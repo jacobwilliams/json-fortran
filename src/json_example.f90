@@ -257,12 +257,12 @@
 
 	!config structure:
 	call json_value_create(inp)			!an object
-	call to_object(inp,'INPUTS')
+	call to_object(inp,'inputs')
 	call json_value_add(p, inp)
 
 	!trajectory structure:
 	call json_value_create(traj)			!an array
-	call to_array(traj,'TRAJECTORY')
+	call to_array(traj,'trajectory')
 	call json_value_add(p, traj)
 
 	write(*,*) ''
@@ -274,8 +274,8 @@
 	call json_value_add(inp, 't0', 				0.1_wp)
 	call json_value_add(inp, 'tf', 				1.1_wp)
 	call json_value_add(inp, 'x0', 				9999.000_wp)
-	call json_value_add(inp, 'current_segment', 1)
-	call json_value_add(inp, 'segment_groups', 	[2,4,99])
+	call json_value_add(inp, 'integer_scalar', 	1)
+	call json_value_add(inp, 'integer_array', 	[2,4,99])
 	call json_value_add(inp, 'names', 			['aaa','bbb','ccc'])
 	call json_value_add(inp, 'logical_scalar',  .true.)
 	call json_value_add(inp, 'logical_vector',  [.true., .false., .true.])
@@ -326,7 +326,7 @@
 
 	!create the object before data can be added:
 	call json_value_create(var)
-	call to_object(var,'VARIABLE')
+	call to_object(var,'')	!name does not matter
 
 	!variable info:
 	call json_value_add(var, 'VARIABLE',trim(variable))
@@ -482,67 +482,67 @@
 		write(*,*) 'get some data from the file...'
 
 		write(*,*) ''
-		call json%get('VERSION_VARS.COP_SVN_REVISION', ival)
+		call json%get('version.svn', ival)
 		if (json_failed()) then
 			call print_error_message()
 		else
-			write(*,*) 'VERSION_VARS.COP_SVN_REVISION = ',ival
+			write(*,*) 'version.svn = ',ival
 		end if
 
 		write(*,*) ''
-		call json%get('SEGMENT_VARS(1).array(2)', cval)
+		call json%get('data(1).array(2)', cval)
 		if (json_failed()) then
 			call print_error_message()
 		else
-			write(*,'(1x,A)') 'SEGMENT_VARS(1).array(2) = '//trim(cval)
+			write(*,'(1x,A)') 'data(1).array(2) = '//trim(cval)
 		end if
 
 		write(*,*) ''
-		call json%get('SPICE_VARS(1)', cval)
+		call json%get('files(1)', cval)
 		if (json_failed()) then
 			call print_error_message()
 		else
-			write(*,'(1x,A)') 'SPICE_VARS(1) = '//trim(cval)
+			write(*,'(1x,A)') 'files(1) = '//trim(cval)
 		end if
 
 		write(*,*) ''
-		call json%get('SPICE_VARS(2)', cval)
+		call json%get('files(2)', cval)
 		if (json_failed()) then
 			call print_error_message()
 		else
-			write(*,'(1x,A)') 'SPICE_VARS(2) = '//trim(cval)
+			write(*,'(1x,A)') 'files(2) = '//trim(cval)
 		end if
 
 		write(*,*) ''
-		call json%get('SPICE_VARS(3)', cval)
+		call json%get('files(3)', cval)
 		if (json_failed()) then
 			call print_error_message()
 		else
-			write(*,*) 'SPICE_VARS(3) = '//trim(cval)
+			write(*,*) 'files(3) = '//trim(cval)
 		end if
 
 		write(*,*) ''
-		call json%get('SEGMENT_VARS(2).blah2', rval)
+		call json%get('data(2).real', rval)
 		if (json_failed()) then
 			call print_error_message()
 		else
-			write(*,*) 'SEGMENT_VARS(2).blah2 = ',rval
+			write(*,*) 'data(2).real = ',rval
 		end if
 
 		write(*,*) ''
-		call json%get('SPICE_VARS[4]', cval)		!has hex characters
+		call json%get('files[4]', cval)		!has hex characters
 		if (json_failed()) then
 			call print_error_message()
 		else
-			write(*,'(1x,A)') 'SPICE_VARS[4] = '//trim(cval)
+			write(*,'(1x,A)') 'files[4] = '//trim(cval)
 		end if
 
 		write(*,*) ''
-		call json%get('SPICE_VARS[5]', cval)		!string with spaces and no escape characters
+		call json%get('files[5]', cval)		!string with spaces and no escape characters
 		if (json_failed()) then
 			call print_error_message()
 		else
-			write(*,'(1x,A)') 'SPICE_VARS[5] = '//trim(cval)
+			write(*,'(1x,A)') 'files[5] = '//trim(cval)
 		end if
 
 		!
@@ -551,19 +551,19 @@
 		!
 		
 		write(*,*) ''
-		call json%get('SPICE_VARS[10]', cval, found)		!value that isn't there
+		call json%get('files[10]', cval, found)		!value that isn't there
 		if (.not. found) then
-			write(*,*) 'SPICE_VARS[10] not in file.'
+			write(*,*) 'files[10] not in file.'
 		else
-			write(*,'(1x,A)') 'SPICE_VARS[10] = '//trim(cval)
+			write(*,'(1x,A)') 'files[10] = '//trim(cval)
 		end if
 
 		write(*,*) ''
-		call json%get('VERSION_VARS.blah', ival, found)		!value that isn't there
+		call json%get('version.blah', ival, found)		!value that isn't there
 		if (.not. found) then
-			write(*,*) 'VERSION_VARS.blah not in file.'
+			write(*,*) 'version.blah not in file.'
 		else
-			write(*,*) 'VERSION_VARS.blah = ',ival
+			write(*,*) 'version.blah = ',ival
 		end if
 
 	end if
