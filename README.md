@@ -91,7 +91,7 @@ Writing a json file is slightly more complicated and involves the use of pointer
 Other Comments
 ---------------
 
-This code is a fork and extensive upgrade of the FSON code that can be found at: <https://github.com/josephalevin/fson>.  It includes many features that the original code did not have, and fixes many of that codes bugs.
+This code is a fork and extensive upgrade of the FSON code that can be found at: <https://github.com/josephalevin/fson>.  It includes many features that the original code did not have, and fixes many of that code's bugs.
 
 More About JSON
 ------------
