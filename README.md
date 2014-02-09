@@ -1,15 +1,12 @@
 json-fortran
 ============
 
-Project Name
----------------
-
-Fortran 2003/2008 JSON API
+A Fortran 2003/2008 JSON API
 
 Brief Description
 ---------------
 
-A mostly complete API for reading and writing JSON files, written in modern Fortran.  The code requires a Fortran compiler that supports various Fortran 2003 and Fortran 2008 features such as: allocatable strings, associate, newunit, generic, class, and abstract interface.  I am using the Intel Fortran compiler 13.1.0 on Linux (the Mac and PC versions should also work fine).  It does not currently compile with the gnu gfortran compiler.
+A mostly-complete API for reading and writing JSON files, written in modern Fortran.  The code requires a Fortran compiler that supports various Fortran 2003 and Fortran 2008 features such as: allocatable strings, associate, newunit, generic, class, and abstract interface.  I am using the Intel Fortran compiler 13.1.0 on Linux (the Mac and PC versions should also work fine).  It does not currently compile with the gnu gfortran compiler.
 
 Reading a JSON file
 ---------------
@@ -22,7 +19,7 @@ Reading a JSON file and getting data from it is fairly straightforward.  Here is
 
         type(json_file) :: json
         logical :: found
-        integer :: ival
+        integer :: i,j,k
 
         ! initialize the module
         call json_initialize()
@@ -35,8 +32,9 @@ Reading a JSON file and getting data from it is fairly straightforward.  Here is
 
         ! extract data from the parsed value
         ! [found can be used to check if the data was really there]
-        call json%get('version.major', ival, found)
-        call json%get('version.minor', ival, found)
+        call json%get('version.major', i, found)
+        call json%get('version.minor', j, found)
+        call json%get('data(1).number', k, found)
 
         ! clean up
         call json%destroy()
@@ -93,7 +91,7 @@ Writing a json file is slightly more complicated and involves the use of pointer
 Other Comments
 ---------------
 
-This code is a fork and extensive upgrade of the FSON code that can be found at: https://github.com/josephalevin/fson
+This code is a fork and extensive upgrade of the FSON code that can be found at: <https://github.com/josephalevin/fson>.  It includes many features that the original code did not have, and fixes many of that codes bugs.
 
 More About JSON
 ------------
