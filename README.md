@@ -71,7 +71,7 @@ Writing a json file is slightly more complicated and involves the use of pointer
         call json_value_add(inp, 't0', 0.1_wp)
         call json_value_add(inp, 'tf', 1.1_wp)
         call json_value_add(inp, 'x0', 9999.0000e0)
-        call json_value_add(inp, 'integer_scalar',)
+        call json_value_add(inp, 'integer_scalar', 787)
         call json_value_add(inp, 'integer_array', [2,4,99])
         call json_value_add(inp, 'names', ['aaa','bbb','ccc'])
         call json_value_add(inp, 'logical_scalar', .true.)
