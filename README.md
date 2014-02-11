@@ -11,7 +11,7 @@ A mostly-complete API for reading and writing JSON files, written in modern Fort
 Reading a JSON file
 ---------------
 
-Reading a JSON file and getting data from it is fairly straightforward.  Here is an exmaple.  See the json_example.f90 file for more examples.
+Reading a JSON file and getting data from it is fairly straightforward.  Here is an example.  See the json_example.f90 file for more examples.
 
     program example1
 
