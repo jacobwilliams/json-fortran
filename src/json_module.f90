@@ -94,33 +94,11 @@
     character(len=*),parameter,public :: json_ext = '.json'            !JSON file extension
     
     character(len=1),parameter :: space = ' '
+    character(len=1),parameter :: newline = char(10)           !new line character
     character(len=*),parameter :: real_fmt = '(E30.16E3)'      !format for real numbers
     character(len=*),parameter :: int_fmt = '(I10)'            !format for integers
 
     logical,parameter :: debug = .false.    !for printing the debug messages
-
-    !public routines:
-    public :: json_initialize            !to initialize the module
-    public :: json_parse                 !read a JSON file and populate the structure
-    public :: json_get                   !get data from the JSON structure
-    public :: json_destroy               !clear a JSON structure
-    public :: json_print                 !print a JSON structure
-    public :: json_clear_exceptions      !clear exceptions
-    public :: json_check_for_errors      !check for error and get error message
-    public :: json_failed                !check for error
-
-    public :: json_value_create          !low-level routines
-    public :: json_value_add
-    public :: json_value_count
-    public :: integer_to_string
-
-    public :: to_logical
-    public :: to_integer
-    public :: to_string
-    public :: to_real
-    public :: to_null
-    public :: to_object
-    public :: to_array
 
     ! The types of data:
     integer,parameter :: json_unknown   = 0
@@ -241,15 +219,7 @@
         end type json_file
     !*********************************************************
 
-    ! Get value
-    ! Use either a 1 based index or member name to get the value.
-    interface json_value_get
-        module procedure get_by_index
-        module procedure get_by_name_chars
-    end interface json_value_get
-    public :: json_value_get
-
-    ! array element callback function
+    !array element callback function
     abstract interface
         subroutine array_callback_func(element, i, count)
             import :: json_value
@@ -259,6 +229,11 @@
             integer,intent(in) :: count    !size of array
         end subroutine array_callback_func
     end interface
+    
+    interface json_value_get
+        module procedure get_by_index
+        module procedure get_by_name_chars
+    end interface json_value_get
 
     interface json_value_add
         module procedure :: json_value_add_member
@@ -267,23 +242,50 @@
         module procedure :: json_value_add_logical, json_value_add_logical_vec
         module procedure :: json_value_add_string,  json_value_add_string_vec
     end interface json_value_add
-
+    
     interface json_get
-        module procedure json_get_by_path
-        module procedure json_get_integer
-        module procedure json_get_double
-        module procedure json_get_logical
-        module procedure json_get_chars
-        module procedure json_get_array
+        module procedure :: json_get_by_path
+        module procedure :: json_get_integer
+        module procedure :: json_get_double
+        module procedure :: json_get_logical
+        module procedure :: json_get_chars
+        module procedure :: json_get_array
     end interface json_get
 
     interface json_print
-        module procedure json_value_print
+        module procedure :: json_value_print
+    end interface
+    
+    interface json_print_to_string
+        module procedure :: json_value_to_string
+    end interface
+    
+    interface json_destroy
+        module procedure :: json_value_destroy
     end interface
 
-    interface json_destroy
-        module procedure json_value_destroy
-    end interface
+    !public routines:
+    public :: json_initialize            !to initialize the module
+    public :: json_destroy               !clear a JSON structure (destructor)
+    public :: json_parse                 !read a JSON file and populate the structure
+    public :: json_clear_exceptions      !clear exceptions
+    public :: json_check_for_errors      !check for error and get error message
+    public :: json_failed                !check for error
+    public :: json_value_get             !use either a 1 based index or member name to get a json_value.
+    public :: json_value_add             !add data to a JSON structure
+    public :: json_get                   !get data from the JSON structure  
+    public :: json_print                 !print the JSON structure to a file
+    public :: json_print_to_string       !write the JSON structure to a string
+    public :: json_value_create          !initialize a json_value pointer
+    public :: json_value_count           !count the number of children
+    public :: to_logical                 !set the data type of a json_value
+    public :: to_integer                 !
+    public :: to_string                  !
+    public :: to_real                    !
+    public :: to_null                    !
+    public :: to_object                  !
+    public :: to_array                   !
+    public :: integer_to_string          !basic integer to string routine
 
     !exception handling [private variables]
     logical :: exception_thrown = .false.            !the error flag
@@ -1796,7 +1798,37 @@
 !********************************************************************************
 
 !********************************************************************************
-    recursive subroutine json_value_print(this, iunit, indent, need_comma, colon)
+    subroutine json_value_to_string(me,str)
+!********************************************************************************
+!****f* json_module/json_value_to_string
+!
+!  NAME
+!    json_value_to_string
+!
+!  DESCRIPTION
+!    Print the JSON structure to an allocatable string.
+!
+!    WARNING: this routine seems to be introducing random line
+!      breaks to the string.  Haven't figured out why yet...
+!
+!  AUTHOR
+!    Jacob Williams : 2/12/2014
+!
+!********************************************************************************
+    implicit none
+    
+    type(json_value),pointer,intent(in)        :: me
+    character(len=:),intent(out),allocatable   :: str
+    
+    str = ''
+    call json_value_print(me, iunit=0, str=str)
+    
+!********************************************************************************
+    end subroutine json_value_to_string
+!********************************************************************************
+    
+!********************************************************************************
+    recursive subroutine json_value_print(this,iunit,indent,need_comma,colon,str)
 !********************************************************************************
 !****f* json_module/json_value_print
 !
@@ -1804,25 +1836,33 @@
 !    json_value_print
 !
 !  DESCRIPTION
-!    Print the JSON structure
+!    Print the JSON structure to a file
 !
 !********************************************************************************
 
     implicit none
 
-    type(json_value),pointer,intent(in) :: this
-    integer,intent(in)                  :: iunit        !file unit to write to (6=console)
-    integer, optional, intent(in)       :: indent
-    logical,intent(in),optional         :: need_comma
-    logical,intent(in),optional         :: colon
+    type(json_value),pointer,intent(in)  :: this
+    integer,intent(in)                   :: iunit        !file unit to write to (6=console)
+    integer,intent(in),optional          :: indent
+    logical,intent(in),optional          :: need_comma
+    logical,intent(in),optional          :: colon
+    character(len=:),intent(inout),allocatable,optional :: str !if iunit==0 and this is present, then the 
+                                                               !structure is printed to this string, rather than a file.
+                                                               !This mode is used by json_value_to_string.
 
     type(json_value), pointer :: element
     integer :: tab, i, count, spaces
     character(len=32) :: tmp    !for val to string conversions
     logical :: print_comma
     logical :: print_spaces
+    logical :: write_file, write_string
 
     if (.not. exception_thrown) then
+        
+        !whether to write a string or a file (one or the other):
+        write_string = (present(str) .and. iunit==0)
+        write_file = .not. write_string
 
         !if the comma will be printed after the value
         ! [comma not printed for the last elements]
@@ -1854,13 +1894,12 @@
 
         associate (d => this%data)
 
-            !select type (d)
             select case (d%var_type)
 
-            !type is (json_object)
             case (json_object)
-
-                write(iunit,fmt='(A)') repeat(space, spaces)//'{'
+                
+                call write_it( repeat(space, spaces)//'{' )
+                 
                 count = json_value_count(this)
                 do i = 1, count
 
@@ -1869,7 +1908,7 @@
 
                     ! print the name
                     if (allocated(element%name)) then
-                        write(iunit,fmt='(A)',advance='NO') repeat(space, spaces)//'"'// trim(element % name)//'": '
+                        call write_it(repeat(space, spaces)//'"'// trim(element % name)//'": ',advance=.false.)
                     else
                         call throw_exception('Error in json_value_print: element%name not allocated')
                         call cleanup()
@@ -1877,20 +1916,15 @@
                     end if
 
                     ! recursive print of the element
-                    call json_value_print(element, iunit=iunit, indent=tab + 1, need_comma=i<count, colon=.true.)
+                    call json_value_print(element, iunit=iunit, indent=tab + 1, need_comma=i<count, colon=.true., str=str)
 
                 end do
 
-                if (print_comma) then
-                    write(iunit,fmt='(A)') repeat(space, spaces)//'}'//','
-                else
-                    write(iunit,fmt='(A)') repeat(space, spaces)//'}'
-                end if
+                call write_it( repeat(space, spaces)//'}', comma=print_comma )
 
-            !type is (json_array)
             case (json_array)
 
-                write(iunit,*) '['
+                call write_it( '[' )
                 count = json_value_count(this)
 
                 do i = 1, count
@@ -1899,89 +1933,49 @@
                     call json_value_get(this, i, element)
 
                     ! recursive print of the element
-                    call json_value_print(element, iunit=iunit, indent=tab + 1, need_comma=i<count)
+                    call json_value_print(element, iunit=iunit, indent=tab + 1, need_comma=i<count, str=str)
 
                 end do
 
-                if (print_comma) then
-                    write(iunit,fmt='(A)') repeat(space, tab * 2)//']'//',' !indent the closing array character
-                else
-                    write(iunit,fmt='(A)') repeat(space, tab * 2)//']'
-                end if
+                call write_it( repeat(space, tab * 2)//']', comma=print_comma ) !indent the closing array character
 
-            !type is (json_null)
             case (json_null)
 
-                if (print_comma) then
-                    write(iunit,fmt='(A)') repeat(space, spaces)//'null'//','
-                else
+                call write_it( repeat(space, spaces)//'null', comma=print_comma )
 
-                    write(iunit,fmt='(A)') repeat(space, spaces)//'null'
-                end if
-
-            !type is (json_string)
             case (json_string)
 
                 if (allocated(d%str_value)) then
-
-                    if (print_comma) then
-                        write(iunit,fmt='(A)') repeat(space, spaces)//'"'// trim(d%str_value)//'"' // ','
-                    else
-                        write(iunit,fmt='(A)') repeat(space, spaces)//'"'// trim(d%str_value)//'"'
-                    end if
+                    call write_it( repeat(space, spaces)//'"'// trim(d%str_value)//'"', comma=print_comma )
                 else
                     call throw_exception('Error in json_value_print: this%value_string not allocated')
                     call cleanup()
                     return
                 end if
 
-            !type is (json_logical)
             case (json_logical)
 
                 if (d%log_value) then
-
-                    if (print_comma) then
-                        write(iunit,fmt='(A)') repeat(space, spaces)// 'true' // ','
-                    else
-                        write(iunit,fmt='(A)') repeat(space, spaces)// 'true'
-                    end if
-
+                    call write_it( repeat(space, spaces)// 'true', comma=print_comma )
                 else
-
-                    if (print_comma) then
-                        write(iunit,fmt='(A)') repeat(space, spaces)//'false'//','
-                    else
-                        write(iunit,fmt='(A)') repeat(space, spaces)//'false'
-                    end if
-
+                    call write_it( repeat(space, spaces)//'false', comma=print_comma )
                 end if
 
-            !type is (json_integer)
             case (json_integer)
 
                 call integer_to_string(d%int_value,tmp)
 
-                if (print_comma) then
-                    write(iunit,fmt='(A)') repeat(space, spaces)//trim(tmp)//','
-                else
-                    write(iunit,fmt='(A)') repeat(space, spaces)//trim(tmp)
-                end if
+                call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
 
-            !type is (json_real)
             case (json_real)
 
                 call real_to_string(d%dbl_value,tmp)
 
-                if (print_comma) then
-                    write(iunit,fmt='(A)') repeat(space, spaces)//trim(tmp)//','
-                else
-                    write(iunit,fmt='(A)') repeat(space, spaces)//trim(tmp)
-                end if
+                call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
 
-            !class default
             case default
 
-                call throw_exception('Error in json_value_print: unknown class')
+                call throw_exception('Error in json_value_print: unknown data type')
 
             end select
 
@@ -1997,6 +1991,8 @@
     !**********************************************
         subroutine cleanup()
     !**********************************************
+    ! cleanup routine
+    !**********************************************
         implicit none
 
         if (associated(element)) nullify(element)
@@ -2004,6 +2000,59 @@
     !**********************************************
         end subroutine cleanup
     !**********************************************
+    
+    !**********************************************
+        subroutine write_it(s,advance,comma)
+    !**********************************************
+    ! write the string to the file 
+    ! (or the output string)
+    !**********************************************
+        implicit none
+
+        character(len=*),intent(in) :: s
+        logical,intent(in),optional :: advance
+        logical,intent(in),optional :: comma
+       
+        logical :: add_line_break, add_comma
+        character(len=:),allocatable :: s2
+        
+        if (present(comma)) then
+            add_comma = comma
+        else
+            add_comma = .false. !default is not to add comma
+        end if
+         
+        if (present(advance)) then
+            add_line_break = advance
+        else
+            add_line_break = .true. !default is to advance
+        end if
+        
+        !string to print:
+        s2 = s
+        if (add_comma) s2 = s2 // ','
+        
+        if (write_file) then
+        
+        	if (add_line_break) then
+                write(iunit,fmt='(A)') s2
+        	else
+                write(iunit,fmt='(A)',advance='NO') s2
+        	end if
+        	
+        else	!write string
+        
+            str = str // s2
+            if (add_line_break) str = str // newline
+            
+        end if
+        
+        !cleanup:
+        if (allocated(s2)) deallocate(s2)
+        
+    !**********************************************
+        end subroutine write_it
+    !********************************************** 
 
 !********************************************************************************
     end subroutine json_value_print

@@ -150,6 +150,8 @@
     write(*,*) '   MEMORY LEAK TEST'
     write(*,*) '================================='
     write(*,*) ''
+    
+    i = 0
 
     do
 
@@ -169,7 +171,10 @@
 !**************************************************************
 !
 !    Populate a JSON structure, write it to a file,
-!        then read it.
+!        then read it.  
+!
+!    Also tests the json_value_to_string routine to write
+!     the file to a character string.
 !
 !**************************************************************
     implicit none
@@ -180,6 +185,7 @@
     integer :: i
     character(len=10) :: istr
     integer :: iunit
+    character(len=:),allocatable :: string
 
     write(*,*) ''
     write(*,*) '================================='
@@ -205,13 +211,21 @@
     nullify(inp)
 
     write(*,*) ''
-    write(*,*) 'write file'
+    write(*,*) 'write to file'
 
     !write the file:
     open(newunit=iunit, file=dir//filename4, status='REPLACE')
     call json_print(p,iunit)
     close(iunit)
 
+    write(*,*) ''
+    write(*,*) 'write to string'
+    write(*,*) ''
+    !write it to a string, and print to console:
+    call json_print_to_string(p, string)
+    write(*,*) string
+    deallocate(string)  !cleanup
+    
     !cleanup:
     call json_destroy(p)
 
