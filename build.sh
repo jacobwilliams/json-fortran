@@ -11,8 +11,8 @@ BUILDDIR='lib/'
 BINDIR='bin/'
 
 FCOMPILER='ifort'
-#FCOMPILERFLAGS='-O2'
-FCOMPILERFLAGS='-check all -debug full'
+FCOMPILERFLAGS='-O2'
+#FCOMPILERFLAGS='-check all -debug full'
 
 ARCHIVER='ar'
 ARCHIVERFLAGS='-cq'
