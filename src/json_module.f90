@@ -2031,13 +2031,13 @@
         
         if (write_file) then
         
-        	if (add_line_break) then
+            if (add_line_break) then
                 write(iunit,fmt='(A)') s2
-        	else
+            else
                 write(iunit,fmt='(A)',advance='NO') s2
-        	end if
-        	
-        else	!write string
+            end if
+            
+        else    !write string
         
             str = str // s2
             if (add_line_break) str = str // newline
