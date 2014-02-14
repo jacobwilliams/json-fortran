@@ -1808,11 +1808,8 @@
 !  DESCRIPTION
 !    Print the JSON structure to an allocatable string.
 !
-!    WARNING: this routine seems to be introducing random line
-!      breaks to the string.  Haven't figured out why yet...
-!
 !  AUTHOR
-!    Jacob Williams : 2/12/2014
+!    Jacob Williams : 2/13/2014
 !
 !********************************************************************************
     implicit none

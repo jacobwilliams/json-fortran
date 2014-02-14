@@ -223,7 +223,7 @@
     write(*,*) ''
     !write it to a string, and print to console:
     call json_print_to_string(p, string)
-    write(*,*) string
+    write(*,'(A)') string
     deallocate(string)  !cleanup
     
     !cleanup:
