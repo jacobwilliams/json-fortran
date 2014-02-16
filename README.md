@@ -30,7 +30,7 @@ Reading a JSON file and getting data from it is fairly straightforward.  Here is
         ! print the file to the console
         call json%print_file()
 
-        ! extract data from the parsed value
+        ! extract data from the file
         ! [found can be used to check if the data was really there]
         call json%get('version.major', i, found)
         call json%get('version.minor', j, found)
