@@ -101,14 +101,14 @@
     logical,parameter :: debug = .false.    !for printing the debug messages
 
     ! The types of data:
-    integer,parameter :: json_unknown   = 0
-    integer,parameter :: json_null      = 1
-    integer,parameter :: json_object    = 2
-    integer,parameter :: json_array     = 3
-    integer,parameter :: json_logical   = 4
-    integer,parameter :: json_integer   = 5
-    integer,parameter :: json_real      = 6
-    integer,parameter :: json_string    = 7
+    integer,parameter,public :: json_unknown   = 0
+    integer,parameter,public :: json_null      = 1
+    integer,parameter,public :: json_object    = 2
+    integer,parameter,public :: json_array     = 3
+    integer,parameter,public :: json_logical   = 4
+    integer,parameter,public :: json_integer   = 5
+    integer,parameter,public :: json_real      = 6
+    integer,parameter,public :: json_string    = 7
 
     type :: json_data_non_polymorphic
 
@@ -230,7 +230,7 @@
         end subroutine array_callback_func
     end interface
     
-    interface json_value_get
+    interface json_value_get                    !consider renaming this json_value_get_child
         module procedure get_by_index
         module procedure get_by_name_chars
     end interface json_value_get
@@ -278,6 +278,7 @@
     public :: json_print_to_string       !write the JSON structure to a string
     public :: json_value_create          !initialize a json_value pointer
     public :: json_value_count           !count the number of children
+    public :: json_info                  !get info about a json_value
     public :: to_logical                 !set the data type of a json_value
     public :: to_integer                 !
     public :: to_string                  !
@@ -355,7 +356,7 @@
 
     class(json_file),intent(inout) :: me
 
-    call json_value_destroy(me%p)
+    if (associated(me%p)) call json_value_destroy(me%p)
 
 !********************************************************************************
     end subroutine destroy_json_file
@@ -468,9 +469,8 @@
 
     if (found) then
 
-        !get other info:
-        var_type = p%data%var_type
-        n_children = json_value_count(p)    !number of children
+        !get info:
+        call json_info(p,var_type,n_children)
 
     else
 
@@ -487,6 +487,38 @@
     end subroutine variable_info_in_file
 !********************************************************************************
 
+!********************************************************************************
+    subroutine json_info(p,var_type,n_children)
+!********************************************************************************
+!****f* json_module/json_info
+!
+!  NAME
+!    json_info
+!
+!  USAGE
+!    call me%info(path,found,var_type,n_children)
+!
+!  DESCRIPTION
+!    Returns information about a json_value
+!
+!  AUTHOR
+!    Jacob Williams : 2/13/2014
+!
+!********************************************************************************
+
+    implicit none
+
+    type(json_value),pointer        :: p
+    integer,intent(out),optional    :: var_type
+    integer,intent(out),optional    :: n_children
+        
+    if (present(var_type))    var_type = p%data%var_type        !variable type
+    if (present(n_children))  n_children = json_value_count(p)  !number of children
+    
+!********************************************************************************
+    end subroutine json_info
+!********************************************************************************
+    
 !********************************************************************************
     subroutine get_object_from_json_file(me, path, p, found)
 !********************************************************************************
@@ -1671,20 +1703,24 @@
     if (.not. exception_thrown) then
 
         count = 0
+        
+        if (associated(this)) then
 
-        if (associated(this%children)) then
+            if (associated(this%children)) then
 
-            p => this%children
+                p => this%children
 
-            do while (associated(p))
-                count = count + 1
-                p => p%next
-            end do
+                do while (associated(p))
+                    count = count + 1
+                    p => p%next
+                end do
 
-            nullify(p)
+                nullify(p)
 
+            end if
+            
         end if
-
+        
     end if
 
 !********************************************************************************
@@ -1700,7 +1736,7 @@
 !    get_by_index
 !
 !  DESCRIPTION
-!
+!    Returns a child in the object given the index.
 !
 !********************************************************************************
 
@@ -1752,12 +1788,7 @@
 !    get_by_name_chars
 !
 !  DESCRIPTION
-!
-!  NOTES
-!    This is a case-sensitive match.
-!
-!  TODO
-!    Maybe add an option for case insensitive files.
+!    Returns a child in the object given the name string.
 !
 !********************************************************************************
 
@@ -1809,7 +1840,7 @@
 !    Print the JSON structure to an allocatable string.
 !
 !  AUTHOR
-!    Jacob Williams : 2/13/2014
+!    Jacob Williams : 2/12/2014
 !
 !********************************************************************************
     implicit none
@@ -1886,7 +1917,7 @@
         else
             spaces = 0
         end if
-
+        
         nullify(element)
 
         associate (d => this%data)
@@ -2128,7 +2159,10 @@
                     cycle
                 end if
 
-                if (.not.associated(p)) return
+                if (.not.associated(p)) then
+                    call throw_exception('Error in json_get_by_path: Error getting child member.')
+                    exit
+                end if
 
                 child_i = i+1
 
@@ -2150,8 +2184,10 @@
                     child_i = i + 1
                     cycle
                 end if
-                if (.not.associated(p)) return
-
+                if (.not.associated(p)) then
+                    call throw_exception('Error in json_get_by_path: Error getting array element')
+                    exit
+                end if
                 child_i = i + 1
 
             case (']',')')
@@ -2190,8 +2226,16 @@
                 p => tmp
                 nullify(tmp)
             end if
-            if (present(found)) found = .true.    !everything seems to be ok
-
+            if (associated(p)) then
+                if (present(found)) found = .true.    !everything seems to be ok
+            else
+                call throw_exception('Error in json_get_by_path: variable not found: '//trim(path))
+                if (present(found)) then
+                    found = .false.
+                    call json_clear_exceptions()
+                end if
+            end if
+            
         end if
 
     else
