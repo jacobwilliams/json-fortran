@@ -224,7 +224,7 @@
         subroutine array_callback_func(element, i, count)
             import :: json_value
             implicit none
-            type(json_value), pointer :: element
+            type(json_value), pointer,intent(in) :: element
             integer,intent(in) :: i        !index
             integer,intent(in) :: count    !size of array
         end subroutine array_callback_func
