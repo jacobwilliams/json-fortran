@@ -12,7 +12,7 @@ Reading a JSON file
 ---------------
 
 Reading a JSON file and getting data from it is fairly straightforward.  Here is an example.  See the json_example.f90 file for more examples.
-
+```fortran
     program example1
 
         use json_module
@@ -40,13 +40,13 @@ Reading a JSON file and getting data from it is fairly straightforward.  Here is
         call json%destroy()
 
     end program example1
-
+```
 
 Writing a JSON file
 ---------------
 
 Writing a json file is slightly more complicated and involves the use of pointers.  See the json_example.f90 file for more examples.
-
+```fortran
     program example2
 
         use json_module
@@ -87,7 +87,7 @@ Writing a json file is slightly more complicated and involves the use of pointer
         call json_destroy(p)
     
     end program example2
-
+```
 Other Comments
 ---------------
 
