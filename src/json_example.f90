@@ -333,7 +333,6 @@
     real(wp),dimension(:),intent(in) :: rdata
 
     type(json_value),pointer :: var        !a variable in the trajectory:
-    integer :: i
 
     !initialize:
     nullify(var)

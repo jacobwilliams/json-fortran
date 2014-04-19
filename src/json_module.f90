@@ -2577,7 +2577,6 @@
 
     type(json_value), pointer :: p
     character(len=:),allocatable :: s,pre,post
-    integer :: irep
     integer :: j,jprev,n
     character(len=1) :: c
 
@@ -2856,7 +2855,6 @@
     character(len=*),intent(in) :: file
     type(json_value),pointer    :: p
 
-    logical :: unit_available
     integer :: iunit
     integer :: istat
 
