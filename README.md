@@ -6,7 +6,7 @@ A Fortran 2003/2008 JSON API
 Brief Description
 ---------------
 
-A mostly-complete API for reading and writing JSON files, written in modern Fortran.  The code requires a Fortran compiler that supports various Fortran 2003 and Fortran 2008 features such as: allocatable strings, associate, newunit, generic, class, and abstract interface.  I am using the Intel Fortran compiler 13.1.0 on Linux (the Mac and PC versions should also work fine).  It does not currently compile with the gnu gfortran compiler.  The source code is a single Fortran module file (json_module.f90).
+A mostly-complete API for reading and writing JSON files, written in modern Fortran.  The code requires a Fortran compiler that supports various Fortran 2003 and Fortran 2008 features such as: allocatable strings, associate, newunit, generic, class, and abstract interface.  I am using the Intel Fortran compiler 13.1.0 on Linux (the Mac and PC versions should also work fine).  It also currently compiles under recent experimental 4.9 release of the gnu gfortran compiler.  The source code is a single Fortran module file (json_module.f90).
 
 Reading a JSON file
 ---------------

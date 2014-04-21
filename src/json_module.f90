@@ -224,7 +224,7 @@
         subroutine array_callback_func(element, i, count)
             import :: json_value
             implicit none
-            type(json_value), pointer :: element
+            type(json_value), pointer,intent(in) :: element
             integer,intent(in) :: i        !index
             integer,intent(in) :: count    !size of array
         end subroutine array_callback_func
@@ -1920,9 +1920,9 @@
         
         nullify(element)
 
-        associate (d => this%data)
+        !associate (d => this%data)
 
-            select case (d%var_type)
+            select case (this%data%var_type)
 
             case (json_object)
                 
@@ -1973,8 +1973,8 @@
 
             case (json_string)
 
-                if (allocated(d%str_value)) then
-                    call write_it( repeat(space, spaces)//'"'// trim(d%str_value)//'"', comma=print_comma )
+                if (allocated(this%data%str_value)) then
+                    call write_it( repeat(space, spaces)//'"'// trim(this%data%str_value)//'"', comma=print_comma )
                 else
                     call throw_exception('Error in json_value_print: this%value_string not allocated')
                     call cleanup()
@@ -1983,7 +1983,7 @@
 
             case (json_logical)
 
-                if (d%log_value) then
+                if (this%data%log_value) then
                     call write_it( repeat(space, spaces)// 'true', comma=print_comma )
                 else
                     call write_it( repeat(space, spaces)//'false', comma=print_comma )
@@ -1991,13 +1991,13 @@
 
             case (json_integer)
 
-                call integer_to_string(d%int_value,tmp)
+                call integer_to_string(this%data%int_value,tmp)
 
                 call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
 
             case (json_real)
 
-                call real_to_string(d%dbl_value,tmp)
+                call real_to_string(this%data%dbl_value,tmp)
 
                 call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
 
@@ -2007,7 +2007,7 @@
 
             end select
 
-        end associate
+        !end associate
 
         call cleanup()
 
@@ -2362,14 +2362,14 @@
 
         else
 
-            associate (d => p%data)
-                select case(d%var_type)
+            !associate (d => p%data)
+                select case(p%data%var_type)
                 case (json_integer)
-                    value = d%int_value
+                    value = p%data%int_value
                 case (json_real)
-                    value = d%dbl_value
+                    value = p%data%dbl_value
                 case (json_logical)
-                    if (d%log_value) then
+                    if (p%data%log_value) then
                         value = 1
                     else
                         value = 0
@@ -2377,7 +2377,7 @@
                 case default
                     call throw_exception('Error in get_integer: Unable to resolve value to integer: '//trim(path))
                 end select
-            end associate
+            !end associate
 
             nullify(p)
 
@@ -2441,14 +2441,14 @@
 
         else
 
-            associate (d => p%data)
-                select case (d%var_type)
+            !associate (d => p%data)
+                select case (p%data%var_type)
                 case (json_integer)
-                    value = d%int_value
+                    value = p%data%int_value
                 case (json_real)
-                    value = d%dbl_value
+                    value = p%data%dbl_value
                 case (json_logical)
-                    if (d%log_value) then
+                    if (p%data%log_value) then
                         value = 1.0_wp
                     else
                         value = 0.0_wp
@@ -2456,7 +2456,7 @@
                 case default
                     call throw_exception('Error in json_get_double: Unable to resolve value to double: '//trim(path))
                 end select
-            end associate
+            !end associate
 
             nullify(p)
 
@@ -2520,16 +2520,16 @@
 
         else
 
-            associate (d => p%data)
-                select case (d%var_type)
+            !associate (d => p%data)
+                select case (p%data%var_type)
                 case (json_integer)
-                    value = (d%int_value > 0)
+                    value = (p%data%int_value > 0)
                 case (json_logical)
-                    value = d % log_value
+                    value = p%data % log_value
                 case default
                     call throw_exception('Error in json_get_logical: Unable to resolve value to logical: '//trim(path))
                 end select
-            end associate
+            !end associate
 
             nullify(p)
 
@@ -2577,7 +2577,6 @@
 
     type(json_value), pointer :: p
     character(len=:),allocatable :: s,pre,post
-    integer :: irep
     integer :: j,jprev,n
     character(len=1) :: c
 
@@ -2597,13 +2596,13 @@
 
         else
 
-            associate (d => p%data)
-                select case (d%var_type)
+            !associate (d => p%data)
+                select case (p%data%var_type)
                 case (json_string)
-                    if (allocated(d%str_value)) then
+                    if (allocated(p%data%str_value)) then
 
                         !get the value as is:
-                        s = d%str_value
+                        s = p%data%str_value
 
                         ! Now, have to remove the escape characters:
                         !
@@ -2726,7 +2725,7 @@
                     ! Note: for the other cases, we could do val to string conversions... TO DO
 
                 end select
-            end associate
+            !end associate
 
         end if
 
@@ -2798,8 +2797,8 @@
 
         else
 
-            associate (d => p%data)
-                select case (d%var_type)
+            !associate (d => p%data)
+                select case (p%data%var_type)
                 case (json_array)
                     count = json_value_count(p)
                     do i = 1, count
@@ -2809,7 +2808,7 @@
                 case default
                     call throw_exception('Error in json_get_array: Resolved value is not an array. '//trim(path))
                 end select
-            end associate
+            !end associate
 
             !cleanup:
             if (associated(p))       nullify(p)
@@ -2856,7 +2855,6 @@
     character(len=*),intent(in) :: file
     type(json_value),pointer    :: p
 
-    logical :: unit_available
     integer :: iunit
     integer :: istat
 
@@ -2969,14 +2967,14 @@
                 ! string
                 call to_string(value)    !allocate class
 
-                 associate (d => value%data)
-                    !select type (d)
-                    select case (d%var_type)
+                 !associate (d => value%data)
+                    !select type (value%data)
+                    select case (value%data%var_type)
                     !type is (json_string)
                     case (json_string)
-                        call parse_string(unit, d%str_value)
+                        call parse_string(unit, value%data%str_value)
                     end select
-                end associate
+                !end associate
 
             case ('t')
 
@@ -3036,16 +3034,16 @@
     logical,intent(in),optional            :: val
 
     !set type and value:
-    associate (d => me%data)
-        call d%destroy()
-        d%var_type = json_logical
-        allocate(d%log_value)
+    !associate (d => me%data)
+        call me%data%destroy()
+        me%data%var_type = json_logical
+        allocate(me%data%log_value)
         if (present(val)) then
-            d%log_value = val
+            me%data%log_value = val
         else
-            d%log_value = .false.    !default value
+            me%data%log_value = .false.    !default value
         end if
-    end associate
+    !end associate
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -3076,16 +3074,16 @@
     integer,intent(in),optional            :: val
 
     !set type and value:
-    associate (d => me%data)
-        call d%destroy()
-        d%var_type = json_integer
-        allocate(d%int_value)
+    !associate (d => me%data)
+        call me%data%destroy()
+        me%data%var_type = json_integer
+        allocate(me%data%int_value)
         if (present(val)) then
-            d%int_value = val
+            me%data%int_value = val
         else
-            d%int_value = 0    !default value
+            me%data%int_value = 0    !default value
         end if
-    end associate
+    !end associate
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -3117,16 +3115,16 @@
     real(wp),intent(in),optional           :: val
 
     !set type and value:
-    associate (d => me%data)
-        call d%destroy()
-        d%var_type = json_real
-        allocate(d%dbl_value)
+    !associate (d => me%data)
+        call me%data%destroy()
+        me%data%var_type = json_real
+        allocate(me%data%dbl_value)
         if (present(val)) then
-            d%dbl_value = val
+            me%data%dbl_value = val
         else
-            d%dbl_value = 0.0_wp    !default value
+            me%data%dbl_value = 0.0_wp    !default value
         end if
-    end associate
+    !end associate
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -3158,15 +3156,15 @@
     character(len=*),intent(in),optional   :: val
 
     !set type and value:
-    associate (d => me%data)
-        call d%destroy()
-        d%var_type = json_string
+    !associate (d => me%data)
+        call me%data%destroy()
+        me%data%var_type = json_string
         if (present(val)) then
-            d%str_value = val
+            me%data%str_value = val
         else
-            d%str_value = ''    !default value
+            me%data%str_value = ''    !default value
         end if
-    end associate
+    !end associate
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -3197,10 +3195,10 @@
     character(len=*),intent(in),optional   :: name
 
     !set type and value:
-    associate (d => me%data)
-        call d%destroy()
-        d%var_type = json_null
-    end associate
+    !associate (d => me%data)
+        call me%data%destroy()
+        me%data%var_type = json_null
+    !end associate
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -3231,10 +3229,10 @@
     character(len=*),intent(in),optional   :: name
 
     !set type and value:
-    associate (d => me%data)
-        call d%destroy()
-        d%var_type = json_object
-    end associate
+    !associate (d => me%data)
+        call me%data%destroy()
+        me%data%var_type = json_object
+    !end associate
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -3264,10 +3262,10 @@
     character(len=*),intent(in),optional   :: name
 
     !set type and value:
-    associate (d => me%data)
-        call d%destroy()
-        d%var_type = json_array
-    end associate
+    !associate (d => me%data)
+        call me%data%destroy()
+        me%data%var_type = json_array
+    !end associate
 
     !name:
     if (present(name)) me%name = trim(name)
