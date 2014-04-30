@@ -8,6 +8,22 @@ Brief Description
 
 A mostly-complete API for reading and writing JSON files, written in modern Fortran.  The code requires a Fortran compiler that supports various Fortran 2003 and Fortran 2008 features such as: allocatable strings, associate, newunit, generic, class, and abstract interface.  I am using the Intel Fortran compiler 13.1.0 on Linux (the Mac and PC versions should also work fine).  It also currently compiles under recent experimental 4.9 release of the gnu gfortran compiler.  The source code is a single Fortran module file (json_module.f90).
 
+Building the Library
+--------------------
+Currently two way are provided to build the jsonfortran library (libjsonfortran). A build script, build.sh is provided in the project root directory. Additionally, a [CMake](www.cmake.org) build system is provided. This build system has been tested on Mac and Linux using the Intel Fortran Compiler. It has not been tested on Windows. This CMake based build provides an install target, and exports from both the install location and the build location so that building and using json-fortran in another CMake based project is trivial. To get started with the CMake based build, set the environment variable `FC` to point to your Fortran compiler, and create a build directory. Then `(cmake-gui|ccmake|cmake) /path/to/json-fortran` to configure, `make` to build and `make install` to optionally install. As long as the project is built with CMake other CMake projects can find it and link against it:
+
+```CMake
+cmake_minimum_required ( VERSION 2.8 FATAL_ERROR )
+enable_language ( Fortran )
+project ( jf_test NONE )
+
+find_package ( jsonfortran 1.0.0 REQUIRED )
+
+add_executable ( json_example src/json_example.f90 )
+target_include_directories ( json_example BEFORE PUBLIC ${jsonfortran_INCLUDE_DIRS} )
+target_link_libraries ( json_example jsonfortran-static )
+```
+
 Reading a JSON file
 ---------------
 

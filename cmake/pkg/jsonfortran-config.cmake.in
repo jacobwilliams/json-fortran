@@ -1,0 +1,15 @@
+# Config file for the INSTALLED package
+# Allow other CMake projects to find this package if it is installed
+# Requires the use of the standard CMake module CMakePackageConfigHelpers
+
+set ( @CMAKE_PROJECT_NAME@_VERSION @version@ )
+
+@PACKAGE_INIT@
+
+
+# Provide the targets
+set_and_check ( @CMAKE_PROJECT_NAME@_CONFIG_INSTALL_DIR "@PACKAGE_EXPORT_INSTALL_DIR@" )
+include ( "${@CMAKE_PROJECT_NAME@_CONFIG_INSTALL_DIR}/@CMAKE_PROJECT_NAME@-targets.cmake" )
+
+# Make the module files available via include
+set_and_check ( @CMAKE_PROJECT_NAME@_INCLUDE_DIRS "@PACKAGE_INSTALL_MOD_DIR@" )
