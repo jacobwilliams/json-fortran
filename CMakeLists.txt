@@ -89,6 +89,16 @@ install ( TARGETS ${LIB_NAME} ${LIB_NAME}-static
 set ( INSTALL_MOD_DIR "${CMAKE_INSTALL_INCLUDEDIR}/fortran/${CMAKE_Fortran_COMPILER_ID}-compiler" )
 install ( DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/ DESTINATION  "${INSTALL_MOD_DIR}" )
 
+#------------------------------------------
+# Add portable unistall command to makefile
+#------------------------------------------
+# Adapted from the CMake Wiki FAQ
+configure_file ( "${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in" "${CMAKE_BINARY_DIR}/uninstall.cmake"
+    @ONLY)
+
+add_custom_target ( uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/uninstall.cmake )
+
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
 #-----------------------------------------------------
