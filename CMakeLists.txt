@@ -1,4 +1,4 @@
-# CMake Configuration and build added by Izaak Beekman -- April, 2014
+# CMake Configuration and build added by Izaak Beekman -- May, 2014
 #
 # Copy right (c) 2014, Izaak Beekman
 # All rights reserved.
@@ -11,10 +11,15 @@
 
 cmake_minimum_required ( VERSION 2.8 FATAL_ERROR )
 
-#include ( cmake/OutOfSourceCheck.cmake ) # default to out of source builds
-#include ( cmake/BuildSettings.cmake ) # Release, RelWithDebInfo, etc.
+# Set the type/configuration of build to perform
+set ( CMAKE_CONFIGURATION_TYPES "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
+set ( CMAKE_BUILD_TYPE "Release"
+  CACHE STRING "Select which configuration to build." )
+set_property ( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
+
+
 enable_language ( Fortran )
-#include ( cmake/CompilerCompatibilityCheck.cmake )
+include ( cmake/pickFortranCompilerFlags.cmake )
 
 # Check for in-source builds and error out if found
 # Provides an advanced option to allow in source builds
@@ -64,6 +69,11 @@ set_target_properties ( ${LIB_NAME}-static
 set_target_properties ( ${LIB_NAME}
   PROPERTIES
   SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR} )
+
+#---------------------------------------------------------------------
+# Add some tests to ensure that the software is performing as expected
+#---------------------------------------------------------------------
+
 
 #-------------------------------------
 # Define where our files get installed
