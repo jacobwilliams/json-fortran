@@ -1,7 +1,9 @@
 #!/bin/sh
 
 #
-#  Build the json library and example program on Linux using ifort
+#  This is just a simple script to 
+#  build the json-fortran library and 
+#  example program on Linux.
 #
 #  Jacob Williams : 2/8/2014
 #
@@ -35,6 +37,8 @@ ARCHIVERFLAGS='-cq'
 FEXT='.f90'
 OBJEXT='.o'
 LIBEXT='.a'
+MODEXT='.mod'
+WC='*'
 
 LIBOUT='libjson'
 EXEOUT='json'
@@ -45,6 +49,11 @@ EXAMPLECODE='json_example'
 #output directories:
 mkdir -p $BUILDDIR
 mkdir -p $BINDIR
+
+#clean build:
+rm -f $BUILDDIR$WC$OBJEXT
+rm -f $BUILDDIR$WC$MODEXT
+rm -f $BUILDDIR$WC$LIBEXT
 
 #build library:
 $FCOMPILER $FCOMPILERFLAGS -c $SRCDIR$MODCODE$FEXT $FCMODULEPATHFLAG$BUILDDIR

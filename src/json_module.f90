@@ -2855,22 +2855,20 @@
     character(len=*),intent(in) :: file
     type(json_value),pointer    :: p
 
-    integer :: iunit
-    integer :: istat
-
-    character(len=256) :: line
+    integer :: iunit, istat
+    character(len=:),allocatable :: line
 
     !clean any exceptions and initialize:
     call json_initialize()
 
     ! open the file
-    open (    newunit     = iunit, &
-            file         = file, &
-            status         = 'OLD', &
-            action         = 'READ', &
-            form         = 'FORMATTED', &
-            position     = 'REWIND', &
-            iostat        = istat)
+    open (  newunit     = iunit, &
+            file        = file, &
+            status      = 'OLD', &
+            action      = 'READ', &
+            form        = 'FORMATTED', &
+            position    = 'REWIND', &
+            iostat      = istat)
 
     if (istat==0) then
 
@@ -2888,10 +2886,10 @@
         !   can print the line where the error occurred:
         !
         if (exception_thrown) then
-            backspace(iunit)
-            read(iunit, fmt='(A256)',iostat=istat) line
+            call get_current_line_from_file(iunit,line)
             if (istat==0) err_message = err_message//new_line(' ')//&
-                                        '   Error in line: '//trim(line)
+                                        'Offending line: '//trim(line)
+            if (allocated(line)) deallocate(line)
         end if
 
         ! close the file
@@ -2909,6 +2907,57 @@
     end subroutine json_parse
 !********************************************************************************
 
+!********************************************************************************
+    subroutine get_current_line_from_file(iunit,line)
+!********************************************************************************
+!****f* json_module/get_current_line_from_file
+!
+!  NAME
+!    get_current_line_from_file
+!
+!  DESCRIPTION
+!    Rewind the file to the beginning of the current line, and return this line.
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!********************************************************************************
+    
+    implicit none
+    
+    integer,intent(in)    :: iunit
+    character(len=:),allocatable,intent(out)    :: line
+    
+    integer,parameter           :: n_chunk = 256      !chunk size [arbitrary]
+    character(len=*),parameter  :: nfmt = '(A256)'    !corresponding format statement
+    
+    character(len=n_chunk) :: chunk
+    integer :: istat,isize
+    
+    !initialize:
+    line = ''
+
+    !rewind to beginning of the current record:
+    backspace(iunit, iostat=istat)
+
+    !loop to read in all the characters in the current record.
+    ![the line is read in chunks until the end of the line is reached]
+    if (istat==0) then
+        do
+            read(iunit,fmt=nfmt,advance='NO',size=isize,iostat=istat) chunk
+            if (istat==0) then            
+                line = line//chunk
+            else
+                if (isize>0) line = line//chunk(1:isize)
+                exit
+            end if
+        end do
+    end if
+    
+!********************************************************************************
+    end subroutine get_current_line_from_file
+!********************************************************************************
+    
 !********************************************************************************
     recursive subroutine parse_value(unit, value)
 !********************************************************************************

@@ -605,7 +605,7 @@
 
     !print it if there is one:
     if (.not. status_ok) then
-        write(*,*) error_msg
+        write(*,'(A)') error_msg
         deallocate(error_msg)
         call json_clear_exceptions()
     end if
