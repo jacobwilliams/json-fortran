@@ -43,6 +43,8 @@ find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 1.0.0 REQUIRED )
 add_executable ( json_example src/json_example.f90 )
 target_include_directories ( json_example BEFORE PUBLIC ${jsonfortran_INCLUDE_DIRS} )
 target_link_libraries ( json_example jsonfortran-static )
+# or for linking against the dynamic/shared library:
+# target_link_libraries ( json_example jsonfortran ) # instead
 ```
 
 Reading a JSON file

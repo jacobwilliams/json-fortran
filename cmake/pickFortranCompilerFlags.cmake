@@ -1,6 +1,6 @@
 if ( NOT Fortran_FLAGS_INIT )
   set ( Fortran_FLAGS_INIT TRUE )
-  set ( CALL_STACK_BACK_TRACE TRUE CACHE BOOL
+  set ( ENABLE_BACK_TRACE TRUE CACHE BOOL
     "Enable backtraces on unexpected runtime errors? (Recommended)" )
   set ( ENABLE_COMPILE_TIME_WARNINGS TRUE CACHE BOOL
     "Enable diagnostic warnings at compile time? (Recommended)" )
@@ -9,9 +9,9 @@ if ( NOT Fortran_FLAGS_INIT )
   mark_as_advanced ( ENABLE_RUNTIME_CHECKS )
 
   if ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel" )
-    if ( CALL_STACK_BACK_TRACE )
+    if ( ENABLE_BACK_TRACE )
       add_compile_options ( -traceback )
-    endif ( CALL_STACK_BACK_TRACE )
+    endif ( ENABLE_BACK_TRACE )
     if ( ENABLE_COMPILE_TIME_WARNINGS )
       # The following warning might be triggered by ifort unless explicitly silenced:
       # warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure 
@@ -23,9 +23,9 @@ if ( NOT Fortran_FLAGS_INIT )
       add_compile_options ( -check all )
     endif ( ENABLE_RUNTIME_CHECKS )
   elseif ( "{CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
-    if ( CALL_STACK_BACK_TRACE )
+    if ( ENABLE_BACK_TRACE )
       add_compile_options ( -fbacktrace )
-    endif ( CALL_STACK_BACK_TRACE )
+    endif ( ENABLE_BACK_TRACE )
     if ( ENABLE_COMPILETIME_CHECKS )
       add_compile_options ( -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008 )
     endif ( ENABLE_COMPILETIME_CHECKS )

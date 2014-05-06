@@ -19,7 +19,7 @@ set_property ( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYP
 
 
 enable_language ( Fortran )
-include ( cmake/pickFortranCompilerFlags.cmake )
+include ( "cmake/pickFortranCompilerFlags.cmake" )
 
 # Check for in-source builds and error out if found
 # Provides an advanced option to allow in source builds
@@ -39,6 +39,8 @@ set ( VERSION_MINOR 0 )
 set ( VERSION_PATCH 0 )
 set ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 
+set ( PROJ_VERSION "${CMAKE_PROJECT_NAME}-${VERSION}" )
+
 #-------------------------------------
 # Collect source files for the library
 #-------------------------------------
@@ -55,29 +57,10 @@ set ( JF_LIB_SRCS src/json_module.f90 )
 # libraries.
 set ( CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/include" )
 
-#---------------------------------------------
-# Build a shared and static library by default
-#---------------------------------------------
-set ( LIB_NAME ${CMAKE_PROJECT_NAME} )
-add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
-add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
-set_target_properties ( ${LIB_NAME}-static 
-  PROPERTIES
-  OUTPUT_NAME ${LIB_NAME}
-  PREFIX lib
-  VERSION ${VERSION} )
-set_target_properties ( ${LIB_NAME}
-  PROPERTIES
-  SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR} )
-
-#---------------------------------------------------------------------
-# Add some tests to ensure that the software is performing as expected
-#---------------------------------------------------------------------
-
-
 #-------------------------------------
 # Define where our files get installed
 #-------------------------------------
+# Most of this is probably 'wrong' for Windows/Cygwin
 
 if ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
   include ( GNU_Install_Dirs ) # Standard CMake module
@@ -90,13 +73,78 @@ endif ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
 # Set the package name to be specific to the compiler used, so that
 # versions compiled with different compilers can be installed in parallel
 string ( TOLOWER ${CMAKE_PROJECT_NAME}-${CMAKE_Fortran_COMPILER_ID} PACKAGE_NAME )
+string ( TOLOWER fortran/${CMAKE_Fortran_COMPILER_ID}-compiler FCOMPILER_DIR )
+
+if ( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
+  set ( ENABLE_DYLIBS_USE_RPATH TRUE CACHE BOOL
+    "Enable @rpath install name for dylibs" )
+  mark_as_advanced ( ENABLE_DYLIBS_USE_RPATH )
+endif ( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
+
+if ( ENABLE_DYLIBS_USE_RPATH )
+  if ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel" )
+    message ( WARNING
+      "CMake bug may cause problems linking against dylibs compiled with ifort and installed using @rpath" )
+  endif ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel" )
+  set ( CMAKE_MACOSX_RPATH FALSE )
+else ( ENABLE_DYLIBS_USE_RPATH )
+  set ( CMAKE_INSTALL_NAME_DIR
+    "\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
+endif ( ENABLE_DYLIBS_USE_RPATH )
+
+#---------------------------------------------
+# Build a shared and static library by default
+#---------------------------------------------
+  
+set ( LIB_NAME ${CMAKE_PROJECT_NAME} )
+add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
+add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
+set_target_properties ( ${LIB_NAME}-static 
+  PROPERTIES
+  OUTPUT_NAME ${LIB_NAME}
+  PREFIX lib
+  VERSION ${VERSION} )
+set_target_properties ( ${LIB_NAME}
+  PROPERTIES
+  OUTPUT_NAME ${LIB_NAME}
+  PREFIX lib
+  SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR} 
+  VERSION ${VERSION} )
+
+#---------------------------------------------------------------------
+# Add some tests to ensure that the software is performing as expected
+#---------------------------------------------------------------------
+
+#-------------------------
+# Perform the installation
+#-------------------------
 
 install ( TARGETS ${LIB_NAME} ${LIB_NAME}-static
   EXPORT ${PACKAGE_NAME}-targets
-  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/fortran/${CMAKE_Fortran_COMPILER_ID}-compiler"
-  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}/fortran/${CMAKE_Fortran_COMPILER_ID}-compiler" )
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}"
+  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
+#?ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}"
 
-set ( INSTALL_MOD_DIR "${CMAKE_INSTALL_INCLUDEDIR}/fortran/${CMAKE_Fortran_COMPILER_ID}-compiler" )
+# The following is some serious hackery and there's likely a better way
+# That better way is RPATH but bugs in CMake when using the Intel compiler persist
+# (-Wl,-rpath,/path/to/dylib does not get passed when compiling against imported dylib)
+set( ABS_LIB_INSTALL_DIR "\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
+if ( NOT ENABLE_DYLIBS_USE_RPATH )
+  if ( CMAKE_INSTALL_NAME_TOOL ) # On Mac and have install_name_tool
+    install ( CODE "
+       if ( DEFINED ENV{DESTDIR} )
+         string ( REGEX REPLACE \"/$\" \"\" DESTDIR \"\$ENV{DESTDIR}\" ) # strip trailing /
+         get_filename_component ( _install_path \${DESTDIR}/${ABS_LIB_INSTALL_DIR}
+              ABSOLUTE )
+         execute_process ( COMMAND 
+              ${CMAKE_INSTALL_NAME_TOOL} -id \${_install_path} \${_install_path}/lib${LIB_NAME}.${VERSION}.dylib)
+       endif ( DEFINED ENV{DESTDIR} )" )
+  endif ( CMAKE_INSTALL_NAME_TOOL )
+endif ( NOT ENABLE_DYLIBS_USE_RPATH )
+  
+  
+
+set ( INSTALL_MOD_DIR "${CMAKE_INSTALL_INCLUDEDIR}/${FCOMPILER_DIR}/${PROJ_VERSION}" )
 install ( DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/ DESTINATION  "${INSTALL_MOD_DIR}" )
 
 #------------------------------------------
@@ -157,8 +205,8 @@ configure_file (
   ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config.cmake
   @ONLY )
 
-set ( ADD_BUILD_TREE_TO_REGISTRY CACHE BOOL TRUE
+set ( ENABLE_BUILD_TREE_IN_REGISTRY FALSE CACHE BOOL
   "Add the ${PACKAGE_NAME} build tree to the CMake package registry?" )
-if ( ADD_BUILD_TREE_TO_REGISTRY )
+if ( ENABLE_BUILD_TREE_IN_REGISTRY )
   export ( PACKAGE ${PACKAGE_NAME} )
-endif ( ADD_BUILD_TREE_TO_REGISTRY )
+endif ( ENABLE_BUILD_TREE_IN_REGISTRY )
