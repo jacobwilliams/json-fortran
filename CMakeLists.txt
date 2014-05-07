@@ -83,8 +83,6 @@ if ( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
 endif ( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
 
 if ( ENABLE_DYLIBS_USE_RPATH )
-  message ( WARNING
-    "NOTICE: Currently CMake does not support installing @rpath install name dylibs using DESTDIR. If you would like to be able to install using 'DESTDIR=/install/path/root' set ENABLE_DYLIBS_USE_RPATH to FALSE." )
   set ( CMAKE_MACOSX_RPATH TRUE )
 else ( ENABLE_DYLIBS_USE_RPATH )
   set ( CMAKE_INSTALL_NAME_DIR
