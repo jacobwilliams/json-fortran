@@ -55,7 +55,7 @@ straightforward.  Here is an example.  See the json_example.f90 file
 for more examples.  
 
 ```fortran
-        program example1
+    program example1
 
         use json_module
 
@@ -91,7 +91,7 @@ Writing a json file is slightly more complicated and involves the use
 of pointers.  See the json_example.f90 file for more examples.
 
 ```fortran
-        program example2
+    program example2
 
         use json_module
 
@@ -130,7 +130,7 @@ of pointers.  See the json_example.f90 file for more examples.
         !cleanup:
         call json_destroy(p)
     
-    end program example2 
+    end program example2
 ```
 
 Other Comments
@@ -143,5 +143,4 @@ many of that code's bugs.
 
 More About JSON
 ------------
-
-For more information about JSON, see: [json.org](http://www.json.org/)
+For more information about JSON, see: <http://www.json.org/>
