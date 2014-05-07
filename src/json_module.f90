@@ -7,7 +7,7 @@
 !    json_module
 !
 !  DESCRIPTION
-!    JSON-FORTRAN: A Fortran 2003/2008 JSON (JavaScript Object Notation) API.
+!    JSON-FORTRAN: A Fortran 2008 JSON (JavaScript Object Notation) API.
 !
 !  NOTES
 !    -Based on fson by Joseph A. Levin (see LICENSE below)
@@ -2917,6 +2917,7 @@
 !
 !  DESCRIPTION
 !    Rewind the file to the beginning of the current line, and return this line.
+!    The file is assumed to be opened.
 !
 !  AUTHOR
 !    Jacob Williams
