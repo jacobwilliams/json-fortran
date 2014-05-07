@@ -54,7 +54,8 @@ Reading a JSON file and getting data from it is fairly
 straightforward.  Here is an example.  See the json_example.f90 file
 for more examples.  
 
-```fortran program example1
+```fortran
+        program example1
 
         use json_module
 
@@ -89,7 +90,8 @@ Writing a JSON file
 Writing a json file is slightly more complicated and involves the use
 of pointers.  See the json_example.f90 file for more examples.
 
-```fortran program example2
+```fortran
+        program example2
 
         use json_module
 
