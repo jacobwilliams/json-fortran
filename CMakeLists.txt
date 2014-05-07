@@ -89,7 +89,6 @@ if ( ENABLE_DYLIBS_USE_RPATH )
 else ( ENABLE_DYLIBS_USE_RPATH )
   set ( CMAKE_INSTALL_NAME_DIR
     "\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
-  set( CMAKE_MACOSX_RPATH FALSE )
 endif ( ENABLE_DYLIBS_USE_RPATH )
 
 #---------------------------------------------
