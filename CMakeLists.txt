@@ -63,7 +63,7 @@ set ( CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/include" )
 # Most of this is probably 'wrong' for Windows/Cygwin
 
 if ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
-  include ( GNU_Install_Dirs ) # Standard CMake module
+  include ( GNUInstallDirs ) # Standard CMake module
 elseif ( UNIX ) #Apple, BSD, solaris, other *NIX? Framework on Apple instead? 
   set ( CMAKE_INSTALL_LIBDIR      lib     )
   set ( CMAKE_INSTALL_INCLUDEDIR  include )
