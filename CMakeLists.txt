@@ -62,13 +62,14 @@ set ( CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/include" )
 #-------------------------------------
 # Most of this is probably 'wrong' for Windows/Cygwin
 
-if ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
-  include ( GNUInstallDirs ) # Standard CMake module
-elseif ( UNIX ) #Apple, BSD, solaris, other *NIX? Framework on Apple instead? 
+#if ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+#  include ( GNUInstallDirs ) # Standard CMake module
+if ( UNIX ) #Apple, BSD, solaris, other *NIX? Framework on Apple instead? 
   set ( CMAKE_INSTALL_LIBDIR      lib     )
   set ( CMAKE_INSTALL_INCLUDEDIR  include )
   set ( CMAKE_INSTALL_DATAROOTDIR share   )
-endif ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
+endif ( UNIX )
+#endif ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
 
 # Set the package name to be specific to the compiler used, so that
 # versions compiled with different compilers can be installed in parallel
@@ -88,6 +89,7 @@ if ( ENABLE_DYLIBS_USE_RPATH )
 else ( ENABLE_DYLIBS_USE_RPATH )
   set ( CMAKE_INSTALL_NAME_DIR
     "\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
+  set( CMAKE_MACOSX_RPATH FALSE )
 endif ( ENABLE_DYLIBS_USE_RPATH )
 
 #---------------------------------------------
