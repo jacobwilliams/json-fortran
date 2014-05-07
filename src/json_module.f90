@@ -94,7 +94,7 @@
     character(len=*),parameter,public :: json_ext = '.json'            !JSON file extension
     
     character(len=1),parameter :: space = ' '
-    character(len=1),parameter :: newline = char(10)           !new line character
+    character(len=1),parameter :: newline = new_line(space)    !new line character
     character(len=*),parameter :: real_fmt = '(E30.16E3)'      !format for real numbers
     character(len=*),parameter :: int_fmt = '(I10)'            !format for integers
 
@@ -2887,7 +2887,7 @@
         !
         if (exception_thrown) then
             call get_current_line_from_file(iunit,line)
-            if (istat==0) err_message = err_message//new_line(' ')//&
+            if (istat==0) err_message = err_message//newline//&
                                         'Offending line: '//trim(line)
             if (allocated(line)) deallocate(line)
         end if
