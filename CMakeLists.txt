@@ -1,8 +1,8 @@
 # CMake Configuration and build added by Izaak Beekman -- May, 2014
-#
+
 # Copy right (c) 2014, Izaak Beekman
 # All rights reserved.
-# 
+
 # This file is contributed to the json-fortran project, and
 # is licensed under the terms of json-fortran license. The json-fortran
 # license is located in the LICENSE file which must be distributed with
@@ -82,11 +82,9 @@ if ( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
 endif ( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
 
 if ( ENABLE_DYLIBS_USE_RPATH )
-  if ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel" )
-    message ( WARNING
-      "CMake bug may cause problems linking against dylibs compiled with ifort and installed using @rpath" )
-  endif ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel" )
-  set ( CMAKE_MACOSX_RPATH FALSE )
+  message ( WARNING
+    "NOTICE: Currently CMake does not support installing @rpath install name dylibs using DESTDIR. If you would like to be able to install using 'DESTDIR=/install/path/root' set ENABLE_DYLIBS_USE_RPATH to FALSE." )
+  set ( CMAKE_MACOSX_RPATH TRUE )
 else ( ENABLE_DYLIBS_USE_RPATH )
   set ( CMAKE_INSTALL_NAME_DIR
     "\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
@@ -114,6 +112,7 @@ set_target_properties ( ${LIB_NAME}
 #---------------------------------------------------------------------
 # Add some tests to ensure that the software is performing as expected
 #---------------------------------------------------------------------
+# Not implemented yet
 
 #-------------------------
 # Perform the installation
@@ -125,27 +124,24 @@ install ( TARGETS ${LIB_NAME} ${LIB_NAME}-static
   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
 #?ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}"
 
-# The following is some serious hackery and there's likely a better way
-# That better way is RPATH but bugs in CMake when using the Intel compiler persist
-# (-Wl,-rpath,/path/to/dylib does not get passed when compiling against imported dylib)
 set( ABS_LIB_INSTALL_DIR "\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
 if ( NOT ENABLE_DYLIBS_USE_RPATH )
   if ( CMAKE_INSTALL_NAME_TOOL ) # On Mac and have install_name_tool
     install ( CODE "
        if ( DEFINED ENV{DESTDIR} )
          string ( REGEX REPLACE \"/$\" \"\" DESTDIR \"\$ENV{DESTDIR}\" ) # strip trailing /
-         get_filename_component ( _install_path \${DESTDIR}/${ABS_LIB_INSTALL_DIR}
+         get_filename_component ( INSALL_LIB 
+              \${DESTDIR}/${ABS_LIB_INSTALL_DIR}/lib${LIB_NAME}.${VERSION_MAJOR}.${VERSION_MINOR}.dylib
               ABSOLUTE )
-         execute_process ( COMMAND 
-              ${CMAKE_INSTALL_NAME_TOOL} -id \${_install_path} \${_install_path}/lib${LIB_NAME}.${VERSION}.dylib)
+         execute_process ( COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" 
+            -id \"\${INSALL_LIB}\" \"\${INSALL_LIB}\" )
        endif ( DEFINED ENV{DESTDIR} )" )
   endif ( CMAKE_INSTALL_NAME_TOOL )
 endif ( NOT ENABLE_DYLIBS_USE_RPATH )
   
-  
 
 set ( INSTALL_MOD_DIR "${CMAKE_INSTALL_INCLUDEDIR}/${FCOMPILER_DIR}/${PROJ_VERSION}" )
-install ( DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/ DESTINATION  "${INSTALL_MOD_DIR}" )
+install ( DIRECTORY "${CMAKE_Fortran_MODULE_DIRECTORY}/" DESTINATION  "${INSTALL_MOD_DIR}" )
 
 #------------------------------------------
 # Add portable unistall command to makefile
@@ -155,17 +151,17 @@ configure_file ( "${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in" "${CMAKE_BINARY_
     @ONLY)
 
 add_custom_target ( uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/uninstall.cmake )
+    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/uninstall.cmake" )
 
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
 #-----------------------------------------------------
 set ( EXPORT_INSTALL_DIR 
-  ${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PACKAGE_NAME}-${VERSION} )
-install ( EXPORT ${PACKAGE_NAME}-targets DESTINATION ${EXPORT_INSTALL_DIR} )
+  "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PACKAGE_NAME}-${VERSION}" )
+install ( EXPORT ${PACKAGE_NAME}-targets DESTINATION "${EXPORT_INSTALL_DIR}" )
 
 include ( CMakePackageConfigHelpers ) # Standard CMake module
-write_basic_package_version_file( ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake 
+write_basic_package_version_file( "${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
   VERSION ${VERSION}
   COMPATIBILITY SameMajorVersion )
 
@@ -183,16 +179,16 @@ endif ( NOT (\"${CMAKE_Fortran_COMPILER_ID}\" MATCHES \"\${CMAKE_Fortran_COMPILE
 
 # install package config file
 configure_package_config_file (
-  ${CMAKE_SOURCE_DIR}/cmake/pkg/${CMAKE_PROJECT_NAME}-config.cmake.in
-  ${CMAKE_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake
-  INSTALL_DESTINATION ${EXPORT_INSTALL_DIR}
+  "${CMAKE_SOURCE_DIR}/cmake/pkg/${CMAKE_PROJECT_NAME}-config.cmake.in"
+  "${CMAKE_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake"
+  INSTALL_DESTINATION "${EXPORT_INSTALL_DIR}"
   PATH_VARS EXPORT_INSTALL_DIR INSTALL_MOD_DIR )
 
 # Install the config and version files so that we can find this project with others
 install ( FILES
-  ${CMAKE_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake
-  ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake 
-  DESTINATION ${EXPORT_INSTALL_DIR} )
+  "${CMAKE_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake"
+  "${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
+  DESTINATION "${EXPORT_INSTALL_DIR}" )
 
 #----------------------------------------------
 # Make build tree targets accessible for import
@@ -201,12 +197,12 @@ export ( TARGETS ${LIB_NAME} ${LIB_NAME}-static FILE ${PACKAGE_NAME}-targets.cma
 
 # build tree package config file, NOT installed
 configure_file ( 
-  ${CMAKE_SOURCE_DIR}/cmake/${CMAKE_PROJECT_NAME}-config.cmake.in
-  ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config.cmake
+  "${CMAKE_SOURCE_DIR}/cmake/${CMAKE_PROJECT_NAME}-config.cmake.in"
+  "${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config.cmake"
   @ONLY )
 
-set ( ENABLE_BUILD_TREE_IN_REGISTRY FALSE CACHE BOOL
+set ( ENABLE_BUILD_TREE_EXPORT FALSE CACHE BOOL
   "Add the ${PACKAGE_NAME} build tree to the CMake package registry?" )
-if ( ENABLE_BUILD_TREE_IN_REGISTRY )
+if ( ENABLE_BUILD_TREE_EXPORT )
   export ( PACKAGE ${PACKAGE_NAME} )
-endif ( ENABLE_BUILD_TREE_IN_REGISTRY )
+endif ( ENABLE_BUILD_TREE_EXPORT )
