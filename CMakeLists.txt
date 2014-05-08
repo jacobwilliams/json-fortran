@@ -39,8 +39,6 @@ set ( VERSION_MINOR 0 )
 set ( VERSION_PATCH 0 )
 set ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 
-set ( PROJ_VERSION "${CMAKE_PROJECT_NAME}-${VERSION}" )
-
 #-------------------------------------
 # Collect source files for the library
 #-------------------------------------
@@ -59,15 +57,18 @@ set ( CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/lib" )
 # versions compiled with different compilers can be installed in parallel
 string ( TOLOWER ${CMAKE_PROJECT_NAME}-${CMAKE_Fortran_COMPILER_ID} PACKAGE_NAME )
 string ( TOLOWER ${CMAKE_Fortran_COMPILER_ID}-compiler              FCOMPILER_DIR )
+set ( PACKAGE_VERSION "${PACKAGE_NAME}-${VERSION}" )
 
-# Most of this is probably 'wrong' for Windows/Cygwin
-# if ( UNIX )
-  set ( CMAKE_INSTALL_LIBDIR      lib     )
-  set ( CMAKE_INSTALL_DATAROOTDIR share   )
-# endif ( UNIX )
-set ( INSTALL_MOD_DIR "${CMAKE_INSTALL_LIBDIR}/${PROJ_VERSION}/${FCOMPILER_DIR}" )
-set ( INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}/${PROJ_VERSION}/${FCOMPILER_DIR}" )
+
+# Most of this could be 'wrong' for Windows/Cygwin
+
+set ( INSTALL_MOD_DIR    "${PACKAGE_VERSION}/lib" )
+set ( INSTALL_LIB_DIR    "${INSTALL_MOD_DIR}" )
 set( ABS_LIB_INSTALL_DIR "\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIB_DIR}" )
+
+# Put package export CMake files where they can be found
+# use `find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} <version> REQUIRED )`
+set ( EXPORT_INSTALL_DIR "${PACKAGE_VERSION}/cmake" )
 
 if ( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
   set ( ENABLE_DYLIBS_USE_RPATH TRUE CACHE BOOL
@@ -115,7 +116,7 @@ install ( TARGETS ${LIB_NAME} ${LIB_NAME}-static
   LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
   ARCHIVE DESTINATION "${INSTALL_LIB_DIR}" )
 
-# Code to  fix the install name.
+# Code to  fix the dylib install name on Mac.
 include ( cmake/fixupInstallNameDir.cmake )
 
 install ( DIRECTORY "${CMAKE_Fortran_MODULE_DIRECTORY}/" DESTINATION  "${INSTALL_MOD_DIR}" )
@@ -133,8 +134,6 @@ add_custom_target ( uninstall
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
 #-----------------------------------------------------
-set ( EXPORT_INSTALL_DIR 
-  "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PACKAGE_NAME}-${VERSION}" )
 install ( EXPORT ${PACKAGE_NAME}-targets DESTINATION "${EXPORT_INSTALL_DIR}" )
 
 include ( CMakePackageConfigHelpers ) # Standard CMake module
