@@ -115,20 +115,8 @@ install ( TARGETS ${LIB_NAME} ${LIB_NAME}-static
   LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
   ARCHIVE DESTINATION "${INSTALL_LIB_DIR}" )
 
-
-if ( NOT ENABLE_DYLIBS_USE_RPATH )
-  if ( CMAKE_INSTALL_NAME_TOOL ) # On Mac and have install_name_tool
-    install ( CODE
-      "if ( DEFINED ENV{DESTDIR} )
-         string ( REGEX REPLACE \"/$\" \"\" DESTDIR \"\$ENV{DESTDIR}\" ) # strip trailing /
-         get_filename_component ( INSTALL_LIB 
-              \${DESTDIR}/${ABS_LIB_INSTALL_DIR}/lib${LIB_NAME}.${VERSION_MAJOR}.${VERSION_MINOR}.dylib
-              ABSOLUTE )
-         execute_process ( COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" 
-            -id \"\${INSTALL_LIB}\" \"\${INSTALL_LIB}\" )
-       endif ( DEFINED ENV{DESTDIR} )" )
-  endif ( CMAKE_INSTALL_NAME_TOOL )
-endif ( NOT ENABLE_DYLIBS_USE_RPATH )
+# Code to  fix the install name.
+include ( cmake/fixupInstallNameDir.cmake )
 
 install ( DIRECTORY "${CMAKE_Fortran_MODULE_DIRECTORY}/" DESTINATION  "${INSTALL_MOD_DIR}" )
 
@@ -154,17 +142,8 @@ write_basic_package_version_file( "${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config-ve
   VERSION ${VERSION}
   COMPATIBILITY SameMajorVersion )
 
-# Put common compiler compatibility check in a variable to be written out, rather than
-# duplicating it across the build and install package-config files
-set ( COMPILER_CONSISTENCY_CHECK
-  "# Check that the correct compiler is in use. Mod files and object files/archives
-# are NOT compatible across different Fortran compilers when modules are present
-set ( ${PACKAGE_NAME}_Fortran_COMPILER_ID ${CMAKE_Fortran_COMPILER_ID} )
-set ( ${PACKAGE_NAME}_COMPATIBLE_COMPILER TRUE )
-if ( NOT (\"${CMAKE_Fortran_COMPILER_ID}\" MATCHES \"\${CMAKE_Fortran_COMPILER_ID}\") )
-  message ( SEND_ERROR \"Incompatible Fortran compilers detected! ${PACKAGE_NAME} was compiled with the ${CMAKE_Fortran_COMPILER_ID} Fortran compiler, but the current project is trying to use the \${CMAKE_Fortran_COMPILER_ID} Fortran compiler! In general, Fortran modules and libraries can only link against other projects built using the same compiler.\" )
-  set ( ${PACKAGE_NAME}_COMPATIBLE_COMPILER FALSE )
-endif ( NOT (\"${CMAKE_Fortran_COMPILER_ID}\" MATCHES \"\${CMAKE_Fortran_COMPILER_ID}\") )" )
+# provides COMPILER_CONSISTENCY_CHECK
+include ( cmake/FCompilerConsistencyCheck.cmake )
 
 # install package config file
 configure_package_config_file (
