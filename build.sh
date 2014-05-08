@@ -40,7 +40,7 @@ LIBEXT='.a'
 MODEXT='.mod'
 WC='*'
 
-LIBOUT='libjson'
+LIBOUT='libjsonfortran'
 EXEOUT='json'
 
 MODCODE='json_module'
