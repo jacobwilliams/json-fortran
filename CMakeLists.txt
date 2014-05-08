@@ -50,31 +50,24 @@ set ( JF_LIB_SRCS src/json_module.f90 )
 # Collect all the mod files into their own
 # directory to ease installation issues
 #-----------------------------------------
-# No standard mechanism or location for compiled .mod files
-# but often they are thought of as similar to precompiled 
-# header files. Let's include the compiler ID to ease
-# compatibility issues for thos linking against the installed
-# libraries.
-set ( CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/include" )
+set ( CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/lib" )
 
 #-------------------------------------
 # Define where our files get installed
 #-------------------------------------
-# Most of this is probably 'wrong' for Windows/Cygwin
-
-#if ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
-#  include ( GNUInstallDirs ) # Standard CMake module
-if ( UNIX ) #Apple, BSD, solaris, other *NIX? Framework on Apple instead? 
-  set ( CMAKE_INSTALL_LIBDIR      lib     )
-  set ( CMAKE_INSTALL_INCLUDEDIR  include )
-  set ( CMAKE_INSTALL_DATAROOTDIR share   )
-endif ( UNIX )
-#endif ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
-
 # Set the package name to be specific to the compiler used, so that
 # versions compiled with different compilers can be installed in parallel
 string ( TOLOWER ${CMAKE_PROJECT_NAME}-${CMAKE_Fortran_COMPILER_ID} PACKAGE_NAME )
-string ( TOLOWER fortran/${CMAKE_Fortran_COMPILER_ID}-compiler FCOMPILER_DIR )
+string ( TOLOWER ${CMAKE_Fortran_COMPILER_ID}-compiler              FCOMPILER_DIR )
+
+# Most of this is probably 'wrong' for Windows/Cygwin
+# if ( UNIX )
+  set ( CMAKE_INSTALL_LIBDIR      lib     )
+  set ( CMAKE_INSTALL_DATAROOTDIR share   )
+# endif ( UNIX )
+set ( INSTALL_MOD_DIR "${CMAKE_INSTALL_LIBDIR}/${PROJ_VERSION}/${FCOMPILER_DIR}" )
+set ( INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}/${PROJ_VERSION}/${FCOMPILER_DIR}" )
+set( ABS_LIB_INSTALL_DIR "\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIB_DIR}" )
 
 if ( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
   set ( ENABLE_DYLIBS_USE_RPATH TRUE CACHE BOOL
@@ -86,7 +79,7 @@ if ( ENABLE_DYLIBS_USE_RPATH )
   set ( CMAKE_MACOSX_RPATH TRUE )
 else ( ENABLE_DYLIBS_USE_RPATH )
   set ( CMAKE_INSTALL_NAME_DIR
-    "\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
+    "${ABS_LIB_INSTALL_DIR}" )
 endif ( ENABLE_DYLIBS_USE_RPATH )
 
 #---------------------------------------------
@@ -119,27 +112,24 @@ set_target_properties ( ${LIB_NAME}
 
 install ( TARGETS ${LIB_NAME} ${LIB_NAME}-static
   EXPORT ${PACKAGE_NAME}-targets
-  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}"
-  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
-#?ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}/${CMAKE_PROJECT_NAME}-${VERSION}"
+  LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
+  ARCHIVE DESTINATION "${INSTALL_LIB_DIR}" )
 
-set( ABS_LIB_INSTALL_DIR "\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${FCOMPILER_DIR}" )
+
 if ( NOT ENABLE_DYLIBS_USE_RPATH )
   if ( CMAKE_INSTALL_NAME_TOOL ) # On Mac and have install_name_tool
-    install ( CODE "
-       if ( DEFINED ENV{DESTDIR} )
+    install ( CODE
+      "if ( DEFINED ENV{DESTDIR} )
          string ( REGEX REPLACE \"/$\" \"\" DESTDIR \"\$ENV{DESTDIR}\" ) # strip trailing /
-         get_filename_component ( INSALL_LIB 
+         get_filename_component ( INSTALL_LIB 
               \${DESTDIR}/${ABS_LIB_INSTALL_DIR}/lib${LIB_NAME}.${VERSION_MAJOR}.${VERSION_MINOR}.dylib
               ABSOLUTE )
          execute_process ( COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" 
-            -id \"\${INSALL_LIB}\" \"\${INSALL_LIB}\" )
+            -id \"\${INSTALL_LIB}\" \"\${INSTALL_LIB}\" )
        endif ( DEFINED ENV{DESTDIR} )" )
   endif ( CMAKE_INSTALL_NAME_TOOL )
 endif ( NOT ENABLE_DYLIBS_USE_RPATH )
-  
 
-set ( INSTALL_MOD_DIR "${CMAKE_INSTALL_INCLUDEDIR}/${FCOMPILER_DIR}/${PROJ_VERSION}" )
 install ( DIRECTORY "${CMAKE_Fortran_MODULE_DIRECTORY}/" DESTINATION  "${INSTALL_MOD_DIR}" )
 
 #------------------------------------------
