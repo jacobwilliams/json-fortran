@@ -94,7 +94,7 @@
     character(len=*),parameter,public :: json_ext = '.json'            !JSON file extension
     
     character(len=1),parameter :: space = ' '
-    character(len=1),parameter :: newline = new_line(space)    !new line character
+    character(len=1),parameter :: newline = char(10)           !new line character
     character(len=*),parameter :: real_fmt = '(E30.16E3)'      !format for real numbers
     character(len=*),parameter :: int_fmt = '(I10)'            !format for integers
 
