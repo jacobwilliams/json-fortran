@@ -245,10 +245,10 @@
     
     interface json_get
         module procedure :: json_get_by_path
-        module procedure :: json_get_integer
-        module procedure :: json_get_double
-        module procedure :: json_get_logical
-        module procedure :: json_get_chars
+        module procedure :: json_get_integer, json_get_integer_vec
+        module procedure :: json_get_double, json_get_double_vec
+        module procedure :: json_get_logical, json_get_logical_vec
+        module procedure :: json_get_chars, json_get_char_vec
         module procedure :: json_get_array
     end interface json_get
 
@@ -609,41 +609,7 @@
     integer,dimension(:),allocatable,intent(out)    :: vec
     logical,intent(out),optional                    :: found
 
-    logical :: initialized
-
-    initialized = .false.
-
-    if (allocated(vec)) deallocate(vec)
-
-    !the callback function is called for each element of the array:
-    call json_get(me%p, path=path, array_callback=get_int_from_array, found=found)
-
-    contains
-!********************************************************************************
-
-    !*********************************************************
-        subroutine get_int_from_array(element, i, count)
-    !*********************************************************
-    ! callback function for integer
-    !*********************************************************
-        implicit none
-
-        type(json_value),pointer,intent(in)     :: element
-        integer,intent(in)                      :: i        !index
-        integer,intent(in)                      :: count    !size of array
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json_get(element, value=vec(i))
-
-    !*********************************************************
-        end subroutine get_int_from_array
-    !*********************************************************
+    call json_get(me%p, path, vec, found)
 
 !********************************************************************************
     end subroutine get_integer_vec_from_json_file
@@ -707,41 +673,7 @@
     real(wp),dimension(:),allocatable,intent(out)   :: vec
     logical,intent(out),optional                    :: found
 
-    logical :: initialized
-
-    initialized = .false.
-
-    if (allocated(vec)) deallocate(vec)
-
-    !the callback function is called for each element of the array:
-    call json_get(me%p, path=path, array_callback=get_double_from_array, found=found)
-
-    contains
-!********************************************************************************
-
-    !*********************************************************
-        subroutine get_double_from_array(element, i, count)
-    !*********************************************************
-    ! callback function for doubles
-    !*********************************************************
-        implicit none
-
-        type(json_value),pointer,intent(in)  :: element
-        integer,intent(in)                   :: i        !index
-        integer,intent(in)                   :: count    !size of array
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json_get(element, value=vec(i))
-
-    !*********************************************************
-        end subroutine get_double_from_array
-    !*********************************************************
+    call json_get(me%p, path, vec, found)
 
 !********************************************************************************
     end subroutine get_double_vec_from_json_file
@@ -804,42 +736,8 @@
     character(len=*),intent(in)                    :: path
     logical,dimension(:),allocatable,intent(out)   :: vec
     logical,intent(out),optional                   :: found
-
-    logical :: initialized
-
-    initialized = .false.
-
-    if (allocated(vec)) deallocate(vec)
-
-    !the callback function is called for each element of the array:
-    call json_get(me%p, path=path, array_callback=get_logical_from_array, found=found)
-
-    contains
-!********************************************************************************
-
-    !*********************************************************
-        subroutine get_logical_from_array(element, i, count)
-    !*********************************************************
-    ! callback function for logical
-    !*********************************************************
-        implicit none
-
-        type(json_value),pointer,intent(in)  :: element
-        integer,intent(in)                   :: i        !index
-        integer,intent(in)                   :: count    !size of array
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json_get(element, value=vec(i))
-
-    !*********************************************************
-        end subroutine get_logical_from_array
-    !*********************************************************
+    
+    call json_get(me%p, path, vec, found)
 
 !********************************************************************************
     end subroutine get_logical_vec_from_json_file
@@ -904,49 +802,7 @@
     character(len=*),dimension(:),allocatable,intent(out)  :: vec
     logical,intent(out),optional                           :: found
 
-    logical :: initialized
-
-    initialized = .false.
-
-    if (allocated(vec)) deallocate(vec)
-
-    !the callback function is called for each element of the array:
-    call json_get(me%p, path=path, array_callback=get_chars_from_array, found=found)
-
-    contains
-!********************************************************************************
-
-    !*********************************************************
-        subroutine get_chars_from_array(element, i, count)
-    !*********************************************************
-    ! callback function for chars
-    !*********************************************************
-        implicit none
-
-        type(json_value),pointer,intent(in)  :: element
-        integer,intent(in)                   :: i        !index
-        integer,intent(in)                   :: count    !size of array
-
-        character(len=:),allocatable :: cval
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json_get(element, value=cval)
-        if (allocated(cval)) then
-            vec(i) = cval
-            deallocate(cval)
-        else
-            vec(i) = ''
-        end if
-
-    !*********************************************************
-        end subroutine get_chars_from_array
-    !*********************************************************
+    call json_get(me%p, path, vec, found)
 
 !********************************************************************************
     end subroutine get_char_vec_from_json_file
@@ -2404,6 +2260,69 @@
 !********************************************************************************
 
 !********************************************************************************
+    subroutine json_get_integer_vec(me, path, vec, found)
+!********************************************************************************
+!****f* json_module/json_get_integer_vec
+!
+!  NAME
+!    json_get_integer_vec
+!
+!  DESCRIPTION
+!    Get an integer vector from a JSON value.
+!
+!  AUTHOR
+!    Jacob Williams : 5/14/2014
+!
+!********************************************************************************
+
+    implicit none
+
+    type(json_value), pointer                       :: me
+    character(len=*),intent(in)                     :: path
+    integer,dimension(:),allocatable,intent(out)    :: vec
+    logical,intent(out),optional                    :: found
+
+    logical :: initialized
+
+    initialized = .false.
+
+    if (allocated(vec)) deallocate(vec)
+
+    !the callback function is called for each element of the array:
+    call json_get(me, path=path, array_callback=get_int_from_array, found=found)
+
+    contains
+!********************************************************************************
+
+    !*********************************************************
+        subroutine get_int_from_array(element, i, count)
+    !*********************************************************
+    ! callback function for integer
+    !*********************************************************
+        implicit none
+
+        type(json_value),pointer,intent(in)     :: element
+        integer,intent(in)                      :: i        !index
+        integer,intent(in)                      :: count    !size of array
+
+        !size the output array:
+        if (.not. initialized) then
+            allocate(vec(count))
+            initialized = .true.
+        end if
+
+        !populate the elements:
+        call json_get(element, value=vec(i))
+
+    !*********************************************************
+        end subroutine get_int_from_array
+    !*********************************************************
+
+!********************************************************************************
+    end subroutine json_get_integer_vec
+!********************************************************************************
+
+!********************************************************************************
     subroutine json_get_double(this, path, value, found)
 !********************************************************************************
 !****f* json_module/json_get_double
@@ -2483,6 +2402,69 @@
 !********************************************************************************
 
 !********************************************************************************
+    subroutine json_get_double_vec(me, path, vec, found)
+!********************************************************************************
+!****f* json_module/json_get_double_vec
+!
+!  NAME
+!    json_get_double_vec
+!
+!  DESCRIPTION
+!    Get a double vector from a JSON value.
+!
+!  AUTHOR
+!    Jacob Williams : 5/14/2014
+!
+!********************************************************************************
+
+    implicit none
+
+    type(json_value), pointer                       :: me
+    character(len=*),intent(in)                     :: path
+    real(wp),dimension(:),allocatable,intent(out)    :: vec
+    logical,intent(out),optional                    :: found
+
+    logical :: initialized
+
+    initialized = .false.
+
+    if (allocated(vec)) deallocate(vec)
+
+    !the callback function is called for each element of the array:
+    call json_get(me, path=path, array_callback=get_double_from_array, found=found)
+
+    contains
+!********************************************************************************
+
+    !*********************************************************
+        subroutine get_double_from_array(element, i, count)
+    !*********************************************************
+    ! callback function for double
+    !*********************************************************
+        implicit none
+
+        type(json_value),pointer,intent(in)     :: element
+        integer,intent(in)                      :: i        !index
+        integer,intent(in)                      :: count    !size of array
+
+        !size the output array:
+        if (.not. initialized) then
+            allocate(vec(count))
+            initialized = .true.
+        end if
+
+        !populate the elements:
+        call json_get(element, value=vec(i))
+
+    !*********************************************************
+        end subroutine get_double_from_array
+    !*********************************************************
+
+!********************************************************************************
+    end subroutine json_get_double_vec
+!********************************************************************************
+
+!********************************************************************************
     subroutine json_get_logical(this, path, value, found)
 !********************************************************************************
 !****f* json_module/json_get_logical
@@ -2553,6 +2535,69 @@
 
 !********************************************************************************
     end subroutine json_get_logical
+!********************************************************************************
+
+!********************************************************************************
+    subroutine json_get_logical_vec(me, path, vec, found)
+!********************************************************************************
+!****f* json_module/json_get_logical_vec
+!
+!  NAME
+!    json_get_logical_vec
+!
+!  DESCRIPTION
+!    Get a logical vector from a JSON value.
+!
+!  AUTHOR
+!    Jacob Williams : 5/14/2014
+!
+!********************************************************************************
+
+    implicit none
+
+    type(json_value),pointer,intent(in)            :: me
+    character(len=*),intent(in)                    :: path
+    logical,dimension(:),allocatable,intent(out)   :: vec
+    logical,intent(out),optional                   :: found
+
+    logical :: initialized
+
+    initialized = .false.
+
+    if (allocated(vec)) deallocate(vec)
+
+    !the callback function is called for each element of the array:
+    call json_get(me, path=path, array_callback=get_logical_from_array, found=found)
+
+    contains
+!********************************************************************************
+
+    !*********************************************************
+        subroutine get_logical_from_array(element, i, count)
+    !*********************************************************
+    ! callback function for logical
+    !*********************************************************
+        implicit none
+
+        type(json_value),pointer,intent(in)  :: element
+        integer,intent(in)                   :: i        !index
+        integer,intent(in)                   :: count    !size of array
+
+        !size the output array:
+        if (.not. initialized) then
+            allocate(vec(count))
+            initialized = .true.
+        end if
+
+        !populate the elements:
+        call json_get(element, value=vec(i))
+
+    !*********************************************************
+        end subroutine get_logical_from_array
+    !*********************************************************
+
+!********************************************************************************
+    end subroutine json_get_logical_vec
 !********************************************************************************
 
 !********************************************************************************
@@ -2756,6 +2801,77 @@
 !********************************************************************************
 
 !********************************************************************************
+    subroutine json_get_char_vec(me, path, vec, found)
+!********************************************************************************
+!****f* json_module/json_get_char_vec
+!
+!  NAME
+!    json_get_char_vec
+!
+!  DESCRIPTION
+!    Get a char vector from a JSON file.
+!
+!  AUTHOR
+!    Jacob Williams : 5/14/2014
+!
+!********************************************************************************
+
+    implicit none
+
+    type(json_value),pointer,intent(in)                    :: me
+    character(len=*),intent(in)                            :: path
+    character(len=*),dimension(:),allocatable,intent(out)  :: vec
+    logical,intent(out),optional                           :: found
+
+    logical :: initialized
+
+    initialized = .false.
+
+    if (allocated(vec)) deallocate(vec)
+
+    !the callback function is called for each element of the array:
+    call json_get(me, path=path, array_callback=get_chars_from_array, found=found)
+
+    contains
+!********************************************************************************
+
+    !*********************************************************
+        subroutine get_chars_from_array(element, i, count)
+    !*********************************************************
+    ! callback function for chars
+    !*********************************************************
+        implicit none
+
+        type(json_value),pointer,intent(in)  :: element
+        integer,intent(in)                   :: i        !index
+        integer,intent(in)                   :: count    !size of array
+
+        character(len=:),allocatable :: cval
+
+        !size the output array:
+        if (.not. initialized) then
+            allocate(vec(count))
+            initialized = .true.
+        end if
+
+        !populate the elements:
+        call json_get(element, value=cval)
+        if (allocated(cval)) then
+            vec(i) = cval
+            deallocate(cval)
+        else
+            vec(i) = ''
+        end if
+
+    !*********************************************************
+        end subroutine get_chars_from_array
+    !*********************************************************
+
+!********************************************************************************
+    end subroutine json_get_char_vec
+!********************************************************************************
+
+!********************************************************************************
     subroutine json_get_array(this, path, array_callback, found)
 !********************************************************************************
 !****f* json_module/json_get_array
@@ -2774,7 +2890,7 @@
 
     type(json_value),pointer,intent(in)  :: this
     character(len=*),intent(in),optional :: path
-     procedure(array_callback_func)      :: array_callback
+    procedure(array_callback_func)       :: array_callback
     logical,intent(out),optional         :: found
 
     type(json_value), pointer :: element,p
