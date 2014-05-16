@@ -294,6 +294,8 @@
     logical,parameter :: print_tracebacks = .false.  !used when debugging
 
     ! POP/PUSH CHARACTER [private variables]
+    integer :: char_count = 0
+    integer :: line_count = 1
     integer :: pushed_index = 0
     character (len = 10) :: pushed_char              !JW : what is this magic number 10??
 
@@ -318,6 +320,7 @@
 !    Jacob Williams
 !
 !********************************************************************************
+
     implicit none
 
     class(json_data_non_polymorphic),intent(inout) :: me
@@ -833,6 +836,8 @@
     !Just in case, clear these global variables also:
     pushed_index = 0
     pushed_char = ''
+    char_count = 0
+    line_count = 1
 
 !********************************************************************************
     end subroutine json_initialize
@@ -992,7 +997,7 @@
 !
 !  NOTES
 !    This routine does not check for exceptions.
-!   The pointer should not already be allocated.
+!    The pointer should not already be allocated.
 !
 !********************************************************************************
 
@@ -2972,7 +2977,8 @@
     type(json_value),pointer    :: p
 
     integer :: iunit, istat
-    character(len=:),allocatable :: line
+    character(len=:),allocatable :: line, arrow_str
+    character(len=10) :: line_str, char_str
 
     !clean any exceptions and initialize:
     call json_initialize()
@@ -2998,20 +3004,32 @@
         call parse_value(unit = iunit, value = p)
 
         !
-        !  If there was an error reading the file, then see if we
+        !  If there was an error reading the file, then
         !   can print the line where the error occurred:
         !
         if (exception_thrown) then
+        
             call get_current_line_from_file(iunit,line)
-            if (istat==0) err_message = err_message//newline//&
-                                        'Offending line: '//trim(line)
+            
+            !the counters for the current line and the last character read:
+            call integer_to_string(line_count, line_str)
+            call integer_to_string(char_count, char_str)
+            
+            !draw the arrow string that points to the current character:
+            arrow_str = repeat('-',max( 0, char_count - 1) )//'^'
+
+            !create the error message:
+            err_message = err_message//newline//&
+                           'line: '//trim(adjustl(line_str))//', '//&
+                           'character: '//trim(adjustl(char_str))//newline//&
+                           trim(line)//newline//arrow_str
+                                        
             if (allocated(line)) deallocate(line)
+                        
         end if
 
         ! close the file
         close (iunit, iostat=istat)
-
-        if (istat/=0) call throw_exception('Error in json_parse: Error closing file: '//trim(file))
 
     else
 
@@ -3836,13 +3854,17 @@
             else
 
                 read (unit = unit, fmt = '(A)', advance = 'NO', iostat = ios) c
+                char_count = char_count + 1    !character count in the current line
 
                 if (IS_IOSTAT_EOR(ios)) then            !JW : use intrinsic
 
+                    char_count = 0
+                    line_count = line_count + 1
                     cycle
 
                 else if (IS_IOSTAT_END(ios)) then        !JW : use intrinsic
 
+                    char_count = 0
                     eof = .true.
                     exit
 
@@ -3869,8 +3891,6 @@
         end do
 
     end if
-
-    !write(*,'(A)') 'pop_char: '//popped
 
 !********************************************************************************
     end function pop_char
@@ -3934,16 +3954,12 @@
 
     integer :: istat
 
-    if (.not. exception_thrown) then
+    write(str,fmt=int_fmt,iostat=istat) ival
 
-        write(str,fmt=int_fmt,iostat=istat) ival
-
-        if (istat==0) then
-            str = adjustl(str)
-        else
-            call throw_exception('Error in integer_to_string: invalid value.')
-        end if
-
+    if (istat==0) then
+        str = adjustl(str)
+    else
+        str = repeat('*',len(str))
     end if
 
 !********************************************************************************
@@ -3972,16 +3988,12 @@
 
     integer :: istat
 
-    if (.not. exception_thrown) then
+    write(str,fmt=real_fmt,iostat=istat) rval
 
-        write(str,fmt=real_fmt,iostat=istat) rval
-
-        if (istat==0) then
-            str = adjustl(str)
-        else
-            call throw_exception('Error in real_to_string: invalid value.')
-        end if
-
+    if (istat==0) then
+        str = adjustl(str)
+    else
+        str = repeat('*',len(str))
     end if
 
 !********************************************************************************
