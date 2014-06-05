@@ -3,7 +3,7 @@
 #
 #  This is just a simple script to 
 #  build the json-fortran library and 
-#  example program on Linux.
+#  example program on Linux and Mac.
 #
 #  Jacob Williams : 2/8/2014
 #
@@ -40,7 +40,7 @@ LIBEXT='.a'
 MODEXT='.mod'
 WC='*'
 
-LIBOUT='libjson'
+LIBOUT='libjsonfortran'
 EXEOUT='json'
 
 MODCODE='json_module'
