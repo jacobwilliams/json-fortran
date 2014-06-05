@@ -21,12 +21,12 @@ Building the Library
 Currently three ways are provided to build the jsonfortran library
 (libjsonfortran). 
 
-A simple build script, build.sh is provided in the project
+* A simple build script, build.sh is provided in the project
 root directory. This is mainly used for testing, and also builds the example program.
 
-A Visual Studio 2010 project is included for building the library (and example program) on Windows.
+* A Visual Studio 2010 project is included for building the library (and example program) on Windows.
 
-Additionally, a [CMake](http://www.cmake.org) build
+* Additionally, a [CMake](http://www.cmake.org) build
 system is provided. This build system has been tested on Mac and Linux
 using the Intel Fortran Compiler and gfortran 4.9. It has not been
 tested on Windows. This CMake based build provides an install target,
