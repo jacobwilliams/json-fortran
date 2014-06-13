@@ -102,6 +102,40 @@ set_target_properties ( ${LIB_NAME}
   SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR} 
   VERSION ${VERSION} )
 
+#-------------------------------------
+# Build the documentation with ROBODoc
+#-------------------------------------
+set ( ROBODOC_SKIP_DOC_GEN FALSE CACHE BOOL
+  "Disable building the API documentation with ROBODoc" )
+if ( NOT ROBODOC_SKIP_DOC_GEN )
+  find_program ( ROBODOC robodoc )
+  if ( ROBODOC ) # Found
+    set ( ROBODOC_OPTIONS --tabsize 4 --index --toc --sections --syntaxcolors --source_line_numbers
+      CACHE STRING "Options passed to robodoc to control building the documentation" )
+    set ( DOC_DIR "${CMAKE_BINARY_DIR}/doc" )
+    set ( REQUIRED_ROBODOC_OPTIONS
+      --src "${CMAKE_SOURCE_DIR}/src" --doc "${DOC_DIR}"
+      --multidoc --html --ignore_case_when_linking
+      --documenttitle "${CMAKE_PROJECT_NAME}" )
+    set ( ROBODOC_OUPUTS json_example_f90.html masterindex.html robo_functions.html robo_sourcefiles.html
+      toc_index.html json_module_f90.html robo_classes.html robo_modules.html robodoc.css )
+    foreach ( ARG ${ROBODOC_OUPUTS} )
+      set ( ROBO_OUTPUTS "${DOC_DIR}/${ARG}" )
+    endforeach ( ARG ${ROBODOC_OUPUTS} )
+    add_custom_command ( OUTPUT ${ROBO_OUTPUTS}
+      COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOC_DIR}" # Ensure DOC_DIR exists at build time
+      COMMAND "${ROBODOC}" ${REQUIRED_ROBODOC_OPTIONS} ${ROBODOC_OPTIONS}
+      DEPENDS "${CMAKE_SOURCE_DIR}/${JF_LIB_SRCS}"
+      COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using ROBODoc" )
+    add_custom_target ( documentation ALL
+      DEPENDS ${ROBO_OUTPUTS} )
+    set_directory_properties ( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES doc )
+  else ( ROBODOC ) # Not found
+    message ( WARNING
+      "ROBODoc not found! Please set the CMake cache variable ROBODOC to point to the installed ROBODoc binary, and reconfigure or disable building the documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/ If you do not wish to install ROBODoc and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOCUMENTATION_GENERATION to FALSE." )
+  endif ( ROBODOC )
+endif ( NOT ROBODOC_SKIP_DOC_GEN )
+
 #---------------------------------------------------------------------
 # Add some tests to ensure that the software is performing as expected
 #---------------------------------------------------------------------
