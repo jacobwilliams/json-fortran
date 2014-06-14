@@ -9,10 +9,13 @@
 !  DESCRIPTION
 !    Unit tests for the json_module.
 !
+!  USES
+!	json_module
+!
 !  HISTORY
 !    Jacob Williams : 2/8/2014 : Created
 !
-!  LICENSE
+!  COPYRIGHT
 !
 !    JSON-FORTRAN: A Fortran 2003/2008 JSON API
 !    https://github.com/jacobwilliams/json-fortran
@@ -45,6 +48,7 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !*******************************************************************************************************
+
     use json_module
     
     implicit none

@@ -10,24 +10,28 @@
 !    JSON-FORTRAN: A Fortran 2008 JSON (JavaScript Object Notation) API.
 !
 !  NOTES
-!    -Based on fson by Joseph A. Levin (see LICENSE below)
+!    -Based on fson by Joseph A. Levin (see License below)
 !        -The original F95 code was split into four files:
 !            fson_path_m.f95, fson_string_m.f95, fson_value_m.f95, fson.f95
 !        -The code has been extensively modified and combined into this one module (json_module.f90).
 !        -Some Fortran 2003/2008 features are now used 
 !            (e.g., allocatable strings, associate, newunit, generic, class, and abstract interface)
 !    -The headers in this file follow the ROBODoc conventions.
-!
-!  SEE ALSO
-!    [1] https://github.com/josephalevin/fson [FSON code retrieved on 12/2/2013]
-!    [3] http://www.json.org/ [JSON website]
-!    [2] http://jsonlint.com/ [JSON validator]
+!            Compile with: robodoc --src ./ --doc ./doc --multidoc --html 
+!                                  --tabsize 4 --ignore_case_when_linking 
+!                                  --syntaxcolors --source_line_numbers --index
 !
 !  HISTORY
 !    Joseph A. Levin : March 2012
 !    Jacob Williams : 2/8/2013 : Extensive modifications to the original code.
 !
-!  LICENSE
+!  SEE ALSO
+!
+!    [1] https://github.com/josephalevin/fson [FSON code retrieved on 12/2/2013]
+!    [3] http://www.json.org/ [JSON website]
+!    [2] http://jsonlint.com/ [JSON validator]
+!
+!  COPYRIGHT
 !
 !    -----------------------------------------------------------------------------------------
 !    json-fortran License:
@@ -110,24 +114,33 @@
     integer,parameter,public :: json_real      = 6
     integer,parameter,public :: json_string    = 7
 
-    type :: json_data_non_polymorphic
-
-        integer :: var_type = json_unknown
-
-        logical,allocatable             :: log_value
-        integer,allocatable             :: int_value
-        real(wp),allocatable            :: dbl_value
-        character(len=:),allocatable    :: str_value
-
-    contains
-
-        procedure :: destroy => destroy_json_data_non_polymorphic
-
-    end type json_data_non_polymorphic
-
-
     !*********************************************************
-        type,public :: json_value
+    !****c* json_module/json_data_non_polymorphic
+    !
+    !  NAME
+    !    json_data_non_polymorphic
+    !
+    !  DESCRIPTION
+    !    The data in a json_value class
+    !
+    !  SOURCE
+    
+        type :: json_data_non_polymorphic
+
+            integer :: var_type = json_unknown
+
+            logical,allocatable             :: log_value
+            integer,allocatable             :: int_value
+            real(wp),allocatable            :: dbl_value
+            character(len=:),allocatable    :: str_value
+
+        contains
+
+            procedure :: destroy => destroy_json_data_non_polymorphic
+
+        end type json_data_non_polymorphic
+    !*********************************************************
+
     !*********************************************************
     !****c* json_module/json_value
     !
@@ -137,7 +150,9 @@
     !  DESCRIPTION
     !    Type used to construct the linked-list json structure
     !
-    !*********************************************************
+    !  SOURCE
+    
+        type,public :: json_value
 
         !variable name:
         character(len=:),allocatable :: name
@@ -150,7 +165,6 @@
         type(json_value), pointer :: parent => null()
         type(json_value), pointer :: children => null()
 
-    !*********************************************************
         end type json_value
     !*********************************************************
 
@@ -178,7 +192,7 @@
     !  AUTHOR
     !    Jacob Williams : 12/9/2013
     !
-    !*********************************************************
+    !  SOURCE
 
         private
 
@@ -303,8 +317,6 @@
 !***********************************************************************************************************************************
 
 !********************************************************************************
-    subroutine destroy_json_data_non_polymorphic(me)
-!********************************************************************************
 !****f* json_module/destroy_json_data_non_polymorphic
 !
 !  NAME
@@ -319,7 +331,9 @@
 !  AUTHOR
 !    Jacob Williams
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine destroy_json_data_non_polymorphic(me)
 
     implicit none
 
@@ -332,12 +346,9 @@
     if (allocated(me%dbl_value)) deallocate(me%dbl_value)
     if (allocated(me%str_value)) deallocate(me%str_value)
 
-!********************************************************************************
     end subroutine destroy_json_data_non_polymorphic
 !********************************************************************************
 
-!********************************************************************************
-    subroutine destroy_json_file(me)
 !********************************************************************************
 !****f* json_module/destroy_json_file
 !
@@ -353,20 +364,19 @@
 !  AUTHOR
 !    Jacob Williams : 12/9/2013
 !
-!********************************************************************************
+!  SOURCE
 
+    subroutine destroy_json_file(me)
+    
     implicit none
 
     class(json_file),intent(inout) :: me
 
     if (associated(me%p)) call json_value_destroy(me%p)
 
-!********************************************************************************
     end subroutine destroy_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine load_json_file(me, filename)
 !********************************************************************************
 !****f* json_module/load_json_file
 !
@@ -382,7 +392,9 @@
 !  AUTHOR
 !    Jacob Williams : 12/9/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine load_json_file(me, filename)
 
     implicit none
 
@@ -391,12 +403,9 @@
 
     call json_parse(filename, me%p)
 
-!********************************************************************************
     end subroutine load_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine print_json_file(me, iunit)
 !********************************************************************************
 !****f* json_module/print_json_file
 !
@@ -413,7 +422,10 @@
 !  AUTHOR
 !    Jacob Williams : 12/9/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine print_json_file(me, iunit)
+
     use, intrinsic :: iso_fortran_env,    only: output_unit
 
     implicit none
@@ -431,12 +443,9 @@
 
     call json_value_print(me%p,iunit=i)
 
-!********************************************************************************
     end subroutine print_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine variable_info_in_file(me,path,found,var_type,n_children)
 !********************************************************************************
 !****f* json_module/variable_info_in_file
 !
@@ -452,7 +461,9 @@
 !  AUTHOR
 !    Jacob Williams : 2/3/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine variable_info_in_file(me,path,found,var_type,n_children)
 
     implicit none
 
@@ -486,12 +497,9 @@
     !cleanup:
     nullify(p)
 
-!********************************************************************************
     end subroutine variable_info_in_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_info(p,var_type,n_children)
 !********************************************************************************
 !****f* json_module/json_info
 !
@@ -507,7 +515,9 @@
 !  AUTHOR
 !    Jacob Williams : 2/13/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_info(p,var_type,n_children)
 
     implicit none
 
@@ -518,12 +528,9 @@
     if (present(var_type))    var_type = p%data%var_type        !variable type
     if (present(n_children))  n_children = json_value_count(p)  !number of children
     
-!********************************************************************************
     end subroutine json_info
 !********************************************************************************
     
-!********************************************************************************
-    subroutine get_object_from_json_file(me, path, p, found)
 !********************************************************************************
 !****f* json_module/get_object_from_json_file
 !
@@ -539,8 +546,10 @@
 !  AUTHOR
 !    Jacob Williams : 2/3/2014
 !
-!********************************************************************************
+!  SOURCE
 
+    subroutine get_object_from_json_file(me, path, p, found)
+    
     implicit none
 
     class(json_file),intent(inout)          :: me
@@ -550,12 +559,9 @@
 
     call json_get_by_path(me%p, path=path, p=p, found=found)
 
-!********************************************************************************
     end subroutine get_object_from_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_integer_from_json_file(me, path, val, found)
 !********************************************************************************
 !****f* json_module/get_integer_from_json_file
 !
@@ -571,7 +577,9 @@
 !  AUTHOR
 !    Jacob Williams : 12/9/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_integer_from_json_file(me, path, val, found)
 
     implicit none
 
@@ -582,12 +590,9 @@
 
     call json_get(me%p, path=path, value=val, found=found)
 
-!********************************************************************************
     end subroutine get_integer_from_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_integer_vec_from_json_file(me, path, vec, found)
 !********************************************************************************
 !****f* json_module/get_integer_vec_from_json_file
 !
@@ -603,7 +608,9 @@
 !  AUTHOR
 !    Jacob Williams : 1/20/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_integer_vec_from_json_file(me, path, vec, found)
 
     implicit none
 
@@ -612,14 +619,12 @@
     integer,dimension(:),allocatable,intent(out)    :: vec
     logical,intent(out),optional                    :: found
 
+
     call json_get(me%p, path, vec, found)
 
-!********************************************************************************
     end subroutine get_integer_vec_from_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_double_from_json_file (me, path, val, found)
 !********************************************************************************
 !****f* json_module/get_double_from_json_file
 !
@@ -627,15 +632,17 @@
 !    get_double_from_json_file
 !
 !  USAGE
-!    call me%get(path,val)
+!    call me%get(path,val,found)
 !
 !  DESCRIPTION
-!    Get an double from a JSON file.
+!    Get a double from a JSON file.
 !
 !  AUTHOR
 !    Jacob Williams : 12/9/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_double_from_json_file (me, path, val, found)
 
     implicit none
 
@@ -646,12 +653,9 @@
 
     call json_get(me%p, path=path, value=val, found=found)
 
-!********************************************************************************
     end subroutine get_double_from_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_double_vec_from_json_file(me, path, vec, found)
 !********************************************************************************
 !****f* json_module/get_double_vec_from_json_file
 !
@@ -659,16 +663,18 @@
 !    get_double_vec_from_json_file
 !
 !  USAGE
-!    call me%get(path,vec)
+!    call me%get(path,vec,found)
 !
 !  DESCRIPTION
-!    Get an double vector from a JSON file.
+!    Get a double vector from a JSON file.
 !
 !  AUTHOR
 !    Jacob Williams : 1/19/2014
 !
-!********************************************************************************
+!  SOURCE
 
+    subroutine get_double_vec_from_json_file(me, path, vec, found)
+    
     implicit none
 
     class(json_file),intent(inout)                  :: me
@@ -678,12 +684,9 @@
 
     call json_get(me%p, path, vec, found)
 
-!********************************************************************************
     end subroutine get_double_vec_from_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_logical_from_json_file(me,path,val,found)
 !********************************************************************************
 !****f* json_module/get_logical_from_json_file
 !
@@ -691,7 +694,7 @@
 !    get_logical_from_json_file
 !
 !  USAGE
-!    call me%get(path,val)
+!    call me%get(path,val,found)
 !
 !  DESCRIPTION
 !    Get an logical from a JSON file.
@@ -699,7 +702,9 @@
 !  AUTHOR
 !    Jacob Williams : 12/9/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_logical_from_json_file(me,path,val,found)
 
     implicit none
 
@@ -710,12 +715,9 @@
 
     call json_get(me%p, path=path, value=val, found=found)
 
-!********************************************************************************
     end subroutine get_logical_from_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_logical_vec_from_json_file(me, path, vec, found)
 !********************************************************************************
 !****f* json_module/get_logical_vec_from_json_file
 !
@@ -731,7 +733,9 @@
 !  AUTHOR
 !    Jacob Williams : 1/20/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_logical_vec_from_json_file(me, path, vec, found)
 
     implicit none
 
@@ -742,12 +746,9 @@
     
     call json_get(me%p, path, vec, found)
 
-!********************************************************************************
     end subroutine get_logical_vec_from_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_chars_from_json_file(me, path, val, found)
 !********************************************************************************
 !****f* json_module/get_chars_from_json_file
 !
@@ -764,7 +765,9 @@
 !  AUTHOR
 !    Jacob Williams : 12/9/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_chars_from_json_file(me, path, val, found)
 
     implicit none
 
@@ -775,12 +778,9 @@
 
     call json_get(me%p, path=path, value=val, found=found)
 
-!********************************************************************************
     end subroutine get_chars_from_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_char_vec_from_json_file(me, path, vec, found)
 !********************************************************************************
 !****f* json_module/get_char_vec_from_json_file
 !
@@ -796,7 +796,9 @@
 !  AUTHOR
 !    Jacob Williams : 1/19/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_char_vec_from_json_file(me, path, vec, found)
 
     implicit none
 
@@ -807,12 +809,9 @@
 
     call json_get(me%p, path, vec, found)
 
-!********************************************************************************
     end subroutine get_char_vec_from_json_file
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_initialize()
 !********************************************************************************
 !****f* json_module/json_initialize
 !
@@ -827,7 +826,10 @@
 !  AUTHOR
 !    Jacob Williams : 12/4/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_initialize()
+
     implicit none
 
     !clear any errors from previous runs:
@@ -839,12 +841,9 @@
     char_count = 0
     line_count = 1
 
-!********************************************************************************
     end subroutine json_initialize
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_clear_exceptions()
 !********************************************************************************
 !****f* json_module/json_clear_exceptions
 !
@@ -857,19 +856,19 @@
 !  AUTHOR
 !    Jacob Williams : 12/4/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_clear_exceptions()
+
     implicit none
 
     !clear the flag and message:
     exception_thrown = .false.
     err_message = ''
 
-!********************************************************************************
     end subroutine json_clear_exceptions
 !********************************************************************************
 
-!********************************************************************************
-    subroutine throw_exception(msg)
 !********************************************************************************
 !****f* json_module/throw_exception
 !
@@ -884,7 +883,10 @@
 !  AUTHOR
 !    Jacob Williams : 12/4/2013
 !
-!********************************************************************************
+!  SOURCE
+ 
+    subroutine throw_exception(msg)
+
     !use ifcore,    only: tracebackqq    !Intel routine
 
     implicit none
@@ -905,12 +907,9 @@
     !
     !end if
 
-!********************************************************************************
     end subroutine throw_exception
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_check_for_errors(status_ok, error_msg)
 !********************************************************************************
 !****f* json_module/json_check_for_errors
 !
@@ -926,7 +925,10 @@
 !  AUTHOR
 !    Jacob Williams : 12/4/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_check_for_errors(status_ok, error_msg)
+
     implicit none
 
     logical,intent(out) :: status_ok
@@ -944,12 +946,9 @@
         error_msg = ''
     end if
 
-!********************************************************************************
     end subroutine json_check_for_errors
 !********************************************************************************
 
-!********************************************************************************
-    function json_failed() result(failed)
 !********************************************************************************
 !****f* json_module/json_failed
 !
@@ -968,19 +967,19 @@
 !  AUTHOR
 !    Jacob Williams : 12/5/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    function json_failed() result(failed)
+
     implicit none
 
     logical :: failed
 
     failed = exception_thrown
 
-!********************************************************************************
     end function json_failed
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_create(p)
 !********************************************************************************
 !****f* json_module/json_value_create
 !
@@ -999,7 +998,9 @@
 !    This routine does not check for exceptions.
 !    The pointer should not already be allocated.
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_create(p)
 
     implicit none
 
@@ -1008,12 +1009,9 @@
     nullify(p)
     allocate(p)
 
-!********************************************************************************
     end subroutine json_value_create
 !********************************************************************************
 
-!********************************************************************************
-    recursive subroutine json_value_destroy(this)
 !********************************************************************************
 !****f* json_module/json_value_destroy
 !
@@ -1031,7 +1029,9 @@
 !  AUTHOR
 !    Jacob Williams : 1/22/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    recursive subroutine json_value_destroy(this)
 
     implicit none
 
@@ -1053,12 +1053,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine json_value_destroy
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_add_member(this, member)
 !********************************************************************************
 !****f* json_module/json_value_add_member
 !
@@ -1068,7 +1065,9 @@
 !  DESCRIPTION
 !    Adds the member to the linked list
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_add_member(this, member)
 
     implicit none
 
@@ -1104,12 +1103,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine json_value_add_member
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_add_real(me, name, val)
 !********************************************************************************
 !****f* json_module/json_value_add_real
 !
@@ -1125,7 +1121,10 @@
 !  AUTHOR
 !    Jacob Williams : 1/19/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_add_real(me, name, val)
+
     implicit none
 
     type(json_value), pointer   :: me
@@ -1144,12 +1143,9 @@
     !cleanup:
     nullify(var)
 
-!********************************************************************************
     end subroutine json_value_add_real
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_add_real_vec(me, name, val)
 !********************************************************************************
 !****f* json_module/json_value_add_real_vec
 !
@@ -1165,7 +1161,10 @@
 !  AUTHOR
 !    Jacob Williams : 1/20/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_add_real_vec(me, name, val)
+
     implicit none
 
     type(json_value), pointer         :: me
@@ -1190,12 +1189,9 @@
     !cleanup:
     nullify(var)
 
-!********************************************************************************
     end subroutine json_value_add_real_vec
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_add_integer(me, name, val)
 !********************************************************************************
 !****f* json_module/json_value_add_integer
 !
@@ -1211,7 +1207,10 @@
 !  AUTHOR
 !    Jacob Williams : 1/20/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_add_integer(me, name, val)
+
     implicit none
 
     type(json_value), pointer     :: me
@@ -1230,12 +1229,9 @@
     !cleanup:
     nullify(var)
 
-!********************************************************************************
     end subroutine json_value_add_integer
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_add_integer_vec(me, name, val)
 !********************************************************************************
 !****f* json_module/json_value_add_integer_vec
 !
@@ -1251,7 +1247,10 @@
 !  AUTHOR
 !    Jacob Williams : 1/20/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_add_integer_vec(me, name, val)
+
     implicit none
 
     type(json_value), pointer       :: me
@@ -1276,12 +1275,9 @@
     !cleanup:
     nullify(var)
 
-!********************************************************************************
     end subroutine json_value_add_integer_vec
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_add_logical(me, name, val)
 !********************************************************************************
 !****f* json_module/json_value_add_logical
 !
@@ -1297,7 +1293,10 @@
 !  AUTHOR
 !    Jacob Williams : 1/20/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_add_logical(me, name, val)
+
     implicit none
 
     type(json_value), pointer   :: me
@@ -1316,12 +1315,9 @@
     !cleanup:
     nullify(var)
 
-!********************************************************************************
     end subroutine json_value_add_logical
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_add_logical_vec(me, name, val)
 !********************************************************************************
 !****f* json_module/json_value_add_logical_vec
 !
@@ -1337,7 +1333,10 @@
 !  AUTHOR
 !    Jacob Williams : 1/20/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_add_logical_vec(me, name, val)
+
     implicit none
 
     type(json_value), pointer       :: me
@@ -1362,12 +1361,9 @@
     !cleanup:
     nullify(var)
 
-!********************************************************************************
     end subroutine json_value_add_logical_vec
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_add_string(me, name, val)
 !********************************************************************************
 !****f* json_module/json_value_add_string
 !
@@ -1383,7 +1379,10 @@
 !  AUTHOR
 !    Jacob Williams : 1/19/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_add_string(me, name, val)
+
     implicit none
 
     type(json_value), pointer   :: me
@@ -1406,12 +1405,9 @@
     !cleanup:
     nullify(var)
 
-!********************************************************************************
     end subroutine json_value_add_string
 !********************************************************************************
 
-!********************************************************************************
-    subroutine escape_string(str_in, str_out)
 !********************************************************************************
 !****f* json_module/escape_string
 !
@@ -1424,7 +1420,9 @@
 !  AUTHOR
 !    Jacob Williams : 1/21/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine escape_string(str_in, str_out)
 
     implicit none
 
@@ -1464,12 +1462,9 @@
 
     end do
 
-!********************************************************************************
     end subroutine escape_string
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_add_string_vec(me, name, val, trim_str, adjustl_str)
 !********************************************************************************
 !****f* json_module/json_value_add_string_vec
 !
@@ -1485,7 +1480,10 @@
 !  AUTHOR
 !    Jacob Williams : 1/19/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_add_string_vec(me, name, val, trim_str, adjustl_str)
+
     implicit none
 
     type(json_value), pointer                :: me
@@ -1537,12 +1535,9 @@
     !cleanup:
     nullify(var)
 
-!********************************************************************************
     end subroutine json_value_add_string_vec
 !********************************************************************************
 
-!********************************************************************************
-    function json_value_count(this) result(count)
 !********************************************************************************
 !****f* json_module/json_value_count
 !
@@ -1552,7 +1547,9 @@
 !  DESCRIPTION
 !    Count the number of children.
 !
-!********************************************************************************
+!  SOURCE
+
+    function json_value_count(this) result(count)
 
     implicit none
 
@@ -1584,12 +1581,9 @@
         
     end if
 
-!********************************************************************************
     end function json_value_count
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_by_index(this, idx, p)
 !********************************************************************************
 !****f* json_module/get_by_index
 !
@@ -1599,7 +1593,9 @@
 !  DESCRIPTION
 !    Returns a child in the object given the index.
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_by_index(this, idx, p)
 
     implicit none
 
@@ -1636,12 +1632,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine get_by_index
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_by_name_chars(this, name, p)
 !********************************************************************************
 !****f* json_module/get_by_name_chars
 !
@@ -1651,7 +1644,9 @@
 !  DESCRIPTION
 !    Returns a child in the object given the name string.
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_by_name_chars(this, name, p)
 
     implicit none
 
@@ -1676,7 +1671,7 @@
                 end do
             end if
 
-            !didn't find anything:
+            !did not find anything:
             nullify(p)
 
         else
@@ -1685,12 +1680,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine get_by_name_chars
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_value_to_string(me,str)
 !********************************************************************************
 !****f* json_module/json_value_to_string
 !
@@ -1703,7 +1695,10 @@
 !  AUTHOR
 !    Jacob Williams : 2/12/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_value_to_string(me,str)
+
     implicit none
     
     type(json_value),pointer,intent(in)        :: me
@@ -1712,12 +1707,9 @@
     str = ''
     call json_value_print(me, iunit=0, str=str)
     
-!********************************************************************************
     end subroutine json_value_to_string
 !********************************************************************************
     
-!********************************************************************************
-    recursive subroutine json_value_print(this,iunit,indent,need_comma,colon,str)
 !********************************************************************************
 !****f* json_module/json_value_print
 !
@@ -1727,7 +1719,9 @@
 !  DESCRIPTION
 !    Print the JSON structure to a file
 !
-!********************************************************************************
+!  SOURCE
+
+    recursive subroutine json_value_print(this,iunit,indent,need_comma,colon,str)
 
     implicit none
 
@@ -1875,27 +1869,18 @@
     end if
 
     contains
-!********************************************************************************
 
-    !**********************************************
+        ! cleanup routine
         subroutine cleanup()
-    !**********************************************
-    ! cleanup routine
-    !**********************************************
         implicit none
 
         if (associated(element)) nullify(element)
 
-    !**********************************************
         end subroutine cleanup
-    !**********************************************
     
-    !**********************************************
+        ! write the string to the file (or the output string)
         subroutine write_it(s,advance,comma)
-    !**********************************************
-    ! write the string to the file 
-    ! (or the output string)
-    !**********************************************
+
         implicit none
 
         character(len=*),intent(in) :: s
@@ -1939,16 +1924,11 @@
         !cleanup:
         if (allocated(s2)) deallocate(s2)
         
-    !**********************************************
         end subroutine write_it
-    !********************************************** 
 
-!********************************************************************************
     end subroutine json_value_print
 !********************************************************************************
 
-!********************************************************************************
-    recursive subroutine json_get_by_path(this, path, p, found)       !JW : Does this need to be recursive ???
 !********************************************************************************
 !****f* json_module/json_get_by_path
 !
@@ -1961,7 +1941,9 @@
 !     .         child object member
 !     [] or ()  child array element
 !
-!********************************************************************************
+!  SOURCE
+
+    recursive subroutine json_get_by_path(this, path, p, found)       !JW : Does this need to be recursive ???
 
     implicit none
 
@@ -2103,12 +2085,9 @@
         if (present(found)) found = .false.
     end if
 
-!********************************************************************************
     end subroutine json_get_by_path
 !********************************************************************************
 
-!********************************************************************************
-    function string_to_integer(str) result(ival)
 !********************************************************************************
 !****f* json_module/string_to_integer
 !
@@ -2124,7 +2103,9 @@
 !  AUTHOR
 !    Jacob Williams : 12/10/2013 : Rewrote routine.  Added error checking.
 !
-!********************************************************************************
+!  SOURCE
+
+    function string_to_integer(str) result(ival)
 
     implicit none
 
@@ -2144,12 +2125,9 @@
 
     end if
 
-!********************************************************************************
     end function string_to_integer
 !********************************************************************************
 
-!********************************************************************************
-    function string_to_double(str) result(rval)
 !********************************************************************************
 !****f* json_module/string_to_double
 !
@@ -2162,7 +2140,9 @@
 !  AUTHOR
 !    Jacob Williams : 1/19/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    function string_to_double(str) result(rval)
 
     implicit none
 
@@ -2182,12 +2162,9 @@
 
     end if
 
-!********************************************************************************
     end function string_to_double
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_get_integer(this, path, value, found)
 !********************************************************************************
 !****f* json_module/json_get_integer
 !
@@ -2197,7 +2174,9 @@
 !  DESCRIPTION
 !    Get an integer value from an json_value.
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_get_integer(this, path, value, found)
 
     implicit none
 
@@ -2260,12 +2239,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine json_get_integer
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_get_integer_vec(me, path, vec, found)
 !********************************************************************************
 !****f* json_module/json_get_integer_vec
 !
@@ -2278,7 +2254,9 @@
 !  AUTHOR
 !    Jacob Williams : 5/14/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_get_integer_vec(me, path, vec, found)
 
     implicit none
 
@@ -2297,13 +2275,9 @@
     call json_get(me, path=path, array_callback=get_int_from_array, found=found)
 
     contains
-!********************************************************************************
 
-    !*********************************************************
+        ! callback function for integer
         subroutine get_int_from_array(element, i, count)
-    !*********************************************************
-    ! callback function for integer
-    !*********************************************************
         implicit none
 
         type(json_value),pointer,intent(in)     :: element
@@ -2319,16 +2293,12 @@
         !populate the elements:
         call json_get(element, value=vec(i))
 
-    !*********************************************************
         end subroutine get_int_from_array
-    !*********************************************************
 
 !********************************************************************************
     end subroutine json_get_integer_vec
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_get_double(this, path, value, found)
 !********************************************************************************
 !****f* json_module/json_get_double
 !
@@ -2338,7 +2308,9 @@
 !  DESCRIPTION
 !    Get a double value from an json_value.
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_get_double(this, path, value, found)
 
     implicit none
 
@@ -2402,12 +2374,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine json_get_double
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_get_double_vec(me, path, vec, found)
 !********************************************************************************
 !****f* json_module/json_get_double_vec
 !
@@ -2420,7 +2389,9 @@
 !  AUTHOR
 !    Jacob Williams : 5/14/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_get_double_vec(me, path, vec, found)
 
     implicit none
 
@@ -2439,13 +2410,9 @@
     call json_get(me, path=path, array_callback=get_double_from_array, found=found)
 
     contains
-!********************************************************************************
 
-    !*********************************************************
+        ! callback function for double
         subroutine get_double_from_array(element, i, count)
-    !*********************************************************
-    ! callback function for double
-    !*********************************************************
         implicit none
 
         type(json_value),pointer,intent(in)     :: element
@@ -2461,16 +2428,11 @@
         !populate the elements:
         call json_get(element, value=vec(i))
 
-    !*********************************************************
         end subroutine get_double_from_array
-    !*********************************************************
 
-!********************************************************************************
     end subroutine json_get_double_vec
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_get_logical(this, path, value, found)
 !********************************************************************************
 !****f* json_module/json_get_logical
 !
@@ -2480,7 +2442,9 @@
 !  DESCRIPTION
 !    Get a logical value from an json_value.
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_get_logical(this, path, value, found)
 
     implicit none
 
@@ -2538,12 +2502,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine json_get_logical
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_get_logical_vec(me, path, vec, found)
 !********************************************************************************
 !****f* json_module/json_get_logical_vec
 !
@@ -2556,7 +2517,9 @@
 !  AUTHOR
 !    Jacob Williams : 5/14/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_get_logical_vec(me, path, vec, found)
 
     implicit none
 
@@ -2575,13 +2538,9 @@
     call json_get(me, path=path, array_callback=get_logical_from_array, found=found)
 
     contains
-!********************************************************************************
 
-    !*********************************************************
+        ! callback function for logical
         subroutine get_logical_from_array(element, i, count)
-    !*********************************************************
-    ! callback function for logical
-    !*********************************************************
         implicit none
 
         type(json_value),pointer,intent(in)  :: element
@@ -2597,16 +2556,11 @@
         !populate the elements:
         call json_get(element, value=vec(i))
 
-    !*********************************************************
         end subroutine get_logical_from_array
-    !*********************************************************
 
-!********************************************************************************
     end subroutine json_get_logical_vec
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_get_chars(this, path, value, found)
 !********************************************************************************
 !****f* json_module/json_get_chars
 !
@@ -2616,7 +2570,9 @@
 !  DESCRIPTION
 !    Get a character string from a json_value.
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_get_chars(this, path, value, found)
 
     implicit none
 
@@ -2801,11 +2757,11 @@
 
     end if
 
-!********************************************************************************
     end subroutine json_get_chars
 !********************************************************************************
 
 !********************************************************************************
+
     subroutine json_get_char_vec(me, path, vec, found)
 !********************************************************************************
 !****f* json_module/json_get_char_vec
@@ -2877,8 +2833,6 @@
 !********************************************************************************
 
 !********************************************************************************
-    subroutine json_get_array(this, path, array_callback, found)
-!********************************************************************************
 !****f* json_module/json_get_array
 !
 !  NAME
@@ -2889,7 +2843,9 @@
 !    This routine calls the user-supplied array_callback subroutine
 !        for each element in the array.
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_get_array(this, path, array_callback, found)
 
     implicit none
 
@@ -2950,12 +2906,9 @@
         if (present(found)) found = .false.
     end if
 
-!********************************************************************************
     end subroutine json_get_array
 !********************************************************************************
 
-!********************************************************************************
-    subroutine json_parse(file, p)
 !********************************************************************************
 !****f* json_module/json_parse
 !
@@ -2969,7 +2922,9 @@
 !    When calling this routine, any exceptions thrown from previous
 !        calls will automatically be cleared.
 !
-!********************************************************************************
+!  SOURCE
+ 
+    subroutine json_parse(file, p)
 
     implicit none
 
@@ -3037,12 +2992,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine json_parse
 !********************************************************************************
 
-!********************************************************************************
-    subroutine get_current_line_from_file(iunit,line)
 !********************************************************************************
 !****f* json_module/get_current_line_from_file
 !
@@ -3056,7 +3008,9 @@
 !  AUTHOR
 !    Jacob Williams
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine get_current_line_from_file(iunit,line)
     
     implicit none
     
@@ -3089,12 +3043,9 @@
         end do
     end if
     
-!********************************************************************************
     end subroutine get_current_line_from_file
 !********************************************************************************
     
-!********************************************************************************
-    recursive subroutine parse_value(unit, value)
 !********************************************************************************
 !****f* json_module/parse_value
 !
@@ -3104,7 +3055,9 @@
 !  DESCRIPTION
 !
 !
-!********************************************************************************
+!  SOURCE
+
+    recursive subroutine parse_value(unit, value)
 
     implicit none
 
@@ -3191,12 +3144,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine parse_value
 !********************************************************************************
 
-!********************************************************************************
-    subroutine to_logical(me,val,name)
 !********************************************************************************
 !****f* json_module/to_logical
 !
@@ -3209,7 +3159,9 @@
 !  AUTHOR
 !    Jacob Williams
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine to_logical(me,val,name)
 
     implicit none
 
@@ -3232,12 +3184,9 @@
     !name:
     if (present(name)) me%name = trim(name)
 
-!********************************************************************************
     end subroutine to_logical
 !********************************************************************************
 
-!********************************************************************************
-    subroutine to_integer(me,val,name)
 !********************************************************************************
 !****f* json_module/to_integer
 !
@@ -3250,7 +3199,10 @@
 !  AUTHOR
 !    Jacob Williams
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine to_integer(me,val,name)
+
     implicit none
 
     type(json_value), intent(inout)        :: me
@@ -3272,12 +3224,9 @@
     !name:
     if (present(name)) me%name = trim(name)
 
-!********************************************************************************
     end subroutine to_integer
 !********************************************************************************
 
-!********************************************************************************
-    subroutine to_real(me,val,name)
 !********************************************************************************
 !****f* json_module/to_real
 !
@@ -3290,7 +3239,9 @@
 !  AUTHOR
 !    Jacob Williams
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine to_real(me,val,name)
 
     implicit none
 
@@ -3313,12 +3264,9 @@
     !name:
     if (present(name)) me%name = trim(name)
 
-!********************************************************************************
     end subroutine to_real
 !********************************************************************************
 
-!********************************************************************************
-    subroutine to_string(me,val,name)
 !********************************************************************************
 !****f* json_module/to_string
 !
@@ -3331,7 +3279,9 @@
 !  AUTHOR
 !    Jacob Williams
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine to_string(me,val,name)
 
     implicit none
 
@@ -3353,12 +3303,9 @@
     !name:
     if (present(name)) me%name = trim(name)
 
-!********************************************************************************
     end subroutine to_string
 !********************************************************************************
 
-!********************************************************************************
-    subroutine to_null(me,name)
 !********************************************************************************
 !****f* json_module/to_null
 !
@@ -3371,7 +3318,9 @@
 !  AUTHOR
 !    Jacob Williams
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine to_null(me,name)
 
     implicit none
 
@@ -3387,12 +3336,9 @@
     !name:
     if (present(name)) me%name = trim(name)
 
-!********************************************************************************
     end subroutine to_null
 !********************************************************************************
 
-!********************************************************************************
-    subroutine to_object(me,name)
 !********************************************************************************
 !****f* json_module/to_object
 !
@@ -3405,7 +3351,9 @@
 !  AUTHOR
 !    Jacob Williams
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine to_object(me,name)
 
     implicit none
 
@@ -3421,12 +3369,9 @@
     !name:
     if (present(name)) me%name = trim(name)
 
-!********************************************************************************
     end subroutine to_object
 !********************************************************************************
 
-!********************************************************************************
-    subroutine to_array(me,name)
 !********************************************************************************
 !****f* json_module/to_array
 !
@@ -3439,7 +3384,10 @@
 !  AUTHOR
 !    Jacob Williams
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine to_array(me,name)
+
     implicit none
 
     type(json_value), intent(inout)        :: me
@@ -3454,12 +3402,9 @@
     !name:
     if (present(name)) me%name = trim(name)
 
-!********************************************************************************
     end subroutine to_array
 !********************************************************************************
 
-!********************************************************************************
-    recursive subroutine parse_object(unit, parent)
 !********************************************************************************
 !****f* json_module/parse_object
 !
@@ -3469,7 +3414,9 @@
 !  DESCRIPTION
 !
 !
-!********************************************************************************
+!  SOURCE
+
+    recursive subroutine parse_object(unit, parent)
 
     implicit none
 
@@ -3546,25 +3493,18 @@
     end if
 
     contains
-!********************************************************************************
 
-    !****************************************************
         subroutine cleanup()
-    !****************************************************
+        
         implicit none
 
         if (associated(pair)) nullify(pair)
 
-    !****************************************************
         end subroutine cleanup
-    !****************************************************
 
-!********************************************************************************
     end subroutine parse_object
 !********************************************************************************
 
-!********************************************************************************
-    recursive subroutine parse_array(unit, array)
 !********************************************************************************
 !****f* json_module/parse_array
 !
@@ -3574,7 +3514,9 @@
 !  DESCRIPTION
 !
 !
-!********************************************************************************
+!  SOURCE
+
+    recursive subroutine parse_array(unit, array)
 
     implicit none
 
@@ -3613,12 +3555,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine parse_array
 !********************************************************************************
 
-!********************************************************************************
-    subroutine parse_string(unit, string)
 !********************************************************************************
 !****f* json_module/parse_string
 !
@@ -3628,7 +3567,9 @@
 !  DESCRIPTION
 !
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine parse_string(unit, string)
 
     implicit none
 
@@ -3657,12 +3598,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine parse_string
 !********************************************************************************
 
-!********************************************************************************
-    subroutine parse_for_chars(unit, chars)
 !********************************************************************************
 !****f* json_module/parse_for_chars
 !
@@ -3672,7 +3610,9 @@
 !  DESCRIPTION
 !
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine parse_for_chars(unit, chars)
 
     implicit none
 
@@ -3700,12 +3640,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine parse_for_chars
 !********************************************************************************
 
-!********************************************************************************
-    subroutine parse_number(unit, value)
 !********************************************************************************
 !****f* json_module/parse_number
 !
@@ -3722,7 +3659,9 @@
 !  AUTHOR
 !    Jacob Williams : 1/20/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine parse_number(unit, value)
 
     implicit none
 
@@ -3802,12 +3741,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine parse_number
 !********************************************************************************
 
-!********************************************************************************
-    recursive function pop_char(unit, eof, skip_ws) result(popped)
 !********************************************************************************
 !****f* json_module/pop_char
 !
@@ -3821,8 +3757,10 @@
 !    This routine ignores non-printing ascii characters (iachar<=31) that
 !    are in strings.
 !
-!********************************************************************************
+!  SOURCE
 
+    recursive function pop_char(unit, eof, skip_ws) result(popped)
+    
     implicit none
 
     character(len=1)              :: popped
@@ -3892,12 +3830,9 @@
 
     end if
 
-!********************************************************************************
     end function pop_char
 !********************************************************************************
 
-!********************************************************************************
-    subroutine push_char(c)
 !********************************************************************************
 !****f* json_module/push_char
 !
@@ -3907,8 +3842,10 @@
 !  DESCRIPTION
 !
 !
-!********************************************************************************
+!  SOURCE
 
+    subroutine push_char(c)
+    
     implicit none
 
     character(len=1), intent(in) :: c
@@ -3928,12 +3865,9 @@
 
     end if
 
-!********************************************************************************
     end subroutine push_char
 !********************************************************************************
 
-!********************************************************************************
-    subroutine integer_to_string(ival,str)
 !********************************************************************************
 !****f* json_module/integer_to_string
 !
@@ -3946,7 +3880,10 @@
 !  AUTHOR
 !    Jacob Williams : 12/4/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine integer_to_string(ival,str)
+
     implicit none
 
     integer,intent(in)           :: ival
@@ -3962,12 +3899,9 @@
         str = repeat('*',len(str))
     end if
 
-!********************************************************************************
     end subroutine integer_to_string
 !********************************************************************************
 
-!********************************************************************************
-    subroutine real_to_string(rval,str)
 !********************************************************************************
 !****f* json_module/real_to_string
 !
@@ -3980,7 +3914,10 @@
 !  AUTHOR
 !    Jacob Williams : 12/4/2013
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine real_to_string(rval,str)
+
     implicit none
 
     real(wp),intent(in)          :: rval
@@ -3996,7 +3933,6 @@
         str = repeat('*',len(str))
     end if
 
-!********************************************************************************
     end subroutine real_to_string
 !********************************************************************************
 
