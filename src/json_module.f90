@@ -990,7 +990,7 @@
 !    Allocate a json_value pointer variable.
 !    This should be called before adding data to it.
 !    Example:
-!       type(json_value),pointer :: var
+!        type(json_value),pointer :: var
 !        call json_value_create(var)
 !        call to_real(var,1.0d0)
 !
@@ -2761,9 +2761,6 @@
 !********************************************************************************
 
 !********************************************************************************
-
-    subroutine json_get_char_vec(me, path, vec, found)
-!********************************************************************************
 !****f* json_module/json_get_char_vec
 !
 !  NAME
@@ -2775,7 +2772,9 @@
 !  AUTHOR
 !    Jacob Williams : 5/14/2014
 !
-!********************************************************************************
+!  SOURCE
+
+    subroutine json_get_char_vec(me, path, vec, found)
 
     implicit none
 
@@ -2794,13 +2793,10 @@
     call json_get(me, path=path, array_callback=get_chars_from_array, found=found)
 
     contains
-!********************************************************************************
 
-    !*********************************************************
+        ! callback function for chars
         subroutine get_chars_from_array(element, i, count)
-    !*********************************************************
-    ! callback function for chars
-    !*********************************************************
+        
         implicit none
 
         type(json_value),pointer,intent(in)  :: element
@@ -2824,11 +2820,8 @@
             vec(i) = ''
         end if
 
-    !*********************************************************
         end subroutine get_chars_from_array
-    !*********************************************************
 
-!********************************************************************************
     end subroutine json_get_char_vec
 !********************************************************************************
 
@@ -3494,6 +3487,7 @@
 
     contains
 
+        !cleanup routine:
         subroutine cleanup()
         
         implicit none
