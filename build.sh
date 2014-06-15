@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 #
-#  This is just a simple script to 
-#  build the json-fortran library and 
-#  example program on Linux and Mac.
+#  This is just a simple script to build the json-fortran library and example program on Linux and Mac.
+#
+#  It also builds the documentation using RoboDoc
 #
 #  Jacob Williams : 2/8/2014
 #
@@ -14,6 +14,7 @@
 SRCDIR='src/'
 BUILDDIR='lib/'
 BINDIR='bin/'
+DOCDIR='documentation/'
 
 # Intel compiler
 FCOMPILER='ifort'
@@ -27,6 +28,7 @@ FCOMPILERFLAGS='-O2 -warn -stand f08 -diag-disable 7601 -traceback'
 FCMODULEPATHFLAG='-module '
 
 # GFortran (must be >= 4.9)
+#FCOMPILER='gfortran'
 #FCOMPILER='/opt/local/bin/gfortran-mp-4.9'
 #FCOMPILERFLAGS='-O2 -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008'
 #FCMODULEPATHFLAG='-J'
@@ -46,19 +48,37 @@ EXEOUT='json'
 MODCODE='json_module'
 EXAMPLECODE='json_example'
 
+ROBODOC='robodoc'
+ROBOFLAGS="--src ${SRCDIR} --doc ${DOCDIR} --multidoc --html --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4"
+
 #output directories:
 mkdir -p $BUILDDIR
 mkdir -p $BINDIR
+mkdir -p $DOCDIR
 
 #clean build:
 rm -f $BUILDDIR$WC$OBJEXT
 rm -f $BUILDDIR$WC$MODEXT
 rm -f $BUILDDIR$WC$LIBEXT
+rm -rf $DOCDIR$WC
 
-#build library:
+#
+# build library:
+#
+
 $FCOMPILER $FCOMPILERFLAGS -c $SRCDIR$MODCODE$FEXT $FCMODULEPATHFLAG$BUILDDIR
 mv $MODCODE$OBJEXT $BUILDDIR
 $ARCHIVER $ARCHIVERFLAGS $BUILDDIR$LIBOUT$LIBEXT $BUILDDIR$MODCODE$OBJEXT
 
-#build example:
+#
+# build example:
+#
+
 $FCOMPILER $FCOMPILERFLAGS -o $BINDIR$EXEOUT $FCMODULEPATHFLAG$BUILDDIR $SRCDIR$EXAMPLECODE$FEXT $BUILDDIR$LIBOUT$LIBEXT
+
+#
+# build documentation:
+#
+
+$ROBODOC $ROBOFLAGS
+
