@@ -2917,28 +2917,52 @@
 !
 !  SOURCE
  
-    subroutine json_parse(file, p)
+    subroutine json_parse(file, p, unit)
 
     implicit none
 
     character(len=*),intent(in) :: file
     type(json_value),pointer    :: p
+    integer,intent(in),optional :: unit
 
     integer :: iunit, istat
     character(len=:),allocatable :: line, arrow_str
     character(len=10) :: line_str, char_str
+    logical :: is_open
 
     !clean any exceptions and initialize:
     call json_initialize()
 
-    ! open the file
-    open (  newunit     = iunit, &
-            file        = file, &
-            status      = 'OLD', &
-            action      = 'READ', &
-            form        = 'FORMATTED', &
-            position    = 'REWIND', &
-            iostat      = istat)
+    if (present(unit)) then
+        
+        iunit = unit   
+        
+        !check to see if the file is already open
+        ! if it is, then use it, otherwise open the file.
+        inquire(unit=iunit, opened=is_open, iostat=istat)
+        if (istat==0 .and. .not. is_open) then
+           ! open the file
+            open (  unit        = iunit, &
+                    file        = file, &
+                    status      = 'OLD', &
+                    action      = 'READ', &
+                    form        = 'FORMATTED', &
+                    position    = 'REWIND', &
+                    iostat      = istat)
+        end if
+        
+    else
+    
+        ! open the file with a new unit number:
+        open (  newunit     = iunit, &
+                file        = file, &
+                status      = 'OLD', &
+                action      = 'READ', &
+                form        = 'FORMATTED', &
+                position    = 'REWIND', &
+                iostat      = istat)
+    
+    end if
 
     if (istat==0) then
 
@@ -3576,6 +3600,7 @@
     if (.not. exception_thrown) then
 
         string = ''    !initialize string
+        last = ' '     !
 
         do
             c = pop_char(unit, eof = eof, skip_ws = .false.)
@@ -3930,6 +3955,54 @@
     end subroutine real_to_string
 !********************************************************************************
 
+!********************************************************************************
+!****f* json_module/valid_json_hex
+!
+!  NAME
+!    valid_json_hex
+!
+!  DESCRIPTION
+!    Returns true if the string is a valid 4-digit hex string.
+!
+!  EXAMPLE
+!    valid_json_hex('0000')  !returns true
+!    valid_json_hex('ABC4')  !returns true    
+!    valid_json_hex('AB')    !returns false (< 4 characters)
+!    valid_json_hex('WXYZ')  !returns false (invalid characters)
+!
+!  AUTHOR
+!    Jacob Williams : 6/14/2014
+!
+!  SOURCE
+
+    function valid_json_hex(str) result(valid)
+
+    implicit none
+
+    character(len=*),intent(in) :: str
+    logical :: valid
+    
+    integer :: n,i
+    
+    !an array of the valid hex characters:
+    character(len=1),dimension(16),parameter :: valid_chars = &
+        ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
+
+    !initialize
+    valid = .false.   
+    
+    !check all the characters in the string:
+    n = len(str)
+    if (n==4) then
+        do i=1,n
+            if (.not. any(str(i:i)==valid_chars)) return
+        end do
+        valid = .true.    !all are in the set, so it is OK
+    end if
+
+    end function valid_json_hex
+!********************************************************************************
+    
 !***********************************************************************************************************************************
     end module json_module
 !***********************************************************************************************************************************
