@@ -49,7 +49,7 @@ MODCODE='json_module'
 EXAMPLECODE='json_example'
 
 ROBODOC='robodoc'
-ROBOFLAGS="--src ${SRCDIR} --doc ${DOCDIR} --multidoc --html --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4"
+ROBOFLAGS="--src ${SRCDIR} --doc ${DOCDIR} --multidoc --html --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4 --documenttitle jsonfortran --sections"
 
 #output directories:
 mkdir -p $BUILDDIR
