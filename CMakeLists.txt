@@ -94,13 +94,15 @@ set_target_properties ( ${LIB_NAME}-static
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
   PREFIX lib
-  VERSION ${VERSION} )
+  VERSION ${VERSION}
+  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 set_target_properties ( ${LIB_NAME}
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
   PREFIX lib
   SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR} 
-  VERSION ${VERSION} )
+  VERSION ${VERSION}
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 
 #-------------------------------------
 # Build the documentation with ROBODoc
@@ -112,7 +114,7 @@ if ( NOT ROBODOC_SKIP_DOC_GEN )
   if ( ROBODOC ) # Found
     set ( ROBODOC_OPTIONS --tabsize 4 --index --toc --sections --syntaxcolors --source_line_numbers
       CACHE STRING "Options passed to robodoc to control building the documentation" )
-    set ( DOC_DIR "${CMAKE_BINARY_DIR}/doc" )
+    set ( DOC_DIR "${CMAKE_BINARY_DIR}/documentation" )
     set ( REQUIRED_ROBODOC_OPTIONS
       --src "${CMAKE_SOURCE_DIR}/src" --doc "${DOC_DIR}"
       --multidoc --html --ignore_case_when_linking
@@ -129,7 +131,6 @@ if ( NOT ROBODOC_SKIP_DOC_GEN )
       COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using ROBODoc" )
     add_custom_target ( documentation ALL
       DEPENDS ${ROBO_OUTPUTS} )
-    set_directory_properties ( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES doc )
   else ( ROBODOC ) # Not found
     message ( WARNING
       "ROBODoc not found! Please set the CMake cache variable ROBODOC to point to the installed ROBODoc binary, and reconfigure or disable building the documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/ If you do not wish to install ROBODoc and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOCUMENTATION_GENERATION to FALSE." )
