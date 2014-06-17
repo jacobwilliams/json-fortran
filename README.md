@@ -37,7 +37,7 @@ environment variable `FC` to point to your Fortran compiler, and
 create a build directory. Then `(cmake-gui|ccmake|cmake)
 /path/to/json-fortran-root` to configure, `make` to build and `make
 install` to optionally install. As long as the project is built with
-CMake other CMake projects can find it and link against it:
+CMake, other CMake projects can find it and link against it:
 
 ```CMake
 cmake_minimum_required ( VERSION 2.8 FATAL_ERROR )
