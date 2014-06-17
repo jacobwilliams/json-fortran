@@ -26,10 +26,11 @@
 !    Jacob Williams : 2/8/2013 : Extensive modifications to the original code.
 !
 !  SEE ALSO
-!
-!    [1] https://github.com/josephalevin/fson [FSON code retrieved on 12/2/2013]
-!    [3] http://www.json.org/ [JSON website]
-!    [2] http://jsonlint.com/ [JSON validator]
+!    [1] http://github.com/jacobwilliams/json-fortran [json-fortran development site]
+!    [2] http://jacobwilliams.github.io/json-fortran [json-fortran online documentation]
+!    [3] http://github.com/josephalevin/fson [FSON code retrieved on 12/2/2013]
+!    [4] http://www.json.org/ [JSON website]
+!    [5] http://jsonlint.com/ [JSON validator]
 !
 !  COPYRIGHT
 !
@@ -37,7 +38,7 @@
 !    json-fortran License:
 !
 !    JSON-FORTRAN: A Fortran 2003/2008 JSON API
-!    https://github.com/jacobwilliams/json-fortran
+!    http://github.com/jacobwilliams/json-fortran
 !
 !    Copyright (c) 2014, Jacob Williams
 !    All rights reserved.
