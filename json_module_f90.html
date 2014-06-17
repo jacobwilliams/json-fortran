@@ -691,24 +691,24 @@
 <pre>    Jacob Williams : 12/4/2013
 </pre>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">3904 </span>    subroutine <strong>integer_to_string</strong><span class="sign">(</span>ival<span class="sign">,</span>str<span class="sign">)</span>
-<span class="line_number">3905 </span>
-<span class="line_number">3906 </span>    implicit none
-<span class="line_number">3907 </span>
-<span class="line_number">3908 </span>    integer<span class="sign">,</span>intent<span class="sign">(</span>in<span class="sign">)</span>           <span class="sign">:</span><span class="sign">:</span> ival
-<span class="line_number">3909 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span>intent<span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> str
-<span class="line_number">3910 </span>
-<span class="line_number">3911 </span>    integer <span class="sign">:</span><span class="sign">:</span> istat
-<span class="line_number">3912 </span>
-<span class="line_number">3913 </span>    write<span class="sign">(</span>str<span class="sign">,</span>fmt<span class="sign">=</span>int_fmt<span class="sign">,</span>iostat<span class="sign">=</span>istat<span class="sign">)</span> ival
-<span class="line_number">3914 </span>
-<span class="line_number">3915 </span>    if <span class="sign">(</span>istat<span class="sign">=</span><span class="sign">=</span>0<span class="sign">)</span> then
-<span class="line_number">3916 </span>        str <span class="sign">=</span> adjustl<span class="sign">(</span>str<span class="sign">)</span>
-<span class="line_number">3917 </span>    else
-<span class="line_number">3918 </span>        str <span class="sign">=</span> repeat<span class="sign">(</span><span class="squote">'*'</span><span class="sign">,</span>len<span class="sign">(</span>str<span class="sign">)</span><span class="sign">)</span>
-<span class="line_number">3919 </span>    end if
-<span class="line_number">3920 </span>
-<span class="line_number">3921 </span>    end subroutine <strong>integer_to_string</strong>
+<pre class="source"><span class="line_number">3960 </span>    subroutine <strong>integer_to_string</strong><span class="sign">(</span>ival<span class="sign">,</span>str<span class="sign">)</span>
+<span class="line_number">3961 </span>
+<span class="line_number">3962 </span>    implicit none
+<span class="line_number">3963 </span>
+<span class="line_number">3964 </span>    integer<span class="sign">,</span>intent<span class="sign">(</span>in<span class="sign">)</span>           <span class="sign">:</span><span class="sign">:</span> ival
+<span class="line_number">3965 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span>intent<span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> str
+<span class="line_number">3966 </span>
+<span class="line_number">3967 </span>    integer <span class="sign">:</span><span class="sign">:</span> istat
+<span class="line_number">3968 </span>
+<span class="line_number">3969 </span>    write<span class="sign">(</span>str<span class="sign">,</span>fmt<span class="sign">=</span>int_fmt<span class="sign">,</span>iostat<span class="sign">=</span>istat<span class="sign">)</span> ival
+<span class="line_number">3970 </span>
+<span class="line_number">3971 </span>    if <span class="sign">(</span>istat<span class="sign">=</span><span class="sign">=</span>0<span class="sign">)</span> then
+<span class="line_number">3972 </span>        str <span class="sign">=</span> adjustl<span class="sign">(</span>str<span class="sign">)</span>
+<span class="line_number">3973 </span>    else
+<span class="line_number">3974 </span>        str <span class="sign">=</span> repeat<span class="sign">(</span><span class="squote">'*'</span><span class="sign">,</span>len<span class="sign">(</span>str<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">3975 </span>    end if
+<span class="line_number">3976 </span>
+<span class="line_number">3977 </span>    end subroutine <strong>integer_to_string</strong>
 </pre>
 
 <hr />
@@ -2852,46 +2852,48 @@
 </pre>
 <p class="item_name">DESCRIPTION</p>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">3537 </span>    recursive subroutine <strong>parse_array</strong><span class="sign">(</span>unit<span class="sign">,</span> array<span class="sign">)</span>
-<span class="line_number">3538 </span>
-<span class="line_number">3539 </span>    implicit none
+<pre class="source"><span class="line_number">3539 </span>    recursive subroutine <strong>parse_array</strong><span class="sign">(</span>unit<span class="sign">,</span> array<span class="sign">)</span>
 <span class="line_number">3540 </span>
-<span class="line_number">3541 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>       <span class="sign">:</span><span class="sign">:</span> unit
-<span class="line_number">3542 </span>    type<span class="sign">(</span><a href="#robo36">json_value</a><span class="sign">)</span><span class="sign">,</span> pointer <span class="sign">:</span><span class="sign">:</span> array
-<span class="line_number">3543 </span>
-<span class="line_number">3544 </span>    type<span class="sign">(</span><a href="#robo36">json_value</a><span class="sign">)</span><span class="sign">,</span> pointer <span class="sign">:</span><span class="sign">:</span> element
-<span class="line_number">3545 </span>    logical <span class="sign">:</span><span class="sign">:</span> eof
-<span class="line_number">3546 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
-<span class="line_number">3547 </span>
-<span class="line_number">3548 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
-<span class="line_number">3549 </span>        nullify<span class="sign">(</span>element<span class="sign">)</span>
-<span class="line_number">3550 </span>
-<span class="line_number">3551 </span>        <span class="sign">!</span> try to parse an element value
-<span class="line_number">3552 </span>        call <a href="#robo47">json_value_create</a><span class="sign">(</span>element<span class="sign">)</span>
-<span class="line_number">3553 </span>        call <a href="#robo57">parse_value</a><span class="sign">(</span>unit<span class="sign">,</span> element<span class="sign">)</span>
-<span class="line_number">3554 </span>
-<span class="line_number">3555 </span>        <span class="sign">!</span> parse value will disassociate an empty array value
-<span class="line_number">3556 </span>        if <span class="sign">(</span>associated<span class="sign">(</span>element<span class="sign">)</span><span class="sign">)</span> then
-<span class="line_number">3557 </span>            call json_value_add<span class="sign">(</span>array<span class="sign">,</span> element<span class="sign">)</span>
-<span class="line_number">3558 </span>            nullify<span class="sign">(</span>element<span class="sign">)</span>    <span class="sign">!</span>cleanup
-<span class="line_number">3559 </span>        end if
-<span class="line_number">3560 </span>
-<span class="line_number">3561 </span>        <span class="sign">!</span> popped the next character
-<span class="line_number">3562 </span>        c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">3541 </span>    implicit none
+<span class="line_number">3542 </span>
+<span class="line_number">3543 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>       <span class="sign">:</span><span class="sign">:</span> unit
+<span class="line_number">3544 </span>    type<span class="sign">(</span><a href="#robo36">json_value</a><span class="sign">)</span><span class="sign">,</span> pointer <span class="sign">:</span><span class="sign">:</span> array
+<span class="line_number">3545 </span>
+<span class="line_number">3546 </span>    type<span class="sign">(</span><a href="#robo36">json_value</a><span class="sign">)</span><span class="sign">,</span> pointer <span class="sign">:</span><span class="sign">:</span> element
+<span class="line_number">3547 </span>    logical <span class="sign">:</span><span class="sign">:</span> eof
+<span class="line_number">3548 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
+<span class="line_number">3549 </span>
+<span class="line_number">3550 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
+<span class="line_number">3551 </span>        nullify<span class="sign">(</span>element<span class="sign">)</span>
+<span class="line_number">3552 </span>
+<span class="line_number">3553 </span>        <span class="sign">!</span> try to parse an element value
+<span class="line_number">3554 </span>        call <a href="#robo47">json_value_create</a><span class="sign">(</span>element<span class="sign">)</span>
+<span class="line_number">3555 </span>        call <a href="#robo57">parse_value</a><span class="sign">(</span>unit<span class="sign">,</span> element<span class="sign">)</span>
+<span class="line_number">3556 </span>        if <span class="sign">(</span>exception_thrown<span class="sign">)</span> return
+<span class="line_number">3557 </span>
+<span class="line_number">3558 </span>        <span class="sign">!</span> parse value will disassociate an empty array value
+<span class="line_number">3559 </span>        if <span class="sign">(</span>associated<span class="sign">(</span>element<span class="sign">)</span><span class="sign">)</span> then
+<span class="line_number">3560 </span>            call json_value_add<span class="sign">(</span>array<span class="sign">,</span> element<span class="sign">)</span>
+<span class="line_number">3561 </span>            nullify<span class="sign">(</span>element<span class="sign">)</span>    <span class="sign">!</span>cleanup
+<span class="line_number">3562 </span>        end if
 <span class="line_number">3563 </span>
-<span class="line_number">3564 </span>        if <span class="sign">(</span>eof<span class="sign">)</span> then
-<span class="line_number">3565 </span>            return
-<span class="line_number">3566 </span>        else if <span class="sign">(</span><span class="squote">','</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
-<span class="line_number">3567 </span>            <span class="sign">!</span> parse the next element
-<span class="line_number">3568 </span>            call <strong>parse_array</strong><span class="sign">(</span>unit<span class="sign">,</span> array<span class="sign">)</span>
-<span class="line_number">3569 </span>        else if <span class="sign">(</span><span class="squote">']'</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
-<span class="line_number">3570 </span>            <span class="sign">!</span> end of array
-<span class="line_number">3571 </span>            return
-<span class="line_number">3572 </span>        end if
-<span class="line_number">3573 </span>
-<span class="line_number">3574 </span>    end if
-<span class="line_number">3575 </span>
-<span class="line_number">3576 </span>    end subroutine <strong>parse_array</strong>
+<span class="line_number">3564 </span>        <span class="sign">!</span> popped the next character
+<span class="line_number">3565 </span>        c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">3566 </span>
+<span class="line_number">3567 </span>        if <span class="sign">(</span>eof<span class="sign">)</span> then
+<span class="line_number">3568 </span>            return
+<span class="line_number">3569 </span>        else if <span class="sign">(</span><span class="squote">','</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
+<span class="line_number">3570 </span>            <span class="sign">!</span> parse the next element
+<span class="line_number">3571 </span>            call <strong>parse_array</strong><span class="sign">(</span>unit<span class="sign">,</span> array<span class="sign">)</span>
+<span class="line_number">3572 </span>            if <span class="sign">(</span>exception_thrown<span class="sign">)</span> return
+<span class="line_number">3573 </span>        else if <span class="sign">(</span><span class="squote">']'</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
+<span class="line_number">3574 </span>            <span class="sign">!</span> end of array
+<span class="line_number">3575 </span>            return
+<span class="line_number">3576 </span>        end if
+<span class="line_number">3577 </span>
+<span class="line_number">3578 </span>    end if
+<span class="line_number">3579 </span>
+<span class="line_number">3580 </span>    end subroutine <strong>parse_array</strong>
 </pre>
 
 <hr />
@@ -2904,35 +2906,35 @@
 </pre>
 <p class="item_name">DESCRIPTION</p>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">3634 </span>    subroutine <strong>parse_for_chars</strong><span class="sign">(</span>unit<span class="sign">,</span> chars<span class="sign">)</span>
-<span class="line_number">3635 </span>
-<span class="line_number">3636 </span>    implicit none
-<span class="line_number">3637 </span>
-<span class="line_number">3638 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>            <span class="sign">:</span><span class="sign">:</span> unit
-<span class="line_number">3639 </span>    character<span class="sign">(</span>len <span class="sign">=</span> <span class="sign">*</span><span class="sign">)</span><span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> chars
-<span class="line_number">3640 </span>
-<span class="line_number">3641 </span>    integer <span class="sign">:</span><span class="sign">:</span> i<span class="sign">,</span> length
-<span class="line_number">3642 </span>    logical <span class="sign">:</span><span class="sign">:</span> eof
-<span class="line_number">3643 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
-<span class="line_number">3644 </span>
-<span class="line_number">3645 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
-<span class="line_number">3646 </span>
-<span class="line_number">3647 </span>        length <span class="sign">=</span> len_trim<span class="sign">(</span>chars<span class="sign">)</span>
-<span class="line_number">3648 </span>
-<span class="line_number">3649 </span>        do i <span class="sign">=</span> 1<span class="sign">,</span> length
-<span class="line_number">3650 </span>            c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
-<span class="line_number">3651 </span>            if <span class="sign">(</span>eof<span class="sign">)</span> then
-<span class="line_number">3652 </span>                call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_for_chars</strong>: Unexpected end of file while parsing array.'</span><span class="sign">)</span>
-<span class="line_number">3653 </span>                return
-<span class="line_number">3654 </span>            else if <span class="sign">(</span>c <span class="sign">/</span><span class="sign">=</span> chars<span class="sign">(</span>i<span class="sign">:</span>i<span class="sign">)</span><span class="sign">)</span> then
-<span class="line_number">3655 </span>                call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_for_chars</strong>: Unexpected character.: "'</span><span class="sign">/</span><span class="sign">/</span>c<span class="sign">/</span><span class="sign">/</span><span class="squote">'" '</span><span class="sign">/</span><span class="sign">/</span>chars<span class="sign">(</span>i<span class="sign">:</span>i<span class="sign">)</span><span class="sign">)</span>
-<span class="line_number">3656 </span>                return
-<span class="line_number">3657 </span>            end if
-<span class="line_number">3658 </span>        end do
-<span class="line_number">3659 </span>
-<span class="line_number">3660 </span>    end if
-<span class="line_number">3661 </span>
-<span class="line_number">3662 </span>    end subroutine <strong>parse_for_chars</strong>
+<pre class="source"><span class="line_number">3690 </span>    subroutine <strong>parse_for_chars</strong><span class="sign">(</span>unit<span class="sign">,</span> chars<span class="sign">)</span>
+<span class="line_number">3691 </span>
+<span class="line_number">3692 </span>    implicit none
+<span class="line_number">3693 </span>
+<span class="line_number">3694 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>            <span class="sign">:</span><span class="sign">:</span> unit
+<span class="line_number">3695 </span>    character<span class="sign">(</span>len <span class="sign">=</span> <span class="sign">*</span><span class="sign">)</span><span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> chars
+<span class="line_number">3696 </span>
+<span class="line_number">3697 </span>    integer <span class="sign">:</span><span class="sign">:</span> i<span class="sign">,</span> length
+<span class="line_number">3698 </span>    logical <span class="sign">:</span><span class="sign">:</span> eof
+<span class="line_number">3699 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
+<span class="line_number">3700 </span>
+<span class="line_number">3701 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
+<span class="line_number">3702 </span>
+<span class="line_number">3703 </span>        length <span class="sign">=</span> len_trim<span class="sign">(</span>chars<span class="sign">)</span>
+<span class="line_number">3704 </span>
+<span class="line_number">3705 </span>        do i <span class="sign">=</span> 1<span class="sign">,</span> length
+<span class="line_number">3706 </span>            c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">3707 </span>            if <span class="sign">(</span>eof<span class="sign">)</span> then
+<span class="line_number">3708 </span>                call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_for_chars</strong>: Unexpected end of file while parsing array.'</span><span class="sign">)</span>
+<span class="line_number">3709 </span>                return
+<span class="line_number">3710 </span>            else if <span class="sign">(</span>c <span class="sign">/</span><span class="sign">=</span> chars<span class="sign">(</span>i<span class="sign">:</span>i<span class="sign">)</span><span class="sign">)</span> then
+<span class="line_number">3711 </span>                call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_for_chars</strong>: Unexpected character.: "'</span><span class="sign">/</span><span class="sign">/</span>c<span class="sign">/</span><span class="sign">/</span><span class="squote">'" '</span><span class="sign">/</span><span class="sign">/</span>chars<span class="sign">(</span>i<span class="sign">:</span>i<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">3712 </span>                return
+<span class="line_number">3713 </span>            end if
+<span class="line_number">3714 </span>        end do
+<span class="line_number">3715 </span>
+<span class="line_number">3716 </span>    end if
+<span class="line_number">3717 </span>
+<span class="line_number">3718 </span>    end subroutine <strong>parse_for_chars</strong>
 </pre>
 
 <hr />
@@ -2953,87 +2955,87 @@
 <pre>    Jacob Williams : 1/20/2014
 </pre>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">3683 </span>    subroutine <strong>parse_number</strong><span class="sign">(</span>unit<span class="sign">,</span> value<span class="sign">)</span>
-<span class="line_number">3684 </span>
-<span class="line_number">3685 </span>    implicit none
-<span class="line_number">3686 </span>
-<span class="line_number">3687 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>       <span class="sign">:</span><span class="sign">:</span> unit
-<span class="line_number">3688 </span>    type<span class="sign">(</span><a href="#robo36">json_value</a><span class="sign">)</span><span class="sign">,</span> pointer <span class="sign">:</span><span class="sign">:</span> value
-<span class="line_number">3689 </span>
-<span class="line_number">3690 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">:</span><span class="sign">)</span><span class="sign">,</span>allocatable <span class="sign">:</span><span class="sign">:</span> str
-<span class="line_number">3691 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
-<span class="line_number">3692 </span>    logical <span class="sign">:</span><span class="sign">:</span> eof
-<span class="line_number">3693 </span>    real<span class="sign">(</span>wp<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> rval
-<span class="line_number">3694 </span>    integer <span class="sign">:</span><span class="sign">:</span> ival
-<span class="line_number">3695 </span>    logical <span class="sign">:</span><span class="sign">:</span> first
-<span class="line_number">3696 </span>    logical <span class="sign">:</span><span class="sign">:</span> is_integer
-<span class="line_number">3697 </span>
-<span class="line_number">3698 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
-<span class="line_number">3699 </span>
-<span class="line_number">3700 </span>        str <span class="sign">=</span> <span class="squote">''</span>
-<span class="line_number">3701 </span>        first <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>
-<span class="line_number">3702 </span>        is_integer <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>    <span class="sign">!</span>assume it may be an integer<span class="sign">,</span>unless otherwise determined
-<span class="line_number">3703 </span>
-<span class="line_number">3704 </span>        <span class="sign">!</span>read one character at a time and accumulate the string<span class="sign">:</span>
-<span class="line_number">3705 </span>        do
-<span class="line_number">3706 </span>
-<span class="line_number">3707 </span>            <span class="sign">!</span>get the next character<span class="sign">:</span>
-<span class="line_number">3708 </span>            c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
-<span class="line_number">3709 </span>
-<span class="line_number">3710 </span>            if <span class="sign">(</span>eof<span class="sign">)</span> then
-<span class="line_number">3711 </span>                call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_number</strong>: Unexpected end of file while parsing number.'</span><span class="sign">)</span>
-<span class="line_number">3712 </span>                return
-<span class="line_number">3713 </span>            else
-<span class="line_number">3714 </span>
-<span class="line_number">3715 </span>                select case <span class="sign">(</span>c<span class="sign">)</span>
-<span class="line_number">3716 </span>                case<span class="sign">(</span><span class="squote">'-'</span><span class="sign">,</span><span class="squote">'+'</span><span class="sign">)</span>    <span class="sign">!</span>note<span class="sign">:</span> allowing a <span class="squote">'+'</span> as the first character here<span class="sign">.</span>
-<span class="line_number">3717 </span>
-<span class="line_number">3718 </span>                    if <span class="sign">(</span>is_integer <span class="sign">.</span>and<span class="sign">.</span> <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> first<span class="sign">)</span><span class="sign">)</span> is_integer <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">3719 </span>
-<span class="line_number">3720 </span>                    <span class="sign">!</span>add it to the string<span class="sign">:</span>
-<span class="line_number">3721 </span>                    str <span class="sign">=</span> str <span class="sign">/</span><span class="sign">/</span> c
-<span class="line_number">3722 </span>
-<span class="line_number">3723 </span>                case<span class="sign">(</span><span class="squote">'.'</span><span class="sign">,</span><span class="squote">'E'</span><span class="sign">,</span><span class="squote">'e'</span><span class="sign">)</span>    <span class="sign">!</span>can be present in real numbers
-<span class="line_number">3724 </span>
-<span class="line_number">3725 </span>                    if <span class="sign">(</span>is_integer<span class="sign">)</span> is_integer <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">3726 </span>
-<span class="line_number">3727 </span>                    <span class="sign">!</span>add it to the string<span class="sign">:</span>
-<span class="line_number">3728 </span>                    str <span class="sign">=</span> str <span class="sign">/</span><span class="sign">/</span> c
-<span class="line_number">3729 </span>
-<span class="line_number">3730 </span>                case<span class="sign">(</span><span class="squote">'0'</span><span class="sign">:</span><span class="squote">'9'</span><span class="sign">)</span>    <span class="sign">!</span>valid characters for numbers
-<span class="line_number">3731 </span>
-<span class="line_number">3732 </span>                    <span class="sign">!</span>add it to the string<span class="sign">:</span>
-<span class="line_number">3733 </span>                    str <span class="sign">=</span> str <span class="sign">/</span><span class="sign">/</span> c
-<span class="line_number">3734 </span>
-<span class="line_number">3735 </span>                case default
-<span class="line_number">3736 </span>
-<span class="line_number">3737 </span>                    <span class="sign">!</span>push back the last character read<span class="sign">:</span>
-<span class="line_number">3738 </span>                    call <a href="#robo60">push_char</a><span class="sign">(</span>c<span class="sign">)</span>
-<span class="line_number">3739 </span>
-<span class="line_number">3740 </span>                    <span class="sign">!</span>string to value<span class="sign">:</span>
-<span class="line_number">3741 </span>                    if <span class="sign">(</span>is_integer<span class="sign">)</span> then
-<span class="line_number">3742 </span>                        ival <span class="sign">=</span> <a href="#robo63">string_to_integer</a><span class="sign">(</span>str<span class="sign">)</span>
-<span class="line_number">3743 </span>                        call <a href="#robo66">to_integer</a><span class="sign">(</span>value<span class="sign">,</span>ival<span class="sign">)</span>
-<span class="line_number">3744 </span>                    else
-<span class="line_number">3745 </span>                        rval <span class="sign">=</span> <a href="#robo62">string_to_double</a><span class="sign">(</span>str<span class="sign">)</span>
-<span class="line_number">3746 </span>                        call <a href="#robo70">to_real</a><span class="sign">(</span>value<span class="sign">,</span>rval<span class="sign">)</span>
-<span class="line_number">3747 </span>                    end if
-<span class="line_number">3748 </span>
-<span class="line_number">3749 </span>                    exit    <span class="sign">!</span>finished
-<span class="line_number">3750 </span>
-<span class="line_number">3751 </span>                end select
-<span class="line_number">3752 </span>
-<span class="line_number">3753 </span>            end if
-<span class="line_number">3754 </span>            if <span class="sign">(</span>first<span class="sign">)</span> first <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
+<pre class="source"><span class="line_number">3739 </span>    subroutine <strong>parse_number</strong><span class="sign">(</span>unit<span class="sign">,</span> value<span class="sign">)</span>
+<span class="line_number">3740 </span>
+<span class="line_number">3741 </span>    implicit none
+<span class="line_number">3742 </span>
+<span class="line_number">3743 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>       <span class="sign">:</span><span class="sign">:</span> unit
+<span class="line_number">3744 </span>    type<span class="sign">(</span><a href="#robo36">json_value</a><span class="sign">)</span><span class="sign">,</span> pointer <span class="sign">:</span><span class="sign">:</span> value
+<span class="line_number">3745 </span>
+<span class="line_number">3746 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">:</span><span class="sign">)</span><span class="sign">,</span>allocatable <span class="sign">:</span><span class="sign">:</span> str
+<span class="line_number">3747 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
+<span class="line_number">3748 </span>    logical <span class="sign">:</span><span class="sign">:</span> eof
+<span class="line_number">3749 </span>    real<span class="sign">(</span>wp<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> rval
+<span class="line_number">3750 </span>    integer <span class="sign">:</span><span class="sign">:</span> ival
+<span class="line_number">3751 </span>    logical <span class="sign">:</span><span class="sign">:</span> first
+<span class="line_number">3752 </span>    logical <span class="sign">:</span><span class="sign">:</span> is_integer
+<span class="line_number">3753 </span>
+<span class="line_number">3754 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
 <span class="line_number">3755 </span>
-<span class="line_number">3756 </span>        end do
-<span class="line_number">3757 </span>
-<span class="line_number">3758 </span>        <span class="sign">!</span>cleanup<span class="sign">:</span>
-<span class="line_number">3759 </span>        if <span class="sign">(</span>allocated<span class="sign">(</span>str<span class="sign">)</span><span class="sign">)</span> deallocate<span class="sign">(</span>str<span class="sign">)</span>
-<span class="line_number">3760 </span>
-<span class="line_number">3761 </span>    end if
+<span class="line_number">3756 </span>        str <span class="sign">=</span> <span class="squote">''</span>
+<span class="line_number">3757 </span>        first <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>
+<span class="line_number">3758 </span>        is_integer <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>    <span class="sign">!</span>assume it may be an integer<span class="sign">,</span>unless otherwise determined
+<span class="line_number">3759 </span>
+<span class="line_number">3760 </span>        <span class="sign">!</span>read one character at a time and accumulate the string<span class="sign">:</span>
+<span class="line_number">3761 </span>        do
 <span class="line_number">3762 </span>
-<span class="line_number">3763 </span>    end subroutine <strong>parse_number</strong>
+<span class="line_number">3763 </span>            <span class="sign">!</span>get the next character<span class="sign">:</span>
+<span class="line_number">3764 </span>            c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">3765 </span>
+<span class="line_number">3766 </span>            if <span class="sign">(</span>eof<span class="sign">)</span> then
+<span class="line_number">3767 </span>                call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_number</strong>: Unexpected end of file while parsing number.'</span><span class="sign">)</span>
+<span class="line_number">3768 </span>                return
+<span class="line_number">3769 </span>            else
+<span class="line_number">3770 </span>
+<span class="line_number">3771 </span>                select case <span class="sign">(</span>c<span class="sign">)</span>
+<span class="line_number">3772 </span>                case<span class="sign">(</span><span class="squote">'-'</span><span class="sign">,</span><span class="squote">'+'</span><span class="sign">)</span>    <span class="sign">!</span>note<span class="sign">:</span> allowing a <span class="squote">'+'</span> as the first character here<span class="sign">.</span>
+<span class="line_number">3773 </span>
+<span class="line_number">3774 </span>                    if <span class="sign">(</span>is_integer <span class="sign">.</span>and<span class="sign">.</span> <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> first<span class="sign">)</span><span class="sign">)</span> is_integer <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
+<span class="line_number">3775 </span>
+<span class="line_number">3776 </span>                    <span class="sign">!</span>add it to the string<span class="sign">:</span>
+<span class="line_number">3777 </span>                    str <span class="sign">=</span> str <span class="sign">/</span><span class="sign">/</span> c
+<span class="line_number">3778 </span>
+<span class="line_number">3779 </span>                case<span class="sign">(</span><span class="squote">'.'</span><span class="sign">,</span><span class="squote">'E'</span><span class="sign">,</span><span class="squote">'e'</span><span class="sign">)</span>    <span class="sign">!</span>can be present in real numbers
+<span class="line_number">3780 </span>
+<span class="line_number">3781 </span>                    if <span class="sign">(</span>is_integer<span class="sign">)</span> is_integer <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
+<span class="line_number">3782 </span>
+<span class="line_number">3783 </span>                    <span class="sign">!</span>add it to the string<span class="sign">:</span>
+<span class="line_number">3784 </span>                    str <span class="sign">=</span> str <span class="sign">/</span><span class="sign">/</span> c
+<span class="line_number">3785 </span>
+<span class="line_number">3786 </span>                case<span class="sign">(</span><span class="squote">'0'</span><span class="sign">:</span><span class="squote">'9'</span><span class="sign">)</span>    <span class="sign">!</span>valid characters for numbers
+<span class="line_number">3787 </span>
+<span class="line_number">3788 </span>                    <span class="sign">!</span>add it to the string<span class="sign">:</span>
+<span class="line_number">3789 </span>                    str <span class="sign">=</span> str <span class="sign">/</span><span class="sign">/</span> c
+<span class="line_number">3790 </span>
+<span class="line_number">3791 </span>                case default
+<span class="line_number">3792 </span>
+<span class="line_number">3793 </span>                    <span class="sign">!</span>push back the last character read<span class="sign">:</span>
+<span class="line_number">3794 </span>                    call <a href="#robo60">push_char</a><span class="sign">(</span>c<span class="sign">)</span>
+<span class="line_number">3795 </span>
+<span class="line_number">3796 </span>                    <span class="sign">!</span>string to value<span class="sign">:</span>
+<span class="line_number">3797 </span>                    if <span class="sign">(</span>is_integer<span class="sign">)</span> then
+<span class="line_number">3798 </span>                        ival <span class="sign">=</span> <a href="#robo63">string_to_integer</a><span class="sign">(</span>str<span class="sign">)</span>
+<span class="line_number">3799 </span>                        call <a href="#robo66">to_integer</a><span class="sign">(</span>value<span class="sign">,</span>ival<span class="sign">)</span>
+<span class="line_number">3800 </span>                    else
+<span class="line_number">3801 </span>                        rval <span class="sign">=</span> <a href="#robo62">string_to_double</a><span class="sign">(</span>str<span class="sign">)</span>
+<span class="line_number">3802 </span>                        call <a href="#robo70">to_real</a><span class="sign">(</span>value<span class="sign">,</span>rval<span class="sign">)</span>
+<span class="line_number">3803 </span>                    end if
+<span class="line_number">3804 </span>
+<span class="line_number">3805 </span>                    exit    <span class="sign">!</span>finished
+<span class="line_number">3806 </span>
+<span class="line_number">3807 </span>                end select
+<span class="line_number">3808 </span>
+<span class="line_number">3809 </span>            end if
+<span class="line_number">3810 </span>            if <span class="sign">(</span>first<span class="sign">)</span> first <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
+<span class="line_number">3811 </span>
+<span class="line_number">3812 </span>        end do
+<span class="line_number">3813 </span>
+<span class="line_number">3814 </span>        <span class="sign">!</span>cleanup<span class="sign">:</span>
+<span class="line_number">3815 </span>        if <span class="sign">(</span>allocated<span class="sign">(</span>str<span class="sign">)</span><span class="sign">)</span> deallocate<span class="sign">(</span>str<span class="sign">)</span>
+<span class="line_number">3816 </span>
+<span class="line_number">3817 </span>    end if
+<span class="line_number">3818 </span>
+<span class="line_number">3819 </span>    end subroutine <strong>parse_number</strong>
 </pre>
 
 <hr />
@@ -3079,61 +3081,63 @@
 <span class="line_number">3466 </span>        else if <span class="sign">(</span><span class="squote">'"'</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
 <span class="line_number">3467 </span>            call <a href="#robo47">json_value_create</a><span class="sign">(</span>pair<span class="sign">)</span>
 <span class="line_number">3468 </span>            call <a href="#robo56">parse_string</a><span class="sign">(</span>unit<span class="sign">,</span> pair <span class="sign">%</span> name<span class="sign">)</span>
-<span class="line_number">3469 </span>        else
-<span class="line_number">3470 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_object</strong>: Expecting string: "'</span><span class="sign">/</span><span class="sign">/</span>c<span class="sign">/</span><span class="sign">/</span><span class="squote">'"'</span><span class="sign">)</span>
-<span class="line_number">3471 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
-<span class="line_number">3472 </span>            return
-<span class="line_number">3473 </span>        end if
-<span class="line_number">3474 </span>
-<span class="line_number">3475 </span>        <span class="sign">!</span> pair value
-<span class="line_number">3476 </span>        c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
-<span class="line_number">3477 </span>        if <span class="sign">(</span>eof<span class="sign">)</span> then
-<span class="line_number">3478 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_object</strong>: Unexpected end of file while parsing object member.'</span><span class="sign">)</span>
-<span class="line_number">3479 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
-<span class="line_number">3480 </span>            return
-<span class="line_number">3481 </span>        else if <span class="sign">(</span><span class="squote">':'</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
-<span class="line_number">3482 </span>            <span class="sign">!</span> parse the value
-<span class="line_number">3483 </span>            call <a href="#robo57">parse_value</a><span class="sign">(</span>unit<span class="sign">,</span> pair<span class="sign">)</span>
-<span class="line_number">3484 </span>            call json_value_add<span class="sign">(</span>parent<span class="sign">,</span> pair<span class="sign">)</span>
-<span class="line_number">3485 </span>        else
-<span class="line_number">3486 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_object</strong>: Expecting : and then a value: '</span><span class="sign">/</span><span class="sign">/</span>c<span class="sign">)</span>
-<span class="line_number">3487 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
-<span class="line_number">3488 </span>            return
-<span class="line_number">3489 </span>        end if
-<span class="line_number">3490 </span>
-<span class="line_number">3491 </span>        <span class="sign">!</span> another possible pair
-<span class="line_number">3492 </span>        c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
-<span class="line_number">3493 </span>        if <span class="sign">(</span>eof<span class="sign">)</span> then
-<span class="line_number">3494 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
-<span class="line_number">3495 </span>            return
-<span class="line_number">3496 </span>        else if <span class="sign">(</span><span class="squote">','</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
-<span class="line_number">3497 </span>            <span class="sign">!</span> read the next member
-<span class="line_number">3498 </span>            call <strong>parse_object</strong><span class="sign">(</span>unit <span class="sign">=</span> unit<span class="sign">,</span> parent <span class="sign">=</span> parent<span class="sign">)</span>
-<span class="line_number">3499 </span>        else if <span class="sign">(</span><span class="squote">'}'</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
-<span class="line_number">3500 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
-<span class="line_number">3501 </span>            return
-<span class="line_number">3502 </span>        else
-<span class="line_number">3503 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_object</strong>: Expecting end of object: '</span><span class="sign">/</span><span class="sign">/</span>c<span class="sign">)</span>
-<span class="line_number">3504 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
-<span class="line_number">3505 </span>            return
-<span class="line_number">3506 </span>        end if
-<span class="line_number">3507 </span>
-<span class="line_number">3508 </span>        call cleanup<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">3469 </span>            if <span class="sign">(</span>exception_thrown<span class="sign">)</span> return
+<span class="line_number">3470 </span>        else
+<span class="line_number">3471 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_object</strong>: Expecting string: "'</span><span class="sign">/</span><span class="sign">/</span>c<span class="sign">/</span><span class="sign">/</span><span class="squote">'"'</span><span class="sign">)</span>
+<span class="line_number">3472 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">3473 </span>            return
+<span class="line_number">3474 </span>        end if
+<span class="line_number">3475 </span>
+<span class="line_number">3476 </span>        <span class="sign">!</span> pair value
+<span class="line_number">3477 </span>        c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">3478 </span>        if <span class="sign">(</span>eof<span class="sign">)</span> then
+<span class="line_number">3479 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_object</strong>: Unexpected end of file while parsing object member.'</span><span class="sign">)</span>
+<span class="line_number">3480 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">3481 </span>            return
+<span class="line_number">3482 </span>        else if <span class="sign">(</span><span class="squote">':'</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
+<span class="line_number">3483 </span>            <span class="sign">!</span> parse the value
+<span class="line_number">3484 </span>            call <a href="#robo57">parse_value</a><span class="sign">(</span>unit<span class="sign">,</span> pair<span class="sign">)</span>
+<span class="line_number">3485 </span>            if <span class="sign">(</span>exception_thrown<span class="sign">)</span> return
+<span class="line_number">3486 </span>            call json_value_add<span class="sign">(</span>parent<span class="sign">,</span> pair<span class="sign">)</span>
+<span class="line_number">3487 </span>        else
+<span class="line_number">3488 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_object</strong>: Expecting : and then a value: '</span><span class="sign">/</span><span class="sign">/</span>c<span class="sign">)</span>
+<span class="line_number">3489 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">3490 </span>            return
+<span class="line_number">3491 </span>        end if
+<span class="line_number">3492 </span>
+<span class="line_number">3493 </span>        <span class="sign">!</span> another possible pair
+<span class="line_number">3494 </span>        c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">3495 </span>        if <span class="sign">(</span>eof<span class="sign">)</span> then
+<span class="line_number">3496 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">3497 </span>            return
+<span class="line_number">3498 </span>        else if <span class="sign">(</span><span class="squote">','</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
+<span class="line_number">3499 </span>            <span class="sign">!</span> read the next member
+<span class="line_number">3500 </span>            call <strong>parse_object</strong><span class="sign">(</span>unit <span class="sign">=</span> unit<span class="sign">,</span> parent <span class="sign">=</span> parent<span class="sign">)</span>
+<span class="line_number">3501 </span>        else if <span class="sign">(</span><span class="squote">'}'</span> <span class="sign">=</span><span class="sign">=</span> c<span class="sign">)</span> then
+<span class="line_number">3502 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">3503 </span>            return
+<span class="line_number">3504 </span>        else
+<span class="line_number">3505 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_object</strong>: Expecting end of object: '</span><span class="sign">/</span><span class="sign">/</span>c<span class="sign">)</span>
+<span class="line_number">3506 </span>            call cleanup<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">3507 </span>            return
+<span class="line_number">3508 </span>        end if
 <span class="line_number">3509 </span>
-<span class="line_number">3510 </span>    end if
+<span class="line_number">3510 </span>        call cleanup<span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">3511 </span>
-<span class="line_number">3512 </span>    contains
+<span class="line_number">3512 </span>    end if
 <span class="line_number">3513 </span>
-<span class="line_number">3514 </span>        <span class="sign">!</span>cleanup routine<span class="sign">:</span>
-<span class="line_number">3515 </span>        subroutine cleanup<span class="sign">(</span><span class="sign">)</span>
-<span class="line_number">3516 </span>        
-<span class="line_number">3517 </span>        implicit none
-<span class="line_number">3518 </span>
-<span class="line_number">3519 </span>        if <span class="sign">(</span>associated<span class="sign">(</span>pair<span class="sign">)</span><span class="sign">)</span> nullify<span class="sign">(</span>pair<span class="sign">)</span>
+<span class="line_number">3514 </span>    contains
+<span class="line_number">3515 </span>
+<span class="line_number">3516 </span>        <span class="sign">!</span>cleanup routine<span class="sign">:</span>
+<span class="line_number">3517 </span>        subroutine cleanup<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">3518 </span>        
+<span class="line_number">3519 </span>        implicit none
 <span class="line_number">3520 </span>
-<span class="line_number">3521 </span>        end subroutine cleanup
+<span class="line_number">3521 </span>        if <span class="sign">(</span>associated<span class="sign">(</span>pair<span class="sign">)</span><span class="sign">)</span> nullify<span class="sign">(</span>pair<span class="sign">)</span>
 <span class="line_number">3522 </span>
-<span class="line_number">3523 </span>    end subroutine <strong>parse_object</strong>
+<span class="line_number">3523 </span>        end subroutine cleanup
+<span class="line_number">3524 </span>
+<span class="line_number">3525 </span>    end subroutine <strong>parse_object</strong>
 </pre>
 
 <hr />
@@ -3145,38 +3149,92 @@
 <pre>    <strong>parse_string</strong>
 </pre>
 <p class="item_name">DESCRIPTION</p>
+<pre>    Parses a string while reading a json file
+</pre>
+<p class="item_name">HISTORY</p>
+<pre>    JW : 6/16/2014 : added hex validation.
+</pre>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">3590 </span>    subroutine <strong>parse_string</strong><span class="sign">(</span>unit<span class="sign">,</span> string<span class="sign">)</span>
-<span class="line_number">3591 </span>
-<span class="line_number">3592 </span>    implicit none
-<span class="line_number">3593 </span>
-<span class="line_number">3594 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>                      <span class="sign">:</span><span class="sign">:</span> unit
-<span class="line_number">3595 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">:</span><span class="sign">)</span><span class="sign">,</span>allocatable<span class="sign">,</span>intent<span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> string
-<span class="line_number">3596 </span>
-<span class="line_number">3597 </span>    logical <span class="sign">:</span><span class="sign">:</span> eof
-<span class="line_number">3598 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c<span class="sign">,</span> last
-<span class="line_number">3599 </span>
-<span class="line_number">3600 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
-<span class="line_number">3601 </span>
-<span class="line_number">3602 </span>        string <span class="sign">=</span> <span class="squote">''</span>    <span class="sign">!</span>initialize string
-<span class="line_number">3603 </span>        last <span class="sign">=</span> <span class="squote">' '</span>     <span class="sign">!</span>
-<span class="line_number">3604 </span>
-<span class="line_number">3605 </span>        do
-<span class="line_number">3606 </span>            c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span><span class="sign">)</span>
-<span class="line_number">3607 </span>            if <span class="sign">(</span>eof<span class="sign">)</span> then
-<span class="line_number">3608 </span>                call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_string</strong>: Expecting end of string'</span><span class="sign">)</span>
-<span class="line_number">3609 </span>                return
-<span class="line_number">3610 </span>            else if <span class="sign">(</span><span class="squote">'"'</span> <span class="sign">=</span><span class="sign">=</span> c <span class="sign">.</span>and<span class="sign">.</span> last <span class="sign">/</span><span class="sign">=</span> <span class="squote">'\') then
-<span class="line_number">3611 </span>                exit
-<span class="line_number">3612 </span>            else
-<span class="line_number">3613 </span>                last = c
-<span class="line_number">3614 </span>                string = string//c    !append to string
-<span class="line_number">3615 </span>            end if
-<span class="line_number">3616 </span>        end do
-<span class="line_number">3617 </span>
-<span class="line_number">3618 </span>    end if
-<span class="line_number">3619 </span>
-<span class="line_number">3620 </span>    end subroutine <strong>parse_string</strong>
+<pre class="source"><span class="line_number">3597 </span>    subroutine <strong>parse_string</strong><span class="sign">(</span>unit<span class="sign">,</span> string<span class="sign">)</span>
+<span class="line_number">3598 </span>
+<span class="line_number">3599 </span>    implicit none
+<span class="line_number">3600 </span>
+<span class="line_number">3601 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>                      <span class="sign">:</span><span class="sign">:</span> unit
+<span class="line_number">3602 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">:</span><span class="sign">)</span><span class="sign">,</span>allocatable<span class="sign">,</span>intent<span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> string
+<span class="line_number">3603 </span>
+<span class="line_number">3604 </span>    logical <span class="sign">:</span><span class="sign">:</span> eof<span class="sign">,</span> is_hex<span class="sign">,</span> escape
+<span class="line_number">3605 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c<span class="sign">,</span> last
+<span class="line_number">3606 </span>    character<span class="sign">(</span>len<span class="sign">=</span>4<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> hex
+<span class="line_number">3607 </span>    integer <span class="sign">:</span><span class="sign">:</span> i
+<span class="line_number">3608 </span>
+<span class="line_number">3609 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
+<span class="line_number">3610 </span>
+<span class="line_number">3611 </span>        <span class="sign">!</span>initialize<span class="sign">:</span>
+<span class="line_number">3612 </span>        string <span class="sign">=</span> <span class="squote">''</span> 
+<span class="line_number">3613 </span>        last <span class="sign">=</span> space
+<span class="line_number">3614 </span>        is_hex <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
+<span class="line_number">3615 </span>        escape <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
+<span class="line_number">3616 </span>        i <span class="sign">=</span> 0
+<span class="line_number">3617 </span>        
+<span class="line_number">3618 </span>        do
+<span class="line_number">3619 </span>        
+<span class="line_number">3620 </span>            <span class="sign">!</span>get the next character from the file<span class="sign">:</span>
+<span class="line_number">3621 </span>            c <span class="sign">=</span> <a href="#robo58">pop_char</a><span class="sign">(</span>unit<span class="sign">,</span> eof <span class="sign">=</span> eof<span class="sign">,</span> skip_ws <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">3622 </span>        
+<span class="line_number">3623 </span>            if <span class="sign">(</span>eof<span class="sign">)</span> then
+<span class="line_number">3624 </span>            
+<span class="line_number">3625 </span>                call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>parse_string</strong>: Expecting end of string'</span><span class="sign">)</span>
+<span class="line_number">3626 </span>                return
+<span class="line_number">3627 </span>                
+<span class="line_number">3628 </span>            else if <span class="sign">(</span><span class="squote">'"'</span> <span class="sign">=</span><span class="sign">=</span> c <span class="sign">.</span>and<span class="sign">.</span> last <span class="sign">/</span><span class="sign">=</span> <span class="squote">'\') then
+<span class="line_number">3629 </span>            
+<span class="line_number">3630 </span>                if (is_hex) call <a href="#robo64">throw_exception</a>('</span>Error in <strong>parse_string</strong><span class="sign">:</span> incomplete hex string<span class="sign">:</span> <span class="sign">\</span>u<span class="squote">'//trim(hex))
+<span class="line_number">3631 </span>                exit
+<span class="line_number">3632 </span>                    
+<span class="line_number">3633 </span>            else
+<span class="line_number">3634 </span>            
+<span class="line_number">3635 </span>                !append to string:
+<span class="line_number">3636 </span>                string = string//c    
+<span class="line_number">3637 </span>                
+<span class="line_number">3638 </span>                !hex validation:
+<span class="line_number">3639 </span>                if (is_hex) then  !accumulate the four characters after '</span><span class="sign">\</span>u<span class="squote">'
+<span class="line_number">3640 </span>                    
+<span class="line_number">3641 </span>                    i=i+1
+<span class="line_number">3642 </span>                    hex(i:i) = c
+<span class="line_number">3643 </span>                    if (i==4) then
+<span class="line_number">3644 </span>                        if (<a href="#robo72">valid_json_hex</a>(hex)) then
+<span class="line_number">3645 </span>                            i = 0
+<span class="line_number">3646 </span>                            hex = '</span><span class="squote">'
+<span class="line_number">3647 </span>                            is_hex = .false.                            
+<span class="line_number">3648 </span>                        else
+<span class="line_number">3649 </span>                            call <a href="#robo64">throw_exception</a>('</span>Error in <strong>parse_string</strong><span class="sign">:</span> invalid hex string<span class="sign">:</span> <span class="sign">\</span>u<span class="squote">'//trim(hex))
+<span class="line_number">3650 </span>                            exit
+<span class="line_number">3651 </span>                        end if
+<span class="line_number">3652 </span>                    end if
+<span class="line_number">3653 </span>                    
+<span class="line_number">3654 </span>                else
+<span class="line_number">3655 </span>                    
+<span class="line_number">3656 </span>                    !when the '</span><span class="sign">\</span>u<span class="squote">' string is encountered, then
+<span class="line_number">3657 </span>                    !  start accumulating the hex string (should be the next 4 characters)
+<span class="line_number">3658 </span>                    if (escape) then
+<span class="line_number">3659 </span>                        escape = .false.
+<span class="line_number">3660 </span>                        is_hex = (c=='</span>u<span class="squote">')    !the next four characters are the hex string
+<span class="line_number">3661 </span>                    else
+<span class="line_number">3662 </span>                        escape = (c=='</span><span class="sign">\</span><span class="sign">'</span><span class="sign">)</span>
+<span class="line_number">3663 </span>                    end if
+<span class="line_number">3664 </span>                    
+<span class="line_number">3665 </span>                end if
+<span class="line_number">3666 </span>                
+<span class="line_number">3667 </span>                <span class="sign">!</span>update for next char<span class="sign">:</span>
+<span class="line_number">3668 </span>                last <span class="sign">=</span> c
+<span class="line_number">3669 </span>                
+<span class="line_number">3670 </span>            end if
+<span class="line_number">3671 </span>            
+<span class="line_number">3672 </span>        end do
+<span class="line_number">3673 </span>
+<span class="line_number">3674 </span>    end if
+<span class="line_number">3675 </span>
+<span class="line_number">3676 </span>    end subroutine <strong>parse_string</strong>
 </pre>
 
 <hr />
@@ -3295,78 +3353,78 @@
     are in strings.
 </pre>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">3781 </span>    recursive function <strong>pop_char</strong><span class="sign">(</span>unit<span class="sign">,</span> eof<span class="sign">,</span> skip_ws<span class="sign">)</span> result<span class="sign">(</span>popped<span class="sign">)</span>
-<span class="line_number">3782 </span>    
-<span class="line_number">3783 </span>    implicit none
-<span class="line_number">3784 </span>
-<span class="line_number">3785 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span>              <span class="sign">:</span><span class="sign">:</span> popped
-<span class="line_number">3786 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>           <span class="sign">:</span><span class="sign">:</span> unit
-<span class="line_number">3787 </span>    logical<span class="sign">,</span> intent<span class="sign">(</span>out<span class="sign">)</span>          <span class="sign">:</span><span class="sign">:</span> eof
-<span class="line_number">3788 </span>    logical<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span><span class="sign">,</span> optional <span class="sign">:</span><span class="sign">:</span> skip_ws
-<span class="line_number">3789 </span>
-<span class="line_number">3790 </span>    integer <span class="sign">:</span><span class="sign">:</span> ios
-<span class="line_number">3791 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
-<span class="line_number">3792 </span>    logical <span class="sign">:</span><span class="sign">:</span> ignore
-<span class="line_number">3793 </span>
-<span class="line_number">3794 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
-<span class="line_number">3795 </span>
-<span class="line_number">3796 </span>        eof <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">3797 </span>        if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span>present<span class="sign">(</span>skip_ws<span class="sign">)</span><span class="sign">)</span> then
-<span class="line_number">3798 </span>            ignore <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">3799 </span>        else
-<span class="line_number">3800 </span>            ignore <span class="sign">=</span> skip_ws
-<span class="line_number">3801 </span>        end if
-<span class="line_number">3802 </span>
-<span class="line_number">3803 </span>        do
-<span class="line_number">3804 </span>
-<span class="line_number">3805 </span>            if <span class="sign">(</span>pushed_index <span class="sign">&gt;</span> 0<span class="sign">)</span> then
-<span class="line_number">3806 </span>
-<span class="line_number">3807 </span>                <span class="sign">!</span> there is a character pushed back on<span class="sign">,</span> most likely from the number parsing
-<span class="line_number">3808 </span>                c <span class="sign">=</span> pushed_char<span class="sign">(</span>pushed_index<span class="sign">:</span>pushed_index<span class="sign">)</span>
-<span class="line_number">3809 </span>                pushed_index <span class="sign">=</span> pushed_index <span class="sign">-</span> 1
-<span class="line_number">3810 </span>
-<span class="line_number">3811 </span>            else
-<span class="line_number">3812 </span>
-<span class="line_number">3813 </span>                read <span class="sign">(</span>unit <span class="sign">=</span> unit<span class="sign">,</span> fmt <span class="sign">=</span> <span class="squote">'(A)'</span><span class="sign">,</span> advance <span class="sign">=</span> <span class="squote">'NO'</span><span class="sign">,</span> iostat <span class="sign">=</span> ios<span class="sign">)</span> c
-<span class="line_number">3814 </span>                char_count <span class="sign">=</span> char_count <span class="sign">+</span> 1    <span class="sign">!</span>character count in the current line
-<span class="line_number">3815 </span>
-<span class="line_number">3816 </span>                if <span class="sign">(</span>IS_IOSTAT_EOR<span class="sign">(</span>ios<span class="sign">)</span><span class="sign">)</span> then            <span class="sign">!</span>JW <span class="sign">:</span> use intrinsic
-<span class="line_number">3817 </span>
-<span class="line_number">3818 </span>                    char_count <span class="sign">=</span> 0
-<span class="line_number">3819 </span>                    line_count <span class="sign">=</span> line_count <span class="sign">+</span> 1
-<span class="line_number">3820 </span>                    cycle
-<span class="line_number">3821 </span>
-<span class="line_number">3822 </span>                else if <span class="sign">(</span>IS_IOSTAT_END<span class="sign">(</span>ios<span class="sign">)</span><span class="sign">)</span> then        <span class="sign">!</span>JW <span class="sign">:</span> use intrinsic
-<span class="line_number">3823 </span>
-<span class="line_number">3824 </span>                    char_count <span class="sign">=</span> 0
-<span class="line_number">3825 </span>                    eof <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>
-<span class="line_number">3826 </span>                    exit
-<span class="line_number">3827 </span>
-<span class="line_number">3828 </span>                end if
-<span class="line_number">3829 </span>
-<span class="line_number">3830 </span>            end if
-<span class="line_number">3831 </span>
-<span class="line_number">3832 </span>            if <span class="sign">(</span>iachar<span class="sign">(</span>c<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">=</span> 31<span class="sign">)</span> then            <span class="sign">!</span>JW <span class="sign">:</span> fixed so it will read spaces in the string <span class="sign">(</span>was 32<span class="sign">)</span>
-<span class="line_number">3833 </span>
-<span class="line_number">3834 </span>                <span class="sign">!</span> non printing ascii characters
-<span class="line_number">3835 </span>                cycle
-<span class="line_number">3836 </span>
-<span class="line_number">3837 </span>            else if <span class="sign">(</span>ignore <span class="sign">.</span>and<span class="sign">.</span> c <span class="sign">=</span><span class="sign">=</span> space<span class="sign">)</span> then
-<span class="line_number">3838 </span>
-<span class="line_number">3839 </span>                cycle
+<pre class="source"><span class="line_number">3837 </span>    recursive function <strong>pop_char</strong><span class="sign">(</span>unit<span class="sign">,</span> eof<span class="sign">,</span> skip_ws<span class="sign">)</span> result<span class="sign">(</span>popped<span class="sign">)</span>
+<span class="line_number">3838 </span>    
+<span class="line_number">3839 </span>    implicit none
 <span class="line_number">3840 </span>
-<span class="line_number">3841 </span>            else
-<span class="line_number">3842 </span>
-<span class="line_number">3843 </span>                popped <span class="sign">=</span> c
-<span class="line_number">3844 </span>                exit
+<span class="line_number">3841 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span>              <span class="sign">:</span><span class="sign">:</span> popped
+<span class="line_number">3842 </span>    integer<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span>           <span class="sign">:</span><span class="sign">:</span> unit
+<span class="line_number">3843 </span>    logical<span class="sign">,</span> intent<span class="sign">(</span>out<span class="sign">)</span>          <span class="sign">:</span><span class="sign">:</span> eof
+<span class="line_number">3844 </span>    logical<span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span><span class="sign">,</span> optional <span class="sign">:</span><span class="sign">:</span> skip_ws
 <span class="line_number">3845 </span>
-<span class="line_number">3846 </span>            end if
-<span class="line_number">3847 </span>
-<span class="line_number">3848 </span>        end do
+<span class="line_number">3846 </span>    integer <span class="sign">:</span><span class="sign">:</span> ios
+<span class="line_number">3847 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
+<span class="line_number">3848 </span>    logical <span class="sign">:</span><span class="sign">:</span> ignore
 <span class="line_number">3849 </span>
-<span class="line_number">3850 </span>    end if
+<span class="line_number">3850 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
 <span class="line_number">3851 </span>
-<span class="line_number">3852 </span>    end function <strong>pop_char</strong>
+<span class="line_number">3852 </span>        eof <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
+<span class="line_number">3853 </span>        if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span>present<span class="sign">(</span>skip_ws<span class="sign">)</span><span class="sign">)</span> then
+<span class="line_number">3854 </span>            ignore <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
+<span class="line_number">3855 </span>        else
+<span class="line_number">3856 </span>            ignore <span class="sign">=</span> skip_ws
+<span class="line_number">3857 </span>        end if
+<span class="line_number">3858 </span>
+<span class="line_number">3859 </span>        do
+<span class="line_number">3860 </span>
+<span class="line_number">3861 </span>            if <span class="sign">(</span>pushed_index <span class="sign">&gt;</span> 0<span class="sign">)</span> then
+<span class="line_number">3862 </span>
+<span class="line_number">3863 </span>                <span class="sign">!</span> there is a character pushed back on<span class="sign">,</span> most likely from the number parsing
+<span class="line_number">3864 </span>                c <span class="sign">=</span> pushed_char<span class="sign">(</span>pushed_index<span class="sign">:</span>pushed_index<span class="sign">)</span>
+<span class="line_number">3865 </span>                pushed_index <span class="sign">=</span> pushed_index <span class="sign">-</span> 1
+<span class="line_number">3866 </span>
+<span class="line_number">3867 </span>            else
+<span class="line_number">3868 </span>
+<span class="line_number">3869 </span>                read <span class="sign">(</span>unit <span class="sign">=</span> unit<span class="sign">,</span> fmt <span class="sign">=</span> <span class="squote">'(A)'</span><span class="sign">,</span> advance <span class="sign">=</span> <span class="squote">'NO'</span><span class="sign">,</span> iostat <span class="sign">=</span> ios<span class="sign">)</span> c
+<span class="line_number">3870 </span>                char_count <span class="sign">=</span> char_count <span class="sign">+</span> 1    <span class="sign">!</span>character count in the current line
+<span class="line_number">3871 </span>
+<span class="line_number">3872 </span>                if <span class="sign">(</span>IS_IOSTAT_EOR<span class="sign">(</span>ios<span class="sign">)</span><span class="sign">)</span> then            <span class="sign">!</span>JW <span class="sign">:</span> use intrinsic
+<span class="line_number">3873 </span>
+<span class="line_number">3874 </span>                    char_count <span class="sign">=</span> 0
+<span class="line_number">3875 </span>                    line_count <span class="sign">=</span> line_count <span class="sign">+</span> 1
+<span class="line_number">3876 </span>                    cycle
+<span class="line_number">3877 </span>
+<span class="line_number">3878 </span>                else if <span class="sign">(</span>IS_IOSTAT_END<span class="sign">(</span>ios<span class="sign">)</span><span class="sign">)</span> then        <span class="sign">!</span>JW <span class="sign">:</span> use intrinsic
+<span class="line_number">3879 </span>
+<span class="line_number">3880 </span>                    char_count <span class="sign">=</span> 0
+<span class="line_number">3881 </span>                    eof <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>
+<span class="line_number">3882 </span>                    exit
+<span class="line_number">3883 </span>
+<span class="line_number">3884 </span>                end if
+<span class="line_number">3885 </span>
+<span class="line_number">3886 </span>            end if
+<span class="line_number">3887 </span>
+<span class="line_number">3888 </span>            if <span class="sign">(</span>iachar<span class="sign">(</span>c<span class="sign">)</span> <span class="sign">&lt;</span><span class="sign">=</span> 31<span class="sign">)</span> then            <span class="sign">!</span>JW <span class="sign">:</span> fixed so it will read spaces in the string <span class="sign">(</span>was 32<span class="sign">)</span>
+<span class="line_number">3889 </span>
+<span class="line_number">3890 </span>                <span class="sign">!</span> non printing ascii characters
+<span class="line_number">3891 </span>                cycle
+<span class="line_number">3892 </span>
+<span class="line_number">3893 </span>            else if <span class="sign">(</span>ignore <span class="sign">.</span>and<span class="sign">.</span> c <span class="sign">=</span><span class="sign">=</span> space<span class="sign">)</span> then
+<span class="line_number">3894 </span>
+<span class="line_number">3895 </span>                cycle
+<span class="line_number">3896 </span>
+<span class="line_number">3897 </span>            else
+<span class="line_number">3898 </span>
+<span class="line_number">3899 </span>                popped <span class="sign">=</span> c
+<span class="line_number">3900 </span>                exit
+<span class="line_number">3901 </span>
+<span class="line_number">3902 </span>            end if
+<span class="line_number">3903 </span>
+<span class="line_number">3904 </span>        end do
+<span class="line_number">3905 </span>
+<span class="line_number">3906 </span>    end if
+<span class="line_number">3907 </span>
+<span class="line_number">3908 </span>    end function <strong>pop_char</strong>
 </pre>
 
 <hr />
@@ -3420,28 +3478,28 @@
 </pre>
 <p class="item_name">DESCRIPTION</p>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">3866 </span>    subroutine <strong>push_char</strong><span class="sign">(</span>c<span class="sign">)</span>
-<span class="line_number">3867 </span>    
-<span class="line_number">3868 </span>    implicit none
-<span class="line_number">3869 </span>
-<span class="line_number">3870 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span><span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
-<span class="line_number">3871 </span>
-<span class="line_number">3872 </span>    character<span class="sign">(</span>len<span class="sign">=</span>32<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> istr
-<span class="line_number">3873 </span>
-<span class="line_number">3874 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
-<span class="line_number">3875 </span>
-<span class="line_number">3876 </span>        pushed_index <span class="sign">=</span> pushed_index <span class="sign">+</span> 1
-<span class="line_number">3877 </span>
-<span class="line_number">3878 </span>        if <span class="sign">(</span>pushed_index<span class="sign">&gt;</span>0 <span class="sign">.</span>and<span class="sign">.</span> pushed_index<span class="sign">&lt;</span><span class="sign">=</span>len<span class="sign">(</span>pushed_char<span class="sign">)</span><span class="sign">)</span> then
-<span class="line_number">3879 </span>            pushed_char<span class="sign">(</span>pushed_index<span class="sign">:</span>pushed_index<span class="sign">)</span> <span class="sign">=</span> c
-<span class="line_number">3880 </span>        else
-<span class="line_number">3881 </span>            call <a href="#robo17">integer_to_string</a><span class="sign">(</span>pushed_index<span class="sign">,</span>istr<span class="sign">)</span>
-<span class="line_number">3882 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>push_char</strong>: invalid valid of pushed_index: '</span><span class="sign">/</span><span class="sign">/</span>trim<span class="sign">(</span>istr<span class="sign">)</span><span class="sign">)</span>
-<span class="line_number">3883 </span>        end if
-<span class="line_number">3884 </span>
-<span class="line_number">3885 </span>    end if
-<span class="line_number">3886 </span>
-<span class="line_number">3887 </span>    end subroutine <strong>push_char</strong>
+<pre class="source"><span class="line_number">3922 </span>    subroutine <strong>push_char</strong><span class="sign">(</span>c<span class="sign">)</span>
+<span class="line_number">3923 </span>    
+<span class="line_number">3924 </span>    implicit none
+<span class="line_number">3925 </span>
+<span class="line_number">3926 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span><span class="sign">,</span> intent<span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> c
+<span class="line_number">3927 </span>
+<span class="line_number">3928 </span>    character<span class="sign">(</span>len<span class="sign">=</span>32<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> istr
+<span class="line_number">3929 </span>
+<span class="line_number">3930 </span>    if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
+<span class="line_number">3931 </span>
+<span class="line_number">3932 </span>        pushed_index <span class="sign">=</span> pushed_index <span class="sign">+</span> 1
+<span class="line_number">3933 </span>
+<span class="line_number">3934 </span>        if <span class="sign">(</span>pushed_index<span class="sign">&gt;</span>0 <span class="sign">.</span>and<span class="sign">.</span> pushed_index<span class="sign">&lt;</span><span class="sign">=</span>len<span class="sign">(</span>pushed_char<span class="sign">)</span><span class="sign">)</span> then
+<span class="line_number">3935 </span>            pushed_char<span class="sign">(</span>pushed_index<span class="sign">:</span>pushed_index<span class="sign">)</span> <span class="sign">=</span> c
+<span class="line_number">3936 </span>        else
+<span class="line_number">3937 </span>            call <a href="#robo17">integer_to_string</a><span class="sign">(</span>pushed_index<span class="sign">,</span>istr<span class="sign">)</span>
+<span class="line_number">3938 </span>            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>push_char</strong>: invalid valid of pushed_index: '</span><span class="sign">/</span><span class="sign">/</span>trim<span class="sign">(</span>istr<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">3939 </span>        end if
+<span class="line_number">3940 </span>
+<span class="line_number">3941 </span>    end if
+<span class="line_number">3942 </span>
+<span class="line_number">3943 </span>    end subroutine <strong>push_char</strong>
 </pre>
 
 <hr />
@@ -3459,24 +3517,24 @@
 <pre>    Jacob Williams : 12/4/2013
 </pre>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">3938 </span>    subroutine <strong>real_to_string</strong><span class="sign">(</span>rval<span class="sign">,</span>str<span class="sign">)</span>
-<span class="line_number">3939 </span>
-<span class="line_number">3940 </span>    implicit none
-<span class="line_number">3941 </span>
-<span class="line_number">3942 </span>    real<span class="sign">(</span>wp<span class="sign">)</span><span class="sign">,</span>intent<span class="sign">(</span>in<span class="sign">)</span>          <span class="sign">:</span><span class="sign">:</span> rval
-<span class="line_number">3943 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span>intent<span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> str
-<span class="line_number">3944 </span>
-<span class="line_number">3945 </span>    integer <span class="sign">:</span><span class="sign">:</span> istat
-<span class="line_number">3946 </span>
-<span class="line_number">3947 </span>    write<span class="sign">(</span>str<span class="sign">,</span>fmt<span class="sign">=</span>real_fmt<span class="sign">,</span>iostat<span class="sign">=</span>istat<span class="sign">)</span> rval
-<span class="line_number">3948 </span>
-<span class="line_number">3949 </span>    if <span class="sign">(</span>istat<span class="sign">=</span><span class="sign">=</span>0<span class="sign">)</span> then
-<span class="line_number">3950 </span>        str <span class="sign">=</span> adjustl<span class="sign">(</span>str<span class="sign">)</span>
-<span class="line_number">3951 </span>    else
-<span class="line_number">3952 </span>        str <span class="sign">=</span> repeat<span class="sign">(</span><span class="squote">'*'</span><span class="sign">,</span>len<span class="sign">(</span>str<span class="sign">)</span><span class="sign">)</span>
-<span class="line_number">3953 </span>    end if
-<span class="line_number">3954 </span>
-<span class="line_number">3955 </span>    end subroutine <strong>real_to_string</strong>
+<pre class="source"><span class="line_number">3994 </span>    subroutine <strong>real_to_string</strong><span class="sign">(</span>rval<span class="sign">,</span>str<span class="sign">)</span>
+<span class="line_number">3995 </span>
+<span class="line_number">3996 </span>    implicit none
+<span class="line_number">3997 </span>
+<span class="line_number">3998 </span>    real<span class="sign">(</span>wp<span class="sign">)</span><span class="sign">,</span>intent<span class="sign">(</span>in<span class="sign">)</span>          <span class="sign">:</span><span class="sign">:</span> rval
+<span class="line_number">3999 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span>intent<span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> str
+<span class="line_number">4000 </span>
+<span class="line_number">4001 </span>    integer <span class="sign">:</span><span class="sign">:</span> istat
+<span class="line_number">4002 </span>
+<span class="line_number">4003 </span>    write<span class="sign">(</span>str<span class="sign">,</span>fmt<span class="sign">=</span>real_fmt<span class="sign">,</span>iostat<span class="sign">=</span>istat<span class="sign">)</span> rval
+<span class="line_number">4004 </span>
+<span class="line_number">4005 </span>    if <span class="sign">(</span>istat<span class="sign">=</span><span class="sign">=</span>0<span class="sign">)</span> then
+<span class="line_number">4006 </span>        str <span class="sign">=</span> adjustl<span class="sign">(</span>str<span class="sign">)</span>
+<span class="line_number">4007 </span>    else
+<span class="line_number">4008 </span>        str <span class="sign">=</span> repeat<span class="sign">(</span><span class="squote">'*'</span><span class="sign">,</span>len<span class="sign">(</span>str<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">4009 </span>    end if
+<span class="line_number">4010 </span>
+<span class="line_number">4011 </span>    end subroutine <strong>real_to_string</strong>
 </pre>
 
 <hr />
@@ -3886,32 +3944,32 @@
 <pre>    Jacob Williams : 6/14/2014
 </pre>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">3978 </span>    function <strong>valid_json_hex</strong><span class="sign">(</span>str<span class="sign">)</span> result<span class="sign">(</span>valid<span class="sign">)</span>
-<span class="line_number">3979 </span>
-<span class="line_number">3980 </span>    implicit none
-<span class="line_number">3981 </span>
-<span class="line_number">3982 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span>intent<span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> str
-<span class="line_number">3983 </span>    logical <span class="sign">:</span><span class="sign">:</span> valid
-<span class="line_number">3984 </span>    
-<span class="line_number">3985 </span>    integer <span class="sign">:</span><span class="sign">:</span> n<span class="sign">,</span>i
-<span class="line_number">3986 </span>    
-<span class="line_number">3987 </span>    <span class="sign">!</span>an array of the valid hex characters<span class="sign">:</span>
-<span class="line_number">3988 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span><span class="sign">,</span>dimension<span class="sign">(</span>16<span class="sign">)</span><span class="sign">,</span>parameter <span class="sign">:</span><span class="sign">:</span> valid_chars <span class="sign">=</span> <span class="sign">&amp;</span>
-<span class="line_number">3989 </span>        <span class="sign">[</span><span class="squote">'0'</span><span class="sign">,</span><span class="squote">'1'</span><span class="sign">,</span><span class="squote">'2'</span><span class="sign">,</span><span class="squote">'3'</span><span class="sign">,</span><span class="squote">'4'</span><span class="sign">,</span><span class="squote">'5'</span><span class="sign">,</span><span class="squote">'6'</span><span class="sign">,</span><span class="squote">'7'</span><span class="sign">,</span><span class="squote">'8'</span><span class="sign">,</span><span class="squote">'9'</span><span class="sign">,</span><span class="squote">'A'</span><span class="sign">,</span><span class="squote">'B'</span><span class="sign">,</span><span class="squote">'C'</span><span class="sign">,</span><span class="squote">'D'</span><span class="sign">,</span><span class="squote">'E'</span><span class="sign">,</span><span class="squote">'F'</span><span class="sign">]</span>
-<span class="line_number">3990 </span>
-<span class="line_number">3991 </span>    <span class="sign">!</span>initialize
-<span class="line_number">3992 </span>    valid <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>   
-<span class="line_number">3993 </span>    
-<span class="line_number">3994 </span>    <span class="sign">!</span>check all the characters in the string<span class="sign">:</span>
-<span class="line_number">3995 </span>    n <span class="sign">=</span> len<span class="sign">(</span>str<span class="sign">)</span>
-<span class="line_number">3996 </span>    if <span class="sign">(</span>n<span class="sign">=</span><span class="sign">=</span>4<span class="sign">)</span> then
-<span class="line_number">3997 </span>        do i<span class="sign">=</span>1<span class="sign">,</span>n
-<span class="line_number">3998 </span>            if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> any<span class="sign">(</span>str<span class="sign">(</span>i<span class="sign">:</span>i<span class="sign">)</span><span class="sign">=</span><span class="sign">=</span>valid_chars<span class="sign">)</span><span class="sign">)</span> return
-<span class="line_number">3999 </span>        end do
-<span class="line_number">4000 </span>        valid <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>    <span class="sign">!</span>all are in the set<span class="sign">,</span> so it is OK
-<span class="line_number">4001 </span>    end if
-<span class="line_number">4002 </span>
-<span class="line_number">4003 </span>    end function <strong>valid_json_hex</strong>
+<pre class="source"><span class="line_number">4034 </span>    function <strong>valid_json_hex</strong><span class="sign">(</span>str<span class="sign">)</span> result<span class="sign">(</span>valid<span class="sign">)</span>
+<span class="line_number">4035 </span>
+<span class="line_number">4036 </span>    implicit none
+<span class="line_number">4037 </span>
+<span class="line_number">4038 </span>    character<span class="sign">(</span>len<span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span>intent<span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> str
+<span class="line_number">4039 </span>    logical <span class="sign">:</span><span class="sign">:</span> valid
+<span class="line_number">4040 </span>    
+<span class="line_number">4041 </span>    integer <span class="sign">:</span><span class="sign">:</span> n<span class="sign">,</span>i
+<span class="line_number">4042 </span>    
+<span class="line_number">4043 </span>    <span class="sign">!</span>an array of the valid hex characters<span class="sign">:</span>
+<span class="line_number">4044 </span>    character<span class="sign">(</span>len<span class="sign">=</span>1<span class="sign">)</span><span class="sign">,</span>dimension<span class="sign">(</span>16<span class="sign">)</span><span class="sign">,</span>parameter <span class="sign">:</span><span class="sign">:</span> valid_chars <span class="sign">=</span> <span class="sign">&amp;</span>
+<span class="line_number">4045 </span>        <span class="sign">[</span><span class="squote">'0'</span><span class="sign">,</span><span class="squote">'1'</span><span class="sign">,</span><span class="squote">'2'</span><span class="sign">,</span><span class="squote">'3'</span><span class="sign">,</span><span class="squote">'4'</span><span class="sign">,</span><span class="squote">'5'</span><span class="sign">,</span><span class="squote">'6'</span><span class="sign">,</span><span class="squote">'7'</span><span class="sign">,</span><span class="squote">'8'</span><span class="sign">,</span><span class="squote">'9'</span><span class="sign">,</span><span class="squote">'A'</span><span class="sign">,</span><span class="squote">'B'</span><span class="sign">,</span><span class="squote">'C'</span><span class="sign">,</span><span class="squote">'D'</span><span class="sign">,</span><span class="squote">'E'</span><span class="sign">,</span><span class="squote">'F'</span><span class="sign">]</span>
+<span class="line_number">4046 </span>
+<span class="line_number">4047 </span>    <span class="sign">!</span>initialize
+<span class="line_number">4048 </span>    valid <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>   
+<span class="line_number">4049 </span>    
+<span class="line_number">4050 </span>    <span class="sign">!</span>check all the characters in the string<span class="sign">:</span>
+<span class="line_number">4051 </span>    n <span class="sign">=</span> len<span class="sign">(</span>str<span class="sign">)</span>
+<span class="line_number">4052 </span>    if <span class="sign">(</span>n<span class="sign">=</span><span class="sign">=</span>4<span class="sign">)</span> then
+<span class="line_number">4053 </span>        do i<span class="sign">=</span>1<span class="sign">,</span>n
+<span class="line_number">4054 </span>            if <span class="sign">(</span><span class="sign">.</span>not<span class="sign">.</span> any<span class="sign">(</span>str<span class="sign">(</span>i<span class="sign">:</span>i<span class="sign">)</span><span class="sign">=</span><span class="sign">=</span>valid_chars<span class="sign">)</span><span class="sign">)</span> return
+<span class="line_number">4055 </span>        end do
+<span class="line_number">4056 </span>        valid <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>    <span class="sign">!</span>all are in the set<span class="sign">,</span> so it is OK
+<span class="line_number">4057 </span>    end if
+<span class="line_number">4058 </span>
+<span class="line_number">4059 </span>    end function <strong>valid_json_hex</strong>
 </pre>
 
 <hr />
@@ -3971,7 +4029,7 @@
 
 </div> <!-- content -->
 <div id="footer">
-<p>Generated from ./src/json_module.f90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.38 on Sun Jun 15 2014 17:51:20
+<p>Generated from ./src/json_module.f90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.38 on Mon Jun 16 2014 23:27:59
 </p>
 </div> <!-- footer -->
 </body>
