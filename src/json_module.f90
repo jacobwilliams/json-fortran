@@ -3466,6 +3466,7 @@
         else if ('"' == c) then
             call json_value_create(pair)
             call parse_string(unit, pair % name)
+            if (exception_thrown) return
         else
             call throw_exception('Error in parse_object: Expecting string: "'//c//'"')
             call cleanup()
@@ -3481,6 +3482,7 @@
         else if (':' == c) then
             ! parse the value
             call parse_value(unit, pair)
+            if (exception_thrown) return
             call json_value_add(parent, pair)
         else
             call throw_exception('Error in parse_object: Expecting : and then a value: '//c)
@@ -3551,6 +3553,7 @@
         ! try to parse an element value
         call json_value_create(element)
         call parse_value(unit, element)
+        if (exception_thrown) return
 
         ! parse value will disassociate an empty array value
         if (associated(element)) then
@@ -3566,6 +3569,7 @@
         else if (',' == c) then
             ! parse the next element
             call parse_array(unit, array)
+            if (exception_thrown) return
         else if (']' == c) then
             ! end of array
             return
@@ -3583,7 +3587,10 @@
 !    parse_string
 !
 !  DESCRIPTION
+!    Parses a string while reading a json file
 !
+!  HISTORY
+!    JW : 6/16/2014 : added hex validation.
 !
 !  SOURCE
 
@@ -3594,25 +3601,74 @@
     integer, intent(in)                      :: unit
     character(len=:),allocatable,intent(out) :: string
 
-    logical :: eof
+    logical :: eof, is_hex, escape
     character(len=1) :: c, last
+    character(len=4) :: hex
+    integer :: i
 
     if (.not. exception_thrown) then
 
-        string = ''    !initialize string
-        last = ' '     !
-
+        !initialize:
+        string = '' 
+        last = space
+        is_hex = .false.
+        escape = .false.
+        i = 0
+        
         do
+        
+            !get the next character from the file:
             c = pop_char(unit, eof = eof, skip_ws = .false.)
+        
             if (eof) then
+            
                 call throw_exception('Error in parse_string: Expecting end of string')
                 return
+                
             else if ('"' == c .and. last /= '\') then
+            
+                if (is_hex) call throw_exception('Error in parse_string: incomplete hex string: \u'//trim(hex))
                 exit
+                    
             else
+            
+                !append to string:
+                string = string//c    
+                
+                !hex validation:
+                if (is_hex) then  !accumulate the four characters after '\u'
+                    
+                    i=i+1
+                    hex(i:i) = c
+                    if (i==4) then
+                        if (valid_json_hex(hex)) then
+                            i = 0
+                            hex = ''
+                            is_hex = .false.                            
+                        else
+                            call throw_exception('Error in parse_string: invalid hex string: \u'//trim(hex))
+                            exit
+                        end if
+                    end if
+                    
+                else
+                    
+                    !when the '\u' string is encountered, then
+                    !  start accumulating the hex string (should be the next 4 characters)
+                    if (escape) then
+                        escape = .false.
+                        is_hex = (c=='u')    !the next four characters are the hex string
+                    else
+                        escape = (c=='\')
+                    end if
+                    
+                end if
+                
+                !update for next char:
                 last = c
-                string = string//c    !append to string
+                
             end if
+            
         end do
 
     end if
