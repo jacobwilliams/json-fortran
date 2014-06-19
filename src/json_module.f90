@@ -903,7 +903,7 @@
     !    !Throw a traceback and return control to the user.
     !    call tracebackqq(string=trim(msg), user_exit_code=-1)
     !
-    !    !write(*,*) trim(msg)        !gfortran version
+    !    !write(*,'(A)') trim(msg)        !gfortran version
     !    !stop
     !
     !end if

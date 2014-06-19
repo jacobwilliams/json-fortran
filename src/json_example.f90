@@ -92,14 +92,14 @@
     type(json_file) :: json   
     logical :: found
 
-    write(*,*) ''
-    write(*,*) '================================='
-    write(*,*) '   EXAMPLE 5'
-    write(*,*) '================================='
-    write(*,*) ''
+    write(*,'(A)') ''
+    write(*,'(A)') '================================='
+    write(*,'(A)') '   EXAMPLE 5'
+    write(*,'(A)') '================================='
+    write(*,'(A)') ''
 
     ! parse the json file:
-    write(*,*) 'load file...'
+    write(*,'(A)') 'load file...'
     call json%load_file(filename = dir//filename5)
     if (json_failed()) then
 
@@ -108,24 +108,24 @@
     else
 
         ! print the parsed data to the console:
-        write(*,*) 'print file...'
+        write(*,'(A)') 'print file...'
         call json%print_file()
 
         ! extract data from the parsed value:
-        write(*,*) ''
-        write(*,*) 'extract data...'
+        write(*,'(A)') ''
+        write(*,'(A)') 'extract data...'
 
-        write(*,*) '--------------------------'
+        write(*,'(A)') '--------------------------'
         call json%get('Correl.ID2', vv, found)
-        if (found) write(*,*) 'vv = ',vv
+        if (found) write(*,'(A,I5)') 'vv = ',vv
 
         call json%get('Correl.ID1', vvv, found)
-        if (found) write(*,*) 'vvv= ',vvv
+        if (found) write(*,'(A,*(I5,1X))') 'vvv= ',vvv
 
         call json%get('Prior[3].mode', d, found)
-        if (found) write(*,*) 'd  = ',d
+        if (found) write(*,'(A,E30.16)') 'd  = ',d
 
-        write(*,*) ''
+        write(*,'(A)') ''
 
     end if
 
@@ -149,18 +149,18 @@
 
     integer :: i
 
-    write(*,*) ''
-    write(*,*) '================================='
-    write(*,*) '   MEMORY LEAK TEST'
-    write(*,*) '================================='
-    write(*,*) ''
+    write(*,'(A)') ''
+    write(*,'(A)') '================================='
+    write(*,'(A)') '   MEMORY LEAK TEST'
+    write(*,'(A)') '================================='
+    write(*,'(A)') ''
     
     i = 0
 
     do
 
         i=i+1
-        write(*,*) '***********************', i
+        write(*,'(A)') '***********************', i
 
         call test_4()
 
@@ -191,14 +191,14 @@
     integer :: iunit
     character(len=:),allocatable :: string
 
-    write(*,*) ''
-    write(*,*) '================================='
-    write(*,*) '   EXAMPLE 4'
-    write(*,*) '================================='
-    write(*,*) ''
+    write(*,'(A)') ''
+    write(*,'(A)') '================================='
+    write(*,'(A)') '   EXAMPLE 4'
+    write(*,'(A)') '================================='
+    write(*,'(A)') ''
 
-    write(*,*) ''
-    write(*,*) 'creating structure'
+    write(*,'(A)') ''
+    write(*,'(A)') 'creating structure'
 
     call json_value_create(p)            ! create the value and associate the pointer
     call to_object(p,dir//filename4)     !add the file name as the name of the overall structure:
@@ -214,17 +214,17 @@
     call json_value_add(p, inp)
     nullify(inp)
 
-    write(*,*) ''
-    write(*,*) 'write to file'
+    write(*,'(A)') ''
+    write(*,'(A)') 'write to file'
 
     !write the file:
     open(newunit=iunit, file=dir//filename4, status='REPLACE')
     call json_print(p,iunit)
     close(iunit)
 
-    write(*,*) ''
-    write(*,*) 'write to string'
-    write(*,*) ''
+    write(*,'(A)') ''
+    write(*,'(A)') 'write to string'
+    write(*,'(A)') ''
     !write it to a string, and print to console:
     call json_print_to_string(p, string)
     write(*,'(A)') string
@@ -233,14 +233,14 @@
     !cleanup:
     call json_destroy(p)
 
-    write(*,*) ''
-    write(*,*) 'read file'
+    write(*,'(A)') ''
+    write(*,'(A)') 'read file'
 
     call json%load_file(filename = dir//filename4)
     if (json_failed()) call print_error_message()
 
-    write(*,*) ''
-    write(*,*) 'cleanup'
+    write(*,'(A)') ''
+    write(*,'(A)') 'cleanup'
     call json%destroy()
 
 !**************************************************************
@@ -260,18 +260,18 @@
 
     integer :: iunit
 
-    write(*,*) ''
-    write(*,*) '================================='
-    write(*,*) '   EXAMPLE 2'
-    write(*,*) '================================='
-    write(*,*) ''
+    write(*,'(A)') ''
+    write(*,'(A)') '================================='
+    write(*,'(A)') '   EXAMPLE 2'
+    write(*,'(A)') '================================='
+    write(*,'(A)') ''
 
     !root:
     call json_value_create(p)           ! create the value and associate the pointer
     call to_object(p,dir//filename2)    ! add the file name as the name of the overall structure
 
-    write(*,*) ''
-    write(*,*) 'initialize the structure...'
+    write(*,'(A)') ''
+    write(*,'(A)') 'initialize the structure...'
 
     !config structure:
     call json_value_create(inp)             !an object
@@ -283,8 +283,8 @@
     call to_array(traj,'trajectory')
     call json_value_add(p, traj)
 
-    write(*,*) ''
-    write(*,*) 'adding some data to structure...'
+    write(*,'(A)') ''
+    write(*,'(A)') 'adding some data to structure...'
 
     !add some variables:
 
@@ -308,8 +308,8 @@
     call add_variables_to_input(traj, 'Vz', 'km/s', 'J2000', 'EARTH', [3.0e-3_wp, 30.0e-3_wp, 40.0e-3_wp] )
     nullify(traj)
 
-    write(*,*) ''
-    write(*,*) 'writing file '//trim(dir//filename2)//'...'
+    write(*,'(A)') ''
+    write(*,'(A)') 'writing file '//trim(dir//filename2)//'...'
 
     open(newunit=iunit, file=dir//filename2, status='REPLACE')
     call json_print(p,iunit)
@@ -318,7 +318,7 @@
     !cleanup:
     call json_destroy(p)
 
-    write(*,*) ''
+    write(*,'(A)') ''
 
 !**************************************************************
     end subroutine test_2
@@ -382,15 +382,15 @@
     character(len=10) :: str
     real(wp),dimension(:),allocatable :: rvec
 
-    write(*,*) ''
-    write(*,*) '================================='
-    write(*,*) '   EXAMPLE 3'
-    write(*,*) '================================='
-    write(*,*) ''
+    write(*,'(A)') ''
+    write(*,'(A)') '================================='
+    write(*,'(A)') '   EXAMPLE 3'
+    write(*,'(A)') '================================='
+    write(*,'(A)') ''
 
     ! parse the json file:
-    write(*,*) ''
-    write(*,*) 'parsing file: '//dir//filename2
+    write(*,'(A)') ''
+    write(*,'(A)') 'parsing file: '//dir//filename2
 
     call json%load_file(filename = dir//filename2)
 
@@ -400,10 +400,10 @@
 
     else
 
-        write(*,*) ''
-        write(*,*) 'reading data from file...'
+        write(*,'(A)') ''
+        write(*,'(A)') 'reading data from file...'
         !get scalars:
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('inputs.integer_scalar', ival)
         if (json_failed()) then
             call print_error_message()
@@ -411,7 +411,7 @@
             write(*,'(A,1X,I5)') 'inputs.integer_scalar = ',ival
         end if
         !get one element from a vector:
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('trajectory(1).DATA(2)', rval)
         if (json_failed()) then
             call print_error_message()
@@ -423,7 +423,7 @@
 
             call integer_to_string(i,str)
 
-            write(*,*) ''
+            write(*,'(A)') ''
             call json%get('trajectory('//trim(str)//').VARIABLE', cval)
             if (json_failed()) then
 
@@ -448,8 +448,8 @@
     end if
 
     ! clean up
-    write(*,*) ''
-    write(*,*) 'destroy...'
+    write(*,'(A)') ''
+    write(*,'(A)') 'destroy...'
     call json%destroy()
 
 !**************************************************************
@@ -471,15 +471,15 @@
     real(wp) :: rval
     logical :: found
 
-    write(*,*) ''
-    write(*,*) '================================='
-    write(*,*) '   EXAMPLE 1'
-    write(*,*) '================================='
-    write(*,*) ''
+    write(*,'(A)') ''
+    write(*,'(A)') '================================='
+    write(*,'(A)') '   EXAMPLE 1'
+    write(*,'(A)') '================================='
+    write(*,'(A)') ''
 
     ! parse the json file:
-    write(*,*) ''
-    write(*,*) 'parsing file...'
+    write(*,'(A)') ''
+    write(*,'(A)') 'parsing file...'
 
     call json%load_file(filename = dir//filename1)
 
@@ -490,76 +490,76 @@
     else
 
         ! print the parsed data to the console
-        write(*,*) ''
-        write(*,*) 'printing the file...'
+        write(*,'(A)') ''
+        write(*,'(A)') 'printing the file...'
         call json%print_file()
 
         ! extract data from the parsed value
-        write(*,*) ''
-        write(*,*) 'get some data from the file...'
+        write(*,'(A)') ''
+        write(*,'(A)') 'get some data from the file...'
 
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('version.svn', ival)
         if (json_failed()) then
             call print_error_message()
         else
-            write(*,*) 'version.svn = ',ival
+            write(*,'(A,I5)') 'version.svn = ',ival
         end if
 
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('data(1).array(2)', cval)
         if (json_failed()) then
             call print_error_message()
         else
-            write(*,'(1x,A)') 'data(1).array(2) = '//trim(cval)
+            write(*,'(A)') 'data(1).array(2) = '//trim(cval)
         end if
 
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('files(1)', cval)
         if (json_failed()) then
             call print_error_message()
         else
-            write(*,'(1x,A)') 'files(1) = '//trim(cval)
+            write(*,'(A)') 'files(1) = '//trim(cval)
         end if
 
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('files(2)', cval)
         if (json_failed()) then
             call print_error_message()
         else
-            write(*,'(1x,A)') 'files(2) = '//trim(cval)
+            write(*,'(A)') 'files(2) = '//trim(cval)
         end if
 
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('files(3)', cval)
         if (json_failed()) then
             call print_error_message()
         else
-            write(*,*) 'files(3) = '//trim(cval)
+            write(*,'(A)') 'files(3) = '//trim(cval)
         end if
 
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('data(2).real', rval)
         if (json_failed()) then
             call print_error_message()
         else
-            write(*,*) 'data(2).real = ',rval
+            write(*,'(A,E30.16)') 'data(2).real = ',rval
         end if
 
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('files[4]', cval)        !has hex characters
         if (json_failed()) then
             call print_error_message()
         else
-            write(*,'(1x,A)') 'files[4] = '//trim(cval)
+            write(*,'(A)') 'files[4] = '//trim(cval)
         end if
 
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('files[5]', cval)        !string with spaces and no escape characters
         if (json_failed()) then
             call print_error_message()
         else
-            write(*,'(1x,A)') 'files[5] = '//trim(cval)
+            write(*,'(A)') 'files[5] = '//trim(cval)
         end if
 
         !
@@ -567,27 +567,27 @@
         ! Note: when using the "found" output, the exceptions are cleared automatically.
         !
         
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('files[10]', cval, found)        !value that isn't there
         if (.not. found) then
-            write(*,*) 'files[10] not in file.'
+            write(*,'(A)') 'files[10] not in file.'
         else
             write(*,'(1x,A)') 'files[10] = '//trim(cval)
         end if
 
-        write(*,*) ''
+        write(*,'(A)') ''
         call json%get('version.blah', ival, found)        !value that isn't there
         if (.not. found) then
-            write(*,*) 'version.blah not in file.'
+            write(*,'(A)') 'version.blah not in file.'
         else
-            write(*,*) 'version.blah = ',ival
+            write(*,'(A)') 'version.blah = ',ival
         end if
 
     end if
 
     ! clean up
-    write(*,*) ''
-    write(*,*) 'destroy...'
+    write(*,'(A)') ''
+    write(*,'(A)') 'destroy...'
     call json%destroy()
 
 !**************************************************************
