@@ -42,7 +42,8 @@ set ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 #-------------------------------------
 # Collect source files for the library
 #-------------------------------------
-set ( JF_LIB_SRCS src/json_module.f90 )
+set ( JF_LIB_SRCS  src/json_module.f90  )
+set ( JF_TEST_SRCS src/json_example.f90 )
 
 #-----------------------------------------
 # Collect all the mod files into their own
@@ -90,7 +91,7 @@ endif ( ENABLE_DYLIBS_USE_RPATH )
 set ( LIB_NAME ${CMAKE_PROJECT_NAME} )
 add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
 add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
-set_target_properties ( ${LIB_NAME}-static 
+set_target_properties ( ${LIB_NAME}-static
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
   PREFIX lib
@@ -103,6 +104,17 @@ set_target_properties ( ${LIB_NAME}
   SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR} 
   VERSION ${VERSION}
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+
+#--------------------------
+# Build the test executable
+#--------------------------
+add_executable ( test-${CMAKE_PROJECT_NAME} ${JF_TEST_SRCS} )
+target_link_libraries ( test-${CMAKE_PROJECT_NAME} ${LIB_NAME} )
+add_executable ( test-${CMAKE_PROJECT_NAME}-static ${JF_TEST_SRCS} )
+target_link_libraries ( test-${CMAKE_PROJECT_NAME}-static ${LIB_NAME}-static )
+set_target_properties ( test-${CMAKE_PROJECT_NAME} test-${CMAKE_PROJECT_NAME}-static
+  PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
 
 #-------------------------------------
 # Build the documentation with ROBODoc
@@ -132,7 +144,7 @@ if ( NOT ROBODOC_SKIP_DOC_GEN )
     add_custom_command ( OUTPUT ${ROBODOC_OUTPUTS}
       COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOC_DIR}" # Ensure DOC_DIR exists at build time
       COMMAND "${ROBODOC}" ${REQUIRED_ROBODOC_OPTIONS} ${ROBODOC_OPTIONS}
-      DEPENDS "${CMAKE_SOURCE_DIR}/${JF_LIB_SRCS}"
+      DEPENDS "${CMAKE_SOURCE_DIR}/${JF_LIB_SRCS}" "${CMAKE_SOURCE_DIR}/${JF_TEST_SRCS}"
       COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using ROBODoc" )
     add_custom_target ( documentation ALL
       DEPENDS ${ROBODOC_OUTPUTS} )
@@ -145,7 +157,112 @@ endif ( NOT ROBODOC_SKIP_DOC_GEN )
 #---------------------------------------------------------------------
 # Add some tests to ensure that the software is performing as expected
 #---------------------------------------------------------------------
-# Not implemented yet
+enable_testing()
+find_program ( JSONLINT jsonlint )
+find_program ( DIFF     diff )
+set ( DATA_DIR ${CMAKE_BINARY_DIR}/files )
+configure_file ( ${CMAKE_SOURCE_DIR}/files/test1.json ${DATA_DIR}/test1.json COPYONLY )
+configure_file ( ${CMAKE_SOURCE_DIR}/files/test5.json ${DATA_DIR}/test5.json COPYONLY )
+
+# Validate input
+if ( JSONLINT )
+  add_test ( NAME validate-input1
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${JSONLINT} test1.json )
+  add_test ( NAME validate-input5
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${JSONLINT} test5.json )
+endif ( JSONLINT )
+# As of now these are kind of sniff tests... Need to modify test program to indicate failure with `stop` codes
+# or more easily parsed results, and be able to validate json sent to stdout
+
+# Dynamic lib
+add_test ( NAME test-${CMAKE_PROJECT_NAME}
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin/
+  COMMAND test-${CMAKE_PROJECT_NAME} )
+# Validate output
+if ( JSONLINT )
+  add_test ( NAME validate-test2
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${JSONLINT} test2.json )
+  add_test ( NAME validate-test4
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${JSONLINT} test4.json )
+endif ( JSONLINT )
+# Check output for differences
+if ( DIFF )
+  add_test ( NAME test2-regression
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${DIFF} -q test2.json ${CMAKE_SOURCE_DIR}/files/test2.json )
+  add_test ( NAME test4-regression
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${DIFF} -q test4.json ${CMAKE_SOURCE_DIR}/files/test4.json )
+else ( DIFF )
+  message ( WARNING
+    "For full test coverage diff, or a similar tool must be present on your system" )
+endif ( DIFF )
+set_tests_properties ( validate-test2 test2-regression
+  PROPERTIES
+  DEPENDS test-${CMAKE_PROJECT_NAME}
+  REQUIRED_FILES "${DATA_DIR}/test2.json"
+  RESOURCE_LOCK  "${DATA_DIR}/test2.json" )
+set_tests_properties ( validate-test4 test4-regression
+  PROPERTIES
+  DEPENDS test-${CMAKE_PROJECT_NAME}
+  REQUIRED_FILES "${DATA_DIR}/test4.json"
+  RESOURCE_LOCK  "${DATA_DIR}/test4.json" )
+
+# Static lib
+add_test ( NAME test-${CMAKE_PROJECT_NAME}-static
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin/"
+  COMMAND test-${CMAKE_PROJECT_NAME}-static )
+# Validate output
+if ( JSONLINT )
+  add_test ( NAME validate-test2-static
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${JSONLINT} test2.json )
+  add_test ( NAME validate-test4-static
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${JSONLINT} test4.json )
+endif ( JSONLINT )
+# Check output for differences
+if ( DIFF )
+  add_test ( NAME test2-regression-static
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${DIFF} -q test2.json ${CMAKE_SOURCE_DIR}/files/test2.json )
+  add_test ( NAME test4-regression-static
+    WORKING_DIRECTORY ${DATA_DIR}
+    COMMAND ${DIFF} -q test4.json ${CMAKE_SOURCE_DIR}/files/test4.json )
+endif ( DIFF )
+set_tests_properties ( validate-test2-static test2-regression-static
+  PROPERTIES
+  DEPENDS test-${CMAKE_PROJECT_NAME}-static
+  REQUIRED_FILES "${DATA_DIR}/test2.json"
+  RESOURCE_LOCK  "${DATA_DIR}/test2.json" )
+set_tests_properties ( validate-test4-static test4-regression-static
+  PROPERTIES
+  DEPENDS test-${CMAKE_PROJECT_NAME}-static
+  REQUIRED_FILES "${DATA_DIR}/test4.json"
+  RESOURCE_LOCK  "${DATA_DIR}/test4.json" )
+
+if ( JSONLINT )
+  set_tests_properties ( test-${CMAKE_PROJECT_NAME} test-${CMAKE_PROJECT_NAME}-static
+    PROPERTIES
+    FAIL_REGULAR_EXPRESSION "Error;ERROR;error"
+    REQUIRED_FILES "${DATA_DIR}/test1.json;${DATA_DIR}/test5.json"
+    RESOURCE_LOCK "${DATA_DIR}/test2.json;${DATA_DIR}/test4.json"
+    DEPENDS "validate-input1;validate-input5" )
+else ( JSONLINT ) # Don't force validation of input if no JSONLINT
+  message ( WARNING
+    "For full test coverage please download and install jsonlint, a NODEJS package <http://nodejs.org>" )
+  set_tests_properties ( test-${CMAKE_PROJECT_NAME} test-${CMAKE_PROJECT_NAME}-static
+    PROPERTIES
+    FAIL_REGULAR_EXPRESSION "Error;ERROR;error"
+    REQUIRED_FILES "${DATA_DIR}/test1.json;${DATA_DIR}/test5.json"
+    RESOURCE_LOCK "${DATA_DIR}/test2.json;${DATA_DIR}/test4.json" )
+endif ( JSONLINT )
+set_directory_properties ( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
+  "${DATA_DIR}/test2.json;${DATA_DIR}/test4.json" )
 
 #-------------------------
 # Perform the installation
