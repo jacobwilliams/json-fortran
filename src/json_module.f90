@@ -2685,7 +2685,7 @@
 
                                         s = pre//c//post
 
-                                        n = n-1    !one character has been removed from the string ('\')
+                                        n = n-1    !backslash character has been removed from the string
 
                                     case('u')    !expecting 4 hexadecimal digits after the escape character    [\uXXXX]
 
