@@ -1320,85 +1320,85 @@
 <span class="line_number">2685 </span>
 <span class="line_number">2686 </span>                                        s <span class="sign">=</span> pre<span class="sign">/</span><span class="sign">/</span>c<span class="sign">/</span><span class="sign">/</span>post
 <span class="line_number">2687 </span>
-<span class="line_number">2688 </span>                                        n <span class="sign">=</span> n<span class="sign">-</span>1    <span class="sign">!</span>one character has been removed from the string <span class="sign">(</span><span class="squote">'\')
+<span class="line_number">2688 </span>                                        n <span class="sign">=</span> n<span class="sign">-</span>1    <span class="sign">!</span>backslash character has been removed from the string
 <span class="line_number">2689 </span>
-<span class="line_number">2690 </span>                                    case('</span>u<span class="squote">')    !expecting 4 hexadecimal digits after the escape character    [\uXXXX]
+<span class="line_number">2690 </span>                                    case<span class="sign">(</span><span class="squote">'u'</span><span class="sign">)</span>    <span class="sign">!</span>expecting 4 hexadecimal digits after the escape character    <span class="sign">[</span><span class="sign">\</span>uXXXX<span class="sign">]</span>
 <span class="line_number">2691 </span>
-<span class="line_number">2692 </span>                                        !for now, we are just printing them as is
-<span class="line_number">2693 </span>                                        ![Note: not checking to see if it is a valid hex value]
+<span class="line_number">2692 </span>                                        <span class="sign">!</span>for now<span class="sign">,</span> we are just printing them as is
+<span class="line_number">2693 </span>                                        <span class="sign">!</span><span class="sign">[</span>Note<span class="sign">:</span> not checking to see if it is a valid hex value<span class="sign">]</span>
 <span class="line_number">2694 </span>
-<span class="line_number">2695 </span>                                        if (j+5&lt;=n) then
-<span class="line_number">2696 </span>                                            j=j+4
+<span class="line_number">2695 </span>                                        if <span class="sign">(</span>j<span class="sign">+</span>5<span class="sign">&lt;</span><span class="sign">=</span>n<span class="sign">)</span> then
+<span class="line_number">2696 </span>                                            j<span class="sign">=</span>j<span class="sign">+</span>4
 <span class="line_number">2697 </span>                                        else
-<span class="line_number">2698 </span>                                            call <a href="#robo64">throw_exception</a>(&amp;
-<span class="line_number">2699 </span>                                                '</span>Error in <strong>json_get_chars</strong><span class="sign">:</span> Invalid hexadecimal sequence in string<span class="sign">:</span> <span class="squote">'//trim(c))
+<span class="line_number">2698 </span>                                            call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="sign">&amp;</span>
+<span class="line_number">2699 </span>                                                <span class="squote">'Error in <strong>json_get_chars</strong>: Invalid hexadecimal sequence in string: '</span><span class="sign">/</span><span class="sign">/</span>trim<span class="sign">(</span>c<span class="sign">)</span><span class="sign">)</span>
 <span class="line_number">2700 </span>                                            exit
 <span class="line_number">2701 </span>                                        end if
 <span class="line_number">2702 </span>
 <span class="line_number">2703 </span>                                    case default
-<span class="line_number">2704 </span>                                        !unknown escape character
-<span class="line_number">2705 </span>                                        call <a href="#robo64">throw_exception</a>('</span>Error in <strong>json_get_chars</strong><span class="sign">:</span> unknown escape sequence in string <span class="quote">"'//&amp;
-<span class="line_number">2706 </span>                                                trim(s)//'"</span> <span class="sign">[</span><span class="squote">'//backslash//c//'</span><span class="sign">]</span><span class="squote">')
+<span class="line_number">2704 </span>                                        <span class="sign">!</span>unknown escape character
+<span class="line_number">2705 </span>                                        call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>json_get_chars</strong>: unknown escape sequence in string "'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
+<span class="line_number">2706 </span>                                                trim<span class="sign">(</span>s<span class="sign">)</span><span class="sign">/</span><span class="sign">/</span><span class="squote">'" ['</span><span class="sign">/</span><span class="sign">/</span>backslash<span class="sign">/</span><span class="sign">/</span>c<span class="sign">/</span><span class="sign">/</span><span class="squote">']'</span><span class="sign">)</span>
 <span class="line_number">2707 </span>                                        exit
 <span class="line_number">2708 </span>                                    end select
 <span class="line_number">2709 </span>
-<span class="line_number">2710 </span>                                    j=j+1    !go to the next character
+<span class="line_number">2710 </span>                                    j<span class="sign">=</span>j<span class="sign">+</span>1    <span class="sign">!</span>go to the next character
 <span class="line_number">2711 </span>
-<span class="line_number">2712 </span>                                    if (j&gt;=n) exit    !finished
+<span class="line_number">2712 </span>                                    if <span class="sign">(</span>j<span class="sign">&gt;</span><span class="sign">=</span>n<span class="sign">)</span> exit    <span class="sign">!</span>finished
 <span class="line_number">2713 </span>
 <span class="line_number">2714 </span>                                else
-<span class="line_number">2715 </span>                                    !an escape character is the last character in the string
-<span class="line_number">2716 </span>                                    ! [this may not be valid syntax, but just keep it]
+<span class="line_number">2715 </span>                                    <span class="sign">!</span>an escape character is the last character in the string
+<span class="line_number">2716 </span>                                    <span class="sign">!</span> <span class="sign">[</span>this may not be valid syntax<span class="sign">,</span> but just keep it<span class="sign">]</span>
 <span class="line_number">2717 </span>                                    exit
 <span class="line_number">2718 </span>                                end if
 <span class="line_number">2719 </span>
 <span class="line_number">2720 </span>                            else
-<span class="line_number">2721 </span>                                exit    !no more escape characters in the string
+<span class="line_number">2721 </span>                                exit    <span class="sign">!</span>no more escape characters in the string
 <span class="line_number">2722 </span>                            end if
 <span class="line_number">2723 </span>
 <span class="line_number">2724 </span>                        end do
 <span class="line_number">2725 </span>
-<span class="line_number">2726 </span>                        if (exception_thrown) then
-<span class="line_number">2727 </span>                            if (allocated(value)) deallocate(value)
+<span class="line_number">2726 </span>                        if <span class="sign">(</span>exception_thrown<span class="sign">)</span> then
+<span class="line_number">2727 </span>                            if <span class="sign">(</span>allocated<span class="sign">(</span>value<span class="sign">)</span><span class="sign">)</span> deallocate<span class="sign">(</span>value<span class="sign">)</span>
 <span class="line_number">2728 </span>                        else
-<span class="line_number">2729 </span>                            value = s
+<span class="line_number">2729 </span>                            value <span class="sign">=</span> s
 <span class="line_number">2730 </span>                        end if
 <span class="line_number">2731 </span>
 <span class="line_number">2732 </span>                    else
-<span class="line_number">2733 </span>                        call <a href="#robo64">throw_exception</a>('</span>Error in <strong>json_get_chars</strong><span class="sign">:</span> p<span class="sign">%</span>data<span class="sign">%</span>value not allocated<span class="squote">')
+<span class="line_number">2733 </span>                        call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>json_get_chars</strong>: p%data%value not allocated'</span><span class="sign">)</span>
 <span class="line_number">2734 </span>                    end if
 <span class="line_number">2735 </span>
-<span class="line_number">2736 </span>                !class default
+<span class="line_number">2736 </span>                <span class="sign">!</span>class default
 <span class="line_number">2737 </span>                case default
 <span class="line_number">2738 </span>
-<span class="line_number">2739 </span>                    call <a href="#robo64">throw_exception</a>('</span>Error in <strong>json_get_chars</strong><span class="sign">:</span> Unable to resolve value to characters<span class="sign">:</span> <span class="squote">'//trim(path))
+<span class="line_number">2739 </span>                    call <a href="#robo64">throw_exception</a><span class="sign">(</span><span class="squote">'Error in <strong>json_get_chars</strong>: Unable to resolve value to characters: '</span><span class="sign">/</span><span class="sign">/</span>trim<span class="sign">(</span>path<span class="sign">)</span><span class="sign">)</span>
 <span class="line_number">2740 </span>
-<span class="line_number">2741 </span>                    ! Note: for the other cases, we could do val to string conversions... TO DO
+<span class="line_number">2741 </span>                    <span class="sign">!</span> Note<span class="sign">:</span> for the other cases<span class="sign">,</span> we could do val to string conversions<span class="sign">.</span><span class="sign">.</span><span class="sign">.</span> TO DO
 <span class="line_number">2742 </span>
 <span class="line_number">2743 </span>                end select
-<span class="line_number">2744 </span>            !end associate
+<span class="line_number">2744 </span>            <span class="sign">!</span>end associate
 <span class="line_number">2745 </span>
 <span class="line_number">2746 </span>        end if
 <span class="line_number">2747 </span>
-<span class="line_number">2748 </span>        if (allocated(value) .and. .not. exception_thrown) then
-<span class="line_number">2749 </span>            if (present(found)) found = .true.
+<span class="line_number">2748 </span>        if <span class="sign">(</span>allocated<span class="sign">(</span>value<span class="sign">)</span> <span class="sign">.</span>and<span class="sign">.</span> <span class="sign">.</span>not<span class="sign">.</span> exception_thrown<span class="sign">)</span> then
+<span class="line_number">2749 </span>            if <span class="sign">(</span>present<span class="sign">(</span>found<span class="sign">)</span><span class="sign">)</span> found <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>
 <span class="line_number">2750 </span>        else
-<span class="line_number">2751 </span>            if (present(found)) then
-<span class="line_number">2752 </span>                found = .false.
-<span class="line_number">2753 </span>                call <a href="#robo19">json_clear_exceptions</a>()
+<span class="line_number">2751 </span>            if <span class="sign">(</span>present<span class="sign">(</span>found<span class="sign">)</span><span class="sign">)</span> then
+<span class="line_number">2752 </span>                found <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
+<span class="line_number">2753 </span>                call <a href="#robo19">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">2754 </span>            end if
 <span class="line_number">2755 </span>        end if
 <span class="line_number">2756 </span>
-<span class="line_number">2757 </span>        !cleanup:
-<span class="line_number">2758 </span>        if (associated(p)) nullify(p)
-<span class="line_number">2759 </span>        if (allocated(s)) deallocate(s)
-<span class="line_number">2760 </span>        if (allocated(pre)) deallocate(pre)
-<span class="line_number">2761 </span>        if (allocated(post)) deallocate(post)
+<span class="line_number">2757 </span>        <span class="sign">!</span>cleanup<span class="sign">:</span>
+<span class="line_number">2758 </span>        if <span class="sign">(</span>associated<span class="sign">(</span>p<span class="sign">)</span><span class="sign">)</span> nullify<span class="sign">(</span>p<span class="sign">)</span>
+<span class="line_number">2759 </span>        if <span class="sign">(</span>allocated<span class="sign">(</span>s<span class="sign">)</span><span class="sign">)</span> deallocate<span class="sign">(</span>s<span class="sign">)</span>
+<span class="line_number">2760 </span>        if <span class="sign">(</span>allocated<span class="sign">(</span>pre<span class="sign">)</span><span class="sign">)</span> deallocate<span class="sign">(</span>pre<span class="sign">)</span>
+<span class="line_number">2761 </span>        if <span class="sign">(</span>allocated<span class="sign">(</span>post<span class="sign">)</span><span class="sign">)</span> deallocate<span class="sign">(</span>post<span class="sign">)</span>
 <span class="line_number">2762 </span>
 <span class="line_number">2763 </span>    else
 <span class="line_number">2764 </span>
-<span class="line_number">2765 </span>        value = '</span><span class="squote">'
-<span class="line_number">2766 </span>        found = .false.
+<span class="line_number">2765 </span>        value <span class="sign">=</span> <span class="squote">''</span>
+<span class="line_number">2766 </span>        found <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
 <span class="line_number">2767 </span>
 <span class="line_number">2768 </span>    end if
 <span class="line_number">2769 </span>
@@ -4032,7 +4032,7 @@
 
 </div> <!-- content -->
 <div id="footer">
-<p>Generated from ./src/json_module.f90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.38 on Thu Jun 19 2014 19:34:10
+<p>Generated from ./src/json_module.f90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.38 on Thu Jun 19 2014 19:38:24
 </p>
 </div> <!-- footer -->
 </body>
