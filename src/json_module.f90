@@ -98,10 +98,18 @@
     integer,parameter,public :: wp    = selected_real_kind(15,307)     !double precision reals
     character(len=*),parameter,public :: json_ext = '.json'            !JSON file extension
     
-    character(len=1),parameter :: space = ' '
-    character(len=1),parameter :: newline  = ACHAR(10)         !new line character
-    character(len=*),parameter :: real_fmt = '(E30.16E3)'      !format for real numbers
-    character(len=*),parameter :: int_fmt  = '(I10)'           !format for integers
+    character(len=1),parameter :: space             = ' '         !special characters
+    character(len=1),parameter :: bspace            = achar(8)
+    character(len=1),parameter :: horizontal_tab    = achar(9)
+    character(len=1),parameter :: newline           = achar(10)  
+    character(len=1),parameter :: formfeed          = achar(12)
+    character(len=1),parameter :: carriage_return   = achar(13)
+    character(len=1),parameter :: quotation_mark    = achar(34)
+    character(len=1),parameter :: slash             = achar(47)
+    character(len=1),parameter :: backslash         = achar(92)  
+       
+    character(len=*),parameter :: real_fmt  = '(E30.16E3)'      !format for real numbers
+    character(len=*),parameter :: int_fmt   = '(I10)'           !format for integers
 
     logical,parameter :: debug = .false.    !for printing the debug messages
 
@@ -1442,19 +1450,20 @@
 
         select case(c)
 
-        case('"',ACHAR(92),'/',ACHAR(8),ACHAR(12),ACHAR(10),ACHAR(13),ACHAR(9))    !special characters
+        case(quotation_mark,backslash,slash,bspace,&
+             formfeed,newline,carriage_return,horizontal_tab)    !special characters
             select case(c)
-            case('"',ACHAR(92),'/')
-                str_out = str_out//ACHAR(92)//c    !add escape char
-            case(ACHAR(8))
+            case(quotation_mark,backslash,slash)
+                str_out = str_out//backslash//c    !add escape char
+            case(bspace)
                 str_out = str_out//'\b'        !backspace
-            case(ACHAR(12))
+            case(formfeed)
                 str_out = str_out//'\f'        !formfeed
-            case(ACHAR(10))
+            case(newline)
                 str_out = str_out//'\n'        !new line
-            case(ACHAR(13))
+            case(carriage_return)
                 str_out = str_out//'\r'        !carriage return
-            case(ACHAR(9))
+            case(horizontal_tab)
                 str_out = str_out//'\t'        !horizontal tab
             end select
         case default
@@ -2208,7 +2217,7 @@
                 case (json_integer)
                     value = p%data%int_value
                 case (json_real)
-                    value = p%data%dbl_value
+                    value = int(p%data%dbl_value)
                 case (json_logical)
                     if (p%data%log_value) then
                         value = 1
@@ -2631,7 +2640,7 @@
                         do
 
                             jprev = j                !initialize
-                            j = index(s(j:n),ACHAR(92))    !look for an escape character
+                            j = index(s(j:n),backslash)    !look for an escape character
 
                             if (j>0) then            !an escape character was found
 
@@ -2650,7 +2659,7 @@
                                     c = s( j+1 : j+1 )
 
                                     select case (c)
-                                    case('"',ACHAR(92),'/','b','f','n','r','t')
+                                    case(quotation_mark,backslash,slash,'b','f','n','r','t')
 
                                         !save the bit after the escape characters:
                                         if (j+2<n) then
@@ -2660,18 +2669,18 @@
                                         end if
 
                                         select case(c)
-                                        case('"',ACHAR(92),'/')
+                                        case(quotation_mark,backslash,slash)
                                             !use c as is
                                         case('b')
-                                            c = ACHAR(8)        !backspace
+                                            c = bspace
                                         case('f')
-                                            c = ACHAR(12)    !formfeed
+                                            c = formfeed
                                         case('n')
-                                            c = ACHAR(10)    !new line
+                                            c = newline
                                         case('r')
-                                            c = ACHAR(13)    !carriage return
+                                            c = carriage_return
                                         case('t')
-                                            c = ACHAR(9)        !horizontal tab
+                                            c = horizontal_tab
                                         end select
 
                                         s = pre//c//post
@@ -2694,7 +2703,7 @@
                                     case default
                                         !unknown escape character
                                         call throw_exception('Error in json_get_chars: unknown escape sequence in string "'//&
-                                                trim(s)//'" ['//ACHAR(92)//c//']')
+                                                trim(s)//'" ['//backslash//c//']')
                                         exit
                                     end select
 
@@ -3626,7 +3635,7 @@
                 call throw_exception('Error in parse_string: Expecting end of string')
                 return
                 
-            else if ('"' == c .and. last /= ACHAR(92)) then
+            else if ('"' == c .and. last /= backslash) then
             
                 if (is_hex) call throw_exception('Error in parse_string: incomplete hex string: \u'//trim(hex))
                 exit
@@ -3660,7 +3669,7 @@
                         escape = .false.
                         is_hex = (c=='u')    !the next four characters are the hex string
                     else
-                        escape = (c==ACHAR(92))
+                        escape = (c==backslash)
                     end if
                     
                 end if
