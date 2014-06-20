@@ -99,9 +99,9 @@
     character(len=*),parameter,public :: json_ext = '.json'            !JSON file extension
     
     character(len=1),parameter :: space = ' '
-    character(len=1),parameter :: newline = char(10)           !new line character
+    character(len=1),parameter :: newline  = ACHAR(10)         !new line character
     character(len=*),parameter :: real_fmt = '(E30.16E3)'      !format for real numbers
-    character(len=*),parameter :: int_fmt = '(I10)'            !format for integers
+    character(len=*),parameter :: int_fmt  = '(I10)'           !format for integers
 
     logical,parameter :: debug = .false.    !for printing the debug messages
 
@@ -1442,19 +1442,19 @@
 
         select case(c)
 
-        case('"','\','/',CHAR(8),CHAR(12),CHAR(10),CHAR(13),CHAR(9))    !special characters
+        case('"',ACHAR(92),'/',ACHAR(8),ACHAR(12),ACHAR(10),ACHAR(13),ACHAR(9))    !special characters
             select case(c)
-            case('"','\','/')
-                str_out = str_out//'\'//c    !add escape char
-            case(CHAR(8))
+            case('"',ACHAR(92),'/')
+                str_out = str_out//ACHAR(92)//c    !add escape char
+            case(ACHAR(8))
                 str_out = str_out//'\b'        !backspace
-            case(CHAR(12))
+            case(ACHAR(12))
                 str_out = str_out//'\f'        !formfeed
-            case(CHAR(10))
+            case(ACHAR(10))
                 str_out = str_out//'\n'        !new line
-            case(CHAR(13))
+            case(ACHAR(13))
                 str_out = str_out//'\r'        !carriage return
-            case(CHAR(9))
+            case(ACHAR(9))
                 str_out = str_out//'\t'        !horizontal tab
             end select
         case default
@@ -2631,7 +2631,7 @@
                         do
 
                             jprev = j                !initialize
-                            j = index(s(j:n),'\')    !look for an escape character
+                            j = index(s(j:n),ACHAR(92))    !look for an escape character
 
                             if (j>0) then            !an escape character was found
 
@@ -2650,7 +2650,7 @@
                                     c = s( j+1 : j+1 )
 
                                     select case (c)
-                                    case('"','\','/','b','f','n','r','t')
+                                    case('"',ACHAR(92),'/','b','f','n','r','t')
 
                                         !save the bit after the escape characters:
                                         if (j+2<n) then
@@ -2660,18 +2660,18 @@
                                         end if
 
                                         select case(c)
-                                        case('"','\','/')
+                                        case('"',ACHAR(92),'/')
                                             !use c as is
                                         case('b')
-                                            c = CHAR(8)        !backspace
+                                            c = ACHAR(8)        !backspace
                                         case('f')
-                                            c = CHAR(12)    !formfeed
+                                            c = ACHAR(12)    !formfeed
                                         case('n')
-                                            c = CHAR(10)    !new line
+                                            c = ACHAR(10)    !new line
                                         case('r')
-                                            c = CHAR(13)    !carriage return
+                                            c = ACHAR(13)    !carriage return
                                         case('t')
-                                            c = CHAR(9)        !horizontal tab
+                                            c = ACHAR(9)        !horizontal tab
                                         end select
 
                                         s = pre//c//post
@@ -2694,7 +2694,7 @@
                                     case default
                                         !unknown escape character
                                         call throw_exception('Error in json_get_chars: unknown escape sequence in string "'//&
-                                                trim(s)//'" [\'//c//']')
+                                                trim(s)//'" ['//ACHAR(92)//c//']')
                                         exit
                                     end select
 
@@ -3626,7 +3626,7 @@
                 call throw_exception('Error in parse_string: Expecting end of string')
                 return
                 
-            else if ('"' == c .and. last /= '\') then
+            else if ('"' == c .and. last /= ACHAR(92)) then
             
                 if (is_hex) call throw_exception('Error in parse_string: incomplete hex string: \u'//trim(hex))
                 exit
@@ -3660,7 +3660,7 @@
                         escape = .false.
                         is_hex = (c=='u')    !the next four characters are the hex string
                     else
-                        escape = (c=='\')
+                        escape = (c==ACHAR(92))
                     end if
                     
                 end if
