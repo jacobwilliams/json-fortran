@@ -1,6 +1,6 @@
-!***********************************************************************************************************************************
+!*****************************************************************************************
     module json_module
-!***********************************************************************************************************************************
+!*****************************************************************************************
 !****h* JSON/json_module
 !
 !  NAME
@@ -13,9 +13,11 @@
 !    -Based on fson by Joseph A. Levin (see License below)
 !        -The original F95 code was split into four files:
 !            fson_path_m.f95, fson_string_m.f95, fson_value_m.f95, fson.f95
-!        -The code has been extensively modified and combined into this one module (json_module.f90).
+!        -The code has been extensively modified and combined into this 
+!            one module (json_module.f90).
 !        -Some Fortran 2003/2008 features are now used 
-!            (e.g., allocatable strings, associate, newunit, generic, class, and abstract interface)
+!            (e.g., allocatable strings, associate, newunit, generic, class, 
+!            and abstract interface)
 !    -The headers in this file follow the ROBODoc conventions.
 !            Compile with: robodoc --src ./ --doc ./doc --multidoc --html 
 !                                  --tabsize 4 --ignore_case_when_linking 
@@ -28,13 +30,12 @@
 !  SEE ALSO
 !    [1] http://github.com/jacobwilliams/json-fortran [json-fortran development site]
 !    [2] http://jacobwilliams.github.io/json-fortran [json-fortran online documentation]
-!    [3] http://github.com/josephalevin/fson [FSON code retrieved on 12/2/2013]
-!    [4] http://www.json.org/ [JSON website]
-!    [5] http://jsonlint.com/ [JSON validator]
+!    [3] http://www.json.org/ [JSON website]
+!    [4] http://jsonlint.com/ [JSON validator]
 !
 !  COPYRIGHT
 !
-!    -----------------------------------------------------------------------------------------
+!    -------------------------------------------------------------------------------------
 !    json-fortran License:
 !
 !    JSON-FORTRAN: A Fortran 2003/2008 JSON API
@@ -67,8 +68,10 @@
 !    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
-!    -----------------------------------------------------------------------------------------
+!    -------------------------------------------------------------------------------------
 !    Original FSON License:
+!
+!    http://github.com/josephalevin/fson [FSON code retrieved on 12/2/2013]
 !
 !    Copyright (c) 2012 Joseph A. Levin
 !
@@ -88,15 +91,15 @@
 !    OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 !    DEALINGS IN THE SOFTWARE.
 !
-!***********************************************************************************************************************************
+!*****************************************************************************************
 
     implicit none
 
     private
 
     !parameters:
-    integer,parameter,public :: wp    = selected_real_kind(15,307)     !double precision reals
-    character(len=*),parameter,public :: json_ext = '.json'            !JSON file extension
+    integer,parameter,public :: wp = selected_real_kind(15,307)    !double precision reals
+    character(len=*),parameter,public :: json_ext = '.json'        !JSON file extension
     
     character(len=1),parameter :: space             = ' '         !special characters
     character(len=1),parameter :: bspace            = achar(8)
@@ -124,7 +127,7 @@
     integer,parameter,public :: json_string    = 7
 
     !*********************************************************
-    !****c* json_module/json_data_non_polymorphic
+    !****ic* json_module/json_data_non_polymorphic
     !
     !  NAME
     !    json_data_non_polymorphic
@@ -205,7 +208,7 @@
 
         private
 
-        type(json_value), pointer :: p    => null()    !the JSON structure read from the file:
+        type(json_value), pointer :: p => null()    !the JSON structure read from the file
 
         contains
 
@@ -253,7 +256,7 @@
         end subroutine array_callback_func
     end interface
     
-    interface json_value_get                    !consider renaming this json_value_get_child
+    interface json_value_get           !consider renaming this json_value_get_child
         module procedure get_by_index
         module procedure get_by_name_chars
     end interface json_value_get
@@ -274,10 +277,6 @@
         module procedure :: json_get_chars, json_get_char_vec
         module procedure :: json_get_array
     end interface json_get
-
-    interface json_print
-        module procedure :: json_value_print
-    end interface
     
     interface json_print_to_string
         module procedure :: json_value_to_string
@@ -294,7 +293,8 @@
     public :: json_clear_exceptions      !clear exceptions
     public :: json_check_for_errors      !check for error and get error message
     public :: json_failed                !check for error
-    public :: json_value_get             !use either a 1 based index or member name to get a json_value.
+    public :: json_value_get             !use either a 1 based index or member 
+                                         ! name to get a json_value.
     public :: json_value_add             !add data to a JSON structure
     public :: json_get                   !get data from the JSON structure  
     public :: json_print                 !print the JSON structure to a file
@@ -309,6 +309,7 @@
     public :: to_null                    !
     public :: to_object                  !
     public :: to_array                   !
+    
     public :: integer_to_string          !basic integer to string routine
 
     !exception handling [private variables]
@@ -323,9 +324,9 @@
     character (len = 10) :: pushed_char              !JW : what is this magic number 10??
 
     contains
-!***********************************************************************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/destroy_json_data_non_polymorphic
 !
 !  NAME
@@ -356,9 +357,9 @@
     if (allocated(me%str_value)) deallocate(me%str_value)
 
     end subroutine destroy_json_data_non_polymorphic
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/destroy_json_file
 !
 !  NAME
@@ -384,9 +385,9 @@
     if (associated(me%p)) call json_value_destroy(me%p)
 
     end subroutine destroy_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/load_json_file
 !
 !  NAME
@@ -413,9 +414,9 @@
     call json_parse(filename, me%p)
 
     end subroutine load_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/print_json_file
 !
 !  NAME
@@ -440,22 +441,28 @@
     implicit none
 
     class(json_file),intent(inout) :: me
-    integer,intent(in),optional :: iunit
+    integer,intent(in),optional :: iunit  !must be non-zero
 
     integer :: i
+    character(len=:),allocatable :: dummy
 
     if (present(iunit)) then
-        i = iunit
+        if (iunit/=0) then
+            i = iunit
+        else
+            call throw_exception('Error in print_json_file: iunit must be nonzero.')
+            return
+        end if
     else
         i = output_unit
     end if
 
-    call json_value_print(me%p,iunit=i)
+    call json_value_print(me%p,iunit=i,str=dummy)
 
     end subroutine print_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/variable_info_in_file
 !
 !  NAME
@@ -507,9 +514,9 @@
     nullify(p)
 
     end subroutine variable_info_in_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_info
 !
 !  NAME
@@ -538,9 +545,9 @@
     if (present(n_children))  n_children = json_value_count(p)  !number of children
     
     end subroutine json_info
-!********************************************************************************
+!*****************************************************************************************
     
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_object_from_json_file
 !
 !  NAME
@@ -569,9 +576,9 @@
     call json_get_by_path(me%p, path=path, p=p, found=found)
 
     end subroutine get_object_from_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_integer_from_json_file
 !
 !  NAME
@@ -600,9 +607,9 @@
     call json_get(me%p, path=path, value=val, found=found)
 
     end subroutine get_integer_from_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_integer_vec_from_json_file
 !
 !  NAME
@@ -632,9 +639,9 @@
     call json_get(me%p, path, vec, found)
 
     end subroutine get_integer_vec_from_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_double_from_json_file
 !
 !  NAME
@@ -663,9 +670,9 @@
     call json_get(me%p, path=path, value=val, found=found)
 
     end subroutine get_double_from_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_double_vec_from_json_file
 !
 !  NAME
@@ -694,9 +701,9 @@
     call json_get(me%p, path, vec, found)
 
     end subroutine get_double_vec_from_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_logical_from_json_file
 !
 !  NAME
@@ -725,9 +732,9 @@
     call json_get(me%p, path=path, value=val, found=found)
 
     end subroutine get_logical_from_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_logical_vec_from_json_file
 !
 !  NAME
@@ -756,9 +763,9 @@
     call json_get(me%p, path, vec, found)
 
     end subroutine get_logical_vec_from_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_chars_from_json_file
 !
 !  NAME
@@ -788,9 +795,9 @@
     call json_get(me%p, path=path, value=val, found=found)
 
     end subroutine get_chars_from_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_char_vec_from_json_file
 !
 !  NAME
@@ -819,9 +826,9 @@
     call json_get(me%p, path, vec, found)
 
     end subroutine get_char_vec_from_json_file
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_initialize
 !
 !  NAME
@@ -851,9 +858,9 @@
     line_count = 1
 
     end subroutine json_initialize
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_clear_exceptions
 !
 !  NAME
@@ -876,9 +883,9 @@
     err_message = ''
 
     end subroutine json_clear_exceptions
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/throw_exception
 !
 !  NAME
@@ -917,9 +924,9 @@
     !end if
 
     end subroutine throw_exception
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_check_for_errors
 !
 !  NAME
@@ -956,9 +963,9 @@
     end if
 
     end subroutine json_check_for_errors
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_failed
 !
 !  NAME
@@ -987,9 +994,9 @@
     failed = exception_thrown
 
     end function json_failed
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_create
 !
 !  NAME
@@ -1019,9 +1026,9 @@
     allocate(p)
 
     end subroutine json_value_create
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_destroy
 !
 !  NAME
@@ -1063,9 +1070,9 @@
     end if
 
     end subroutine json_value_destroy
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_add_member
 !
 !  NAME
@@ -1113,9 +1120,9 @@
     end if
 
     end subroutine json_value_add_member
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_add_real
 !
 !  NAME
@@ -1153,9 +1160,9 @@
     nullify(var)
 
     end subroutine json_value_add_real
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_add_real_vec
 !
 !  NAME
@@ -1199,9 +1206,9 @@
     nullify(var)
 
     end subroutine json_value_add_real_vec
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_add_integer
 !
 !  NAME
@@ -1239,9 +1246,9 @@
     nullify(var)
 
     end subroutine json_value_add_integer
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_add_integer_vec
 !
 !  NAME
@@ -1285,9 +1292,9 @@
     nullify(var)
 
     end subroutine json_value_add_integer_vec
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_add_logical
 !
 !  NAME
@@ -1325,9 +1332,9 @@
     nullify(var)
 
     end subroutine json_value_add_logical
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_add_logical_vec
 !
 !  NAME
@@ -1371,9 +1378,9 @@
     nullify(var)
 
     end subroutine json_value_add_logical_vec
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_add_string
 !
 !  NAME
@@ -1415,9 +1422,9 @@
     nullify(var)
 
     end subroutine json_value_add_string
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/escape_string
 !
 !  NAME
@@ -1473,9 +1480,9 @@
     end do
 
     end subroutine escape_string
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_add_string_vec
 !
 !  NAME
@@ -1546,9 +1553,9 @@
     nullify(var)
 
     end subroutine json_value_add_string_vec
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_count
 !
 !  NAME
@@ -1592,9 +1599,9 @@
     end if
 
     end function json_value_count
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_by_index
 !
 !  NAME
@@ -1628,7 +1635,8 @@
                 if (associated(p%next)) then
                     p => p%next
                 else
-                    call throw_exception('Error in get_by_index: p%next is not associated.')
+                    call throw_exception('Error in get_by_index:'//&
+                                         ' p%next is not associated.')
                     return
                 end if
 
@@ -1636,16 +1644,17 @@
 
         else
 
-            call throw_exception('Error in get_by_index: this%children is not associated.')
+            call throw_exception('Error in get_by_index:'//&
+                                 ' this%children is not associated.')
 
         end if
 
     end if
 
     end subroutine get_by_index
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_by_name_chars
 !
 !  NAME
@@ -1691,9 +1700,9 @@
     end if
 
     end subroutine get_by_name_chars
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_value_to_string
 !
 !  NAME
@@ -1716,18 +1725,55 @@
     
     str = ''
     call json_value_print(me, iunit=0, str=str)
-    
+        
     end subroutine json_value_to_string
-!********************************************************************************
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_print
+!
+!  NAME
+!    json_print
+!
+!  DESCRIPTION
+!    Print the JSON structure to a file
+!
+!  AUTHOR
+!    Jacob Williams, 6/20/2014
+!
+!  SOURCE
+
+    subroutine json_print(me,iunit)
     
-!********************************************************************************
-!****f* json_module/json_value_print
+    implicit none
+    
+    type(json_value),pointer,intent(in)  :: me
+    integer,intent(in) :: iunit                   !must be non-zero
+    
+    character(len=:),allocatable :: dummy
+    
+    if (iunit/=0) then
+        call json_value_print(me,iunit,str=dummy)
+    else
+        call throw_exception('Error in json_print: iunit must be nonzero.')
+    end if
+    
+    end subroutine json_print
+    
+!*****************************************************************************************
+!****if* json_module/json_value_print
 !
 !  NAME
 !    json_value_print
 !
 !  DESCRIPTION
-!    Print the JSON structure to a file
+!    Print the JSON structure to a string or a file.
+!
+!  NOTES
+!    This is an internal routine called by the wrapper routines
+!        json_print and json_value_to_string
+!    The reason the str argument is non-optional is because of a 
+!        bug in v4.9 of the gfortran compiler.  
 !
 !  SOURCE
 
@@ -1736,13 +1782,14 @@
     implicit none
 
     type(json_value),pointer,intent(in)  :: this
-    integer,intent(in)                   :: iunit        !file unit to write to (6=console)
+    integer,intent(in)                   :: iunit     !file unit to write to (6=console)
     integer,intent(in),optional          :: indent
     logical,intent(in),optional          :: need_comma
     logical,intent(in),optional          :: colon
-    character(len=:),intent(inout),allocatable,optional :: str !if iunit==0 and this is present, then the 
-                                                               !structure is printed to this string, rather than a file.
-                                                               !This mode is used by json_value_to_string.
+    character(len=:),intent(inout),allocatable :: str !if iunit==0, then the structure is 
+                                                      ! printed to this string rather than 
+                                                      ! a file. This mode is used by 
+                                                      ! json_value_to_string.
 
     type(json_value), pointer :: element
     integer :: tab, i, count, spaces
@@ -1752,11 +1799,11 @@
     logical :: write_file, write_string
 
     if (.not. exception_thrown) then
-        
+            
         !whether to write a string or a file (one or the other):
-        write_string = (present(str) .and. iunit==0)
+        write_string = (iunit==0)
         write_file = .not. write_string
-
+        
         !if the comma will be printed after the value
         ! [comma not printed for the last elements]
         if (present(need_comma)) then
@@ -1801,15 +1848,18 @@
 
                     ! print the name
                     if (allocated(element%name)) then
-                        call write_it(repeat(space, spaces)//'"'// trim(element % name)//'": ',advance=.false.)
+                        call write_it(repeat(space, spaces)//'"'//&
+                                      trim(element % name)//'": ',advance=.false.)
                     else
-                        call throw_exception('Error in json_value_print: element%name not allocated')
+                        call throw_exception('Error in json_value_print:'//&
+                                             ' element%name not allocated')
                         call cleanup()
                         return
                     end if
 
                     ! recursive print of the element
-                    call json_value_print(element, iunit=iunit, indent=tab + 1, need_comma=i<count, colon=.true., str=str)
+                    call json_value_print(element, iunit=iunit, indent=tab + 1, &
+                                          need_comma=i<count, colon=.true., str=str)
 
                 end do
 
@@ -1826,11 +1876,13 @@
                     call json_value_get(this, i, element)
 
                     ! recursive print of the element
-                    call json_value_print(element, iunit=iunit, indent=tab + 1, need_comma=i<count, str=str)
+                    call json_value_print(element, iunit=iunit, indent=tab + 1, &
+                                          need_comma=i<count, str=str)
 
                 end do
-
-                call write_it( repeat(space, tab * 2)//']', comma=print_comma ) !indent the closing array character
+                
+                !indent the closing array character:
+                call write_it( repeat(space, tab * 2)//']', comma=print_comma ) 
 
             case (json_null)
 
@@ -1839,9 +1891,11 @@
             case (json_string)
 
                 if (allocated(this%data%str_value)) then
-                    call write_it( repeat(space, spaces)//'"'// trim(this%data%str_value)//'"', comma=print_comma )
+                    call write_it( repeat(space, spaces)//'"'// &
+                                   trim(this%data%str_value)//'"', comma=print_comma )
                 else
-                    call throw_exception('Error in json_value_print: this%value_string not allocated')
+                    call throw_exception('Error in json_value_print:'//&
+                                         ' this%value_string not allocated')
                     call cleanup()
                     return
                 end if
@@ -1880,15 +1934,20 @@
 
     contains
 
+        !-------------------------------
         ! cleanup routine
+        !-------------------------------
         subroutine cleanup()
         implicit none
 
         if (associated(element)) nullify(element)
 
         end subroutine cleanup
-    
+         !-------------------------------
+   
+        !-------------------------------
         ! write the string to the file (or the output string)
+        !-------------------------------
         subroutine write_it(s,advance,comma)
 
         implicit none
@@ -1925,27 +1984,31 @@
             end if
             
         else    !write string
-        
+               
             str = str // s2
             if (add_line_break) str = str // newline
-            
+           
         end if
         
         !cleanup:
         if (allocated(s2)) deallocate(s2)
         
         end subroutine write_it
+        !-------------------------------
 
     end subroutine json_value_print
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_by_path
 !
 !  NAME
 !    json_get_by_path
 !
 !  DESCRIPTION
+!
+!
+!  NOTES
 !     $         root
 !     @         this
 !     .         child object member
@@ -1953,7 +2016,7 @@
 !
 !  SOURCE
 
-    recursive subroutine json_get_by_path(this, path, p, found)       !JW : Does this need to be recursive ???
+    subroutine json_get_by_path(this, path, p, found)
 
     implicit none
 
@@ -2013,7 +2076,8 @@
                 end if
 
                 if (.not.associated(p)) then
-                    call throw_exception('Error in json_get_by_path: Error getting child member.')
+                    call throw_exception('Error in json_get_by_path:'//&
+                                         ' Error getting child member.')
                     exit
                 end if
 
@@ -2038,7 +2102,8 @@
                     cycle
                 end if
                 if (.not.associated(p)) then
-                    call throw_exception('Error in json_get_by_path: Error getting array element')
+                    call throw_exception('Error in json_get_by_path:'//&
+                                         ' Error getting array element')
                     exit
                 end if
                 child_i = i + 1
@@ -2082,7 +2147,8 @@
             if (associated(p)) then
                 if (present(found)) found = .true.    !everything seems to be ok
             else
-                call throw_exception('Error in json_get_by_path: variable not found: '//trim(path))
+                call throw_exception('Error in json_get_by_path:'//&
+                                     ' variable not found: '//trim(path))
                 if (present(found)) then
                     found = .false.
                     call json_clear_exceptions()
@@ -2096,9 +2162,9 @@
     end if
 
     end subroutine json_get_by_path
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/string_to_integer
 !
 !  NAME
@@ -2130,15 +2196,16 @@
 
         if (ierr/=0) then                   !if there was an error
             ival = 0
-            call throw_exception('Error in string_to_integer: string cannot be converted to an integer: '//trim(str))
+            call throw_exception('Error in string_to_integer:'//&
+                                 ' string cannot be converted to an integer: '//trim(str))
         end if
 
     end if
 
     end function string_to_integer
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/string_to_double
 !
 !  NAME
@@ -2167,15 +2234,16 @@
 
         if (ierr/=0) then    !if there was an error
             rval = 0.0_wp
-            call throw_exception('Error in string_to_double: string cannot be converted to a double: '//trim(str))
+            call throw_exception('Error in string_to_double:'//&
+                                 ' string cannot be converted to a double: '//trim(str))
         end if
 
     end if
 
     end function string_to_double
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_integer
 !
 !  NAME
@@ -2208,7 +2276,8 @@
 
         if (.not.associated(p)) then
 
-            call throw_exception('Error in json_get_integer: Unable to resolve path: '// trim(path))
+            call throw_exception('Error in json_get_integer:'//&
+                                 ' Unable to resolve path: '// trim(path))
 
         else
 
@@ -2225,7 +2294,9 @@
                         value = 0
                     end if
                 case default
-                    call throw_exception('Error in get_integer: Unable to resolve value to integer: '//trim(path))
+                    call throw_exception('Error in get_integer:'//&
+                                         ' Unable to resolve value to integer: '//&
+                                         trim(path))
                 end select
             !end associate
 
@@ -2250,9 +2321,9 @@
     end if
 
     end subroutine json_get_integer
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_integer_vec
 !
 !  NAME
@@ -2305,11 +2376,11 @@
 
         end subroutine get_int_from_array
 
-!********************************************************************************
+!*****************************************************************************************
     end subroutine json_get_integer_vec
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_double
 !
 !  NAME
@@ -2343,7 +2414,8 @@
 
         if (.not.associated(p)) then
 
-            call throw_exception('Error in json_get_double: Unable to resolve path: '//trim(path))
+            call throw_exception('Error in json_get_double:'//&
+                                 ' Unable to resolve path: '//trim(path))
 
         else
 
@@ -2360,7 +2432,9 @@
                         value = 0.0_wp
                     end if
                 case default
-                    call throw_exception('Error in json_get_double: Unable to resolve value to double: '//trim(path))
+                    call throw_exception('Error in json_get_double:'//&
+                                         ' Unable to resolve value to double: '//&
+                                         trim(path))
                 end select
             !end associate
 
@@ -2385,9 +2459,9 @@
     end if
 
     end subroutine json_get_double
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_double_vec
 !
 !  NAME
@@ -2441,9 +2515,9 @@
         end subroutine get_double_from_array
 
     end subroutine json_get_double_vec
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_logical
 !
 !  NAME
@@ -2477,7 +2551,8 @@
 
         if (.not.associated(p)) then
 
-            call throw_exception('Error in json_get_logical: Unable to resolve path: '//trim(path))
+            call throw_exception('Error in json_get_logical:'//&
+                                 ' Unable to resolve path: '//trim(path))
 
         else
 
@@ -2488,7 +2563,9 @@
                 case (json_logical)
                     value = p%data % log_value
                 case default
-                    call throw_exception('Error in json_get_logical: Unable to resolve value to logical: '//trim(path))
+                    call throw_exception('Error in json_get_logical:'//&
+                                         ' Unable to resolve value to logical: '//&
+                                         trim(path))
                 end select
             !end associate
 
@@ -2513,9 +2590,9 @@
     end if
 
     end subroutine json_get_logical
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_logical_vec
 !
 !  NAME
@@ -2569,9 +2646,9 @@
         end subroutine get_logical_from_array
 
     end subroutine json_get_logical_vec
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_chars
 !
 !  NAME
@@ -2608,7 +2685,8 @@
 
         if (.not.associated(p)) then
 
-            call throw_exception('Error in json_get_chars: Unable to resolve path: '//trim(path))
+            call throw_exception('Error in json_get_chars:'//&
+                                 ' Unable to resolve path: '//trim(path))
 
         else
 
@@ -2639,12 +2717,13 @@
 
                         do
 
-                            jprev = j                !initialize
+                            jprev = j                      !initialize
                             j = index(s(j:n),backslash)    !look for an escape character
 
                             if (j>0) then            !an escape character was found
-
-                                j = j + (jprev-1)    !index in full string of the escape character
+                            
+                                !index in full string of the escape character:
+                                j = j + (jprev-1)   
 
                                 if (j<n) then
 
@@ -2659,7 +2738,8 @@
                                     c = s( j+1 : j+1 )
 
                                     select case (c)
-                                    case(quotation_mark,backslash,slash,'b','f','n','r','t')
+                                    case(quotation_mark,backslash,slash,&
+                                         'b','f','n','r','t')
 
                                         !save the bit after the escape characters:
                                         if (j+2<n) then
@@ -2685,24 +2765,29 @@
 
                                         s = pre//c//post
 
-                                        n = n-1    !backslash character has been removed from the string
+                                        n = n-1    !backslash character has been 
+                                                   ! removed from the string
 
-                                    case('u')    !expecting 4 hexadecimal digits after the escape character    [\uXXXX]
+                                    case('u')    !expecting 4 hexadecimal digits after 
+                                                 ! the escape character    [\uXXXX]
 
                                         !for now, we are just printing them as is
-                                        ![Note: not checking to see if it is a valid hex value]
+                                        ![not checking to see if it is a valid hex value]
 
                                         if (j+5<=n) then
                                             j=j+4
                                         else
                                             call throw_exception(&
-                                                'Error in json_get_chars: Invalid hexadecimal sequence in string: '//trim(c))
+                                                'Error in json_get_chars:'//&
+                                                ' Invalid hexadecimal sequence'//&
+                                                ' in string: '//trim(c))
                                             exit
                                         end if
 
                                     case default
                                         !unknown escape character
-                                        call throw_exception('Error in json_get_chars: unknown escape sequence in string "'//&
+                                        call throw_exception('Error in json_get_chars:'//&
+                                                ' unknown escape sequence in string "'//&
                                                 trim(s)//'" ['//backslash//c//']')
                                         exit
                                     end select
@@ -2712,8 +2797,9 @@
                                     if (j>=n) exit    !finished
 
                                 else
-                                    !an escape character is the last character in the string
-                                    ! [this may not be valid syntax, but just keep it]
+                                    !an escape character is the last character in 
+                                    ! the string [this may not be valid syntax, 
+                                    ! but just keep it]
                                     exit
                                 end if
 
@@ -2730,15 +2816,18 @@
                         end if
 
                     else
-                        call throw_exception('Error in json_get_chars: p%data%value not allocated')
+                        call throw_exception('Error in json_get_chars:'//&
+                                             ' p%data%value not allocated')
                     end if
 
                 !class default
                 case default
 
-                    call throw_exception('Error in json_get_chars: Unable to resolve value to characters: '//trim(path))
+                    call throw_exception('Error in json_get_chars:'//&
+                                         ' Unable to resolve value to characters: '//&
+                                         trim(path))
 
-                    ! Note: for the other cases, we could do val to string conversions... TO DO
+                    ! Note: for the other cases, we could do val to string conversions.
 
                 end select
             !end associate
@@ -2768,9 +2857,9 @@
     end if
 
     end subroutine json_get_chars
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_char_vec
 !
 !  NAME
@@ -2833,9 +2922,9 @@
         end subroutine get_chars_from_array
 
     end subroutine json_get_char_vec
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_get_array
 !
 !  NAME
@@ -2873,7 +2962,8 @@
 
         if (.not.associated(p)) then
 
-            call throw_exception('Error in json_get_array: Unable to resolve path: '//trim(path))
+            call throw_exception('Error in json_get_array:'//&
+                                 ' Unable to resolve path: '//trim(path))
 
         else
 
@@ -2886,7 +2976,8 @@
                         call array_callback(element, i, count)
                     end do
                 case default
-                    call throw_exception('Error in json_get_array: Resolved value is not an array. '//trim(path))
+                    call throw_exception('Error in json_get_array:'//&
+                                         ' Resolved value is not an array. '//trim(path))
                 end select
             !end associate
 
@@ -2910,9 +3001,9 @@
     end if
 
     end subroutine json_get_array
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/json_parse
 !
 !  NAME
@@ -3020,9 +3111,9 @@
     end if
 
     end subroutine json_parse
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/get_current_line_from_file
 !
 !  NAME
@@ -3071,9 +3162,9 @@
     end if
     
     end subroutine get_current_line_from_file
-!********************************************************************************
+!*****************************************************************************************
     
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/parse_value
 !
 !  NAME
@@ -3093,6 +3184,8 @@
 
     logical :: eof
     character(len=1) :: c
+    character(len=:),allocatable :: tmp  !this is a work-around for a bug 
+                                         !  in the gfortran 4.9 compiler.
 
     if (.not. exception_thrown) then
 
@@ -3136,7 +3229,9 @@
                     select case (value%data%var_type)
                     !type is (json_string)
                     case (json_string)
-                        call parse_string(unit, value%data%str_value)
+                        call parse_string(unit, tmp)  !write to a tmp variable because of
+                        value%data%str_value = tmp    ! a bug in 4.9 gfortran compiler.
+                        deallocate(tmp)
                     end select
                 !end associate
 
@@ -3144,13 +3239,15 @@
 
                 !true
                 call parse_for_chars(unit, 'rue')
-                if (.not. exception_thrown) call to_logical(value,.true.)    !allocate class and set value
+                !allocate class and set value:
+                if (.not. exception_thrown) call to_logical(value,.true.)    
 
             case ('f')
 
                 !false
                 call parse_for_chars(unit, 'alse')
-                if (.not. exception_thrown) call to_logical(value,.false.)    !allocate class and set value
+                !allocate class and set value:
+                if (.not. exception_thrown) call to_logical(value,.false.)
 
             case ('n')
 
@@ -3164,7 +3261,9 @@
 
             case default
 
-                call throw_exception('Error in parse_value: Unexpected character while parsing value. "'//c//'"')
+                call throw_exception('Error in parse_value:'//&
+                                     ' Unexpected character while parsing value. "'//&
+                                     c//'"')
 
             end select
         end if
@@ -3172,9 +3271,9 @@
     end if
 
     end subroutine parse_value
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/to_logical
 !
 !  NAME
@@ -3212,9 +3311,9 @@
     if (present(name)) me%name = trim(name)
 
     end subroutine to_logical
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/to_integer
 !
 !  NAME
@@ -3252,9 +3351,9 @@
     if (present(name)) me%name = trim(name)
 
     end subroutine to_integer
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/to_real
 !
 !  NAME
@@ -3292,9 +3391,9 @@
     if (present(name)) me%name = trim(name)
 
     end subroutine to_real
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/to_string
 !
 !  NAME
@@ -3331,9 +3430,9 @@
     if (present(name)) me%name = trim(name)
 
     end subroutine to_string
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/to_null
 !
 !  NAME
@@ -3364,9 +3463,9 @@
     if (present(name)) me%name = trim(name)
 
     end subroutine to_null
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/to_object
 !
 !  NAME
@@ -3397,9 +3496,9 @@
     if (present(name)) me%name = trim(name)
 
     end subroutine to_object
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/to_array
 !
 !  NAME
@@ -3430,9 +3529,9 @@
     if (present(name)) me%name = trim(name)
 
     end subroutine to_array
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/parse_object
 !
 !  NAME
@@ -3453,6 +3552,8 @@
     type(json_value), pointer :: pair
     logical :: eof
     character(len=1) :: c
+    character(len=:),allocatable :: tmp  !this is a work-around for a bug 
+                                         !  in the gfortran 4.9 compiler.
 
     if (.not. exception_thrown) then
 
@@ -3466,7 +3567,8 @@
         ! pair name
         c = pop_char(unit, eof = eof, skip_ws = .true.)
         if (eof) then
-            call throw_exception('Error in parse_object: Unexpected end of file while parsing start of object.')
+            call throw_exception('Error in parse_object:'//&
+                                 ' Unexpected end of file while parsing start of object.')
             call cleanup()
             return
         else if ('}' == c) then
@@ -3475,7 +3577,9 @@
             return
         else if ('"' == c) then
             call json_value_create(pair)
-            call parse_string(unit, pair % name)
+            call parse_string(unit, tmp)   !write to a tmp variable because of
+            pair % name = tmp              ! a bug in 4.9 gfortran compiler.
+            deallocate(tmp)
             if (exception_thrown) return
         else
             call throw_exception('Error in parse_object: Expecting string: "'//c//'"')
@@ -3486,7 +3590,8 @@
         ! pair value
         c = pop_char(unit, eof = eof, skip_ws = .true.)
         if (eof) then
-            call throw_exception('Error in parse_object: Unexpected end of file while parsing object member.')
+            call throw_exception('Error in parse_object:'//&
+                                 ' Unexpected end of file while parsing object member.')
             call cleanup()
             return
         else if (':' == c) then
@@ -3495,7 +3600,8 @@
             if (exception_thrown) return
             call json_value_add(parent, pair)
         else
-            call throw_exception('Error in parse_object: Expecting : and then a value: '//c)
+            call throw_exception('Error in parse_object:'//&
+                                 ' Expecting : and then a value: '//c)
             call cleanup()
             return
         end if
@@ -3533,10 +3639,10 @@
         end subroutine cleanup
 
     end subroutine parse_object
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
-!****f* json_module/parse_array
+!*****************************************************************************************
+!****if* json_module/parse_array
 !
 !  NAME
 !    parse_array
@@ -3588,10 +3694,10 @@
     end if
 
     end subroutine parse_array
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
-!****f* json_module/parse_string
+!*****************************************************************************************
+!****if* json_module/parse_string
 !
 !  NAME
 !    parse_string
@@ -3615,11 +3721,13 @@
     character(len=1) :: c, last
     character(len=4) :: hex
     integer :: i
+    
+    !at least return a blank string if there is a problem:
+    string = '' 
 
     if (.not. exception_thrown) then
 
         !initialize:
-        string = '' 
         last = space
         is_hex = .false.
         escape = .false.
@@ -3637,7 +3745,8 @@
                 
             else if ('"' == c .and. last /= backslash) then
             
-                if (is_hex) call throw_exception('Error in parse_string: incomplete hex string: \u'//trim(hex))
+                if (is_hex) call throw_exception('Error in parse_string:'//&
+                                                 ' incomplete hex string: \u'//trim(hex))
                 exit
                     
             else
@@ -3656,7 +3765,8 @@
                             hex = ''
                             is_hex = .false.                            
                         else
-                            call throw_exception('Error in parse_string: invalid hex string: \u'//trim(hex))
+                            call throw_exception('Error in parse_string:'//&
+                                                 ' invalid hex string: \u'//trim(hex))
                             exit
                         end if
                     end if
@@ -3684,10 +3794,10 @@
     end if
 
     end subroutine parse_string
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
-!****f* json_module/parse_for_chars
+!*****************************************************************************************
+!****if* json_module/parse_for_chars
 !
 !  NAME
 !    parse_for_chars
@@ -3715,10 +3825,12 @@
         do i = 1, length
             c = pop_char(unit, eof = eof, skip_ws = .true.)
             if (eof) then
-                call throw_exception('Error in parse_for_chars: Unexpected end of file while parsing array.')
+                call throw_exception('Error in parse_for_chars:'//&
+                                     ' Unexpected end of file while parsing array.')
                 return
             else if (c /= chars(i:i)) then
-                call throw_exception('Error in parse_for_chars: Unexpected character.: "'//c//'" '//chars(i:i))
+                call throw_exception('Error in parse_for_chars:'//&
+                                     ' Unexpected character.: "'//c//'" '//chars(i:i))
                 return
             end if
         end do
@@ -3726,10 +3838,10 @@
     end if
 
     end subroutine parse_for_chars
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
-!****f* json_module/parse_number
+!*****************************************************************************************
+!****if* json_module/parse_number
 !
 !  NAME
 !
@@ -3774,7 +3886,8 @@
             c = pop_char(unit, eof = eof, skip_ws = .true.)
 
             if (eof) then
-                call throw_exception('Error in parse_number: Unexpected end of file while parsing number.')
+                call throw_exception('Error in parse_number:'//&
+                                     ' Unexpected end of file while parsing number.')
                 return
             else
 
@@ -3827,10 +3940,10 @@
     end if
 
     end subroutine parse_number
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
-!****f* json_module/pop_char
+!*****************************************************************************************
+!****if* json_module/pop_char
 !
 !  NAME
 !    pop_char
@@ -3895,7 +4008,8 @@
 
             end if
 
-            if (iachar(c) <= 31) then            !JW : fixed so it will read spaces in the string (was 32)
+            if (iachar(c) <= 31) then         !JW : fixed so it will read spaces 
+                                              !      in the string (was 32)
 
                 ! non printing ascii characters
                 cycle
@@ -3916,10 +4030,10 @@
     end if
 
     end function pop_char
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
-!****f* json_module/push_char
+!*****************************************************************************************
+!****if* json_module/push_char
 !
 !  NAME
 !    push_char
@@ -3945,15 +4059,16 @@
             pushed_char(pushed_index:pushed_index) = c
         else
             call integer_to_string(pushed_index,istr)
-            call throw_exception('Error in push_char: invalid valid of pushed_index: '//trim(istr))
+            call throw_exception('Error in push_char:'//&
+                                 ' invalid valid of pushed_index: '//trim(istr))
         end if
 
     end if
 
     end subroutine push_char
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
+!*****************************************************************************************
 !****f* json_module/integer_to_string
 !
 !  NAME
@@ -3985,10 +4100,10 @@
     end if
 
     end subroutine integer_to_string
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
-!****f* json_module/real_to_string
+!*****************************************************************************************
+!****if* json_module/real_to_string
 !
 !  NAME
 !    real_to_string
@@ -4019,10 +4134,10 @@
     end if
 
     end subroutine real_to_string
-!********************************************************************************
+!*****************************************************************************************
 
-!********************************************************************************
-!****f* json_module/valid_json_hex
+!*****************************************************************************************
+!****if* json_module/valid_json_hex
 !
 !  NAME
 !    valid_json_hex
@@ -4067,8 +4182,8 @@
     end if
 
     end function valid_json_hex
-!********************************************************************************
+!*****************************************************************************************
     
-!***********************************************************************************************************************************
+!*****************************************************************************************
     end module json_module
-!***********************************************************************************************************************************
+!*****************************************************************************************
