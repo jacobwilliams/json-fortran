@@ -1454,25 +1454,20 @@
     do i=1,len(str_in)
 
         c = str_in(i:i)    !get next character in the input string
-
+             
         select case(c)
-
-        case(quotation_mark,backslash,slash,bspace,&
-             formfeed,newline,carriage_return,horizontal_tab)    !special characters
-            select case(c)
-            case(quotation_mark,backslash,slash)
-                str_out = str_out//backslash//c    !add escape char
-            case(bspace)
-                str_out = str_out//'\b'        !backspace
-            case(formfeed)
-                str_out = str_out//'\f'        !formfeed
-            case(newline)
-                str_out = str_out//'\n'        !new line
-            case(carriage_return)
-                str_out = str_out//'\r'        !carriage return
-            case(horizontal_tab)
-                str_out = str_out//'\t'        !horizontal tab
-            end select
+        case(quotation_mark,backslash,slash)
+            str_out = str_out//backslash//c
+        case(bspace)
+            str_out = str_out//'\b'
+        case(formfeed)
+            str_out = str_out//'\f'
+        case(newline)
+            str_out = str_out//'\n'
+        case(carriage_return)
+            str_out = str_out//'\r'
+        case(horizontal_tab)
+            str_out = str_out//'\t'
         case default
             str_out = str_out//c
         end select
