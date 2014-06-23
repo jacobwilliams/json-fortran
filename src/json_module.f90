@@ -114,8 +114,6 @@
     character(len=*),parameter :: real_fmt  = '(E30.16E3)'      !format for real numbers
     character(len=*),parameter :: int_fmt   = '(I10)'           !format for integers
 
-    logical,parameter :: debug = .false.    !for printing the debug messages
-
     ! The types of data:
     integer,parameter,public :: json_unknown   = 0
     integer,parameter,public :: json_null      = 1
