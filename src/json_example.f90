@@ -10,7 +10,7 @@
 !    Unit tests for the json_module.
 !
 !  USES
-!	json_module
+!    json_module
 !
 !  HISTORY
 !    Jacob Williams : 2/8/2014 : Created
@@ -472,6 +472,7 @@
     character(len=:),allocatable :: cval
     real(wp) :: rval
     logical :: found
+    type(json_value),pointer :: p
 
     write(*,'(A)') ''
     write(*,'(A)') '================================='
@@ -584,7 +585,23 @@
         else
             write(*,'(A)') 'version.blah = ',ival
         end if
-
+        
+        write(*,'(A)') ''
+        write(*,'(A)') ' Test removing data from the json structure:'
+        
+        call json%get('files', p)           !in the middle of a list
+        call json_remove(p)
+        
+        call json%get('data(1).array', p)   !at the end of a list
+        call json_remove(p)
+        
+        call json%get('data(2).number', p)  !at the beginning of a list
+        call json_remove(p)
+        
+        write(*,'(A)') ''
+        write(*,'(A)') 'printing the modified structure...'
+        call json%print_file()       
+        
     end if
 
     ! clean up

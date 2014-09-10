@@ -171,6 +171,7 @@
         type(json_data_non_polymorphic) :: data
 
         !for the linked list:
+        type(json_value), pointer :: previous => null()
         type(json_value), pointer :: next => null()
         type(json_value), pointer :: parent => null()
         type(json_value), pointer :: children => null()
@@ -283,10 +284,15 @@
     interface json_destroy
         module procedure :: json_value_destroy
     end interface
+    
+    interface json_remove
+        module procedure :: json_value_remove
+    end interface
 
     !public routines:
     public :: json_initialize            !to initialize the module
     public :: json_destroy               !clear a JSON structure (destructor)
+    public :: json_remove                !remove from a JSON structure
     public :: json_parse                 !read a JSON file and populate the structure
     public :: json_clear_exceptions      !clear exceptions
     public :: json_check_for_errors      !check for error and get error message
@@ -1056,6 +1062,73 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!****f* json_module/json_value_remove
+!
+!  NAME
+!    json_value_destroy
+!
+!  DESCRIPTION
+!    Remove and destroy a json_value (and all its children) 
+!        from a linked-list structure.
+!
+!  AUTHOR
+!    Jacob Williams : 9/9/2014
+!
+!  SOURCE
+
+    subroutine json_value_remove(me)
+
+    implicit none
+
+    type(json_value),pointer :: me
+    
+    type(json_value),pointer :: parent,previous,next
+    
+    if (associated(me)) then
+        if (associated(me%parent)) then
+            if (associated(me%next)) then
+        
+                !there are later items in the list:
+            
+                next => me%next
+                nullify(me%next)
+            
+                if (associated(me%previous)) then           
+                    !there are earlier items in the list
+                    previous => me%previous                
+                    previous%next => next
+                    next%previous => previous
+                else
+                    !this is the first item in the list
+                    parent => me%parent                    
+                    parent%children => next
+                    next%previous => null()
+                end if
+                
+            else
+            
+                if (associated(me%previous)) then
+                	!there are earlier items in the list:
+                    previous => me%previous 
+                    previous%next => null()  
+                else
+                	!this is the only item in the list:
+                    parent => me%parent 
+                    parent%children => null()                   
+                end if
+                
+            end if     
+                   
+        end if
+            
+        call json_value_destroy(me)
+
+    end if
+
+    end subroutine json_value_remove
+!*****************************************************************************************
+
+!*****************************************************************************************
 !****f* json_module/json_value_add_member
 !
 !  NAME
@@ -1090,13 +1163,15 @@
                 p => p % next
             end do
 
-            p % next => member
+            p%next => member
+            member%previous => p
 
             nullify(p)    !cleanup
 
         else
 
-            this % children => member
+            this%children => member
+            member%previous => null()
 
         end if
 
