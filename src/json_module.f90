@@ -270,9 +270,9 @@
     interface json_get
         module procedure :: json_get_by_path
         module procedure :: json_get_integer, json_get_integer_vec
-        module procedure :: json_get_double, json_get_double_vec
+        module procedure :: json_get_double,  json_get_double_vec
         module procedure :: json_get_logical, json_get_logical_vec
-        module procedure :: json_get_chars, json_get_char_vec
+        module procedure :: json_get_chars,   json_get_char_vec
         module procedure :: json_get_array
     end interface json_get
     
@@ -308,18 +308,15 @@
     public :: to_object                  !
     public :: to_array                   !
     
-    public :: integer_to_string          !basic integer to string routine
-
     !exception handling [private variables]
     logical :: exception_thrown = .false.            !the error flag
     character(len=:),allocatable :: err_message      !the error message
-    logical,parameter :: print_tracebacks = .false.  !used when debugging
 
     ! POP/PUSH CHARACTER [private variables]
     integer :: char_count = 0
     integer :: line_count = 1
     integer :: pushed_index = 0
-    character (len = 10) :: pushed_char              !JW : what is this magic number 10??
+    character(len=10) :: pushed_char    !JW : what is this magic number 10??
 
     contains
 !*****************************************************************************************
@@ -633,7 +630,6 @@
     integer,dimension(:),allocatable,intent(out)    :: vec
     logical,intent(out),optional                    :: found
 
-
     call json_get(me%p, path, vec, found)
 
     end subroutine get_integer_vec_from_json_file
@@ -909,17 +905,6 @@
 
     exception_thrown = .true.
     err_message = trim(msg)
-
-    !if (print_tracebacks) then
-    !
-    !    !This is a feature of the Intel Fortran Compiler:
-    !    !Throw a traceback and return control to the user.
-    !    call tracebackqq(string=trim(msg), user_exit_code=-1)
-    !
-    !    !write(*,'(A)') trim(msg)        !gfortran version
-    !    !stop
-    !
-    !end if
 
     end subroutine throw_exception
 !*****************************************************************************************

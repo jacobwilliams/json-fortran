@@ -200,15 +200,16 @@
     write(*,'(A)') ''
     write(*,'(A)') 'creating structure'
 
-    call json_value_create(p)            ! create the value and associate the pointer
-    call to_object(p,dir//filename4)     !add the file name as the name of the overall structure:
+    call json_value_create(p)            !create the value and associate the pointer
+    call to_object(p,dir//filename4)     !add the file name as the name of the overall structure
 
     !config structure:
     call json_value_create(inp)          !an object
     call to_object(inp,'INPUTS')
     !add just integers:
     do i=1,100
-        call integer_to_string(i,istr)
+        write(istr,fmt='(I10)') i
+        istr = adjustl(istr)
         call json_value_add(inp, 'x'//trim(istr),i)
     end do
     call json_value_add(p, inp)
@@ -421,7 +422,8 @@
         !get vectors:
         do i=1,4
 
-            call integer_to_string(i,str)
+            write(str,fmt='(I10)') i
+            str = adjustl(str)
 
             write(*,'(A)') ''
             call json%get('trajectory('//trim(str)//').VARIABLE', cval)
