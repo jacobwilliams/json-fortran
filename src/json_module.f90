@@ -193,7 +193,11 @@
     !
     !  EXAMPLE
     !    type(json_file) :: json
-    !    call json%load_file(filename)
+    !    integer :: ival
+    !    real(wp) :: rval
+    !    character(len=:),allocatable :: cval
+    !    logical :: found
+    !    call json%load_file(filename='myfile.json')
     !    call json%print_file()
     !    call json%get('var.i',ival,found)
     !    call json%get('var.d',rval,found)
@@ -254,12 +258,33 @@
             integer,intent(in) :: count    !size of array
         end subroutine array_callback_func
     end interface
-    
+
+	!*************************************************************************************
+	!****f* json_module/json_value_get
+	!
+	!  NAME
+	!    json_value_get
+	!
+	!  DESCRIPTION
+	!    Get a child, either by index or name string.
+	!
+	!  SOURCE
     interface json_value_get           !consider renaming this json_value_get_child
         module procedure get_by_index
         module procedure get_by_name_chars
     end interface json_value_get
+	!*************************************************************************************
 
+	!*************************************************************************************
+	!****f* json_module/json_value_add
+	!
+	!  NAME
+	!    json_value_add
+	!
+	!  DESCRIPTION
+	!    Add objects to a linked list of json_values.
+	!
+	!  SOURCE
     interface json_value_add
         module procedure :: json_value_add_member
         module procedure :: json_value_add_integer, json_value_add_integer_vec
@@ -267,7 +292,18 @@
         module procedure :: json_value_add_logical, json_value_add_logical_vec
         module procedure :: json_value_add_string,  json_value_add_string_vec
     end interface json_value_add
+	!*************************************************************************************
     
+	!*************************************************************************************
+	!****f* json_module/json_get
+	!
+	!  NAME
+	!    json_get
+	!
+	!  DESCRIPTION
+	!    Get data from a json_value linked list.
+	!
+	!  SOURCE
     interface json_get
         module procedure :: json_get_by_path
         module procedure :: json_get_integer, json_get_integer_vec
@@ -276,6 +312,7 @@
         module procedure :: json_get_chars,   json_get_char_vec
         module procedure :: json_get_array
     end interface json_get
+	!*************************************************************************************
     
     interface json_print_to_string
         module procedure :: json_value_to_string
@@ -1135,7 +1172,7 @@
 !    json_value_add_member
 !
 !  DESCRIPTION
-!    Adds the member to the linked list
+!    Adds the member as a child of this.
 !
 !  SOURCE
 
