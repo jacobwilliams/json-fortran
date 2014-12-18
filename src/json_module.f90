@@ -451,7 +451,8 @@
 !
 !  DESCRIPTION
 !    Move the json_value pointer from one json_file to another.
-!    Note: "from" is not destroyed, since we want to preserve the pointers in "to".
+!    "from" is then nullified, but not destroyed.
+!    Note: if "from%p" is not associated, then an error is thrown.
 !
 !  AUTHOR
 !    Jacob Williams : 12/5/2014
@@ -469,7 +470,8 @@
         to%p => from%p
         nullify(from%p)
     else
-        nullify(to%p)   !in this case, just nullify it
+        call throw_exception('Error in move_pointer_in_json_file: '//&
+                             'pointer is not associated.')
     end if
 
     end subroutine move_pointer_in_json_file
