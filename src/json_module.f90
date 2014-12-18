@@ -218,7 +218,7 @@
         procedure,public :: load_file   => load_json_file
         procedure,public :: print_file  => print_json_file
         procedure,public :: destroy     => destroy_json_file
-
+        procedure,public :: move        => move_pointer_in_json_file
         procedure,public :: info        => variable_info_in_file
 
         generic,public :: get => get_pointer,&
@@ -259,32 +259,32 @@
         end subroutine array_callback_func
     end interface
 
-	!*************************************************************************************
-	!****f* json_module/json_value_get
-	!
-	!  NAME
-	!    json_value_get
-	!
-	!  DESCRIPTION
-	!    Get a child, either by index or name string.
-	!
-	!  SOURCE
+    !*************************************************************************************
+    !****f* json_module/json_value_get
+    !
+    !  NAME
+    !    json_value_get
+    !
+    !  DESCRIPTION
+    !    Get a child, either by index or name string.
+    !
+    !  SOURCE
     interface json_value_get           !consider renaming this json_value_get_child
         module procedure get_by_index
         module procedure get_by_name_chars
     end interface json_value_get
-	!*************************************************************************************
+    !*************************************************************************************
 
-	!*************************************************************************************
-	!****f* json_module/json_value_add
-	!
-	!  NAME
-	!    json_value_add
-	!
-	!  DESCRIPTION
-	!    Add objects to a linked list of json_values.
-	!
-	!  SOURCE
+    !*************************************************************************************
+    !****f* json_module/json_value_add
+    !
+    !  NAME
+    !    json_value_add
+    !
+    !  DESCRIPTION
+    !    Add objects to a linked list of json_values.
+    !
+    !  SOURCE
     interface json_value_add
         module procedure :: json_value_add_member
         module procedure :: json_value_add_integer, json_value_add_integer_vec
@@ -292,18 +292,27 @@
         module procedure :: json_value_add_logical, json_value_add_logical_vec
         module procedure :: json_value_add_string,  json_value_add_string_vec
     end interface json_value_add
-	!*************************************************************************************
+    !*************************************************************************************
     
-	!*************************************************************************************
-	!****f* json_module/json_get
-	!
-	!  NAME
-	!    json_get
-	!
-	!  DESCRIPTION
-	!    Get data from a json_value linked list.
-	!
-	!  SOURCE
+    !*************************************************************************************
+    interface json_value_update
+        module procedure :: json_update_logical,&
+                            json_update_real,&
+                            json_update_integer,&
+                            json_update_chars
+    end interface json_value_update
+    !*************************************************************************************
+    
+    !*************************************************************************************
+    !****f* json_module/json_get
+    !
+    !  NAME
+    !    json_get
+    !
+    !  DESCRIPTION
+    !    Get data from a json_value linked list.
+    !
+    !  SOURCE
     interface json_get
         module procedure :: json_get_by_path
         module procedure :: json_get_integer, json_get_integer_vec
@@ -312,7 +321,7 @@
         module procedure :: json_get_chars,   json_get_char_vec
         module procedure :: json_get_array
     end interface json_get
-	!*************************************************************************************
+    !*************************************************************************************
     
     interface json_print_to_string
         module procedure :: json_value_to_string
@@ -325,11 +334,16 @@
     interface json_remove
         module procedure :: json_value_remove
     end interface
+    
+    interface json_remove_if_present
+        module procedure :: json_value_remove_if_present
+    end interface
 
     !public routines:
     public :: json_initialize            !to initialize the module
     public :: json_destroy               !clear a JSON structure (destructor)
     public :: json_remove                !remove from a JSON structure
+    public :: json_remove_if_present     !remove from a JSON structure (if it is present)
     public :: json_parse                 !read a JSON file and populate the structure
     public :: json_clear_exceptions      !clear exceptions
     public :: json_check_for_errors      !check for error and get error message
@@ -337,6 +351,7 @@
     public :: json_value_get             !use either a 1 based index or member 
                                          ! name to get a json_value.
     public :: json_value_add             !add data to a JSON structure
+    public :: json_value_update          !update a value in a JSON structure
     public :: json_get                   !get data from the JSON structure  
     public :: json_print                 !print the JSON structure to a file
     public :: json_print_to_string       !write the JSON structure to a string
@@ -425,6 +440,40 @@
     end subroutine destroy_json_file
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/move_pointer_in_json_file
+!
+!  NAME
+!    move_pointer_in_json_file
+!
+!  USAGE
+!    call to%move(from)
+!
+!  DESCRIPTION
+!    Move the json_value pointer from one json_file to another.
+!    Note: "from" is not destroyed, since we want to preserve the pointers in "to".
+!
+!  AUTHOR
+!    Jacob Williams : 12/5/2014
+!
+!  SOURCE
+
+    subroutine move_pointer_in_json_file(to,from)
+    
+    implicit none
+
+    class(json_file),intent(inout) :: to
+    class(json_file),intent(inout) :: from
+
+    if (associated(from%p)) then
+        to%p => from%p
+        nullify(from%p)
+    else
+        nullify(to%p)   !in this case, just nullify it
+    end if
+
+    end subroutine move_pointer_in_json_file
+    
 !*****************************************************************************************
 !****f* json_module/load_json_file
 !
@@ -1145,11 +1194,11 @@
             else
             
                 if (associated(me%previous)) then
-                	!there are earlier items in the list:
+                    !there are earlier items in the list:
                     previous => me%previous 
                     previous%next => null()  
                 else
-                	!this is the only item in the list:
+                    !this is the only item in the list:
                     parent => me%parent 
                     parent%children => null()                   
                 end if
@@ -1163,6 +1212,224 @@
     end if
 
     end subroutine json_value_remove
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_value_remove_if_present
+!
+!  NAME
+!    json_value_remove_if_present
+!
+!  DESCRIPTION
+!    If the child variable is present, then remove it.
+!
+!  AUTHOR
+!    Jacob Williams : 12/6/2014
+!
+!  SOURCE
+
+    subroutine json_value_remove_if_present(p,name)
+     
+    implicit none
+    
+    type(json_value),pointer    :: p
+    character(len=*),intent(in) :: name
+    
+    type(json_value),pointer :: p_var
+    logical :: found
+    
+    call json_get(p,name,p_var,found)
+    if (found) call json_remove(p_var)
+     
+    end subroutine json_value_remove_if_present
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_update_logical
+!
+!  NAME
+!    json_update_logical
+!
+!  DESCRIPTION
+!    If the child variable is present, and is a scalar, then update its value.
+!    If it is not present, then create it and set its value.
+!
+!  AUTHOR
+!    Jacob Williams : 12/6/2014
+!
+!  SOURCE
+
+    subroutine json_update_logical(p,name,val,found)
+     
+    implicit none
+    
+    type(json_value), pointer   :: p
+    character(len=*),intent(in) :: name
+    logical,intent(in)          :: val
+    logical,intent(out)         :: found
+    
+    type(json_value),pointer :: p_var
+    integer :: var_type
+ 
+    call json_get(p,name,p_var,found)
+    if (found) then
+
+        call json_info(p_var,var_type)
+        select case (var_type)
+        case (json_null,json_logical,json_integer,json_real,json_string)
+            call to_logical(p_var,val)    !update the value
+        case default
+            found = .false.
+            write(*,*) 'Error in json_update_logical: '//&
+                            'the variable is not a scalar value'
+        end select          
+
+    else
+        call json_value_add(p,name,val)   !add the new element
+    end if
+                     
+    end subroutine json_update_logical
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_update_real
+!
+!  NAME
+!    json_update_real
+!
+!  DESCRIPTION
+!    If the child variable is present, and is a scalar, then update its value.
+!    If it is not present, then create it and set its value.
+!
+!  AUTHOR
+!    Jacob Williams : 12/6/2014
+!
+!  SOURCE
+
+    subroutine json_update_real(p,name,val,found)
+     
+    implicit none
+    
+    type(json_value), pointer   :: p
+    character(len=*),intent(in) :: name
+    real(wp),intent(in)         :: val
+    logical,intent(out)         :: found
+    
+    type(json_value),pointer :: p_var
+    integer :: var_type
+ 
+    call json_get(p,name,p_var,found)
+    if (found) then
+
+        call json_info(p_var,var_type)
+        select case (var_type)
+        case (json_null,json_logical,json_integer,json_real,json_string)
+            call to_real(p_var,val)    !update the value
+        case default
+            found = .false.
+            write(*,*) 'Error in json_update_real: '//&
+                            'the variable is not a scalar value'
+        end select          
+
+    else
+        call json_value_add(p,name,val)   !add the new element
+    end if
+                     
+    end subroutine json_update_real
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_update_integer
+!
+!  NAME
+!    json_update_integer
+!
+!  DESCRIPTION
+!    If the child variable is present, and is a scalar, then update its value.
+!    If it is not present, then create it and set its value.
+!
+!  AUTHOR
+!    Jacob Williams : 12/6/2014
+!
+!  SOURCE
+
+    subroutine json_update_integer(p,name,val,found)
+
+    implicit none
+    
+    type(json_value), pointer   :: p
+    character(len=*),intent(in) :: name
+    integer,intent(in)          :: val
+    logical,intent(out)         :: found
+    
+    type(json_value),pointer :: p_var
+    integer :: var_type
+ 
+    call json_get(p,name,p_var,found)
+    if (found) then
+
+        call json_info(p_var,var_type)
+        select case (var_type)
+        case (json_null,json_logical,json_integer,json_real,json_string)
+            call to_integer(p_var,val)    !update the value
+        case default
+            found = .false.
+            write(*,*) 'Error in json_update_integer: '//&
+                            'the variable is not a scalar value'
+        end select          
+
+    else
+        call json_value_add(p,name,val)   !add the new element
+    end if
+                     
+    end subroutine json_update_integer
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_update_chars
+!
+!  NAME
+!    json_update_chars
+!
+!  DESCRIPTION
+!    If the child variable is present, and is a scalar, then update its value.
+!    If it is not present, then create it and set its value.
+!
+!  AUTHOR
+!    Jacob Williams : 12/6/2014
+!
+!  SOURCE
+
+    subroutine json_update_chars(p,name,val,found)
+     
+    implicit none
+    
+    type(json_value), pointer   :: p
+    character(len=*),intent(in) :: name
+    character(len=*),intent(in) :: val
+    logical,intent(out)         :: found
+    
+    type(json_value),pointer :: p_var
+    integer :: var_type
+ 
+    call json_get(p,name,p_var,found)
+    if (found) then
+
+        call json_info(p_var,var_type)
+        select case (var_type)
+        case (json_null,json_logical,json_integer,json_real,json_string)
+            call to_string(p_var,val)    !update the value
+        case default
+            found = .false.
+            write(*,*) 'Error in json_update_chars: '//&
+                            'the variable is not a scalar value'
+        end select          
+
+    else
+        call json_value_add(p,name,val)   !add the new element
+    end if
+                     
+    end subroutine json_update_chars
 !*****************************************************************************************
 
 !*****************************************************************************************

@@ -601,6 +601,19 @@
         write(*,'(A)') ''
         write(*,'(A)') 'printing the modified structure...'
         call json%print_file()       
+
+        write(*,'(A)') ''
+        write(*,'(A)') ' Test replacing data from the json structure:'
+        
+        call json%get('data(1)', p)
+        call json_value_update(p,'name','Cuthbert',found)
+
+        !call json%get('data(2)', p)
+        !call json_value_update(p,'real',[1.0_wp, 2.0_wp, 3.0_wp],found)   !........ ??? .......
+		
+        write(*,'(A)') ''
+        write(*,'(A)') 'printing the modified structure...'
+        call json%print_file()       
         
     end if
 
