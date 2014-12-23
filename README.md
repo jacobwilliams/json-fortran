@@ -26,6 +26,8 @@ Currently three ways are provided to build the jsonfortran library
 
 * A Visual Studio 2010 project is included for building the library (and example program) on Windows with the Intel compiler.
 
+* An [SCons](http://www.scons.org) `SConstruct` file.  The library and example program are built by typing `scons` and installed by `scons install` or `sudo scons install`. 
+
 * Additionally, a [CMake](http://www.cmake.org) build
 system is provided. This build system has been tested on Mac and Linux
 using the Intel Fortran Compiler and gfortran 4.9. It has not been
