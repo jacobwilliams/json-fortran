@@ -19,7 +19,7 @@ It has been successfully compiled with the [Intel Fortran compiler
 13.1.0](https://software.intel.com/en-us/non-commercial-software-development) (and greater) and the recent [4.9 release of the GNU gfortran
 compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9).  
 
-Currently three ways are provided to build the jsonfortran library
+Currently, several ways are provided to build the jsonfortran library
 (libjsonfortran). 
 
 * A simple build script, build.sh is provided in the project root directory. This is mainly used for testing, and also builds the example program.  Edit the script to use either the Intel compiler or gfortran.
