@@ -48,6 +48,7 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !*******************************************************************************************************
+    use,intrinsic :: iso_fortran_env, only: wp => real64    !double precision reals  
 
     use json_module
     
@@ -606,10 +607,10 @@
         write(*,'(A)') ' Test replacing data from the json structure:'
         
         call json%get('data(1)', p)
-        call json_value_update(p,'name','Cuthbert',found)
+        call json_update(p,'name','Cuthbert',found)
 
         !call json%get('data(2)', p)
-        !call json_value_update(p,'real',[1.0_wp, 2.0_wp, 3.0_wp],found)   !........ ??? .......
+        !call json_update(p,'real',[1.0_wp, 2.0_wp, 3.0_wp],found)   !don't have one like this yet...
 		
         write(*,'(A)') ''
         write(*,'(A)') 'printing the modified structure...'

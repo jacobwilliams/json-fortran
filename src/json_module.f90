@@ -92,14 +92,14 @@
 !    DEALINGS IN THE SOFTWARE.
 !
 !*****************************************************************************************
+    use,intrinsic :: iso_fortran_env, only: wp => real64    !double precision reals  
 
     implicit none
 
     private
 
     !parameters:
-    integer,parameter,public :: wp = selected_real_kind(15,307)    !double precision reals
-    character(len=*),parameter,public :: json_ext = '.json'        !JSON file extension
+    character(len=*),parameter,public :: json_ext = '.json'       !JSON file extension
     
     character(len=1),parameter :: space             = ' '         !special characters
     character(len=1),parameter :: bspace            = achar(8)
@@ -295,12 +295,25 @@
     !*************************************************************************************
     
     !*************************************************************************************
-    interface json_value_update
+    !****f* json_module/json_update
+    !
+    !  NAME
+    !    json_update
+    !
+    !  DESCRIPTION
+    !    These are like json_value_add, except if a child with the same name is
+    !     already present, then its value is simply updated.
+    !    Note that currently, these only work for scalar variables.
+    !    These routines can also change the variable's type (but an error will be 
+    !     thrown if the existing variable is not a scalar).
+    !
+    !  SOURCE
+    interface json_update
         module procedure :: json_update_logical,&
                             json_update_real,&
                             json_update_integer,&
                             json_update_chars
-    end interface json_value_update
+    end interface json_update
     !*************************************************************************************
     
     !*************************************************************************************
@@ -351,7 +364,7 @@
     public :: json_value_get             !use either a 1 based index or member 
                                          ! name to get a json_value.
     public :: json_value_add             !add data to a JSON structure
-    public :: json_value_update          !update a value in a JSON structure
+    public :: json_update                !update a value in a JSON structure
     public :: json_get                   !get data from the JSON structure  
     public :: json_print                 !print the JSON structure to a file
     public :: json_print_to_string       !write the JSON structure to a string
@@ -1282,8 +1295,8 @@
             call to_logical(p_var,val)    !update the value
         case default
             found = .false.
-            write(*,*) 'Error in json_update_logical: '//&
-                            'the variable is not a scalar value'
+            call throw_exception('Error in json_update_logical: '//&
+                                 'the variable is not a scalar value')
         end select          
 
     else
@@ -1329,8 +1342,8 @@
             call to_real(p_var,val)    !update the value
         case default
             found = .false.
-            write(*,*) 'Error in json_update_real: '//&
-                            'the variable is not a scalar value'
+            call throw_exception('Error in json_update_real: '//&
+                                 'the variable is not a scalar value')
         end select          
 
     else
@@ -1376,8 +1389,8 @@
             call to_integer(p_var,val)    !update the value
         case default
             found = .false.
-            write(*,*) 'Error in json_update_integer: '//&
-                            'the variable is not a scalar value'
+            call throw_exception('Error in json_update_integer: '//&
+                                 'the variable is not a scalar value')
         end select          
 
     else
@@ -1423,8 +1436,8 @@
             call to_string(p_var,val)    !update the value
         case default
             found = .false.
-            write(*,*) 'Error in json_update_chars: '//&
-                            'the variable is not a scalar value'
+            call throw_exception('Error in json_update_chars: '//&
+                                 'the variable is not a scalar value')
         end select          
 
     else
