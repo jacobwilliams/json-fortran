@@ -4000,7 +4000,7 @@
 !    parse_object
 !
 !  DESCRIPTION
-!
+!    Core parsing routine.
 !
 !  SOURCE
 
