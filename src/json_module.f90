@@ -2712,7 +2712,7 @@
 !    json_get_integer
 !
 !  DESCRIPTION
-!    Get an integer value from an json_value.
+!    Get an integer value from a json_value.
 !
 !  SOURCE
 
@@ -2849,7 +2849,7 @@
 !    json_get_double
 !
 !  DESCRIPTION
-!    Get a double value from an json_value.
+!    Get a double value from a json_value.
 !
 !  SOURCE
 
@@ -2986,7 +2986,7 @@
 !    json_get_logical
 !
 !  DESCRIPTION
-!    Get a logical value from an json_value.
+!    Get a logical value from a json_value.
 !
 !  SOURCE
 
