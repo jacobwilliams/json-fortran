@@ -38,7 +38,7 @@
 !    -------------------------------------------------------------------------------------
 !    json-fortran License:
 !
-!    JSON-FORTRAN: A Fortran 2003/2008 JSON API
+!    JSON-FORTRAN: A Fortran 2008 JSON API
 !    http://github.com/jacobwilliams/json-fortran
 !
 !    Copyright (c) 2014, Jacob Williams
@@ -160,6 +160,15 @@
     !  DESCRIPTION
     !    Type used to construct the linked-list json structure
     !
+    !  EXAMPLE
+    !    type(json_value),pointer :: p
+    !    call json_value_create(p) 
+    !    call to_object(p) 
+    !    call json_value_add(p,'year',1805)
+    !    call json_value_add(p,'value',1.0_wp)
+    !    call json_print(p,'test.json')
+    !    call json_destroy(p)
+    !
     !  SOURCE
     
         type,public :: json_value
@@ -200,7 +209,7 @@
     !    call json%load_file(filename='myfile.json')
     !    call json%print_file()
     !    call json%get('var.i',ival,found)
-    !    call json%get('var.d',rval,found)
+    !    call json%get('var.r(3)',rval,found)
     !    call json%get('var.c',cval,found)
     !    call json%destroy()
     !
@@ -339,7 +348,28 @@
     interface json_print_to_string
         module procedure :: json_value_to_string
     end interface
-    
+
+    !*************************************************************************************
+    !****f* json_module/json_print
+    !
+    !  NAME
+    !    json_print
+    !
+    !  DESCRIPTION
+    !    Print the json_value to a file.
+    !
+    !  EXAMPLE
+    !    type(json_value) :: p
+    !    ...
+    !    call json_print(p,'test.json')  !this is json_print_2
+    !
+    !  SOURCE
+    interface json_print
+        module procedure :: json_print_1    !input is unit number
+        module procedure :: json_print_2    !input is file name
+    end interface
+    !*************************************************************************************
+   
     interface json_destroy
         module procedure :: json_value_destroy
     end interface
@@ -1028,6 +1058,21 @@
 !    If an error is thrown, before using the module again, json_initialize
 !    should be called to clean up before it is used again.
 !
+!  EXAMPLE
+!    type(json_file) :: json
+!    logical :: status_ok
+!    character(len=:),allocatable :: error_msg
+!    call json%load_file(filename='myfile.json')
+!    call json_check_for_errors(status_ok, error_msg)
+!    if (.not. status_ok) then
+!        write(*,*) 'Error: '//error_msg
+!        call json_clear_exceptions()
+!        call json%destroy()
+!    end if
+!
+!  SEE ALSO
+!    json_failed
+!
 !  AUTHOR
 !    Jacob Williams : 12/4/2013
 !
@@ -1064,11 +1109,20 @@
 !  DESCRIPTION
 !    Logical function to indicate if an exception has been thrown.
 !
-!  USAGE
+!  EXAMPLE
+!    type(json_file) :: json
+!    logical :: status_ok
+!    character(len=:),allocatable :: error_msg
+!    call json%load_file(filename='myfile.json')
 !    if (json_failed()) then
-!        !do something about it
+!        call json_check_for_errors(status_ok, error_msg)
+!        write(*,*) 'Error: '//error_msg
 !        call json_clear_exceptions()
+!        call json%destroy()
 !    end if
+!
+!  SEE ALSO
+!    json_check_for_errors
 !
 !  AUTHOR
 !    Jacob Williams : 12/5/2013
@@ -1095,10 +1149,11 @@
 !  DESCRIPTION
 !    Allocate a json_value pointer variable.
 !    This should be called before adding data to it.
-!    Example:
-!        type(json_value),pointer :: var
-!        call json_value_create(var)
-!        call to_real(var,1.0d0)
+!
+!  EXAMPLE
+!    type(json_value),pointer :: var
+!    call json_value_create(var)
+!    call to_real(var,1.0d0)
 !
 !  NOTES
 !    This routine does not check for exceptions.
@@ -2102,20 +2157,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_print
+!****f* json_module/json_print_1
 !
 !  NAME
-!    json_print
+!    json_print_1
 !
 !  DESCRIPTION
 !    Print the JSON structure to a file
+!    Input is the nonzero file unit (the file must already have been opened).
 !
 !  AUTHOR
 !    Jacob Williams, 6/20/2014
 !
 !  SOURCE
 
-    subroutine json_print(me,iunit)
+    subroutine json_print_1(me,iunit)
     
     implicit none
     
@@ -2130,7 +2186,41 @@
         call throw_exception('Error in json_print: iunit must be nonzero.')
     end if
     
-    end subroutine json_print
+    end subroutine json_print_1
+
+!*****************************************************************************************
+!****f* json_module/json_print_2
+!
+!  NAME
+!    json_print_2
+!
+!  DESCRIPTION
+!    Print the JSON structure to a file.
+!    Input is the filename.
+!
+!  AUTHOR
+!    Jacob Williams, 12/23/2014
+!
+!  SOURCE
+
+    subroutine json_print_2(me,filename)
+    
+    implicit none
+    
+    type(json_value),pointer,intent(in)  :: me
+    character(len=*),intent(in) :: filename
+    
+    integer :: iunit,istat
+    
+    open(newunit=iunit,file=filename,status='REPLACE',iostat=istat)
+    if (istat==0) then
+        call json_print(me,iunit)
+        close(iunit,iostat=istat)
+    else
+        call throw_exception('Error in json_print: could not open file: '//trim(filename))
+    end if
+    
+    end subroutine json_print_2
     
 !*****************************************************************************************
 !****if* json_module/json_value_print
@@ -2378,7 +2468,7 @@
 !    json_get_by_path
 !
 !  DESCRIPTION
-!
+!    Returns the json_value pointer given the path string.
 !
 !  NOTES
 !     $         root
@@ -3303,7 +3393,7 @@
 !    json_get_array
 !
 !  DESCRIPTION
-!    Get an array from an json_value.
+!    Get an array from a json_value.
 !    This routine calls the user-supplied array_callback subroutine
 !        for each element in the array.
 !
@@ -3543,7 +3633,7 @@
 !    parse_value
 !
 !  DESCRIPTION
-!
+!    Core parsing routine.
 !
 !  SOURCE
 

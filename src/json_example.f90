@@ -189,7 +189,6 @@
 
     integer :: i
     character(len=10) :: istr
-    integer :: iunit
     character(len=:),allocatable :: string
 
     write(*,'(A)') ''
@@ -220,9 +219,7 @@
     write(*,'(A)') 'write to file'
 
     !write the file:
-    open(newunit=iunit, file=dir//filename4, status='REPLACE')
-    call json_print(p,iunit)
-    close(iunit)
+    call json_print(p,trim(dir//filename4))
 
     write(*,'(A)') ''
     write(*,'(A)') 'write to string'
