@@ -197,7 +197,7 @@
     !    json_file
     !
     !  DESCRIPTION
-    !  The json_file is the main public class that is
+    !    The json_file is the main public class that is
     !    used to open a file and get data from it.
     !
     !  EXAMPLE
@@ -345,9 +345,20 @@
     end interface json_get
     !*************************************************************************************
     
+    !*************************************************************************************
+    !****f* json_module/json_print_to_string
+    !
+    !  NAME
+    !    json_print_to_string
+    !
+    !  DESCRIPTION
+    !    Print the json_value structure to an allocatable string.
+    !
+    !  SOURCE
     interface json_print_to_string
         module procedure :: json_value_to_string
     end interface
+    !*************************************************************************************
 
     !*************************************************************************************
     !****f* json_module/json_print
@@ -370,17 +381,59 @@
     end interface
     !*************************************************************************************
    
+    !*************************************************************************************
+    !****f* json_module/json_destroy
+    !
+    !  NAME
+    !    json_destroy
+    !
+    !  DESCRIPTION
+    !    Destructor routine for a json_value pointer.
+    !    This must be called explicitly if it is no longer needed, 
+    !    before it goes out of scope.  Otherwise, a memory leak will result.
+    !
+    !  USAGE
+    !    type(json_value) :: p
+    !    ...
+    !    call json_destroy(p)
+    !
+    !  SOURCE
     interface json_destroy
         module procedure :: json_value_destroy
     end interface
+    !*************************************************************************************
     
+    !*************************************************************************************
+    !****f* json_module/json_remove
+    !
+    !  NAME
+    !    json_remove
+    !
+    !  DESCRIPTION
+    !    Remove and destroy a json_value (and all its children) 
+    !        from a linked-list structure.
+    !    The rest of the structure is preserved.
+    !
+    !  SOURCE
     interface json_remove
         module procedure :: json_value_remove
     end interface
-    
+    !*************************************************************************************
+
+    !*************************************************************************************
+    !****f* json_module/json_remove_if_present
+    !
+    !  NAME
+    !    json_remove_if_present
+    !
+    !  DESCRIPTION
+    !    If the child variable is present, then remove it.
+    !
+    !  SOURCE
     interface json_remove_if_present
         module procedure :: json_value_remove_if_present
     end interface
+    !*************************************************************************************
 
     !public routines:
     public :: json_initialize            !to initialize the module
@@ -391,8 +444,7 @@
     public :: json_clear_exceptions      !clear exceptions
     public :: json_check_for_errors      !check for error and get error message
     public :: json_failed                !check for error
-    public :: json_value_get             !use either a 1 based index or member 
-                                         ! name to get a json_value.
+    public :: json_value_get             !use either a 1 based index or member name to get a json_value.
     public :: json_value_add             !add data to a JSON structure
     public :: json_update                !update a value in a JSON structure
     public :: json_get                   !get data from the JSON structure  
@@ -423,7 +475,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/destroy_json_data_non_polymorphic
+!****if* json_module/destroy_json_data_non_polymorphic
 !
 !  NAME
 !    destroy_json_data_non_polymorphic
@@ -1226,6 +1278,7 @@
 !  DESCRIPTION
 !    Remove and destroy a json_value (and all its children) 
 !        from a linked-list structure.
+!    The rest of the structure is preserved.
 !
 !  AUTHOR
 !    Jacob Williams : 9/9/2014
@@ -4531,7 +4584,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/integer_to_string
+!****if* json_module/integer_to_string
 !
 !  NAME
 !    integer_to_string
