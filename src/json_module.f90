@@ -121,7 +121,7 @@
     integer,parameter,public :: json_array     = 3
     integer,parameter,public :: json_logical   = 4
     integer,parameter,public :: json_integer   = 5
-    integer,parameter,public :: json_real      = 6
+    integer,parameter,public :: json_double    = 6
     integer,parameter,public :: json_string    = 7
 
     !*********************************************************
@@ -252,7 +252,7 @@
         procedure :: get_double_vec     => get_double_vec_from_json_file
         procedure :: get_logical_vec    => get_logical_vec_from_json_file
         procedure :: get_char_vec       => get_char_vec_from_json_file
-
+                
     !*********************************************************
         end type json_file
     !*********************************************************
@@ -297,7 +297,7 @@
     interface json_value_add
         module procedure :: json_value_add_member
         module procedure :: json_value_add_integer, json_value_add_integer_vec
-        module procedure :: json_value_add_real,    json_value_add_real_vec
+        module procedure :: json_value_add_double,  json_value_add_double_vec
         module procedure :: json_value_add_logical, json_value_add_logical_vec
         module procedure :: json_value_add_string,  json_value_add_string_vec
     end interface json_value_add
@@ -319,7 +319,7 @@
     !  SOURCE
     interface json_update
         module procedure :: json_update_logical,&
-                            json_update_real,&
+                            json_update_double,&
                             json_update_integer,&
                             json_update_chars
     end interface json_update
@@ -456,7 +456,7 @@
     public :: to_logical                 !set the data type of a json_value
     public :: to_integer                 !
     public :: to_string                  !
-    public :: to_real                    !
+    public :: to_double                  !
     public :: to_null                    !
     public :: to_object                  !
     public :: to_array                   !
@@ -896,7 +896,7 @@
 !    call me%get(path,val,found)
 !
 !  DESCRIPTION
-!    Get an logical from a JSON file.
+!    Get a logical from a JSON file.
 !
 !  AUTHOR
 !    Jacob Williams : 12/9/2013
@@ -1086,8 +1086,6 @@
  
     subroutine throw_exception(msg)
 
-    !use ifcore,    only: tracebackqq    !Intel routine
-
     implicit none
 
     character(len=*),intent(in) :: msg    !the error message
@@ -1205,7 +1203,7 @@
 !  EXAMPLE
 !    type(json_value),pointer :: var
 !    call json_value_create(var)
-!    call to_real(var,1.0d0)
+!    call to_double(var,1.0d0)
 !
 !  NOTES
 !    This routine does not check for exceptions.
@@ -1399,7 +1397,7 @@
 
         call json_info(p_var,var_type)
         select case (var_type)
-        case (json_null,json_logical,json_integer,json_real,json_string)
+        case (json_null,json_logical,json_integer,json_double,json_string)
             call to_logical(p_var,val)    !update the value
         case default
             found = .false.
@@ -1415,10 +1413,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_update_real
+!****f* json_module/json_update_double
 !
 !  NAME
-!    json_update_real
+!    json_update_double
 !
 !  DESCRIPTION
 !    If the child variable is present, and is a scalar, then update its value.
@@ -1429,7 +1427,7 @@
 !
 !  SOURCE
 
-    subroutine json_update_real(p,name,val,found)
+    subroutine json_update_double(p,name,val,found)
      
     implicit none
     
@@ -1446,11 +1444,11 @@
 
         call json_info(p_var,var_type)
         select case (var_type)
-        case (json_null,json_logical,json_integer,json_real,json_string)
-            call to_real(p_var,val)    !update the value
+        case (json_null,json_logical,json_integer,json_double,json_string)
+            call to_double(p_var,val)    !update the value
         case default
             found = .false.
-            call throw_exception('Error in json_update_real: '//&
+            call throw_exception('Error in json_update_double: '//&
                                  'the variable is not a scalar value')
         end select          
 
@@ -1458,7 +1456,7 @@
         call json_value_add(p,name,val)   !add the new element
     end if
                      
-    end subroutine json_update_real
+    end subroutine json_update_double
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1493,7 +1491,7 @@
 
         call json_info(p_var,var_type)
         select case (var_type)
-        case (json_null,json_logical,json_integer,json_real,json_string)
+        case (json_null,json_logical,json_integer,json_double,json_string)
             call to_integer(p_var,val)    !update the value
         case default
             found = .false.
@@ -1540,7 +1538,7 @@
 
         call json_info(p_var,var_type)
         select case (var_type)
-        case (json_null,json_logical,json_integer,json_real,json_string)
+        case (json_null,json_logical,json_integer,json_double,json_string)
             call to_string(p_var,val)    !update the value
         case default
             found = .false.
@@ -1608,10 +1606,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_real
+!****f* json_module/json_value_add_double
 !
 !  NAME
-!    json_value_add_real
+!    json_value_add_double
 !
 !  DESCRIPTION
 !    Add a real value to the structure.
@@ -1624,7 +1622,7 @@
 !
 !  SOURCE
 
-    subroutine json_value_add_real(me, name, val)
+    subroutine json_value_add_double(me, name, val)
 
     implicit none
 
@@ -1636,7 +1634,7 @@
 
     !create the variable:
     call json_value_create(var)
-    call to_real(var,val,name)
+    call to_double(var,val,name)
 
     !add it:
     call json_value_add(me, var)
@@ -1644,14 +1642,14 @@
     !cleanup:
     nullify(var)
 
-    end subroutine json_value_add_real
+    end subroutine json_value_add_double
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_real_vec
+!****f* json_module/json_value_add_double_vec
 !
 !  NAME
-!    json_value_add_real_vec
+!    json_value_add_double_vec
 !
 !  DESCRIPTION
 !    Add a real vector to the structure.
@@ -1664,7 +1662,7 @@
 !
 !  SOURCE
 
-    subroutine json_value_add_real_vec(me, name, val)
+    subroutine json_value_add_double_vec(me, name, val)
 
     implicit none
 
@@ -1690,7 +1688,7 @@
     !cleanup:
     nullify(var)
 
-    end subroutine json_value_add_real_vec
+    end subroutine json_value_add_double_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1910,7 +1908,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/escape_string
+!****if* json_module/escape_string
 !
 !  NAME
 !    escape_string
@@ -2429,7 +2427,7 @@
 
                 call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
 
-            case (json_real)
+            case (json_double)
 
                 call real_to_string(this%data%dbl_value,tmp)
 
@@ -2680,7 +2678,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/string_to_integer
+!****if* json_module/string_to_integer
 !
 !  NAME
 !    string_to_integer
@@ -2721,7 +2719,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/string_to_double
+!****if* json_module/string_to_double
 !
 !  NAME
 !    string_to_double
@@ -2800,7 +2798,7 @@
                 select case(p%data%var_type)
                 case (json_integer)
                     value = p%data%int_value
-                case (json_real)
+                case (json_double)
                     value = int(p%data%dbl_value)
                 case (json_logical)
                     if (p%data%log_value) then
@@ -2891,7 +2889,6 @@
 
         end subroutine get_int_from_array
 
-!*****************************************************************************************
     end subroutine json_get_integer_vec
 !*****************************************************************************************
 
@@ -2938,7 +2935,7 @@
                 select case (p%data%var_type)
                 case (json_integer)
                     value = p%data%int_value
-                case (json_real)
+                case (json_double)
                     value = p%data%dbl_value
                 case (json_logical)
                     if (p%data%log_value) then
@@ -3629,7 +3626,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_current_line_from_file
+!****if* json_module/get_current_line_from_file
 !
 !  NAME
 !    get_current_line_from_file
@@ -3680,7 +3677,7 @@
 !*****************************************************************************************
     
 !*****************************************************************************************
-!****f* json_module/parse_value
+!****if* json_module/parse_value
 !
 !  NAME
 !    parse_value
@@ -3806,7 +3803,7 @@
 
     implicit none
 
-    type(json_value), intent(inout)        :: me
+    type(json_value),intent(inout)         :: me
     character(len=*),intent(in),optional   :: name
     logical,intent(in),optional            :: val
 
@@ -3846,7 +3843,7 @@
 
     implicit none
 
-    type(json_value), intent(inout)        :: me
+    type(json_value),intent(inout)         :: me
     character(len=*),intent(in),optional   :: name
     integer,intent(in),optional            :: val
 
@@ -3869,10 +3866,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/to_real
+!****f* json_module/to_double
 !
 !  NAME
-!    to_real
+!    to_double
 !
 !  DESCRIPTION
 !    Change the variable to a double.
@@ -3882,18 +3879,18 @@
 !
 !  SOURCE
 
-    subroutine to_real(me,val,name)
+    subroutine to_double(me,val,name)
 
     implicit none
 
-    type(json_value), intent(inout)        :: me
+    type(json_value),intent(inout)         :: me
     character(len=*),intent(in),optional   :: name
     real(wp),intent(in),optional           :: val
 
     !set type and value:
     !associate (d => me%data)
         call me%data%destroy()
-        me%data%var_type = json_real
+        me%data%var_type = json_double
         allocate(me%data%dbl_value)
         if (present(val)) then
             me%data%dbl_value = val
@@ -3905,7 +3902,7 @@
     !name:
     if (present(name)) me%name = trim(name)
 
-    end subroutine to_real
+    end subroutine to_double
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3926,7 +3923,7 @@
 
     implicit none
 
-    type(json_value), intent(inout)        :: me
+    type(json_value),intent(inout)         :: me
     character(len=*),intent(in),optional   :: name
     character(len=*),intent(in),optional   :: val
 
@@ -3965,7 +3962,7 @@
 
     implicit none
 
-    type(json_value), intent(inout)        :: me
+    type(json_value),intent(inout)         :: me
     character(len=*),intent(in),optional   :: name
 
     !set type and value:
@@ -3998,9 +3995,10 @@
 
     implicit none
 
-    type(json_value), intent(inout)        :: me
+    type(json_value),intent(inout)         :: me
+    !type(json_value),pointer,intent(inout) :: me  !this causes crash in gfortran (compiler bug?)
     character(len=*),intent(in),optional   :: name
-
+	
     !set type and value:
     !associate (d => me%data)
         call me%data%destroy()
@@ -4031,7 +4029,7 @@
 
     implicit none
 
-    type(json_value), intent(inout)        :: me
+    type(json_value),intent(inout)         :: me
     character(len=*),intent(in),optional   :: name
 
     !set type and value:
@@ -4047,7 +4045,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/parse_object
+!****if* json_module/parse_object
 !
 !  NAME
 !    parse_object
@@ -4437,7 +4435,7 @@
                         call to_integer(value,ival)
                     else
                         rval = string_to_double(str)
-                        call to_real(value,rval)
+                        call to_double(value,rval)
                     end if
 
                     exit    !finished
