@@ -100,25 +100,26 @@ of pointers.  See the json_example.f90 file for more examples.
 
 ```fortran
     program example2
+    
+        use,intrinsic :: iso_fortran_env, only: wp => real64 
 
         use json_module
 
-        type(json_value),pointer	:: p, inp
+        type(json_value),pointer    :: p, inp
         logical :: found
-        integer :: iunit
 
         ! initialize the module
         call json_initialize()
 
         ! initialize the structure:
         call json_value_create(p)
-        call to_object(p,'test2.json')
+        call to_object(p)
 
         ! add an "inputs" object to the structure:
         call json_value_create(inp)
         call to_object(inp,'inputs')
         call json_value_add(p, inp) !add it to the root
-    
+
         ! add some data to inputs:
         call json_value_add(inp, 't0', 0.1_wp)
         call json_value_add(inp, 'tf', 1.1_wp)
@@ -129,16 +130,43 @@ of pointers.  See the json_example.f90 file for more examples.
         call json_value_add(inp, 'logical_scalar', .true.)
         call json_value_add(inp, 'logical_vector', [.true., .false., .true.])
         nullify(inp)  !don't need this anymore
-      	
+
         ! write the file:
-        open(newunit=iunit, file='test2.json', status='REPLACE')
-        call json_print(p,iunit)
-        close(iunit)
+        call json_print(p,'test2.json')
 
         !cleanup:
         call json_destroy(p)
-    
+
     end program example2
+```
+
+The code above produces the file:
+
+```Python
+{
+"inputs": {
+"t0": 0.1000000000000000E+000,
+"tf": 0.1100000000000000E+001,
+"x0": 0.9999000000000000E+004,
+"integer_scalar": 787,
+"integer_array": [
+      2,
+      4,
+      99
+    ],
+"names": [
+      "aaa",
+      "bbb",
+      "ccc"
+    ],
+"logical_scalar": true,
+"logical_vector": [
+      true,
+      false,
+      true
+    ]
+}
+}
 ```
 
 Documentation
