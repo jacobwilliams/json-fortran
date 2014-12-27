@@ -70,11 +70,44 @@
     call test_3()
     call test_4()
     call test_5()
+    call test_6()
 
     !call memory_leak_test()    
     
     contains
 !*******************************************************************************************************
+
+
+!**************************************************************
+    subroutine test_6()
+!**************************************************************
+!
+!    This example tries to read an invalid json file.
+!
+!**************************************************************
+    implicit none
+
+    type(json_file) :: json   
+
+    write(*,'(A)') ''
+    write(*,'(A)') '================================='
+    write(*,'(A)') '   EXAMPLE 6 : invalid JSON file '
+    write(*,'(A)') '================================='
+    write(*,'(A)') ''
+
+    ! parse the json file:
+    write(*,'(A)') 'load file...'
+    call json%load_file(filename = dir//'invalid.json')
+    if (json_failed()) then
+        call print_error_message()
+    end if
+
+    ! clean up
+    call json%destroy()
+
+!**************************************************************
+    end subroutine test_6
+!**************************************************************
 
 !**************************************************************
     subroutine test_5()

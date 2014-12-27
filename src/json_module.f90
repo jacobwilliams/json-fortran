@@ -465,8 +465,9 @@
     public :: to_array                   !
     
     !exception handling [private variables]
-    logical :: exception_thrown = .false.            !the error flag
-    character(len=:),allocatable :: err_message      !the error message
+    logical :: is_verbose = .false.             !if true, all exceptions are immediately printed to console
+    logical :: exception_thrown = .false.       !the error flag
+    character(len=:),allocatable :: err_message !the error message
 
     ! POP/PUSH CHARACTER [private variables]
     integer :: char_count = 0
@@ -1030,9 +1031,14 @@
 !
 !  SOURCE
 
-    subroutine json_initialize()
+    subroutine json_initialize(verbose)
 
     implicit none
+    
+    logical,intent(in),optional :: verbose  !mainly useful for debugging (default is false)
+    
+    !optional input (if not present, value remains unchanged):
+    if (present(verbose)) is_verbose = verbose
 
     !clear any errors from previous runs:
     call json_clear_exceptions()
@@ -1095,7 +1101,13 @@
 
     exception_thrown = .true.
     err_message = trim(msg)
-
+    
+    if (is_verbose) then
+        write(*,'(A)') '***********************'
+        write(*,'(A)') 'JSON-FORTRAN EXCEPTION: '//trim(msg)
+        write(*,'(A)') '***********************'
+    end if
+    
     end subroutine throw_exception
 !*****************************************************************************************
 
@@ -4165,11 +4177,11 @@
 !    parse_array
 !
 !  DESCRIPTION
-!
+!   Core parsing routine.
 !
 !  SOURCE
 
-    recursive subroutine parse_array(unit, array)
+    subroutine parse_array(unit, array)
 
     implicit none
 
@@ -4179,36 +4191,41 @@
     type(json_value), pointer :: element
     logical :: eof
     character(len=1) :: c
+    
+    do
 
-    if (.not. exception_thrown) then
-        nullify(element)
+        if (exception_thrown) exit
 
         ! try to parse an element value
+        nullify(element)
         call json_value_create(element)
         call parse_value(unit, element)
-        if (exception_thrown) return
+        if (exception_thrown) exit
 
         ! parse value will disassociate an empty array value
-        if (associated(element)) then
-            call json_value_add(array, element)
-            nullify(element)    !cleanup
-        end if
+        if (associated(element)) call json_value_add(array, element)
 
         ! popped the next character
         c = pop_char(unit, eof = eof, skip_ws = .true.)
 
         if (eof) then
-            return
+            ! The file ended before array was finished:
+            call throw_exception('Error in parse_array: '//&
+                                 'End of file encountered when parsing an array.')
+            exit
         else if (',' == c) then
             ! parse the next element
-            call parse_array(unit, array)
-            if (exception_thrown) return
+            cycle
         else if (']' == c) then
             ! end of array
-            return
+            exit
+        else
+            call throw_exception('Error in parse_array: '//&
+                                 'Unexpected character encountered when parsing array.')
+            exit
         end if
-
-    end if
+    
+    end do
 
     end subroutine parse_array
 !*****************************************************************************************
@@ -4320,7 +4337,7 @@
 !    parse_for_chars
 !
 !  DESCRIPTION
-!
+!    Core parsing routine.
 !
 !  SOURCE
 
