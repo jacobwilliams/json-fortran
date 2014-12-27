@@ -113,6 +113,10 @@
        
     character(len=*),parameter :: real_fmt  = '(E30.16E3)'      !format for real numbers
     character(len=*),parameter :: int_fmt   = '(I10)'           !format for integers
+    character(len=*),parameter :: null_str  = 'null'
+    character(len=*),parameter :: true_str  = 'true'
+    character(len=*),parameter :: false_str = 'false'
+    
 
     ! The types of data:
     integer,parameter,public :: json_unknown   = 0
@@ -2399,7 +2403,7 @@
 
             case (json_null)
 
-                call write_it( repeat(space, spaces)//'null', comma=print_comma )
+                call write_it( repeat(space, spaces)//null_str, comma=print_comma )
 
             case (json_string)
 
@@ -2416,9 +2420,9 @@
             case (json_logical)
 
                 if (this%data%log_value) then
-                    call write_it( repeat(space, spaces)// 'true', comma=print_comma )
+                    call write_it( repeat(space, spaces)//true_str, comma=print_comma )
                 else
-                    call write_it( repeat(space, spaces)//'false', comma=print_comma )
+                    call write_it( repeat(space, spaces)//false_str, comma=print_comma )
                 end if
 
             case (json_integer)
@@ -3747,23 +3751,24 @@
                     end select
                 !end associate
 
-            case ('t')
+            case (true_str(1:1))
 
                 !true
-                call parse_for_chars(unit, 'rue')
+                call parse_for_chars(unit, true_str(2:))
                 !allocate class and set value:
                 if (.not. exception_thrown) call to_logical(value,.true.)    
 
-            case ('f')
+            case (false_str(1:1))
 
                 !false
-                call parse_for_chars(unit, 'alse')
+                call parse_for_chars(unit, false_str(2:))
                 !allocate class and set value:
                 if (.not. exception_thrown) call to_logical(value,.false.)
 
-            case ('n')
+            case (null_str(1:1))
 
-                call parse_for_chars(unit, 'ull')
+                !null
+                call parse_for_chars(unit, null_str(2:))
                 if (.not. exception_thrown) call to_null(value)    !allocate class
 
             case('-', '0': '9')
