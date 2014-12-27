@@ -70,7 +70,8 @@
     call test_3()
     call test_4()
     call test_5()
-    call test_6()
+    
+    call test_6()  !these are attempting to read invalid json files
 
     !call memory_leak_test()    
     
@@ -87,24 +88,33 @@
 !**************************************************************
     implicit none
 
-    type(json_file) :: json   
+    type(json_file) :: json 
+    integer :: i  
+    
+    character(len=*),dimension(2),parameter :: files = ['invalid.json ',&
+                                                        'invalid2.json']
 
     write(*,'(A)') ''
     write(*,'(A)') '================================='
-    write(*,'(A)') '   EXAMPLE 6 : invalid JSON file '
+    write(*,'(A)') '   EXAMPLE 6 : invalid JSON files'
     write(*,'(A)') '================================='
     write(*,'(A)') ''
 
-    ! parse the json file:
-    write(*,'(A)') 'load file...'
-    call json%load_file(filename = dir//'invalid.json')
-    if (json_failed()) then
-        call print_error_message()
-    end if
+    do i=1,2
+    
+        ! parse the json file:
+        write(*,'(A)') ''
+        write(*,'(A)') 'load file: '//trim(files(i))
+        write(*,'(A)') ''
+        call json%load_file(filename = dir//trim(files(i)))
+        if (json_failed()) then
+            call print_error_message()
+        end if
+        ! clean up
+        call json%destroy()
 
-    ! clean up
-    call json%destroy()
-
+    end do
+    
 !**************************************************************
     end subroutine test_6
 !**************************************************************
@@ -641,7 +651,7 @@
 
         !call json%get('data(2)', p)
         !call json_update(p,'real',[1.0_wp, 2.0_wp, 3.0_wp],found)   !don't have one like this yet...
-		
+        
         write(*,'(A)') ''
         write(*,'(A)') 'printing the modified structure...'
         call json%print_file()       

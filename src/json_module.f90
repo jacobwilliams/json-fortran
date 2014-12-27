@@ -4098,21 +4098,21 @@
         if (eof) then
             call throw_exception('Error in parse_object:'//&
                                  ' Unexpected end of file while parsing start of object.')
-            call cleanup()
             return
         else if ('}' == c) then
             ! end of an empty object
-            call cleanup()
             return
         else if ('"' == c) then
             call json_value_create(pair)
             call parse_string(unit, tmp)   !write to a tmp variable because of
             pair % name = tmp              ! a bug in 4.9 gfortran compiler.
             deallocate(tmp)
-            if (exception_thrown) return
+            if (exception_thrown) then
+                call json_destroy(pair)
+                return
+            end if
         else
             call throw_exception('Error in parse_object: Expecting string: "'//c//'"')
-            call cleanup()
             return
         end if
 
@@ -4121,51 +4121,40 @@
         if (eof) then
             call throw_exception('Error in parse_object:'//&
                                  ' Unexpected end of file while parsing object member.')
-            call cleanup()
             return
         else if (':' == c) then
             ! parse the value
             call parse_value(unit, pair)
-            if (exception_thrown) return
-            call json_value_add(parent, pair)
+            if (exception_thrown) then
+                call json_destroy(pair)
+                return
+            else
+                call json_value_add(parent, pair)
+            end if
         else
             call throw_exception('Error in parse_object:'//&
                                  ' Expecting : and then a value: '//c)
-            call cleanup()
             return
         end if
 
         ! another possible pair
         c = pop_char(unit, eof = eof, skip_ws = .true.)
         if (eof) then
-            call cleanup()
+            call throw_exception('Error in parse_object: '//&
+                                 'End of file encountered when parsing an object')            
             return
         else if (',' == c) then
             ! read the next member
             call parse_object(unit = unit, parent = parent)
         else if ('}' == c) then
-            call cleanup()
+            ! end of object
             return
         else
             call throw_exception('Error in parse_object: Expecting end of object: '//c)
-            call cleanup()
             return
         end if
 
-        call cleanup()
-
     end if
-
-    contains
-
-        !cleanup routine:
-        subroutine cleanup()
-        
-        implicit none
-
-        if (associated(pair)) nullify(pair)
-
-        end subroutine cleanup
 
     end subroutine parse_object
 !*****************************************************************************************
@@ -4200,8 +4189,11 @@
         nullify(element)
         call json_value_create(element)
         call parse_value(unit, element)
-        if (exception_thrown) exit
-
+        if (exception_thrown) then
+            if (associated(element)) call json_destroy(element)
+            exit
+        end if
+        
         ! parse value will disassociate an empty array value
         if (associated(element)) call json_value_add(array, element)
 
