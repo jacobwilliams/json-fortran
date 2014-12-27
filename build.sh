@@ -32,7 +32,8 @@ EXEOUT='json'                #name of example program
 MODCODE='json_module'        #json module file name (no extension)
 EXAMPLECODE='json_example'   #example program file name (no extension)
 ROBODOC='robodoc'            #robodoc executable name
-ROBOFLAGS="--src ${SRCDIR} --doc ${DOCDIR} --multidoc --html --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4 --documenttitle jsonfortran --sections"  #robodoc flags
+PROJECTNAME='jsonfortran'    #project name for robodoc (example: jsonfortran_1.0.0)
+ROBOFLAGS="--src ${SRCDIR} --doc ${DOCDIR} --multidoc --html --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4 --documenttitle ${PROJECTNAME} --sections"  #robodoc flags
 
 #
 # Compiler-specifics:
