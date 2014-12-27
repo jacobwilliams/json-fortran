@@ -116,7 +116,6 @@
     character(len=*),parameter :: null_str  = 'null'
     character(len=*),parameter :: true_str  = 'true'
     character(len=*),parameter :: false_str = 'false'
-    
 
     ! The types of data:
     integer,parameter,public :: json_unknown   = 0
