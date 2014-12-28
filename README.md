@@ -46,7 +46,7 @@ cmake_minimum_required ( VERSION 2.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 1.0.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 2.0.0 REQUIRED )
 
 add_executable ( json_example src/json_example.f90 )
 target_include_directories ( json_example BEFORE PUBLIC ${jsonfortran_INCLUDE_DIRS} )
