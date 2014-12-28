@@ -22,7 +22,7 @@ compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9).
 Currently, several ways are provided to build the jsonfortran library
 (libjsonfortran). 
 
-* A build script, build.sh is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the example program.  Edit the script to use either the Intel compiler or gfortran.
+* A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the example program.  Edit the script to use either the Intel compiler or gfortran.
 
 * A Visual Studio 2010 project is included for building the library (and example program) on Windows with the Intel compiler.
 
