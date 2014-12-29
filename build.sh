@@ -54,5 +54,5 @@ echo "Building example program..."
 #build the documentation with RoboDoc:
 echo ""
 echo "Building documentation..."
-robodoc --src ${SRCDIR} --doc ${DOCDIR} --multidoc --html --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4 --documenttitle ${PROJECTNAME} --sections
+robodoc --rc ./robodoc.rc --src ${SRCDIR} --doc ${DOCDIR} --multidoc --html --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4 --documenttitle ${PROJECTNAME} --sections
 echo ""

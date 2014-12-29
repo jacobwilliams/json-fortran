@@ -64,7 +64,7 @@ if find_executable('robodoc'):
                 join('documentation','robodoc.css'), 
                 join('documentation','toc_index.html'), ]
 
-    bld = Builder(action='robodoc --src src/ --doc documentation/ --multidoc --html'+
+    bld = Builder(action='robodoc --rc robodoc.rc --src src/ --doc documentation/ --multidoc --html'+
                   ' --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4 --documenttitle jsonfortran --sections')
     env = Environment(BUILDERS = {'RoboDoc' : bld})
     env.RoboDoc(docfiles, src)
