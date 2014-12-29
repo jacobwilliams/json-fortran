@@ -1289,25 +1289,58 @@
 !    json_value_destroy
 !
 !  DESCRIPTION
-!    Remove and destroy a json_value (and all its children) 
-!        from a linked-list structure.
-!    The rest of the structure is preserved.
+!    Remove a json_value (and all its children) 
+!    from a linked-list structure, preserving the rest of the structure.
+!
+!    If destroy is not present, it is also destroyed.
+!    If destroy is present and false, it is not destroyed.
+!
+!  EXAMPLE
+!
+!    !to extract an object from one json structure, and add it to another:
+!    type(json_value),pointer :: json1,json2,p
+!    logical :: found
+!    ...create json1 and json2
+!    call json_get(json1,'name',p,found)  ! get pointer to name element of json1
+!    call json_remove(p,destroy=.false.)  ! remove it from json1 (don't destroy)
+!    call json_value_add(json2,p)         ! add it to json2
+!
+!    !to remove an object from a json structure (and destroy it)
+!    type(json_value),pointer :: json1,p
+!    logical :: found
+!    ...create json1
+!    call json_get(json1,'name',p,found)  ! get pointer to name element of json1
+!    call json_remove(p)                  ! remove and destroy it
 !
 !  AUTHOR
-!    Jacob Williams : 9/9/2014
+!    Jacob Williams : 9/9/2014 
+!
+!  HISTORY
+!    JW : 12/28/2014 : added destroy optional argument.
 !
 !  SOURCE
 
-    subroutine json_value_remove(me)
+    subroutine json_value_remove(me,destroy)
 
     implicit none
 
-    type(json_value),pointer :: me
+    type(json_value),pointer    :: me
+    logical,intent(in),optional :: destroy
     
     type(json_value),pointer :: parent,previous,next
+    logical :: destroy_it
     
     if (associated(me)) then
+    
         if (associated(me%parent)) then
+        
+            !optional input argument:
+            if (present(destroy)) then
+                destroy_it = destroy
+            else
+                destroy_it = .true.
+            end if
+            
             if (associated(me%next)) then
         
                 !there are later items in the list:
@@ -1343,7 +1376,7 @@
                    
         end if
             
-        call json_value_destroy(me)
+        if (destroy_it) call json_value_destroy(me)
 
     end if
 
@@ -2603,7 +2636,7 @@
                     cycle
                 end if
 
-                if (.not.associated(p)) then
+                if (.not. associated(p)) then
                     call throw_exception('Error in json_get_by_path:'//&
                                          ' Error getting child member.')
                     exit
@@ -2629,7 +2662,7 @@
                     child_i = i + 1
                     cycle
                 end if
-                if (.not.associated(p)) then
+                if (.not. associated(p)) then
                     call throw_exception('Error in json_get_by_path:'//&
                                          ' Error getting array element')
                     exit
@@ -2802,7 +2835,7 @@
             p => this
         end if
 
-        if (.not.associated(p)) then
+        if (.not. associated(p)) then
 
             call throw_exception('Error in json_get_integer:'//&
                                  ' Unable to resolve path: '// trim(path))
@@ -2939,7 +2972,7 @@
             p => this
         end if
 
-        if (.not.associated(p)) then
+        if (.not. associated(p)) then
 
             call throw_exception('Error in json_get_double:'//&
                                  ' Unable to resolve path: '//trim(path))
@@ -3076,7 +3109,7 @@
             p => this
         end if
 
-        if (.not.associated(p)) then
+        if (.not. associated(p)) then
 
             call throw_exception('Error in json_get_logical:'//&
                                  ' Unable to resolve path: '//trim(path))
@@ -3210,7 +3243,7 @@
             p => this
         end if
 
-        if (.not.associated(p)) then
+        if (.not. associated(p)) then
 
             call throw_exception('Error in json_get_chars:'//&
                                  ' Unable to resolve path: '//trim(path))
@@ -3487,7 +3520,7 @@
             p => this
         end if
 
-        if (.not.associated(p)) then
+        if (.not. associated(p)) then
 
             call throw_exception('Error in json_get_array:'//&
                                  ' Unable to resolve path: '//trim(path))
@@ -4014,7 +4047,7 @@
     type(json_value),intent(inout)         :: me
     !type(json_value),pointer,intent(inout) :: me  !this causes crash in gfortran (compiler bug?)
     character(len=*),intent(in),optional   :: name
-	
+    
     !set type and value:
     !associate (d => me%data)
         call me%data%destroy()
