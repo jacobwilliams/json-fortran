@@ -591,14 +591,15 @@
 !
 !  SOURCE
 
-    subroutine load_json_file(me, filename)
+    subroutine load_json_file(me, filename, unit)
 
     implicit none
 
     class(json_file),intent(inout) :: me
     character(len=*),intent(in) :: filename
+    integer,intent(in),optional :: unit
 
-    call json_parse(filename, me%p)
+    call json_parse(file=filename, p=me%p, unit=unit)
 
     end subroutine load_json_file
 !*****************************************************************************************
@@ -1285,7 +1286,7 @@
 !****f* json_module/json_value_remove
 !
 !  NAME
-!    json_value_destroy
+!    json_value_remove
 !
 !  DESCRIPTION
 !    Remove a json_value (and all its children) 
@@ -4206,7 +4207,7 @@
 !
 !  SOURCE
 
-    subroutine parse_array(unit, array)
+    recursive subroutine parse_array(unit, array)
 
     implicit none
 
