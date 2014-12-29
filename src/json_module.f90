@@ -223,7 +223,8 @@
 
         private
 
-        type(json_value), pointer :: p => null()    !the JSON structure read from the file
+        !the JSON structure read from the file:
+        type(json_value), pointer :: p => null()
 
         contains
 
@@ -281,9 +282,9 @@
     !    Get a child, either by index or name string.
     !
     !  SOURCE
-    interface json_value_get           !consider renaming this json_value_get_child
-        module procedure get_by_index
-        module procedure get_by_name_chars
+    interface json_value_get    !consider renaming this json_value_get_child
+        module procedure json_value_get_by_index
+        module procedure json_value_get_by_name_chars
     end interface json_value_get
     !*************************************************************************************
 
@@ -413,9 +414,7 @@
     !    json_remove
     !
     !  DESCRIPTION
-    !    Remove and destroy a json_value (and all its children) 
-    !        from a linked-list structure.
-    !    The rest of the structure is preserved.
+    !    Remove a json_value from a linked-list structure.
     !
     !  SOURCE
     interface json_remove
@@ -1078,7 +1077,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/throw_exception
+!****if* json_module/throw_exception
 !
 !  NAME
 !    throw_exception
@@ -1269,9 +1268,9 @@
 
         call this%data%destroy()
 
-        if (associated(this%children))    call json_value_destroy(this%children)
+        if (associated(this%children)) call json_value_destroy(this%children)
 
-        if (associated(this%next))        call json_value_destroy(this%next)
+        if (associated(this%next))     call json_value_destroy(this%next)
 
         deallocate(this)
 
@@ -1290,9 +1289,9 @@
 !
 !  DESCRIPTION
 !    Remove a json_value (and all its children) 
-!    from a linked-list structure, preserving the rest of the structure.
-!
+!      from a linked-list structure, preserving the rest of the structure.
 !    If destroy is not present, it is also destroyed.
+!    If destroy is present and true, it is destroyed.
 !    If destroy is present and false, it is not destroyed.
 !
 !  EXAMPLE
@@ -1300,7 +1299,7 @@
 !    !to extract an object from one json structure, and add it to another:
 !    type(json_value),pointer :: json1,json2,p
 !    logical :: found
-!    ...create json1 and json2
+!    [create and populate json1 and json2]
 !    call json_get(json1,'name',p,found)  ! get pointer to name element of json1
 !    call json_remove(p,destroy=.false.)  ! remove it from json1 (don't destroy)
 !    call json_value_add(json2,p)         ! add it to json2
@@ -1308,7 +1307,7 @@
 !    !to remove an object from a json structure (and destroy it)
 !    type(json_value),pointer :: json1,p
 !    logical :: found
-!    ...create json1
+!    [create and populate json1]
 !    call json_get(json1,'name',p,found)  ! get pointer to name element of json1
 !    call json_remove(p)                  ! remove and destroy it
 !
@@ -2128,17 +2127,17 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_by_index
+!****f* json_module/json_value_get_by_index
 !
 !  NAME
-!    get_by_index
+!    json_value_get_by_index
 !
 !  DESCRIPTION
 !    Returns a child in the object given the index.
 !
 !  SOURCE
 
-    subroutine get_by_index(this, idx, p)
+    subroutine json_value_get_by_index(this, idx, p)
 
     implicit none
 
@@ -2161,7 +2160,7 @@
                 if (associated(p%next)) then
                     p => p%next
                 else
-                    call throw_exception('Error in get_by_index:'//&
+                    call throw_exception('Error in json_value_get_by_index:'//&
                                          ' p%next is not associated.')
                     return
                 end if
@@ -2170,28 +2169,28 @@
 
         else
 
-            call throw_exception('Error in get_by_index:'//&
+            call throw_exception('Error in json_value_get_by_index:'//&
                                  ' this%children is not associated.')
 
         end if
 
     end if
 
-    end subroutine get_by_index
+    end subroutine json_value_get_by_index
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_by_name_chars
+!****f* json_module/json_value_get_by_name_chars
 !
 !  NAME
-!    get_by_name_chars
+!    json_value_get_by_name_chars
 !
 !  DESCRIPTION
 !    Returns a child in the object given the name string.
 !
 !  SOURCE
 
-    subroutine get_by_name_chars(this, name, p)
+    subroutine json_value_get_by_name_chars(this, name, p)
 
     implicit none
 
@@ -2220,12 +2219,13 @@
             nullify(p)
 
         else
-            call throw_exception('Error in get_by_name_chars: pointer is not associated.')
+            call throw_exception('Error in json_value_get_by_name_chars: '//&
+                                 'pointer is not associated.')
         end if
 
     end if
 
-    end subroutine get_by_name_chars
+    end subroutine json_value_get_by_name_chars
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3491,9 +3491,11 @@
 !    json_get_array
 !
 !  DESCRIPTION
-!    Get an array from a json_value.
 !    This routine calls the user-supplied array_callback subroutine
 !        for each element in the array.
+!    Note: for integer, double, logical, and character arrays,
+!        a higher-level routine is provided (see json_get), so
+!        this routine does not have to be used for those cases.
 !
 !  SOURCE
 
@@ -3537,7 +3539,8 @@
                     end do
                 case default
                     call throw_exception('Error in json_get_array:'//&
-                                         ' Resolved value is not an array. '//trim(path))
+                                         ' Resolved value is not an array. '//&
+                                         trim(path))
                 end select
             !end associate
 
