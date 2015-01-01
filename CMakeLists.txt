@@ -124,7 +124,7 @@ set ( ROBODOC_SKIP_DOC_GEN FALSE CACHE BOOL
 if ( NOT ROBODOC_SKIP_DOC_GEN )
   find_program ( ROBODOC robodoc )
   if ( ROBODOC ) # Found
-    set ( ROBODOC_OPTIONS --rc robodoc.rc --tabsize 4 --index --toc --sections --syntaxcolors --source_line_numbers
+    set ( ROBODOC_OPTIONS --rc ${CMAKE_SOURCE_DIR}/robodoc.rc --tabsize 4 --index --toc --sections --syntaxcolors --source_line_numbers
       CACHE STRING "Options passed to robodoc to control building the documentation" )
     set ( DOC_DIR "${CMAKE_BINARY_DIR}/documentation" )
     set ( REQUIRED_ROBODOC_OPTIONS
