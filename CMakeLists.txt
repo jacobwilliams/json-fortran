@@ -124,7 +124,7 @@ set ( ROBODOC_SKIP_DOC_GEN FALSE CACHE BOOL
 if ( NOT ROBODOC_SKIP_DOC_GEN )
   find_program ( ROBODOC robodoc )
   if ( ROBODOC ) # Found
-    set ( ROBODOC_OPTIONS --rc robodoc.rc --tabsize 4 --index --toc --sections --syntaxcolors --source_line_numbers
+    set ( ROBODOC_OPTIONS --rc ${CMAKE_SOURCE_DIR}/robodoc.rc --tabsize 4 --index --toc --sections --syntaxcolors --source_line_numbers
       CACHE STRING "Options passed to robodoc to control building the documentation" )
     set ( DOC_DIR "${CMAKE_BINARY_DIR}/documentation" )
     set ( REQUIRED_ROBODOC_OPTIONS
@@ -185,65 +185,78 @@ if ( JSONLINT )
   add_test ( NAME validate-test2
     WORKING_DIRECTORY ${DATA_DIR}
     COMMAND ${JSONLINT} test2.json )
+  set ( OPTIONAL_TESTS2 ${OPTIONAL_TESTS2} validate-test2 )
   add_test ( NAME validate-test4
     WORKING_DIRECTORY ${DATA_DIR}
     COMMAND ${JSONLINT} test4.json )
+  set ( OPTIONAL_TESTS4 ${OPTIONAL_TESTS4} validate-test4 )
 endif ( JSONLINT )
 # Check output for differences
 if ( DIFF )
   add_test ( NAME test2-regression
     WORKING_DIRECTORY ${DATA_DIR}
     COMMAND ${DIFF} -q test2.json ${CMAKE_SOURCE_DIR}/files/test2.json )
+  set ( OPTIONAL_TESTS2 ${OPTIONAL_TESTS2} test2-regression )
   add_test ( NAME test4-regression
     WORKING_DIRECTORY ${DATA_DIR}
     COMMAND ${DIFF} -q test4.json ${CMAKE_SOURCE_DIR}/files/test4.json )
+  set ( OPTIONAL_TESTS4 ${OPTIONAL_TESTS4} test4-regression )
 else ( DIFF )
   message ( WARNING
     "For full test coverage diff, or a similar tool must be present on your system" )
 endif ( DIFF )
-set_tests_properties ( validate-test2 test2-regression
-  PROPERTIES
-  DEPENDS test-${CMAKE_PROJECT_NAME}
-  REQUIRED_FILES "${DATA_DIR}/test2.json"
-  RESOURCE_LOCK  "${DATA_DIR}/test2.json" )
-set_tests_properties ( validate-test4 test4-regression
-  PROPERTIES
-  DEPENDS test-${CMAKE_PROJECT_NAME}
-  REQUIRED_FILES "${DATA_DIR}/test4.json"
-  RESOURCE_LOCK  "${DATA_DIR}/test4.json" )
-
+if ( DIFF OR JSONLINT )
+  set_tests_properties ( ${OPTIONAL_TESTS2}
+    PROPERTIES
+    DEPENDS test-${CMAKE_PROJECT_NAME}
+    REQUIRED_FILES "${DATA_DIR}/test2.json"
+    RESOURCE_LOCK  "${DATA_DIR}/test2.json" )
+  set_tests_properties ( ${OPTIONAL_TESTS4}
+    PROPERTIES
+    DEPENDS test-${CMAKE_PROJECT_NAME}
+    REQUIRED_FILES "${DATA_DIR}/test4.json"
+    RESOURCE_LOCK  "${DATA_DIR}/test4.json" )
+endif ( DIFF OR JSONLINT )
 # Static lib
 add_test ( NAME test-${CMAKE_PROJECT_NAME}-static
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin/"
   COMMAND test-${CMAKE_PROJECT_NAME}-static )
+unset ( OPTIONAL_TESTS2 )
+unset ( OPTIONAL_TESTS4 )
 # Validate output
 if ( JSONLINT )
   add_test ( NAME validate-test2-static
     WORKING_DIRECTORY ${DATA_DIR}
     COMMAND ${JSONLINT} test2.json )
+  set ( OPTIONAL_TESTS2 ${OPTIONAL_TESTS2} validate-test2-static )
   add_test ( NAME validate-test4-static
     WORKING_DIRECTORY ${DATA_DIR}
     COMMAND ${JSONLINT} test4.json )
+  set ( OPTIONAL_TESTS4 ${OPTIONAL_TESTS4} validate-test4-static )
 endif ( JSONLINT )
 # Check output for differences
 if ( DIFF )
   add_test ( NAME test2-regression-static
     WORKING_DIRECTORY ${DATA_DIR}
     COMMAND ${DIFF} -q test2.json ${CMAKE_SOURCE_DIR}/files/test2.json )
+  set ( OPTIONAL_TESTS2 ${OPTIONAL_TESTS2} test2-regression-static )
   add_test ( NAME test4-regression-static
     WORKING_DIRECTORY ${DATA_DIR}
     COMMAND ${DIFF} -q test4.json ${CMAKE_SOURCE_DIR}/files/test4.json )
+  set ( OPTIONAL_TESTS4 ${OPTIONAL_TESTS4} test4-regression-static )
 endif ( DIFF )
-set_tests_properties ( validate-test2-static test2-regression-static
+if ( JSONLINT OR DIFF )
+set_tests_properties ( ${OPTIONAL_TESTS2}
   PROPERTIES
   DEPENDS test-${CMAKE_PROJECT_NAME}-static
   REQUIRED_FILES "${DATA_DIR}/test2.json"
   RESOURCE_LOCK  "${DATA_DIR}/test2.json" )
-set_tests_properties ( validate-test4-static test4-regression-static
+set_tests_properties ( ${OPTIONAL_TESTS4}
   PROPERTIES
   DEPENDS test-${CMAKE_PROJECT_NAME}-static
   REQUIRED_FILES "${DATA_DIR}/test4.json"
   RESOURCE_LOCK  "${DATA_DIR}/test4.json" )
+endif ( JSONLINT OR DIFF )
 
 if ( JSONLINT )
   set_tests_properties ( test-${CMAKE_PROJECT_NAME} test-${CMAKE_PROJECT_NAME}-static
