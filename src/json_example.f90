@@ -62,6 +62,7 @@
     character(len=*),parameter :: filename5 = 'test5.json'        !
     
     !initialize the module:
+    !call json_initialize(verbose=.true.)
     call json_initialize()
 
     !run the tests:
@@ -93,6 +94,8 @@
     
     character(len=*),dimension(2),parameter :: files = ['invalid.json ',&
                                                         'invalid2.json']
+
+    call json_initialize()
 
     write(*,'(A)') ''
     write(*,'(A)') '================================='
@@ -135,6 +138,8 @@
     real(wp) :: d
     type(json_file) :: json   
     logical :: found
+
+    call json_initialize()
 
     write(*,'(A)') ''
     write(*,'(A)') '================================='
@@ -193,6 +198,8 @@
 
     integer :: i
 
+    call json_initialize()
+
     write(*,'(A)') ''
     write(*,'(A)') '================================='
     write(*,'(A)') '   MEMORY LEAK TEST'
@@ -233,6 +240,8 @@
     integer :: i
     character(len=10) :: istr
     character(len=:),allocatable :: string
+
+    call json_initialize()
 
     write(*,'(A)') ''
     write(*,'(A)') '================================='
@@ -301,6 +310,8 @@
     type(json_value),pointer    :: p, inp, traj
 
     integer :: iunit
+
+    call json_initialize()
 
     write(*,'(A)') ''
     write(*,'(A)') '================================='
@@ -424,6 +435,8 @@
     character(len=10) :: str
     real(wp),dimension(:),allocatable :: rvec
 
+    call json_initialize()
+
     write(*,'(A)') ''
     write(*,'(A)') '================================='
     write(*,'(A)') '   EXAMPLE 3'
@@ -514,6 +527,8 @@
     real(wp) :: rval
     logical :: found
     type(json_value),pointer :: p
+
+    call json_initialize()
 
     write(*,'(A)') ''
     write(*,'(A)') '================================='
@@ -632,22 +647,27 @@
         
         call json%get('files', p)           !in the middle of a list
         call json_remove(p)
-        
+        if (json_failed()) call print_error_message()
+       
         call json%get('data(1).array', p)   !at the end of a list
         call json_remove(p)
-        
+        if (json_failed()) call print_error_message()
+       
         call json%get('data(2).number', p)  !at the beginning of a list
         call json_remove(p)
+        if (json_failed()) call print_error_message()
         
         write(*,'(A)') ''
         write(*,'(A)') 'printing the modified structure...'
         call json%print_file()       
+        if (json_failed()) call print_error_message()
 
         write(*,'(A)') ''
         write(*,'(A)') ' Test replacing data from the json structure:'
         
         call json%get('data(1)', p)
         call json_update(p,'name','Cuthbert',found)
+        if (json_failed()) call print_error_message()
 
         !call json%get('data(2)', p)
         !call json_update(p,'real',[1.0_wp, 2.0_wp, 3.0_wp],found)   !don't have one like this yet...
@@ -655,6 +675,7 @@
         write(*,'(A)') ''
         write(*,'(A)') 'printing the modified structure...'
         call json%print_file()       
+        if (json_failed()) call print_error_message()
         
     end if
 
@@ -676,7 +697,7 @@
 
     character(len=:),allocatable :: error_msg
     logical :: status_ok
-
+    
     !get error message:
     call json_check_for_errors(status_ok, error_msg)
 
