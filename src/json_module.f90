@@ -181,12 +181,16 @@
 
         !the data for this variable:
         type(json_data_non_polymorphic) :: data
+        
+        !number of children:
+        integer,private :: n_children = 0
 
         !for the linked list:
         type(json_value), pointer :: previous => null()
-        type(json_value), pointer :: next => null()
-        type(json_value), pointer :: parent => null()
+        type(json_value), pointer :: next     => null()
+        type(json_value), pointer :: parent   => null()
         type(json_value), pointer :: children => null()
+        type(json_value), pointer :: tail     => null()
 
         end type json_value
     !*********************************************************
@@ -1270,9 +1274,14 @@
         call this%data%destroy()
 
         if (associated(this%children)) call json_value_destroy(this%children)
+        this%n_children = 0
+        
+        if (associated(this%next)) call json_value_destroy(this%next)
 
-        if (associated(this%next))     call json_value_destroy(this%next)
-
+        if (associated(this%previous)) nullify(this%previous)
+        if (associated(this%parent))   nullify(this%parent)
+        if (associated(this%tail))     nullify(this%tail)
+        
         deallocate(this)
 
         nullify(this)
@@ -1329,18 +1338,20 @@
     
     type(json_value),pointer :: parent,previous,next
     logical :: destroy_it
-    
+        
     if (associated(me)) then
+        
+        !optional input argument:
+        if (present(destroy)) then
+            destroy_it = destroy
+        else
+            destroy_it = .true.
+        end if
     
         if (associated(me%parent)) then
         
-            !optional input argument:
-            if (present(destroy)) then
-                destroy_it = destroy
-            else
-                destroy_it = .true.
-            end if
-            
+            parent => me%parent                    
+           
             if (associated(me%next)) then
         
                 !there are later items in the list:
@@ -1348,16 +1359,15 @@
                 next => me%next
                 nullify(me%next)
             
-                if (associated(me%previous)) then           
+                if (associated(me%previous)) then   
                     !there are earlier items in the list
                     previous => me%previous                
                     previous%next => next
                     next%previous => previous
                 else
                     !this is the first item in the list
-                    parent => me%parent                    
                     parent%children => next
-                    next%previous => null()
+                    nullify(next%previous)
                 end if
                 
             else
@@ -1365,14 +1375,17 @@
                 if (associated(me%previous)) then
                     !there are earlier items in the list:
                     previous => me%previous 
-                    previous%next => null()  
+                    nullify(previous%next)  
+                    parent%tail => previous
                 else
                     !this is the only item in the list:
-                    parent => me%parent 
-                    parent%children => null()                   
+                    nullify(parent%children)
+                    nullify(parent%tail)            
                 end if
                 
-            end if     
+            end if
+            
+            parent%n_children = parent%n_children - 1
                    
         end if
             
@@ -1618,35 +1631,29 @@
 
     type(json_value), pointer :: this, member
 
-    type(json_value), pointer :: p
+   ! type(json_value), pointer :: p
 
     if (.not. exception_thrown) then
-
-        nullify(p)
 
         ! associate the parent
         member % parent => this
 
         ! add to linked list
-        if (associated(this % children)) then
+        if (associated(this%children)) then
 
-            ! get to the tail of the linked list
-            p => this % children
-            do while (associated(p % next))
-                p => p % next
-            end do
-
-            p%next => member
-            member%previous => p
-
-            nullify(p)    !cleanup
+            this%tail%next => member
+            member%previous => this%tail
 
         else
 
             this%children => member
-            member%previous => null()
+            member%previous => null()  !first in the list
 
         end if
+        
+        ! new member is now the last one in the list
+        this%tail => member
+        this%n_children = this%n_children + 1
 
     end if
 
@@ -2090,39 +2097,20 @@
 !  DESCRIPTION
 !    Count the number of children.
 !
+!  HISTORY
+!    JW : 1/4/2014 : Original routine removed.  
+!                    Now using n_children variable.
+!
 !  SOURCE
 
-    function json_value_count(this) result(count)
+    function json_value_count(me) result(count)
 
     implicit none
 
     integer :: count
-    type(json_value),pointer,intent(in) :: this
-
-    type(json_value), pointer :: p
-
-    if (.not. exception_thrown) then
-
-        count = 0
-        
-        if (associated(this)) then
-
-            if (associated(this%children)) then
-
-                p => this%children
-
-                do while (associated(p))
-                    count = count + 1
-                    p => p%next
-                end do
-
-                nullify(p)
-
-            end if
-            
-        end if
-        
-    end if
+    type(json_value),pointer,intent(in) :: me
+    
+    count = me%n_children
 
     end function json_value_count
 !*****************************************************************************************
@@ -3534,9 +3522,10 @@
                 select case (p%data%var_type)
                 case (json_array)
                     count = json_value_count(p)
-                    do i = 1, count
-                        call json_value_get(p, i, element)
+                    element => p%children
+                    do i = 1, count ! callback for each child
                         call array_callback(element, i, count)
+                        element => element%next
                     end do
                 case default
                     call throw_exception('Error in json_get_array:'//&
