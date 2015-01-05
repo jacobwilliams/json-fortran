@@ -171,8 +171,8 @@
     !  EXAMPLE
     !    type(json_value),pointer :: p
     !    call json_create_object(p) 
-    !    call json_value_add(p,'year',1805)
-    !    call json_value_add(p,'value',1.0_wp)
+    !    call json_add(p,'year',1805)
+    !    call json_add(p,'value',1.0_wp)
     !    call json_print(p,'test.json')
     !    call json_destroy(p)
     !
@@ -281,39 +281,45 @@
     end interface
 
     !*************************************************************************************
-    !****f* json_module/json_value_get_child
+    !****f* json_module/json_get_child
     !
     !  NAME
-    !    json_value_get_child
+    !    json_get_child
     !
     !  DESCRIPTION
     !    Get a child, either by index or name string.
     !    Both of these return a json_value pointer.
     !
+    !  NOTES
+    !    Formerly, this was called json_value_get_child
+    !
     !  SOURCE
-    interface json_value_get_child
+    interface json_get_child
         module procedure json_value_get_by_index
         module procedure json_value_get_by_name_chars
-    end interface json_value_get_child
+    end interface json_get_child
     !*************************************************************************************
 
     !*************************************************************************************
-    !****f* json_module/json_value_add
+    !****f* json_module/json_add
     !
     !  NAME
-    !    json_value_add
+    !    json_add
     !
     !  DESCRIPTION
     !    Add objects to a linked list of json_values.
     !
+    !  NOTES
+    !    Formerly, this was called json_value_add
+    !
     !  SOURCE
-    interface json_value_add
+    interface json_add
         module procedure :: json_value_add_member
         module procedure :: json_value_add_integer, json_value_add_integer_vec
         module procedure :: json_value_add_double,  json_value_add_double_vec
         module procedure :: json_value_add_logical, json_value_add_logical_vec
         module procedure :: json_value_add_string,  json_value_add_string_vec
-    end interface json_value_add
+    end interface json_add
     !*************************************************************************************
     
     !*************************************************************************************
@@ -323,7 +329,7 @@
     !    json_update
     !
     !  DESCRIPTION
-    !    These are like json_value_add, except if a child with the same name is
+    !    These are like json_add, except if a child with the same name is
     !     already present, then its value is simply updated.
     !    Note that currently, these only work for scalar variables.
     !    These routines can also change the variable's type (but an error will be 
@@ -334,7 +340,7 @@
         module procedure :: json_update_logical,&
                             json_update_double,&
                             json_update_integer,&
-                            json_update_chars
+                            json_update_string
     end interface json_update
     !*************************************************************************************
     
@@ -353,7 +359,7 @@
         module procedure :: json_get_integer, json_get_integer_vec
         module procedure :: json_get_double,  json_get_double_vec
         module procedure :: json_get_logical, json_get_logical_vec
-        module procedure :: json_get_chars,   json_get_char_vec
+        module procedure :: json_get_string,  json_get_string_vec
         module procedure :: json_get_array
     end interface json_get
     !*************************************************************************************
@@ -447,29 +453,29 @@
     !*************************************************************************************
 
     !public routines:
-    public :: json_initialize            !to initialize the module
-    public :: json_destroy               !clear a JSON structure (destructor)
-    public :: json_remove                !remove from a JSON structure
-    public :: json_remove_if_present     !remove from a JSON structure (if it is present)
-    public :: json_parse                 !read a JSON file and populate the structure
-    public :: json_clear_exceptions      !clear exceptions
+    public :: json_add                   !add data to a JSON structure
     public :: json_check_for_errors      !check for error and get error message
+    public :: json_clear_exceptions      !clear exceptions
+    public :: json_count                 !count the number of children
+    public :: json_create_array          !allocate a json_value array
+    public :: json_create_double         !allocate a json_value double
+    public :: json_create_integer        !allocate a json_value integer
+    public :: json_create_logical        !allocate a json_value logical
+    public :: json_create_null           !allocate a json_value null
+    public :: json_create_object         !allocate a json_value object
+    public :: json_create_string         !allocate a json_value string
+    public :: json_destroy               !clear a JSON structure (destructor)
     public :: json_failed                !check for error
-    public :: json_value_get_child       !get a child of a json_value
-    public :: json_value_add             !add data to a JSON structure
-    public :: json_update                !update a value in a JSON structure
     public :: json_get                   !get data from the JSON structure  
+    public :: json_get_child             !get a child of a json_value
+    public :: json_info                  !get info about a json_value
+    public :: json_initialize            !to initialize the module
+    public :: json_parse                 !read a JSON file and populate the structure
     public :: json_print                 !print the JSON structure to a file
     public :: json_print_to_string       !write the JSON structure to a string
-    public :: json_value_count           !count the number of children
-    public :: json_info                  !get info about a json_value
-    public :: json_create_logical        !allocate a json_value pointer
-    public :: json_create_integer        ! and define its data type
-    public :: json_create_string
-    public :: json_create_double
-    public :: json_create_null
-    public :: json_create_object
-    public :: json_create_array
+    public :: json_remove                !remove from a JSON structure
+    public :: json_remove_if_present     !remove from a JSON structure (if it is present)
+    public :: json_update                !update a value in a JSON structure
        
     !exception handling [private variables]
     logical :: is_verbose = .false.             !if true, all exceptions are immediately printed to console
@@ -739,7 +745,7 @@
     integer,intent(out),optional    :: n_children
         
     if (present(var_type))    var_type = p%data%var_type        !variable type
-    if (present(n_children))  n_children = json_value_count(p)  !number of children
+    if (present(n_children))  n_children = json_count(p)  !number of children
     
     end subroutine json_info
 !*****************************************************************************************
@@ -1003,7 +1009,7 @@
 !    call me%get(path,vec)
 !
 !  DESCRIPTION
-!    Get a char vector from a JSON file.
+!    Get a string vector from a JSON file.
 !
 !  AUTHOR
 !    Jacob Williams : 1/19/2014
@@ -1319,7 +1325,7 @@
 !    [create and populate json1 and json2]
 !    call json_get(json1,'name',p,found)  ! get pointer to name element of json1
 !    call json_remove(p,destroy=.false.)  ! remove it from json1 (don't destroy)
-!    call json_value_add(json2,p)         ! add it to json2
+!    call json_add(json2,p)         ! add it to json2
 !
 !    !to remove an object from a json structure (and destroy it)
 !    type(json_value),pointer :: json1,p
@@ -1410,7 +1416,8 @@
 !    json_value_remove_if_present
 !
 !  DESCRIPTION
-!    If the child variable is present, then remove it.
+!    Given the path string, remove the variable from 
+!    the json_value structure, if it exists.
 !
 !  AUTHOR
 !    Jacob Williams : 12/6/2014
@@ -1440,7 +1447,8 @@
 !    json_update_logical
 !
 !  DESCRIPTION
-!    If the child variable is present, and is a scalar, then update its value.
+!    Given the path string, if the variable is present, 
+!    and is a scalar, then update its value.
 !    If it is not present, then create it and set its value.
 !
 !  AUTHOR
@@ -1474,7 +1482,7 @@
         end select          
 
     else
-        call json_value_add(p,name,val)   !add the new element
+        call json_add(p,name,val)   !add the new element
     end if
                      
     end subroutine json_update_logical
@@ -1487,7 +1495,8 @@
 !    json_update_double
 !
 !  DESCRIPTION
-!    If the child variable is present, and is a scalar, then update its value.
+!    Given the path string, if the variable is present, 
+!    and is a scalar, then update its value.
 !    If it is not present, then create it and set its value.
 !
 !  AUTHOR
@@ -1521,7 +1530,7 @@
         end select          
 
     else
-        call json_value_add(p,name,val)   !add the new element
+        call json_add(p,name,val)   !add the new element
     end if
                      
     end subroutine json_update_double
@@ -1534,7 +1543,8 @@
 !    json_update_integer
 !
 !  DESCRIPTION
-!    If the child variable is present, and is a scalar, then update its value.
+!    Given the path string, if the variable is present, 
+!    and is a scalar, then update its value.
 !    If it is not present, then create it and set its value.
 !
 !  AUTHOR
@@ -1568,20 +1578,21 @@
         end select          
 
     else
-        call json_value_add(p,name,val)   !add the new element
+        call json_add(p,name,val)   !add the new element
     end if
                      
     end subroutine json_update_integer
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_update_chars
+!****f* json_module/json_update_string
 !
 !  NAME
-!    json_update_chars
+!    json_update_string
 !
 !  DESCRIPTION
-!    If the child variable is present, and is a scalar, then update its value.
+!    Given the path string, if the variable is present, 
+!    and is a scalar, then update its value.
 !    If it is not present, then create it and set its value.
 !
 !  AUTHOR
@@ -1589,7 +1600,7 @@
 !
 !  SOURCE
 
-    subroutine json_update_chars(p,name,val,found)
+    subroutine json_update_string(p,name,val,found)
      
     implicit none
     
@@ -1610,15 +1621,15 @@
             call to_string(p_var,val)    !update the value
         case default
             found = .false.
-            call throw_exception('Error in json_update_chars: '//&
+            call throw_exception('Error in json_update_string: '//&
                                  'the variable is not a scalar value')
         end select          
 
     else
-        call json_value_add(p,name,val)   !add the new element
+        call json_add(p,name,val)   !add the new element
     end if
                      
-    end subroutine json_update_chars
+    end subroutine json_update_string
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1697,7 +1708,7 @@
     call to_double(var,val,name)
 
     !add it:
-    call json_value_add(me, var)
+    call json_add(me, var)
 
     !cleanup:
     nullify(var)
@@ -1739,11 +1750,11 @@
 
     !populate the array:
     do i=1,size(val)
-        call json_value_add(var, '', val(i))
+        call json_add(var, '', val(i))
     end do
 
     !add it:
-    call json_value_add(me, var)
+    call json_add(me, var)
 
     !cleanup:
     nullify(var)
@@ -1783,7 +1794,7 @@
     call to_integer(var,val,name)
 
     !add it:
-    call json_value_add(me, var)
+    call json_add(me, var)
 
     !cleanup:
     nullify(var)
@@ -1825,11 +1836,11 @@
 
     !populate the array:
     do i=1,size(val)
-        call json_value_add(var, '', val(i))
+        call json_add(var, '', val(i))
     end do
 
     !add it:
-    call json_value_add(me, var)
+    call json_add(me, var)
 
     !cleanup:
     nullify(var)
@@ -1869,7 +1880,7 @@
     call to_logical(var,val,name)
 
     !add it:
-    call json_value_add(me, var)
+    call json_add(me, var)
 
     !cleanup:
     nullify(var)
@@ -1911,11 +1922,11 @@
 
     !populate the array:
     do i=1,size(val)
-        call json_value_add(var, '', val(i))
+        call json_add(var, '', val(i))
     end do
 
     !add it:
-    call json_value_add(me, var)
+    call json_add(me, var)
 
     !cleanup:
     nullify(var)
@@ -1959,7 +1970,7 @@
     call to_string(var,str,name)
 
     !add it:
-    call json_value_add(me, var)
+    call json_add(me, var)
 
     !cleanup:
     nullify(var)
@@ -2027,7 +2038,7 @@
 !    json_value_add_string_vec
 !
 !  DESCRIPTION
-!    Add an array of character string to the structure.
+!    Add an array of character strings to the structure.
 !
 !    These routines are part of the public API that can be
 !        used to build a json structure using data.
@@ -2077,7 +2088,7 @@
         if (trim_string)    str = trim(str)
 
         !write it:
-        call json_value_add(var, '', str)
+        call json_add(var, '', str)
 
         !cleanup
         deallocate(str)
@@ -2085,7 +2096,7 @@
     end do
 
     !add it:
-    call json_value_add(me, var)
+    call json_add(me, var)
 
     !cleanup:
     nullify(var)
@@ -2094,10 +2105,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_count
+!****f* json_module/json_count
 !
 !  NAME
-!    json_value_count
+!    json_count
 !
 !  DESCRIPTION
 !    Count the number of children.
@@ -2105,10 +2116,11 @@
 !  HISTORY
 !    JW : 1/4/2014 : Original routine removed.  
 !                    Now using n_children variable.
+!                    Renamed from json_value_count.
 !
 !  SOURCE
 
-    function json_value_count(me) result(count)
+    function json_count(me) result(count)
 
     implicit none
 
@@ -2117,7 +2129,7 @@
     
     count = me%n_children
 
-    end function json_value_count
+    end function json_count
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2206,8 +2218,8 @@
         if (associated(this)) then
 
             if (this%data%var_type==json_object) then
-                do i=1, json_value_count(this)
-                    call json_value_get_child(this, i, p)
+                do i=1, json_count(this)
+                    call json_get_child(this, i, p)
                     if (allocated(p%name)) then
                         if (p%name == name) return
                     end if
@@ -2402,11 +2414,11 @@
                 
                 call write_it( repeat(space, spaces)//'{' )
                  
-                count = json_value_count(this)
+                count = json_count(this)
                 do i = 1, count
 
                     ! get the element
-                    call json_value_get_child(this, i, element)
+                    call json_get_child(this, i, element)
 
                     ! print the name
                     if (allocated(element%name)) then
@@ -2430,12 +2442,12 @@
             case (json_array)
 
                 call write_it( '[' )
-                count = json_value_count(this)
+                count = json_count(this)
 
                 do i = 1, count
 
                     ! get the element
-                    call json_value_get_child(this, i, element)
+                    call json_get_child(this, i, element)
 
                     ! recursive print of the element
                     call json_value_print(element, iunit=iunit, indent=tab + 1, &
@@ -2629,7 +2641,7 @@
                 ! get child member from p
                 if (child_i < i) then
                     nullify(tmp)
-                    call json_value_get_child(p, path(child_i:i-1), tmp)
+                    call json_get_child(p, path(child_i:i-1), tmp)
                     p => tmp
                     nullify(tmp)
                 else
@@ -2656,7 +2668,7 @@
                 ! get child member from p
                 if (child_i < i) then
                     nullify(tmp)
-                    call json_value_get_child(p, path(child_i:i-1), tmp)
+                    call json_get_child(p, path(child_i:i-1), tmp)
                     p => tmp
                     nullify(tmp)
                 else
@@ -2680,7 +2692,7 @@
                 child_i = string_to_integer(path(child_i:i-1))
 
                 nullify(tmp)
-                call json_value_get_child(p, child_i, tmp)
+                call json_get_child(p, child_i, tmp)
                 p => tmp
                 nullify(tmp)
 
@@ -2702,7 +2714,7 @@
             ! grab the last child if present in the path
             if (child_i <= length) then
                 nullify(tmp)
-                call json_value_get_child(p, path(child_i:i-1), tmp)
+                call json_get_child(p, path(child_i:i-1), tmp)
                 p => tmp
                 nullify(tmp)
             end if
@@ -3210,17 +3222,17 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_chars
+!****f* json_module/json_get_string
 !
 !  NAME
-!    json_get_chars
+!    json_get_string
 !
 !  DESCRIPTION
 !    Get a character string from a json_value.
 !
 !  SOURCE
 
-    subroutine json_get_chars(this, path, value, found)
+    subroutine json_get_string(this, path, value, found)
 
     implicit none
 
@@ -3246,7 +3258,7 @@
 
         if (.not. associated(p)) then
 
-            call throw_exception('Error in json_get_chars:'//&
+            call throw_exception('Error in json_get_string:'//&
                                  ' Unable to resolve path: '//trim(path))
 
         else
@@ -3339,7 +3351,7 @@
                                             j=j+4
                                         else
                                             call throw_exception(&
-                                                'Error in json_get_chars:'//&
+                                                'Error in json_get_string:'//&
                                                 ' Invalid hexadecimal sequence'//&
                                                 ' in string: '//trim(c))
                                             exit
@@ -3347,7 +3359,7 @@
 
                                     case default
                                         !unknown escape character
-                                        call throw_exception('Error in json_get_chars:'//&
+                                        call throw_exception('Error in json_get_string:'//&
                                                 ' unknown escape sequence in string "'//&
                                                 trim(s)//'" ['//backslash//c//']')
                                         exit
@@ -3377,14 +3389,14 @@
                         end if
 
                     else
-                        call throw_exception('Error in json_get_chars:'//&
+                        call throw_exception('Error in json_get_string:'//&
                                              ' p%data%value not allocated')
                     end if
 
                 !class default
                 case default
 
-                    call throw_exception('Error in json_get_chars:'//&
+                    call throw_exception('Error in json_get_string:'//&
                                          ' Unable to resolve value to characters: '//&
                                          trim(path))
 
@@ -3417,24 +3429,24 @@
 
     end if
 
-    end subroutine json_get_chars
+    end subroutine json_get_string
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_char_vec
+!****f* json_module/json_get_string_vec
 !
 !  NAME
-!    json_get_char_vec
+!    json_get_string_vec
 !
 !  DESCRIPTION
-!    Get a char vector from a JSON file.
+!    Get a string vector from a JSON file.
 !
 !  AUTHOR
 !    Jacob Williams : 5/14/2014
 !
 !  SOURCE
 
-    subroutine json_get_char_vec(me, path, vec, found)
+    subroutine json_get_string_vec(me, path, vec, found)
 
     implicit none
 
@@ -3482,7 +3494,7 @@
 
         end subroutine get_chars_from_array
 
-    end subroutine json_get_char_vec
+    end subroutine json_get_string_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3533,7 +3545,7 @@
             !associate (d => p%data)
                 select case (p%data%var_type)
                 case (json_array)
-                    count = json_value_count(p)
+                    count = json_count(p)
                     element => p%children
                     do i = 1, count ! callback for each child
                         call array_callback(element, i, count)
@@ -4391,7 +4403,7 @@
                 call json_destroy(pair)
                 return
             else
-                call json_value_add(parent, pair)
+                call json_add(parent, pair)
             end if
         else
             call throw_exception('Error in parse_object:'//&
@@ -4457,7 +4469,7 @@
         end if
         
         ! parse value will disassociate an empty array value
-        if (associated(element)) call json_value_add(array, element)
+        if (associated(element)) call json_add(array, element)
 
         ! popped the next character
         c = pop_char(unit, eof = eof, skip_ws = .true.)

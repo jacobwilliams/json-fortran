@@ -261,9 +261,9 @@
     do i=1,100
         write(istr,fmt='(I10)') i
         istr = adjustl(istr)
-        call json_value_add(inp, 'x'//trim(istr),i)
+        call json_add(inp, 'x'//trim(istr),i)
     end do
-    call json_value_add(p, inp)
+    call json_add(p, inp)
     nullify(inp)
 
     write(*,'(A)') ''
@@ -327,11 +327,11 @@
 
     !config structure:
     call json_create_object(inp,'inputs')   !an object
-    call json_value_add(p, inp)
+    call json_add(p, inp)
 
     !trajectory structure:
     call json_create_array(traj,'trajectory')    !an array
-    call json_value_add(p, traj)
+    call json_add(p, traj)
 
     write(*,'(A)') ''
     write(*,'(A)') 'adding some data to structure...'
@@ -339,14 +339,14 @@
     !add some variables:
 
     !input variables:
-    call json_value_add(inp, 't0', 0.1_wp)
-    call json_value_add(inp, 'tf', 1.1_wp)
-    call json_value_add(inp, 'x0', 9999.000_wp)
-    call json_value_add(inp, 'integer_scalar', 1)
-    call json_value_add(inp, 'integer_array', [2,4,99])
-    call json_value_add(inp, 'names', ['aaa','bbb','ccc'])
-    call json_value_add(inp, 'logical_scalar', .true.)
-    call json_value_add(inp, 'logical_vector', [.true., .false., .true.])
+    call json_add(inp, 't0', 0.1_wp)
+    call json_add(inp, 'tf', 1.1_wp)
+    call json_add(inp, 'x0', 9999.000_wp)
+    call json_add(inp, 'integer_scalar', 1)
+    call json_add(inp, 'integer_array', [2,4,99])
+    call json_add(inp, 'names', ['aaa','bbb','ccc'])
+    call json_add(inp, 'logical_scalar', .true.)
+    call json_add(inp, 'logical_vector', [.true., .false., .true.])
     nullify(inp)
 
     !trajectory variables:
@@ -395,16 +395,16 @@
     call json_create_object(var,'')    !name does not matter
 
     !variable info:
-    call json_value_add(var, 'VARIABLE',trim(variable))
-    call json_value_add(var, 'UNITS', trim(units))
-    call json_value_add(var, 'FRAME', trim(frame))
-    call json_value_add(var, 'CENTER', trim(center))
+    call json_add(var, 'VARIABLE',trim(variable))
+    call json_add(var, 'UNITS', trim(units))
+    call json_add(var, 'FRAME', trim(frame))
+    call json_add(var, 'CENTER', trim(center))
 
     !trajectory [vector of reals]:
-    call json_value_add(var, 'DATA', rdata)
+    call json_add(var, 'DATA', rdata)
 
     !add this variable to trajectory structure:
-    call json_value_add(me, var)
+    call json_add(me, var)
 
     !cleanup:
     nullify(var)
