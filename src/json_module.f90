@@ -1631,8 +1631,6 @@
 
     type(json_value), pointer :: this, member
 
-   ! type(json_value), pointer :: p
-
     if (.not. exception_thrown) then
 
         ! associate the parent
