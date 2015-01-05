@@ -252,12 +252,11 @@
     write(*,'(A)') ''
     write(*,'(A)') 'creating structure'
 
-    call json_value_create(p)            !create the value and associate the pointer
-    call to_object(p,dir//filename4)     !add the file name as the name of the overall structure
+    call json_create_object(p,dir//filename4)     !create the value and associate the pointer
+                                                  !add the file name as the name of the overall structure
 
     !config structure:
-    call json_value_create(inp)          !an object
-    call to_object(inp,'INPUTS')
+    call json_create_object(inp,'INPUTS')    !an object
     !add just integers:
     do i=1,100
         write(istr,fmt='(I10)') i
@@ -320,20 +319,18 @@
     write(*,'(A)') ''
 
     !root:
-    call json_value_create(p)           ! create the value and associate the pointer
-    call to_object(p,dir//filename2)    ! add the file name as the name of the overall structure
+    call json_create_object(p,dir//filename2)    ! create the value and associate the pointer
+                                                 ! add the file name as the name of the overall structure
 
     write(*,'(A)') ''
     write(*,'(A)') 'initialize the structure...'
 
     !config structure:
-    call json_value_create(inp)             !an object
-    call to_object(inp,'inputs')
+    call json_create_object(inp,'inputs')   !an object
     call json_value_add(p, inp)
 
     !trajectory structure:
-    call json_value_create(traj)            !an array
-    call to_array(traj,'trajectory')
+    call json_create_array(traj,'trajectory')    !an array
     call json_value_add(p, traj)
 
     write(*,'(A)') ''
@@ -395,8 +392,7 @@
     nullify(var)
 
     !create the object before data can be added:
-    call json_value_create(var)
-    call to_object(var,'')    !name does not matter
+    call json_create_object(var,'')    !name does not matter
 
     !variable info:
     call json_value_add(var, 'VARIABLE',trim(variable))

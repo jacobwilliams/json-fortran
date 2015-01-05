@@ -136,6 +136,11 @@
     !  DESCRIPTION
     !    The data in a json_value class
     !
+    !  NOTES
+    !    In earlier versions of the code, this was a polymorphic
+    !    class.  That was removed because of a bug in the Intel
+    !    compiler.  
+    !
     !  SOURCE
     
         type :: json_data_non_polymorphic
@@ -165,8 +170,7 @@
     !
     !  EXAMPLE
     !    type(json_value),pointer :: p
-    !    call json_value_create(p) 
-    !    call to_object(p) 
+    !    call json_create_object(p) 
     !    call json_value_add(p,'year',1805)
     !    call json_value_add(p,'value',1.0_wp)
     !    call json_print(p,'test.json')
@@ -232,35 +236,35 @@
 
         contains
 
-        procedure,public :: load_file   => load_json_file
-        procedure,public :: print_file  => print_json_file
-        procedure,public :: destroy     => destroy_json_file
-        procedure,public :: move        => move_pointer_in_json_file
-        procedure,public :: info        => variable_info_in_file
+        procedure,public :: load_file   => json_file_load
+        procedure,public :: print_file  => json_file_print
+        procedure,public :: destroy     => json_file_destroy
+        procedure,public :: move        => json_file_move_pointer
+        procedure,public :: info        => json_file_variable_info
 
-        generic,public :: get => get_pointer,&
-                                 get_integer,&
-                                 get_double,&
-                                 get_logical,&
-                                 get_chars,&
-                                 get_double_vec,&
-                                 get_char_vec,&
-                                 get_integer_vec,&
-                                 get_logical_vec
-
+        generic,public :: get => json_file_get_object,      &
+                                 json_file_get_integer,     &
+                                 json_file_get_double,      &
+                                 json_file_get_logical,     &
+                                 json_file_get_string,      &
+                                 json_file_get_integer_vec, &
+                                 json_file_get_double_vec,  &
+                                 json_file_get_logical_vec, &
+                                 json_file_get_string_vec
+ 
         !scalars:
-        procedure :: get_pointer        => get_object_from_json_file
-        procedure :: get_integer        => get_integer_from_json_file
-        procedure :: get_double         => get_double_from_json_file
-        procedure :: get_logical        => get_logical_from_json_file
-        procedure :: get_chars          => get_chars_from_json_file
-
+        procedure :: json_file_get_object
+        procedure :: json_file_get_integer
+        procedure :: json_file_get_double
+        procedure :: json_file_get_logical
+        procedure :: json_file_get_string
+ 
         !vectors:
-        procedure :: get_integer_vec    => get_integer_vec_from_json_file
-        procedure :: get_double_vec     => get_double_vec_from_json_file
-        procedure :: get_logical_vec    => get_logical_vec_from_json_file
-        procedure :: get_char_vec       => get_char_vec_from_json_file
-                
+        procedure :: json_file_get_integer_vec
+        procedure :: json_file_get_double_vec
+        procedure :: json_file_get_logical_vec
+        procedure :: json_file_get_string_vec
+               
     !*********************************************************
         end type json_file
     !*********************************************************
@@ -277,19 +281,20 @@
     end interface
 
     !*************************************************************************************
-    !****f* json_module/json_value_get
+    !****f* json_module/json_value_get_child
     !
     !  NAME
-    !    json_value_get
+    !    json_value_get_child
     !
     !  DESCRIPTION
     !    Get a child, either by index or name string.
+    !    Both of these return a json_value pointer.
     !
     !  SOURCE
-    interface json_value_get    !consider renaming this json_value_get_child
+    interface json_value_get_child
         module procedure json_value_get_by_index
         module procedure json_value_get_by_name_chars
-    end interface json_value_get
+    end interface json_value_get_child
     !*************************************************************************************
 
     !*************************************************************************************
@@ -450,31 +455,30 @@
     public :: json_clear_exceptions      !clear exceptions
     public :: json_check_for_errors      !check for error and get error message
     public :: json_failed                !check for error
-    public :: json_value_get             !use either a 1 based index or member name to get a json_value.
+    public :: json_value_get_child       !get a child of a json_value
     public :: json_value_add             !add data to a JSON structure
     public :: json_update                !update a value in a JSON structure
     public :: json_get                   !get data from the JSON structure  
     public :: json_print                 !print the JSON structure to a file
     public :: json_print_to_string       !write the JSON structure to a string
-    public :: json_value_create          !initialize a json_value pointer
     public :: json_value_count           !count the number of children
     public :: json_info                  !get info about a json_value
-    public :: to_logical                 !set the data type of a json_value
-    public :: to_integer                 !
-    public :: to_string                  !
-    public :: to_double                  !
-    public :: to_null                    !
-    public :: to_object                  !
-    public :: to_array                   !
-    
+    public :: json_create_logical        !allocate a json_value pointer
+    public :: json_create_integer        ! and define its data type
+    public :: json_create_string
+    public :: json_create_double
+    public :: json_create_null
+    public :: json_create_object
+    public :: json_create_array
+       
     !exception handling [private variables]
     logical :: is_verbose = .false.             !if true, all exceptions are immediately printed to console
     logical :: exception_thrown = .false.       !the error flag
     character(len=:),allocatable :: err_message !the error message
 
-    ! POP/PUSH CHARACTER [private variables]
-    integer :: char_count = 0
-    integer :: line_count = 1
+    !temp vars used when parsing lines in file [private variables]
+    integer :: char_count = 0           !character position in the current line
+    integer :: line_count = 1           !lines read counter
     integer :: pushed_index = 0
     character(len=10) :: pushed_char    !JW : what is this magic number 10??
 
@@ -515,10 +519,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/destroy_json_file
+!****f* json_module/json_file_destroy
 !
 !  NAME
-!    destroy_json_file
+!    json_file_destroy
 !
 !  USAGE
 !    call me%destroy()
@@ -531,7 +535,7 @@
 !
 !  SOURCE
 
-    subroutine destroy_json_file(me)
+    subroutine json_file_destroy(me)
     
     implicit none
 
@@ -539,14 +543,14 @@
 
     if (associated(me%p)) call json_value_destroy(me%p)
 
-    end subroutine destroy_json_file
+    end subroutine json_file_destroy
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/move_pointer_in_json_file
+!****f* json_module/json_file_move_pointer
 !
 !  NAME
-!    move_pointer_in_json_file
+!    json_file_move_pointer
 !
 !  USAGE
 !    call to%move(from)
@@ -561,7 +565,7 @@
 !
 !  SOURCE
 
-    subroutine move_pointer_in_json_file(to,from)
+    subroutine json_file_move_pointer(to,from)
     
     implicit none
 
@@ -572,30 +576,31 @@
         to%p => from%p
         nullify(from%p)
     else
-        call throw_exception('Error in move_pointer_in_json_file: '//&
+        call throw_exception('Error in json_file_move_pointer: '//&
                              'pointer is not associated.')
     end if
 
-    end subroutine move_pointer_in_json_file
+    end subroutine json_file_move_pointer
     
 !*****************************************************************************************
-!****f* json_module/load_json_file
+!****f* json_module/json_file_load
 !
 !  NAME
-!    load_json_file
-!
-!  USAGE
-!    call me%load_file(filename)
+!    json_file_load
 !
 !  DESCRIPTION
-!    Load the JSON file.
+!    Load a JSON file.
+!
+!  EXAMPLE
+!    type(json_file) :: f
+!    call f%load_file('my_file.json')
 !
 !  AUTHOR
 !    Jacob Williams : 12/9/2013
 !
 !  SOURCE
 
-    subroutine load_json_file(me, filename, unit)
+    subroutine json_file_load(me, filename, unit)
 
     implicit none
 
@@ -605,14 +610,14 @@
 
     call json_parse(file=filename, p=me%p, unit=unit)
 
-    end subroutine load_json_file
+    end subroutine json_file_load
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/print_json_file
+!****f* json_module/json_file_print
 !
 !  NAME
-!    print_json_file
+!    json_file_print
 !
 !  USAGE
 !    call me%print_file()
@@ -626,7 +631,7 @@
 !
 !  SOURCE
 
-    subroutine print_json_file(me, iunit)
+    subroutine json_file_print(me, iunit)
 
     use, intrinsic :: iso_fortran_env,    only: output_unit
 
@@ -642,7 +647,7 @@
         if (iunit/=0) then
             i = iunit
         else
-            call throw_exception('Error in print_json_file: iunit must be nonzero.')
+            call throw_exception('Error in json_file_print: iunit must be nonzero.')
             return
         end if
     else
@@ -651,14 +656,14 @@
 
     call json_value_print(me%p,iunit=i,str=dummy)
 
-    end subroutine print_json_file
+    end subroutine json_file_print
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/variable_info_in_file
+!****f* json_module/json_file_variable_info
 !
 !  NAME
-!    variable_info_in_file
+!    json_file_variable_info
 !
 !  USAGE
 !    call me%info(path,found,var_type,n_children)
@@ -671,7 +676,7 @@
 !
 !  SOURCE
 
-    subroutine variable_info_in_file(me,path,found,var_type,n_children)
+    subroutine json_file_variable_info(me,path,found,var_type,n_children)
 
     implicit none
 
@@ -705,7 +710,7 @@
     !cleanup:
     nullify(p)
 
-    end subroutine variable_info_in_file
+    end subroutine json_file_variable_info
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -740,10 +745,10 @@
 !*****************************************************************************************
     
 !*****************************************************************************************
-!****f* json_module/get_object_from_json_file
+!****f* json_module/json_file_get_object
 !
 !  NAME
-!    get_object_from_json_file
+!    json_file_get_object
 !
 !  USAGE
 !    call me%get(path,p,found)
@@ -756,7 +761,7 @@
 !
 !  SOURCE
 
-    subroutine get_object_from_json_file(me, path, p, found)
+    subroutine json_file_get_object(me, path, p, found)
     
     implicit none
 
@@ -767,14 +772,14 @@
 
     call json_get_by_path(me%p, path=path, p=p, found=found)
 
-    end subroutine get_object_from_json_file
+    end subroutine json_file_get_object
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_integer_from_json_file
+!****f* json_module/json_file_get_integer
 !
 !  NAME
-!    get_integer_from_json_file
+!    json_file_get_integer
 !
 !  USAGE
 !    call me%get(path,val)
@@ -787,7 +792,7 @@
 !
 !  SOURCE
 
-    subroutine get_integer_from_json_file(me, path, val, found)
+    subroutine json_file_get_integer(me, path, val, found)
 
     implicit none
 
@@ -798,14 +803,14 @@
 
     call json_get(me%p, path=path, value=val, found=found)
 
-    end subroutine get_integer_from_json_file
+    end subroutine json_file_get_integer
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_integer_vec_from_json_file
+!****f* json_module/json_file_get_integer_vec
 !
 !  NAME
-!    get_integer_vec_from_json_file
+!    json_file_get_integer_vec
 !
 !  USAGE
 !    call me%get(path,vec)
@@ -818,7 +823,7 @@
 !
 !  SOURCE
 
-    subroutine get_integer_vec_from_json_file(me, path, vec, found)
+    subroutine json_file_get_integer_vec(me, path, vec, found)
 
     implicit none
 
@@ -829,14 +834,14 @@
 
     call json_get(me%p, path, vec, found)
 
-    end subroutine get_integer_vec_from_json_file
+    end subroutine json_file_get_integer_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_double_from_json_file
+!****f* json_module/json_file_get_double
 !
 !  NAME
-!    get_double_from_json_file
+!    json_file_get_double
 !
 !  USAGE
 !    call me%get(path,val,found)
@@ -849,7 +854,7 @@
 !
 !  SOURCE
 
-    subroutine get_double_from_json_file (me, path, val, found)
+    subroutine json_file_get_double (me, path, val, found)
 
     implicit none
 
@@ -860,14 +865,14 @@
 
     call json_get(me%p, path=path, value=val, found=found)
 
-    end subroutine get_double_from_json_file
+    end subroutine json_file_get_double
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_double_vec_from_json_file
+!****f* json_module/json_file_get_double_vec
 !
 !  NAME
-!    get_double_vec_from_json_file
+!    json_file_get_double_vec
 !
 !  USAGE
 !    call me%get(path,vec,found)
@@ -880,7 +885,7 @@
 !
 !  SOURCE
 
-    subroutine get_double_vec_from_json_file(me, path, vec, found)
+    subroutine json_file_get_double_vec(me, path, vec, found)
     
     implicit none
 
@@ -891,14 +896,14 @@
 
     call json_get(me%p, path, vec, found)
 
-    end subroutine get_double_vec_from_json_file
+    end subroutine json_file_get_double_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_logical_from_json_file
+!****f* json_module/json_file_get_logical
 !
 !  NAME
-!    get_logical_from_json_file
+!    json_file_get_logical
 !
 !  USAGE
 !    call me%get(path,val,found)
@@ -911,7 +916,7 @@
 !
 !  SOURCE
 
-    subroutine get_logical_from_json_file(me,path,val,found)
+    subroutine json_file_get_logical(me,path,val,found)
 
     implicit none
 
@@ -922,14 +927,14 @@
 
     call json_get(me%p, path=path, value=val, found=found)
 
-    end subroutine get_logical_from_json_file
+    end subroutine json_file_get_logical
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_logical_vec_from_json_file
+!****f* json_module/json_file_get_logical_vec
 !
 !  NAME
-!    get_logical_vec_from_json_file
+!    json_file_get_logical_vec
 !
 !  USAGE
 !    call me%get(path,vec)
@@ -942,7 +947,7 @@
 !
 !  SOURCE
 
-    subroutine get_logical_vec_from_json_file(me, path, vec, found)
+    subroutine json_file_get_logical_vec(me, path, vec, found)
 
     implicit none
 
@@ -953,14 +958,14 @@
     
     call json_get(me%p, path, vec, found)
 
-    end subroutine get_logical_vec_from_json_file
+    end subroutine json_file_get_logical_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_chars_from_json_file
+!****f* json_module/json_file_get_string
 !
 !  NAME
-!    get_chars_from_json_file
+!    json_file_get_string
 !
 !  USAGE
 !    call me%get(path,val)
@@ -974,7 +979,7 @@
 !
 !  SOURCE
 
-    subroutine get_chars_from_json_file(me, path, val, found)
+    subroutine json_file_get_string(me, path, val, found)
 
     implicit none
 
@@ -985,14 +990,14 @@
 
     call json_get(me%p, path=path, value=val, found=found)
 
-    end subroutine get_chars_from_json_file
+    end subroutine json_file_get_string
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/get_char_vec_from_json_file
+!****f* json_module/json_file_get_string_vec
 !
 !  NAME
-!    get_char_vec_from_json_file
+!    json_file_get_string_vec
 !
 !  USAGE
 !    call me%get(path,vec)
@@ -1005,7 +1010,7 @@
 !
 !  SOURCE
 
-    subroutine get_char_vec_from_json_file(me, path, vec, found)
+    subroutine json_file_get_string_vec(me, path, vec, found)
 
     implicit none
 
@@ -1016,7 +1021,7 @@
 
     call json_get(me%p, path, vec, found)
 
-    end subroutine get_char_vec_from_json_file
+    end subroutine json_file_get_string_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1109,8 +1114,10 @@
     if (is_verbose) then
         write(*,'(A)') '***********************'
         write(*,'(A)') 'JSON-FORTRAN EXCEPTION: '//trim(msg)
+        !call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)
+        !call tracebackqq(-1) ! intel (requires "use ifcore" in this routine)
         write(*,'(A)') '***********************'
-    end if
+   end if
     
     end subroutine throw_exception
 !*****************************************************************************************
@@ -1210,7 +1217,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_create
+!****if* json_module/json_value_create
 !
 !  NAME
 !    json_value_create
@@ -2120,7 +2127,7 @@
 !    json_value_get_by_index
 !
 !  DESCRIPTION
-!    Returns a child in the object given the index.
+!    Returns a child in the object or array given the index.
 !
 !  SOURCE
 
@@ -2133,10 +2140,10 @@
     type(json_value), pointer           :: p
 
     integer :: i
+    
+    nullify(p)
 
     if (.not. exception_thrown) then
-
-        nullify(p)
 
         if (associated(this%children)) then
 
@@ -2149,6 +2156,7 @@
                 else
                     call throw_exception('Error in json_value_get_by_index:'//&
                                          ' p%next is not associated.')
+                    nullify(p)
                     return
                 end if
 
@@ -2173,7 +2181,11 @@
 !    json_value_get_by_name_chars
 !
 !  DESCRIPTION
-!    Returns a child in the object given the name string.
+!    Returns a child in the object or array given the name string.
+!
+!  NOTES
+!    It is a case-sensitive search, and the name string is not trimmed,
+!    So, for example, 'a ' /= 'A ' /= 'a  '
 !
 !  SOURCE
 
@@ -2186,16 +2198,16 @@
     type(json_value),pointer            :: p
 
     integer :: i
+    
+    nullify(p)
 
     if (.not. exception_thrown) then
 
         if (associated(this)) then
 
-            nullify(p)
-
             if (this%data%var_type==json_object) then
                 do i=1, json_value_count(this)
-                    call json_value_get(this, i, p)
+                    call json_value_get_child(this, i, p)
                     if (allocated(p%name)) then
                         if (p%name == name) return
                     end if
@@ -2203,6 +2215,8 @@
             end if
 
             !did not find anything:
+            call throw_exception('Error in json_value_get_by_name_chars: '//&
+                                 'child variable '//trim(name)//' was not found.')
             nullify(p)
 
         else
@@ -2392,12 +2406,12 @@
                 do i = 1, count
 
                     ! get the element
-                    call json_value_get(this, i, element)
+                    call json_value_get_child(this, i, element)
 
                     ! print the name
                     if (allocated(element%name)) then
                         call write_it(repeat(space, spaces)//'"'//&
-                                      trim(element % name)//'": ',advance=.false.)
+                                      element%name//'": ',advance=.false.)
                     else
                         call throw_exception('Error in json_value_print:'//&
                                              ' element%name not allocated')
@@ -2421,7 +2435,7 @@
                 do i = 1, count
 
                     ! get the element
-                    call json_value_get(this, i, element)
+                    call json_value_get_child(this, i, element)
 
                     ! recursive print of the element
                     call json_value_print(element, iunit=iunit, indent=tab + 1, &
@@ -2615,7 +2629,7 @@
                 ! get child member from p
                 if (child_i < i) then
                     nullify(tmp)
-                    call json_value_get(p, path(child_i:i-1), tmp)
+                    call json_value_get_child(p, path(child_i:i-1), tmp)
                     p => tmp
                     nullify(tmp)
                 else
@@ -2642,7 +2656,7 @@
                 ! get child member from p
                 if (child_i < i) then
                     nullify(tmp)
-                    call json_value_get(p, path(child_i:i-1), tmp)
+                    call json_value_get_child(p, path(child_i:i-1), tmp)
                     p => tmp
                     nullify(tmp)
                 else
@@ -2666,7 +2680,7 @@
                 child_i = string_to_integer(path(child_i:i-1))
 
                 nullify(tmp)
-                call json_value_get(p, child_i, tmp)
+                call json_value_get_child(p, child_i, tmp)
                 p => tmp
                 nullify(tmp)
 
@@ -2688,7 +2702,7 @@
             ! grab the last child if present in the path
             if (child_i <= length) then
                 nullify(tmp)
-                call json_value_get(p, path(child_i:i-1), tmp)
+                call json_value_get_child(p, path(child_i:i-1), tmp)
                 p => tmp
                 nullify(tmp)
             end if
@@ -3825,8 +3839,232 @@
     end subroutine parse_value
 !*****************************************************************************************
 
+
+
 !*****************************************************************************************
-!****f* json_module/to_logical
+!****f* json_module/json_create_logical
+!
+!  NAME
+!    json_create_logical
+!
+!  DESCRIPTION
+!    Allocate a json_value pointer and make it a logical variable.
+!    The pointer should not already be allocated.
+!
+!  EXAMPLE
+!    type(json_value),pointer :: p
+!    call json_create(p,'value',.true.)
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!  SOURCE
+
+    subroutine json_create_logical(me,val,name)
+    
+    implicit none
+    
+    type(json_value),pointer      :: me
+    character(len=*),intent(in)   :: name
+    logical,intent(in)            :: val
+    
+    call json_value_create(me)
+    call to_logical(me,val,name)    
+    
+    end subroutine json_create_logical
+!*****************************************************************************************   
+!*****************************************************************************************
+!****f* json_module/json_create_integer
+!
+!  NAME
+!    json_create_integer
+!
+!  DESCRIPTION
+!    Allocate a json_value pointer and make it an integer variable.
+!    The pointer should not already be allocated.
+!
+!  EXAMPLE
+!    type(json_value),pointer :: p
+!    call json_create(p,'value',1)
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!  SOURCE
+
+    subroutine json_create_integer(me,val,name)
+    
+    implicit none
+    
+    type(json_value),pointer      :: me
+    character(len=*),intent(in)   :: name
+    integer,intent(in)            :: val
+    
+    call json_value_create(me)
+    call to_integer(me,val,name)    
+    
+    end subroutine json_create_integer
+!*****************************************************************************************   
+!*****************************************************************************************
+!****f* json_module/json_create_double
+!
+!  NAME
+!    json_create_double
+!
+!  DESCRIPTION
+!    Allocate a json_value pointer and make it a double variable.
+!    The pointer should not already be allocated.
+!
+!  EXAMPLE
+!    type(json_value),pointer :: p
+!    call json_create(p,'value',1.0d0)
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!  SOURCE
+
+    subroutine json_create_double(me,val,name)
+    
+    implicit none
+    
+    type(json_value),pointer      :: me
+    character(len=*),intent(in)   :: name
+    real(wp),intent(in)           :: val
+    
+    call json_value_create(me)
+    call to_double(me,val,name)    
+    
+    end subroutine json_create_double
+!*****************************************************************************************   
+!*****************************************************************************************
+!****f* json_module/json_create_string
+!
+!  NAME
+!    json_create_integer
+!
+!  DESCRIPTION
+!    Allocate a json_value pointer and make it a string variable.
+!    The pointer should not already be allocated.
+!
+!  EXAMPLE
+!    type(json_value),pointer :: p
+!    call json_create(p,'value','hello')
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!  SOURCE
+
+    subroutine json_create_string(me,val,name)
+    
+    implicit none
+    
+    type(json_value),pointer      :: me
+    character(len=*),intent(in)   :: name
+    character(len=*),intent(in)   :: val
+    
+    call json_value_create(me)
+    call to_string(me,val,name)    
+    
+    end subroutine json_create_string
+!*****************************************************************************************   
+!*****************************************************************************************
+!****f* json_module/json_create_null
+!
+!  NAME
+!    json_create_null
+!
+!  DESCRIPTION
+!    Allocate a json_value pointer and make it a null variable.
+!    The pointer should not already be allocated.
+!
+!  EXAMPLE
+!    type(json_value),pointer :: p
+!    call json_create(p,'value')
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!  SOURCE
+
+    subroutine json_create_null(me,name)
+    
+    implicit none
+    
+    type(json_value),pointer      :: me
+    character(len=*),intent(in)   :: name
+    
+    call json_value_create(me)
+    call to_null(me,name)    
+    
+    end subroutine json_create_null
+!*****************************************************************************************   
+!*****************************************************************************************
+!****f* json_module/json_create_object
+!
+!  NAME
+!    json_create_object
+!
+!  DESCRIPTION
+!    Allocate a json_value pointer and make it an object variable.
+!    The pointer should not already be allocated.
+!
+!  EXAMPLE
+!    type(json_value),pointer :: p
+!    call json_create(p,'objectname')
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!  SOURCE
+
+    subroutine json_create_object(me,name)
+    
+    implicit none
+    
+    type(json_value),pointer      :: me
+    character(len=*),intent(in)   :: name
+    
+    call json_value_create(me)
+    call to_object(me,name)    
+    
+    end subroutine json_create_object
+!*****************************************************************************************   
+!*****************************************************************************************
+!****f* json_module/json_create_array
+!
+!  NAME
+!    json_create_array
+!
+!  DESCRIPTION
+!    Allocate a json_value pointer and make it an array variable.
+!    The pointer should not already be allocated.
+!
+!  EXAMPLE
+!    type(json_value),pointer :: p
+!    call json_create(p,'arrayname')
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!  SOURCE
+
+    subroutine json_create_array(me,name)
+    
+    implicit none
+    
+    type(json_value),pointer      :: me
+    character(len=*),intent(in)   :: name
+    
+    call json_value_create(me)
+    call to_array(me,name)    
+    
+    end subroutine json_create_array
+!*****************************************************************************************   
+
+!*****************************************************************************************
+!****if* json_module/to_logical
 !
 !  NAME
 !    to_logical
@@ -3866,7 +4104,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/to_integer
+!****if* json_module/to_integer
 !
 !  NAME
 !    to_integer
@@ -3906,7 +4144,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/to_double
+!****if* json_module/to_double
 !
 !  NAME
 !    to_double
@@ -3946,7 +4184,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/to_string
+!****if* json_module/to_string
 !
 !  NAME
 !    to_string
@@ -3985,7 +4223,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/to_null
+!****if* json_module/to_null
 !
 !  NAME
 !    to_null
@@ -4018,7 +4256,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/to_object
+!****if* json_module/to_object
 !
 !  NAME
 !    to_object
@@ -4052,7 +4290,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/to_array
+!****if* json_module/to_array
 !
 !  NAME
 !    to_array

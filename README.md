@@ -105,19 +105,17 @@ of pointers.  See the json_example.f90 file for more examples.
 
         use json_module
 
-        type(json_value),pointer    :: p, inp
+        type(json_value),pointer :: p, inp
         logical :: found
 
         ! initialize the module
         call json_initialize()
 
         ! initialize the structure:
-        call json_value_create(p)
-        call to_object(p)
+        call json_create_object(p)
 
         ! add an "inputs" object to the structure:
-        call json_value_create(inp)
-        call to_object(inp,'inputs')
+        call json_create_object(inp,'inputs')
         call json_value_add(p, inp) !add it to the root
 
         ! add some data to inputs:

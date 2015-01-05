@@ -39,6 +39,8 @@ else
 	
 	FCOMPILER='gnu'
 	FCOMPILERFLAGS='-c -O2 -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008'
+	#FCOMPILERFLAGS='-c -O2 -fbacktrace -fall-intrinsics -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008'
+	
 fi
 
 #build the stand-alone library:
