@@ -3608,7 +3608,7 @@
     character(len=10) :: line_str, char_str
     logical :: is_open
 
-    !clean any exceptions and initialize:
+    !clear any exceptions and initialize:
     call json_initialize()
 
     if (present(unit)) then
@@ -3684,6 +3684,7 @@
     else
 
         call throw_exception('Error in json_parse: Error opening file: '//trim(file))
+        nullify(p)
 
     end if
 
@@ -3953,7 +3954,7 @@
 !****f* json_module/json_create_string
 !
 !  NAME
-!    json_create_integer
+!    json_create_string
 !
 !  DESCRIPTION
 !    Allocate a json_value pointer and make it a string variable.
