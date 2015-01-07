@@ -16,8 +16,7 @@
 !        -The code has been extensively modified and combined into this 
 !            one module (json_module.f90).
 !        -Some Fortran 2003/2008 features are now used 
-!            (e.g., allocatable strings, associate, newunit, generic, class, 
-!            and abstract interface)
+!            (e.g., allocatable strings, newunit, generic, class, abstract interface)
 !    -The headers in this file follow the ROBODoc conventions.
 !            Compile with: robodoc --src ./ --doc ./doc --multidoc --html 
 !                                  --tabsize 4 --ignore_case_when_linking 
@@ -128,10 +127,10 @@
     integer,parameter,public :: json_string    = 7
 
     !*********************************************************
-    !****ic* json_module/json_data_non_polymorphic
+    !****ic* json_module/json_data
     !
     !  NAME
-    !    json_data_non_polymorphic
+    !    json_data
     !
     !  DESCRIPTION
     !    The data in a json_value class
@@ -141,9 +140,14 @@
     !    class.  That was removed because of a bug in the Intel
     !    compiler.  
     !
+    !  SEE ALSO
+    !    destroy_json_data
+    !
     !  SOURCE
     
-        type :: json_data_non_polymorphic
+        type :: json_data
+        
+            sequence  !required since json_value has it
 
             integer :: var_type = json_unknown
 
@@ -152,11 +156,7 @@
             real(wp),allocatable            :: dbl_value
             character(len=:),allocatable    :: str_value
 
-        contains
-
-            procedure :: destroy => destroy_json_data_non_polymorphic
-
-        end type json_data_non_polymorphic
+        end type json_data
     !*********************************************************
 
     !*********************************************************
@@ -179,12 +179,14 @@
     !  SOURCE
     
         type,public :: json_value
+        
+        sequence  !force the constituents to be stored contiguously
 
         !variable name:
         character(len=:),allocatable :: name
 
         !the data for this variable:
-        type(json_data_non_polymorphic) :: data
+        type(json_data) :: data
         
         !number of children:
         integer,private :: n_children = 0
@@ -492,36 +494,36 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/destroy_json_data_non_polymorphic
+!****if* json_module/destroy_json_data
 !
 !  NAME
-!    destroy_json_data_non_polymorphic
+!    destroy_json_data
 !
 !  USAGE
-!    call me%destroy()
+!    call destroy_json_data(d)
 !
 !  DESCRIPTION
-!    Destroy the nonpolymorphic data type.
+!    Destroy the json_data type.
 !
 !  AUTHOR
 !    Jacob Williams
 !
 !  SOURCE
 
-    subroutine destroy_json_data_non_polymorphic(me)
+    subroutine destroy_json_data(d)
 
     implicit none
 
-    class(json_data_non_polymorphic),intent(inout) :: me
+    type(json_data),intent(inout) :: d
 
-    me%var_type = 0
+    d%var_type = 0
 
-    if (allocated(me%log_value)) deallocate(me%log_value)
-    if (allocated(me%int_value)) deallocate(me%int_value)
-    if (allocated(me%dbl_value)) deallocate(me%dbl_value)
-    if (allocated(me%str_value)) deallocate(me%str_value)
+    if (allocated(d%log_value)) deallocate(d%log_value)
+    if (allocated(d%int_value)) deallocate(d%int_value)
+    if (allocated(d%dbl_value)) deallocate(d%dbl_value)
+    if (allocated(d%str_value)) deallocate(d%str_value)
 
-    end subroutine destroy_json_data_non_polymorphic
+    end subroutine destroy_json_data
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1284,7 +1286,7 @@
 
         if (allocated(this%name)) deallocate(this%name)
 
-        call this%data%destroy()
+        call destroy_json_data(this%data)
 
         if (associated(this%children)) call json_value_destroy(this%children)
         this%n_children = 0
@@ -2406,101 +2408,97 @@
         
         nullify(element)
 
-        !associate (d => this%data)
+        select case (this%data%var_type)
 
-            select case (this%data%var_type)
+        case (json_object)
+            
+            call write_it( repeat(space, spaces)//'{' )
+             
+            count = json_count(this)
+            do i = 1, count
 
-            case (json_object)
-                
-                call write_it( repeat(space, spaces)//'{' )
-                 
-                count = json_count(this)
-                do i = 1, count
+                ! get the element
+                call json_get_child(this, i, element)
 
-                    ! get the element
-                    call json_get_child(this, i, element)
-
-                    ! print the name
-                    if (allocated(element%name)) then
-                        call write_it(repeat(space, spaces)//'"'//&
-                                      element%name//'": ',advance=.false.)
-                    else
-                        call throw_exception('Error in json_value_print:'//&
-                                             ' element%name not allocated')
-                        call cleanup()
-                        return
-                    end if
-
-                    ! recursive print of the element
-                    call json_value_print(element, iunit=iunit, indent=tab + 1, &
-                                          need_comma=i<count, colon=.true., str=str)
-
-                end do
-
-                call write_it( repeat(space, spaces)//'}', comma=print_comma )
-
-            case (json_array)
-
-                call write_it( '[' )
-                count = json_count(this)
-
-                do i = 1, count
-
-                    ! get the element
-                    call json_get_child(this, i, element)
-
-                    ! recursive print of the element
-                    call json_value_print(element, iunit=iunit, indent=tab + 1, &
-                                          need_comma=i<count, str=str)
-
-                end do
-                
-                !indent the closing array character:
-                call write_it( repeat(space, tab * 2)//']', comma=print_comma ) 
-
-            case (json_null)
-
-                call write_it( repeat(space, spaces)//null_str, comma=print_comma )
-
-            case (json_string)
-
-                if (allocated(this%data%str_value)) then
-                    call write_it( repeat(space, spaces)//'"'// &
-                                   trim(this%data%str_value)//'"', comma=print_comma )
+                ! print the name
+                if (allocated(element%name)) then
+                    call write_it(repeat(space, spaces)//'"'//&
+                                  element%name//'": ',advance=.false.)
                 else
                     call throw_exception('Error in json_value_print:'//&
-                                         ' this%value_string not allocated')
+                                         ' element%name not allocated')
                     call cleanup()
                     return
                 end if
 
-            case (json_logical)
+                ! recursive print of the element
+                call json_value_print(element, iunit=iunit, indent=tab + 1, &
+                                      need_comma=i<count, colon=.true., str=str)
 
-                if (this%data%log_value) then
-                    call write_it( repeat(space, spaces)//true_str, comma=print_comma )
-                else
-                    call write_it( repeat(space, spaces)//false_str, comma=print_comma )
-                end if
+            end do
 
-            case (json_integer)
+            call write_it( repeat(space, spaces)//'}', comma=print_comma )
 
-                call integer_to_string(this%data%int_value,tmp)
+        case (json_array)
 
-                call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
+            call write_it( '[' )
+            count = json_count(this)
 
-            case (json_double)
+            do i = 1, count
 
-                call real_to_string(this%data%dbl_value,tmp)
+                ! get the element
+                call json_get_child(this, i, element)
 
-                call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
+                ! recursive print of the element
+                call json_value_print(element, iunit=iunit, indent=tab + 1, &
+                                      need_comma=i<count, str=str)
 
-            case default
+            end do
+            
+            !indent the closing array character:
+            call write_it( repeat(space, tab * 2)//']', comma=print_comma ) 
 
-                call throw_exception('Error in json_value_print: unknown data type')
+        case (json_null)
 
-            end select
+            call write_it( repeat(space, spaces)//null_str, comma=print_comma )
 
-        !end associate
+        case (json_string)
+
+            if (allocated(this%data%str_value)) then
+                call write_it( repeat(space, spaces)//'"'// &
+                               trim(this%data%str_value)//'"', comma=print_comma )
+            else
+                call throw_exception('Error in json_value_print:'//&
+                                     ' this%value_string not allocated')
+                call cleanup()
+                return
+            end if
+
+        case (json_logical)
+
+            if (this%data%log_value) then
+                call write_it( repeat(space, spaces)//true_str, comma=print_comma )
+            else
+                call write_it( repeat(space, spaces)//false_str, comma=print_comma )
+            end if
+
+        case (json_integer)
+
+            call integer_to_string(this%data%int_value,tmp)
+
+            call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
+
+        case (json_double)
+
+            call real_to_string(this%data%dbl_value,tmp)
+
+            call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
+
+        case default
+
+            call throw_exception('Error in json_value_print: unknown data type')
+
+        end select
 
         call cleanup()
 
@@ -2855,24 +2853,22 @@
 
         else
 
-            !associate (d => p%data)
-                select case(p%data%var_type)
-                case (json_integer)
-                    value = p%data%int_value
-                case (json_double)
-                    value = int(p%data%dbl_value)
-                case (json_logical)
-                    if (p%data%log_value) then
-                        value = 1
-                    else
-                        value = 0
-                    end if
-                case default
-                    call throw_exception('Error in get_integer:'//&
-                                         ' Unable to resolve value to integer: '//&
-                                         trim(path))
-                end select
-            !end associate
+            select case(p%data%var_type)
+            case (json_integer)
+                value = p%data%int_value
+            case (json_double)
+                value = int(p%data%dbl_value)
+            case (json_logical)
+                if (p%data%log_value) then
+                    value = 1
+                else
+                    value = 0
+                end if
+            case default
+                call throw_exception('Error in get_integer:'//&
+                                     ' Unable to resolve value to integer: '//&
+                                     trim(path))
+            end select
 
             nullify(p)
 
@@ -2992,24 +2988,22 @@
 
         else
 
-            !associate (d => p%data)
-                select case (p%data%var_type)
-                case (json_integer)
-                    value = p%data%int_value
-                case (json_double)
-                    value = p%data%dbl_value
-                case (json_logical)
-                    if (p%data%log_value) then
-                        value = 1.0_wp
-                    else
-                        value = 0.0_wp
-                    end if
-                case default
-                    call throw_exception('Error in json_get_double:'//&
-                                         ' Unable to resolve value to double: '//&
-                                         trim(path))
-                end select
-            !end associate
+            select case (p%data%var_type)
+            case (json_integer)
+                value = p%data%int_value
+            case (json_double)
+                value = p%data%dbl_value
+            case (json_logical)
+                if (p%data%log_value) then
+                    value = 1.0_wp
+                else
+                    value = 0.0_wp
+                end if
+            case default
+                call throw_exception('Error in json_get_double:'//&
+                                     ' Unable to resolve value to double: '//&
+                                     trim(path))
+            end select
 
             nullify(p)
 
@@ -3129,18 +3123,16 @@
 
         else
 
-            !associate (d => p%data)
-                select case (p%data%var_type)
-                case (json_integer)
-                    value = (p%data%int_value > 0)
-                case (json_logical)
-                    value = p%data % log_value
-                case default
-                    call throw_exception('Error in json_get_logical:'//&
-                                         ' Unable to resolve value to logical: '//&
-                                         trim(path))
-                end select
-            !end associate
+            select case (p%data%var_type)
+            case (json_integer)
+                value = (p%data%int_value > 0)
+            case (json_logical)
+                value = p%data % log_value
+            case default
+                call throw_exception('Error in json_get_logical:'//&
+                                     ' Unable to resolve value to logical: '//&
+                                     trim(path))
+            end select
 
             nullify(p)
 
@@ -3263,147 +3255,146 @@
 
         else
 
-            !associate (d => p%data)
-                select case (p%data%var_type)
-                case (json_string)
-                    if (allocated(p%data%str_value)) then
+            select case (p%data%var_type)
+            
+            case (json_string)
+            
+                if (allocated(p%data%str_value)) then
 
-                        !get the value as is:
-                        s = p%data%str_value
+                    !get the value as is:
+                    s = p%data%str_value
 
-                        ! Now, have to remove the escape characters:
-                        !
-                        ! '\"'        quotation mark
-                        ! '\\'        reverse solidus
-                        ! '\/'        solidus
-                        ! '\b'        backspace
-                        ! '\f'        formfeed
-                        ! '\n'        newline (LF)
-                        ! '\r'        carriage return (CR)
-                        ! '\t'        horizontal tab
-                        ! '\uXXXX'    4 hexadecimal digits
-                        !
+                    ! Now, have to remove the escape characters:
+                    !
+                    ! '\"'        quotation mark
+                    ! '\\'        reverse solidus
+                    ! '\/'        solidus
+                    ! '\b'        backspace
+                    ! '\f'        formfeed
+                    ! '\n'        newline (LF)
+                    ! '\r'        carriage return (CR)
+                    ! '\t'        horizontal tab
+                    ! '\uXXXX'    4 hexadecimal digits
+                    !
 
-                        !initialize:
-                        n = len(s)
-                        j = 1
+                    !initialize:
+                    n = len(s)
+                    j = 1
 
-                        do
+                    do
 
-                            jprev = j                      !initialize
-                            j = index(s(j:n),backslash)    !look for an escape character
+                        jprev = j                      !initialize
+                        j = index(s(j:n),backslash)    !look for an escape character
 
-                            if (j>0) then            !an escape character was found
-                            
-                                !index in full string of the escape character:
-                                j = j + (jprev-1)   
+                        if (j>0) then            !an escape character was found
+                        
+                            !index in full string of the escape character:
+                            j = j + (jprev-1)   
 
-                                if (j<n) then
+                            if (j<n) then
 
-                                    !save the bit before the escape character:
-                                    if (j>1) then
-                                        pre = s( 1 : j-1 )
-                                    else
-                                        pre = ''
-                                    end if
-
-                                    !character after the escape character:
-                                    c = s( j+1 : j+1 )
-
-                                    select case (c)
-                                    case(quotation_mark,backslash,slash,&
-                                         'b','f','n','r','t')
-
-                                        !save the bit after the escape characters:
-                                        if (j+2<n) then
-                                            post = s(j+2:n)
-                                        else
-                                            post = ''
-                                        end if
-
-                                        select case(c)
-                                        case(quotation_mark,backslash,slash)
-                                            !use c as is
-                                        case('b')
-                                            c = bspace
-                                        case('f')
-                                            c = formfeed
-                                        case('n')
-                                            c = newline
-                                        case('r')
-                                            c = carriage_return
-                                        case('t')
-                                            c = horizontal_tab
-                                        end select
-
-                                        s = pre//c//post
-
-                                        n = n-1    !backslash character has been 
-                                                   ! removed from the string
-
-                                    case('u')    !expecting 4 hexadecimal digits after 
-                                                 ! the escape character    [\uXXXX]
-
-                                        !for now, we are just printing them as is
-                                        ![not checking to see if it is a valid hex value]
-
-                                        if (j+5<=n) then
-                                            j=j+4
-                                        else
-                                            call throw_exception(&
-                                                'Error in json_get_string:'//&
-                                                ' Invalid hexadecimal sequence'//&
-                                                ' in string: '//trim(c))
-                                            exit
-                                        end if
-
-                                    case default
-                                        !unknown escape character
-                                        call throw_exception('Error in json_get_string:'//&
-                                                ' unknown escape sequence in string "'//&
-                                                trim(s)//'" ['//backslash//c//']')
-                                        exit
-                                    end select
-
-                                    j=j+1    !go to the next character
-
-                                    if (j>=n) exit    !finished
-
+                                !save the bit before the escape character:
+                                if (j>1) then
+                                    pre = s( 1 : j-1 )
                                 else
-                                    !an escape character is the last character in 
-                                    ! the string [this may not be valid syntax, 
-                                    ! but just keep it]
-                                    exit
+                                    pre = ''
                                 end if
 
+                                !character after the escape character:
+                                c = s( j+1 : j+1 )
+
+                                select case (c)
+                                case(quotation_mark,backslash,slash,&
+                                     'b','f','n','r','t')
+
+                                    !save the bit after the escape characters:
+                                    if (j+2<n) then
+                                        post = s(j+2:n)
+                                    else
+                                        post = ''
+                                    end if
+
+                                    select case(c)
+                                    case(quotation_mark,backslash,slash)
+                                        !use c as is
+                                    case('b')
+                                        c = bspace
+                                    case('f')
+                                        c = formfeed
+                                    case('n')
+                                        c = newline
+                                    case('r')
+                                        c = carriage_return
+                                    case('t')
+                                        c = horizontal_tab
+                                    end select
+
+                                    s = pre//c//post
+
+                                    n = n-1    !backslash character has been 
+                                               ! removed from the string
+
+                                case('u')    !expecting 4 hexadecimal digits after 
+                                             ! the escape character    [\uXXXX]
+
+                                    !for now, we are just printing them as is
+                                    ![not checking to see if it is a valid hex value]
+
+                                    if (j+5<=n) then
+                                        j=j+4
+                                    else
+                                        call throw_exception(&
+                                            'Error in json_get_string:'//&
+                                            ' Invalid hexadecimal sequence'//&
+                                            ' in string: '//trim(c))
+                                        exit
+                                    end if
+
+                                case default
+                                    !unknown escape character
+                                    call throw_exception('Error in json_get_string:'//&
+                                            ' unknown escape sequence in string "'//&
+                                            trim(s)//'" ['//backslash//c//']')
+                                    exit
+                                end select
+
+                                j=j+1    !go to the next character
+
+                                if (j>=n) exit    !finished
+
                             else
-                                exit    !no more escape characters in the string
+                                !an escape character is the last character in 
+                                ! the string [this may not be valid syntax, 
+                                ! but just keep it]
+                                exit
                             end if
 
-                        end do
-
-                        if (exception_thrown) then
-                            if (allocated(value)) deallocate(value)
                         else
-                            value = s
+                            exit    !no more escape characters in the string
                         end if
 
+                    end do
+
+                    if (exception_thrown) then
+                        if (allocated(value)) deallocate(value)
                     else
-                        call throw_exception('Error in json_get_string:'//&
-                                             ' p%data%value not allocated')
+                        value = s
                     end if
 
-                !class default
-                case default
-
+                else
                     call throw_exception('Error in json_get_string:'//&
-                                         ' Unable to resolve value to characters: '//&
-                                         trim(path))
+                                         ' p%data%value not allocated')
+                end if
 
-                    ! Note: for the other cases, we could do val to string conversions.
+            case default
 
-                end select
-            !end associate
+                call throw_exception('Error in json_get_string:'//&
+                                     ' Unable to resolve value to characters: '//&
+                                     trim(path))
+
+                ! Note: for the other cases, we could do val to string conversions.
+
+            end select
 
         end if
 
@@ -3542,21 +3533,19 @@
 
         else
 
-            !associate (d => p%data)
-                select case (p%data%var_type)
-                case (json_array)
-                    count = json_count(p)
-                    element => p%children
-                    do i = 1, count ! callback for each child
-                        call array_callback(element, i, count)
-                        element => element%next
-                    end do
-                case default
-                    call throw_exception('Error in json_get_array:'//&
-                                         ' Resolved value is not an array. '//&
-                                         trim(path))
-                end select
-            !end associate
+            select case (p%data%var_type)
+            case (json_array)
+                count = json_count(p)
+                element => p%children
+                do i = 1, count ! callback for each child
+                    call array_callback(element, i, count)
+                    element => element%next
+                end do
+            case default
+                call throw_exception('Error in json_get_array:'//&
+                                     ' Resolved value is not an array. '//&
+                                     trim(path))
+            end select
 
             !cleanup:
             if (associated(p))       nullify(p)
@@ -3802,16 +3791,12 @@
                 ! string
                 call to_string(value)    !allocate class
 
-                 !associate (d => value%data)
-                    !select type (value%data)
-                    select case (value%data%var_type)
-                    !type is (json_string)
-                    case (json_string)
-                        call parse_string(unit, tmp)  !write to a tmp variable because of
-                        value%data%str_value = tmp    ! a bug in 4.9 gfortran compiler.
-                        deallocate(tmp)
-                    end select
-                !end associate
+                select case (value%data%var_type)
+                case (json_string)
+                    call parse_string(unit, tmp)  !write to a tmp variable because of
+                    value%data%str_value = tmp    ! a bug in 4.9 gfortran compiler.
+                    deallocate(tmp)
+                end select
 
             case (true_str(1:1))
 
@@ -4103,16 +4088,14 @@
     logical,intent(in),optional            :: val
 
     !set type and value:
-    !associate (d => me%data)
-        call me%data%destroy()
-        me%data%var_type = json_logical
-        allocate(me%data%log_value)
-        if (present(val)) then
-            me%data%log_value = val
-        else
-            me%data%log_value = .false.    !default value
-        end if
-    !end associate
+    call destroy_json_data(me%data)
+    me%data%var_type = json_logical
+    allocate(me%data%log_value)
+    if (present(val)) then
+        me%data%log_value = val
+    else
+        me%data%log_value = .false.    !default value
+    end if
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -4143,16 +4126,14 @@
     integer,intent(in),optional            :: val
 
     !set type and value:
-    !associate (d => me%data)
-        call me%data%destroy()
-        me%data%var_type = json_integer
-        allocate(me%data%int_value)
-        if (present(val)) then
-            me%data%int_value = val
-        else
-            me%data%int_value = 0    !default value
-        end if
-    !end associate
+    call destroy_json_data(me%data)
+    me%data%var_type = json_integer
+    allocate(me%data%int_value)
+    if (present(val)) then
+        me%data%int_value = val
+    else
+        me%data%int_value = 0    !default value
+    end if
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -4183,16 +4164,14 @@
     real(wp),intent(in),optional           :: val
 
     !set type and value:
-    !associate (d => me%data)
-        call me%data%destroy()
-        me%data%var_type = json_double
-        allocate(me%data%dbl_value)
-        if (present(val)) then
-            me%data%dbl_value = val
-        else
-            me%data%dbl_value = 0.0_wp    !default value
-        end if
-    !end associate
+    call destroy_json_data(me%data)
+    me%data%var_type = json_double
+    allocate(me%data%dbl_value)
+    if (present(val)) then
+        me%data%dbl_value = val
+    else
+        me%data%dbl_value = 0.0_wp    !default value
+    end if
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -4223,15 +4202,13 @@
     character(len=*),intent(in),optional   :: val
 
     !set type and value:
-    !associate (d => me%data)
-        call me%data%destroy()
-        me%data%var_type = json_string
-        if (present(val)) then
-            me%data%str_value = val
-        else
-            me%data%str_value = ''    !default value
-        end if
-    !end associate
+    call destroy_json_data(me%data)
+    me%data%var_type = json_string
+    if (present(val)) then
+        me%data%str_value = val
+    else
+        me%data%str_value = ''    !default value
+    end if
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -4261,10 +4238,8 @@
     character(len=*),intent(in),optional   :: name
 
     !set type and value:
-    !associate (d => me%data)
-        call me%data%destroy()
-        me%data%var_type = json_null
-    !end associate
+    call destroy_json_data(me%data)
+    me%data%var_type = json_null
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -4295,10 +4270,8 @@
     character(len=*),intent(in),optional   :: name
     
     !set type and value:
-    !associate (d => me%data)
-        call me%data%destroy()
-        me%data%var_type = json_object
-    !end associate
+    call destroy_json_data(me%data)
+    me%data%var_type = json_object
 
     !name:
     if (present(name)) me%name = trim(name)
@@ -4328,10 +4301,8 @@
     character(len=*),intent(in),optional   :: name
 
     !set type and value:
-    !associate (d => me%data)
-        call me%data%destroy()
-        me%data%var_type = json_array
-    !end associate
+    call destroy_json_data(me%data)
+    me%data%var_type = json_array
 
     !name:
     if (present(name)) me%name = trim(name)
