@@ -14,7 +14,7 @@ Building the Library
 
 The code requires a Fortran compiler that supports
 various Fortran 2003 and Fortran 2008 features such as: allocatable
-strings, associate, newunit, generic, class, and abstract interface.
+strings, newunit, generic, class, and abstract interface.
 It has been successfully compiled with the [Intel Fortran compiler
 13.1.0](https://software.intel.com/en-us/non-commercial-software-development) (and greater) and the recent [4.9 release of the GNU gfortran
 compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9).  
@@ -24,7 +24,7 @@ Currently, several ways are provided to build the jsonfortran library
 
 * A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the example program.  Edit the script to use either the Intel compiler or gfortran.
 
-* A Visual Studio 2010 project is included for building the library (and example program) on Windows with the Intel compiler.
+* A Visual Studio 2010 project is included for building the library (and example program) on Windows with the Intel compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
 * An [SCons](http://www.scons.org) `SConstruct` file.  The library and example program are built by typing `scons` and installed by `scons install` or `sudo scons install`. 
 
