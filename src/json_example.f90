@@ -74,11 +74,109 @@
     
     call test_6()  !these are attempting to read invalid json files
 
+    call test_7()  !indent test
+      
     !call memory_leak_test()    
     
     contains
 !*******************************************************************************************************
 
+!**************************************************************
+    subroutine test_7()
+!**************************************************************
+!
+!   Indent test
+!  
+!**************************************************************
+
+    implicit none
+    
+    type(json_value),pointer :: root,a,b,c,d,e,e1,e2
+
+    call json_initialize()
+
+    write(*,'(A)') ''
+    write(*,'(A)') '================================='
+    write(*,'(A)') '   EXAMPLE 7 : indent test'
+    write(*,'(A)') '================================='
+    write(*,'(A)') ''
+    
+!-----------------------
+! jsonlint indention is
+!-----------------------
+!{
+!    "a": {
+!        "ints": [
+!            1,
+!            2,
+!            3
+!        ],
+!        "chars": [
+!            "a",
+!            "b",
+!            "c"
+!        ]
+!    },
+!    "b": {
+!        "c": {
+!            "val1": 1066
+!        }
+!    },
+!    "d": {
+!        "val2": 1815
+!    },
+!    "array": [
+!        {
+!            "int1": 1
+!        },
+!        {
+!            "int1": 1,
+!            "int2": 2
+!        }
+!    ]
+!}
+
+    !create a json structure:
+    call json_create_object(root,'root')    
+    call json_create_object(a,'a')
+        call json_add(a,'ints', [1,2,3])
+    call json_create_object(b,'b')
+        call json_add(a,'chars', ['a','b','c'])
+    call json_create_object(c,'c')
+        call json_add(c,'val1', 1066)
+    call json_create_object(d,'d')
+        call json_add(d,'val2', 1815)
+	
+	call json_create_array(e,'array')   !objects in an array
+    call json_create_object(e1,'')
+        call json_add(e1,'int1', 1)   
+    call json_create_object(e2,'')
+        call json_add(e2,'int1', 1)   
+        call json_add(e2,'int2', 2)   
+    call json_add(e,e1)
+    call json_add(e,e2)
+	
+    call json_add(root,a)
+    call json_add(root,b)
+    call json_add(b,c)
+    call json_add(root,d)
+    call json_add(root,e)
+    
+    nullify(a)  !don't need these anymore
+    nullify(b)
+    nullify(c)
+    nullify(d)
+    nullify(e)
+    nullify(e1)
+    nullify(e2)
+    
+    call json_print(root,6)  !print to the console
+    
+    call json_destroy(root)  !cleanup
+
+!**************************************************************
+    end subroutine test_7
+!**************************************************************
 
 !**************************************************************
     subroutine test_6()

@@ -146,7 +146,10 @@
     character(kind=CK,len=*),parameter :: quotation_mark  = achar(34)
     character(kind=CK,len=*),parameter :: slash           = achar(47)
     character(kind=CK,len=*),parameter :: backslash       = achar(92)
+    
+    integer(IK),parameter :: spaces_per_tab = 2    !for indenting (Note: jsonlint.com uses 4 spaces)
        
+    integer(IK),parameter :: max_numeric_str_len = 32
     character(kind=CK,len=*),parameter :: real_fmt = '(E30.16E3)' !format for real numbers
     character(kind=CK,len=*),parameter :: int_fmt  = '(I10)'      !format for integers
     character(kind=CK,len=*),parameter :: star     = '*'          !for invalid numbers
@@ -681,7 +684,7 @@
         i = output_unit
     end if
 
-    call json_value_print(me%p,iunit=i,str=dummy)
+    call json_value_print(me%p,iunit=i,str=dummy,indent=1,colon=.true.)
 
     end subroutine json_file_print
 !*****************************************************************************************
@@ -2284,7 +2287,7 @@
     character(kind=CK,len=:),intent(out),allocatable :: str
     
     str = ''
-    call json_value_print(me, iunit=0, str=str)
+    call json_value_print(me, iunit=0, str=str, indent=1, colon=.true.)
         
     end subroutine json_value_to_string
 !*****************************************************************************************
@@ -2314,7 +2317,7 @@
     character(kind=CK,len=:),allocatable :: dummy
     
     if (iunit/=0) then
-        call json_value_print(me,iunit,str=dummy)
+        call json_value_print(me,iunit,str=dummy, indent=1, colon=.true.)
     else
         call throw_exception('Error in json_print: iunit must be nonzero.')
     end if
@@ -2350,7 +2353,8 @@
         call json_print(me,iunit)
         close(iunit,iostat=istat)
     else
-        call throw_exception('Error in json_print: could not open file: '//trim(filename))
+        call throw_exception('Error in json_print: could not open file: '//&
+                              trim(filename))
     end if
     
     end subroutine json_print_2
@@ -2372,28 +2376,30 @@
 !
 !  SOURCE
 
-    recursive subroutine json_value_print(this,iunit,indent,need_comma,colon,str)
+    recursive subroutine json_value_print(this,iunit,str,indent,need_comma,colon,is_array_element)
 
     implicit none
 
     type(json_value),pointer,intent(in)  :: this
-    integer(IK),intent(in)               :: iunit     !file unit to write to (6=console)
-    integer(IK),intent(in),optional      :: indent
-    logical(LK),intent(in),optional      :: need_comma
-    logical(LK),intent(in),optional      :: colon
+    integer(IK),intent(in)               :: iunit             !file unit to write to (6=console)
+    integer(IK),intent(in),optional      :: indent            !indention level
+    logical(LK),intent(in),optional      :: is_array_element  !if this is an array element
+    logical(LK),intent(in),optional      :: need_comma        !if it needs a comma after it
+    logical(LK),intent(in),optional      :: colon             !if the colon was just written
     character(kind=CK,len=:),intent(inout),allocatable :: str 
                                                       !if iunit==0, then the structure is 
                                                       ! printed to this string rather than 
                                                       ! a file. This mode is used by 
                                                       ! json_value_to_string.
 
+    character(kind=CK,len=max_numeric_str_len) :: tmp !for val to string conversions
+    character(kind=CK,len=:),allocatable :: s
     type(json_value),pointer :: element
     integer(IK) :: tab, i, count, spaces
-    character(kind=CK,len=32) :: tmp    !for val to string conversions
     logical(LK) :: print_comma
-    logical(LK) :: print_spaces
     logical(LK) :: write_file, write_string
-
+    logical(LK) :: is_array
+        
     if (.not. exception_thrown) then
             
         !whether to write a string or a file (one or the other):
@@ -2407,38 +2413,46 @@
         else
             print_comma = .false.
         end if
-        !if the colon was the last thing written
-        if (present(colon)) then
-            print_spaces = .not. colon
-        else
-            print_spaces = .true.
-        end if
-
+        
+        !number of "tabs" to indent:
         if (present(indent)) then
             tab = indent
         else
             tab = 0
         end if
-
-        if (print_spaces) then
-            spaces = tab * 2
+        !convert to number of spaces:
+        spaces = tab*spaces_per_tab
+        
+        !if this is an element in an array:
+        if (present(is_array_element)) then
+            is_array = is_array_element
         else
-            spaces = 0
+            is_array = .false.
+        end if
+
+        !if the colon was the last thing written
+        if (present(colon)) then
+            s = ''
+        else
+            s = repeat(space, spaces)
         end if
         
-        nullify(element)
-
         select case (this%var_type)
 
         case (json_object)
             
-            call write_it( repeat(space, spaces)//start_object )
-             
+            call write_it( s//start_object )
+            
+			!if an object is in an array, there is an extra tab:
+            if (is_array) then
+                 tab = tab+1
+                 spaces = tab*spaces_per_tab                
+            end if
+            
+            nullify(element)
             count = json_count(this)
+            element => this%children
             do i = 1, count
-
-                ! get the element
-                call json_get_child(this, i, element)
 
                 ! print the name
                 if (allocated(element%name)) then
@@ -2448,106 +2462,105 @@
                 else
                     call throw_exception('Error in json_value_print:'//&
                                          ' element%name not allocated')
-                    call cleanup()
+                    nullify(element)
                     return
                 end if
-
+                
                 ! recursive print of the element
                 call json_value_print(element, iunit=iunit, indent=tab + 1, &
                                       need_comma=i<count, colon=.true., str=str)
-
-            end do
-
-            call write_it( repeat(space, spaces)//end_object, comma=print_comma )
-
-        case (json_array)
-
-            call write_it( start_array )
-            count = json_count(this)
-
-            do i = 1, count
-
-                ! get the element
-                call json_get_child(this, i, element)
-
-                ! recursive print of the element
-                call json_value_print(element, iunit=iunit, indent=tab + 1, &
-                                      need_comma=i<count, str=str)
+                
+                ! get the next child the list:
+                element => element%next
 
             end do
             
-            !indent the closing array character:
-            call write_it( repeat(space, tab * 2)//end_array, comma=print_comma ) 
+            ! [one fewer tab if it isn't an array element]
+            if (.not. is_array) s = repeat(space, max(0,spaces-spaces_per_tab))
+            call write_it( s//end_object, comma=print_comma )
+            nullify(element)
+            
+        case (json_array)
 
+            call write_it( start_array )
+            
+            nullify(element)
+            count = json_count(this)
+            element => this%children
+            do i = 1, count
+                
+                ! recursive print of the element
+                call json_value_print(element, iunit=iunit, indent=tab,&
+                                      need_comma=i<count, is_array_element=.true., str=str)
+
+                ! get the next child the list:
+                element => element%next
+                
+            end do
+            
+            !indent the closing array character:        
+            call write_it( repeat(space, max(0,spaces-spaces_per_tab))//end_array,&
+                           comma=print_comma )
+            nullify(element)
+            
         case (json_null)
 
-            call write_it( repeat(space, spaces)//null_str, comma=print_comma )
-
+            call write_it( s//null_str, comma=print_comma )
+            
         case (json_string)
 
             if (allocated(this%str_value)) then
-                call write_it( repeat(space, spaces)//quotation_mark// &
+                call write_it( s//quotation_mark// &
                                trim(this%str_value)//quotation_mark, comma=print_comma )
             else
                 call throw_exception('Error in json_value_print:'//&
                                      ' this%value_string not allocated')
-                call cleanup()
                 return
             end if
 
         case (json_logical)
 
             if (this%log_value) then
-                call write_it( repeat(space, spaces)//true_str, comma=print_comma )
+                call write_it( s//true_str, comma=print_comma )
             else
-                call write_it( repeat(space, spaces)//false_str, comma=print_comma )
+                call write_it( s//false_str, comma=print_comma )
             end if
 
         case (json_integer)
 
             call integer_to_string(this%int_value,tmp)
 
-            call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
+            call write_it( s//trim(tmp), comma=print_comma )
 
         case (json_double)
 
             call real_to_string(this%dbl_value,tmp)
 
-            call write_it( repeat(space, spaces)//trim(tmp), comma=print_comma )
+            call write_it( s//trim(tmp), comma=print_comma )
 
         case default
 
             call throw_exception('Error in json_value_print: unknown data type')
 
         end select
-
-        call cleanup()
+        
+        !cleanup:
+        if (allocated(s)) deallocate(s)
 
     end if
 
     contains
-
-        !-------------------------------
-        ! cleanup routine
-        !-------------------------------
-        subroutine cleanup()
-        implicit none
-
-        if (associated(element)) nullify(element)
-
-        end subroutine cleanup
-         !-------------------------------
    
-        !-------------------------------
-        ! write the string to the file (or the output string)
-        !-------------------------------
+    !
+    ! write the string to the file (or the output string)
+    !
         subroutine write_it(s,advance,comma)
 
         implicit none
 
-        character(kind=CK,len=*),intent(in) :: s
-        logical(LK),intent(in),optional     :: advance
-        logical(LK),intent(in),optional     :: comma
+        character(kind=CK,len=*),intent(in) :: s        !string to print
+        logical(LK),intent(in),optional     :: advance  !to add line break or not
+        logical(LK),intent(in),optional     :: comma    !print comma after the string
        
         logical(LK) :: add_line_break, add_comma
         character(kind=CK,len=:),allocatable :: s2
@@ -2587,7 +2600,6 @@
         if (allocated(s2)) deallocate(s2)
         
         end subroutine write_it
-        !-------------------------------
 
     end subroutine json_value_print
 !*****************************************************************************************
@@ -4848,7 +4860,7 @@
 
     character(kind=CK,len=1), intent(in) :: c
 
-    character(kind=CK,len=32) :: istr
+    character(kind=CK,len=max_numeric_str_len) :: istr
 
     if (.not. exception_thrown) then
 
