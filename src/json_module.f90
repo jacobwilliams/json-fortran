@@ -2443,7 +2443,7 @@
             
             call write_it( s//start_object )
             
-			!if an object is in an array, there is an extra tab:
+            !if an object is in an array, there is an extra tab:
             if (is_array) then
                  tab = tab+1
                  spaces = tab*spaces_per_tab                
