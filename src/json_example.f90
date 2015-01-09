@@ -146,8 +146,8 @@
         call json_add(c,'val1', 1066)
     call json_create_object(d,'d')
         call json_add(d,'val2', 1815)
-	
-	call json_create_array(e,'array')   !objects in an array
+    
+    call json_create_array(e,'array')   !objects in an array
     call json_create_object(e1,'')
         call json_add(e1,'int1', 1)   
     call json_create_object(e2,'')
@@ -155,7 +155,7 @@
         call json_add(e2,'int2', 2)   
     call json_add(e,e1)
     call json_add(e,e2)
-	
+    
     call json_add(root,a)
     call json_add(root,b)
     call json_add(b,c)
