@@ -277,19 +277,24 @@
                                  json_file_get_double_vec,  &
                                  json_file_get_logical_vec, &
                                  json_file_get_string_vec
- 
-        !scalars:
+                                 
+        generic,public :: update =>  json_file_update_integer,  &
+                                     json_file_update_logical,  &
+                                     json_file_update_real,     &
+                                     json_file_update_string
+
+        !get:
         procedure :: json_file_get_object
-        procedure :: json_file_get_integer
-        procedure :: json_file_get_double
-        procedure :: json_file_get_logical
-        procedure :: json_file_get_string
- 
-        !vectors:
-        procedure :: json_file_get_integer_vec
-        procedure :: json_file_get_double_vec
-        procedure :: json_file_get_logical_vec
-        procedure :: json_file_get_string_vec
+        procedure :: json_file_get_integer, json_file_get_integer_vec
+        procedure :: json_file_get_double,  json_file_get_double_vec
+        procedure :: json_file_get_logical, json_file_get_logical_vec
+        procedure :: json_file_get_string,  json_file_get_string_vec
+        
+        !update:
+        procedure :: json_file_update_integer
+        procedure :: json_file_update_logical
+        procedure :: json_file_update_real
+        procedure :: json_file_update_string
                
     !*********************************************************
         end type json_file
@@ -360,6 +365,10 @@
     !    Note that currently, these only work for scalar variables.
     !    These routines can also change the variable's type (but an error will be 
     !     thrown if the existing variable is not a scalar).
+    !
+    !  NOTES
+    !    It should not be used to change the type of a variable in an array,
+    !     or it will produce an invalid JSON file.
     !
     !  SOURCE
     interface json_update
@@ -1462,6 +1471,134 @@
     if (found) call json_remove(p_var)
      
     end subroutine json_value_remove_if_present
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_file_update_integer
+!
+!  NAME
+!    json_file_update_integer
+!
+!  DESCRIPTION
+!    Given the path string, if the variable is present in the file, 
+!    and is a scalar, then update its value.
+!    If it is not present, then create it and set its value.
+!
+!  SEE ALSO
+!    json_update_integer
+!
+!  AUTHOR
+!    Jacob Williams : 1/10/2015
+!
+!  SOURCE
+
+    subroutine json_file_update_integer(me,name,val,found)
+    implicit none
+    
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: name
+    integer(IK),intent(in)              :: val
+    logical(LK),intent(out)             :: found
+    
+    if (.not. exception_thrown) call json_update(me%p,name,val,found)
+    
+    end subroutine json_file_update_integer
+!*****************************************************************************************
+    
+!*****************************************************************************************
+!****f* json_module/json_file_update_logical
+!
+!  NAME
+!    json_file_update_logical
+!
+!  DESCRIPTION
+!    Given the path string, if the variable is present in the file, 
+!    and is a scalar, then update its value.
+!    If it is not present, then create it and set its value.
+!
+!  SEE ALSO
+!    json_update_logical
+!
+!  AUTHOR
+!    Jacob Williams : 1/10/2015
+!
+!  SOURCE
+
+    subroutine json_file_update_logical(me,name,val,found)
+    implicit none
+    
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: name
+    logical(LK),intent(in)              :: val
+    logical(LK),intent(out)             :: found
+
+    if (.not. exception_thrown) call json_update(me%p,name,val,found)
+
+    end subroutine json_file_update_logical
+!*****************************************************************************************
+    
+!*****************************************************************************************
+!****f* json_module/json_file_update_real
+!
+!  NAME
+!    json_file_update_real
+!
+!  DESCRIPTION
+!    Given the path string, if the variable is present in the file, 
+!    and is a scalar, then update its value.
+!    If it is not present, then create it and set its value.
+!
+!  SEE ALSO
+!    json_update_real
+!
+!  AUTHOR
+!    Jacob Williams : 1/10/2015
+!
+!  SOURCE
+
+    subroutine json_file_update_real(me,name,val,found)
+    implicit none
+    
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: name
+    real(RK),intent(in)                 :: val
+    logical(LK),intent(out)             :: found
+
+    if (.not. exception_thrown) call json_update(me%p,name,val,found)
+
+    end subroutine json_file_update_real
+!*****************************************************************************************
+    
+!*****************************************************************************************
+!****f* json_module/json_file_update_string
+!
+!  NAME
+!    json_file_update_string
+!
+!  DESCRIPTION
+!    Given the path string, if the variable is present in the file, 
+!    and is a scalar, then update its value.
+!    If it is not present, then create it and set its value.
+!
+!  SEE ALSO
+!    json_update_string
+!
+!  AUTHOR
+!    Jacob Williams : 1/10/2015
+!
+!  SOURCE
+
+    subroutine json_file_update_string(me,name,val,found)
+    implicit none
+    
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: val
+    logical(LK),intent(out)             :: found
+
+    if (.not. exception_thrown) call json_update(me%p,name,val,found)
+
+    end subroutine json_file_update_string
 !*****************************************************************************************
 
 !*****************************************************************************************

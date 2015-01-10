@@ -766,6 +766,10 @@
         !call json%get('data(2)', p)
         !call json_update(p,'real',[1.0_wp, 2.0_wp, 3.0_wp],found)   !don't have one like this yet...
         
+        !use the json_file procedure to update a variable:
+        call json%update('version.svn',999,found)
+        if (json_failed()) call print_error_message()
+
         write(*,'(A)') ''
         write(*,'(A)') 'printing the modified structure...'
         call json%print_file()       
