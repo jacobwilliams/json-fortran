@@ -164,28 +164,28 @@ The code above produces the file:
 
 ```Python
 {
-"inputs": {
-"t0": 0.1000000000000000E+000,
-"tf": 0.1100000000000000E+001,
-"x0": 0.9999000000000000E+004,
-"integer_scalar": 787,
-"integer_array": [
+  "inputs": {
+    "t0": 0.1000000000000000E+000,
+    "tf": 0.1100000000000000E+001,
+    "x0": 0.9999000000000000E+004,
+    "integer_scalar": 787,
+    "integer_array": [
       2,
       4,
       99
     ],
-"names": [
+    "names": [
       "aaa",
       "bbb",
       "ccc"
     ],
-"logical_scalar": true,
-"logical_vector": [
+    "logical_scalar": true,
+    "logical_vector": [
       true,
       false,
       true
     ]
-}
+  }
 }
 ```
 
