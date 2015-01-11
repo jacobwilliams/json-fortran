@@ -92,10 +92,32 @@ for more examples.
     end program example1
 ```
 
+Modifying variables in a JSON file
+---------------
+
+After reading a JSON file, if you want to change the values of some of the variables, you can use the ```update``` method.  For the example above:
+
+```fortran
+    ! [found can be used to check if the data was really there]
+    call json%update('version.major',9,found)  !change major version to 9
+    call json%update('version.minor',0,found)  !change minor version to 0
+    call json%update('version.patch',0,found)  !change patch to 0
+```
+
 Writing a JSON file
 ---------------
 
-Writing a json file is slightly more complicated and involves the use
+To print the JSON file (either to a file or the console), the ```print_file``` method can be used.  For the above example:
+
+```fortran
+    call json%print_file()         !prints to the console
+    call json%print_file(iunit)    !prints to the file connnected to iunit
+```
+
+Building a JSON file from scratch
+---------------
+
+Constructing a JSON file element by element is slightly more complicated and involves the use
 of pointers.  See the json_example.f90 file for more examples.
 
 ```fortran
