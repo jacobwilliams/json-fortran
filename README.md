@@ -59,7 +59,7 @@ Reading a JSON file
 ---------------
 
 Reading a JSON file and getting data from it is fairly
-straightforward.  Here is an example.  See the json_example.f90 file
+straightforward using the ```json_file``` class.  Here is an example.  See the json_example.f90 file
 for more examples.  
 
 ```fortran
@@ -118,7 +118,7 @@ Building a JSON file from scratch
 ---------------
 
 Constructing a JSON file element by element is slightly more complicated and involves the use
-of pointers.  See the json_example.f90 file for more examples.
+of ```json_value``` pointers.  See the json_example.f90 file for more examples.
 
 ```fortran
     program example2
