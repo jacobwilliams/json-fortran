@@ -244,7 +244,7 @@
     !    character(len=:),allocatable :: cval
     !    logical :: found
     !    call json%load_file(filename='myfile.json')
-    !    call json%print_file()
+    !    call json%print_file() !print to the console
     !    call json%get('var.i',ival,found)
     !    call json%get('var.r(3)',rval,found)
     !    call json%get('var.c',cval,found)
@@ -263,11 +263,16 @@
         contains
 
         procedure,public :: load_file   => json_file_load
-        procedure,public :: print_file  => json_file_print
         procedure,public :: destroy     => json_file_destroy
         procedure,public :: move        => json_file_move_pointer
         procedure,public :: info        => json_file_variable_info
+        
+        procedure,public :: print_to_string => json_file_print_to_string
 
+        generic,public :: print_file => json_file_print_to_console, &
+                                        json_file_print_1, &
+                                        json_file_print_2
+        
         generic,public :: get => json_file_get_object,      &
                                  json_file_get_integer,     &
                                  json_file_get_double,      &
@@ -285,16 +290,25 @@
 
         !get:
         procedure :: json_file_get_object
-        procedure :: json_file_get_integer, json_file_get_integer_vec
-        procedure :: json_file_get_double,  json_file_get_double_vec
-        procedure :: json_file_get_logical, json_file_get_logical_vec
-        procedure :: json_file_get_string,  json_file_get_string_vec
+        procedure :: json_file_get_integer
+        procedure :: json_file_get_double
+        procedure :: json_file_get_logical
+        procedure :: json_file_get_string
+        procedure :: json_file_get_integer_vec
+        procedure :: json_file_get_double_vec
+        procedure :: json_file_get_logical_vec
+        procedure :: json_file_get_string_vec
         
         !update:
         procedure :: json_file_update_integer
         procedure :: json_file_update_logical
         procedure :: json_file_update_real
         procedure :: json_file_update_string
+        
+        !print_file:
+        procedure :: json_file_print_to_console
+        procedure :: json_file_print_1
+        procedure :: json_file_print_2
                
     !*********************************************************
         end type json_file
@@ -655,13 +669,43 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_print
+!****f* json_module/json_file_print_to_console
 !
 !  NAME
-!    json_file_print
+!    json_file_print_to_console
 !
 !  USAGE
 !    call me%print_file()
+!
+!  DESCRIPTION
+!    Print the JSON file to the console.
+!
+!  AUTHOR
+!    Jacob Williams : 1/11/2015
+!
+!  SOURCE
+
+    subroutine json_file_print_to_console(me)
+
+    implicit none
+
+    class(json_file),intent(inout)  :: me
+
+    character(kind=CK,len=:),allocatable :: dummy
+
+    call json_value_print(me%p,iunit=output_unit,str=dummy,indent=1,colon=.true.)
+
+    end subroutine json_file_print_to_console
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_file_print_1
+!
+!  NAME
+!    json_file_print_1
+!
+!  USAGE
+!    call me%print_file(iunit)
 !
 !  DESCRIPTION
 !    Print the JSON file.
@@ -672,30 +716,107 @@
 !
 !  SOURCE
 
-    subroutine json_file_print(me, iunit)
+    subroutine json_file_print_1(me, iunit)
 
     implicit none
 
     class(json_file),intent(inout)  :: me
-    integer(IK),intent(in),optional :: iunit  !must be non-zero
+    integer(IK),intent(in)          :: iunit  !must be non-zero
 
     integer(IK) :: i
     character(kind=CK,len=:),allocatable :: dummy
 
-    if (present(iunit)) then
-        if (iunit/=0) then
-            i = iunit
-        else
-            call throw_exception('Error in json_file_print: iunit must be nonzero.')
-            return
-        end if
+    if (iunit/=0) then
+        i = iunit
     else
-        i = output_unit
+        call throw_exception('Error in json_file_print_1: iunit must be nonzero.')
+        return
     end if
 
     call json_value_print(me%p,iunit=i,str=dummy,indent=1,colon=.true.)
 
-    end subroutine json_file_print
+    end subroutine json_file_print_1
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_file_print_2
+!
+!  NAME
+!    json_file_print_2
+!
+!  USAGE
+!    call me%print_file(filename)
+!
+!  DESCRIPTION
+!    Print the JSON file.
+!    Input is the filename.  The file is opened, printed, and then closed.
+!
+!  EXAMPLE
+!    type(json_file) :: f
+!    logical :: found
+!    call f%load_file('my_file.json')    !open the original file
+!    call f%update('version',4,found)    !change the value of a variable
+!    call f%print_file('my_file_2.json') !save file as new name
+!
+!  AUTHOR
+!    Jacob Williams : 1/11/2015
+!
+!  SOURCE
+
+    subroutine json_file_print_2(me,filename)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: filename
+
+    integer(IK) :: iunit,istat
+
+    open(newunit=iunit,file=filename,status='REPLACE',iostat=istat)
+    if (istat==0) then
+        call me%print_file(iunit)    !call the other routine
+        close(iunit,iostat=istat)
+    else
+        call throw_exception('Error in json_file_print_2: could not open file: '//&
+                              trim(filename))
+    end if
+    
+    end subroutine json_file_print_2
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_file_print_to_string
+!
+!  NAME
+!    json_file_print_to_string
+!
+!  USAGE
+!    call me%print_to_string(str)
+!
+!  DESCRIPTION
+!    Print the JSON file to a string.
+!
+!  EXAMPLE
+!    type(json_file) :: f
+!    character(kind=CK,len=:),allocatable :: str
+!    call f%load_file('my_file.json')
+!    call f%print_file(str)
+!
+!  AUTHOR
+!    Jacob Williams : 1/11/2015
+!
+!  SOURCE
+
+    subroutine json_file_print_to_string(me,str)
+
+    implicit none
+
+    class(json_file),intent(inout)                   :: me
+    character(kind=CK,len=:),allocatable,intent(out) :: str
+
+    call json_value_to_string(me%p,str)
+    
+    end subroutine json_file_print_to_string
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2578,67 +2699,85 @@
 
         case (json_object)
             
-            call write_it( s//start_object )
-            
-            !if an object is in an array, there is an extra tab:
-            if (is_array) then
-                 tab = tab+1
-                 spaces = tab*spaces_per_tab                
-            end if
-            
-            nullify(element)
             count = json_count(this)
-            element => this%children
-            do i = 1, count
-
-                ! print the name
-                if (allocated(element%name)) then
-                    call write_it(repeat(space, spaces)//quotation_mark//&
-                                  element%name//quotation_mark//colon_char//space,&
-                                  advance=.false.)
-                else
-                    call throw_exception('Error in json_value_print:'//&
-                                         ' element%name not allocated')
-                    nullify(element)
-                    return
+            
+            if (count==0) then    !special case for empty object
+            
+                call write_it( s//start_object//end_object, comma=print_comma )
+           
+            else
+           
+                call write_it( s//start_object )
+                
+                !if an object is in an array, there is an extra tab:
+                if (is_array) then
+                     tab = tab+1
+                     spaces = tab*spaces_per_tab                
                 end if
                 
-                ! recursive print of the element
-                call json_value_print(element, iunit=iunit, indent=tab + 1, &
-                                      need_comma=i<count, colon=.true., str=str)
+                nullify(element)
+                element => this%children
+                do i = 1, count
+    
+                    ! print the name
+                    if (allocated(element%name)) then
+                        call write_it(repeat(space, spaces)//quotation_mark//&
+                                      element%name//quotation_mark//colon_char//space,&
+                                      advance=.false.)
+                    else
+                        call throw_exception('Error in json_value_print:'//&
+                                             ' element%name not allocated')
+                        nullify(element)
+                        return
+                    end if
+                    
+                    ! recursive print of the element
+                    call json_value_print(element, iunit=iunit, indent=tab + 1, &
+                                          need_comma=i<count, colon=.true., str=str)
+                    
+                    ! get the next child the list:
+                    element => element%next
+    
+                end do
                 
-                ! get the next child the list:
-                element => element%next
-
-            end do
+                ! [one fewer tab if it isn't an array element]
+                if (.not. is_array) s = repeat(space, max(0,spaces-spaces_per_tab))
+                call write_it( s//end_object, comma=print_comma )
+                nullify(element)
             
-            ! [one fewer tab if it isn't an array element]
-            if (.not. is_array) s = repeat(space, max(0,spaces-spaces_per_tab))
-            call write_it( s//end_object, comma=print_comma )
-            nullify(element)
+            end if
             
         case (json_array)
 
-            call write_it( start_array )
-            
-            nullify(element)
             count = json_count(this)
-            element => this%children
-            do i = 1, count
-                
-                ! recursive print of the element
-                call json_value_print(element, iunit=iunit, indent=tab,&
-                                      need_comma=i<count, is_array_element=.true., str=str)
-
-                ! get the next child the list:
-                element => element%next
-                
-            end do
             
-            !indent the closing array character:        
-            call write_it( repeat(space, max(0,spaces-spaces_per_tab))//end_array,&
-                           comma=print_comma )
-            nullify(element)
+            if (count==0) then    !special case for empty array
+
+                call write_it( s//start_array//end_array, comma=print_comma )
+                
+            else
+
+                call write_it( start_array )
+                
+                nullify(element)
+                element => this%children
+                do i = 1, count
+                    
+                    ! recursive print of the element
+                    call json_value_print(element, iunit=iunit, indent=tab,&
+                                          need_comma=i<count, is_array_element=.true., str=str)
+    
+                    ! get the next child the list:
+                    element => element%next
+                    
+                end do
+                
+                !indent the closing array character:        
+                call write_it( repeat(space, max(0,spaces-spaces_per_tab))//end_array,&
+                               comma=print_comma )
+                nullify(element)
+            
+            end if
             
         case (json_null)
 
@@ -2747,14 +2886,24 @@
 !  NAME
 !    json_get_by_path
 !
+!  USAGE
+!	call json_get(me,path,p,found)
+!
 !  DESCRIPTION
 !    Returns the json_value pointer given the path string.
 !
 !  NOTES
+!    Path syntax is:
 !     $         root
 !     @         this
 !     .         child object member
 !     [] or ()  child array element
+!
+!  EXAMPLE
+!    type(json_value),pointer :: dat,p
+!    logical :: found
+!    ...
+!    call json_get(dat,'data(2).version',p,found)
 !
 !  SOURCE
 
@@ -4257,8 +4406,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: me
-    character(kind=CK,len=*),intent(in),optional :: name
     logical(LK),intent(in),optional              :: val
+    character(kind=CK,len=*),intent(in),optional :: name
 
     !set type and value:
     call destroy_json_data(me)
@@ -4295,8 +4444,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: me
-    character(kind=CK,len=*),intent(in),optional :: name
     integer(IK),intent(in),optional              :: val
+    character(kind=CK,len=*),intent(in),optional :: name
 
     !set type and value:
     call destroy_json_data(me)
@@ -4333,8 +4482,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: me
-    character(kind=CK,len=*),intent(in),optional :: name
     real(RK),intent(in),optional                 :: val
+    character(kind=CK,len=*),intent(in),optional :: name
 
     !set type and value:
     call destroy_json_data(me)
@@ -4371,8 +4520,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: me
-    character(kind=CK,len=*),intent(in),optional :: name
     character(kind=CK,len=*),intent(in),optional :: val
+    character(kind=CK,len=*),intent(in),optional :: name
 
     !set type and value:
     call destroy_json_data(me)
