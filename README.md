@@ -55,7 +55,7 @@ target_link_libraries ( json_example jsonfortran-static )
 # target_link_libraries ( json_example jsonfortran ) # instead
 ```
 
-Reading a JSON file
+Reading JSON from a file
 ---------------
 
 Reading a JSON file and getting data from it is fairly
@@ -90,6 +90,13 @@ for more examples.
         call json%destroy()
 
     end program example1
+```
+
+Reading JSON from a string
+---------------
+JSON can also be ready directly from a character string like so:
+```fortran 
+    call json%load_from_string('{"name", "Leonidas"}')
 ```
 
 Modifying variables in a JSON file
