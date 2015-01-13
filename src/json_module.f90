@@ -262,7 +262,9 @@
 
         contains
 
-        procedure,public :: load_file   => json_file_load
+        procedure,public :: load_file        => json_file_load
+        procedure,public :: load_from_string => json_file_load_from_string
+        
         procedure,public :: destroy     => json_file_destroy
         procedure,public :: move        => json_file_move_pointer
         procedure,public :: info        => json_file_variable_info
@@ -666,6 +668,36 @@
     call json_parse(file=filename, p=me%p, unit=unit)
 
     end subroutine json_file_load
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****f* json_module/json_file_load_from_string
+!
+!  NAME
+!    json_file_load_from_string
+!
+!  DESCRIPTION
+!    Load the JSON data from a string.
+!
+!  EXAMPLE
+!    type(json_file) :: f
+!    call f%load_from_string('{ "name": "Leonidas" }')
+!
+!  AUTHOR
+!    Jacob Williams : 1/13/2015
+!
+!  SOURCE
+
+    subroutine json_file_load_from_string(me, str)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: str
+
+    call json_parse(str=str, p=me%p)
+
+    end subroutine json_file_load_from_string
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3900,34 +3932,54 @@
 !  DESCRIPTION
 !    Parse the JSON file and populate the json_value tree.
 !
+!    Inputs can be:
+!      file and unit : the specified unit is used to read JSON from file
+!                      [note if unit is already open, then the filename is ignored]
+!      file          : JSON is read from file using internal unit number
+!      str           : JSON data is read from the string instead
+!
+!  EXAMPLE
+!    type(json_value),pointer :: p
+!    call json_parse(file='myfile.json', p=p)
+!  
 !  NOTES
 !    When calling this routine, any exceptions thrown from previous
 !        calls will automatically be cleared.
 !
+!  HISTORY
+!    Jacob Williams : 1/13/2015 : added read from string option.
+!
 !  SOURCE
  
-    subroutine json_parse(file, p, unit)
+    subroutine json_parse(file, p, unit, str)
 
     implicit none
 
-    character(kind=CK,len=*),intent(in) :: file
-    type(json_value),pointer            :: p
-    integer(IK),intent(in),optional     :: unit
+    character(kind=CK,len=*),intent(in),optional :: file  !JSON file name
+    type(json_value),pointer                     :: p     !output structure
+    integer(IK),intent(in),optional              :: unit  !file unit number (/= 0)
+    character(kind=CK,len=*),intent(in),optional :: str   !string with JSON data
 
-    integer(IK) :: iunit, istat
+    integer(IK) :: iunit, istat, i, i_nl_prev, i_nl
     character(kind=CK,len=:),allocatable :: line, arrow_str
     character(kind=CK,len=10) :: line_str, char_str
     logical(LK) :: is_open
+    character(len=:),allocatable :: buffer
 
     !clear any exceptions and initialize:
     call json_initialize()
 
-    if (present(unit)) then
+    if (present(unit) .and. present(file) .and. .not. present(str)) then
         
-        iunit = unit   
+        if (unit==0) then
+            call throw_exception('Error in json_parse: unit number must not be 0.')
+            return      
+        end if
+        
+        iunit = unit 
         
         !check to see if the file is already open
-        ! if it is, then use it, otherwise open the file.
+        ! if it is, then use it, otherwise open the file with the name given.
         inquire(unit=iunit, opened=is_open, iostat=istat)
         if (istat==0 .and. .not. is_open) then
            ! open the file
@@ -3940,7 +3992,7 @@
                     iostat      = istat)
         end if
         
-    else
+    elseif (.not. present(unit) .and. present(file) .and. .not. present(str)) then
     
         ! open the file with a new unit number:
         open (  newunit     = iunit, &
@@ -3951,26 +4003,41 @@
                 position    = 'REWIND', &
                 iostat      = istat)
     
+    elseif (.not. present(unit) .and. .not. present(file) .and. present(str)) then
+    
+        buffer = str
+        iunit = 0    !indicates that json data will be read from buffer
+        istat = 0
+        
+    else
+        call throw_exception('Error in json_parse: Invalid inputs')
+        return
     end if
 
     if (istat==0) then
 
         ! create the value and associate the pointer
         call json_value_create(p)
-
-        !add the file name as the name of the overall structure:
-        p%name = trim(file)
-
+        
+        ! Note: the name of the root json_value doesn't really matter,
+        !  but we'll allocate something here just in case.
+        if (present(file)) then
+            p%name = trim(file)  !use the file name
+        else
+            p%name = ''          !if reading it from the string
+        end if
+        
         ! parse as a value
-        call parse_value(unit = iunit, value = p)
+        call parse_value(unit=iunit, str=buffer, value=p)
+        
+        ! cleanup:
+        if (allocated(buffer)) deallocate(buffer)
 
         !
         !  If there was an error reading the file, then
-        !   can print the line where the error occurred:
+        !   print the line where the error occurred:
         !
         if (exception_thrown) then
-        
-            call get_current_line_from_file(iunit,line)
             
             !the counters for the current line and the last character read:
             call integer_to_string(line_count, line_str)
@@ -3978,7 +4045,29 @@
             
             !draw the arrow string that points to the current character:
             arrow_str = repeat('-',max( 0, char_count - 1) )//'^'
-
+        
+            if (iunit/=0) then
+            
+                call get_current_line_from_file(iunit,line)
+                
+            else
+            
+                !get the current line from the string:
+                ! [this is done by counting the newline characters]
+                i_nl_prev = 0  !index of previous newline character
+                do i=1,line_count
+                    i_nl = index(str(i_nl_prev+1:),newline)
+                    if (i_nl==0) then   !last line - no newline character
+                        i_nl = len(str)+1
+                        exit
+                    end if
+                    i_nl = i_nl + i_nl_prev   !index of current newline character
+                    i_nl_prev = i_nl          !update for next iteration
+                end do
+                line = str(i_nl_prev+1 : i_nl-1)  !extract current line
+                
+            end if
+            
             !create the error message:
             err_message = err_message//newline//&
                            'line: '//trim(adjustl(line_str))//', '//&
@@ -3989,8 +4078,8 @@
                         
         end if
 
-        ! close the file
-        close (iunit, iostat=istat)
+        ! close the file if necessary
+        if (iunit/=0) close(unit=iunit, iostat=istat)
 
     else
 
@@ -4064,12 +4153,13 @@
 !
 !  SOURCE
 
-    recursive subroutine parse_value(unit, value)
+    recursive subroutine parse_value(unit, str, value)
 
     implicit none
 
-    integer(IK),intent(in)   :: unit
-    type(json_value),pointer :: value
+    integer(IK),intent(in)                             :: unit
+    character(kind=CK,len=:),allocatable,intent(inout) :: str  !only used if unit=0
+    type(json_value),pointer                           :: value
 
     logical(LK) :: eof
     character(kind=CK,len=1) :: c
@@ -4084,7 +4174,7 @@
         end if
 
         ! pop the next non whitespace character off the file
-        c = pop_char(unit, eof = eof, skip_ws = .true.)
+        c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
 
         if (eof) then
             return
@@ -4094,13 +4184,13 @@
 
                 ! start object
                 call to_object(value)    !allocate class
-                call parse_object(unit, value)
+                call parse_object(unit, str, value)
 
             case (start_array)
 
                 ! start array
                 call to_array(value)    !allocate class
-                call parse_array(unit, value)
+                call parse_array(unit, str, value)
 
             case (end_array)
 
@@ -4115,7 +4205,7 @@
 
                 select case (value%var_type)
                 case (json_string)
-                    call parse_string(unit, tmp)  !write to a tmp variable because of
+                    call parse_string(unit, str, tmp)  !write to a tmp variable because of
                     value%str_value = tmp    ! a bug in 4.9 gfortran compiler.
                     deallocate(tmp)
                 end select
@@ -4123,27 +4213,27 @@
             case (true_str(1:1))
 
                 !true
-                call parse_for_chars(unit, true_str(2:))
+                call parse_for_chars(unit, str, true_str(2:))
                 !allocate class and set value:
                 if (.not. exception_thrown) call to_logical(value,.true.)    
 
             case (false_str(1:1))
 
                 !false
-                call parse_for_chars(unit, false_str(2:))
+                call parse_for_chars(unit, str, false_str(2:))
                 !allocate class and set value:
                 if (.not. exception_thrown) call to_logical(value,.false.)
 
             case (null_str(1:1))
 
                 !null
-                call parse_for_chars(unit, null_str(2:))
+                call parse_for_chars(unit, str, null_str(2:))
                 if (.not. exception_thrown) call to_null(value)    !allocate class
 
             case('-', '0': '9')
 
                 call push_char(c)
-                call parse_number(unit, value)
+                call parse_number(unit, str, value)
 
             case default
 
@@ -4642,11 +4732,12 @@
 !
 !  SOURCE
 
-    recursive subroutine parse_object(unit, parent)
+    recursive subroutine parse_object(unit, str, parent)
 
     implicit none
 
     integer(IK), intent(in)  :: unit
+    character(kind=CK,len=:),allocatable,intent(inout) :: str
     type(json_value),pointer :: parent
 
     type(json_value),pointer :: pair
@@ -4665,7 +4756,7 @@
         nullify(pair)    !probably not necessary
 
         ! pair name
-        c = pop_char(unit, eof = eof, skip_ws = .true.)
+        c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
         if (eof) then
             call throw_exception('Error in parse_object:'//&
                                  ' Unexpected end of file while parsing start of object.')
@@ -4675,7 +4766,7 @@
             return
         else if (quotation_mark == c) then
             call json_value_create(pair)
-            call parse_string(unit, tmp)   !write to a tmp variable because of
+            call parse_string(unit, str, tmp)   !write to a tmp variable because of
             pair % name = tmp              ! a bug in 4.9 gfortran compiler.
             deallocate(tmp)
             if (exception_thrown) then
@@ -4688,14 +4779,14 @@
         end if
 
         ! pair value
-        c = pop_char(unit, eof = eof, skip_ws = .true.)
+        c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
         if (eof) then
             call throw_exception('Error in parse_object:'//&
                                  ' Unexpected end of file while parsing object member.')
             return
         else if (colon_char == c) then
             ! parse the value
-            call parse_value(unit, pair)
+            call parse_value(unit, str, pair)
             if (exception_thrown) then
                 call json_destroy(pair)
                 return
@@ -4709,14 +4800,14 @@
         end if
 
         ! another possible pair
-        c = pop_char(unit, eof = eof, skip_ws = .true.)
+        c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
         if (eof) then
             call throw_exception('Error in parse_object: '//&
                                  'End of file encountered when parsing an object')            
             return
         else if (delimiter == c) then
             ! read the next member
-            call parse_object(unit = unit, parent = parent)
+            call parse_object(unit = unit, str=str, parent = parent)
         else if (end_object == c) then
             ! end of object
             return
@@ -4741,11 +4832,12 @@
 !
 !  SOURCE
 
-    recursive subroutine parse_array(unit, array)
+    recursive subroutine parse_array(unit, str, array)
 
     implicit none
 
     integer(IK), intent(in)  :: unit
+    character(kind=CK,len=:),allocatable,intent(inout) :: str
     type(json_value),pointer :: array
 
     type(json_value),pointer :: element
@@ -4759,7 +4851,7 @@
         ! try to parse an element value
         nullify(element)
         call json_value_create(element)
-        call parse_value(unit, element)
+        call parse_value(unit, str, element)
         if (exception_thrown) then
             if (associated(element)) call json_destroy(element)
             exit
@@ -4769,7 +4861,7 @@
         if (associated(element)) call json_add(array, element)
 
         ! popped the next character
-        c = pop_char(unit, eof = eof, skip_ws = .true.)
+        c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
 
         if (eof) then
             ! The file ended before array was finished:
@@ -4807,12 +4899,13 @@
 !
 !  SOURCE
 
-    subroutine parse_string(unit, string)
+    subroutine parse_string(unit, str, string)
 
     implicit none
 
-    integer(IK), intent(in)                          :: unit
-    character(kind=CK,len=:),allocatable,intent(out) :: string
+    integer(IK), intent(in)                            :: unit
+    character(kind=CK,len=:),allocatable,intent(inout) :: str
+    character(kind=CK,len=:),allocatable,intent(out)   :: string
 
     logical(LK) :: eof, is_hex, escape
     character(kind=CK,len=1) :: c, last
@@ -4833,7 +4926,7 @@
         do
         
             !get the next character from the file:
-            c = pop_char(unit, eof = eof, skip_ws = .false.)
+            c = pop_char(unit, str=str, eof = eof, skip_ws = .false.)
         
             if (eof) then
             
@@ -4904,12 +4997,13 @@
 !
 !  SOURCE
 
-    subroutine parse_for_chars(unit, chars)
+    subroutine parse_for_chars(unit, str, chars)
 
     implicit none
 
-    integer(IK), intent(in)                :: unit
-    character(kind=CK,len = *), intent(in) :: chars
+    integer(IK), intent(in)                            :: unit
+    character(kind=CK,len=:),allocatable,intent(inout) :: str
+    character(kind=CK,len = *), intent(in)             :: chars
 
     integer(IK) :: i, length
     logical(LK) :: eof
@@ -4920,7 +5014,7 @@
         length = len_trim(chars)
 
         do i = 1, length
-            c = pop_char(unit, eof = eof, skip_ws = .true.)
+            c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
             if (eof) then
                 call throw_exception('Error in parse_for_chars:'//&
                                      ' Unexpected end of file while parsing array.')
@@ -4955,14 +5049,15 @@
 !
 !  SOURCE
 
-    subroutine parse_number(unit, value)
+    subroutine parse_number(unit, str, value)
 
     implicit none
 
-    integer(IK),intent(in)   :: unit
-    type(json_value),pointer :: value
+    integer(IK),intent(in)                             :: unit
+    character(kind=CK,len=:),allocatable,intent(inout) :: str
+    type(json_value),pointer                           :: value
 
-    character(kind=CK,len=:),allocatable :: str
+    character(kind=CK,len=:),allocatable :: tmp
     character(kind=CK,len=1) :: c
     logical(LK) :: eof
     real(RK) :: rval
@@ -4972,7 +5067,7 @@
 
     if (.not. exception_thrown) then
 
-        str = ''
+        tmp = ''
         first = .true.
         is_integer = .true.  !assume it may be an integer, unless otherwise determined
 
@@ -4980,7 +5075,7 @@
         do
 
             !get the next character:
-            c = pop_char(unit, eof = eof, skip_ws = .true.)
+            c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
 
             if (eof) then
                 call throw_exception('Error in parse_number:'//&
@@ -4994,19 +5089,19 @@
                     if (is_integer .and. (.not. first)) is_integer = .false.
 
                     !add it to the string:
-                    str = str // c
+                    tmp = tmp // c
 
                 case('.','E','e')    !can be present in real numbers
 
                     if (is_integer) is_integer = .false.
 
                     !add it to the string:
-                    str = str // c
+                    tmp = tmp // c
 
                 case('0':'9')    !valid characters for numbers
 
                     !add it to the string:
-                    str = str // c
+                    tmp = tmp // c
 
                 case default
 
@@ -5015,10 +5110,10 @@
 
                     !string to value:
                     if (is_integer) then
-                        ival = string_to_integer(str)
+                        ival = string_to_integer(tmp)
                         call to_integer(value,ival)
                     else
-                        rval = string_to_double(str)
+                        rval = string_to_double(tmp)
                         call to_double(value,rval)
                     end if
 
@@ -5032,7 +5127,7 @@
         end do
 
         !cleanup:
-        if (allocated(str)) deallocate(str)
+        if (allocated(tmp)) deallocate(tmp)
 
     end if
 
@@ -5046,7 +5141,7 @@
 !    pop_char
 !
 !  DESCRIPTION
-!    Get the next character from the file.
+!    Get the next character from the file (or string).
 !
 !  NOTES
 !    This routine ignores non-printing ascii characters (iachar<=31) that
@@ -5054,18 +5149,20 @@
 !
 !  SOURCE
 
-    recursive function pop_char(unit, eof, skip_ws) result(popped)
+    recursive function pop_char(unit, str, eof, skip_ws) result(popped)
     
     implicit none
 
-    character(kind=CK,len=1)        :: popped
-    integer(IK),intent(in)          :: unit
-    logical(LK),intent(out)         :: eof
-    logical(LK),intent(in),optional :: skip_ws
+    character(kind=CK,len=1)                           :: popped
+    integer(IK),intent(in)                             :: unit
+    character(kind=CK,len=:),allocatable,intent(inout) :: str  !only used if unit=0
+    logical(LK),intent(out)                            :: eof
+    logical(LK),intent(in),optional                    :: skip_ws
 
     integer(IK) :: ios
     character(kind=CK,len=1) :: c
     logical(LK) :: ignore
+    integer(IK) :: str_len
 
     if (.not. exception_thrown) then
 
@@ -5086,25 +5183,40 @@
 
             else
 
-                read (unit = unit, fmt = '(A)', advance = 'NO', iostat = ios) c
+                if (unit/=0) then    !read from the file
+                    read (unit = unit, fmt = '(A1)', advance = 'NO', iostat = ios) c
+                else    !read from the string
+                    str_len = len(str)   !length of the string
+                    if (str_len>0) then
+                        read (unit = str, fmt = '(A1)', iostat = ios) c
+                        if (str_len>1) then
+                            str = str(2:str_len)  !remove the character that was read
+                        else
+                            str = ''    !that was the last one
+                        end if
+                    else
+                        ios = IOSTAT_END  !end of the string
+                    end if
+                end if
+                
                 char_count = char_count + 1    !character count in the current line
-
-                if (IS_IOSTAT_EOR(ios)) then       !JW : use intrinsic
-
+                                    
+                if (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
+        
                     char_count = 0
                     line_count = line_count + 1
                     cycle
-
-                else if (IS_IOSTAT_END(ios)) then  !JW : use intrinsic
-
+    
+                else if (IS_IOSTAT_END(ios)) then  !end of file
+                  
                     char_count = 0
                     eof = .true.
                     exit
-
+    
                 end if
-
+                    
             end if
-
+            
             if (iachar(c) <= 31) then         !JW : fixed so it will read spaces 
                                               !      in the string (was 32)
 

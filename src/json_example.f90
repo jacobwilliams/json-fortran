@@ -48,7 +48,7 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !*******************************************************************************************************
-    use,intrinsic :: iso_fortran_env, only: wp => real64    !double precision reals  
+    use,intrinsic :: iso_fortran_env, wp => real64    !double precision reals  
 
     use json_module
     
@@ -75,12 +75,78 @@
     call test_6()  !these are attempting to read invalid json files
 
     call test_7()  !indent test
+    
+    call test_8()  !read from string test
       
     !call memory_leak_test()    
     
     contains
 !*******************************************************************************************************
 
+!**************************************************************
+    subroutine test_8()
+!**************************************************************
+!
+!   read a JSON structure from a string
+!  
+!**************************************************************
+
+    implicit none
+    
+    type(json_value),pointer :: p
+    
+    character(len=*),parameter :: str = '{ "label": "foo",'//new_line(' ')//' "value": "bar" }'
+    
+    character(len=*),parameter :: str2 = '{ "label": "foo",'//new_line(' ')//&
+                                         '  "value": "bar",'//new_line(' ')//&
+                                         '  "empty_array": [],'//new_line(' ')//&
+                                         '  "empty_object": {}' //new_line(' ')//&
+                                         '}'
+
+    character(len=*),parameter :: str_invalid = '{ "label": "foo",'//new_line(' ')//' "value : "bar" }'
+
+    call json_initialize()
+
+    write(*,'(A)') ''
+    write(*,'(A)') '================================='
+    write(*,'(A)') '   EXAMPLE 8 : read JSON from string'
+    write(*,'(A)') '================================='
+    write(*,'(A)') ''
+        
+    write(*,'(A)') '**************'
+    write(*,'(A)') ' Valid test 1:'
+    write(*,'(A)') '**************'
+    write(*,'(A)') ''
+    call json_parse(str=str, p=p)   ! read it from str
+    call json_print(p,OUTPUT_UNIT)  ! print to console    
+    call json_destroy(p)            ! cleanup
+    if (json_failed()) call print_error_message()
+    write(*,'(A)') ''
+
+    write(*,'(A)') '**************'
+    write(*,'(A)') ' Valid test 2:'
+    write(*,'(A)') '**************'
+    write(*,'(A)') ''
+    call json_parse(str=str2, p=p)   ! read it from str
+    call json_print(p,OUTPUT_UNIT)  ! print to console    
+    call json_destroy(p)            ! cleanup
+    if (json_failed()) call print_error_message()
+    write(*,'(A)') ''
+    
+    write(*,'(A)') '**************'
+    write(*,'(A)') ' Invalid test:'
+    write(*,'(A)') '**************'
+    write(*,'(A)') ''
+    call json_parse(str=str_invalid, p=p)   ! read it from str
+    call json_print(p,OUTPUT_UNIT)  ! print to console    
+    call json_destroy(p)            ! cleanup
+    if (json_failed()) call print_error_message()    
+    write(*,'(A)') ''
+       
+!**************************************************************
+    end subroutine test_8
+!**************************************************************
+    
 !**************************************************************
     subroutine test_7()
 !**************************************************************
@@ -171,8 +237,10 @@
     nullify(e2)
     
     call json_print(root,6)  !print to the console
-    
+        
     call json_destroy(root)  !cleanup
+
+    if (json_failed()) call print_error_message()
 
 !**************************************************************
     end subroutine test_7
