@@ -94,7 +94,7 @@ for more examples.
 
 Reading JSON from a string
 ---------------
-JSON can also be ready directly from a character string like so:
+JSON can also be read directly from a character string like so:
 ```fortran 
     call json%load_from_string('{"name", "Leonidas"}')
 ```
