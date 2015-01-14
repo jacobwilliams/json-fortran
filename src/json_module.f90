@@ -2511,7 +2511,8 @@
 !
 !  NOTES
 !    It is a case-sensitive search, and the name string is not trimmed,
-!    So, for example, 'a ' /= 'A ' /= 'a  '
+!        So, for example, 'a ' /= 'A ' /= 'a  '
+!    Note that the name is not parsed like it is in json_get_by_path.
 !
 !  SOURCE
 
@@ -2523,7 +2524,7 @@
     character(kind=CK,len=*),intent(in) :: name
     type(json_value),pointer            :: p
 
-    integer(IK) :: i
+    integer(IK) :: i,n_children
     
     nullify(p)
 
@@ -2532,11 +2533,13 @@
         if (associated(this)) then
 
             if (this%var_type==json_object) then
-                do i=1, json_count(this)
-                    call json_get_child(this, i, p)
+                n_children = json_count(this)
+                p => this%children    !start with first one
+                do i=1, n_children
                     if (allocated(p%name)) then
                         if (p%name == name) return
                     end if
+                    p => p%next
                 end do
             end if
 
@@ -2924,18 +2927,22 @@
 !  DESCRIPTION
 !    Returns the json_value pointer given the path string.
 !
-!  NOTES
-!    Path syntax is:
-!     $         root
-!     @         this
-!     .         child object member
-!     [] or ()  child array element
-!
 !  EXAMPLE
 !    type(json_value),pointer :: dat,p
 !    logical :: found
 !    ...
 !    call json_get(dat,'data(2).version',p,found)
+!
+!  NOTES
+!    The following special characters are used to denote paths:
+!     $         - root
+!     @         - this
+!     .         - child object member
+!     [] or ()  - child array element
+!
+!    Thus, if any of these characters are present in the name key,
+!        this routine cannot be used to get the value.
+!    In that case, the json_get_child routines would need to be used.
 !
 !  SOURCE
 
