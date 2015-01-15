@@ -5195,12 +5195,13 @@
                 else    !read from the string
                     str_len = len(str)   !length of the string
                     if (str_len>0) then
-                        read (unit = str, fmt = '(A1)', iostat = ios) c
+                        c = str(1:1)
                         if (str_len>1) then
                             str = str(2:str_len)  !remove the character that was read
                         else
                             str = ''    !that was the last one
                         end if
+                        ios = 0
                     else
                         ios = IOSTAT_END  !end of the string
                     end if
