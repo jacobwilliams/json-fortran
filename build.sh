@@ -4,8 +4,8 @@
 #  Build the json-fortran library and example program.
 #
 #  Requires: 
-#    FoBiS.py : https://github.com/szaghi/FoBiS
-#    RoboDoc  : http://rfsber.home.xs4all.nl/Robo/
+#    FoBiS.py : https://github.com/szaghi/FoBiS      [version 1.2.5 or later required]
+#    RoboDoc  : http://rfsber.home.xs4all.nl/Robo/   [version 4.99.38 is the one tested]
 #
 #  Jacob Williams : 12/27/2014
 #
@@ -15,7 +15,8 @@ use_ifort=0
 
 PROJECTNAME='jsonfortran'       # project name for robodoc (example: jsonfortran_2.0.0)
 DOCDIR='./documentation/'       # build directory for documentation
-SRCDIR='./src/'                 # source directory
+SRCDIR='./src/'                 # library source directory
+EXAMPLEDIR='./tests/'           # example source directory
 BINDIR='./bin/'                 # build directory for example
 LIBDIR='./lib/'                 # build directory for library
 MODCODE='json_module.f90'       # json module file name
@@ -46,12 +47,12 @@ fi
 #build the stand-alone library:
 echo ""
 echo "Building library..."
-./FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static
+FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors 
 
-#build the example program:
+#build the example program (uses the above library):
 echo ""
 echo "Building example program..."
-./FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" -dbld ${BINDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${EXAMPLECODE} -o json
+FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" -dbld ${BINDIR} -s ${EXAMPLEDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${EXAMPLECODE} -o json -colors 
 
 #build the documentation with RoboDoc:
 echo ""

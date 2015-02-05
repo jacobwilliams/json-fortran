@@ -31,7 +31,7 @@ env.Library(ar, src,
 
 
 ## this builds the example program and places it in bin/
-env.Program(exe, join('src','json_example.f90'), LIBS=['jsonfortran',], LIBPATH=['lib'])
+env.Program(exe, join('tests','json_example.f90'), LIBS=['jsonfortran',], LIBPATH=['lib'])
 
 env.Requires(exe, mod)
 

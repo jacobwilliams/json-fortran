@@ -43,7 +43,7 @@ set ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 # Collect source files for the library
 #-------------------------------------
 set ( JF_LIB_SRCS  src/json_module.f90  )
-set ( JF_TEST_SRCS src/json_example.f90 )
+set ( JF_TEST_SRCS tests/json_example.f90 )
 
 #-----------------------------------------
 # Collect all the mod files into their own
