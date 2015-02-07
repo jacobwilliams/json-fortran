@@ -9,6 +9,11 @@ Brief Description
 An easy-to-use API for reading and writing JSON files, written in
 modern Fortran.  The source code is a single Fortran module file (json_module.f90).
 
+Download
+--------------------
+
+Download the official versioned releases [here](https://github.com/jacobwilliams/json-fortran/releases).  Or, get the latest development code from the master branch [here](https://github.com/jacobwilliams/json-fortran.git).
+
 Building the Library
 --------------------
 
