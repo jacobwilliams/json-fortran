@@ -1,7 +1,13 @@
-json-fortran
+json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
 ============
 
 A Fortran 2008 JSON API
+
+Status
+------
+[![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
+[![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://waffle.io/jacobwilliams/json-fortran)
+[![In Progress](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=In%20Progress&title=In%20Progress)](https://waffle.io/jacobwilliams/json-fortran)
 
 Brief Description
 ---------------
