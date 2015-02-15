@@ -1,0 +1,25 @@
+language: python
+
+python:
+  - 2.7
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install gfortran-4.9
+  - ln -fs /usr/bin/gfortran-4.9 gfortran
+  - pip install FoBiS.py
+  - wget http://rfsber.home.xs4all.nl/Robo/robodoc-4.99.41.tar.gz
+  - gunzip robodoc-4.99.41.tar.gz
+  - tar -xvf robodoc-4.99.41.tar
+  - cd robodoc-4.99.41
+  - configure
+  - make
+  - make install
+  - cd ../
+  - export PATH=".:$PATH"
+
+before_script:
+  - build.sh
+
+script:
+  - ./bin/json
