@@ -9,7 +9,7 @@ Status
 [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://waffle.io/jacobwilliams/json-fortran)
 [![In Progress](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=In%20Progress&title=In%20Progress)](https://waffle.io/jacobwilliams/json-fortran)
 
-Brief Description
+Brief description
 ---------------
 
 An easy-to-use API for reading and writing JSON files, written in
@@ -20,7 +20,7 @@ Download
 
 Download the official versioned releases [here](https://github.com/jacobwilliams/json-fortran/releases).  Or, get the latest development code from the master branch [here](https://github.com/jacobwilliams/json-fortran.git).
 
-Building the Library
+Building the library
 --------------------
 
 The code requires a Fortran compiler that supports
@@ -217,12 +217,10 @@ License
 
 The json-fortran sourcecode and related files and documentation are distributed under a permissive free software license (BSD-style).  See the [LICENSE](https://raw.githubusercontent.com/jacobwilliams/json-fortran/master/LICENSE) file for more details.
 
-Other Comments
+Miscellaneous
 ---------------
 
-This code is a fork and extensive upgrade of the Fortran 95 [FSON](https://github.com/josephalevin/fson) code.  It
-includes many features that the original code did not have, and fixes many of that code's bugs.
-
-More About JSON
-------------
-For more information about JSON, see: <http://www.json.org/>
+* This code is a fork and extensive upgrade of the Fortran 95 [FSON](https://github.com/josephalevin/fson) code. The reason for the split was to be able to incorporate object-oriented and other nice features of the Fortran 2003 and 2008 standards.  Many thanks to the original authors of FSON.
+* For more information about JSON, see: <http://www.json.org/>
+* [json-fortran on Travis CI](https://travis-ci.org/jacobwilliams/json-fortran)
+* [json-fortran on Waffle.IO](https://waffle.io/jacobwilliams/json-fortran)
