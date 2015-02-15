@@ -527,7 +527,11 @@
     public :: json_remove                !remove from a JSON structure
     public :: json_remove_if_present     !remove from a JSON structure (if it is present)
     public :: json_update                !update a value in a JSON structure
-       
+    
+    !
+    ! Note: the following global variables make this module non thread safe.
+    !
+    
     !exception handling [private variables]
     logical(LK) :: is_verbose = .false.                 !if true, all exceptions are immediately printed to console
     logical(LK) :: exception_thrown = .false.           !the error flag
@@ -537,7 +541,7 @@
     integer(IK) :: char_count = 0    !character position in the current line
     integer(IK) :: line_count = 1    !lines read counter
     integer(IK) :: pushed_index = 0
-    character(kind=CK,len=10) :: pushed_char  !JW : what is this magic number 10??
+    character(kind=CK,len=10) :: pushed_char = ''  !JW : what is this magic number 10??
 
     contains
 !*****************************************************************************************
@@ -2922,7 +2926,7 @@
 !    json_get_by_path
 !
 !  USAGE
-!	call json_get(me,path,p,found)
+!    call json_get(me,path,p,found)
 !
 !  DESCRIPTION
 !    Returns the json_value pointer given the path string.
