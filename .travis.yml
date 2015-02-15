@@ -13,11 +13,11 @@ before_install:
   - gunzip robodoc-4.99.41.tar.gz
   - tar -xvf robodoc-4.99.41.tar
   - cd robodoc-4.99.41
-  - ./configure
+  - ./configure --prefix=$TRAVIS_BUILD_DIR
   - make
-  - sudo make install
-  - export PATH=".:$PATH"
+  - make install
   - cd $TRAVIS_BUILD_DIR
+  - export PATH="$TRAVIS_BUILD_DIR/bin:$PATH"
 
 before_script:
   - build.sh
