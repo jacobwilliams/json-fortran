@@ -34,9 +34,9 @@ compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9).
 Currently, several ways are provided to build the jsonfortran library
 (libjsonfortran). 
 
-* A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the example program.  Edit the script to use either the Intel compiler or gfortran.  Note that version 1.2.5 of FoBiS (or later) is required.
+* A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the example program.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
 
-* A Visual Studio 2010 project is included for building the library (and example program) on Windows with the Intel compiler.  The project has been tested with Visual Studio 2010 and 2013.
+* A [Visual Studio](http://www.visualstudio.com) project is included for building the library (and example program) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
 * An [SCons](http://www.scons.org) `SConstruct` file.  The library and example program are built by typing `scons` and installed by `scons install` or `sudo scons install`. 
 
