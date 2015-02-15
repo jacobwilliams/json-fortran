@@ -95,15 +95,17 @@
     
     type(json_value),pointer :: p
     
-    character(len=*),parameter :: str = '{ "label": "foo",'//new_line(' ')//' "value": "bar" }'
+    character(len=*),parameter :: newline = achar(10)
     
-    character(len=*),parameter :: str2 = '{ "label": "foo",'//new_line(' ')//&
-                                         '  "value": "bar",'//new_line(' ')//&
-                                         '  "empty_array": [],'//new_line(' ')//&
-                                         '  "empty_object": {}' //new_line(' ')//&
+    character(len=*),parameter :: str = '{ "label": "foo",'//newline//' "value": "bar" }'
+    
+    character(len=*),parameter :: str2 = '{ "label": "foo",'//newline//&
+                                         '  "value": "bar",'//newline//&
+                                         '  "empty_array": [],'//newline//&
+                                         '  "empty_object": {}' //newline//&
                                          '}'
 
-    character(len=*),parameter :: str_invalid = '{ "label": "foo",'//new_line(' ')//' "value : "bar" }'
+    character(len=*),parameter :: str_invalid = '{ "label": "foo",'//newline//' "value : "bar" }'
 
     call json_initialize()
 
