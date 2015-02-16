@@ -8,25 +8,26 @@ cache: apt
 # Build matrix: Run the three build systems and tests in parallel
 env:
   global:
-    - DEPENDS="gfortran-4.9"
+    - DEPENDS="gfortran-4.9 binutils"
   matrix:
       # CMake build with unit tests, no documentation
       # Allow to fail for now until tests are fixed
-    - BUILD_SCRIPT="mkdir cmake-build && cd cmake-build && cmake -DSKIP_DOC_GEN:BOOL=TRUE .. && make -j 3 && (make test || true)"
+    - BUILD_SCRIPT="mkdir cmake-build && cd cmake-build && cmake -DENABLE_CODE_COVERAGE:BOOL=TRUE -DSKIP_DOC_GEN:BOOL=TRUE .. && make -j 4 && make test"
       SPECIFIC_DEPENDS="cmake nodejs"
       JLINT="yes"
       DOCS="no"
       FoBiS="no"
 
       # build with build.sh, make documentation, and do sniff test
-    - BUILD_SCRIPT="./build.sh && cd bin && ./json"
+    - BUILD_SCRIPT="./build.sh"
       SPECIFIC_DEPENDS=""
       JLINT="no"
       DOCS="yes"
       FoBiS="yes"
+      CODE_COVERAGE="yes"
 
       # test scons build, no documentation or jsonlint, sniff test
-    - BUILD_SCRIPT="scons && cd bin && ./json"
+    - BUILD_SCRIPT="scons && scons test"
       SPECIFIC_DEPENDS=""
       JLINT="no"
       DOCS="no"
@@ -43,7 +44,7 @@ install:
   - sudo apt-get install -y $SPECIFIC_DEPENDS $DEPENDS
   - if [[ $JLINT == [yY]* ]]; then sudo npm install -g jsonlint; fi
   - sudo ln -fs /usr/bin/gfortran-4.9 /usr/bin/gfortran && gfortran --version
-  - if [[ $FoBiS == [yY]* ]]; then sudo -H pip install FoBiS.py && FoBiS.py --version; fi
+  - if [[ $FoBiS == [yY]* ]]; then sudo -H pip install FoBiS.py==1.5.5 && FoBiS.py --version; fi
   - if [[ $DOCS == [yY]* ]]; then sudo dpkg -i robodoc_4.99.41-1_amd64.deb && robodoc --version; fi
 
 script:
