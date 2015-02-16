@@ -33,7 +33,7 @@
 !      list of conditions and the following disclaimer in the documentation and/or
 !      other materials provided with the distribution.
 !
-!    * The names of its contributors may not be used to endorse or promote products 
+!    * The names of its contributors may not be used to endorse or promote products
 !      derived from this software without specific prior written permission.
 !
 !    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -48,19 +48,19 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !*******************************************************************************************************
-    use,intrinsic :: iso_fortran_env, wp => real64    !double precision reals  
+    use,intrinsic :: iso_fortran_env, wp => real64    !double precision reals
 
     use json_module
-    
+
     implicit none
-    
+
     character(len=*),parameter :: dir = '../files/'               !working directory
-    
+
     character(len=*),parameter :: filename1 = 'test1.json'        !filenames
     character(len=*),parameter :: filename2 = 'test2.json'        !
     character(len=*),parameter :: filename4 = 'test4.json'        !
     character(len=*),parameter :: filename5 = 'test5.json'        !
-    
+
     !initialize the module:
     !call json_initialize(verbose=.true.)
     call json_initialize()
@@ -71,15 +71,15 @@
     call test_3()
     call test_4()
     call test_5()
-    
+
     call test_6()  !these are attempting to read invalid json files
 
     call test_7()  !indent test
-    
+
     call test_8()  !read from string test
-      
+
     !call memory_leak_test()    
-    
+
     contains
 !*******************************************************************************************************
 
@@ -88,17 +88,17 @@
 !**************************************************************
 !
 !   read a JSON structure from a string
-!  
+!
 !**************************************************************
 
     implicit none
-    
+
     type(json_value),pointer :: p
-    
+
     character(len=*),parameter :: newline = achar(10)
-    
+
     character(len=*),parameter :: str = '{ "label": "foo",'//newline//' "value": "bar" }'
-    
+
     character(len=*),parameter :: str2 = '{ "label": "foo",'//newline//&
                                          '  "value": "bar",'//newline//&
                                          '  "empty_array": [],'//newline//&
@@ -114,13 +114,13 @@
     write(*,'(A)') '   EXAMPLE 8 : read JSON from string'
     write(*,'(A)') '================================='
     write(*,'(A)') ''
-        
+
     write(*,'(A)') '**************'
     write(*,'(A)') ' Valid test 1:'
     write(*,'(A)') '**************'
     write(*,'(A)') ''
     call json_parse(str=str, p=p)   ! read it from str
-    call json_print(p,OUTPUT_UNIT)  ! print to console    
+    call json_print(p,OUTPUT_UNIT)  ! print to console
     call json_destroy(p)            ! cleanup
     if (json_failed()) call print_error_message()
     write(*,'(A)') ''
@@ -130,35 +130,35 @@
     write(*,'(A)') '**************'
     write(*,'(A)') ''
     call json_parse(str=str2, p=p)   ! read it from str
-    call json_print(p,OUTPUT_UNIT)  ! print to console    
+    call json_print(p,OUTPUT_UNIT)  ! print to console
     call json_destroy(p)            ! cleanup
     if (json_failed()) call print_error_message()
     write(*,'(A)') ''
-    
+
     write(*,'(A)') '**************'
     write(*,'(A)') ' Invalid test:'
     write(*,'(A)') '**************'
     write(*,'(A)') ''
     call json_parse(str=str_invalid, p=p)   ! read it from str
-    call json_print(p,OUTPUT_UNIT)  ! print to console    
+    call json_print(p,OUTPUT_UNIT)  ! print to console
     call json_destroy(p)            ! cleanup
-    if (json_failed()) call print_error_message()    
+    if (json_failed()) call print_error_message()
     write(*,'(A)') ''
-       
+
 !**************************************************************
     end subroutine test_8
 !**************************************************************
-    
+
 !**************************************************************
     subroutine test_7()
 !**************************************************************
 !
 !   Indent test
-!  
+!
 !**************************************************************
 
     implicit none
-    
+
     type(json_value),pointer :: root,a,b,c,d,e,e1,e2
 
     call json_initialize()
@@ -168,7 +168,7 @@
     write(*,'(A)') '   EXAMPLE 7 : indent test'
     write(*,'(A)') '================================='
     write(*,'(A)') ''
-    
+
 !-----------------------
 ! jsonlint indention is
 !-----------------------
@@ -205,7 +205,7 @@
 !}
 
     !create a json structure:
-    call json_create_object(root,'root')    
+    call json_create_object(root,'root')
     call json_create_object(a,'a')
         call json_add(a,'ints', [1,2,3])
     call json_create_object(b,'b')
@@ -214,22 +214,22 @@
         call json_add(c,'val1', 1066)
     call json_create_object(d,'d')
         call json_add(d,'val2', 1815)
-    
+
     call json_create_array(e,'array')   !objects in an array
     call json_create_object(e1,'')
-        call json_add(e1,'int1', 1)   
+        call json_add(e1,'int1', 1)
     call json_create_object(e2,'')
-        call json_add(e2,'int1', 1)   
-        call json_add(e2,'int2', 2)   
+        call json_add(e2,'int1', 1)
+        call json_add(e2,'int2', 2)
     call json_add(e,e1)
     call json_add(e,e2)
-    
+
     call json_add(root,a)
     call json_add(root,b)
     call json_add(b,c)
     call json_add(root,d)
     call json_add(root,e)
-    
+
     nullify(a)  !don't need these anymore
     nullify(b)
     nullify(c)
@@ -237,9 +237,9 @@
     nullify(e)
     nullify(e1)
     nullify(e2)
-    
+
     call json_print(root,6)  !print to the console
-        
+
     call json_destroy(root)  !cleanup
 
     if (json_failed()) call print_error_message()
@@ -258,8 +258,8 @@
     implicit none
 
     type(json_file) :: json 
-    integer :: i  
-    
+    integer :: i
+
     character(len=*),dimension(2),parameter :: files = ['invalid.json ',&
                                                         'invalid2.json']
 
@@ -272,7 +272,7 @@
     write(*,'(A)') ''
 
     do i=1,2
-    
+
         ! parse the json file:
         write(*,'(A)') ''
         write(*,'(A)') 'load file: '//trim(files(i))
@@ -285,7 +285,7 @@
         call json%destroy()
 
     end do
-    
+
 !**************************************************************
     end subroutine test_6
 !**************************************************************
@@ -304,7 +304,7 @@
     integer :: vv
     integer,dimension(:),allocatable :: vvv
     real(wp) :: d
-    type(json_file) :: json   
+    type(json_file) :: json
     logical :: found
 
     call json_initialize()
@@ -373,7 +373,7 @@
     write(*,'(A)') '   MEMORY LEAK TEST'
     write(*,'(A)') '================================='
     write(*,'(A)') ''
-    
+
     i = 0
 
     do
@@ -394,7 +394,7 @@
 !**************************************************************
 !
 !    Populate a JSON structure, write it to a file,
-!        then read it.  
+!        then read it.
 !
 !    Also tests the json_value_to_string routine to write
 !     the file to a character string.
@@ -447,7 +447,7 @@
     call json_print_to_string(p, string)
     write(*,'(A)') string
     deallocate(string)  !cleanup
-    
+
     !cleanup:
     call json_destroy(p)
 
@@ -789,7 +789,7 @@
         ! Test of values that aren't there:
         ! Note: when using the "found" output, the exceptions are cleared automatically.
         !
-        
+
         write(*,'(A)') ''
         call json%get('files[10]', cval, found)        !value that isn't there
         if (.not. found) then
@@ -805,46 +805,46 @@
         else
             write(*,'(A)') 'version.blah = ',ival
         end if
-        
+
         write(*,'(A)') ''
         write(*,'(A)') ' Test removing data from the json structure:'
-        
+
         call json%get('files', p)           !in the middle of a list
         call json_remove(p)
         if (json_failed()) call print_error_message()
-       
+
         call json%get('data(1).array', p)   !at the end of a list
         call json_remove(p)
         if (json_failed()) call print_error_message()
-       
+
         call json%get('data(2).number', p)  !at the beginning of a list
         call json_remove(p)
         if (json_failed()) call print_error_message()
-        
+
         write(*,'(A)') ''
         write(*,'(A)') 'printing the modified structure...'
-        call json%print_file()       
+        call json%print_file()
         if (json_failed()) call print_error_message()
 
         write(*,'(A)') ''
         write(*,'(A)') ' Test replacing data from the json structure:'
-        
+
         call json%get('data(1)', p)
         call json_update(p,'name','Cuthbert',found)
         if (json_failed()) call print_error_message()
 
         !call json%get('data(2)', p)
         !call json_update(p,'real',[1.0_wp, 2.0_wp, 3.0_wp],found)   !don't have one like this yet...
-        
+
         !use the json_file procedure to update a variable:
         call json%update('version.svn',999,found)
         if (json_failed()) call print_error_message()
 
         write(*,'(A)') ''
         write(*,'(A)') 'printing the modified structure...'
-        call json%print_file()       
+        call json%print_file()
         if (json_failed()) call print_error_message()
-        
+
     end if
 
     ! clean up
@@ -865,7 +865,7 @@
 
     character(len=:),allocatable :: error_msg
     logical :: status_ok
-    
+
     !get error message:
     call json_check_for_errors(status_ok, error_msg)
 
@@ -879,7 +879,7 @@
 !**************************************************************
     end subroutine print_error_message
 !**************************************************************
-    
+
 !*******************************************************************************************************
     end program json_test
 !*******************************************************************************************************

@@ -14,7 +14,7 @@ if ( NOT Fortran_FLAGS_INIT )
     endif ( ENABLE_BACK_TRACE )
     if ( ENABLE_COMPILE_TIME_WARNINGS )
       # The following warning might be triggered by ifort unless explicitly silenced:
-      # warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure 
+      # warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure
       # name. (R1214.4). In the context of F2008 this is an erroneous warning.
       # See https://prd1idz.cps.intel.com/en-us/forums/topic/486629
       add_compile_options ( -warn -stand f08 -diag-disable 7601 )

@@ -29,10 +29,10 @@ various Fortran 2003 and Fortran 2008 features such as: allocatable
 strings, newunit, generic, class, and abstract interface.
 It has been successfully compiled with the [Intel Fortran compiler
 13.1.0](https://software.intel.com/en-us/non-commercial-software-development) (and greater) and the recent [4.9 release of the GNU gfortran
-compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9).  
+compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9).
 
 Currently, several ways are provided to build the jsonfortran library
-(libjsonfortran). 
+(libjsonfortran).
 
 * A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the example program.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
 
@@ -72,7 +72,7 @@ Reading JSON from a file
 
 Reading a JSON file and getting data from it is fairly
 straightforward using the ```json_file``` class.  Here is an example.  See the json_example.f90 file
-for more examples.  
+for more examples.
 
 ```fortran
     program example1
@@ -107,7 +107,7 @@ for more examples.
 Reading JSON from a string
 ---------------
 JSON can also be read directly from a character string like so:
-```fortran 
+```fortran
     call json%load_from_string('{"name", "Leonidas"}')
 ```
 
@@ -141,7 +141,7 @@ of ```json_value``` pointers.  See the json_example.f90 file for more examples.
 
 ```fortran
     program example2
-    
+
         use,intrinsic :: iso_fortran_env, only: wp => real64 
 
         use json_module

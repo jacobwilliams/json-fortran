@@ -56,12 +56,12 @@ if find_executable('robodoc'):
     docfiles = [join('documentation','json_example_f90.html'), 
                 join('documentation','json_module_f90.html'),
                 join('documentation','masterindex.html'),
-                join('documentation','robo_classes.html'),   
+                join('documentation','robo_classes.html'),
                 join('documentation','robo_functions.html'),
                 join('documentation','robo_modules.html'),
                 join('documentation','robo_sourcefiles.html'),
                 join('documentation','robo_unittests.html'),
-                join('documentation','robodoc.css'), 
+                join('documentation','robodoc.css'),
                 join('documentation','toc_index.html'), ]
 
     bld = Builder(action='robodoc --rc robodoc.rc --src src/ --doc documentation/ --multidoc --html'+
