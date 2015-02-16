@@ -87,7 +87,7 @@ endif ( ENABLE_DYLIBS_USE_RPATH )
 #---------------------------------------------
 # Build a shared and static library by default
 #---------------------------------------------
-  
+
 set ( LIB_NAME ${CMAKE_PROJECT_NAME} )
 add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
 add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
@@ -101,7 +101,7 @@ set_target_properties ( ${LIB_NAME}
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
   PREFIX lib
-  SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR} 
+  SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR}
   VERSION ${VERSION}
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 
@@ -133,7 +133,7 @@ if ( NOT ROBODOC_SKIP_DOC_GEN )
       --documenttitle "${CMAKE_PROJECT_NAME}" )
     # Dynamically generate the ROBODoc outputs list
     message ( STATUS "Dynamically computing ROBODoc output information..." )
-    execute_process ( COMMAND ${CMAKE_COMMAND} -E remove_directory ${DOC_DIR} 
+    execute_process ( COMMAND ${CMAKE_COMMAND} -E remove_directory ${DOC_DIR}
       COMMAND ${CMAKE_COMMAND} -E make_directory ${DOC_DIR}
       COMMAND "${ROBODOC}" ${REQUIRED_ROBODOC_OPTIONS} ${ROBODOC_OPTIONS} )
     file ( GLOB_RECURSE ROBODOC_OUTPUTS
@@ -333,7 +333,7 @@ install ( FILES
 export ( TARGETS ${LIB_NAME} ${LIB_NAME}-static FILE ${PACKAGE_NAME}-targets.cmake )
 
 # build tree package config file, NOT installed
-configure_file ( 
+configure_file (
   "${CMAKE_SOURCE_DIR}/cmake/${CMAKE_PROJECT_NAME}-config.cmake.in"
   "${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config.cmake"
   @ONLY )

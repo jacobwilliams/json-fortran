@@ -1,4 +1,4 @@
-option ( ENABLE_IN_SOURCE_BUILDS 
+option ( ENABLE_IN_SOURCE_BUILDS
   "Allow in source builds? Do so at your own risk, only if you know what you are doing. We STRONGLY advise against in source builds."
   OFF )
 mark_as_advanced ( ENABLE_IN_SOURCE_BUILDS )

@@ -3,7 +3,7 @@
 #
 #  Build the json-fortran library and example program.
 #
-#  Requires: 
+#  Requires:
 #    FoBiS.py : https://github.com/szaghi/FoBiS      [version 1.2.5 or later required]
 #    RoboDoc  : http://rfsber.home.xs4all.nl/Robo/   [version 4.99.38 is the one tested]
 #
@@ -26,33 +26,33 @@ LIBOUT='libjsonfortran.a'       # name of json library
 if [ $use_ifort -eq 1 ]
 then
 	# Intel compiler
-	
+
 	FCOMPILER='Intel'
 	# The following warning might be triggered by ifort unless explicitly silenced:
 	# warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure name. (R1214.4).
 	# In the context of F2008 this is an erroneous warning.
 	# See https://prd1idz.cps.intel.com/en-us/forums/topic/486629
 	FCOMPILERFLAGS= '-c -O2 -warn -stand f08 -diag-disable 7601 -traceback'
-	#FCOMPILERFLAGS='-c -O2 -warn -traceback -stand f08 -assume protect_parens -assume buffered_io -check all'	
+	#FCOMPILERFLAGS='-c -O2 -warn -traceback -stand f08 -assume protect_parens -assume buffered_io -check all'
 
 else
 	# GFortran (must be >= 4.9)
-	
+
 	FCOMPILER='gnu'
 	FCOMPILERFLAGS='-c -O2 -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008'
 	#FCOMPILERFLAGS='-c -O2 -fbacktrace -fall-intrinsics -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008'
-	
+
 fi
 
 #build the stand-alone library:
 echo ""
 echo "Building library..."
-FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors 
+FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
 
 #build the example program (uses the above library):
 echo ""
 echo "Building example program..."
-FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" -dbld ${BINDIR} -s ${EXAMPLEDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${EXAMPLECODE} -o json -colors 
+FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" -dbld ${BINDIR} -s ${EXAMPLEDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${EXAMPLECODE} -o json -colors
 
 #build the documentation with RoboDoc:
 echo ""
