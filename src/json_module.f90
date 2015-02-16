@@ -698,9 +698,9 @@
 
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: str
-
+    
     call json_parse(str=str, p=me%p)
-
+    
     end subroutine json_file_load_from_string
 !*****************************************************************************************
 
@@ -3979,7 +3979,7 @@
 
     !clear any exceptions and initialize:
     call json_initialize()
-
+    
     if (present(unit) .and. present(file) .and. .not. present(str)) then
         
         if (unit==0) then
@@ -4217,8 +4217,8 @@
                 select case (value%var_type)
                 case (json_string)
                     call parse_string(unit, str, tmp)  !write to a tmp variable because of
-                    value%str_value = tmp    ! a bug in 4.9 gfortran compiler.
-                    deallocate(tmp)
+                    value%str_value = tmp              ! a bug in 4.9 gfortran compiler.
+                    deallocate(tmp)                    !
                 end select
 
             case (true_str(1:1))
@@ -4778,7 +4778,7 @@
         else if (quotation_mark == c) then
             call json_value_create(pair)
             call parse_string(unit, str, tmp)   !write to a tmp variable because of
-            pair % name = tmp              ! a bug in 4.9 gfortran compiler.
+            pair % name = tmp                   ! a bug in 4.9 gfortran compiler.
             deallocate(tmp)
             if (exception_thrown) then
                 call json_destroy(pair)
@@ -4810,8 +4810,8 @@
             return
         end if
 
-        ! another possible pair
-        c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+       ! another possible pair
+       c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
         if (eof) then
             call throw_exception('Error in parse_object: '//&
                                  'End of file encountered when parsing an object')            
@@ -4938,7 +4938,7 @@
         
             !get the next character from the file:
             c = pop_char(unit, str=str, eof = eof, skip_ws = .false.)
-        
+      
             if (eof) then
             
                 call throw_exception('Error in parse_string: Expecting end of string')
@@ -5174,6 +5174,7 @@
     character(kind=CK,len=1) :: c
     logical(LK) :: ignore
     integer(IK) :: str_len
+    character(kind=CK,len=:),allocatable :: tmp  !workaround for bug in gfortran 4.9.2 compiler
 
     if (.not. exception_thrown) then
 
@@ -5197,14 +5198,17 @@
                 if (unit/=0) then    !read from the file
                     read (unit = unit, fmt = '(A1)', advance = 'NO', iostat = ios) c
                 else    !read from the string
-                    str_len = len(str)   !length of the string
+                    tmp = str   !!! copy to a temp variable to workaround a bug in gfortran 4.9.2
+                    str_len = len(tmp)   !length of the string
                     if (str_len>0) then
-                        c = str(1:1)
+                        c = tmp(1:1)
                         if (str_len>1) then
-                            str = str(2:str_len)  !remove the character that was read
+                            tmp = tmp(2:str_len)  !remove the character that was read
                         else
-                            str = ''    !that was the last one
+                            tmp = ''    !that was the last one
                         end if
+                        str = tmp
+                        deallocate(tmp)   !!!
                         ios = 0
                     else
                         ios = IOSTAT_END  !end of the string
