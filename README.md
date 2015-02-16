@@ -5,7 +5,7 @@ A Fortran 2008 JSON API
 
 Status
 ------
-[![Build Status](https://travis-ci.org/jacobwilliams/json-fortran.svg?branch=master)](https://travis-ci.org/jacobwilliams/json-fortran)
+[![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/#contributing-)
 [![In Progress](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=In%20Progress&title=In%20Progress)](https://waffle.io/jacobwilliams/json-fortran)
@@ -17,7 +17,7 @@ Brief description
 An easy-to-use API for reading and writing JSON files, written in
 modern Fortran.  The source code is a single Fortran module file ([json_module.f90](https://github.com/jacobwilliams/json-fortran/blob/master/src/json_module.f90)).
 
-Download
+Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
 --------------------
 
 Download the official versioned releases [here](https://github.com/jacobwilliams/json-fortran/releases).  Or, get the latest development code from the master branch [here](https://github.com/jacobwilliams/json-fortran.git).
@@ -131,7 +131,7 @@ To print the JSON file (either to a file or the console), the ```print_file``` m
 
 ```fortran
     call json%print_file()         !prints to the console
-    call json%print_file(iunit)    !prints to the file connnected to iunit
+    call json%print_file(iunit)    !prints to the file connected to iunit
 ```
 
 Building a JSON file from scratch
