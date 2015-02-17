@@ -103,7 +103,8 @@ set_target_properties ( ${LIB_NAME}
   PREFIX lib
   SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR}
   VERSION ${VERSION}
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+  Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR} )
 
 #--------------------------
 # Build the test executable
