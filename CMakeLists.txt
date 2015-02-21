@@ -162,8 +162,10 @@ enable_testing()
 find_program ( JSONLINT jsonlint )
 find_program ( DIFF     diff )
 set ( DATA_DIR ${CMAKE_BINARY_DIR}/files )
-configure_file ( ${CMAKE_SOURCE_DIR}/files/test1.json ${DATA_DIR}/test1.json COPYONLY )
-configure_file ( ${CMAKE_SOURCE_DIR}/files/test5.json ${DATA_DIR}/test5.json COPYONLY )
+configure_file ( ${CMAKE_SOURCE_DIR}/files/test1.json    ${DATA_DIR}/test1.json    COPYONLY )
+configure_file ( ${CMAKE_SOURCE_DIR}/files/test5.json    ${DATA_DIR}/test5.json    COPYONLY )
+configure_file ( ${CMAKE_SOURCE_DIR}/files/invalid.json  ${DATA_DIR}/invalid.json  COPYONLY )
+configure_file ( ${CMAKE_SOURCE_DIR}/files/invalid2.json ${DATA_DIR}/invalid2.json COPYONLY )
 
 # Validate input
 if ( JSONLINT )
