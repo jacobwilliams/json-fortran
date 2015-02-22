@@ -9,7 +9,7 @@
 # this software. The contributing author, Izaak Beekman, retains all
 # rights permitted by the terms of the json-fortran license.
 
-cmake_minimum_required ( VERSION 2.8 FATAL_ERROR )
+cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 
 # Set the type/configuration of build to perform
 set ( CMAKE_CONFIGURATION_TYPES "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
