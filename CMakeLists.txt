@@ -9,7 +9,7 @@
 # this software. The contributing author, Izaak Beekman, retains all
 # rights permitted by the terms of the json-fortran license.
 
-cmake_minimum_required ( VERSION 2.8 FATAL_ERROR )
+cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 
 # Set the type/configuration of build to perform
 set ( CMAKE_CONFIGURATION_TYPES "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
@@ -120,9 +120,9 @@ set_target_properties ( test-${CMAKE_PROJECT_NAME} test-${CMAKE_PROJECT_NAME}-st
 #-------------------------------------
 # Build the documentation with ROBODoc
 #-------------------------------------
-set ( ROBODOC_SKIP_DOC_GEN FALSE CACHE BOOL
+set ( SKIP_DOC_GEN FALSE CACHE BOOL
   "Disable building the API documentation with ROBODoc" )
-if ( NOT ROBODOC_SKIP_DOC_GEN )
+if ( NOT SKIP_DOC_GEN )
   find_program ( ROBODOC robodoc )
   if ( ROBODOC ) # Found
     set ( ROBODOC_OPTIONS --rc ${CMAKE_SOURCE_DIR}/robodoc.rc --tabsize 4 --index --toc --sections --syntaxcolors --source_line_numbers
@@ -151,9 +151,9 @@ if ( NOT ROBODOC_SKIP_DOC_GEN )
       DEPENDS ${ROBODOC_OUTPUTS} )
   else ( ROBODOC ) # Not found
     message ( WARNING
-      "ROBODoc not found! Please set the CMake cache variable ROBODOC to point to the installed ROBODoc binary, and reconfigure or disable building the documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/ If you do not wish to install ROBODoc and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOCUMENTATION_GENERATION to FALSE." )
+      "ROBODoc not found! Please set the CMake cache variable ROBODOC to point to the installed ROBODoc binary, and reconfigure or disable building the documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/ If you do not wish to install ROBODoc and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
   endif ( ROBODOC )
-endif ( NOT ROBODOC_SKIP_DOC_GEN )
+endif ( NOT SKIP_DOC_GEN )
 
 #---------------------------------------------------------------------
 # Add some tests to ensure that the software is performing as expected
