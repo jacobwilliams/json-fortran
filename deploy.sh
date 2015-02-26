@@ -34,7 +34,7 @@ if [ ! "$TRAVIS" ]; then #not on travis, try a sane deploy of current branch's d
 else #running under travis
     if $TRAVIS_SECURE_ENV_VARS ; then
 	# only try to update master's development documentation
-	if [ "$TRAVIS_BRANCH" = "master" ] && [ "$(ls -A $TRAVIS_BUILD_DIR/documentation)" ] ; then #not empty
+	if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$(ls -A $TRAVIS_BUILD_DIR/documentation)" ] ; then #not empty
             git clone --branch=gh-pages https://${GH_TOKEN}@github.com/$TRAVIS_REPO_SLUG gh-pages
             cd gh-pages
             [ -e master ] && rm -r master # wipe out docs if they exist
