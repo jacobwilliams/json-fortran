@@ -116,10 +116,10 @@
     !default integer kind [4 bytes]
     integer,parameter :: IK = int32
 
-    !default character kind [1 byte]    
+    !default character kind [1 byte]
     integer,parameter :: CK = character_kinds(1)
 
-    !default logical kind [4 bytes]  
+    !default logical kind [4 bytes]
     !The statement here is to ensure a valid kind
     ! if the compiler doesn't have a logical_kinds(3)
     integer,parameter :: LK = logical_kinds(min(3,size(logical_kinds)))
@@ -149,9 +149,19 @@
 
     integer(IK),parameter :: spaces_per_tab = 2    !for indenting (Note: jsonlint.com uses 4 spaces)
 
-    integer(IK),parameter :: max_numeric_str_len = 32
-    character(kind=CK,len=*),parameter :: real_fmt = '(E30.16E3)' !format for real numbers
-    character(kind=CK,len=*),parameter :: int_fmt  = '(I10)'      !format for integers
+    ! find out the precision of the floating point number system, in io use 4Xprecision
+    integer(IK),parameter :: rp_safety_factor = 1
+    integer(IK),parameter :: rp_addl_safety = 1
+    integer(IK),parameter :: real_precision = rp_safety_factor*precision(1.0_RK) + rp_addl_safety
+    ! Get the number of possible digits in the exponent when using decimal number system
+    integer(IK),parameter :: real_exponent_digits = ceiling( log10( &
+                                  real(max(maxexponent(1.0_RK),abs(minexponent(1.0_RK))),kind=RK) &
+                                  ) )
+    ! 4*precision to prevent rounding errors
+    ! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
+    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6
+    ! real format set by library initialization
+    character(kind=CK,len=*),parameter :: int_fmt  = '(I0)'       !minimum width format for integers
     character(kind=CK,len=*),parameter :: star     = '*'          !for invalid numbers
 
     !*********************************************************
@@ -532,6 +542,7 @@
     ! Note: the following global variables make this module non thread safe.
     !
 
+    character(kind=CK,len=:),allocatable :: real_fmt
     !exception handling [private variables]
     logical(LK) :: is_verbose = .false.                 !if true, all exceptions are immediately printed to console
     logical(LK) :: exception_thrown = .false.           !the error flag
@@ -1234,6 +1245,9 @@
 !  AUTHOR
 !    Jacob Williams : 12/4/2013
 !
+!  MODIFIED
+!    Izaak Beekman : 02/24/2015
+!
 !  SOURCE
 
     subroutine json_initialize(verbose)
@@ -1241,12 +1255,18 @@
     implicit none
 
     logical(LK),intent(in),optional :: verbose  !mainly useful for debugging (default is false)
-
+    character(kind=CK,len=10) :: w,d,e
     !optional input (if not present, value remains unchanged):
     if (present(verbose)) is_verbose = verbose
 
     !clear any errors from previous runs:
     call json_clear_exceptions()
+
+    ! set the output/input format for reals:
+    write(w,'(I0)') max_numeric_str_len
+    write(d,'(I0)') real_precision
+    write(e,'(I0)') real_exponent_digits
+    real_fmt = '(e' // trim(w) // '.' // trim(d) // 'e' // trim(e) // ')'
 
     !Just in case, clear these global variables also:
     pushed_index = 0
@@ -1553,7 +1573,7 @@
 
         if (associated(me%parent)) then
 
-            parent => me%parent                    
+            parent => me%parent
 
             if (associated(me%next)) then
 
@@ -1562,7 +1582,7 @@
                 next => me%next
                 nullify(me%next)
 
-                if (associated(me%previous)) then   
+                if (associated(me%previous)) then
                     !there are earlier items in the list
                     previous => me%previous
                     previous%next => next
@@ -2811,7 +2831,7 @@
 
                 end do
 
-                !indent the closing array character:        
+                !indent the closing array character:
                 call write_it( repeat(space, max(0,spaces-spaces_per_tab))//end_array,&
                                comma=print_comma )
                 nullify(element)
@@ -3696,10 +3716,10 @@
 
                                     s = pre//c//post
 
-                                    n = n-1    !backslash character has been 
+                                    n = n-1    !backslash character has been
                                                ! removed from the string
 
-                                case('u')    !expecting 4 hexadecimal digits after 
+                                case('u')    !expecting 4 hexadecimal digits after
                                              ! the escape character    [\uXXXX]
 
                                     !for now, we are just printing them as is
@@ -3987,7 +4007,7 @@
             return
         end if
 
-        iunit = unit 
+        iunit = unit
 
         !check to see if the file is already open
         ! if it is, then use it, otherwise open the file with the name given.
@@ -4614,6 +4634,9 @@
 !  AUTHOR
 !    Jacob Williams
 !
+!  MODIFIED
+!    Izaak Beekman : 02/24/2015
+!
 !  SOURCE
 
     subroutine to_string(me,val,name)
@@ -5233,7 +5256,7 @@
 
             end if
 
-            if (iachar(c) <= 31) then         !JW : fixed so it will read spaces 
+            if (iachar(c) <= 31) then         !JW : fixed so it will read spaces
                                               !      in the string (was 32)
 
                 ! non printing ascii characters
@@ -5348,12 +5371,62 @@
     real(RK),intent(in)                  :: rval
     character(kind=CK,len=*),intent(out) :: str
 
-    integer(IK) :: istat
+    character(kind=CK,len=len(str)) :: significand, expnt
+    character(kind=CK,len=2) :: separator
+    integer(IK) :: istat, exp_start, decimal_pos, sig_trim, exp_trim, i
 
     write(str,fmt=real_fmt,iostat=istat) rval
 
     if (istat==0) then
         str = adjustl(str)
+        exp_start = scan(str,CK_'eEdD')
+        if (exp_start == 0) exp_start = scan(str,CK_'-+',back=.true.)
+        decimal_pos = scan(str,CK_'.')
+        if (exp_start /= 0) separator = str(exp_start:exp_start)
+        if (exp_start > 0 .and. exp_start < decimal_pos) then !signed, exponent-less float
+            significand = str
+            sig_trim = len(trim(significand))
+            do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
+                                                           !but save one after the decimal place
+                if (significand(i:i) == CK_'0') then
+                    sig_trim = i-1
+                else
+                    exit
+                end if
+            end do
+            str = trim(significand(1:sig_trim))
+        else if (exp_start > decimal_pos) then !float has exponent
+            significand = str(1:exp_start-1)
+            sig_trim = len(trim(significand))
+            do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
+                if (significand(i:i) == CK_'0') then
+                    sig_trim = i-1
+                else
+                    exit
+                end if
+            end do
+            expnt = adjustl(str(exp_start+1:))
+            if (expnt(1:1) == CK_'+' .or. expnt(1:1) == CK_'-') then
+                separator = trim(adjustl(separator))//expnt(1:1)
+                exp_start = exp_start + 1
+                expnt = adjustl(str(exp_start+1:))
+            end if
+            exp_trim = 1
+            do i = 1,(len(trim(expnt))-1) !look at exponent leading zeros saving last
+                if (expnt(i:i) == CK_'0') then
+                    exp_trim = i+1
+                else
+                    exit
+                end if
+            end do
+            str = trim(adjustl(significand(1:sig_trim)))// &
+                    trim(adjustl(separator))// &
+                    trim(adjustl(expnt(exp_trim:)))
+
+        !else ! mal-formed real, BUT this code should be unreachable
+
+        end if
+
     else
         str = repeat(star,len(str))
     end if
