@@ -542,7 +542,11 @@
     ! Note: the following global variables make this module non thread safe.
     !
 
-    character(kind=CK,len=:),allocatable :: real_fmt
+    !real string printing:
+    character(kind=CK,len=:),allocatable :: real_fmt    !the format string to use for real numbers
+                                                        ! [set in json_initialize]
+    logical(LK) :: compact_real = .true.   !to use the "compact" form of real numbers for output
+
     !exception handling [private variables]
     logical(LK) :: is_verbose = .false.                 !if true, all exceptions are immediately printed to console
     logical(LK) :: exception_thrown = .false.           !the error flag
@@ -1250,23 +1254,35 @@
 !
 !  SOURCE
 
-    subroutine json_initialize(verbose)
+    subroutine json_initialize(verbose,compact_reals)
 
     implicit none
 
     logical(LK),intent(in),optional :: verbose  !mainly useful for debugging (default is false)
+    logical(LK),intent(in),optional :: compact_reals !to compact the real number strings for output
+
     character(kind=CK,len=10) :: w,d,e
-    !optional input (if not present, value remains unchanged):
-    if (present(verbose)) is_verbose = verbose
+    integer(IK) :: istat
 
     !clear any errors from previous runs:
     call json_clear_exceptions()
 
-    ! set the output/input format for reals:
-    write(w,'(I0)') max_numeric_str_len
-    write(d,'(I0)') real_precision
-    write(e,'(I0)') real_exponent_digits
-    real_fmt = '(e' // trim(w) // '.' // trim(d) // 'e' // trim(e) // ')'
+    !optional inputs (if not present, values remains unchanged):
+    if (present(verbose))       is_verbose   = verbose
+    if (present(compact_reals)) compact_real = compact_reals  !may be a bug here in Gfortran 5.0.0... check this...
+
+    ! set the default output/input format for reals:
+    !  [this only needs to be done once, since it can't change]
+    if (.not. allocated(real_fmt)) then
+                      write(w,'(I0)',iostat=istat) max_numeric_str_len
+        if (istat==0) write(d,'(I0)',iostat=istat) real_precision
+        if (istat==0) write(e,'(I0)',iostat=istat) real_exponent_digits
+        if (istat==0) then
+            real_fmt = '(E' // trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
+        else
+            real_fmt = '(E30.16E3)'  !just use this one (should never happen)
+        end if
+    end if
 
     !Just in case, clear these global variables also:
     pushed_index = 0
@@ -5375,55 +5391,67 @@
     character(kind=CK,len=2) :: separator
     integer(IK) :: istat, exp_start, decimal_pos, sig_trim, exp_trim, i
 
+    !default format:
     write(str,fmt=real_fmt,iostat=istat) rval
 
     if (istat==0) then
-        str = adjustl(str)
-        exp_start = scan(str,CK_'eEdD')
-        if (exp_start == 0) exp_start = scan(str,CK_'-+',back=.true.)
-        decimal_pos = scan(str,CK_'.')
-        if (exp_start /= 0) separator = str(exp_start:exp_start)
-        if (exp_start > 0 .and. exp_start < decimal_pos) then !signed, exponent-less float
-            significand = str
-            sig_trim = len(trim(significand))
-            do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
-                                                           !but save one after the decimal place
-                if (significand(i:i) == CK_'0') then
-                    sig_trim = i-1
-                else
-                    exit
-                end if
-            end do
-            str = trim(significand(1:sig_trim))
-        else if (exp_start > decimal_pos) then !float has exponent
-            significand = str(1:exp_start-1)
-            sig_trim = len(trim(significand))
-            do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
-                if (significand(i:i) == CK_'0') then
-                    sig_trim = i-1
-                else
-                    exit
-                end if
-            end do
-            expnt = adjustl(str(exp_start+1:))
-            if (expnt(1:1) == CK_'+' .or. expnt(1:1) == CK_'-') then
-                separator = trim(adjustl(separator))//expnt(1:1)
-                exp_start = exp_start + 1
-                expnt = adjustl(str(exp_start+1:))
-            end if
-            exp_trim = 1
-            do i = 1,(len(trim(expnt))-1) !look at exponent leading zeros saving last
-                if (expnt(i:i) == CK_'0') then
-                    exp_trim = i+1
-                else
-                    exit
-                end if
-            end do
-            str = trim(adjustl(significand(1:sig_trim)))// &
-                    trim(adjustl(separator))// &
-                    trim(adjustl(expnt(exp_trim:)))
 
-        !else ! mal-formed real, BUT this code should be unreachable
+        !in this case, the default string will be compacted,
+        ! so that the same value is displayed with fewer characters.
+        if (compact_real) then  
+
+            str = adjustl(str)
+            exp_start = scan(str,CK_'eEdD')
+            if (exp_start == 0) exp_start = scan(str,CK_'-+',back=.true.)
+            decimal_pos = scan(str,CK_'.')
+            if (exp_start /= 0) separator = str(exp_start:exp_start)
+
+            if (exp_start > 0 .and. exp_start < decimal_pos) then !signed, exponent-less float
+
+                significand = str
+                sig_trim = len(trim(significand))
+                do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
+                                                               !but save one after the decimal place
+                    if (significand(i:i) == CK_'0') then
+                        sig_trim = i-1
+                    else
+                        exit
+                    end if
+                end do
+                str = trim(significand(1:sig_trim))
+
+            else if (exp_start > decimal_pos) then !float has exponent
+
+                significand = str(1:exp_start-1)
+                sig_trim = len(trim(significand))
+                do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
+                    if (significand(i:i) == CK_'0') then
+                        sig_trim = i-1
+                    else
+                        exit
+                    end if
+                end do
+                expnt = adjustl(str(exp_start+1:))
+                if (expnt(1:1) == CK_'+' .or. expnt(1:1) == CK_'-') then
+                    separator = trim(adjustl(separator))//expnt(1:1)
+                    exp_start = exp_start + 1
+                    expnt = adjustl(str(exp_start+1:))
+                end if
+                exp_trim = 1
+                do i = 1,(len(trim(expnt))-1) !look at exponent leading zeros saving last
+                    if (expnt(i:i) == CK_'0') then
+                        exp_trim = i+1
+                    else
+                        exit
+                    end if
+                end do
+                str = trim(adjustl(significand(1:sig_trim)))// &
+                        trim(adjustl(separator))// &
+                        trim(adjustl(expnt(exp_trim:)))
+
+            !else ! mal-formed real, BUT this code should be unreachable
+
+            end if
 
         end if
 
