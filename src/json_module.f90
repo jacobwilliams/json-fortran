@@ -1268,10 +1268,8 @@
     call json_clear_exceptions()
 
     !optional inputs (if not present, values remains unchanged):
-    if (present(verbose)) is_verbose   = verbose
-
-    !....... gfortran 5.0.0 bug???? seems to be true, even when not present !!!!!
-    if (present(compact_reals)) compact_real = compact_reals
+    if (present(verbose))       is_verbose   = verbose
+    if (present(compact_reals)) compact_real = compact_reals  !may be a bug here in Gfortran 5.0.0... check this...
 
     ! set the default output/input format for reals:
     !  [this only needs to be done once, since it can't change]
