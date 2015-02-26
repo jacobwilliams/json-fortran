@@ -155,7 +155,7 @@ of ```json_value``` pointers.  See the json_example.f90 file for more examples.
         call json_initialize()
 
         ! initialize the structure:
-        call json_create_object(p)
+        call json_create_object(p,'')
 
         ! add an "inputs" object to the structure:
         call json_create_object(inp,'inputs')
@@ -186,9 +186,9 @@ The code above produces the file:
 ```Python
 {
   "inputs": {
-    "t0": 0.1000000000000000E+000,
-    "tf": 0.1100000000000000E+001,
-    "x0": 0.9999000000000000E+004,
+    "t0": 0.1E+0,
+    "tf": 0.11E+1,
+    "x0": 0.9999E+4,
     "integer_scalar": 787,
     "integer_array": [
       2,
