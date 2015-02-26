@@ -11,6 +11,7 @@
 #
 
 # Set to 1 to use ifort, otherwise use gfortran
+set -e
 use_ifort=0
 
 PROJECTNAME='jsonfortran'       # project name for robodoc (example: jsonfortran_2.0.0)

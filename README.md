@@ -1,4 +1,4 @@
-json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
+json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)
 ============
 
 A Fortran 2008 JSON API
@@ -21,7 +21,7 @@ modern Fortran.  The source code is a single Fortran module file ([json_module.f
 Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
 --------------------
 
-Download the official versioned releases [here](https://github.com/jacobwilliams/json-fortran/releases).  Or, get the latest development code from the master branch [here](https://github.com/jacobwilliams/json-fortran.git).
+Download the official versioned releases [here](https://github.com/jacobwilliams/json-fortran/releases/latest).  Or, get the latest development code from the master branch [here](https://github.com/jacobwilliams/json-fortran.git).
 
 Building the library
 --------------------

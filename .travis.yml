@@ -8,7 +8,7 @@ cache: apt
 # Build matrix: Run the three build systems and tests in parallel
 env:
   global:
-    - DEPENDS=gfortran-4.9
+    - DEPENDS="gfortran-4.9"
   matrix:
       # CMake build with unit tests, no documentation
       # Allow to fail for now until tests are fixed
@@ -33,34 +33,25 @@ env:
       FoBiS="no"
 
 before_install:
+  - if [[ $DOCS == [yY]* ]]; then export DEPENDS="$DEPENDS exuberant-ctags"; fi
   - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
-  - ([[ $SPECIFIC_DEPENDS == *cmake* ]] &&
-    sudo apt-add-repository -y ppa:kalakris/cmake) ||
-    [[ $SPECIFIC_DEPENDS != *cmake* ]]
-  - ([[ $JLINT == [yY]* ]] &&
-    curl -sL https://deb.nodesource.com/setup | sudo bash - ) ||
-    ([[ $JLINT != [yY]* ]] && sudo apt-get update -qq)
-  - ([[ $DOCS == [yY]* ]] &&
-    wget http://rfsber.home.xs4all.nl/Robo/robodoc-4.99.41.tar.gz) ||
-    [[ $DOCS != [yY]* ]]
+  - if [[ $SPECIFIC_DEPENDS == *cmake* ]]; then sudo apt-add-repository -y ppa:kalakris/cmake; fi
+  - if [[ $JLINT == [yY]* ]]; then curl -sL https://deb.nodesource.com/setup | sudo bash -; else sudo apt-get update -qq; fi
+  - if [[ $DOCS == [yY]* ]]; then wget http://launchpadlibrarian.net/70968359/robodoc_4.99.41-1_amd64.deb; fi
 
 install:
   - sudo apt-get install -y $SPECIFIC_DEPENDS $DEPENDS
-  - ([[ $JLINT == [yY]* ]] &&
-    sudo npm install -g jsonlint)
-    || [[ $JLINT != [yY]* ]]
+  - if [[ $JLINT == [yY]* ]]; then sudo npm install -g jsonlint; fi
   - sudo ln -fs /usr/bin/gfortran-4.9 /usr/bin/gfortran && gfortran --version
-  - ([[ $FoBiS == [yY]* ]] &&
-    sudo pip install FoBiS.py && FoBiS.py --version) ||
-    [[ $FoBiS != [yY]* ]]
-  - ([[ $DOCS == [yY]* ]] &&
-    tar -xzvf robodoc-4.99.41.tar.gz &&
-    cd robodoc-4.99.41 &&
-    ./configure && make -j 3 && cd $TRAVIS_BUILD_DIR &&
-    export PATH="$TRAVIS_BUILD_DIR/robodoc-4.99.41/Source:$PATH") ||
-    [[ $DOCS != [yY]* ]]
-
+  - if [[ $FoBiS == [yY]* ]]; then sudo -H pip install FoBiS.py && FoBiS.py --version; fi
+  - if [[ $DOCS == [yY]* ]]; then sudo dpkg -i robodoc_4.99.41-1_amd64.deb && robodoc --version; fi
 
 script:
   - echo $BUILD_SCRIPT
   - echo $BUILD_SCRIPT | bash -
+
+after_success:
+  - cd $TRAVIS_BUILD_DIR
+  - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
+  - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"
+  - ./deploy.sh #handles updating documentation for master branch as well as tags
