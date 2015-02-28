@@ -1,8 +1,8 @@
 !*******************************************************************************************************
-!****f* JSON/test_7
+!****u* JSON/jf_test_7
 !
 !  NAME
-!    json_test
+!    jf_test_7
 !
 !  DESCRIPTION
 !    Seventh unit test
@@ -12,11 +12,11 @@
 !    iso_fortran_env (intrinsic)
 !
 !  HISTORY
-!    Izaak Beekman  : 2/18/2015 : Created
+!    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 !
-!  COPYRIGHT
+!  LICENSE
 !
-!    JSON-FORTRAN: A Fortran 2003/2008 JSON API
+!    JSON-FORTRAN: A Fortran 2008 JSON API
 !    https://github.com/jacobwilliams/json-fortran
 !
 !    Copyright (c) 2014, Jacob Williams
@@ -47,21 +47,21 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !  SOURCE
+
 module jf_test_7_mod
+
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    
     implicit none
+    
     character(len=*),parameter :: dir = '../files/'               !working directory
 
 contains
 
-!**************************************************************
     subroutine test_7(error_cnt)
-!**************************************************************
-!
+
 !   Indent test
-!
-!**************************************************************
 
     implicit none
 
@@ -251,12 +251,9 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-!**************************************************************
     end subroutine test_7
-!**************************************************************
 
 end module jf_test_7_mod
-!*******************************************************************************************************
 
 program jf_test_7
     use jf_test_7_mod , only: test_7
@@ -266,3 +263,5 @@ program jf_test_7
     call test_7(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_7
+
+!*******************************************************************************************************

@@ -1,8 +1,8 @@
 !*******************************************************************************************************
-!****f* JSON/test_1
+!****u* JSON/jf_test_1
 !
 !  NAME
-!    json_test
+!    jf_test_1
 !
 !  DESCRIPTION
 !    First unit test
@@ -12,11 +12,11 @@
 !    iso_fortran_env (intrinsic)
 !
 !  HISTORY
-!    Izaak Beekman  : 2/18/2015 : Created
+!    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 !
-!  COPYRIGHT
+!  LICENSE
 !
-!    JSON-FORTRAN: A Fortran 2003/2008 JSON API
+!    JSON-FORTRAN: A Fortran 2008 JSON API
 !    https://github.com/jacobwilliams/json-fortran
 !
 !    Copyright (c) 2014, Jacob Williams
@@ -47,22 +47,23 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !  SOURCE
+
 module jf_test_1_mod
+
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
-    implicit none
-    character(len=*),parameter :: dir = '../files/'               !working directory
 
+    implicit none
+
+    character(len=*),parameter :: dir = '../files/'    !working directory
     character(len=*),parameter :: filename1 = 'test1.json'
 
 contains
-!**************************************************************
-    subroutine test_1(error_cnt)
-!**************************************************************
-!
-!    Read a sample JSON file and retrieve some data from it
-!
-!**************************************************************
+
+    subroutine test_1(error_cnt) 
+
+!   Read a sample JSON file and retrieve some data from it
+
     implicit none
 
     integer,intent(out) :: error_cnt
@@ -278,12 +279,9 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-!**************************************************************
     end subroutine test_1
-!**************************************************************
 
 end module jf_test_1_mod
-!*******************************************************************************************************
 
 program jf_test_1
     use jf_test_1_mod , only: test_1
@@ -293,3 +291,5 @@ program jf_test_1
     call test_1(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_1
+
+!*******************************************************************************************************

@@ -1,8 +1,8 @@
 !*******************************************************************************************************
-!****f* JSON/test_6
+!****u* JSON/jf_test_6
 !
 !  NAME
-!    json_test
+!    jf_test_6
 !
 !  DESCRIPTION
 !    Sixth unit test
@@ -12,11 +12,11 @@
 !    iso_fortran_env (intrinsic)
 !
 !  HISTORY
-!    Izaak Beekman  : 2/18/2015 : Created
+!    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 !
-!  COPYRIGHT
+!  LICENSE
 !
-!    JSON-FORTRAN: A Fortran 2003/2008 JSON API
+!    JSON-FORTRAN: A Fortran 2008 JSON API
 !    https://github.com/jacobwilliams/json-fortran
 !
 !    Copyright (c) 2014, Jacob Williams
@@ -47,20 +47,22 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !  SOURCE
+
 module jf_test_6_mod
+
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+
     implicit none
+
     character(len=*),parameter :: dir = '../files/'               !working directory
 
 contains
-!**************************************************************
+
     subroutine test_6(error_cnt)
-!**************************************************************
-!
+
 !    This example tries to read an invalid json file.
-!
-!**************************************************************
+
     implicit none
 
     integer,intent(out) :: error_cnt
@@ -105,12 +107,9 @@ contains
         end if
     end do
 
-!**************************************************************
     end subroutine test_6
-!**************************************************************
 
 end module jf_test_6_mod
-!*******************************************************************************************************
 
 program jf_test_6
     use jf_test_6_mod , only: test_6
@@ -120,3 +119,5 @@ program jf_test_6
     call test_6(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_6
+
+!*******************************************************************************************************
