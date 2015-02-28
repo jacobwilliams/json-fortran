@@ -99,18 +99,10 @@ env.Alias('install', libinstall)
 
 if find_executable('robodoc'):
 
-    docfiles = [join('documentation','json_module_f90.html'),
-                join('documentation','masterindex.html'),
-                join('documentation','robo_classes.html'),
-                join('documentation','robo_definitions.html'),
-                join('documentation','robo_functions.html'),
-                join('documentation','robo_modules.html'),
-                join('documentation','robo_sourcefiles.html'),
-                join('documentation','robodoc.css'),
-                join('documentation','toc_index.html'), ]
+    docfiles = glob.glob('documentation/*.*')   #main directory
+    docfiles.append(glob.glob('documentation/tests/*.*')) #tests directory
 
-    bld = Builder(action='robodoc --rc robodoc.rc --src src/ --doc documentation/ --multidoc --html'+
-                  ' --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4 --documenttitle jsonfortran --sections')
+    bld = Builder(action='robodoc --rc robodoc.rc --src src/ --doc documentation/ --documenttitle jsonfortran')
     env = Environment(BUILDERS = {'RoboDoc' : bld})
     env.RoboDoc(docfiles, src)
     env.Depends(docfiles, src)
