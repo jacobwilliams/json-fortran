@@ -18,8 +18,10 @@ if [ ! "$TRAVIS" ]; then #not on travis, try a sane deploy of current branch's d
 	cd gh-pages
         [ -e "$BRANCH" ] && rm -r "$BRANCH" # wipe out old docs if they exist
         mkdir "$BRANCH"
-        for f in ../documentation/*.*; do # add branch info to header and clean line endings
-	    sed '/[^#]robo_top_of_doc/ s;jsonfortran</a>;jsonfortran '"$BRANCH"'</a>;' $f | sed 's/ *$//' > "$BRANCH/${f##*/}"
+        mkdir "$BRANCH/tests"
+        FILES=$(find ../documentation -name '*.*')  #get all the files (including in subdirectories)
+        for f in $FILES; do # add branch info to header and clean line endings
+	    sed '/[^#]robo_top_of_doc/ s;jsonfortran</a>;jsonfortran '"$BRANCH"'</a>;' $f | sed 's/ *$//' > "$BRANCH/${f##*documentation/}"
         done
         git add "$BRANCH"
         git commit -m "Development documentation for $BRANCH updated for commit $REVISION"
@@ -39,8 +41,10 @@ else #running under travis
             cd gh-pages
             [ -e master ] && rm -r master # wipe out docs if they exist
             mkdir master
-            for f in ../documentation/*.*; do # add branch info to header and clean line endings
-		sed '/[^#]robo_top_of_doc/ s;jsonfortran</a>;jsonfortran master</a>;' $f | sed 's/ *$//' > master/${f##*/}
+            mkdir master/tests
+            FILES=$(find ../documentation -name '*.*')  #get all the files (including in subdirectories)
+            for f in $FILES; do # add branch info to header and clean line endings
+		sed '/[^#]robo_top_of_doc/ s;jsonfortran</a>;jsonfortran master</a>;' $f | sed 's/ *$//' > master/${f##*documentation/}
             done
             git add master
             git commit -m "Development documentation updated by travis job $TRAVIS_JOB_NUMBER for commits $TRAVIS_COMMIT_RANGE"
@@ -52,10 +56,12 @@ else #running under travis
 	    cd gh-pages
 	    [ -e "$TRAVIS_TAG" ] && rm -r "$TRAVIS_TAG" # wipe out existing docs for tag if they exist
 	    mkdir "$TRAVIS_TAG"
+	    mkdir "$TRAVIS_TAG/tests"
 	    # Add an entry in index.html for the new tag, assume none exists
 	    awk '/<!--Next stable release goes here-->/{print "<a href=\"./'"$TRAVIS_TAG"'/masterindex.html\" class=\"indexitem\" >'"$TRAVIS_TAG"'</a>"}1' index.html > index2.html && mv index2.html index.html
-	    for f in ../documentation/*.*; do # add tag info to headers and clean line endings
-		sed '/[^#]robo_top_of_doc/ s;jsonfortran</a>;jsonfortran '"$TRAVIS_TAG"'</a>;' $f | sed 's/ *$//' > "$TRAVIS_TAG/${f##*/}"
+        FILES=$(find ../documentation -name '*.*')  #get all the files (including in subdirectories)
+        for f in $FILES; do # add tag info to headers and clean line endings
+		sed '/[^#]robo_top_of_doc/ s;jsonfortran</a>;jsonfortran '"$TRAVIS_TAG"'</a>;' $f | sed 's/ *$//' > "$TRAVIS_TAG/${f##*documentation/}"
 	    done
 	    git add "$TRAVIS_TAG" index.html # don't forget to add the top level index!
 	    git commit -m "Tag/release documentation updated by travis job $TRAVIS_JOB_NUMBER for tag $TRAVIS_TAG $TRAVIS_COMMIT"
