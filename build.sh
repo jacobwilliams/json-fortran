@@ -70,7 +70,7 @@ fi
 #build the documentation with RoboDoc:
 echo ""
 echo "Building documentation..."
-robodoc --rc ./robodoc.rc --src ${SRCDIR} --doc ${DOCDIR} --multidoc --html --ignore_case_when_linking --syntaxcolors --source_line_numbers --index --tabsize 4 --documenttitle ${PROJECTNAME} --sections
+robodoc --rc ./robodoc.rc --src ${SRCDIR} --doc ${DOCDIR} --documenttitle ${PROJECTNAME}
 echo ""
 
 # Run all the tests unless $JF_SKIP_TESTS
