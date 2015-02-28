@@ -9,31 +9,77 @@
 
 from distutils.spawn import find_executable
 import os
-from os.path import join
+from os.path import join, basename
+import glob
+import subprocess
+import sys
 
 env = Environment()
 
 if env['FORTRAN'] == 'gfortran':
-    env = Environment(F90FLAGS = '-O2 -fbacktrace -g -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008 -Jlib',)
+    env = Environment(F90FLAGS = '-O2 -fbacktrace -g -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008 -J',)
 elif env['FORTRAN'] == 'ifort':
     env = Environment(F90FLAGS = '-O2 -warn -stand f08 -diag-disable 7601 -traceback -module lib',)
 
 src = join('src','json_module.f90')
-obj = join('build','json_module.o')
-ar  = join('lib','libjsonfortran.a')
-mod = join('lib','json_module.mod')
-exe = join('bin','json')
-
-env.Library(ar, src,
-            FORTRANMODDIR='lib', # this tells scons that we want the .mod file to be installed in to lib/
-            LIBPREFIX='',        # this tells scons /not/ to assume that the mod file should be libjson_module.mod
-        )
+ar  = join('lib','libjsonfortran'+env['LIBSUFFIX'])
+sl  = join('lib','libjsonfortran'+env['SHLIBSUFFIX'])
+mod = join('lib','json_module.mod')  ## FORTRANMODSUFFIX
 
 
-## this builds the example program and places it in bin/
-env.Program(exe, join('tests','json_example.f90'), LIBS=['jsonfortran',], LIBPATH=['lib'])
 
-env.Requires(exe, mod)
+## make a list of test files and their resulting executables
+tests = []
+obj   = []
+exe   = []
+here = os.getcwd()
+os.chdir(join('src', 'tests'))
+for f in sorted(glob.glob("*")):
+    if not f.endswith('f90'): continue
+    tests.append(join('src', 'tests', f))
+    e = f[:-4]
+    obj.append(join('src','tests',e+env['OBJSUFFIX']))
+    exe.append(join('bin',e+env['PROGSUFFIX']))
+os.chdir(here)
+
+
+## make the static library
+a=env.Library(ar, src,
+              FORTRANMODDIR='lib', # this tells scons that we want the .mod file to be installed in to lib/
+              LIBPREFIX='',        # this tells scons /not/ to assume that the mod file should be libjson_module.mod
+          )
+
+## make the shared object library (or dll or what have you....)
+#env.SharedLibrary(sl, src,
+#                  FORTRANMODDIR='lib', # this tells scons that we want the .mod file to be installed in to lib/
+#                  LIBPREFIX='',        # this tells scons /not/ to assume that the mod file should be libjson_module.mod
+#              )
+
+
+## this builds the example programs and places them in bin/
+for i, t in enumerate(tests):
+    e=env.Program(exe[i], t, LIBS=['jsonfortran',], LIBPATH=['lib'], FORTRANMODDIR='lib')
+env.Requires(exe, [mod]+obj)
+
+## ------ testing ----------
+
+if "test" in COMMAND_LINE_TARGETS:
+    os.chdir('bin')
+    FNULL = open(os.devnull, 'w')
+    count = 0
+    which = []
+    open('tests.ran', 'w').close()
+    for e in exe:
+        ee = basename(e)
+        this = subprocess.check_call(join(os.getcwd(), ee), stdout=FNULL, stderr=FNULL)
+        count = count + this
+        if this: which.append(ee)
+    if count > 0:
+        print "failing: " + ", ".join(which)
+    else:
+        print 'all tests passed'
+    sys.exit()
+
 
 ## ------ installation ----------
 
@@ -45,7 +91,7 @@ else:
     libinstall = '/usr/local/lib'
     docinstall = '/usr/local/share/doc/json-fortran'
 
-env.Install(libinstall, [obj,ar,mod])
+env.Install(libinstall, [sl,ar,mod])
 env.Alias('install', libinstall)
 
 
@@ -53,14 +99,13 @@ env.Alias('install', libinstall)
 
 if find_executable('robodoc'):
 
-    docfiles = [join('documentation','json_example_f90.html'), 
-                join('documentation','json_module_f90.html'),
+    docfiles = [join('documentation','json_module_f90.html'),
                 join('documentation','masterindex.html'),
                 join('documentation','robo_classes.html'),
+                join('documentation','robo_definitions.html'),
                 join('documentation','robo_functions.html'),
                 join('documentation','robo_modules.html'),
                 join('documentation','robo_sourcefiles.html'),
-                join('documentation','robo_unittests.html'),
                 join('documentation','robodoc.css'),
                 join('documentation','toc_index.html'), ]
 

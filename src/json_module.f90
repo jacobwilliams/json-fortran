@@ -537,6 +537,7 @@
     public :: json_remove                !remove from a JSON structure
     public :: json_remove_if_present     !remove from a JSON structure (if it is present)
     public :: json_update                !update a value in a JSON structure
+    public :: json_print_error_message
 
     !
     ! Note: the following global variables make this module non thread safe.
@@ -5398,7 +5399,7 @@
 
         !in this case, the default string will be compacted,
         ! so that the same value is displayed with fewer characters.
-        if (compact_real) then  
+        if (compact_real) then
 
             str = adjustl(str)
             exp_start = scan(str,CK_'eEdD')
@@ -5509,6 +5510,48 @@
 
     end function valid_json_hex
 !*****************************************************************************************
+
+!*****************************************************************************************
+!****if* json_module/json_print_error_message
+!
+!  NAME
+!    print_error_message
+!
+!  DESCRIPTION
+!    Print any error message, and then clear the exceptions, used by unit tests
+!
+!  NOTES
+!    Originally in json_example.f90, moved here 2/26/2015 by Izaak Beekman
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!  SOURCE
+    subroutine json_print_error_message(io_unit)
+
+    implicit none
+
+    integer, intent(in), optional :: io_unit
+    character(len=:),allocatable :: error_msg
+    logical :: status_ok
+
+    !get error message:
+    call json_check_for_errors(status_ok, error_msg)
+
+    !print it if there is one:
+    if (.not. status_ok) then
+        if (present(io_unit)) then
+            write(io_unit,'(A)') error_msg
+        else
+            write(*,'(A)') error_msg
+        end if
+        deallocate(error_msg)
+        call json_clear_exceptions()
+    end if
+
+!**************************************************************
+    end subroutine json_print_error_message
+!**************************************************************
 
 !*****************************************************************************************
     end module json_module
