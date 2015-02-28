@@ -58,7 +58,7 @@ else #running under travis
 	    mkdir "$TRAVIS_TAG"
 	    mkdir "$TRAVIS_TAG/tests"
 	    # Add an entry in index.html for the new tag, assume none exists
-	    awk '/<!--Next stable release goes here-->/{print "<a href=\"./'"$TRAVIS_TAG"'/masterindex.html\" class=\"indexitem\" >'"$TRAVIS_TAG"'</a>"}1' index.html > index2.html && mv index2.html index.html
+	    awk '/<!--Next stable release goes here-->/{print "<a href=\"./'"$TRAVIS_TAG"'/json_module_f90.html\" class=\"indexitem\" >'"$TRAVIS_TAG"'</a>"}1' index.html > index2.html && mv index2.html index.html
         FILES=$(find ../documentation -name '*.*')  #get all the files (including in subdirectories)
         for f in $FILES; do # add tag info to headers and clean line endings
 		sed '/[^#]robo_top_of_doc/ s;jsonfortran</a>;jsonfortran '"$TRAVIS_TAG"'</a>;' $f | sed 's/ *$//' > "$TRAVIS_TAG/${f##*documentation/}"
