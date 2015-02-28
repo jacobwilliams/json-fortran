@@ -36,11 +36,11 @@ compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9).
 Currently, several ways are provided to build the jsonfortran library
 (libjsonfortran).
 
-* A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the example program.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
+* A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the unit tests.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
 
-* A [Visual Studio](http://www.visualstudio.com) project is included for building the library (and example program) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
+* A [Visual Studio](http://www.visualstudio.com) project is included for building the library (and unit tests) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
-* An [SCons](http://www.scons.org) `SConstruct` file.  The library and example program are built by typing `scons` and installed by `scons install` or `sudo scons install`.
+* An [SCons](http://www.scons.org) `SConstruct` file.  The library and unit tests are built by typing `scons` and tested by typing `scons test`. The library may be optionally installed by `scons install` or `sudo scons install`.
 
 * Additionally, a [CMake](http://www.cmake.org) build
 system is provided. This build system has been tested on Mac and Linux
@@ -53,28 +53,33 @@ environment variable `FC` to point to your Fortran compiler, and
 create a build directory. Then `(cmake-gui|ccmake|cmake)
 /path/to/json-fortran-root` to configure, `make` to build and `make
 install` to optionally install. As long as the project is built with
-CMake, other CMake projects can find it and link against it:
+CMake, other CMake projects can find it and link against it. For example,
+if you have a second copy of the json-fortran project tree, and want to build the unit tests
+linking against those compiled/installed by the first copy:
 
 ```CMake
-cmake_minimum_required ( VERSION 2.8 FATAL_ERROR )
+cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
 find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 3.0.0 REQUIRED )
 
-add_executable ( json_example src/json_example.f90 )
-target_include_directories ( json_example BEFORE PUBLIC ${jsonfortran_INCLUDE_DIRS} )
-target_link_libraries ( json_example jsonfortran-static )
-# or for linking against the dynamic/shared library:
-# target_link_libraries ( json_example jsonfortran ) # instead
+file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
+foreach ( UNIT_TEST ${JF_TEST_SRCS} )
+  get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
+  add_executable ( ${TEST} ${UNIT_TEST} )
+  target_link_libraries ( ${TEST} jsonfortran-static )
+  # or for linking against the dynamic/shareed library:
+  # target_link_libraries ( ${TEST} jsonfortran ) # instead
+endforeach()
 ```
 
 Reading JSON from a file
 ---------------
 
 Reading a JSON file and getting data from it is fairly
-straightforward using the ```json_file``` class.  Here is an example.  See the json_example.f90 file
-for more examples.
+straightforward using the `json_file` class.  Here is an example.  See unit tests 1 and 3-6
+for more examples. The source files may be found in `src/tests/`.
 
 ```fortran
     program example1
@@ -116,7 +121,7 @@ JSON can also be read directly from a character string like so:
 Modifying variables in a JSON file
 ---------------
 
-After reading a JSON file, if you want to change the values of some of the variables, you can use the ```update``` method.  For the example above:
+After reading a JSON file, if you want to change the values of some of the variables, you can use the `update` method.  For the example above:
 
 ```fortran
     ! [found can be used to check if the data was really there]
@@ -128,7 +133,7 @@ After reading a JSON file, if you want to change the values of some of the varia
 Writing a JSON file
 ---------------
 
-To print the JSON file (either to a file or the console), the ```print_file``` method can be used.  For the above example:
+To print the JSON file (either to a file or the console), the `print_file` method can be used.  For the above example:
 
 ```fortran
     call json%print_file()         !prints to the console
@@ -139,7 +144,7 @@ Building a JSON file from scratch
 ---------------
 
 Constructing a JSON file element by element is slightly more complicated and involves the use
-of ```json_value``` pointers.  See the json_example.f90 file for more examples.
+of `json_value` pointers.  For more examples see unit tests 2,4 and 7 in `src/tests/`.
 
 ```fortran
     program example2
@@ -183,7 +188,7 @@ of ```json_value``` pointers.  See the json_example.f90 file for more examples.
 
 The code above produces the file:
 
-```Python
+```JSON
 {
   "inputs": {
     "t0": 0.1E+0,

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-#  Build the json-fortran library and example program.
+#  Build the json-fortran library and unit tests.
 #
 #  Requires:
 #    FoBiS.py : https://github.com/szaghi/FoBiS      [version 1.2.5 or later required]

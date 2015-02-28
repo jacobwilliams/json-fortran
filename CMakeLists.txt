@@ -151,12 +151,12 @@ endif ()
 # Handle test related stuff
 #--------------------------
 set ( ENABLE_TESTS TRUE CACHE BOOL
-  "Enable the json-fortran tests. If true this will force build of example program too" )
+  "Enable the json-fortran tests." )
 
 #---------------------------------------------------------------------
 # Add some tests to ensure that the software is performing as expected
 #---------------------------------------------------------------------
-if ( ENABLE_TESTS ) # BUILD_EXAMPLE_PROGRAM will be true too
+if ( ENABLE_TESTS )
   enable_testing()
 
   find_program ( JSONLINT jsonlint )
