@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./src/tests/jf_test_2.f90</title>
+<!-- Source: ./src/tests/jf_test_2.f90 -->
+<!-- Generated with ROBODoc Version 4.99.41 (May  3 2011) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">jsonfortran master</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="../toc_index.html#top">Table of Contents</a>
+<a class="menuitem" href="../robo_sourcefiles.html#top">Sourcefiles</a>
+<a class="menuitem" href="../masterindex.html#top">Index</a>
+<a class="menuitem" href="../robo_interfaces.html#top">Interfaces</a>
+<a class="menuitem" href="../robo_classes.html#top">Classes</a>
+<a class="menuitem" href="../robo_definitions.html#top">Parameters</a>
+<a class="menuitem" href="../robo_functions.html#top">Functions</a>
+<a class="menuitem" href="../robo_modules.html#top">Modules</a>
+<a class="menuitem" href="../robo_unittests.html#top">Unittest</a>
+</div> <!-- navigation -->
+<div id="content">
+<hr />
+<a name="JSON2fjf5ftest5f2"></a>
+<a name="robo15"></a><h2>JSON/jf_test_2 [ Unittest ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="../robo_unittests.html#robo_top_of_doc">Unittest</a> ]</p>
+<p class="item_name">NAME</p>
+<pre>    <strong>jf_test_2</strong>
+</pre>
+<p class="item_name">DESCRIPTION</p>
+<pre>    Second unit test
+</pre>
+<p class="item_name">USES</p>
+<pre>    <a href="../json_module_f90.html#robo0">json_module</a>
+    iso_fortran_env (intrinsic)
+</pre>
+<p class="item_name">HISTORY</p>
+<pre>    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
+</pre>
+<p class="item_name">LICENSE</p>
+<pre>    JSON-FORTRAN: A Fortran 2008 JSON API
+    https://github.com/jacobwilliams/json-fortran
+
+    Copyright (c) 2014, Jacob Williams
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without modification,
+    are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this
+      list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright notice, this
+      list of conditions and the following disclaimer in the documentation and/or
+      other materials provided with the distribution.
+
+    * The names of its contributors may not be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</pre>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number"> 51 </span><span class="keyword">module</span> jf_test_2_mod
+<span class="line_number"> 52 </span>
+<span class="line_number"> 53 </span>    <span class="keyword">use</span> <a href="../json_module_f90.html#robo0">json_module</a>
+<span class="line_number"> 54 </span>    <span class="keyword">use</span><span class="sign">,</span> <span class="keyword">intrinsic</span> <span class="sign">:</span><span class="sign">:</span> iso_fortran_env <span class="sign">,</span> <span class="keyword">only</span><span class="sign">:</span> error_unit<span class="sign">,</span> output_unit<span class="sign">,</span> wp <span class="sign">=</span><span class="sign">&gt;</span> real64
+<span class="line_number"> 55 </span>
+<span class="line_number"> 56 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number"> 57 </span>
+<span class="line_number"> 58 </span>    <span class="keyword">character</span><span class="sign">(</span>len<span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">parameter</span> <span class="sign">:</span><span class="sign">:</span> dir <span class="sign">=</span> <span class="squote">'../files/'</span>    <span class="comment">!working directory</span>
+<span class="line_number"> 59 </span>    <span class="keyword">character</span><span class="sign">(</span>len<span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">parameter</span> <span class="sign">:</span><span class="sign">:</span> filename2 <span class="sign">=</span> <span class="squote">'test2.json'</span>
+<span class="line_number"> 60 </span>
+<span class="line_number"> 61 </span><span class="keyword">contains</span>
+<span class="line_number"> 62 </span>
+<span class="line_number"> 63 </span>    <span class="keyword">subroutine</span> test_2<span class="sign">(</span>error_cnt<span class="sign">)</span>
+<span class="line_number"> 64 </span>
+<span class="line_number"> 65 </span><span class="comment">!   Populate a JSON structure and write it to a file.</span>
+<span class="line_number"> 66 </span>
+<span class="line_number"> 67 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number"> 68 </span>
+<span class="line_number"> 69 </span>    <span class="keyword">integer</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> error_cnt
+<span class="line_number"> 70 </span>
+<span class="line_number"> 71 </span>    <span class="keyword">type</span><span class="sign">(</span><a href="../json_module_f90.html#robo4">json_value</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">pointer</span>    <span class="sign">:</span><span class="sign">:</span> p<span class="sign">,</span> inp<span class="sign">,</span> traj
+<span class="line_number"> 72 </span>
+<span class="line_number"> 73 </span>    <span class="keyword">integer</span> <span class="sign">:</span><span class="sign">:</span> iunit
+<span class="line_number"> 74 </span>
+<span class="line_number"> 75 </span>    error_cnt <span class="sign">=</span> 0
+<span class="line_number"> 76 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo66">json_initialize</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number"> 77 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number"> 78 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number"> 79 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number"> 80 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number"> 81 </span>
+<span class="line_number"> 82 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number"> 83 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'================================='</span>
+<span class="line_number"> 84 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'   EXAMPLE 2'</span>
+<span class="line_number"> 85 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'================================='</span>
+<span class="line_number"> 86 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number"> 87 </span>
+<span class="line_number"> 88 </span>    <span class="comment">!root:</span>
+<span class="line_number"> 89 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo30">json_create_object</a><span class="sign">(</span>p<span class="sign">,</span>dir<span class="sign">/</span><span class="sign">/</span>filename2<span class="sign">)</span>    <span class="comment">! create the value and associate the pointer</span>
+<span class="line_number"> 90 </span>                                                 <span class="comment">! add the file name as the name of the overall structure</span>
+<span class="line_number"> 91 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number"> 92 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number"> 93 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number"> 94 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number"> 95 </span>
+<span class="line_number"> 96 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number"> 97 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'initialize the structure...'</span>
+<span class="line_number"> 98 </span>
+<span class="line_number"> 99 </span>    <span class="comment">!config structure:</span>
+<span class="line_number">100 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo30">json_create_object</a><span class="sign">(</span>inp<span class="sign">,</span><span class="squote">'inputs'</span><span class="sign">)</span>   <span class="comment">!an object</span>
+<span class="line_number">101 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">102 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">103 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">104 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">105 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>p<span class="sign">,</span> inp<span class="sign">)</span>
+<span class="line_number">106 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">107 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">108 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">109 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">110 </span>
+<span class="line_number">111 </span>    <span class="comment">!trajectory structure:</span>
+<span class="line_number">112 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo25">json_create_array</a><span class="sign">(</span>traj<span class="sign">,</span><span class="squote">'trajectory'</span><span class="sign">)</span>    <span class="comment">!an array</span>
+<span class="line_number">113 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">114 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">115 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">116 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">117 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>p<span class="sign">,</span> traj<span class="sign">)</span>
+<span class="line_number">118 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">119 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">120 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">121 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">122 </span>
+<span class="line_number">123 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number">124 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'adding some data to structure...'</span>
+<span class="line_number">125 </span>
+<span class="line_number">126 </span>    <span class="comment">!add some variables:</span>
+<span class="line_number">127 </span>
+<span class="line_number">128 </span>    <span class="comment">!input variables:</span>
+<span class="line_number">129 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>inp<span class="sign">,</span> <span class="squote">'t0'</span><span class="sign">,</span> 0<span class="sign">.</span>1_wp<span class="sign">)</span>
+<span class="line_number">130 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">131 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">132 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">133 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">134 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>inp<span class="sign">,</span> <span class="squote">'tf'</span><span class="sign">,</span> 1<span class="sign">.</span>1_wp<span class="sign">)</span>
+<span class="line_number">135 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">136 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">137 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">138 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">139 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>inp<span class="sign">,</span> <span class="squote">'x0'</span><span class="sign">,</span> 9999<span class="sign">.</span>000_wp<span class="sign">)</span>
+<span class="line_number">140 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">141 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">142 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">143 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">144 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>inp<span class="sign">,</span> <span class="squote">'integer_scalar'</span><span class="sign">,</span> 1<span class="sign">)</span>
+<span class="line_number">145 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">146 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">147 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">148 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">149 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>inp<span class="sign">,</span> <span class="squote">'integer_array'</span><span class="sign">,</span> <span class="sign">[</span>2<span class="sign">,</span>4<span class="sign">,</span>99<span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">150 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">151 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">152 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">153 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">154 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>inp<span class="sign">,</span> <span class="squote">'names'</span><span class="sign">,</span> <span class="sign">[</span><span class="squote">'aaa'</span><span class="sign">,</span><span class="squote">'bbb'</span><span class="sign">,</span><span class="squote">'ccc'</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">155 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">156 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">157 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">158 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">159 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>inp<span class="sign">,</span> <span class="squote">'logical_scalar'</span><span class="sign">,</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">)</span>
+<span class="line_number">160 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">161 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">162 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">163 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">164 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>inp<span class="sign">,</span> <span class="squote">'logical_vector'</span><span class="sign">,</span> <span class="sign">[</span><span class="sign">.</span>true<span class="sign">.</span><span class="sign">,</span> <span class="sign">.</span>false<span class="sign">.</span><span class="sign">,</span> <span class="sign">.</span>true<span class="sign">.</span><span class="sign">]</span><span class="sign">)</span>
+<span class="line_number">165 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">166 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">167 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">168 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">169 </span>    <span class="keyword">nullify</span><span class="sign">(</span>inp<span class="sign">)</span>
+<span class="line_number">170 </span>
+<span class="line_number">171 </span>    <span class="comment">!trajectory variables:</span>
+<span class="line_number">172 </span>    <span class="keyword">call</span> add_variables_to_input<span class="sign">(</span>traj<span class="sign">,</span> <span class="squote">'Rx'</span><span class="sign">,</span> <span class="squote">'km'</span><span class="sign">,</span> <span class="squote">'J2000'</span><span class="sign">,</span> <span class="squote">'EARTH'</span><span class="sign">,</span> <span class="sign">[</span>1<span class="sign">.</span>0_wp<span class="sign">,</span> 2<span class="sign">.</span>0_wp<span class="sign">,</span> 3<span class="sign">.</span>0_wp<span class="sign">]</span><span class="sign">,</span> error_cnt <span class="sign">)</span>
+<span class="line_number">173 </span>    <span class="keyword">call</span> add_variables_to_input<span class="sign">(</span>traj<span class="sign">,</span> <span class="squote">'Ry'</span><span class="sign">,</span> <span class="squote">'km'</span><span class="sign">,</span> <span class="squote">'J2000'</span><span class="sign">,</span> <span class="squote">'EARTH'</span><span class="sign">,</span> <span class="sign">[</span>10<span class="sign">.</span>0_wp<span class="sign">,</span> 20<span class="sign">.</span>0_wp<span class="sign">,</span> 30<span class="sign">.</span>0_wp<span class="sign">]</span><span class="sign">,</span> error_cnt <span class="sign">)</span>
+<span class="line_number">174 </span>    <span class="keyword">call</span> add_variables_to_input<span class="sign">(</span>traj<span class="sign">,</span> <span class="squote">'Rz'</span><span class="sign">,</span> <span class="squote">'km'</span><span class="sign">,</span> <span class="squote">'J2000'</span><span class="sign">,</span> <span class="squote">'EARTH'</span><span class="sign">,</span> <span class="sign">[</span>100<span class="sign">.</span>0_wp<span class="sign">,</span> 200<span class="sign">.</span>0d0<span class="sign">,</span> 300<span class="sign">.</span>0_wp<span class="sign">]</span><span class="sign">,</span> error_cnt <span class="sign">)</span>
+<span class="line_number">175 </span>    <span class="keyword">call</span> add_variables_to_input<span class="sign">(</span>traj<span class="sign">,</span> <span class="squote">'Vx'</span><span class="sign">,</span> <span class="squote">'km/s'</span><span class="sign">,</span> <span class="squote">'J2000'</span><span class="sign">,</span> <span class="squote">'EARTH'</span><span class="sign">,</span> <span class="sign">[</span>1<span class="sign">.</span>0e<span class="sign">-</span>3_wp<span class="sign">,</span> 2<span class="sign">.</span>0e<span class="sign">-</span>3_wp<span class="sign">,</span> 3<span class="sign">.</span>0e<span class="sign">-</span>3_wp<span class="sign">]</span><span class="sign">,</span> error_cnt <span class="sign">)</span>
+<span class="line_number">176 </span>    <span class="keyword">call</span> add_variables_to_input<span class="sign">(</span>traj<span class="sign">,</span> <span class="squote">'Vy'</span><span class="sign">,</span> <span class="squote">'km/s'</span><span class="sign">,</span> <span class="squote">'J2000'</span><span class="sign">,</span> <span class="squote">'EARTH'</span><span class="sign">,</span> <span class="sign">[</span>2<span class="sign">.</span>0e<span class="sign">-</span>3_wp<span class="sign">,</span> 20<span class="sign">.</span>0e<span class="sign">-</span>3_wp<span class="sign">,</span> 3<span class="sign">.</span>0e<span class="sign">-</span>3_wp<span class="sign">]</span><span class="sign">,</span> error_cnt <span class="sign">)</span>
+<span class="line_number">177 </span>    <span class="keyword">call</span> add_variables_to_input<span class="sign">(</span>traj<span class="sign">,</span> <span class="squote">'Vz'</span><span class="sign">,</span> <span class="squote">'km/s'</span><span class="sign">,</span> <span class="squote">'J2000'</span><span class="sign">,</span> <span class="squote">'EARTH'</span><span class="sign">,</span> <span class="sign">[</span>3<span class="sign">.</span>0e<span class="sign">-</span>3_wp<span class="sign">,</span> 30<span class="sign">.</span>0e<span class="sign">-</span>3_wp<span class="sign">,</span> 40<span class="sign">.</span>0e<span class="sign">-</span>3_wp<span class="sign">]</span><span class="sign">,</span> error_cnt <span class="sign">)</span>
+<span class="line_number">178 </span>    <span class="keyword">nullify</span><span class="sign">(</span>traj<span class="sign">)</span>
+<span class="line_number">179 </span>
+<span class="line_number">180 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number">181 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'writing file '</span><span class="sign">/</span><span class="sign">/</span><span class="keyword">trim</span><span class="sign">(</span>dir<span class="sign">/</span><span class="sign">/</span>filename2<span class="sign">)</span><span class="sign">/</span><span class="sign">/</span><span class="squote">'...'</span>
+<span class="line_number">182 </span>
+<span class="line_number">183 </span>    <span class="keyword">open</span><span class="sign">(</span>newunit<span class="sign">=</span>iunit<span class="sign">,</span> file<span class="sign">=</span>dir<span class="sign">/</span><span class="sign">/</span>filename2<span class="sign">,</span> status<span class="sign">=</span><span class="squote">'REPLACE'</span><span class="sign">)</span>
+<span class="line_number">184 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo9">json_print</a><span class="sign">(</span>p<span class="sign">,</span>iunit<span class="sign">)</span>
+<span class="line_number">185 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">186 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">187 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">188 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">189 </span>    <span class="keyword">close</span><span class="sign">(</span>iunit<span class="sign">)</span>
+<span class="line_number">190 </span>
+<span class="line_number">191 </span>    <span class="comment">!cleanup:</span>
+<span class="line_number">192 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo6">json_destroy</a><span class="sign">(</span>p<span class="sign">)</span>
+<span class="line_number">193 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">194 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">195 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">196 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">197 </span>
+<span class="line_number">198 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number">199 </span>
+<span class="line_number">200 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> test_2
+<span class="line_number">201 </span>
+<span class="line_number">202 </span>    <span class="keyword">subroutine</span> add_variables_to_input<span class="sign">(</span>me<span class="sign">,</span> variable<span class="sign">,</span> units<span class="sign">,</span> frame<span class="sign">,</span> center<span class="sign">,</span> rdata<span class="sign">,</span> error_cnt<span class="sign">)</span>
+<span class="line_number">203 </span>    <span class="comment">!Used by test_2.</span>
+<span class="line_number">204 </span>
+<span class="line_number">205 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number">206 </span>
+<span class="line_number">207 </span>    <span class="keyword">type</span><span class="sign">(</span><a href="../json_module_f90.html#robo4">json_value</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">pointer</span> <span class="sign">:</span><span class="sign">:</span> me
+<span class="line_number">208 </span>    <span class="keyword">character</span><span class="sign">(</span>len<span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> variable<span class="sign">,</span> units<span class="sign">,</span> frame<span class="sign">,</span> center
+<span class="line_number">209 </span>    <span class="keyword">real</span><span class="sign">(</span>wp<span class="sign">)</span><span class="sign">,</span><span class="keyword">dimension</span><span class="sign">(</span><span class="sign">:</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> rdata
+<span class="line_number">210 </span>    <span class="keyword">integer</span><span class="sign">,</span> <span class="keyword">intent</span><span class="sign">(</span>inout<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> error_cnt
+<span class="line_number">211 </span>
+<span class="line_number">212 </span>    <span class="keyword">type</span><span class="sign">(</span><a href="../json_module_f90.html#robo4">json_value</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">pointer</span> <span class="sign">:</span><span class="sign">:</span> var        <span class="comment">!a variable in the trajectory:</span>
+<span class="line_number">213 </span>
+<span class="line_number">214 </span>    <span class="comment">!initialize:</span>
+<span class="line_number">215 </span>    <span class="keyword">nullify</span><span class="sign">(</span>var<span class="sign">)</span>
+<span class="line_number">216 </span>
+<span class="line_number">217 </span>    <span class="comment">!create the object before data can be added:</span>
+<span class="line_number">218 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo30">json_create_object</a><span class="sign">(</span>var<span class="sign">,</span><span class="squote">''</span><span class="sign">)</span>    <span class="comment">!name does not matter</span>
+<span class="line_number">219 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">220 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">221 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">222 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">223 </span>
+<span class="line_number">224 </span>    <span class="comment">!variable info:</span>
+<span class="line_number">225 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>var<span class="sign">,</span> <span class="squote">'VARIABLE'</span><span class="sign">,</span><span class="keyword">trim</span><span class="sign">(</span>variable<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">226 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">227 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">228 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">229 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">230 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>var<span class="sign">,</span> <span class="squote">'UNITS'</span><span class="sign">,</span> <span class="keyword">trim</span><span class="sign">(</span>units<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">231 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">232 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">233 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">234 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">235 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>var<span class="sign">,</span> <span class="squote">'FRAME'</span><span class="sign">,</span> <span class="keyword">trim</span><span class="sign">(</span>frame<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">236 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">237 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">238 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">239 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">240 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>var<span class="sign">,</span> <span class="squote">'CENTER'</span><span class="sign">,</span> <span class="keyword">trim</span><span class="sign">(</span>center<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">241 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">242 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">243 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">244 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">245 </span>
+<span class="line_number">246 </span>    <span class="comment">!trajectory [vector of reals]:</span>
+<span class="line_number">247 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>var<span class="sign">,</span> <span class="squote">'DATA'</span><span class="sign">,</span> rdata<span class="sign">)</span>
+<span class="line_number">248 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">249 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">250 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">251 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">252 </span>
+<span class="line_number">253 </span>    <span class="comment">!add this variable to trajectory structure:</span>
+<span class="line_number">254 </span>    <span class="keyword">call</span> <a href="../json_module_f90.html#robo5">json_add</a><span class="sign">(</span>me<span class="sign">,</span> var<span class="sign">)</span>
+<span class="line_number">255 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_f90.html#robo32">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">256 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">257 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">258 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">259 </span>
+<span class="line_number">260 </span>    <span class="comment">!cleanup:</span>
+<span class="line_number">261 </span>    <span class="keyword">nullify</span><span class="sign">(</span>var<span class="sign">)</span>
+<span class="line_number">262 </span>
+<span class="line_number">263 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> add_variables_to_input
+<span class="line_number">264 </span>
+<span class="line_number">265 </span><span class="keyword">end</span> <span class="keyword">module</span> jf_test_2_mod
+<span class="line_number">266 </span>
+<span class="line_number">267 </span><span class="keyword">program</span> <strong>jf_test_2</strong>
+<span class="line_number">268 </span>    <span class="keyword">use</span> jf_test_2_mod <span class="sign">,</span> <span class="keyword">only</span><span class="sign">:</span> test_2
+<span class="line_number">269 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number">270 </span>    <span class="keyword">integer</span> <span class="sign">:</span><span class="sign">:</span> n_errors
+<span class="line_number">271 </span>    n_errors <span class="sign">=</span> 0
+<span class="line_number">272 </span>    <span class="keyword">call</span> test_2<span class="sign">(</span>n_errors<span class="sign">)</span>
+<span class="line_number">273 </span>    <span class="keyword">if</span> <span class="sign">(</span>n_errors <span class="sign">/</span><span class="sign">=</span> 0<span class="sign">)</span> <span class="keyword">stop</span> 1
+<span class="line_number">274 </span><span class="keyword">end</span> <span class="keyword">program</span> <strong>jf_test_2</strong>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./src/tests/jf_test_2.f90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.41 on Sat Feb 28 2015 05:12:24
+</p>
+</div> <!-- footer -->
+</body>
+</html>
