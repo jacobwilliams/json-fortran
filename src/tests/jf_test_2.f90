@@ -1,8 +1,8 @@
 !*******************************************************************************************************
-!****f* JSON/test_2
+!****u* JSON/jf_test_2
 !
 !  NAME
-!    json_test
+!    jf_test_2
 !
 !  DESCRIPTION
 !    Second unit test
@@ -12,11 +12,11 @@
 !    iso_fortran_env (intrinsic)
 !
 !  HISTORY
-!    Izaak Beekman  : 2/18/2015 : Created
+!    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 !
-!  COPYRIGHT
+!  LICENSE
 !
-!    JSON-FORTRAN: A Fortran 2003/2008 JSON API
+!    JSON-FORTRAN: A Fortran 2008 JSON API
 !    https://github.com/jacobwilliams/json-fortran
 !
 !    Copyright (c) 2014, Jacob Williams
@@ -47,22 +47,23 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !  SOURCE
+
 module jf_test_2_mod
+
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
-    implicit none
-    character(len=*),parameter :: dir = '../files/'               !working directory
 
+    implicit none
+
+    character(len=*),parameter :: dir = '../files/'    !working directory
     character(len=*),parameter :: filename2 = 'test2.json'
 
 contains
-!**************************************************************
-    subroutine test_2(error_cnt)
-!**************************************************************
-!
-!    Populate a JSON structure and write it to a file.
-!
-!**************************************************************
+
+    subroutine test_2(error_cnt)    
+
+!   Populate a JSON structure and write it to a file.
+
     implicit none
 
     integer,intent(out) :: error_cnt
@@ -196,15 +197,10 @@ contains
 
     write(error_unit,'(A)') ''
 
-!**************************************************************
     end subroutine test_2
-!**************************************************************
 
-!**************************************************************
     subroutine add_variables_to_input(me, variable, units, frame, center, rdata, error_cnt)
-!**************************************************************
-!    Used by test_2.
-!**************************************************************
+    !Used by test_2.
 
     implicit none
 
@@ -264,12 +260,9 @@ contains
     !cleanup:
     nullify(var)
 
-!**************************************************************
     end subroutine add_variables_to_input
-!**************************************************************
 
 end module jf_test_2_mod
-!*******************************************************************************************************
 
 program jf_test_2
     use jf_test_2_mod , only: test_2
@@ -279,3 +272,5 @@ program jf_test_2
     call test_2(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_2
+
+!*******************************************************************************************************

@@ -1,8 +1,8 @@
 !*******************************************************************************************************
-!****f* JSON/test_4
+!****u* JSON/jf_test_4
 !
 !  NAME
-!    json_test
+!    jf_test_4
 !
 !  DESCRIPTION
 !    Fourth unit test
@@ -12,11 +12,11 @@
 !    iso_fortran_env (intrinsic)
 !
 !  HISTORY
-!    Izaak Beekman  : 2/18/2015 : Created
+!    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 !
-!  COPYRIGHT
+!  LICENSE
 !
-!    JSON-FORTRAN: A Fortran 2003/2008 JSON API
+!    JSON-FORTRAN: A Fortran 2008 JSON API
 !    https://github.com/jacobwilliams/json-fortran
 !
 !    Copyright (c) 2014, Jacob Williams
@@ -47,27 +47,28 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !  SOURCE
+
 module jf_test_4_mod
+
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
-    implicit none
-    character(len=*),parameter :: dir = '../files/'               !working directory
 
+    implicit none
+
+    character(len=*),parameter :: dir = '../files/'               !working directory
     character(len=*),parameter :: filename4 = 'test4.json'
 
 contains
 
-!**************************************************************
+
     subroutine test_4(error_cnt)
-!**************************************************************
-!
+
 !    Populate a JSON structure, write it to a file,
 !        then read it.
 !
 !    Also tests the json_value_to_string routine to write
 !     the file to a character string.
-!
-!**************************************************************
+
     implicit none
 
     integer,intent(out) :: error_cnt
@@ -162,7 +163,6 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'cleanup'
     call json%destroy()
@@ -171,12 +171,9 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-!**************************************************************
     end subroutine test_4
-!**************************************************************
 
 end module jf_test_4_mod
-!*******************************************************************************************************
 
 program jf_test_4
     use jf_test_4_mod , only: test_4
@@ -186,3 +183,5 @@ program jf_test_4
     call test_4(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_4
+
+!*******************************************************************************************************

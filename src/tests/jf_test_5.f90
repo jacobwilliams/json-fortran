@@ -1,8 +1,8 @@
 !*******************************************************************************************************
-!****f* JSON/test_5
+!****u* JSON/jf_test_5
 !
 !  NAME
-!    json_test
+!    jf_test_5
 !
 !  DESCRIPTION
 !    Fifth unit test
@@ -12,11 +12,11 @@
 !    iso_fortran_env (intrinsic)
 !
 !  HISTORY
-!    Izaak Beekman  : 2/18/2015 : Created
+!    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 !
-!  COPYRIGHT
+!  LICENSE
 !
-!    JSON-FORTRAN: A Fortran 2003/2008 JSON API
+!    JSON-FORTRAN: A Fortran 2008 JSON API
 !    https://github.com/jacobwilliams/json-fortran
 !
 !    Copyright (c) 2014, Jacob Williams
@@ -47,25 +47,25 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !  SOURCE
+
 module jf_test_5_mod
+
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    
     implicit none
+    
     character(len=*),parameter :: dir = '../files/'               !working directory
-
     character(len=*),parameter :: filename5 = 'test5.json'
 
 contains
 
-!**************************************************************
     subroutine test_5(error_cnt)
-!**************************************************************
-!
+
 !    Github issue example: https://github.com/josephalevin/fson/issues/12
 !
 !    Read an existing file and extract some variables.
-!
-!**************************************************************
+
     implicit none
 
     integer,intent(out) :: error_cnt
@@ -143,12 +143,9 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-!**************************************************************
     end subroutine test_5
-!**************************************************************
 
 end module jf_test_5_mod
-!*******************************************************************************************************
 
 program jf_test_5
     use jf_test_5_mod , only: test_5
@@ -158,3 +155,5 @@ program jf_test_5
     call test_5(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_5
+
+!*******************************************************************************************************

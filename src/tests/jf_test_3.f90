@@ -1,8 +1,8 @@
 !*******************************************************************************************************
-!****f* JSON/test_3
+!****u* JSON/jf_test_3
 !
 !  NAME
-!    json_test
+!    jf_test_3
 !
 !  DESCRIPTION
 !    Third unit test
@@ -12,11 +12,11 @@
 !    iso_fortran_env (intrinsic)
 !
 !  HISTORY
-!    Izaak Beekman  : 2/18/2015 : Created
+!    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 !
-!  COPYRIGHT
+!  LICENSE
 !
-!    JSON-FORTRAN: A Fortran 2003/2008 JSON API
+!    JSON-FORTRAN: A Fortran 2008 JSON API
 !    https://github.com/jacobwilliams/json-fortran
 !
 !    Copyright (c) 2014, Jacob Williams
@@ -47,24 +47,23 @@
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !  SOURCE
+
 module jf_test_3_mod
+
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
-    implicit none
-    character(len=*),parameter :: dir = '../files/'               !working directory
 
+    implicit none
+
+    character(len=*),parameter :: dir = '../files/'               !working directory
     character(len=*),parameter :: filename2 = 'test2.json'
 
 contains
 
-!**************************************************************
     subroutine test_3(error_cnt)
-!**************************************************************
-!
-!    Read the file generated in test_2, and extract
-!        some data from it.
-!
-!**************************************************************
+
+!   Read the file generated in jf_test_2, and extract some data from it.
+
     implicit none
 
     integer,intent(out) :: error_cnt
@@ -163,12 +162,9 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-!**************************************************************
     end subroutine test_3
-!**************************************************************
 
 end module jf_test_3_mod
-!*******************************************************************************************************
 
 program jf_test_3
     use jf_test_3_mod , only: test_3
@@ -178,3 +174,5 @@ program jf_test_3
     call test_3(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_3
+
+!*******************************************************************************************************
