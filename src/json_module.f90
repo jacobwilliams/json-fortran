@@ -154,7 +154,7 @@
     integer(IK),parameter :: rp_addl_safety = 1
     integer(IK),parameter :: real_precision = rp_safety_factor*precision(1.0_RK) + rp_addl_safety
     ! Get the number of possible digits in the exponent when using decimal number system
-    integer(IK),parameter :: real_exponent_digits = ceiling( log10( &
+    integer(IK),parameter :: real_exponent_digits = floor( 1 + log10( &
                                   real(max(maxexponent(1.0_RK),abs(minexponent(1.0_RK))),kind=RK) &
                                   ) )
     ! 4*precision to prevent rounding errors
