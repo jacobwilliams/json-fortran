@@ -94,7 +94,7 @@ for more examples. The source files may be found in `src/tests/`.
         call json_initialize()
 
         ! read the file
-        call json%load_file(filename = 'test1.json')
+        call json%load_file(filename = '../files/test1.json')
 
         ! print the file to the console
         call json%print_file()
@@ -107,6 +107,7 @@ for more examples. The source files may be found in `src/tests/`.
 
         ! clean up
         call json%destroy()
+	if (json_failed()) stop 1
 
     end program example1
 ```
@@ -182,6 +183,7 @@ of `json_value` pointers.  For more examples see unit tests 2,4 and 7 in `src/te
 
         !cleanup:
         call json_destroy(p)
+	if (json_failed()) stop 1
 
     end program example2
 ```
