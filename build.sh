@@ -1,18 +1,25 @@
 #!/bin/bash
 
 #
-#  Build the json-fortran library and unit tests.
+#  NAME
+#    build.sh
 #
-#  Requires:
+#  DESCRIPTION
+#    Build the json-fortran library and unit tests.
+#
+#  USAGE
+#    build.sh         : build using gfortran
+#    build.sh -ifort  : build using ifort
+#
+#  REQUIRES
 #    FoBiS.py : https://github.com/szaghi/FoBiS      [version 1.2.5 or later required]
 #    RoboDoc  : http://rfsber.home.xs4all.nl/Robo/   [version 4.99.38 is the one tested]
 #
-#  Jacob Williams : 12/27/2014
+#  AUTHOR
+#    Jacob Williams : 12/27/2014
 #
 
-# Set to 1 to use ifort, otherwise use gfortran
 set -e
-use_ifort=0
 
 PROJECTNAME='jsonfortran'       # project name for robodoc (example: jsonfortran_2.0.0)
 DOCDIR='./documentation/'       # build directory for documentation
@@ -23,8 +30,7 @@ LIBDIR='./lib/'                 # build directory for library
 MODCODE='json_module.f90'       # json module file name
 LIBOUT='libjsonfortran.a'       # name of json library
 
-if [ $use_ifort -eq 1 ]
-then
+if [ "$1" == "-ifort" ]; then
 	# Intel compiler
 
 	FCOMPILER='Intel'
@@ -67,14 +73,19 @@ else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."
 fi
 
-#build the documentation with RoboDoc:
+#build the documentation with RoboDoc (if present):
 echo ""
-echo "Building documentation..."
-robodoc --rc ./robodoc.rc --src ${SRCDIR} --doc ${DOCDIR} --documenttitle ${PROJECTNAME}
-echo ""
+if hash robodoc 2>/dev/null; then
+    echo "Building documentation..."
+    robodoc --rc ./robodoc.rc --src ${SRCDIR} --doc ${DOCDIR} --documenttitle ${PROJECTNAME}
+else
+    echo "ROBODoc not found! Cannot build documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/"
+fi
 
 # Run all the tests unless $JF_SKIP_TESTS
-if [[ $JF_SKIP_TESTS != [yY]* ]]; then
+echo ""
+if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
+    echo "Running tests..."
     cd "$BINDIR"
     rm jf_test*.o jf_test*.mod || true
     OLD_IGNORES="$GLOBIGNORE"
