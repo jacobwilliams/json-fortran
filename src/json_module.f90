@@ -97,38 +97,70 @@
     private
 
     !*********************************************************
-    !****d* json_module/kinds
+    !****d* json_module/RK
     !
     !  NAME
-    !    kinds
+    !    RK
     !
     !  DESCRIPTION
-    !   Kind definitions for real, integer, character, and logical variables.
-    !
-    !   The sizes given here are valid for the Intel and Gfortran compilers
-    !   (and perhaps others)
+    !    Default real kind [8 bytes].
     !
     !  SOURCE
-
-    !default real kind [8 bytes]
     integer,parameter :: RK = real64
+    !*********************************************************
 
-    !default integer kind [4 bytes]
+    !*********************************************************
+    !****d* json_module/IK
+    !
+    !  NAME
+    !    IK
+    !
+    !  DESCRIPTION
+    !    Default integer kind [4 bytes].
+    !
+    !  SOURCE
     integer,parameter :: IK = int32
+    !*********************************************************
 
-    !default character kind [1 byte]
+    !*********************************************************
+    !****d* json_module/CK
+    !
+    !  NAME
+    !    CK
+    !
+    !  DESCRIPTION
+    !    Default character kind.
+    !    This is 1 byte for the Intel and Gfortran compilers
+    !    (and perhaps others).
+    !
+    !  SOURCE
     integer,parameter :: CK = character_kinds(1)
+    !*********************************************************
 
-    !default logical kind [4 bytes]
-    !The statement here is to ensure a valid kind
-    ! if the compiler doesn't have a logical_kinds(3)
+    !*********************************************************
+    !****d* json_module/LK
+    !
+    !  NAME
+    !    LK
+    !
+    !  DESCRIPTION
+    !    Default logical kind.
+    !    This is 4 bytes for the Intel and Gfortran compilers
+    !    (and perhaps others).
+    !    The declaration ensures a valid kind
+    !    if the compiler doesn't have a logical_kinds(3).
+    !
+    !  SOURCE
     integer,parameter :: LK = logical_kinds(min(3,size(logical_kinds)))
     !*********************************************************
 
     !parameters:
-    character(kind=CK,len=*),parameter,public :: json_ext = '.json'   !JSON file extension
 
-    character(kind=CK,len=*),parameter :: space           = ' '   !special json characters
+    !JSON file extension
+    character(kind=CK,len=*),parameter,public :: json_ext = '.json'
+
+    !special JSON characters
+    character(kind=CK,len=*),parameter :: space           = ' '
     character(kind=CK,len=*),parameter :: start_object    = '{'
     character(kind=CK,len=*),parameter :: end_object      = '}'
     character(kind=CK,len=*),parameter :: start_array     = '['
@@ -147,22 +179,27 @@
     character(kind=CK,len=*),parameter :: slash           = achar(47)
     character(kind=CK,len=*),parameter :: backslash       = achar(92)
 
-    integer(IK),parameter :: spaces_per_tab = 2    !for indenting (Note: jsonlint.com uses 4 spaces)
+    !for indenting (Note: jsonlint.com uses 4 spaces)
+    integer(IK),parameter :: spaces_per_tab = 2
 
-    ! find out the precision of the floating point number system, in io use 4Xprecision
+    !find out the precision of the floating point number system, in io use 4Xprecision
     integer(IK),parameter :: rp_safety_factor = 1
     integer(IK),parameter :: rp_addl_safety = 1
-    integer(IK),parameter :: real_precision = rp_safety_factor*precision(1.0_RK) + rp_addl_safety
-    ! Get the number of possible digits in the exponent when using decimal number system
+    integer(IK),parameter :: real_precision = rp_safety_factor*precision(1.0_RK) + &
+                                              rp_addl_safety
+
+    !Get the number of possible digits in the exponent when using decimal number system
     integer(IK),parameter :: real_exponent_digits = floor( 1 + log10( &
-                                  real(max(maxexponent(1.0_RK),abs(minexponent(1.0_RK))),kind=RK) &
-                                  ) )
-    ! 4*precision to prevent rounding errors
-    ! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
+                                  real(max(maxexponent(1.0_RK),abs(minexponent(1.0_RK))),&
+                                  kind=RK) ) )
+
+    !4*precision to prevent rounding errors
+    !6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
     integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6
-    ! real format set by library initialization
-    character(kind=CK,len=*),parameter :: int_fmt  = '(I0)'       !minimum width format for integers
-    character(kind=CK,len=*),parameter :: star     = '*'          !for invalid numbers
+
+    !real format set by library initialization
+    character(kind=CK,len=*),parameter :: int_fmt  = '(I0)' !minimum width format for integers
+    character(kind=CK,len=*),parameter :: star     = '*'    !for invalid numbers
 
     !*********************************************************
     !****d* json_module/var_type
@@ -330,7 +367,19 @@
         end type json_file
     !*********************************************************
 
-    !array element callback function
+    !*************************************************************************************
+    !****I* json_module/array_callback_func
+    !
+    !  NAME
+    !    array_callback_func
+    !
+    !  DESCRIPTION
+    !    Array element callback function.  Used by json_get_array.
+    !
+    !  SEE ALSO
+    !    json_get_array
+    !
+    !  SOURCE
     abstract interface
         subroutine array_callback_func(element, i, count)
             import :: json_value,IK
@@ -340,6 +389,7 @@
             integer(IK),intent(in) :: count    !size of array
         end subroutine array_callback_func
     end interface
+    !*************************************************************************************
 
     !*************************************************************************************
     !****I* json_module/json_get_child
@@ -964,9 +1014,6 @@
 !  NAME
 !    json_info
 !
-!  USAGE
-!    call me%info(path,found,var_type,n_children)
-!
 !  DESCRIPTION
 !    Returns information about a json_value
 !
@@ -1538,30 +1585,30 @@
 !
 !  SOURCE
 
-    recursive subroutine json_value_destroy(this)
+    recursive subroutine json_value_destroy(me)
 
     implicit none
 
-    type(json_value),pointer :: this
+    type(json_value),pointer :: me
 
-    if (associated(this)) then
+    if (associated(me)) then
 
-        if (allocated(this%name)) deallocate(this%name)
+        if (allocated(me%name)) deallocate(me%name)
 
-        call destroy_json_data(this)
+        call destroy_json_data(me)
 
-        if (associated(this%children)) call json_value_destroy(this%children)
-        this%n_children = 0
+        if (associated(me%children)) call json_value_destroy(me%children)
+        me%n_children = 0
 
-        if (associated(this%next)) call json_value_destroy(this%next)
+        if (associated(me%next)) call json_value_destroy(me%next)
 
-        if (associated(this%previous)) nullify(this%previous)
-        if (associated(this%parent))   nullify(this%parent)
-        if (associated(this%tail))     nullify(this%tail)
+        if (associated(me%previous)) nullify(me%previous)
+        if (associated(me%parent))   nullify(me%parent)
+        if (associated(me%tail))     nullify(me%tail)
 
-        deallocate(this)
+        deallocate(me)
 
-        nullify(this)
+        nullify(me)
 
     end if
 
@@ -1588,7 +1635,7 @@
 !    To extract an object from one json structure, and add it to another:
 !     type(json_value),pointer :: json1,json2,p
 !     logical :: found
-!     [create and populate json1 and json2]
+!     !create and populate json1 and json2
 !     call json_get(json1,'name',p,found)  ! get pointer to name element of json1
 !     call json_remove(p,destroy=.false.)  ! remove it from json1 (don't destroy)
 !     call json_add(json2,p)               ! add it to json2
@@ -1596,7 +1643,7 @@
 !    To remove an object from a json structure (and destroy it):
 !     type(json_value),pointer :: json1,p
 !     logical :: found
-!     [create and populate json1]
+!     !create and populate json1
 !     call json_get(json1,'name',p,found)  ! get pointer to name element of json1
 !     call json_remove(p)                  ! remove and destroy it
 !
@@ -2033,37 +2080,37 @@
 !    json_value_add_member
 !
 !  DESCRIPTION
-!    Adds the member as a child of this.
+!    Adds the member as a child of me.
 !
 !  SOURCE
 
-    subroutine json_value_add_member(this, member)
+    subroutine json_value_add_member(me, member)
 
     implicit none
 
-    type(json_value),pointer :: this, member
+    type(json_value),pointer :: me, member
 
     if (.not. exception_thrown) then
 
         ! associate the parent
-        member%parent => this
+        member%parent => me
 
         ! add to linked list
-        if (associated(this%children)) then
+        if (associated(me%children)) then
 
-            this%tail%next => member
-            member%previous => this%tail
+            me%tail%next => member
+            member%previous => me%tail
 
         else
 
-            this%children => member
+            me%children => member
             member%previous => null()  !first in the list
 
         end if
 
         ! new member is now the last one in the list
-        this%tail => member
-        this%n_children = this%n_children + 1
+        me%tail => member
+        me%n_children = me%n_children + 1
 
     end if
 
@@ -2545,11 +2592,11 @@
 !
 !  SOURCE
 
-    subroutine json_value_get_by_index(this, idx, p)
+    subroutine json_value_get_by_index(me, idx, p)
 
     implicit none
 
-    type(json_value),pointer,intent(in) :: this
+    type(json_value),pointer,intent(in) :: me
     integer(IK),intent(in)              :: idx
     type(json_value),pointer            :: p
 
@@ -2559,9 +2606,9 @@
 
     if (.not. exception_thrown) then
 
-        if (associated(this%children)) then
+        if (associated(me%children)) then
 
-            p => this%children
+            p => me%children
 
             do i = 1, idx - 1
 
@@ -2579,7 +2626,7 @@
         else
 
             call throw_exception('Error in json_value_get_by_index:'//&
-                                 ' this%children is not associated.')
+                                 ' me%children is not associated.')
 
         end if
 
@@ -2605,11 +2652,11 @@
 !
 !  SOURCE
 
-    subroutine json_value_get_by_name_chars(this, name, p)
+    subroutine json_value_get_by_name_chars(me, name, p)
 
     implicit none
 
-    type(json_value),pointer,intent(in) :: this
+    type(json_value),pointer,intent(in) :: me
     character(kind=CK,len=*),intent(in) :: name
     type(json_value),pointer            :: p
 
@@ -2619,11 +2666,11 @@
 
     if (.not. exception_thrown) then
 
-        if (associated(this)) then
+        if (associated(me)) then
 
-            if (this%var_type==json_object) then
-                n_children = json_count(this)
-                p => this%children    !start with first one
+            if (me%var_type==json_object) then
+                n_children = json_count(me)
+                p => me%children    !start with first one
                 do i=1, n_children
                     if (allocated(p%name)) then
                         if (p%name == name) return
@@ -2730,7 +2777,7 @@
     implicit none
 
     type(json_value),pointer,intent(in) :: me
-    character(kind=CK,len=*),intent(in) :: filename
+    character(kind=CK,len=*),intent(in) :: filename  !file to print to
 
     integer(IK) :: iunit,istat
 
@@ -2762,11 +2809,11 @@
 !
 !  SOURCE
 
-    recursive subroutine json_value_print(this,iunit,str,indent,need_comma,colon,is_array_element)
+    recursive subroutine json_value_print(me,iunit,str,indent,need_comma,colon,is_array_element)
 
     implicit none
 
-    type(json_value),pointer,intent(in)  :: this
+    type(json_value),pointer,intent(in)  :: me
     integer(IK),intent(in)               :: iunit             !file unit to write to (6=console)
     integer(IK),intent(in),optional      :: indent            !indention level
     logical(LK),intent(in),optional      :: is_array_element  !if this is an array element
@@ -2823,11 +2870,11 @@
             s = repeat(space, spaces)
         end if
 
-        select case (this%var_type)
+        select case (me%var_type)
 
         case (json_object)
 
-            count = json_count(this)
+            count = json_count(me)
 
             if (count==0) then    !special case for empty object
 
@@ -2844,7 +2891,7 @@
                 end if
 
                 nullify(element)
-                element => this%children
+                element => me%children
                 do i = 1, count
 
                     ! print the name
@@ -2877,7 +2924,7 @@
 
         case (json_array)
 
-            count = json_count(this)
+            count = json_count(me)
 
             if (count==0) then    !special case for empty array
 
@@ -2888,7 +2935,7 @@
                 call write_it( start_array )
 
                 nullify(element)
-                element => this%children
+                element => me%children
                 do i = 1, count
 
                     ! recursive print of the element
@@ -2913,18 +2960,18 @@
 
         case (json_string)
 
-            if (allocated(this%str_value)) then
+            if (allocated(me%str_value)) then
                 call write_it( s//quotation_mark// &
-                               trim(this%str_value)//quotation_mark, comma=print_comma )
+                               trim(me%str_value)//quotation_mark, comma=print_comma )
             else
                 call throw_exception('Error in json_value_print:'//&
-                                     ' this%value_string not allocated')
+                                     ' me%value_string not allocated')
                 return
             end if
 
         case (json_logical)
 
-            if (this%log_value) then
+            if (me%log_value) then
                 call write_it( s//true_str, comma=print_comma )
             else
                 call write_it( s//false_str, comma=print_comma )
@@ -2932,13 +2979,13 @@
 
         case (json_integer)
 
-            call integer_to_string(this%int_value,tmp)
+            call integer_to_string(me%int_value,tmp)
 
             call write_it( s//trim(tmp), comma=print_comma )
 
         case (json_double)
 
-            call real_to_string(this%dbl_value,tmp)
+            call real_to_string(me%dbl_value,tmp)
 
             call write_it( s//trim(tmp), comma=print_comma )
 
@@ -3040,11 +3087,11 @@
 !
 !  SOURCE
 
-    subroutine json_get_by_path(this, path, p, found)
+    subroutine json_get_by_path(me, path, p, found)
 
     implicit none
 
-    type(json_value),pointer,intent(in)  :: this
+    type(json_value),pointer,intent(in)  :: me
     character(kind=CK,len=*),intent(in)  :: path
     type(json_value),pointer,intent(out) :: p
     logical(LK),intent(out),optional     :: found
@@ -3052,9 +3099,9 @@
     character(kind=CK,len=1),parameter :: start_array_alt = '('
     character(kind=CK,len=1),parameter :: end_array_alt   = ')'
 
-    integer(IK) :: i, length, child_i
+    integer(IK)              :: i,length,child_i
     character(kind=CK,len=1) :: c
-    logical(LK) :: array
+    logical(LK)              :: array
     type(json_value),pointer :: tmp
 
     if (.not. exception_thrown) then
@@ -3062,7 +3109,7 @@
         nullify(p)
 
         ! default to assuming relative to this
-        p => this
+        p => me
 
         child_i = 1
 
@@ -3086,7 +3133,7 @@
             case ('@')
 
                 ! this
-                p => this
+                p => me
                 child_i = i + 1
 
             case ('.')
@@ -3281,11 +3328,11 @@
 !
 !  SOURCE
 
-    subroutine json_get_integer(this, path, value, found)
+    subroutine json_get_integer(me, path, value, found)
 
     implicit none
 
-    type(json_value),pointer,intent(in) :: this
+    type(json_value),pointer,intent(in) :: me
     character(kind=CK,len=*),optional   :: path
     integer(IK),intent(out)             :: value
     logical(LK),intent(out),optional    :: found
@@ -3296,9 +3343,9 @@
 
         nullify(p)
         if (present(path)) then
-            call json_get_by_path(this=this, path=path, p=p)
+            call json_get_by_path(me=me, path=path, p=p)
         else
-            p => this
+            p => me
         end if
 
         if (.not. associated(p)) then
@@ -3415,11 +3462,11 @@
 !
 !  SOURCE
 
-    subroutine json_get_double(this, path, value, found)
+    subroutine json_get_double(me, path, value, found)
 
     implicit none
 
-    type(json_value),pointer           :: this
+    type(json_value),pointer           :: me
     character(kind=CK,len=*), optional :: path
     real(RK),intent(out)               :: value
     logical(LK),intent(out),optional   :: found
@@ -3431,9 +3478,9 @@
         nullify(p)
 
         if (present(path)) then
-            call json_get_by_path(this=this, path=path, p=p)
+            call json_get_by_path(me=me, path=path, p=p)
         else
-            p => this
+            p => me
         end if
 
         if (.not. associated(p)) then
@@ -3550,11 +3597,11 @@
 !
 !  SOURCE
 
-    subroutine json_get_logical(this, path, value, found)
+    subroutine json_get_logical(me, path, value, found)
 
     implicit none
 
-    type(json_value),pointer,intent(in) :: this
+    type(json_value),pointer,intent(in) :: me
     character(kind=CK,len=*),optional   :: path
     logical(LK)                         :: value
     logical(LK),intent(out),optional    :: found
@@ -3566,9 +3613,9 @@
         nullify(p)
 
         if (present(path)) then
-            call json_get_by_path(this=this, path=path, p=p)
+            call json_get_by_path(me=me, path=path, p=p)
         else
-            p => this
+            p => me
         end if
 
         if (.not. associated(p)) then
@@ -3679,11 +3726,11 @@
 !
 !  SOURCE
 
-    subroutine json_get_string(this, path, value, found)
+    subroutine json_get_string(me, path, value, found)
 
     implicit none
 
-    type(json_value),pointer,intent(in)              :: this
+    type(json_value),pointer,intent(in)              :: me
     character(kind=CK,len=*),intent(in),optional     :: path
     character(kind=CK,len=:),allocatable,intent(out) :: value
     logical(LK),intent(out),optional                 :: found
@@ -3698,9 +3745,9 @@
         nullify(p)
 
         if (present(path)) then
-            call json_get_by_path(this=this, path=path, p=p)
+            call json_get_by_path(me=me, path=path, p=p)
         else
-            p => this
+            p => me
         end if
 
         if (.not. associated(p)) then
@@ -3960,11 +4007,11 @@
 !
 !  SOURCE
 
-    subroutine json_get_array(this, path, array_callback, found)
+    subroutine json_get_array(me, path, array_callback, found)
 
     implicit none
 
-    type(json_value),pointer,intent(in)          :: this
+    type(json_value),pointer,intent(in)          :: me
     character(kind=CK,len=*),intent(in),optional :: path
     procedure(array_callback_func)               :: array_callback
     logical(LK),intent(out),optional             :: found
@@ -3978,9 +4025,9 @@
 
         ! resolve the path to the value
         if (present(path)) then
-            call json_get_by_path(this=this, path=path, p=p)
+            call json_get_by_path(me=me, path=path, p=p)
         else
-            p => this
+            p => me
         end if
 
         if (.not. associated(p)) then
@@ -5465,9 +5512,7 @@
     real(RK),intent(in)                  :: rval
     character(kind=CK,len=*),intent(out) :: str
 
-    character(kind=CK,len=len(str)) :: significand, expnt
-    character(kind=CK,len=2) :: separator
-    integer(IK) :: istat, exp_start, decimal_pos, sig_trim, exp_trim, i
+    integer(IK) :: istat
 
     !default format:
     write(str,fmt=real_fmt,iostat=istat) rval
@@ -5476,68 +5521,97 @@
 
         !in this case, the default string will be compacted,
         ! so that the same value is displayed with fewer characters.
-        if (compact_real) then
-
-            str = adjustl(str)
-            exp_start = scan(str,CK_'eEdD')
-            if (exp_start == 0) exp_start = scan(str,CK_'-+',back=.true.)
-            decimal_pos = scan(str,CK_'.')
-            if (exp_start /= 0) separator = str(exp_start:exp_start)
-
-            if (exp_start > 0 .and. exp_start < decimal_pos) then !signed, exponent-less float
-
-                significand = str
-                sig_trim = len(trim(significand))
-                do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
-                                                               !but save one after the decimal place
-                    if (significand(i:i) == CK_'0') then
-                        sig_trim = i-1
-                    else
-                        exit
-                    end if
-                end do
-                str = trim(significand(1:sig_trim))
-
-            else if (exp_start > decimal_pos) then !float has exponent
-
-                significand = str(1:exp_start-1)
-                sig_trim = len(trim(significand))
-                do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
-                    if (significand(i:i) == CK_'0') then
-                        sig_trim = i-1
-                    else
-                        exit
-                    end if
-                end do
-                expnt = adjustl(str(exp_start+1:))
-                if (expnt(1:1) == CK_'+' .or. expnt(1:1) == CK_'-') then
-                    separator = trim(adjustl(separator))//expnt(1:1)
-                    exp_start = exp_start + 1
-                    expnt = adjustl(str(exp_start+1:))
-                end if
-                exp_trim = 1
-                do i = 1,(len(trim(expnt))-1) !look at exponent leading zeros saving last
-                    if (expnt(i:i) == CK_'0') then
-                        exp_trim = i+1
-                    else
-                        exit
-                    end if
-                end do
-                str = trim(adjustl(significand(1:sig_trim)))// &
-                        trim(adjustl(separator))// &
-                        trim(adjustl(expnt(exp_trim:)))
-
-            !else ! mal-formed real, BUT this code should be unreachable
-
-            end if
-
-        end if
+        if (compact_real) call compact_real_string(str)
 
     else
         str = repeat(star,len(str))
     end if
 
     end subroutine real_to_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****if* json_module/compact_real_string
+!
+!  NAME
+!    compact_real_string
+!
+!  DESCRIPTION
+!    Compact a string representing a real number, so that 
+!    the same value is displayed with fewer characters.
+!
+!  SEE ALSO
+!    real_to_string
+!
+!  AUTHOR
+!    Izaak Beekman : 02/24/2015
+!
+!  SOURCE
+
+    subroutine compact_real_string(str)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(inout) :: str
+
+    character(kind=CK,len=len(str)) :: significand, expnt
+    character(kind=CK,len=2) :: separator
+    integer(IK) :: exp_start,decimal_pos,sig_trim,exp_trim,i
+
+    str = adjustl(str)
+    exp_start = scan(str,CK_'eEdD')
+    if (exp_start == 0) exp_start = scan(str,CK_'-+',back=.true.)
+    decimal_pos = scan(str,CK_'.')
+    if (exp_start /= 0) separator = str(exp_start:exp_start)
+
+    if (exp_start > 0 .and. exp_start < decimal_pos) then !signed, exponent-less float
+
+        significand = str
+        sig_trim = len(trim(significand))
+        do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
+                                                       !but save one after the decimal place
+            if (significand(i:i) == CK_'0') then
+                sig_trim = i-1
+            else
+                exit
+            end if
+        end do
+        str = trim(significand(1:sig_trim))
+
+    else if (exp_start > decimal_pos) then !float has exponent
+
+        significand = str(1:exp_start-1)
+        sig_trim = len(trim(significand))
+        do i = len(trim(significand)),decimal_pos+2,-1 !look from right to left at 0s
+            if (significand(i:i) == CK_'0') then
+                sig_trim = i-1
+            else
+                exit
+            end if
+        end do
+        expnt = adjustl(str(exp_start+1:))
+        if (expnt(1:1) == CK_'+' .or. expnt(1:1) == CK_'-') then
+            separator = trim(adjustl(separator))//expnt(1:1)
+            exp_start = exp_start + 1
+            expnt     = adjustl(str(exp_start+1:))
+        end if
+        exp_trim = 1
+        do i = 1,(len(trim(expnt))-1) !look at exponent leading zeros saving last
+            if (expnt(i:i) == CK_'0') then
+                exp_trim = i+1
+            else
+                exit
+            end if
+        end do
+        str = trim(adjustl(significand(1:sig_trim)))// &
+              trim(adjustl(separator))// &
+              trim(adjustl(expnt(exp_trim:)))
+
+    !else ! mal-formed real, BUT this code should be unreachable
+
+    end if
+
+    end subroutine compact_real_string
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5612,7 +5686,8 @@
 
     implicit none
 
-    integer, intent(in), optional :: io_unit
+    integer,intent(in),optional :: io_unit
+
     character(len=:),allocatable :: error_msg
     logical :: status_ok
 
@@ -5630,9 +5705,8 @@
         call json_clear_exceptions()
     end if
 
-!**************************************************************
     end subroutine json_print_error_message
-!**************************************************************
+!*****************************************************************************************
 
 !*****************************************************************************************
     end module json_module
