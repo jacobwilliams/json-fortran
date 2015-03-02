@@ -240,3 +240,4 @@ Miscellaneous
 * For more information about JSON, see: <http://www.json.org/>
 * [json-fortran on Travis CI](https://travis-ci.org/jacobwilliams/json-fortran)
 * [json-fortran on Waffle.IO](https://waffle.io/jacobwilliams/json-fortran)
+* [json-fortran on Coveralls.IO](https://coveralls.io/r/jacobwilliams/json-fortran)
