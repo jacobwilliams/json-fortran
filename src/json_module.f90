@@ -245,7 +245,7 @@
     !
     !  SOURCE
 
-        type,public :: json_value
+    type,public :: json_value
 
         !force the constituents to be stored contiguously
         ![note: on Intel, the order of the variables below
@@ -272,11 +272,9 @@
 
         integer(IK),private :: n_children = 0   !number of children
 
-        end type json_value
+    end type json_value
     !*********************************************************
 
-    !*********************************************************
-        type,public :: json_file
     !*********************************************************
     !****c* json_module/json_file
     !
@@ -306,12 +304,14 @@
     !
     !  SOURCE
 
+    type,public :: json_file
+
         private
 
         !the JSON structure read from the file:
         type(json_value),pointer :: p => null()
 
-        contains
+    contains
 
         procedure,public :: load_file        => json_file_load
         procedure,public :: load_from_string => json_file_load_from_string
@@ -363,8 +363,7 @@
         procedure :: json_file_print_1
         procedure :: json_file_print_2
 
-    !*********************************************************
-        end type json_file
+    end type json_file
     !*********************************************************
 
     !*************************************************************************************
@@ -506,7 +505,7 @@
     !  EXAMPLE
     !    Consider the following example:
     !     type(json_value) :: p
-    !     ...
+    !     !...
     !     call json_print(p,'test.json')  !this is json_print_2
     !
     !  SOURCE
@@ -1574,14 +1573,10 @@
 !  DESCRIPTION
 !    Destroy a json_value linked-list structure.
 !
-!  NOTES
-!    This routine does not check for exceptions.
-!
-!    The original version of this routine was not
-!    properly freeing the memory.  It has been rewritten.
-!
 !  AUTHOR
-!    Jacob Williams : 1/22/2014
+!    Jacob Williams : 1/22/2014 : The original version of this
+!    routine was not properly freeing the memory.  
+!    It has been rewritten.
 !
 !  SOURCE
 
@@ -2569,7 +2564,7 @@
 !
 !  SOURCE
 
-    function json_count(me) result(count)
+    pure function json_count(me) result(count)
 
     implicit none
 
@@ -3071,7 +3066,7 @@
 !    Consider the following example:
 !     type(json_value),pointer :: dat,p
 !     logical :: found
-!     ...
+!     !...
 !     call json_get(dat,'data(2).version',p,found)
 !
 !  NOTES
@@ -4144,7 +4139,7 @@
                     iostat      = istat)
         end if
 
-    elseif (.not. present(unit) .and. present(file) .and. .not. present(str)) then
+    else if (.not. present(unit) .and. present(file) .and. .not. present(str)) then
 
         ! open the file with a new unit number:
         open (  newunit     = iunit, &
@@ -4155,7 +4150,7 @@
                 position    = 'REWIND', &
                 iostat      = istat)
 
-    elseif (.not. present(unit) .and. .not. present(file) .and. present(str)) then
+    else if (.not. present(unit) .and. .not. present(file) .and. present(str)) then
 
         buffer = str
         iunit = 0    !indicates that json data will be read from buffer
@@ -5468,7 +5463,7 @@
 !
 !  SOURCE
 
-    subroutine integer_to_string(ival,str)
+    pure subroutine integer_to_string(ival,str)
 
     implicit none
 
@@ -5635,7 +5630,7 @@
 !
 !  SOURCE
 
-    function valid_json_hex(str) result(valid)
+    pure function valid_json_hex(str) result(valid)
 
     implicit none
 
