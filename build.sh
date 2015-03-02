@@ -56,7 +56,6 @@ fi
 
 #build the stand-alone library:
 echo ""
-echo "${LFLAGS}"
 echo "Building library..."
 FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" ${COVERAGE} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
 
@@ -87,7 +86,6 @@ echo ""
 if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
     echo "Running tests..."
     cd "$BINDIR"
-    rm jf_test*.o jf_test*.mod || true
     OLD_IGNORES="$GLOBIGNORE"
     GLOBIGNORE='*.*'
     #
