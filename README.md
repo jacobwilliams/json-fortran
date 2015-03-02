@@ -15,7 +15,7 @@ Status
 Brief description
 ---------------
 
-An easy-to-use API for reading and writing JSON files, written in
+A user-friendly and object-oriented API for reading and writing JSON files, written in
 modern Fortran.  The source code is a single Fortran module file ([json_module.f90](https://github.com/jacobwilliams/json-fortran/blob/master/src/json_module.f90)).
 
 Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
@@ -145,7 +145,7 @@ Building a JSON file from scratch
 ---------------
 
 Constructing a JSON file element by element is slightly more complicated and involves the use
-of `json_value` pointers.  For more examples see unit tests 2,4 and 7 in `src/tests/`.
+of `json_value` pointers.  For more examples see unit tests 2, 4 and 7 in `src/tests/`.
 
 ```fortran
     program example2
