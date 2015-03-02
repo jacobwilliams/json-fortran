@@ -6,6 +6,7 @@ A Fortran 2008 JSON API
 Status
 ------
 [![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
+[![Coveralls branch](https://img.shields.io/coveralls/jacobwilliams/json-fortran/master.svg?style=plastic)](https://coveralls.io/r/jacobwilliams/json-fortran) <br/>
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Blocked by Vendor Bug](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=vendor%20bug&title=Blocked%20by%20Vendor%20Bug)](https://waffle.io/jacobwilliams/json-fortran)
 [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/#contributing-)
@@ -102,8 +103,11 @@ for more examples. The source files may be found in `src/tests/`.
         ! extract data from the file
         ! [found can be used to check if the data was really there]
         call json%get('version.major', i, found)
+        if ( .not. found ) stop 1
         call json%get('version.minor', j, found)
+        if ( .not. found ) stop 1
         call json%get('data(1).number', k, found)
+        if ( .not. found ) stop 1
 
         ! clean up
         call json%destroy()
@@ -155,7 +159,6 @@ of `json_value` pointers.  For more examples see unit tests 2, 4 and 7 in `src/t
         use json_module
 
         type(json_value),pointer :: p, inp
-        logical :: found
 
         ! initialize the module
         call json_initialize()
