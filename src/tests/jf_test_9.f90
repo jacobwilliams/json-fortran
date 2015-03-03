@@ -68,7 +68,6 @@ contains
 
     type(json_file) :: f
     real :: tstart, tend
-    character(len=:),allocatable :: str
 
     error_cnt = 0
     call json_initialize()
