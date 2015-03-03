@@ -1571,22 +1571,40 @@
 !
 !  SOURCE
 
-    recursive subroutine json_value_destroy(me)
+    recursive subroutine json_value_destroy(me,destroy_next)
 
     implicit none
 
     type(json_value),pointer :: me
+    logical(LK),intent(in),optional :: destroy_next  !if true, then me%next is also destroyed (default is true)
+
+    logical(LK) :: des_next
+    type(json_value), pointer :: p
 
     if (associated(me)) then
+
+        if (present(destroy_next)) then
+            des_next = destroy_next
+        else
+            des_next = .true.
+        end if
 
         if (allocated(me%name)) deallocate(me%name)
 
         call destroy_json_data(me)
 
-        if (associated(me%children)) call json_value_destroy(me%children)
-        me%n_children = 0
+        if (associated(me%children)) then
+            do while (me%n_children > 0)
+                p => me%children
+                me%children => me%children%next
+                me%n_children = me%n_children - 1
+                call json_value_destroy(p,.false.)
+            end do
+            nullify(me%children)
+            nullify(p)
+        end if
 
-        if (associated(me%next)) call json_value_destroy(me%next)
+        if (associated(me%next) .and. des_next) call json_value_destroy(me%next)
 
         if (associated(me%previous)) nullify(me%previous)
         if (associated(me%parent))   nullify(me%parent)
