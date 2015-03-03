@@ -165,6 +165,8 @@ if ( ENABLE_TESTS )
   configure_file ( ${CMAKE_SOURCE_DIR}/files/test5.json    ${DATA_DIR}/test5.json    COPYONLY )
   configure_file ( ${CMAKE_SOURCE_DIR}/files/invalid.json  ${DATA_DIR}/invalid.json  COPYONLY )
   configure_file ( ${CMAKE_SOURCE_DIR}/files/invalid2.json ${DATA_DIR}/invalid2.json COPYONLY )
+  configure_file ( ${CMAKE_SOURCE_DIR}/files/big.json      ${DATA_DIR}/big.json      COPYONLY )
+  configure_file ( ${CMAKE_SOURCE_DIR}/files/random1.json  ${DATA_DIR}/random1.json  COPYONLY )
 
   set_directory_properties ( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
     "${DATA_DIR}/test2.json;${DATA_DIR}/test4.json" )
