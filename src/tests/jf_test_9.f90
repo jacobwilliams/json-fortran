@@ -48,11 +48,17 @@ module jf_test_9_mod
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
     implicit none
+    !small file - 0.0 sec : http://www.json-generator.com
+    !character(len=*),parameter :: filename = 'random1.json'
 
-    !character(len=*),parameter :: filename = 'random1.json'  !small file - 0.0 sec : http://www.json-generator.com
-     character(len=*),parameter :: filename = 'big.json'      !7 MB - 5.4 sec : http://www.json-generator.com
-    !character(len=*),parameter :: filename = 'AllSets.json'  !13 MB - 7.6 sec : http://mtgjson.com
-    !character(len=*),parameter :: filename = '100mb.json'    !100 MB - takes forever... : https://github.com/seductiveapps/largeJSON
+    !7 MB - 5.4 sec : http://www.json-generator.com
+    character(len=*),parameter :: filename = 'big.json'
+
+    !13 MB - 7.6 sec : http://mtgjson.com
+    !character(len=*),parameter :: filename = 'AllSets.json'
+
+    !100 MB - takes forever... : https://github.com/seductiveapps/largeJSON
+    !character(len=*),parameter :: filename = '100mb.json'
 
     character(len=*),parameter :: dir      = '../files/'     !working directory
 
