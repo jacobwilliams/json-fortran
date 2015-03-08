@@ -74,8 +74,8 @@ contains
     type(json_file) :: json
 
     integer :: i
-    character(len=10) :: istr
-    character(len=:),allocatable :: string
+    character(kind=CK,len=10) :: istr
+    character(kind=CK,len=:),allocatable :: string
 
     error_cnt = 0
     call json_initialize()

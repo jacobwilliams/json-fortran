@@ -17,7 +17,7 @@ import sys
 env = Environment()
 
 if env['FORTRAN'] == 'gfortran':
-    env = Environment(F90FLAGS = '-O2 -fbacktrace -g -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008 -J',)
+    env = Environment(F90FLAGS = '-O2 -fbacktrace -g -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008 -J',)
 elif env['FORTRAN'] == 'ifort':
     env = Environment(F90FLAGS = '-O2 -warn -stand f08 -diag-disable 7601 -traceback -module lib',)
 

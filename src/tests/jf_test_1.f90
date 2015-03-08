@@ -67,7 +67,7 @@ contains
     integer,intent(out) :: error_cnt
     type(json_file) :: json    !the JSON structure read from the file:
     integer :: ival
-    character(len=:),allocatable :: cval
+    character(kind=CK,len=:),allocatable :: cval
     real(wp) :: rval
     logical :: found
     type(json_value),pointer :: p
