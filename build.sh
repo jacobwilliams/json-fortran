@@ -27,7 +27,7 @@ SRCDIR='./src/'                 # library source directory
 TESTDIR='./src/tests/'          # unit test source directory
 BINDIR='./bin/'                 # build directory for unit tests
 LIBDIR='./lib/'                 # build directory for library
-MODCODE='json_module.f90'       # json module file name
+MODCODE='json_module.F90'       # json module file name
 LIBOUT='libjsonfortran.a'       # name of json library
 
 

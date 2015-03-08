@@ -21,7 +21,7 @@ if env['FORTRAN'] == 'gfortran':
 elif env['FORTRAN'] == 'ifort':
     env = Environment(F90FLAGS = '-O2 -warn -stand f08 -diag-disable 7601 -traceback -module lib',)
 
-src = join('src','json_module.f90')
+src = join('src','json_module.F90')
 ar  = join('lib','libjsonfortran'+env['LIBSUFFIX'])
 sl  = join('lib','libjsonfortran'+env['SHLIBSUFFIX'])
 mod = join('lib','json_module.mod')  ## FORTRANMODSUFFIX

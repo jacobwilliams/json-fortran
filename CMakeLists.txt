@@ -41,7 +41,7 @@ set ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 #-------------------------------------
 # Collect source files for the library
 #-------------------------------------
-set ( JF_LIB_SRCS  src/json_module.f90 )
+set ( JF_LIB_SRCS  src/json_module.F90 )
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
 
 #-----------------------------------------
