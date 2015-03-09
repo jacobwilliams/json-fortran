@@ -22,15 +22,15 @@
 !    JSON-FORTRAN: A Fortran 2008 JSON API
 !
 !    http://github.com/jacobwilliams/json-fortran
-!  
+!
 !    Copyright (c) 2014, Jacob Williams
 !
 !    All rights reserved.
-!  
+!
 !    Redistribution and use in source and binary forms, with or without modification,
 !    are permitted provided that the following conditions are met:
 !    * Redistributions of source code must retain the above copyright notice, this
-!      list of conditions and the following disclaimer.  
+!      list of conditions and the following disclaimer.
 !    * Redistributions in binary form must reproduce the above copyright notice, this
 !      list of conditions and the following disclaimer in the documentation and/or
 !      other materials provided with the distribution.
@@ -50,18 +50,18 @@
 !    Original FSON License:
 !
 !    http://github.com/josephalevin/fson
-!  
+!
 !    Copyright (c) 2012 Joseph A. Levin
-!  
+!
 !    Permission is hereby granted, free of charge, to any person obtaining a copy of this
 !    software and associated documentation files (the "Software"), to deal in the Software
 !    without restriction, including without limitation the rights to use, copy, modify, merge,
 !    publish, distribute, sublicense, and/or sell copies of the Software, and to permit
 !    persons to whom the Software is furnished to do so, subject to the following conditions:
-!  
+!
 !    The above copyright notice and this permission notice shall be included in all copies or
 !    substantial portions of the Software.
-!  
+!
 !    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 !    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 !    PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
@@ -528,7 +528,7 @@
     !     end subroutine example1
     !
     !    Note: it should NOT be called for a json_value pointer than has already been
-    !    added to another json_value structure, since doing so may render the 
+    !    added to another json_value structure, since doing so may render the
     !    other structure invalid.  Consider the following example:
     !     subroutine example2(p)
     !     type(json_value),pointer,intent(out) :: p
@@ -538,7 +538,7 @@
     !     call json_create_object(q,'q')
     !     call json_add(q,'val',1)
     !     call json_add(p, q)  !add q to p structure
-    !     ! do NOT call json_destroy(q) here, because q is 
+    !     ! do NOT call json_destroy(q) here, because q is
     !     ! now part of the output structure p.  p should be destroyed
     !     ! somewhere upstream by the caller of this routine.
     !     nullify(q) !OK, but not strictly necessary
@@ -1566,7 +1566,7 @@
 !
 !  AUTHOR
 !    Jacob Williams : 1/22/2014 : The original version of this
-!    routine was not properly freeing the memory.  
+!    routine was not properly freeing the memory.
 !    It has been rewritten.
 !
 !  SOURCE
@@ -4088,7 +4088,7 @@
 !
 !  INPUTS
 !    The inputs can be:
-!    * file and unit : the specified unit is used to read JSON from file. 
+!    * file and unit : the specified unit is used to read JSON from file.
 !                      [note if unit is already open, then the filename is ignored]
 !    * file          : JSON is read from file using internal unit number
 !    * str           : JSON data is read from the string instead
@@ -5541,7 +5541,7 @@
 !    compact_real_string
 !
 !  DESCRIPTION
-!    Compact a string representing a real number, so that 
+!    Compact a string representing a real number, so that
 !    the same value is displayed with fewer characters.
 !
 !  SEE ALSO

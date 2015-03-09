@@ -57,16 +57,24 @@ fi
 #build the stand-alone library:
 echo ""
 echo "Building library..."
-FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" ${COVERAGE} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
+
+# work around for FoBiS.py PR #45
+[ -d "$LIBDIR" ] || mkdir "$LIBDIR"
+
+FoBiS.py build -ch -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" ${COVERAGE} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
 
 #build the unit tests (uses the above library):
 if [[ $JF_SKIP_TESTS != [yY]* ]]; then
     echo ""
     echo "Building unit tests..."
+
+    # FoBiS.py PR #45 work around
+    [ -d "$BINDIR" ] || mkdir "$BINDIR"
+
     for TEST in "${TESTDIR%/}"/jf_test_*.f90; do
 	THIS_TEST=${TEST##*/}
 	echo "Build ${THIS_TEST%.f90}"
-	FoBiS.py build -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" ${COVERAGE} -dbld ${BINDIR} -s ${TESTDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${THIS_TEST} -o ${THIS_TEST%.f90} -colors
+	FoBiS.py build -ch -compiler ${FCOMPILER} -cflags "${FCOMPILERFLAGS}" ${COVERAGE} -dbld ${BINDIR} -s ${TESTDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${THIS_TEST} -o ${THIS_TEST%.f90} -colors
     done
 else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."
