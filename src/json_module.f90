@@ -4289,7 +4289,7 @@
             if (istat==0) then
                 line = line//chunk
             else
-                if (isize>0) line = line//chunk(1:isize)
+                if (isize>0 .and. isize<=n_chunk) line = line//chunk(1:isize)
                 exit
             end if
         end do
