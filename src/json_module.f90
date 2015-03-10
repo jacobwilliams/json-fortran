@@ -415,11 +415,11 @@
     !
     !  SOURCE
     interface json_add
-        module procedure :: json_value_add_member
-        module procedure :: json_value_add_integer, json_value_add_integer_vec
-        module procedure :: json_value_add_double,  json_value_add_double_vec
-        module procedure :: json_value_add_logical, json_value_add_logical_vec
-        module procedure :: json_value_add_string,  json_value_add_string_vec
+        module procedure json_value_add_member
+        module procedure json_value_add_integer, json_value_add_integer_vec
+        module procedure json_value_add_double,  json_value_add_double_vec
+        module procedure json_value_add_logical, json_value_add_logical_vec
+        module procedure json_value_add_string,  json_value_add_string_vec
     end interface json_add
     !*************************************************************************************
 
@@ -442,10 +442,10 @@
     !
     !  SOURCE
     interface json_update
-        module procedure :: json_update_logical,&
-                            json_update_double,&
-                            json_update_integer,&
-                            json_update_string
+        module procedure json_update_logical,&
+                         json_update_double,&
+                         json_update_integer,&
+                         json_update_string
     end interface json_update
     !*************************************************************************************
 
@@ -460,12 +460,12 @@
     !
     !  SOURCE
     interface json_get
-        module procedure :: json_get_by_path
-        module procedure :: json_get_integer, json_get_integer_vec
-        module procedure :: json_get_double,  json_get_double_vec
-        module procedure :: json_get_logical, json_get_logical_vec
-        module procedure :: json_get_string,  json_get_string_vec
-        module procedure :: json_get_array
+        module procedure json_get_by_path
+        module procedure json_get_integer, json_get_integer_vec
+        module procedure json_get_double,  json_get_double_vec
+        module procedure json_get_logical, json_get_logical_vec
+        module procedure json_get_string,  json_get_string_vec
+        module procedure json_get_array
     end interface json_get
     !*************************************************************************************
 
@@ -480,7 +480,7 @@
     !
     !  SOURCE
     interface json_print_to_string
-        module procedure :: json_value_to_string
+        module procedure json_value_to_string
     end interface
     !*************************************************************************************
 
@@ -501,8 +501,8 @@
     !
     !  SOURCE
     interface json_print
-        module procedure :: json_print_1    !input is unit number
-        module procedure :: json_print_2    !input is file name
+        module procedure json_print_1    !input is unit number
+        module procedure json_print_2    !input is file name
     end interface
     !*************************************************************************************
 
@@ -546,7 +546,7 @@
     !
     !  SOURCE
     interface json_destroy
-        module procedure :: json_value_destroy
+        module procedure json_value_destroy
     end interface
     !*************************************************************************************
 
@@ -561,7 +561,7 @@
     !
     !  SOURCE
     interface json_remove
-        module procedure :: json_value_remove
+        module procedure json_value_remove
     end interface
     !*************************************************************************************
 
@@ -576,7 +576,7 @@
     !
     !  SOURCE
     interface json_remove_if_present
-        module procedure :: json_value_remove_if_present
+        module procedure json_value_remove_if_present
     end interface
     !*************************************************************************************
 
@@ -4285,11 +4285,12 @@
     ![the line is read in chunks until the end of the line is reached]
     if (istat==0) then
         do
+            isize=0
             read(iunit,fmt=nfmt,advance='NO',size=isize,iostat=istat) chunk
             if (istat==0) then
                 line = line//chunk
             else
-                if (isize>0) line = line//chunk(1:isize)
+                if (isize>0 .and. isize<=n_chunk) line = line//chunk(1:isize)
                 exit
             end if
         end do
