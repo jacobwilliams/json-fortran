@@ -45,7 +45,7 @@ Currently, several ways are provided to build the jsonfortran library
 
 * Additionally, a [CMake](http://www.cmake.org) build
 system is provided. This build system has been tested on Mac and Linux
-using the Intel Fortran Compiler and gfortran 4.9. It has not been
+using the Intel Fortran Compiler, gfortran 4.9, and NAG Fortran 6.0. It has not been
 tested on Windows. This CMake based build provides an install target,
 and exports from both the install location and the build location so
 that building and using json-fortran in another CMake based project is
