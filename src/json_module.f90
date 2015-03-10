@@ -4285,14 +4285,11 @@
     ![the line is read in chunks until the end of the line is reached]
     if (istat==0) then
         do
+            isize=0
             read(iunit,fmt=nfmt,advance='NO',size=isize,iostat=istat) chunk
             if (istat==0) then
                 line = line//chunk
             else
-                !avoid a comparison to isize if EOF is at the start of object
-                ![some compilers will leave isize uninitialized for this case]
-                if (index(err_message, &
-                    "Unexpected end of file while parsing start of object") > 0) exit
                 if (isize>0 .and. isize<=n_chunk) line = line//chunk(1:isize)
                 exit
             end if
