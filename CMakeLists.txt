@@ -43,6 +43,7 @@ set ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 #-------------------------------------
 set ( JF_LIB_SRCS  src/json_module.F90 )
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
+set ( JF_TEST_UCS4_SUPPORT_SRC "${CMAKE_SOURCE_DIR}/src/tests/introspection/test_iso_10646_support.f90")
 
 #-----------------------------------------
 # Collect all the mod files into their own
@@ -81,6 +82,22 @@ if ( ENABLE_DYLIBS_USE_RPATH )
 else ()
   set ( CMAKE_INSTALL_NAME_DIR
     "${ABS_LIB_INSTALL_DIR}" )
+endif ()
+
+#---------------------------------------------
+# See if our compiler supports ISO 10646/UCS4
+#---------------------------------------------
+set ( ENABLE_UNICODE FLASE CACHE BOOL
+  "Enable unicode/UCS4 support" )
+if ( ENABLE_UNICODE )
+  try_run( UCS4_TEST_RUNS UCS4_TEST_COMPILES
+    ${CMAKE_BINARY_DIR}/bin ${JF_TEST_UCS4_SUPPORT_SRC} )
+  if (UCS4_TEST_RUNS EQUAL 0)
+    add_definitions (-DUSE_UCS4)
+  else ()
+    message ( WARNING
+      "Unicode support requested but ${CMAKE_Fortran_COMPILER_ID} Fortran compiler does not support 'ISO_10646' characters!" )
+  endif ()
 endif ()
 
 #---------------------------------------------
