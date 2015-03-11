@@ -62,12 +62,12 @@ contains
 
     integer,intent(out) :: error_cnt
 
+    character(len=256),dimension(:),allocatable :: str_vec
     type(json_file) :: f,f2
     type(json_value),pointer :: p
     character(len=:),allocatable :: str
     logical :: found,lval
     integer :: var_type,n_children
-    character(len=256),dimension(:),allocatable :: str_vec
 
     character(len=*),parameter :: json_str = '{ "blah": 123 }'
 
@@ -236,8 +236,105 @@ contains
         write(error_unit,'(A)') '...success'
     end if
 
-    !....
+    !--------------------------------
 
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'json_file_get_integer...'
+    call f2%get('$',p,found)  !get root
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        if (found) then
+            write(error_unit,'(A)') '...success'
+            write(error_unit,'(A)') 'json_remove_if_present...'
+            call json_remove_if_present(p,'version.patch')
+            if (json_failed()) then
+                call json_print_error_message(error_unit)
+                error_cnt = error_cnt + 1
+            else
+                write(error_unit,'(A)') '...success'
+            end if
+        else
+            write(error_unit,'(A)') 'Error: variable was not there.'
+            error_cnt = error_cnt + 1
+        end if
+    end if
+
+    write(error_unit,'(A)') 'json_update_logical...'
+    call json_update(p,'data(1).tf1',.true.,found)
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        if (found) then
+            write(error_unit,'(A)') '...success'
+        else
+            write(error_unit,'(A)') 'Error: variable was not there.'
+            error_cnt = error_cnt + 1
+        end if
+    end if
+
+    write(error_unit,'(A)') 'json_update_double...'
+    call json_update(p,'data(2).real',-1.0d0,found)
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        if (found) then
+            write(error_unit,'(A)') '...success'
+        else
+            write(error_unit,'(A)') 'Error: variable was not there.'
+            error_cnt = error_cnt + 1
+        end if
+    end if
+
+    write(error_unit,'(A)') 'json_get_logical...'
+    call json_get(p,'data(1).tf1',lval,found)
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        if (found) then
+            write(error_unit,'(A)') '...success'
+        else
+            write(error_unit,'(A)') 'Error: variable was not there.'
+            error_cnt = error_cnt + 1
+        end if
+    end if
+
+    write(error_unit,'(A)') 'json_get_string_vec...'
+    call json_get(p,'files',str_vec,found)
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        !also make sure the values are correct:
+        if (found .and. size(str_vec)==5 .and. &
+            str_vec(1)=='..\path\to\files\file1.txt') then
+            write(error_unit,'(A)') '...success'
+        else
+            write(error_unit,'(A)') 'Error: incorrect result: '//trim(str_vec(1))
+            error_cnt = error_cnt + 1
+        end if
+    end if
+
+    write(error_unit,'(A)') 'json_create...'
+    write(error_unit,'(A)') 'json_create_logical...'; call json_destroy(p); call json_create_logical(p,.true.,'foo')
+    write(error_unit,'(A)') 'json_create_integer...'; call json_destroy(p); call json_create_integer(p,1000,'foo')
+    write(error_unit,'(A)') 'json_create_double ...'; call json_destroy(p); call json_create_double (p,9.0d0,'foo')
+    write(error_unit,'(A)') 'json_create_string ...'; call json_destroy(p); call json_create_string (p,'foo','bar')
+    write(error_unit,'(A)') 'json_create_null   ...'; call json_destroy(p); call json_create_null   (p,'foo')
+    write(error_unit,'(A)') 'json_create_object ...'; call json_destroy(p); call json_create_object (p,'foo')
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        write(error_unit,'(A)') '...success'
+    end if
+    
+
+    !--------------------------------
 
     !cleanup:
     call f%destroy()
