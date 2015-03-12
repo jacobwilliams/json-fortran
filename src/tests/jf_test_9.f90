@@ -60,7 +60,7 @@ module jf_test_9_mod
     !100 MB - takes forever... : https://github.com/seductiveapps/largeJSON
     !character(len=*),parameter :: filename = '100mb.json'
 
-    character(len=*),parameter :: dir      = '../files/'     !working directory
+    character(len=*),parameter :: dir = '../files/inputs/' !working directory
 
 contains
 

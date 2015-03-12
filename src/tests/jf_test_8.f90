@@ -52,8 +52,6 @@ module jf_test_8_mod
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
     implicit none
-    
-    character(len=*),parameter :: dir = '../files/'               !working directory
 
 contains
 

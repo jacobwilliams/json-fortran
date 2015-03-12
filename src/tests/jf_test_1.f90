@@ -53,12 +53,12 @@ module jf_test_1_mod
 
     implicit none
 
-    character(len=*),parameter :: dir = '../files/'    !working directory
+    character(len=*),parameter :: dir = '../files/inputs/'    !working directory
     character(len=*),parameter :: filename1 = 'test1.json'
 
 contains
 
-    subroutine test_1(error_cnt) 
+    subroutine test_1(error_cnt)
 
 !   Read a sample JSON file and retrieve some data from it
 

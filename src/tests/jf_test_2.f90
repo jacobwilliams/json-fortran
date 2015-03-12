@@ -58,7 +58,7 @@ module jf_test_2_mod
 
 contains
 
-    subroutine test_2(error_cnt)    
+    subroutine test_2(error_cnt)
 
 !   Populate a JSON structure and write it to a file.
 
