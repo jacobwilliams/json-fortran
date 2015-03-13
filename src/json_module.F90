@@ -7133,8 +7133,10 @@
     integer(IK) :: n,i
 
     !an array of the valid hex characters:
-    character(kind=CK,len=1),dimension(16),parameter :: valid_chars = &
-        ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
+    character(kind=CK,len=1),dimension(22),parameter :: valid_chars = &
+        [ (achar(i),i=48,57), & ! decimal digits
+          (achar(i),i=65,70), & ! capital A-F
+          (achar(i),i=97,102) ] ! lowercase a-f
 
     !initialize
     valid = .false.
