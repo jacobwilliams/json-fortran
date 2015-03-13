@@ -232,10 +232,10 @@ if [[ $JF_SKIP_TESTS != [yY]* ]]; then
     # FoBiS.py PR #45 work around
     [ -d "$BINDIR" ] || mkdir "$BINDIR"
 
-    for TEST in "${TESTDIR%/}"/jf_test_*.f90; do
+    for TEST in "${TESTDIR%/}"/jf_test_*.[fF]90; do
 	THIS_TEST=${TEST##*/}
-	echo "Build ${THIS_TEST%.f90}"
-	FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${BINDIR} -s ${TESTDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${THIS_TEST} -o ${THIS_TEST%.f90} -colors
+	echo "Build ${THIS_TEST%.[fF]90}"
+	FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${BINDIR} -s ${TESTDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${THIS_TEST} -o ${THIS_TEST%.[fF]90} -colors
     done
 else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."

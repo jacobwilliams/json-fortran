@@ -34,8 +34,7 @@ obj   = []
 exe   = []
 here = os.getcwd()
 os.chdir(join('src', 'tests'))
-for f in sorted(glob.glob("*")):
-    if not f.endswith('f90'): continue
+for f in sorted(glob.glob("*.[fF]90")):
     tests.append(join('src', 'tests', f))
     e = f[:-4]
     obj.append(join('src','tests',e+env['OBJSUFFIX']))
