@@ -169,6 +169,7 @@
     character(kind=CK,len=*),parameter :: quotation_mark  = achar(34)
     character(kind=CK,len=*),parameter :: slash           = achar(47)
     character(kind=CK,len=*),parameter :: backslash       = achar(92)
+    character(kind=CK,len=*),parameter :: double_backslash = '\\' 
 
     !for indenting (Note: jsonlint.com uses 4 spaces)
     integer(IK),parameter :: spaces_per_tab = 2
@@ -2462,7 +2463,7 @@
         c = str_in(i:i)    !get next character in the input string
 
         select case(c)
-        case(quotation_mark,backslash,slash)
+        case(quotation_mark,backslash,double_backslash,slash)
             str_out = str_out//backslash//c
         case(bspace)
             str_out = str_out//'\b'
@@ -3810,7 +3811,7 @@
                                 c = s( j+1 : j+1 )
 
                                 select case (c)
-                                case(quotation_mark,backslash,slash,&
+                                case(quotation_mark,backslash,double_backslash,slash,&
                                      'b','f','n','r','t')
 
                                     !save the bit after the escape characters:
@@ -3821,7 +3822,7 @@
                                     end if
 
                                     select case(c)
-                                    case(quotation_mark,backslash,slash)
+                                    case(quotation_mark,backslash,double_backslash,slash)
                                         !use c as is
                                     case('b')
                                         c = bspace
@@ -5650,8 +5651,9 @@
     integer(IK) :: n,i
 
     !an array of the valid hex characters:
-    character(kind=CK,len=1),dimension(16),parameter :: valid_chars = &
-        ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
+    character(kind=CK,len=1),dimension(22),parameter :: valid_chars = &
+        ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F', &
+                                                 'a','b','c','d','e','f']
 
     !initialize
     valid = .false.
