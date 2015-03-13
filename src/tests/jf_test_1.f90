@@ -53,12 +53,12 @@ module jf_test_1_mod
 
     implicit none
 
-    character(len=*),parameter :: dir = '../files/'    !working directory
+    character(len=*),parameter :: dir = '../files/inputs/'    !working directory
     character(len=*),parameter :: filename1 = 'test1.json'
 
 contains
 
-    subroutine test_1(error_cnt) 
+    subroutine test_1(error_cnt)
 
 !   Read a sample JSON file and retrieve some data from it
 
@@ -101,6 +101,7 @@ contains
       ! print the parsed data to the console
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the file...'
+      write(output_unit,'(A)') '{ "part a" :' !Wrap 3 outputs to make stdout valid json
       call json%print_file()
       if (json_failed()) then
         call json_print_error_message(error_unit)
@@ -232,6 +233,7 @@ contains
 
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the modified structure...'
+      write(output_unit,'(A)') ', "part b" : '
       call json%print_file()
       if (json_failed()) then
         call json_print_error_message(error_unit)
@@ -260,7 +262,9 @@ contains
 
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the modified structure...'
+      write(output_unit,'(A)') ', "part c" : '
       call json%print_file()
+      write(output_unit,'(A)') '}'
       if (json_failed()) then
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1

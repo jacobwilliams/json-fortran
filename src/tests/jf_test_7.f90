@@ -50,10 +50,8 @@ module jf_test_7_mod
 
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
-    
+
     implicit none
-    
-    character(len=*),parameter :: dir = '../files/'               !working directory
 
 contains
 

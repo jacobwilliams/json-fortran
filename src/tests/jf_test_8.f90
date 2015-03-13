@@ -52,8 +52,6 @@ module jf_test_8_mod
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
     implicit none
-    
-    character(len=*),parameter :: dir = '../files/'               !working directory
 
 contains
 
@@ -101,7 +99,9 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_print(p,OUTPUT_UNIT)  ! print to console
+    write(output_unit,'(A)') '{ "part a" : '
+    call json_print(p,output_unit)  ! print to console
+    write(output_unit,'(A)') ','
     if (json_failed()) then
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -122,7 +122,9 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_print(p,OUTPUT_UNIT)  ! print to console
+    write(output_unit,'(A)') '"part b" : '
+    call json_print(p,output_unit)  ! print to console
+    write(output_unit,'(A)') ','
     if (json_failed()) then
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -145,7 +147,9 @@ contains
         write(error_unit,'(A)') 'This should have failed!'
         error_cnt = error_cnt + 1
     end if
-    call json_print(p,OUTPUT_UNIT)  ! print to console
+    write(output_unit,'(A)') '"part c" : '
+    call json_print(p,output_unit)  ! print to console
+    write(output_unit,'(A)') '}'
     if (json_failed()) then
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1

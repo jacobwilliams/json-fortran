@@ -53,7 +53,7 @@ module jf_test_3_mod
 
     implicit none
 
-    character(len=*),parameter :: dir = '../files/'               !working directory
+    character(len=*),parameter :: dir = '../files/inputs/'               !working directory
     character(len=*),parameter :: filename2 = 'test2.json'
 
 contains

@@ -160,37 +160,37 @@ if ( ENABLE_TESTS )
 
   find_program ( JSONLINT jsonlint )
   find_program ( DIFF     diff )
-  set ( DATA_DIR ${CMAKE_BINARY_DIR}/files )
-  configure_file ( ${CMAKE_SOURCE_DIR}/files/test1.json    ${DATA_DIR}/test1.json    COPYONLY )
-  configure_file ( ${CMAKE_SOURCE_DIR}/files/test5.json    ${DATA_DIR}/test5.json    COPYONLY )
-  configure_file ( ${CMAKE_SOURCE_DIR}/files/invalid.json  ${DATA_DIR}/invalid.json  COPYONLY )
-  configure_file ( ${CMAKE_SOURCE_DIR}/files/invalid2.json ${DATA_DIR}/invalid2.json COPYONLY )
-  configure_file ( ${CMAKE_SOURCE_DIR}/files/big.json      ${DATA_DIR}/big.json      COPYONLY )
-  configure_file ( ${CMAKE_SOURCE_DIR}/files/random1.json  ${DATA_DIR}/random1.json  COPYONLY )
+  file ( COPY "${CMAKE_SOURCE_DIR}/files"
+    DESTINATION "${CMAKE_BINARY_DIR}/" )
+
+  set ( DATA_DIR "${CMAKE_BINARY_DIR}/files" )
 
   set_directory_properties ( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
     "${DATA_DIR}/test2.json;${DATA_DIR}/test4.json" )
 
   # Validate input
   if ( JSONLINT )
-    add_test ( NAME validate-input1
-      WORKING_DIRECTORY ${DATA_DIR}
-      COMMAND ${JSONLINT} test1.json )
-    add_test ( NAME validate-input5
-      WORKING_DIRECTORY ${DATA_DIR}
-      COMMAND ${JSONLINT} test5.json )
-    add_test ( NAME validate-invalid
-      WORKING_DIRECTORY ${DATA_DIR}
-      COMMAND ${JSONLINT} invalid.json )
-    set_property ( TEST validate-invalid
-      PROPERTY
-      WILL_FAIL TRUE)
-    add_test ( NAME validate-invalid2
-      WORKING_DIRECTORY ${DATA_DIR}
-      COMMAND ${JSONLINT} invalid2.json )
-    set_property ( TEST validate-invalid2
-      PROPERTY
-      WILL_FAIL TRUE)
+    file ( GLOB JSON_INPUTS "${DATA_DIR}/inputs/*.json" )
+    file ( GLOB INVALID_JSON "${DATA_DIR}/inputs/*invalid*.json" )
+
+    list ( REMOVE_ITEM JSON_INPUTS ${INVALID_JSON} )
+
+    foreach ( VALID_JSON ${JSON_INPUTS} )
+      get_filename_component ( TESTNAME "${VALID_JSON}" NAME )
+      add_test ( NAME validate-${TESTNAME}
+	WORKING_DIRECTORY "${DATA_DIR}/inputs"
+	COMMAND ${JSONLINT} "${VALID_JSON}" )
+    endforeach ()
+
+    foreach ( INVALID ${INVALID_JSON} )
+      get_filename_component ( TESTNAME "${INVALID}" NAME )
+      add_test ( NAME validate-${TESTNAME}
+	WORKING_DIRECTORY "${DATA_DIR}/inputs"
+	COMMAND ${JSONLINT} "${INVALID}" )
+      set_property ( TEST validate-${TESTNAME}
+	PROPERTY
+	WILL_FAIL TRUE)
+    endforeach ()
   endif ()
 
   set ( UNIT_TESTS '' )
@@ -218,27 +218,28 @@ if ( ENABLE_TESTS )
 
   # Validate output
   if ( JSONLINT )
-    file ( GLOB JSON_FILES "${DATA_DIR}/test*.json" )
+    file ( GLOB JSON_FILES "${DATA_DIR}/*.json" )
     foreach ( JSON_FILE ${JSON_FILES} )
-      get_filename_component ( JSON_STEM ${JSON_FILE} NAME_WE )
-      add_test ( NAME validate-output-${JSON_STEM}.json
-	WORKING_DIRECTORY ${DATA_DIR}
-	COMMAND ${JSONLINT} ${JSON_STEM}.json )
-      set_property ( TEST validate-output-${JSON_STEM}.json
+      get_filename_component ( TESTNAME ${JSON_FILE} NAME )
+      add_test ( NAME validate-output-${TESTNAME}
+	WORKING_DIRECTORY "${DATA_DIR}"
+	COMMAND ${JSONLINT} ${TESTNAME} )
+      set_property ( TEST validate-output-${TESTNAME}
 	APPEND
 	PROPERTY
 	DEPENDS ${UNIT_TESTS}
 	REQUIRED_FILES ${JSON_FILES} )
     endforeach ( JSON_FILE )
   endif ()
+
   # Check output for differences
   if ( DIFF )
-    file ( GLOB JSON_FILES "${DATA_DIR}/test*.json" )
+    file ( GLOB JSON_FILES "${DATA_DIR}/*.json" )
     foreach ( JSON_FILE ${JSON_FILES} )
       get_filename_component ( JSON_STEM ${JSON_FILE} NAME_WE )
       add_test ( NAME regression-${JSON_STEM}.json
-	WORKING_DIRECTORY ${DATA_DIR}
-	COMMAND ${DIFF} -q ${JSON_STEM}.json ${CMAKE_SOURCE_DIR}/files/${JSON_STEM}.json )
+	WORKING_DIRECTORY "${DATA_DIR}"
+	COMMAND ${DIFF} -q ${JSON_STEM}.json expected-outputs/${JSON_STEM}.json )
       set_property ( TEST regression-${JSON_STEM}.json
 	APPEND
 	PROPERTY
