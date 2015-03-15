@@ -88,6 +88,22 @@
     private
 
     !*********************************************************
+    !****M* json_module/USE_UCS4
+    !
+    !  NAME
+    !    USE_UCS4
+    !
+    !  DESCRIPTION
+    !    USE_UCS4 is an optional preprocessor flag.
+    !    When present, Unicode support is enabled.
+    !
+    !  USAGE
+    !    When compiling:
+    !    * gfortran -DUSE_UCS4 ...
+    !
+    !*********************************************************
+
+    !*********************************************************
     !****d* json_module/RK
     !
     !  NAME
@@ -114,6 +130,54 @@
     !*********************************************************
 
     !*********************************************************
+    !****M* json_module/STRING_KIND
+    !
+    !  NAME
+    !    STRING_KIND
+    !
+    !  DESCRIPTION
+    !    String kind preprocessor macro.
+    !
+    !  SOURCE
+# define STRING_KIND 'DEFAULT'
+    ! this is the string kind to use unless compiling with GFortran AND
+    ! UCS4/ISO 10646 support is requested
+# ifdef __GFORTRAN__
+#   ifdef USE_UCS4
+    ! gfortran compiler AND UCS4 support requested, & silence redefine warning:
+#     undef  STRING_KIND
+#     define STRING_KIND 'ISO_10646'
+#   endif
+# endif
+    !*********************************************************
+
+    !*********************************************************
+    !****M* json_module/FILE_ENCODING
+    !
+    !  NAME
+    !    FILE_ENCODING
+    !
+    !  DESCRIPTION
+    !    File encoding preprocessor macro.
+    !
+    !  SOURCE
+# define FILE_ENCODING
+    ! don't ask for utf-8 file encoding unless using UCS4
+    ! this may let us use unformatted stream io to read in files more quickly
+    ! even with unicode support turned on `inquire( ... encoding=FL_ENCODING)`
+    ! may be able to detect json files in which each character is exactly one
+    ! byte
+# ifdef __GFORTRAN__
+#   ifdef USE_UCS4
+    ! gfortran compiler AND UCS4 support requested, & silence redefine warning:
+    ! Make sure we output files with utf-8 encoding too
+#     undef FILE_ENCODING
+#     define FILE_ENCODING ,encoding='utf-8'
+#   endif
+# endif
+    !*********************************************************
+
+    !*********************************************************
     !****d* json_module/CK
     !
     !  NAME
@@ -127,39 +191,21 @@
     !    UCS4 which is stored in 4 bytes.
     !    (and perhaps others).
     !
-    !  NOTE
+    !  NOTES
     !   CK and CDK are the json-fortran character kind and json-fortran default
     !   character kind respectively. Client code must ensure characters of kind=CK
     !   are used for all character variables and strings passed to the json-fortran
     !   library *EXCEPT* for file names which must be of 'DEFAULT' character kind,
     !   provided here as JDCK. In particular, any:
-    !    - json path
-    !    - character or string
-    !    - object name
+    !   * json path
+    !   * character or string
+    !   * object name
     !   passed to the json-fortran library *MUST* be of type CK.
     !
+    !  SEE ALSO
+    !    STRING_KIND
     !
     !  SOURCE
-    !
-# define STRING_KIND 'DEFAULT'
-    ! this is the string kind to use unless compiling with GFortran AND
-    ! UCS4/ISO 10646 support is requested
-# define FILE_ENCODING
-    ! don't ask for utf-8 file encoding unless using UCS4
-    ! this may let us use unformatted stream io to read in files more quickly
-    ! even with unicode support turned on `inquire( ... encoding=FL_ENCODING)`
-    ! may be able to detect json files in which each character is exactly one
-    ! byte
-# ifdef __GFORTRAN__
-#   ifdef USE_UCS4
-    ! gfortran compiler AND UCS4 support requested, & silence redefine warning:
-#     undef  STRING_KIND
-#     define STRING_KIND 'ISO_10646'
-    ! Make sure we output files with utf-8 encoding too
-#     undef FILE_ENCODING
-#     define FILE_ENCODING ,encoding='utf-8'
-#   endif
-# endif
     integer,parameter,public :: CK = selected_char_kind( STRING_KIND )
     !*********************************************************
 
@@ -171,17 +217,17 @@
     !
     !  DESCRIPTION
     !    Processor dependendant 'DEFAULT' character kind.
-    !    This is 1 byte for the Intel and Gfortran compilers
+    !    This is 1 byte for the Intel and Gfortran compilers.
     !
-    !  NOTE
+    !  NOTES
     !   CK and CDK are the json-fortran character kind and json-fortran default
     !   character kind respectively. Client code must ensure characters of kind=CK
     !   are used for all character variables and strings passed to the json-fortran
     !   library *EXCEPT* for file names which must be of 'DEFAULT' character kind,
     !   provided here as CDK. In particular, any:
-    !    - file name
-    !    - format statement
-    !    - file path
+    !   * file name
+    !   * format statement
+    !   * file path
     !   passed to the json-fortran library *MUST* be of type CDK. This
     !   will be the case for all string literals nor prepended with CK_ and only
     !   if ISO 10646 is supported and enabled, will strings of kind CK be different
@@ -209,7 +255,7 @@
     !*********************************************************
 
     !*********************************************************
-    !****id* json_module/MAYBEWRAP
+    !****M* json_module/MAYBEWRAP
     !
     !  NAME
     !    MAYBEWRAP
@@ -237,7 +283,7 @@
 #   endif
 !   ifdef __INTEL_COMPILER
     ! Intel's fpp does support the more contemporary ## concatenation
-    ! operator, but doesn't treat the C/C++ coMments the same way.
+    ! operator, but doesn't treat the C/C++ comments the same way.
     ! If you use the gfortran approach and pass the -noB switch to
     ! fpp, the macro will expand, but with a space between wrap_ and
     ! whatever PROCEDURE expands to
@@ -440,7 +486,7 @@
                                      MAYBEWRAP(json_file_update_string)
 #     ifdef USE_UCS4
         generic,public :: update => json_file_update_string_name_ascii, &
-             json_file_update_string_val_ascii
+                                    json_file_update_string_val_ascii
 #     endif
 
         !load from string:
@@ -605,18 +651,24 @@
     !  DESCRIPTION
     !    Get data from a json_value linked list.
     !
+    !  NOTES
+    !    There are two versions (e.g. json_get_integer and json_get_integer_with_path).
+    !    The first one gets the value from the json_value passed into the routine,
+    !    while the second one gets the value from the json_value found by parsing the
+    !    path.  The path version is split up into unicode and non-unicode versions.
+    !
     !  SOURCE
     interface json_get
-        module procedure MAYBEWRAP(json_get_by_path)
-        module procedure json_get_integer, MAYBEWRAP(json_get_integer_with_path)
+        module procedure                       MAYBEWRAP(json_get_by_path)
+        module procedure json_get_integer,     MAYBEWRAP(json_get_integer_with_path)
         module procedure json_get_integer_vec, MAYBEWRAP(json_get_integer_vec_with_path)
-        module procedure json_get_double, MAYBEWRAP(json_get_double_with_path)
-        module procedure json_get_double_vec, MAYBEWRAP(json_get_double_vec_with_path)
-        module procedure json_get_logical, MAYBEWRAP(json_get_logical_with_path)
+        module procedure json_get_double,      MAYBEWRAP(json_get_double_with_path)
+        module procedure json_get_double_vec,  MAYBEWRAP(json_get_double_vec_with_path)
+        module procedure json_get_logical,     MAYBEWRAP(json_get_logical_with_path)
         module procedure json_get_logical_vec, MAYBEWRAP(json_get_logical_vec_with_path)
-        module procedure json_get_string, MAYBEWRAP(json_get_string_with_path)
-        module procedure json_get_string_vec, MAYBEWRAP(json_get_string_vec_with_path)
-        module procedure json_get_array, MAYBEWRAP(json_get_array_with_path)
+        module procedure json_get_string,      MAYBEWRAP(json_get_string_with_path)
+        module procedure json_get_string_vec,  MAYBEWRAP(json_get_string_vec_with_path)
+        module procedure json_get_array,       MAYBEWRAP(json_get_array_with_path)
     end interface json_get
     !*************************************************************************************
 
@@ -952,9 +1004,20 @@
     end interface
     !*************************************************************************************
 
+    !*************************************************************************************
+    !****iI* json_module/throw_exception
+    !
+    !  NAME
+    !    throw_exception
+    !
+    !  DESCRIPTION
+    !    Throw an exception.
+    !
+    !  SOURCE
     interface throw_exception
        module procedure MAYBEWRAP(json_throw_exception)
     end interface throw_exception
+    !*************************************************************************************
 
     !public routines:
     public :: json_add                   !add data to a JSON structure
@@ -994,7 +1057,7 @@
 
     !real string printing:
     character(kind=CDK,len=:),allocatable :: real_fmt  !the format string to use for real numbers
-                                                        ! [set in json_initialize]
+                                                       ! [set in json_initialize]
     logical(LK) :: compact_real = .true.   !to use the "compact" form of real numbers for output
 
     !exception handling [private variables]
@@ -1179,6 +1242,17 @@
     end subroutine json_file_load_from_string
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_load_from_string
+!
+!  NAME
+!    wrap_json_file_load_from_string
+!
+!  SEE ALSO
+!    json_file_load_from_string
+!
+!  SOURCE
+
     subroutine wrap_json_file_load_from_string(me, str)
 
     implicit none
@@ -1189,7 +1263,7 @@
     call json_file_load_from_string(me,to_unicode(str))
 
     end subroutine wrap_json_file_load_from_string
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_print_to_console
@@ -1398,6 +1472,17 @@
     end subroutine json_file_variable_info
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_variable_info
+!
+!  NAME
+!    wrap_json_file_variable_info
+!
+!  SEE ALSO
+!    json_file_variable_info
+!
+!  SOURCE
+
     subroutine wrap_json_file_variable_info(me,path,found,var_type,n_children)
 
     implicit none
@@ -1411,7 +1496,7 @@
     call json_file_variable_info(me,to_unicode(path),found,var_type,n_children)
 
     end subroutine wrap_json_file_variable_info
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_info
@@ -1472,6 +1557,17 @@
     end subroutine json_file_get_object
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_get_object
+!
+!  NAME
+!    wrap_json_file_get_object
+!
+!  SEE ALSO
+!    json_file_get_object
+!
+!  SOURCE
+
     subroutine wrap_json_file_get_object(me, path, p, found)
 
     implicit none
@@ -1484,6 +1580,7 @@
     call json_file_get_object(me, to_unicode(path), p, found)
 
     end subroutine wrap_json_file_get_object
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_get_integer
@@ -1516,6 +1613,17 @@
     end subroutine json_file_get_integer
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_get_integer
+!
+!  NAME
+!    wrap_json_file_get_integer
+!
+!  SEE ALSO
+!    json_file_get_integer
+!
+!  SOURCE
+
     subroutine wrap_json_file_get_integer(me, path, val, found)
 
     implicit none
@@ -1528,6 +1636,7 @@
     call json_file_get_integer(me, to_unicode(path), val, found)
 
     end subroutine wrap_json_file_get_integer
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_get_integer_vec
@@ -1560,6 +1669,17 @@
     end subroutine json_file_get_integer_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_get_integer_vec
+!
+!  NAME
+!    wrap_json_file_get_integer_vec
+!
+!  SEE ALSO
+!    json_file_get_integer_vec
+!
+!  SOURCE
+
     subroutine wrap_json_file_get_integer_vec(me, path, vec, found)
 
     implicit none
@@ -1572,6 +1692,7 @@
     call json_file_get_integer_vec(me, to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_integer_vec
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_get_double
@@ -1604,6 +1725,17 @@
     end subroutine json_file_get_double
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_get_double
+!
+!  NAME
+!    wrap_json_file_get_double
+!
+!  SEE ALSO
+!    json_file_get_double
+!
+!  SOURCE
+
     subroutine wrap_json_file_get_double (me, path, val, found)
 
     implicit none
@@ -1615,7 +1747,8 @@
 
     call json_file_get_double(me, to_unicode(path), val, found)
 
-    end subroutine
+    end subroutine wrap_json_file_get_double
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_get_double_vec
@@ -1648,6 +1781,17 @@
     end subroutine json_file_get_double_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_get_double_vec
+!
+!  NAME
+!    wrap_json_file_get_double_vec
+!
+!  SEE ALSO
+!    json_file_get_double_vec
+!
+!  SOURCE
+
     subroutine wrap_json_file_get_double_vec(me, path, vec, found)
 
     implicit none
@@ -1660,6 +1804,7 @@
     call json_file_get_double_vec(me, to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_double_vec
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_get_logical
@@ -1692,6 +1837,17 @@
     end subroutine json_file_get_logical
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_get_logical
+!
+!  NAME
+!    wrap_json_file_get_logical
+!
+!  SEE ALSO
+!    json_file_get_logical
+!
+!  SOURCE
+
     subroutine wrap_json_file_get_logical(me,path,val,found)
 
     implicit none
@@ -1704,6 +1860,7 @@
     call json_file_get_logical(me, to_unicode(path), val, found)
 
     end subroutine wrap_json_file_get_logical
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_get_logical_vec
@@ -1736,6 +1893,17 @@
     end subroutine json_file_get_logical_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_get_logical_vec
+!
+!  NAME
+!    wrap_json_file_get_logical_vec
+!
+!  SEE ALSO
+!    json_file_get_logical_vec
+!
+!  SOURCE
+
     subroutine wrap_json_file_get_logical_vec(me, path, vec, found)
 
     implicit none
@@ -1748,6 +1916,7 @@
     call json_file_get_logical_vec(me, to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_logical_vec
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_get_string
@@ -1781,6 +1950,17 @@
     end subroutine json_file_get_string
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_get_string
+!
+!  NAME
+!    wrap_json_file_get_string
+!
+!  SEE ALSO
+!    json_file_get_string
+!
+!  SOURCE
+
     subroutine wrap_json_file_get_string(me, path, val, found)
 
     implicit none
@@ -1793,6 +1973,7 @@
     call json_file_get_string(me, to_unicode(path), val, found)
 
     end subroutine wrap_json_file_get_string
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_get_string_vec
@@ -1825,6 +2006,17 @@
     end subroutine json_file_get_string_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_get_string_vec
+!
+!  NAME
+!    wrap_json_file_get_string_vec
+!
+!  SEE ALSO
+!    json_file_get_string_vec
+!
+!  SOURCE
+
     subroutine wrap_json_file_get_string_vec(me, path, vec, found)
 
     implicit none
@@ -1837,6 +2029,7 @@
     call json_file_get_string_vec(me, to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_string_vec
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_initialize
@@ -1966,7 +2159,18 @@
    end if
 
     end subroutine json_throw_exception
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_throw_exception
+!
+!  NAME
+!    wrap_json_throw_exception
+!
+!  SEE ALSO
+!    json_throw_exception
+!
+!  SOURCE
 
     subroutine wrap_json_throw_exception(msg)
 
@@ -1977,7 +2181,6 @@
     call json_throw_exception(to_unicode(msg))
 
     end subroutine wrap_json_throw_exception
-
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2312,6 +2515,17 @@
     end subroutine json_value_remove_if_present
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_remove_if_present
+!
+!  NAME
+!    wrap_json_value_remove_if_present
+!
+!  SEE ALSO
+!    json_value_remove_if_present
+!
+!  SOURCE
+
     subroutine wrap_json_value_remove_if_present(p,name)
 
     implicit none
@@ -2322,6 +2536,7 @@
     call json_value_remove_if_present(p,to_unicode(name))
 
     end subroutine wrap_json_value_remove_if_present
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_update_integer
@@ -2355,6 +2570,17 @@
     end subroutine json_file_update_integer
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_update_integer
+!
+!  NAME
+!    wrap_json_file_update_integer
+!
+!  SEE ALSO
+!    json_file_update_integer
+!
+!  SOURCE
+
     subroutine wrap_json_file_update_integer(me,name,val,found)
     implicit none
 
@@ -2366,6 +2592,7 @@
     call json_file_update_integer(me,to_unicode(name),val,found)
 
     end subroutine wrap_json_file_update_integer
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_update_logical
@@ -2399,6 +2626,17 @@
     end subroutine json_file_update_logical
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_update_logical
+!
+!  NAME
+!    wrap_json_file_update_logical
+!
+!  SEE ALSO
+!    json_file_update_logical
+!
+!  SOURCE
+
     subroutine wrap_json_file_update_logical(me,name,val,found)
     implicit none
 
@@ -2410,6 +2648,7 @@
     call json_file_update_logical(me,to_unicode(name),val,found)
 
     end subroutine wrap_json_file_update_logical
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_update_real
@@ -2443,6 +2682,17 @@
     end subroutine json_file_update_real
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_update_real
+!
+!  NAME
+!    wrap_json_file_update_real
+!
+!  SEE ALSO
+!    json_file_update_real
+!
+!  SOURCE
+
     subroutine wrap_json_file_update_real(me,name,val,found)
     implicit none
 
@@ -2454,6 +2704,7 @@
     call json_file_update_real(me,to_unicode(name),val,found)
 
     end subroutine wrap_json_file_update_real
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_file_update_string
@@ -2487,6 +2738,17 @@
     end subroutine json_file_update_string
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_file_update_string
+!
+!  NAME
+!    wrap_json_file_update_string
+!
+!  SEE ALSO
+!    json_file_update_string
+!
+!  SOURCE
+
     subroutine wrap_json_file_update_string(me,name,val,found)
     implicit none
 
@@ -2498,7 +2760,15 @@
     call json_file_update_string(me,to_unicode(name),to_unicode(val),found)
 
     end subroutine wrap_json_file_update_string
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_file_update_string_name_ascii
+!
+!  NAME
+!    json_file_update_string_name_ascii
+!
+!  SOURCE
 
     subroutine json_file_update_string_name_ascii(me,name,val,found)
     implicit none
@@ -2511,7 +2781,15 @@
     call json_file_update_string(me,to_unicode(name),val,found)
 
     end subroutine json_file_update_string_name_ascii
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_file_update_string_val_ascii
+!
+!  NAME
+!    json_file_update_string_val_ascii
+!
+!  SOURCE
 
     subroutine json_file_update_string_val_ascii(me,name,val,found)
     implicit none
@@ -2524,6 +2802,7 @@
     call json_file_update_string(me,name,to_unicode(val),found)
 
     end subroutine json_file_update_string_val_ascii
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_update_logical
@@ -2573,6 +2852,17 @@
     end subroutine json_update_logical
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_update_logical
+!
+!  NAME
+!    wrap_json_update_logical
+!
+!  SEE ALSO
+!    json_update_logical
+!
+!  SOURCE
+
     subroutine wrap_json_update_logical(p,name,val,found)
 
     implicit none
@@ -2585,6 +2875,7 @@
     call json_update_logical(p,to_unicode(name),val,found)
 
     end subroutine wrap_json_update_logical
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_update_double
@@ -2634,6 +2925,17 @@
     end subroutine json_update_double
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_update_double
+!
+!  NAME
+!    wrap_json_update_double
+!
+!  SEE ALSO
+!    json_update_double
+!
+!  SOURCE
+
     subroutine wrap_json_update_double(p,name,val,found)
 
     implicit none
@@ -2646,6 +2948,7 @@
     call json_update_double(p,to_unicode(name),val,found)
 
     end subroutine wrap_json_update_double
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_update_integer
@@ -2695,6 +2998,17 @@
     end subroutine json_update_integer
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_update_integer
+!
+!  NAME
+!    wrap_json_update_integer
+!
+!  SEE ALSO
+!    json_update_integer
+!
+!  SOURCE
+
     subroutine wrap_json_update_integer(p,name,val,found)
 
     implicit none
@@ -2707,6 +3021,7 @@
     call json_update_integer(p,to_unicode(name),val,found)
 
     end subroutine wrap_json_update_integer
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_update_string
@@ -2756,6 +3071,17 @@
     end subroutine json_update_string
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_update_string
+!
+!  NAME
+!    wrap_json_update_string
+!
+!  SEE ALSO
+!    json_update_string
+!
+!  SOURCE
+
     subroutine wrap_json_update_string(p,name,val,found)
 
     implicit none
@@ -2768,7 +3094,18 @@
     call json_update_string(p,to_unicode(name),to_unicode(val),found)
 
     end subroutine wrap_json_update_string
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_update_string_name_ascii
+!
+!  NAME
+!    json_update_string_name_ascii
+!
+!  SEE ALSO
+!    json_update_string
+!
+!  SOURCE
 
     subroutine json_update_string_name_ascii(p,name,val,found)
 
@@ -2782,7 +3119,18 @@
     call json_update_string(p,to_unicode(name),val,found)
 
     end subroutine json_update_string_name_ascii
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_update_string_val_ascii
+!
+!  NAME
+!    json_update_string_val_ascii
+!
+!  SEE ALSO
+!    json_update_string
+!
+!  SOURCE
 
     subroutine json_update_string_val_ascii(p,name,val,found)
 
@@ -2796,6 +3144,7 @@
     call json_update_string(p,name,to_unicode(val),found)
 
     end subroutine json_update_string_val_ascii
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_value_add_member
@@ -2882,6 +3231,17 @@
     end subroutine json_value_add_double
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_add_double
+!
+!  NAME
+!    wrap_json_value_add_double
+!
+!  SEE ALSO
+!    json_value_add_double
+!
+!  SOURCE
+
     subroutine wrap_json_value_add_double(me, name, val)
 
     implicit none
@@ -2893,6 +3253,7 @@
     call json_value_add_double(me, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_double
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_value_add_double_vec
@@ -2941,6 +3302,17 @@
     end subroutine json_value_add_double_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_add_double_vec
+!
+!  NAME
+!    wrap_json_value_add_double_vec
+!
+!  SEE ALSO
+!    json_value_add_double_vec
+!
+!  SOURCE
+
     subroutine wrap_json_value_add_double_vec(me, name, val)
 
     implicit none
@@ -2952,6 +3324,7 @@
     call json_value_add_double_vec(me, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_double_vec
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_value_add_integer
@@ -2994,6 +3367,17 @@
     end subroutine json_value_add_integer
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_add_integer
+!
+!  NAME
+!    wrap_json_value_add_integer
+!
+!  SEE ALSO
+!    json_value_add_integer
+!
+!  SOURCE
+
     subroutine wrap_json_value_add_integer(me, name, val)
 
     implicit none
@@ -3005,6 +3389,7 @@
     call json_value_add_integer(me, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_integer
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_value_add_integer_vec
@@ -3053,6 +3438,17 @@
     end subroutine json_value_add_integer_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_add_integer_vec
+!
+!  NAME
+!    wrap_json_value_add_integer_vec
+!
+!  SEE ALSO
+!    json_value_add_integer_vec
+!
+!  SOURCE
+
     subroutine wrap_json_value_add_integer_vec(me, name, val)
 
     implicit none
@@ -3064,6 +3460,7 @@
     call json_value_add_integer_vec(me, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_integer_vec
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_value_add_logical
@@ -3106,6 +3503,17 @@
     end subroutine json_value_add_logical
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_add_logical
+!
+!  NAME
+!    wrap_json_value_add_logical
+!
+!  SEE ALSO
+!    json_value_add_logical
+!
+!  SOURCE
+
     subroutine wrap_json_value_add_logical(me, name, val)
 
     implicit none
@@ -3117,6 +3525,7 @@
     call json_value_add_logical(me, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_logical
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_value_add_logical_vec
@@ -3165,6 +3574,17 @@
     end subroutine json_value_add_logical_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_add_logical_vec
+!
+!  NAME
+!    wrap_json_value_add_logical_vec
+!
+!  SEE ALSO
+!    json_value_add_logical_vec
+!
+!  SOURCE
+
     subroutine wrap_json_value_add_logical_vec(me, name, val)
 
     implicit none
@@ -3176,6 +3596,7 @@
     call json_value_add_logical_vec(me, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_logical_vec
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_value_add_string
@@ -3222,6 +3643,17 @@
     end subroutine json_value_add_string
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_add_string
+!
+!  NAME
+!    wrap_json_value_add_string
+!
+!  SEE ALSO
+!    json_value_add_string
+!
+!  SOURCE
+
     subroutine wrap_json_value_add_string(me, name, val)
 
     implicit none
@@ -3233,20 +3665,42 @@
     call json_value_add_string(me, to_unicode(name), to_unicode(val))
 
     end subroutine wrap_json_value_add_string
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_value_add_string_name_ascii
+!
+!  NAME
+!    json_value_add_string_name_ascii
+!
+!  SEE ALSO
+!    json_value_add_string
+!
+!  SOURCE
 
     subroutine json_value_add_string_name_ascii(me, name, val)
 
     implicit none
 
-    type(json_value),pointer              :: me
+    type(json_value),pointer             :: me
     character(kind=CDK,len=*),intent(in) :: name
     character(kind=CK, len=*),intent(in) :: val
 
     call json_value_add_string(me, to_unicode(name), val)
 
     end subroutine json_value_add_string_name_ascii
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_value_add_string_val_ascii
+!
+!  NAME
+!    json_value_add_string_val_ascii
+!
+!  SEE ALSO
+!    json_value_add_string
+!
+!  SOURCE
 
     subroutine json_value_add_string_val_ascii(me, name, val)
 
@@ -3259,6 +3713,7 @@
     call json_value_add_string(me, name, to_unicode(val))
 
     end subroutine json_value_add_string_val_ascii
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****if* json_module/escape_string
@@ -3387,6 +3842,17 @@
     end subroutine json_value_add_string_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_add_string_vec
+!
+!  NAME
+!    wrap_json_value_add_string_vec
+!
+!  SEE ALSO
+!    json_value_add_string_vec
+!
+!  SOURCE
+
     subroutine wrap_json_value_add_string_vec(me, name, val, trim_str, adjustl_str)
 
     implicit none
@@ -3400,7 +3866,18 @@
     call json_value_add_string_vec(me, to_unicode(name), to_unicode(val), trim_str, adjustl_str)
 
     end subroutine wrap_json_value_add_string_vec
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_value_add_string_vec_name_ascii
+!
+!  NAME
+!    json_value_add_string_vec_name_ascii
+!
+!  SEE ALSO
+!    json_value_add_string_vec
+!
+!  SOURCE
 
     subroutine json_value_add_string_vec_name_ascii(me, name, val, trim_str, adjustl_str)
 
@@ -3415,7 +3892,18 @@
     call json_value_add_string_vec(me, to_unicode(name), val, trim_str, adjustl_str)
 
     end subroutine json_value_add_string_vec_name_ascii
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_value_add_string_vec_val_ascii
+!
+!  NAME
+!    json_value_add_string_vec_val_ascii
+!
+!  SEE ALSO
+!    json_value_add_string_vec
+!
+!  SOURCE
 
     subroutine json_value_add_string_vec_val_ascii(me, name, val, trim_str, adjustl_str)
 
@@ -3430,6 +3918,7 @@
     call json_value_add_string_vec(me, name, to_unicode(val), trim_str, adjustl_str)
 
     end subroutine json_value_add_string_vec_val_ascii
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_count
@@ -3572,6 +4061,17 @@
     end subroutine json_value_get_by_name_chars
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_value_get_by_name_chars
+!
+!  NAME
+!    wrap_json_value_get_by_name_chars
+!
+!  SEE ALSO
+!    json_value_get_by_name_chars
+!
+!  SOURCE
+
     subroutine wrap_json_value_get_by_name_chars(me, name, p)
 
     implicit none
@@ -3583,6 +4083,7 @@
     call json_value_get_by_name_chars(me,to_unicode(name),p)
 
     end subroutine wrap_json_value_get_by_name_chars
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_value_to_string
@@ -3621,7 +4122,7 @@
 !    Print the JSON structure to a file.
 !
 !  INPUT
-!    iunit is the nonzero file unit (the file must already have been opened).
+!    * iunit is the nonzero file unit (the file must already have been opened).
 !
 !  AUTHOR
 !    Jacob Williams, 6/20/2014
@@ -3632,8 +4133,8 @@
 
     implicit none
 
-    type(json_value),pointer,intent(in) :: me
-    integer(IK),intent(in)              :: iunit    !must be non-zero
+    type(json_value),pointer,intent(in)  :: me
+    integer(IK),intent(in)               :: iunit    !must be non-zero
     character(kind=CK,len=:),allocatable :: dummy
 
     if (iunit/=0) then
@@ -3679,6 +4180,7 @@
     end if
 
     end subroutine json_print_2
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****if* json_module/json_value_print
@@ -4126,6 +4628,17 @@
     end subroutine json_get_by_path
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_by_path
+!
+!  NAME
+!    wrap_json_get_by_path
+!
+!  SEE ALSO
+!    json_get_by_path
+!
+!  SOURCE
+
     subroutine wrap_json_get_by_path(me, path, p, found)
 
     implicit none
@@ -4138,6 +4651,7 @@
     call json_get_by_path(me, to_unicode(path), p, found)
 
     end subroutine wrap_json_get_by_path
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****if* json_module/string_to_integer
@@ -4265,6 +4779,17 @@
     end subroutine json_get_integer
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_get_integer_with_path
+!
+!  NAME
+!    json_get_integer_with_path
+!
+!  DESCRIPTION
+!    Get an integer value from a json_value.
+!
+!  SOURCE
+
     subroutine json_get_integer_with_path(me, path, value, found)
 
     implicit none
@@ -4303,7 +4828,18 @@
     end if
 
     end subroutine json_get_integer_with_path
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_integer_with_path
+!
+!  NAME
+!    wrap_json_get_integer_with_path
+!
+!  SEE ALSO
+!    json_get_integer_with_path
+!
+!  SOURCE
 
     subroutine wrap_json_get_integer_with_path(me, path, value, found)
 
@@ -4317,6 +4853,7 @@
     call json_get_integer_with_path(me, to_unicode(path), value, found)
 
     end subroutine wrap_json_get_integer_with_path
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_get_integer_vec
@@ -4372,6 +4909,16 @@
     end subroutine json_get_integer_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_get_integer_vec_with_path
+!
+!  NAME
+!    json_get_integer_vec_with_path
+!
+!  DESCRIPTION
+!    Get an integer vector from a JSON value.
+!
+!  SOURCE
 
     subroutine json_get_integer_vec_with_path(me, path, vec, found)
 
@@ -4411,7 +4958,18 @@
         end subroutine get_int_from_array
 
     end subroutine json_get_integer_vec_with_path
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_integer_vec_with_path
+!
+!  NAME
+!    wrap_json_get_integer_vec_with_path
+!
+!  SEE ALSO
+!    json_get_integer_vec_with_path
+!
+!  SOURCE
 
     subroutine wrap_json_get_integer_vec_with_path(me, path, vec, found)
 
@@ -4425,7 +4983,7 @@
     call json_get_integer_vec_with_path(me,path=to_unicode(path),vec=vec,found=found)
 
     end subroutine wrap_json_get_integer_vec_with_path
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_get_double
@@ -4469,6 +5027,16 @@
     end subroutine json_get_double
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_get_double_with_path
+!
+!  NAME
+!    json_get_double_with_path
+!
+!  DESCRIPTION
+!    Get a double value from a json_value.
+!
+!  SOURCE
 
     subroutine json_get_double_with_path(me, path, value, found)
 
@@ -4512,8 +5080,19 @@
         if (present(found)) found = .true.
     end if
 
-    end subroutine
+    end subroutine json_get_double_with_path
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_double_with_path
+!
+!  NAME
+!    wrap_json_get_double_with_path
+!
+!  SEE ALSO
+!    json_get_double_with_path
+!
+!  SOURCE
 
     subroutine wrap_json_get_double_with_path(me, path, value, found)
 
@@ -4527,7 +5106,7 @@
     call json_get_double_with_path(me,to_unicode(path),value,found)
 
     end subroutine wrap_json_get_double_with_path
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_get_double_vec
@@ -4583,6 +5162,16 @@
     end subroutine json_get_double_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_get_double_vec_with_path
+!
+!  NAME
+!    json_get_double_vec_with_path
+!
+!  DESCRIPTION
+!    Get a double vector from a JSON value.
+!
+!  SOURCE
 
     subroutine json_get_double_vec_with_path(me, path, vec, found)
 
@@ -4624,7 +5213,18 @@
         end subroutine get_double_from_array
 
     end subroutine json_get_double_vec_with_path
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_double_vec_with_path
+!
+!  NAME
+!    wrap_json_get_double_vec_with_path
+!
+!  SEE ALSO
+!    json_get_double_vec_with_path
+!
+!  SOURCE
 
     subroutine wrap_json_get_double_vec_with_path(me, path, vec, found)
 
@@ -4638,7 +5238,7 @@
     call json_get_double_vec_with_path(me, to_unicode(path), vec, found)
 
     end subroutine wrap_json_get_double_vec_with_path
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_get_logical
@@ -4674,6 +5274,16 @@
     end subroutine json_get_logical
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_get_logical_with_path
+!
+!  NAME
+!    json_get_logical_with_path
+!
+!  DESCRIPTION
+!    Get a logical value from a json_value.
+!
+!  SOURCE
 
     subroutine json_get_logical_with_path(me, path, value, found)
 
@@ -4718,7 +5328,18 @@
     end if
 
     end subroutine json_get_logical_with_path
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_logical_with_path
+!
+!  NAME
+!    wrap_json_get_logical_with_path
+!
+!  SEE ALSO
+!    json_get_logical_with_path
+!
+!  SOURCE
 
     subroutine wrap_json_get_logical_with_path(me, path, value, found)
 
@@ -4732,7 +5353,7 @@
     call json_get_logical_with_path(me,to_unicode(path),value,found)
 
     end subroutine wrap_json_get_logical_with_path
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_get_logical_vec
@@ -4788,6 +5409,16 @@
     end subroutine json_get_logical_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_get_logical_vec_with_path
+!
+!  NAME
+!    json_get_logical_vec_with_path
+!
+!  DESCRIPTION
+!    Get a logical vector from a JSON value.
+!
+!  SOURCE
 
     subroutine json_get_logical_vec_with_path(me, path, vec, found)
 
@@ -4829,7 +5460,18 @@
         end subroutine get_logical_from_array
 
     end subroutine json_get_logical_vec_with_path
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_logical_vec_with_path
+!
+!  NAME
+!    wrap_json_get_logical_vec_with_path
+!
+!  SEE ALSO
+!    json_get_logical_vec_with_path
+!
+!  SOURCE
 
     subroutine wrap_json_get_logical_vec_with_path(me, path, vec, found)
 
@@ -4843,7 +5485,7 @@
     call json_get_logical_vec_with_path(me,to_unicode(path),vec,found)
 
     end subroutine wrap_json_get_logical_vec_with_path
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_get_string
@@ -5015,6 +5657,16 @@
     end subroutine json_get_string
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_get_string_with_path
+!
+!  NAME
+!    json_get_string_with_path
+!
+!  DESCRIPTION
+!    Get a character string from a json_value.
+!
+!  SOURCE
 
     subroutine json_get_string_with_path(me, path, value, found)
 
@@ -5061,7 +5713,18 @@
     if (associated(p)) nullify(p)
 
     end subroutine json_get_string_with_path
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_string_with_path
+!
+!  NAME
+!    wrap_json_get_string_with_path
+!
+!  SEE ALSO
+!    json_get_string_with_path
+!
+!  SOURCE
 
     subroutine wrap_json_get_string_with_path(me, path, value, found)
 
@@ -5075,7 +5738,7 @@
     call json_get_string_with_path(me,to_unicode(path),value,found)
 
     end subroutine wrap_json_get_string_with_path
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_get_string_vec
@@ -5140,6 +5803,16 @@
     end subroutine json_get_string_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_get_string_vec_with_path
+!
+!  NAME
+!    json_get_string_vec_with_path
+!
+!  DESCRIPTION
+!    Get a string vector from a JSON file.
+!
+!  SOURCE
 
     subroutine json_get_string_vec_with_path(me, path, vec, found)
 
@@ -5190,7 +5863,18 @@
         end subroutine get_chars_from_array
 
     end subroutine json_get_string_vec_with_path
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_string_vec_with_path
+!
+!  NAME
+!    wrap_json_get_string_vec_with_path
+!
+!  SEE ALSO
+!    json_get_string_vec_with_path
+!
+!  SOURCE
 
     subroutine wrap_json_get_string_vec_with_path(me, path, vec, found)
 
@@ -5204,7 +5888,7 @@
     call json_get_string_vec_with_path(me,to_unicode(path),vec,found)
 
     end subroutine wrap_json_get_string_vec_with_path
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_get_array
@@ -5258,6 +5942,18 @@
     end subroutine json_get_array
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_get_array_with_path
+!
+!  NAME
+!    json_get_array_with_path
+!
+!  DESCRIPTION
+!    This routine calls the user-supplied array_callback subroutine
+!    for each element in the array.
+!
+!  SOURCE
+
     subroutine json_get_array_with_path(me, path, array_callback, found)
 
     implicit none
@@ -5296,7 +5992,18 @@
     end if
 
     end subroutine json_get_array_with_path
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_get_array_with_path
+!
+!  NAME
+!    wrap_json_get_array_with_path
+!
+!  SEE ALSO
+!    json_get_array_with_path
+!
+!  SOURCE
 
     subroutine wrap_json_get_array_with_path(me, path, array_callback, found)
 
@@ -5310,6 +6017,7 @@
     call json_get_array_with_path(me, to_unicode(path), array_callback, found)
 
     end subroutine wrap_json_get_array_with_path
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_parse_file
@@ -5338,8 +6046,8 @@
 !  HISTORY
 !    Jacob Williams : 01/13/2015 : added read from string option.
 !    Izaak Beekman  : 03/08/2015 : moved read from string to separate
-!                                  subroutine, and error annotation
-!                                  to separate subroutine
+!    subroutine, and error annotation
+!    to separate subroutine
 !
 !  SOURCE
 
@@ -5378,7 +6086,8 @@
                     action      = 'READ', &
                     form        = 'FORMATTED', &
                     position    = 'REWIND', &
-                    iostat      = istat FILE_ENCODING )
+                    iostat      = istat &
+                    FILE_ENCODING )
         end if
 
     else
@@ -5390,7 +6099,8 @@
                 action      = 'READ', &
                 form        = 'FORMATTED', &
                 position    = 'REWIND', &
-                iostat      = istat FILE_ENCODING )
+                iostat      = istat &
+                FILE_ENCODING )
 
     end if
 
@@ -5425,6 +6135,19 @@
     end subroutine json_parse_file
 !*****************************************************************************************
 
+!*****************************************************************************************
+!****f* json_module/json_parse_string
+!
+!  NAME
+!    json_parse_string
+!
+!  DESCRIPTION
+!    Parse the JSON string and populate the json_value tree.
+!
+!  SEE ALSO
+!    json_parse_file
+!
+!  SOURCE
 
     subroutine json_parse_string(p, str)
 
@@ -5460,7 +6183,18 @@
     if (allocated(buffer)) deallocate(buffer)
 
     end subroutine json_parse_string
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/wrap_json_parse_string
+!
+!  NAME
+!    wrap_json_parse_string
+!
+!  SEE ALSO
+!    json_parse_string
+!
+!  SOURCE
 
     subroutine wrap_json_parse_string(p, str)
 
@@ -5472,7 +6206,19 @@
     call json_parse_string(p,to_unicode(str))
 
     end subroutine wrap_json_parse_string
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/annotate_invalid_json
+!
+!  NAME
+!    annotate_invalid_json
+!
+!  DESCRIPTION
+!    Generate a warning message if there was an error parsing a JSON
+!    file or string.
+!
+!  SOURCE
 
     subroutine annotate_invalid_json(iunit,str)
 
@@ -5484,6 +6230,7 @@
     character(kind=CK,len=:),allocatable :: line, arrow_str
     character(kind=CK,len=10) :: line_str, char_str
     integer(IK) :: i, i_nl_prev, i_nl
+
     !
     !  If there was an error reading the file, then
     !   print the line where the error occurred:
@@ -5530,7 +6277,7 @@
     end if
 
     end subroutine annotate_invalid_json
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****if* json_module/get_current_line_from_file
@@ -5735,6 +6482,9 @@
 !    Wrapper for json_value_create_logical so json_create_logical can
 !    be called with name of character kind 'DEFAULT' or 'ISO_10646'
 !
+!  SEE ALSO
+!    json_value_create_logical
+!
 !  AUTHOR
 !    Izaak Beekman
 !
@@ -5754,10 +6504,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_create_integer
+!****if* json_module/json_value_create_integer
 !
 !  NAME
-!    wrap_json_value_create_integer
+!    json_value_create_integer
 !
 !  DESCRIPTION
 !    Allocate a json_value pointer and make it an integer variable.
@@ -5788,15 +6538,18 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_create_integer
+!****if* json_module/wrap_json_value_create_integer
 !
 !  NAME
-!    json_value_create_integer
+!    wrap_json_value_create_integer
 !
 !  DESCRIPTION
 !    A wrapper procedure for json_value_create_integer so that json_create_integer
 !    may be called with either a 'DEFAULT' or 'ISO_10646' character kind 'name'
 !    actual argument.
+!
+!  SEE ALSO
+!    json_value_create_integer
 !
 !  AUTHOR
 !    Izaak Beekman
@@ -5861,6 +6614,9 @@
 !    called with an actual argument corresponding to the dummy argument, 'name'
 !    that may be of 'DEFAULT' or 'ISO_10646' character kind.
 !
+!  SEE ALSO
+!    json_value_create_double
+!
 !  AUTHOR
 !    Izaak Beekman
 !
@@ -5924,6 +6680,9 @@
 !    character string arguments for 'name' and 'val' that are BOTH of 'DEFAULT' or
 !    'ISO_10646' character kind.
 !
+!  SEE ALSO
+!    json_value_create_string
+!
 !  AUTHOR
 !    Izaak Beekman
 !
@@ -5985,6 +6744,9 @@
 !    Wrap json_value_create_null so that json_create_null may be called with an actual
 !    argument corresponding to the dummy argument 'name' that is either of 'DEFAULT' or
 !    'ISO_10646' character kind.
+!
+!  SEE ALSO
+!    json_value_create_null
 !
 !  AUTHOR
 !    Izaak Beekman
@@ -6051,6 +6813,9 @@
 !    argument corresponding to the dummy argument 'name' that is of either 'DEFAULT' or
 !    'ISO_10646' character kind.
 !
+!  SEE ALSO
+!    json_value_create_object
+!
 !  AUTHOR
 !    Izaak Beekman
 !
@@ -6111,6 +6876,9 @@
 !    A wrapper for json_value_create_array so that json_create_array may be called with
 !    an actual argument, corresponding to the dummy argument 'name', that is either of
 !    'DEFAULT' or 'ISO_10646' character kind.
+!
+!  SEE ALSO
+!    json_value_create_array
 !
 !  AUTHOR
 !    Izaak Beekman
@@ -7151,25 +7919,81 @@
     end if
 
     end function valid_json_hex
+!*****************************************************************************************
 
+!*****************************************************************************************
+!****if* json_module/to_uni
+!
+!  NAME
+!    to_uni
+!
+!  DESCRIPTION
+!    Convert string to unicode (CDK to CK).
+!
+!  AUTHOR
+!    Izaak Beekman
+!
+!  SOURCE
 
-    function to_uni(str)
+    pure function to_uni(str)
+
+    implicit none
+
     character(kind=CDK,len=*), intent(in) :: str
-    character(kind=CK,len=len(str)) :: to_uni
+    character(kind=CK,len=len(str))       :: to_uni
 
     to_uni = str
 
     end function to_uni
+!*****************************************************************************************
 
-    function to_uni_vec(str)
-    character(kind=CDK,len=*), dimension(:), intent(in) :: str
+!*****************************************************************************************
+!****if* json_module/to_uni_vec
+!
+!  NAME
+!    to_uni_vec
+!
+!  DESCRIPTION
+!    Convert array of strings to unicode (CDK to CK).
+!
+!  NOTES
+!    JW: may be able to remove this by making to_uni PURE ELEMENTAL ?
+!
+!  AUTHOR
+!    Izaak Beekman
+!
+!  SOURCE
+
+    pure function to_uni_vec(str)
+
+    implicit none
+
+    character(kind=CDK,len=*), dimension(:), intent(in)   :: str
     character(kind=CK,len=len(str)), dimension(size(str)) :: to_uni_vec
 
     to_uni_vec = str
 
     end function to_uni_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****if* json_module/ucs4_join_default
+!
+!  NAME
+!    ucs4_join_default
+!
+!  DESCRIPTION
+!    CK//CDK operator.
+!
+!  AUTHOR
+!    Izaak Beekman
+!
+!  SOURCE
 
     function ucs4_join_default(ucs4_str,def_str) result(res)
+
+    implicit none
+
     character(kind=CK, len=*), intent(in) :: ucs4_str
     character(kind=CDK,len=*), intent(in) :: def_str
     character(kind=CK,len=(len(ucs4_str)+len(def_str))) :: res
@@ -7177,8 +8001,26 @@
     res = ucs4_str//to_unicode(def_str)
 
     end function ucs4_join_default
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****if* json_module/default_join_ucs4
+!
+!  NAME
+!    default_join_ucs4
+!
+!  DESCRIPTION
+!    CDK//CK operator.
+!
+!  AUTHOR
+!    Izaak Beekman
+!
+!  SOURCE
 
     function default_join_ucs4(def_str,ucs4_str) result(res)
+
+    implicit none
+
     character(kind=CDK,len=*), intent(in) :: def_str
     character(kind=CK, len=*), intent(in) :: ucs4_str
     character(kind=CK,len=(len(def_str)+len(ucs4_str))) :: res
@@ -7186,8 +8028,26 @@
     res = to_unicode(def_str)//ucs4_str
 
     end function default_join_ucs4
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****if* json_module/ucs4_comp_default
+!
+!  NAME
+!    ucs4_comp_default
+!
+!  DESCRIPTION
+!    CK==CDK operator.
+!
+!  AUTHOR
+!    Izaak Beekman
+!
+!  SOURCE
 
     function ucs4_comp_default(ucs4_str,def_str) result(res)
+
+    implicit none
+
     character(kind=CK, len=*), intent(in) :: ucs4_str
     character(kind=CDK,len=*), intent(in) :: def_str
     logical(LK) :: res
@@ -7195,8 +8055,26 @@
     res = ( ucs4_str == to_unicode(def_str) )
 
     end function ucs4_comp_default
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****if* json_module/default_comp_ucs4
+!
+!  NAME
+!    default_comp_ucs4
+!
+!  DESCRIPTION
+!    CDK==CK operator.
+!
+!  AUTHOR
+!    Izaak Beekman
+!
+!  SOURCE
 
     function default_comp_ucs4(def_str,ucs4_str) result(res)
+
+    implicit none
+
     character(kind=CDK,len=*), intent(in) :: def_str
     character(kind=CK, len=*), intent(in) :: ucs4_str
     logical(LK) :: res
@@ -7204,7 +8082,7 @@
     res = ( to_unicode(def_str) == ucs4_str)
 
     end function default_comp_ucs4
-
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****if* json_module/json_print_error_message
