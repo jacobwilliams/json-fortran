@@ -270,7 +270,7 @@
 </p>
 
 <p>   These are the values returned by the <strong>var_type</strong> arguments
-   of the routines <a href="#robo69">json_file_variable_info</a> and <a href="#robo89">json_info</a>.
+   of the routines <a href="#robo71">json_file_variable_info</a> and <a href="#robo91">json_info</a>.
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">358 </span>    <span class="keyword">integer</span><span class="sign">(</span><a href="#robo3">IK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">parameter</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> json_unknown   <span class="sign">=</span> 0
@@ -295,18 +295,18 @@
 <p>    File encoding preprocessor macro.
 </p>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">164 </span><span class="sign">#</span> define <strong>FILE_ENCODING</strong>
+<pre class="source"><span class="line_number">164 </span><span class="sign">#</span> <span class="keyword">define</span> <strong>FILE_ENCODING</strong>
 <span class="line_number">165 </span>    <span class="comment">! don't ask for utf-8 file encoding unless using UCS4</span>
 <span class="line_number">166 </span>    <span class="comment">! this may let us use unformatted stream io to read in files more quickly</span>
 <span class="line_number">167 </span>    <span class="comment">! even with unicode support turned on `inquire( ... encoding=FL_ENCODING)`</span>
 <span class="line_number">168 </span>    <span class="comment">! may be able to detect json files in which each character is exactly one</span>
 <span class="line_number">169 </span>    <span class="comment">! byte</span>
-<span class="line_number">170 </span><span class="sign">#</span> ifdef __GFORTRAN__
-<span class="line_number">171 </span><span class="sign">#</span>   ifdef <a href="#robo10">USE_UCS4</a>
+<span class="line_number">170 </span><span class="sign">#</span> <span class="keyword">ifdef</span> __GFORTRAN__
+<span class="line_number">171 </span><span class="sign">#</span>   <span class="keyword">ifdef</span> <a href="#robo10">USE_UCS4</a>
 <span class="line_number">172 </span>    <span class="comment">! gfortran compiler AND UCS4 support requested, &amp; silence redefine warning:</span>
 <span class="line_number">173 </span>    <span class="comment">! Make sure we output files with utf-8 encoding too</span>
-<span class="line_number">174 </span><span class="sign">#</span>     undef <strong>FILE_ENCODING</strong>
-<span class="line_number">175 </span><span class="sign">#</span>     define <strong>FILE_ENCODING</strong> <span class="sign">,</span>encoding<span class="sign">=</span><span class="squote">'utf-8'</span>
+<span class="line_number">174 </span><span class="sign">#</span>     <span class="keyword">undef</span> <strong>FILE_ENCODING</strong>
+<span class="line_number">175 </span><span class="sign">#</span>     <span class="keyword">define</span> <strong>FILE_ENCODING</strong> <span class="sign">,</span>encoding<span class="sign">=</span><span class="squote">'utf-8'</span>
 <span class="line_number">176 </span><span class="sign">#</span>   <span class="keyword">endif</span>
 <span class="line_number">177 </span><span class="sign">#</span> <span class="keyword">endif</span>
 </pre>
@@ -331,14 +331,14 @@
     based on whether or not ISO 10646 is supported and requested.
 </p>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">275 </span><span class="sign">#</span> ifdef <a href="#robo10">USE_UCS4</a>
-<span class="line_number">276 </span><span class="sign">#</span>   ifdef __GFORTRAN__
+<pre class="source"><span class="line_number">275 </span><span class="sign">#</span> <span class="keyword">ifdef</span> <a href="#robo10">USE_UCS4</a>
+<span class="line_number">276 </span><span class="sign">#</span>   <span class="keyword">ifdef</span> __GFORTRAN__
 <span class="line_number">277 </span>    <span class="comment">! gfortran uses cpp in old-school compatibility mode so</span>
 <span class="line_number">278 </span>    <span class="comment">! the # stringify and ## concatenate operators don't work</span>
 <span class="line_number">279 </span>    <span class="comment">! but we can use C/C++ style comment to ensure PROCEDURE is</span>
 <span class="line_number">280 </span>    <span class="comment">! correctly tokenized and prepended with 'wrap_' when the</span>
 <span class="line_number">281 </span>    <span class="comment">! macro is expanded</span>
-<span class="line_number">282 </span><span class="sign">#</span>     define <strong>MAYBEWRAP</strong><span class="sign">(</span>PROCEDURE<span class="sign">)</span> PROCEDURE <span class="sign">,</span> wrap_<span class="comment">/**/</span>PROCEDURE
+<span class="line_number">282 </span><span class="sign">#</span>     <span class="keyword">define</span> <strong>MAYBEWRAP</strong><span class="sign">(</span>PROCEDURE<span class="sign">)</span> PROCEDURE <span class="sign">,</span> wrap_<span class="comment">/**/</span>PROCEDURE
 <span class="line_number">283 </span><span class="sign">#</span>   <span class="keyword">endif</span>
 <span class="line_number">284 </span><span class="comment">!   ifdef __INTEL_COMPILER</span>
 <span class="line_number">285 </span>    <span class="comment">! Intel's fpp does support the more contemporary ## concatenation</span>
@@ -351,7 +351,7 @@
 <span class="line_number">292 </span><span class="comment">!     define <strong>MAYBEWRAP</strong>(PROCEDURE) PROCEDURE , wrap_##PROCEDURE</span>
 <span class="line_number">293 </span><span class="comment">!   endif</span>
 <span class="line_number">294 </span><span class="sign">#</span> <span class="keyword">else</span>
-<span class="line_number">295 </span><span class="sign">#</span>   define <strong>MAYBEWRAP</strong><span class="sign">(</span>PROCEDURE<span class="sign">)</span> PROCEDURE
+<span class="line_number">295 </span><span class="sign">#</span>   <span class="keyword">define</span> <strong>MAYBEWRAP</strong><span class="sign">(</span>PROCEDURE<span class="sign">)</span> PROCEDURE
 <span class="line_number">296 </span><span class="sign">#</span> <span class="keyword">endif</span>
 </pre>
 
@@ -367,14 +367,14 @@
 <p>    String kind preprocessor macro.
 </p>
 <p class="item_name">SOURCE</p>
-<pre class="source"><span class="line_number">142 </span><span class="sign">#</span> define <strong>STRING_KIND</strong> <span class="squote">'DEFAULT'</span>
+<pre class="source"><span class="line_number">142 </span><span class="sign">#</span> <span class="keyword">define</span> <strong>STRING_KIND</strong> <span class="squote">'DEFAULT'</span>
 <span class="line_number">143 </span>    <span class="comment">! this is the string kind to use unless compiling with GFortran AND</span>
 <span class="line_number">144 </span>    <span class="comment">! UCS4/ISO 10646 support is requested</span>
-<span class="line_number">145 </span><span class="sign">#</span> ifdef __GFORTRAN__
-<span class="line_number">146 </span><span class="sign">#</span>   ifdef <a href="#robo10">USE_UCS4</a>
+<span class="line_number">145 </span><span class="sign">#</span> <span class="keyword">ifdef</span> __GFORTRAN__
+<span class="line_number">146 </span><span class="sign">#</span>   <span class="keyword">ifdef</span> <a href="#robo10">USE_UCS4</a>
 <span class="line_number">147 </span>    <span class="comment">! gfortran compiler AND UCS4 support requested, &amp; silence redefine warning:</span>
-<span class="line_number">148 </span><span class="sign">#</span>     undef  <strong>STRING_KIND</strong>
-<span class="line_number">149 </span><span class="sign">#</span>     define <strong>STRING_KIND</strong> <span class="squote">'ISO_10646'</span>
+<span class="line_number">148 </span><span class="sign">#</span>     <span class="keyword">undef</span>  <strong>STRING_KIND</strong>
+<span class="line_number">149 </span><span class="sign">#</span>     <span class="keyword">define</span> <strong>STRING_KIND</strong> <span class="squote">'ISO_10646'</span>
 <span class="line_number">150 </span><span class="sign">#</span>   <span class="keyword">endif</span>
 <span class="line_number">151 </span><span class="sign">#</span> <span class="keyword">endif</span>
 </pre>
@@ -440,73 +440,73 @@
 <span class="line_number">453 </span>
 <span class="line_number">454 </span>    <span class="keyword">contains</span>
 <span class="line_number">455 </span>
-<span class="line_number">456 </span>        <span class="keyword">procedure</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> load_file        <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo56">json_file_load</a>
+<span class="line_number">456 </span>        <span class="keyword">procedure</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> load_file        <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo58">json_file_load</a>
 <span class="line_number">457 </span>
-<span class="line_number">458 </span>        <span class="keyword">generic</span><span class="sign">,</span>  <span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> load_from_string <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo57">json_file_load_from_string</a><span class="sign">)</span>
+<span class="line_number">458 </span>        <span class="keyword">generic</span><span class="sign">,</span>  <span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> load_from_string <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo59">json_file_load_from_string</a><span class="sign">)</span>
 <span class="line_number">459 </span>
-<span class="line_number">460 </span>        <span class="keyword">procedure</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> destroy     <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo46">json_file_destroy</a>
-<span class="line_number">461 </span>        <span class="keyword">procedure</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> move        <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo58">json_file_move_pointer</a>
-<span class="line_number">462 </span>        <span class="keyword">generic</span>  <span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> info        <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo69">json_file_variable_info</a><span class="sign">)</span>
+<span class="line_number">460 </span>        <span class="keyword">procedure</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> destroy     <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo48">json_file_destroy</a>
+<span class="line_number">461 </span>        <span class="keyword">procedure</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> move        <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo60">json_file_move_pointer</a>
+<span class="line_number">462 </span>        <span class="keyword">generic</span>  <span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> info        <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo71">json_file_variable_info</a><span class="sign">)</span>
 <span class="line_number">463 </span>
-<span class="line_number">464 </span>        <span class="keyword">procedure</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> print_to_string <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo62">json_file_print_to_string</a>
+<span class="line_number">464 </span>        <span class="keyword">procedure</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> print_to_string <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo64">json_file_print_to_string</a>
 <span class="line_number">465 </span>
-<span class="line_number">466 </span>        <span class="keyword">generic</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> print_file <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo61">json_file_print_to_console</a><span class="sign">,</span> <span class="sign">&amp;</span>
-<span class="line_number">467 </span>                                        <a href="#robo59">json_file_print_1</a><span class="sign">,</span> <span class="sign">&amp;</span>
-<span class="line_number">468 </span>                                        <a href="#robo60">json_file_print_2</a>
+<span class="line_number">466 </span>        <span class="keyword">generic</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> print_file <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo63">json_file_print_to_console</a><span class="sign">,</span> <span class="sign">&amp;</span>
+<span class="line_number">467 </span>                                        <a href="#robo61">json_file_print_1</a><span class="sign">,</span> <span class="sign">&amp;</span>
+<span class="line_number">468 </span>                                        <a href="#robo62">json_file_print_2</a>
 <span class="line_number">469 </span>
-<span class="line_number">470 </span>        <span class="keyword">generic</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> get <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo53">json_file_get_object</a><span class="sign">)</span><span class="sign">,</span>      <span class="sign">&amp;</span>
-<span class="line_number">471 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo49">json_file_get_integer</a><span class="sign">)</span><span class="sign">,</span>     <span class="sign">&amp;</span>
-<span class="line_number">472 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo47">json_file_get_double</a><span class="sign">)</span><span class="sign">,</span>      <span class="sign">&amp;</span>
-<span class="line_number">473 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo51">json_file_get_logical</a><span class="sign">)</span><span class="sign">,</span>     <span class="sign">&amp;</span>
-<span class="line_number">474 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo54">json_file_get_string</a><span class="sign">)</span><span class="sign">,</span>      <span class="sign">&amp;</span>
-<span class="line_number">475 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo50">json_file_get_integer_vec</a><span class="sign">)</span><span class="sign">,</span> <span class="sign">&amp;</span>
-<span class="line_number">476 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo48">json_file_get_double_vec</a><span class="sign">)</span><span class="sign">,</span>  <span class="sign">&amp;</span>
-<span class="line_number">477 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo52">json_file_get_logical_vec</a><span class="sign">)</span><span class="sign">,</span> <span class="sign">&amp;</span>
-<span class="line_number">478 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo55">json_file_get_string_vec</a><span class="sign">)</span>
+<span class="line_number">470 </span>        <span class="keyword">generic</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> get <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo55">json_file_get_object</a><span class="sign">)</span><span class="sign">,</span>      <span class="sign">&amp;</span>
+<span class="line_number">471 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo51">json_file_get_integer</a><span class="sign">)</span><span class="sign">,</span>     <span class="sign">&amp;</span>
+<span class="line_number">472 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo49">json_file_get_double</a><span class="sign">)</span><span class="sign">,</span>      <span class="sign">&amp;</span>
+<span class="line_number">473 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo53">json_file_get_logical</a><span class="sign">)</span><span class="sign">,</span>     <span class="sign">&amp;</span>
+<span class="line_number">474 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo56">json_file_get_string</a><span class="sign">)</span><span class="sign">,</span>      <span class="sign">&amp;</span>
+<span class="line_number">475 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo52">json_file_get_integer_vec</a><span class="sign">)</span><span class="sign">,</span> <span class="sign">&amp;</span>
+<span class="line_number">476 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo50">json_file_get_double_vec</a><span class="sign">)</span><span class="sign">,</span>  <span class="sign">&amp;</span>
+<span class="line_number">477 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo54">json_file_get_logical_vec</a><span class="sign">)</span><span class="sign">,</span> <span class="sign">&amp;</span>
+<span class="line_number">478 </span>                                 <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo57">json_file_get_string_vec</a><span class="sign">)</span>
 <span class="line_number">479 </span>
 <span class="line_number">480 </span>
 <span class="line_number">481 </span>
 <span class="line_number">482 </span>
-<span class="line_number">483 </span>        <span class="keyword">generic</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> update <span class="sign">=</span><span class="sign">&gt;</span>  <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo63">json_file_update_integer</a><span class="sign">)</span><span class="sign">,</span>  <span class="sign">&amp;</span>
-<span class="line_number">484 </span>                                     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo64">json_file_update_logical</a><span class="sign">)</span><span class="sign">,</span>  <span class="sign">&amp;</span>
-<span class="line_number">485 </span>                                     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo65">json_file_update_real</a><span class="sign">)</span><span class="sign">,</span>     <span class="sign">&amp;</span>
-<span class="line_number">486 </span>                                     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo66">json_file_update_string</a><span class="sign">)</span>
-<span class="line_number">487 </span><span class="sign">#</span>     ifdef <a href="#robo10">USE_UCS4</a>
-<span class="line_number">488 </span>        <span class="keyword">generic</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> update <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo67">json_file_update_string_name_ascii</a><span class="sign">,</span> <span class="sign">&amp;</span>
-<span class="line_number">489 </span>                                    <a href="#robo68">json_file_update_string_val_ascii</a>
+<span class="line_number">483 </span>        <span class="keyword">generic</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> update <span class="sign">=</span><span class="sign">&gt;</span>  <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo65">json_file_update_integer</a><span class="sign">)</span><span class="sign">,</span>  <span class="sign">&amp;</span>
+<span class="line_number">484 </span>                                     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo66">json_file_update_logical</a><span class="sign">)</span><span class="sign">,</span>  <span class="sign">&amp;</span>
+<span class="line_number">485 </span>                                     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo67">json_file_update_real</a><span class="sign">)</span><span class="sign">,</span>     <span class="sign">&amp;</span>
+<span class="line_number">486 </span>                                     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo68">json_file_update_string</a><span class="sign">)</span>
+<span class="line_number">487 </span><span class="sign">#</span>     <span class="keyword">ifdef</span> <a href="#robo10">USE_UCS4</a>
+<span class="line_number">488 </span>        <span class="keyword">generic</span><span class="sign">,</span><span class="keyword">public</span> <span class="sign">:</span><span class="sign">:</span> update <span class="sign">=</span><span class="sign">&gt;</span> <a href="#robo69">json_file_update_string_name_ascii</a><span class="sign">,</span> <span class="sign">&amp;</span>
+<span class="line_number">489 </span>                                    <a href="#robo70">json_file_update_string_val_ascii</a>
 <span class="line_number">490 </span><span class="sign">#</span>     <span class="keyword">endif</span>
 <span class="line_number">491 </span>
 <span class="line_number">492 </span>        <span class="comment">!load from string:</span>
-<span class="line_number">493 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo57">json_file_load_from_string</a><span class="sign">)</span>
+<span class="line_number">493 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo59">json_file_load_from_string</a><span class="sign">)</span>
 <span class="line_number">494 </span>
 <span class="line_number">495 </span>        <span class="comment">!git info:</span>
-<span class="line_number">496 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo69">json_file_variable_info</a><span class="sign">)</span>
+<span class="line_number">496 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo71">json_file_variable_info</a><span class="sign">)</span>
 <span class="line_number">497 </span>
 <span class="line_number">498 </span>        <span class="comment">!get:</span>
-<span class="line_number">499 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo53">json_file_get_object</a><span class="sign">)</span>
-<span class="line_number">500 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo49">json_file_get_integer</a><span class="sign">)</span>
-<span class="line_number">501 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo47">json_file_get_double</a><span class="sign">)</span>
-<span class="line_number">502 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo51">json_file_get_logical</a><span class="sign">)</span>
-<span class="line_number">503 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo54">json_file_get_string</a><span class="sign">)</span>
-<span class="line_number">504 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo50">json_file_get_integer_vec</a><span class="sign">)</span>
-<span class="line_number">505 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo48">json_file_get_double_vec</a><span class="sign">)</span>
-<span class="line_number">506 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo52">json_file_get_logical_vec</a><span class="sign">)</span>
-<span class="line_number">507 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo55">json_file_get_string_vec</a><span class="sign">)</span>
+<span class="line_number">499 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo55">json_file_get_object</a><span class="sign">)</span>
+<span class="line_number">500 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo51">json_file_get_integer</a><span class="sign">)</span>
+<span class="line_number">501 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo49">json_file_get_double</a><span class="sign">)</span>
+<span class="line_number">502 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo53">json_file_get_logical</a><span class="sign">)</span>
+<span class="line_number">503 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo56">json_file_get_string</a><span class="sign">)</span>
+<span class="line_number">504 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo52">json_file_get_integer_vec</a><span class="sign">)</span>
+<span class="line_number">505 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo50">json_file_get_double_vec</a><span class="sign">)</span>
+<span class="line_number">506 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo54">json_file_get_logical_vec</a><span class="sign">)</span>
+<span class="line_number">507 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo57">json_file_get_string_vec</a><span class="sign">)</span>
 <span class="line_number">508 </span>
 <span class="line_number">509 </span>        <span class="comment">!update:</span>
-<span class="line_number">510 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo63">json_file_update_integer</a><span class="sign">)</span>
-<span class="line_number">511 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo64">json_file_update_logical</a><span class="sign">)</span>
-<span class="line_number">512 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo65">json_file_update_real</a><span class="sign">)</span>
-<span class="line_number">513 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo66">json_file_update_string</a><span class="sign">)</span>
-<span class="line_number">514 </span><span class="sign">#</span>     ifdef <a href="#robo10">USE_UCS4</a>
-<span class="line_number">515 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo67">json_file_update_string_name_ascii</a>
-<span class="line_number">516 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo68">json_file_update_string_val_ascii</a>
+<span class="line_number">510 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo65">json_file_update_integer</a><span class="sign">)</span>
+<span class="line_number">511 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo66">json_file_update_logical</a><span class="sign">)</span>
+<span class="line_number">512 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo67">json_file_update_real</a><span class="sign">)</span>
+<span class="line_number">513 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo68">json_file_update_string</a><span class="sign">)</span>
+<span class="line_number">514 </span><span class="sign">#</span>     <span class="keyword">ifdef</span> <a href="#robo10">USE_UCS4</a>
+<span class="line_number">515 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo69">json_file_update_string_name_ascii</a>
+<span class="line_number">516 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo70">json_file_update_string_val_ascii</a>
 <span class="line_number">517 </span><span class="sign">#</span>     <span class="keyword">endif</span>
 <span class="line_number">518 </span>
 <span class="line_number">519 </span>        <span class="comment">!print_file:</span>
-<span class="line_number">520 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo61">json_file_print_to_console</a>
-<span class="line_number">521 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo59">json_file_print_1</a>
-<span class="line_number">522 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo60">json_file_print_2</a>
+<span class="line_number">520 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo63">json_file_print_to_console</a>
+<span class="line_number">521 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo61">json_file_print_1</a>
+<span class="line_number">522 </span>        <span class="keyword">procedure</span> <span class="sign">:</span><span class="sign">:</span> <a href="#robo62">json_file_print_2</a>
 <span class="line_number">523 </span>
 <span class="line_number">524 </span>    <span class="keyword">end</span> <span class="keyword">type</span> <strong>json_file</strong>
 </pre>
@@ -573,10 +573,10 @@
 <p>    <strong>array_callback_func</strong>
 </p>
 <p class="item_name">DESCRIPTION</p>
-<p>    Array element callback function.  Used by <a href="#robo70">json_get_array</a>.
+<p>    Array element callback function.  Used by <a href="#robo72">json_get_array</a>.
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo70">json_get_array</a>
+<p>    <a href="#robo72">json_get_array</a>
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">540 </span>    <span class="keyword">abstract</span> <span class="keyword">interface</span>
@@ -606,20 +606,20 @@
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">596 </span>    <span class="keyword">interface</span> <strong>json_add</strong>
-<span class="line_number">597 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo107">json_value_add_member</a>
-<span class="line_number">598 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo103">json_value_add_integer</a><span class="sign">)</span>
-<span class="line_number">599 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo104">json_value_add_integer_vec</a><span class="sign">)</span>
-<span class="line_number">600 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo101">json_value_add_double</a><span class="sign">)</span>
-<span class="line_number">601 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo102">json_value_add_double_vec</a><span class="sign">)</span>
-<span class="line_number">602 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo105">json_value_add_logical</a><span class="sign">)</span>
-<span class="line_number">603 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo106">json_value_add_logical_vec</a><span class="sign">)</span>
-<span class="line_number">604 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo108">json_value_add_string</a><span class="sign">)</span>
-<span class="line_number">605 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo111">json_value_add_string_vec</a><span class="sign">)</span>
-<span class="line_number">606 </span><span class="sign">#</span>     ifdef <a href="#robo10">USE_UCS4</a>
-<span class="line_number">607 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo109">json_value_add_string_name_ascii</a>
-<span class="line_number">608 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo110">json_value_add_string_val_ascii</a>
-<span class="line_number">609 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo112">json_value_add_string_vec_name_ascii</a>
-<span class="line_number">610 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo113">json_value_add_string_vec_val_ascii</a>
+<span class="line_number">597 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo109">json_value_add_member</a>
+<span class="line_number">598 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo105">json_value_add_integer</a><span class="sign">)</span>
+<span class="line_number">599 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo106">json_value_add_integer_vec</a><span class="sign">)</span>
+<span class="line_number">600 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo103">json_value_add_double</a><span class="sign">)</span>
+<span class="line_number">601 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo104">json_value_add_double_vec</a><span class="sign">)</span>
+<span class="line_number">602 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo107">json_value_add_logical</a><span class="sign">)</span>
+<span class="line_number">603 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo108">json_value_add_logical_vec</a><span class="sign">)</span>
+<span class="line_number">604 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo110">json_value_add_string</a><span class="sign">)</span>
+<span class="line_number">605 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo113">json_value_add_string_vec</a><span class="sign">)</span>
+<span class="line_number">606 </span><span class="sign">#</span>     <span class="keyword">ifdef</span> <a href="#robo10">USE_UCS4</a>
+<span class="line_number">607 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo111">json_value_add_string_name_ascii</a>
+<span class="line_number">608 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo112">json_value_add_string_val_ascii</a>
+<span class="line_number">609 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo114">json_value_add_string_vec_name_ascii</a>
+<span class="line_number">610 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo115">json_value_add_string_vec_val_ascii</a>
 <span class="line_number">611 </span><span class="sign">#</span>     <span class="keyword">endif</span>
 <span class="line_number">612 </span>    <span class="keyword">end</span> <span class="keyword">interface</span> <strong>json_add</strong>
 </pre>
@@ -870,7 +870,7 @@
 <p></p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">751 </span>    <span class="keyword">interface</span> <strong>json_destroy</strong>
-<span class="line_number">752 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo114">json_value_destroy</a>
+<span class="line_number">752 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo116">json_value_destroy</a>
 <span class="line_number">753 </span>    <span class="keyword">end</span> <span class="keyword">interface</span>
 </pre>
 
@@ -886,23 +886,23 @@
 <p>    Get data from a <a href="#robo12">json_value</a> linked list.
 </p>
 <p class="item_name">NOTES</p>
-<p>    There are two versions (e.g. <a href="#robo77">json_get_integer</a> and <a href="#robo80">json_get_integer_with_path</a>).
+<p>    There are two versions (e.g. <a href="#robo79">json_get_integer</a> and <a href="#robo82">json_get_integer_with_path</a>).
     The first one gets the value from the <a href="#robo12">json_value</a> passed into the routine,
     while the second one gets the value from the <a href="#robo12">json_value</a> found by parsing the
     path.  The path version is split up into unicode and non-unicode versions.
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">661 </span>    <span class="keyword">interface</span> <strong>json_get</strong>
-<span class="line_number">662 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span>                       <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo72">json_get_by_path</a><span class="sign">)</span>
-<span class="line_number">663 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo77">json_get_integer</a><span class="sign">,</span>     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo80">json_get_integer_with_path</a><span class="sign">)</span>
-<span class="line_number">664 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo78">json_get_integer_vec</a><span class="sign">,</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo79">json_get_integer_vec_with_path</a><span class="sign">)</span>
-<span class="line_number">665 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo73">json_get_double</a><span class="sign">,</span>      <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo76">json_get_double_with_path</a><span class="sign">)</span>
-<span class="line_number">666 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo74">json_get_double_vec</a><span class="sign">,</span>  <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo75">json_get_double_vec_with_path</a><span class="sign">)</span>
-<span class="line_number">667 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo81">json_get_logical</a><span class="sign">,</span>     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo84">json_get_logical_with_path</a><span class="sign">)</span>
-<span class="line_number">668 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo82">json_get_logical_vec</a><span class="sign">,</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo83">json_get_logical_vec_with_path</a><span class="sign">)</span>
-<span class="line_number">669 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo85">json_get_string</a><span class="sign">,</span>      <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo88">json_get_string_with_path</a><span class="sign">)</span>
-<span class="line_number">670 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo86">json_get_string_vec</a><span class="sign">,</span>  <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo87">json_get_string_vec_with_path</a><span class="sign">)</span>
-<span class="line_number">671 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo70">json_get_array</a><span class="sign">,</span>       <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo71">json_get_array_with_path</a><span class="sign">)</span>
+<span class="line_number">662 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span>                       <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo74">json_get_by_path</a><span class="sign">)</span>
+<span class="line_number">663 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo79">json_get_integer</a><span class="sign">,</span>     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo82">json_get_integer_with_path</a><span class="sign">)</span>
+<span class="line_number">664 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo80">json_get_integer_vec</a><span class="sign">,</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo81">json_get_integer_vec_with_path</a><span class="sign">)</span>
+<span class="line_number">665 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo75">json_get_double</a><span class="sign">,</span>      <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo78">json_get_double_with_path</a><span class="sign">)</span>
+<span class="line_number">666 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo76">json_get_double_vec</a><span class="sign">,</span>  <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo77">json_get_double_vec_with_path</a><span class="sign">)</span>
+<span class="line_number">667 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo83">json_get_logical</a><span class="sign">,</span>     <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo86">json_get_logical_with_path</a><span class="sign">)</span>
+<span class="line_number">668 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo84">json_get_logical_vec</a><span class="sign">,</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo85">json_get_logical_vec_with_path</a><span class="sign">)</span>
+<span class="line_number">669 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo87">json_get_string</a><span class="sign">,</span>      <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo90">json_get_string_with_path</a><span class="sign">)</span>
+<span class="line_number">670 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo88">json_get_string_vec</a><span class="sign">,</span>  <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo89">json_get_string_vec_with_path</a><span class="sign">)</span>
+<span class="line_number">671 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo72">json_get_array</a><span class="sign">,</span>       <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo73">json_get_array_with_path</a><span class="sign">)</span>
 <span class="line_number">672 </span>    <span class="keyword">end</span> <span class="keyword">interface</span> <strong>json_get</strong>
 </pre>
 
@@ -923,8 +923,8 @@
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">577 </span>    <span class="keyword">interface</span> <strong>json_get_child</strong>
-<span class="line_number">578 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo115">json_value_get_by_index</a>
-<span class="line_number">579 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo116">json_value_get_by_name_chars</a><span class="sign">)</span>
+<span class="line_number">578 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo117">json_value_get_by_index</a>
+<span class="line_number">579 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo118">json_value_get_by_name_chars</a><span class="sign">)</span>
 <span class="line_number">580 </span>    <span class="keyword">end</span> <span class="keyword">interface</span> <strong>json_get_child</strong>
 </pre>
 
@@ -967,7 +967,7 @@
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">987 </span>    <span class="keyword">interface</span> <strong>json_parse</strong>
-<span class="line_number">988 </span>       <span class="keyword">module</span> <span class="keyword">procedure</span>  <a href="#robo91">json_parse_file</a><span class="sign">,</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo92">json_parse_string</a><span class="sign">)</span>
+<span class="line_number">988 </span>       <span class="keyword">module</span> <span class="keyword">procedure</span>  <a href="#robo93">json_parse_file</a><span class="sign">,</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo94">json_parse_string</a><span class="sign">)</span>
 <span class="line_number">989 </span>    <span class="keyword">end</span> <span class="keyword">interface</span>
 </pre>
 
@@ -987,13 +987,13 @@
 </p>
 <pre>     type(<a href="#robo12">json_value</a>) :: p
      !...
-     call <strong>json_print</strong>(p,'test.json')  !this is <a href="#robo94">json_print_2</a>
+     call <strong>json_print</strong>(p,'test.json')  !this is <a href="#robo96">json_print_2</a>
 </pre>
 <p></p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">706 </span>    <span class="keyword">interface</span> <strong>json_print</strong>
-<span class="line_number">707 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo93">json_print_1</a>    <span class="comment">!input is unit number</span>
-<span class="line_number">708 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo94">json_print_2</a>    <span class="comment">!input is file name</span>
+<span class="line_number">707 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo95">json_print_1</a>    <span class="comment">!input is unit number</span>
+<span class="line_number">708 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo96">json_print_2</a>    <span class="comment">!input is file name</span>
 <span class="line_number">709 </span>    <span class="keyword">end</span> <span class="keyword">interface</span>
 </pre>
 
@@ -1010,7 +1010,7 @@
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">685 </span>    <span class="keyword">interface</span> <strong>json_print_to_string</strong>
-<span class="line_number">686 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo119">json_value_to_string</a>
+<span class="line_number">686 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo121">json_value_to_string</a>
 <span class="line_number">687 </span>    <span class="keyword">end</span> <span class="keyword">interface</span>
 </pre>
 
@@ -1027,7 +1027,7 @@
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">766 </span>    <span class="keyword">interface</span> <strong>json_remove</strong>
-<span class="line_number">767 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo117">json_value_remove</a>
+<span class="line_number">767 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo119">json_value_remove</a>
 <span class="line_number">768 </span>    <span class="keyword">end</span> <span class="keyword">interface</span>
 </pre>
 
@@ -1044,7 +1044,7 @@
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">781 </span>    <span class="keyword">interface</span> <strong>json_remove_if_present</strong>
-<span class="line_number">782 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo118">json_value_remove_if_present</a><span class="sign">)</span>
+<span class="line_number">782 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo120">json_value_remove_if_present</a><span class="sign">)</span>
 <span class="line_number">783 </span>    <span class="keyword">end</span> <span class="keyword">interface</span>
 </pre>
 
@@ -1069,13 +1069,13 @@
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">633 </span>    <span class="keyword">interface</span> <strong>json_update</strong>
-<span class="line_number">634 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo97">json_update_logical</a><span class="sign">)</span><span class="sign">,</span><span class="sign">&amp;</span>
-<span class="line_number">635 </span>                         <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo95">json_update_double</a><span class="sign">)</span><span class="sign">,</span><span class="sign">&amp;</span>
-<span class="line_number">636 </span>                         <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo96">json_update_integer</a><span class="sign">)</span><span class="sign">,</span><span class="sign">&amp;</span>
-<span class="line_number">637 </span>                         <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo98">json_update_string</a><span class="sign">)</span>
-<span class="line_number">638 </span><span class="sign">#</span>     ifdef <a href="#robo10">USE_UCS4</a>
-<span class="line_number">639 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo99">json_update_string_name_ascii</a>
-<span class="line_number">640 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo100">json_update_string_val_ascii</a>
+<span class="line_number">634 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo99">json_update_logical</a><span class="sign">)</span><span class="sign">,</span><span class="sign">&amp;</span>
+<span class="line_number">635 </span>                         <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo97">json_update_double</a><span class="sign">)</span><span class="sign">,</span><span class="sign">&amp;</span>
+<span class="line_number">636 </span>                         <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo98">json_update_integer</a><span class="sign">)</span><span class="sign">,</span><span class="sign">&amp;</span>
+<span class="line_number">637 </span>                         <a href="#robo8">MAYBEWRAP</a><span class="sign">(</span><a href="#robo100">json_update_string</a><span class="sign">)</span>
+<span class="line_number">638 </span><span class="sign">#</span>     <span class="keyword">ifdef</span> <a href="#robo10">USE_UCS4</a>
+<span class="line_number">639 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo101">json_update_string_name_ascii</a>
+<span class="line_number">640 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo102">json_update_string_val_ascii</a>
 <span class="line_number">641 </span><span class="sign">#</span>     <span class="keyword">endif</span>
 <span class="line_number">642 </span>    <span class="keyword">end</span> <span class="keyword">interface</span> <strong>json_update</strong>
 </pre>
@@ -1093,13 +1093,13 @@
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">1002 </span>    <span class="keyword">interface</span> <strong>to_unicode</strong>
-<span class="line_number">1003 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo120">to_uni</a><span class="sign">,</span> <a href="#robo121">to_uni_vec</a>
+<span class="line_number">1003 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo122">to_uni</a><span class="sign">,</span> <a href="#robo123">to_uni_vec</a>
 <span class="line_number">1004 </span>    <span class="keyword">end</span> <span class="keyword">interface</span>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5fcheck5ffor5ferrors"></a>
-<a name="robo42"></a><h2>json_module/json_check_for_errors [ Functions ]</h2>
+<a name="robo44"></a><h2>json_module/json_check_for_errors [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1108,7 +1108,7 @@
 <p class="item_name">DESCRIPTION</p>
 <p>    Retrieve error code from the module.
     This should be called after <a href="#robo25">json_parse</a> to check for errors.
-    If an error is thrown, before using the module again, <a href="#robo90">json_initialize</a>
+    If an error is thrown, before using the module again, <a href="#robo92">json_initialize</a>
     should be called to clean up before it is used again.
 </p>
 <p class="item_name">EXAMPLE</p>
@@ -1121,13 +1121,13 @@
      call <strong>json_check_for_errors</strong>(status_ok, error_msg)
      if (.not. status_ok) then
          write(*,*) 'Error: '//error_msg
-         call <a href="#robo43">json_clear_exceptions</a>()
+         call <a href="#robo45">json_clear_exceptions</a>()
          call json%destroy()
      end if
 </pre>
 <p></p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo45">json_failed</a>
+<p>    <a href="#robo47">json_failed</a>
 </p>
 <p class="item_name">AUTHOR</p>
 <p>    Jacob Williams : 12/4/2013
@@ -1157,7 +1157,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fclear5fexceptions"></a>
-<a name="robo43"></a><h2>json_module/json_clear_exceptions [ Functions ]</h2>
+<a name="robo45"></a><h2>json_module/json_clear_exceptions [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1183,7 +1183,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fcount"></a>
-<a name="robo44"></a><h2>json_module/json_count [ Functions ]</h2>
+<a name="robo46"></a><h2>json_module/json_count [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1212,7 +1212,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffailed"></a>
-<a name="robo45"></a><h2>json_module/json_failed [ Functions ]</h2>
+<a name="robo47"></a><h2>json_module/json_failed [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1229,15 +1229,15 @@
      character(len=:),allocatable :: error_msg
      call json%load_file(filename='myfile.json')
      if (<strong>json_failed</strong>()) then
-         call <a href="#robo42">json_check_for_errors</a>(status_ok, error_msg)
+         call <a href="#robo44">json_check_for_errors</a>(status_ok, error_msg)
          write(*,*) 'Error: '//error_msg
-         call <a href="#robo43">json_clear_exceptions</a>()
+         call <a href="#robo45">json_clear_exceptions</a>()
          call json%destroy()
      end if
 </pre>
 <p></p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo42">json_check_for_errors</a>
+<p>    <a href="#robo44">json_check_for_errors</a>
 </p>
 <p class="item_name">AUTHOR</p>
 <p>    Jacob Williams : 12/5/2013
@@ -1256,7 +1256,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fdestroy"></a>
-<a name="robo46"></a><h2>json_module/json_file_destroy [ Functions ]</h2>
+<a name="robo48"></a><h2>json_module/json_file_destroy [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1278,14 +1278,14 @@
 <span class="line_number">1136 </span>
 <span class="line_number">1137 </span>    <span class="keyword">class</span><span class="sign">(</span><a href="#robo11">json_file</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>inout<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> me
 <span class="line_number">1138 </span>
-<span class="line_number">1139 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">associated</span><span class="sign">(</span>me<span class="sign">%</span>p<span class="sign">)</span><span class="sign">)</span> <span class="keyword">call</span> <a href="#robo114">json_value_destroy</a><span class="sign">(</span>me<span class="sign">%</span>p<span class="sign">)</span>
+<span class="line_number">1139 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">associated</span><span class="sign">(</span>me<span class="sign">%</span>p<span class="sign">)</span><span class="sign">)</span> <span class="keyword">call</span> <a href="#robo116">json_value_destroy</a><span class="sign">(</span>me<span class="sign">%</span>p<span class="sign">)</span>
 <span class="line_number">1140 </span>
 <span class="line_number">1141 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_file_destroy</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fget5fdouble"></a>
-<a name="robo47"></a><h2>json_module/json_file_get_double [ Functions ]</h2>
+<a name="robo49"></a><h2>json_module/json_file_get_double [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1317,7 +1317,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fget5fdouble5fvec"></a>
-<a name="robo48"></a><h2>json_module/json_file_get_double_vec [ Functions ]</h2>
+<a name="robo50"></a><h2>json_module/json_file_get_double_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1349,7 +1349,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fget5finteger"></a>
-<a name="robo49"></a><h2>json_module/json_file_get_integer [ Functions ]</h2>
+<a name="robo51"></a><h2>json_module/json_file_get_integer [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1381,7 +1381,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fget5finteger5fvec"></a>
-<a name="robo50"></a><h2>json_module/json_file_get_integer_vec [ Functions ]</h2>
+<a name="robo52"></a><h2>json_module/json_file_get_integer_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1413,7 +1413,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fget5flogical"></a>
-<a name="robo51"></a><h2>json_module/json_file_get_logical [ Functions ]</h2>
+<a name="robo53"></a><h2>json_module/json_file_get_logical [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1445,7 +1445,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fget5flogical5fvec"></a>
-<a name="robo52"></a><h2>json_module/json_file_get_logical_vec [ Functions ]</h2>
+<a name="robo54"></a><h2>json_module/json_file_get_logical_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1477,7 +1477,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fget5fobject"></a>
-<a name="robo53"></a><h2>json_module/json_file_get_object [ Functions ]</h2>
+<a name="robo55"></a><h2>json_module/json_file_get_object [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1502,14 +1502,14 @@
 <span class="line_number">1552 </span>    <span class="keyword">type</span><span class="sign">(</span><a href="#robo12">json_value</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">pointer</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> p
 <span class="line_number">1553 </span>    <span class="keyword">logical</span><span class="sign">(</span><a href="#robo4">LK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span><span class="sign">,</span><span class="keyword">optional</span>     <span class="sign">:</span><span class="sign">:</span> found
 <span class="line_number">1554 </span>
-<span class="line_number">1555 </span>    <span class="keyword">call</span> <a href="#robo72">json_get_by_path</a><span class="sign">(</span>me<span class="sign">%</span>p<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">,</span> found<span class="sign">=</span>found<span class="sign">)</span>
+<span class="line_number">1555 </span>    <span class="keyword">call</span> <a href="#robo74">json_get_by_path</a><span class="sign">(</span>me<span class="sign">%</span>p<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">,</span> found<span class="sign">=</span>found<span class="sign">)</span>
 <span class="line_number">1556 </span>
 <span class="line_number">1557 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_file_get_object</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fget5fstring"></a>
-<a name="robo54"></a><h2>json_module/json_file_get_string [ Functions ]</h2>
+<a name="robo56"></a><h2>json_module/json_file_get_string [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1542,7 +1542,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fget5fstring5fvec"></a>
-<a name="robo55"></a><h2>json_module/json_file_get_string_vec [ Functions ]</h2>
+<a name="robo57"></a><h2>json_module/json_file_get_string_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1574,7 +1574,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fload"></a>
-<a name="robo56"></a><h2>json_module/json_file_load [ Functions ]</h2>
+<a name="robo58"></a><h2>json_module/json_file_load [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1609,7 +1609,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fload5ffrom5fstring"></a>
-<a name="robo57"></a><h2>json_module/json_file_load_from_string [ Functions ]</h2>
+<a name="robo59"></a><h2>json_module/json_file_load_from_string [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1643,7 +1643,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fmove5fpointer"></a>
-<a name="robo58"></a><h2>json_module/json_file_move_pointer [ Functions ]</h2>
+<a name="robo60"></a><h2>json_module/json_file_move_pointer [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1683,7 +1683,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fprint5f1"></a>
-<a name="robo59"></a><h2>json_module/json_file_print_1 [ Functions ]</h2>
+<a name="robo61"></a><h2>json_module/json_file_print_1 [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1723,7 +1723,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fprint5f2"></a>
-<a name="robo60"></a><h2>json_module/json_file_print_2 [ Functions ]</h2>
+<a name="robo62"></a><h2>json_module/json_file_print_2 [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1774,7 +1774,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fprint5fto5fconsole"></a>
-<a name="robo61"></a><h2>json_module/json_file_print_to_console [ Functions ]</h2>
+<a name="robo63"></a><h2>json_module/json_file_print_to_console [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1805,7 +1805,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fprint5fto5fstring"></a>
-<a name="robo62"></a><h2>json_module/json_file_print_to_string [ Functions ]</h2>
+<a name="robo64"></a><h2>json_module/json_file_print_to_string [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1837,14 +1837,14 @@
 <span class="line_number">1413 </span>    <span class="keyword">class</span><span class="sign">(</span><a href="#robo11">json_file</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>inout<span class="sign">)</span>                   <span class="sign">:</span><span class="sign">:</span> me
 <span class="line_number">1414 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo2">CK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">:</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">allocatable</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> str
 <span class="line_number">1415 </span>
-<span class="line_number">1416 </span>    <span class="keyword">call</span> <a href="#robo119">json_value_to_string</a><span class="sign">(</span>me<span class="sign">%</span>p<span class="sign">,</span>str<span class="sign">)</span>
+<span class="line_number">1416 </span>    <span class="keyword">call</span> <a href="#robo121">json_value_to_string</a><span class="sign">(</span>me<span class="sign">%</span>p<span class="sign">,</span>str<span class="sign">)</span>
 <span class="line_number">1417 </span>
 <span class="line_number">1418 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_file_print_to_string</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fupdate5finteger"></a>
-<a name="robo63"></a><h2>json_module/json_file_update_integer [ Functions ]</h2>
+<a name="robo65"></a><h2>json_module/json_file_update_integer [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1856,7 +1856,7 @@
     If it is not present, then create it and set its value.
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo96">json_update_integer</a>
+<p>    <a href="#robo98">json_update_integer</a>
 </p>
 <p class="item_name">AUTHOR</p>
 <p>    Jacob Williams : 1/10/2015
@@ -1877,7 +1877,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fupdate5flogical"></a>
-<a name="robo64"></a><h2>json_module/json_file_update_logical [ Functions ]</h2>
+<a name="robo66"></a><h2>json_module/json_file_update_logical [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1889,7 +1889,7 @@
     If it is not present, then create it and set its value.
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo97">json_update_logical</a>
+<p>    <a href="#robo99">json_update_logical</a>
 </p>
 <p class="item_name">AUTHOR</p>
 <p>    Jacob Williams : 1/10/2015
@@ -1910,7 +1910,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fupdate5freal"></a>
-<a name="robo65"></a><h2>json_module/json_file_update_real [ Functions ]</h2>
+<a name="robo67"></a><h2>json_module/json_file_update_real [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1943,7 +1943,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fupdate5fstring"></a>
-<a name="robo66"></a><h2>json_module/json_file_update_string [ Functions ]</h2>
+<a name="robo68"></a><h2>json_module/json_file_update_string [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1955,7 +1955,7 @@
     If it is not present, then create it and set its value.
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo98">json_update_string</a>
+<p>    <a href="#robo100">json_update_string</a>
 </p>
 <p class="item_name">AUTHOR</p>
 <p>    Jacob Williams : 1/10/2015
@@ -1976,7 +1976,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fupdate5fstring5fname5fascii"></a>
-<a name="robo67"></a><h2>json_module/json_file_update_string_name_ascii [ Functions ]</h2>
+<a name="robo69"></a><h2>json_module/json_file_update_string_name_ascii [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -1991,14 +1991,14 @@
 <span class="line_number">2778 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo2">CK</a><span class="sign">,</span> <span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> val
 <span class="line_number">2779 </span>    <span class="keyword">logical</span><span class="sign">(</span><a href="#robo4">LK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span>              <span class="sign">:</span><span class="sign">:</span> found
 <span class="line_number">2780 </span>
-<span class="line_number">2781 </span>    <span class="keyword">call</span> <a href="#robo66">json_file_update_string</a><span class="sign">(</span>me<span class="sign">,</span><a href="#robo31">to_unicode</a><span class="sign">(</span>name<span class="sign">)</span><span class="sign">,</span>val<span class="sign">,</span>found<span class="sign">)</span>
+<span class="line_number">2781 </span>    <span class="keyword">call</span> <a href="#robo68">json_file_update_string</a><span class="sign">(</span>me<span class="sign">,</span><a href="#robo31">to_unicode</a><span class="sign">(</span>name<span class="sign">)</span><span class="sign">,</span>val<span class="sign">,</span>found<span class="sign">)</span>
 <span class="line_number">2782 </span>
 <span class="line_number">2783 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_file_update_string_name_ascii</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fupdate5fstring5fval5fascii"></a>
-<a name="robo68"></a><h2>json_module/json_file_update_string_val_ascii [ Functions ]</h2>
+<a name="robo70"></a><h2>json_module/json_file_update_string_val_ascii [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2013,14 +2013,14 @@
 <span class="line_number">2799 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo1">CDK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> val
 <span class="line_number">2800 </span>    <span class="keyword">logical</span><span class="sign">(</span><a href="#robo4">LK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span>              <span class="sign">:</span><span class="sign">:</span> found
 <span class="line_number">2801 </span>
-<span class="line_number">2802 </span>    <span class="keyword">call</span> <a href="#robo66">json_file_update_string</a><span class="sign">(</span>me<span class="sign">,</span>name<span class="sign">,</span><a href="#robo31">to_unicode</a><span class="sign">(</span>val<span class="sign">)</span><span class="sign">,</span>found<span class="sign">)</span>
+<span class="line_number">2802 </span>    <span class="keyword">call</span> <a href="#robo68">json_file_update_string</a><span class="sign">(</span>me<span class="sign">,</span>name<span class="sign">,</span><a href="#robo31">to_unicode</a><span class="sign">(</span>val<span class="sign">)</span><span class="sign">,</span>found<span class="sign">)</span>
 <span class="line_number">2803 </span>
 <span class="line_number">2804 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_file_update_string_val_ascii</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5ffile5fvariable5finfo"></a>
-<a name="robo69"></a><h2>json_module/json_file_variable_info [ Functions ]</h2>
+<a name="robo71"></a><h2>json_module/json_file_variable_info [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2057,7 +2057,7 @@
 <span class="line_number">1456 </span>    <span class="keyword">if</span> <span class="sign">(</span>found<span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">1457 </span>
 <span class="line_number">1458 </span>        <span class="comment">!get info:</span>
-<span class="line_number">1459 </span>        <span class="keyword">call</span> <a href="#robo89">json_info</a><span class="sign">(</span>p<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">,</span>n_children<span class="sign">)</span>
+<span class="line_number">1459 </span>        <span class="keyword">call</span> <a href="#robo91">json_info</a><span class="sign">(</span>p<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">,</span>n_children<span class="sign">)</span>
 <span class="line_number">1460 </span>
 <span class="line_number">1461 </span>    <span class="keyword">else</span>
 <span class="line_number">1462 </span>
@@ -2075,7 +2075,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5farray"></a>
-<a name="robo70"></a><h2>json_module/json_get_array [ Functions ]</h2>
+<a name="robo72"></a><h2>json_module/json_get_array [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2107,7 +2107,7 @@
 <span class="line_number">5923 </span>
 <span class="line_number">5924 </span>    <span class="keyword">select</span> <span class="keyword">case</span> <span class="sign">(</span>me<span class="sign">%</span><a href="#robo6">var_type</a><span class="sign">)</span>
 <span class="line_number">5925 </span>    <span class="keyword">case</span> <span class="sign">(</span>json_array<span class="sign">)</span>
-<span class="line_number">5926 </span>        <span class="keyword">count</span> <span class="sign">=</span> <a href="#robo44">json_count</a><span class="sign">(</span>me<span class="sign">)</span>
+<span class="line_number">5926 </span>        <span class="keyword">count</span> <span class="sign">=</span> <a href="#robo46">json_count</a><span class="sign">(</span>me<span class="sign">)</span>
 <span class="line_number">5927 </span>        element <span class="sign">=</span><span class="sign">&gt;</span> me<span class="sign">%</span>children
 <span class="line_number">5928 </span>        <span class="keyword">do</span> i <span class="sign">=</span> 1<span class="sign">,</span> <span class="keyword">count</span> <span class="comment">! callback for each child</span>
 <span class="line_number">5929 </span>            <span class="keyword">call</span> array_callback<span class="sign">(</span>element<span class="sign">,</span> i<span class="sign">,</span> <span class="keyword">count</span><span class="sign">)</span>
@@ -2128,7 +2128,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5farray5fwith5fpath"></a>
-<a name="robo71"></a><h2>json_module/json_get_array_with_path [ Functions ]</h2>
+<a name="robo73"></a><h2>json_module/json_get_array_with_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2158,19 +2158,19 @@
 <span class="line_number">5973 </span>    <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">5974 </span>
 <span class="line_number">5975 </span>    <span class="comment">! resolve the path to the value</span>
-<span class="line_number">5976 </span>    <span class="keyword">call</span> <a href="#robo72">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
+<span class="line_number">5976 </span>    <span class="keyword">call</span> <a href="#robo74">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
 <span class="line_number">5977 </span>
 <span class="line_number">5978 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="sign">.</span><span class="keyword">not</span><span class="sign">.</span> <span class="keyword">associated</span><span class="sign">(</span>p<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
-<span class="line_number">5979 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo70">json_get_array</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
+<span class="line_number">5979 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo72">json_get_array</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
 <span class="line_number">5980 </span>             <span class="squote">' Unable to resolve path: '</span><span class="sign">/</span><span class="sign">/</span><span class="keyword">trim</span><span class="sign">(</span>path<span class="sign">)</span><span class="sign">)</span>
 <span class="line_number">5981 </span>    <span class="keyword">else</span>
-<span class="line_number">5982 </span>       <span class="keyword">call</span> <a href="#robo70">json_get_array</a><span class="sign">(</span>me<span class="sign">=</span>p<span class="sign">,</span>array_callback<span class="sign">=</span>array_callback<span class="sign">)</span>
+<span class="line_number">5982 </span>       <span class="keyword">call</span> <a href="#robo72">json_get_array</a><span class="sign">(</span>me<span class="sign">=</span>p<span class="sign">,</span>array_callback<span class="sign">=</span>array_callback<span class="sign">)</span>
 <span class="line_number">5983 </span>       <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">5984 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">5985 </span>    <span class="keyword">if</span> <span class="sign">(</span> exception_thrown <span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">5986 </span>        <span class="keyword">if</span> <span class="sign">(</span> <span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span> <span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">5987 </span>            found <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">5988 </span>            <span class="keyword">call</span> <a href="#robo43">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">5988 </span>            <span class="keyword">call</span> <a href="#robo45">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">5989 </span>        <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">5990 </span>    <span class="keyword">else</span>
 <span class="line_number">5991 </span>        <span class="keyword">if</span> <span class="sign">(</span> <span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span> <span class="sign">)</span> found <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>
@@ -2181,7 +2181,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5fby5fpath"></a>
-<a name="robo72"></a><h2>json_module/json_get_by_path [ Functions ]</h2>
+<a name="robo74"></a><h2>json_module/json_get_by_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2335,7 +2335,7 @@
 <span class="line_number">4596 </span>
 <span class="line_number">4597 </span>            <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">4598 </span>                found <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">4599 </span>                <span class="keyword">call</span> <a href="#robo43">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">4599 </span>                <span class="keyword">call</span> <a href="#robo45">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">4600 </span>            <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">4601 </span>
 <span class="line_number">4602 </span>        <span class="keyword">else</span>
@@ -2354,7 +2354,7 @@
 <span class="line_number">4615 </span>                                     <span class="squote">' variable not found: '</span><span class="sign">/</span><span class="sign">/</span><span class="keyword">trim</span><span class="sign">(</span>path<span class="sign">)</span><span class="sign">)</span>
 <span class="line_number">4616 </span>                <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">4617 </span>                    found <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">4618 </span>                    <span class="keyword">call</span> <a href="#robo43">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">4618 </span>                    <span class="keyword">call</span> <a href="#robo45">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">4619 </span>                <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">4620 </span>            <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">4621 </span>
@@ -2369,7 +2369,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5fdouble"></a>
-<a name="robo73"></a><h2>json_module/json_get_double [ Functions ]</h2>
+<a name="robo75"></a><h2>json_module/json_get_double [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2412,7 +2412,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5fdouble5fvec"></a>
-<a name="robo74"></a><h2>json_module/json_get_double_vec [ Functions ]</h2>
+<a name="robo76"></a><h2>json_module/json_get_double_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2467,7 +2467,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5fdouble5fvec5fwith5fpath"></a>
-<a name="robo75"></a><h2>json_module/json_get_double_vec_with_path [ Functions ]</h2>
+<a name="robo77"></a><h2>json_module/json_get_double_vec_with_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2521,7 +2521,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5fdouble5fwith5fpath"></a>
-<a name="robo76"></a><h2>json_module/json_get_double_with_path [ Functions ]</h2>
+<a name="robo78"></a><h2>json_module/json_get_double_with_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2550,16 +2550,16 @@
 <span class="line_number">5057 </span>
 <span class="line_number">5058 </span>    <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">5059 </span>
-<span class="line_number">5060 </span>    <span class="keyword">call</span> <a href="#robo72">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
+<span class="line_number">5060 </span>    <span class="keyword">call</span> <a href="#robo74">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
 <span class="line_number">5061 </span>
 <span class="line_number">5062 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="sign">.</span><span class="keyword">not</span><span class="sign">.</span> <span class="keyword">associated</span><span class="sign">(</span>p<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">5063 </span>
-<span class="line_number">5064 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo73">json_get_double</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
+<span class="line_number">5064 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo75">json_get_double</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
 <span class="line_number">5065 </span>                             <span class="squote">' Unable to resolve path: '</span><span class="sign">/</span><span class="sign">/</span><span class="keyword">trim</span><span class="sign">(</span>path<span class="sign">)</span><span class="sign">)</span>
 <span class="line_number">5066 </span>
 <span class="line_number">5067 </span>    <span class="keyword">else</span>
 <span class="line_number">5068 </span>
-<span class="line_number">5069 </span>        <span class="keyword">call</span> <a href="#robo73">json_get_double</a><span class="sign">(</span>p<span class="sign">,</span><span class="keyword">value</span><span class="sign">)</span>
+<span class="line_number">5069 </span>        <span class="keyword">call</span> <a href="#robo75">json_get_double</a><span class="sign">(</span>p<span class="sign">,</span><span class="keyword">value</span><span class="sign">)</span>
 <span class="line_number">5070 </span>        <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">5071 </span>
 <span class="line_number">5072 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
@@ -2567,7 +2567,7 @@
 <span class="line_number">5074 </span>    <span class="keyword">if</span> <span class="sign">(</span>exception_thrown<span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">5075 </span>        <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">5076 </span>            found <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">5077 </span>            <span class="keyword">call</span> <a href="#robo43">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">5077 </span>            <span class="keyword">call</span> <a href="#robo45">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">5078 </span>        <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">5079 </span>    <span class="keyword">else</span>
 <span class="line_number">5080 </span>        <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span><span class="sign">)</span> found <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>
@@ -2578,7 +2578,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5finteger"></a>
-<a name="robo77"></a><h2>json_module/json_get_integer [ Functions ]</h2>
+<a name="robo79"></a><h2>json_module/json_get_integer [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2619,7 +2619,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5finteger5fvec"></a>
-<a name="robo78"></a><h2>json_module/json_get_integer_vec [ Functions ]</h2>
+<a name="robo80"></a><h2>json_module/json_get_integer_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2674,7 +2674,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5finteger5fvec5fwith5fpath"></a>
-<a name="robo79"></a><h2>json_module/json_get_integer_vec_with_path [ Functions ]</h2>
+<a name="robo81"></a><h2>json_module/json_get_integer_vec_with_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2726,7 +2726,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5finteger5fwith5fpath"></a>
-<a name="robo80"></a><h2>json_module/json_get_integer_with_path [ Functions ]</h2>
+<a name="robo82"></a><h2>json_module/json_get_integer_with_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2755,19 +2755,19 @@
 <span class="line_number">4809 </span>
 <span class="line_number">4810 </span>    <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">4811 </span>
-<span class="line_number">4812 </span>    <span class="keyword">call</span> <a href="#robo72">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
+<span class="line_number">4812 </span>    <span class="keyword">call</span> <a href="#robo74">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
 <span class="line_number">4813 </span>
 <span class="line_number">4814 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="sign">.</span><span class="keyword">not</span><span class="sign">.</span> <span class="keyword">associated</span><span class="sign">(</span>p<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
-<span class="line_number">4815 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo77">json_get_integer</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
+<span class="line_number">4815 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo79">json_get_integer</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
 <span class="line_number">4816 </span>            <span class="squote">' Unable to resolve path: '</span><span class="sign">/</span><span class="sign">/</span> <span class="keyword">trim</span><span class="sign">(</span>path<span class="sign">)</span><span class="sign">)</span>
 <span class="line_number">4817 </span>    <span class="keyword">else</span>
-<span class="line_number">4818 </span>        <span class="keyword">call</span> <a href="#robo77">json_get_integer</a><span class="sign">(</span>p<span class="sign">,</span><span class="keyword">value</span><span class="sign">)</span>
+<span class="line_number">4818 </span>        <span class="keyword">call</span> <a href="#robo79">json_get_integer</a><span class="sign">(</span>p<span class="sign">,</span><span class="keyword">value</span><span class="sign">)</span>
 <span class="line_number">4819 </span>        <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">4820 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">4821 </span>    <span class="keyword">if</span> <span class="sign">(</span> exception_thrown <span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">4822 </span>        <span class="keyword">if</span> <span class="sign">(</span> <span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span> <span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">4823 </span>            found <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">4824 </span>            <span class="keyword">call</span> <a href="#robo43">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">4824 </span>            <span class="keyword">call</span> <a href="#robo45">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">4825 </span>        <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">4826 </span>    <span class="keyword">else</span>
 <span class="line_number">4827 </span>        <span class="keyword">if</span> <span class="sign">(</span> <span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span> <span class="sign">)</span> found <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>
@@ -2778,7 +2778,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5flogical"></a>
-<a name="robo81"></a><h2>json_module/json_get_logical [ Functions ]</h2>
+<a name="robo83"></a><h2>json_module/json_get_logical [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2813,7 +2813,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5flogical5fvec"></a>
-<a name="robo82"></a><h2>json_module/json_get_logical_vec [ Functions ]</h2>
+<a name="robo84"></a><h2>json_module/json_get_logical_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2868,7 +2868,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5flogical5fvec5fwith5fpath"></a>
-<a name="robo83"></a><h2>json_module/json_get_logical_vec_with_path [ Functions ]</h2>
+<a name="robo85"></a><h2>json_module/json_get_logical_vec_with_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2922,7 +2922,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5flogical5fwith5fpath"></a>
-<a name="robo84"></a><h2>json_module/json_get_logical_with_path [ Functions ]</h2>
+<a name="robo86"></a><h2>json_module/json_get_logical_with_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -2951,16 +2951,16 @@
 <span class="line_number">5304 </span>
 <span class="line_number">5305 </span>    <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">5306 </span>
-<span class="line_number">5307 </span>    <span class="keyword">call</span> <a href="#robo72">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
+<span class="line_number">5307 </span>    <span class="keyword">call</span> <a href="#robo74">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
 <span class="line_number">5308 </span>
 <span class="line_number">5309 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="sign">.</span><span class="keyword">not</span><span class="sign">.</span> <span class="keyword">associated</span><span class="sign">(</span>p<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">5310 </span>
-<span class="line_number">5311 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo81">json_get_logical</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
+<span class="line_number">5311 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo83">json_get_logical</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
 <span class="line_number">5312 </span>                             <span class="squote">' Unable to resolve path: '</span><span class="sign">/</span><span class="sign">/</span><span class="keyword">trim</span><span class="sign">(</span>path<span class="sign">)</span><span class="sign">)</span>
 <span class="line_number">5313 </span>
 <span class="line_number">5314 </span>    <span class="keyword">else</span>
 <span class="line_number">5315 </span>
-<span class="line_number">5316 </span>        <span class="keyword">call</span> <a href="#robo81">json_get_logical</a><span class="sign">(</span>p<span class="sign">,</span><span class="keyword">value</span><span class="sign">)</span>
+<span class="line_number">5316 </span>        <span class="keyword">call</span> <a href="#robo83">json_get_logical</a><span class="sign">(</span>p<span class="sign">,</span><span class="keyword">value</span><span class="sign">)</span>
 <span class="line_number">5317 </span>        <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">5318 </span>
 <span class="line_number">5319 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
@@ -2968,7 +2968,7 @@
 <span class="line_number">5321 </span>    <span class="keyword">if</span> <span class="sign">(</span>exception_thrown<span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">5322 </span>        <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">5323 </span>            found <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">5324 </span>            <span class="keyword">call</span> <a href="#robo43">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">5324 </span>            <span class="keyword">call</span> <a href="#robo45">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">5325 </span>        <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">5326 </span>    <span class="keyword">else</span>
 <span class="line_number">5327 </span>        <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span><span class="sign">)</span> found <span class="sign">=</span> <span class="sign">.</span>true<span class="sign">.</span>
@@ -2979,7 +2979,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5fstring"></a>
-<a name="robo85"></a><h2>json_module/json_get_string [ Functions ]</h2>
+<a name="robo87"></a><h2>json_module/json_get_string [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3150,7 +3150,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5fstring5fvec"></a>
-<a name="robo86"></a><h2>json_module/json_get_string_vec [ Functions ]</h2>
+<a name="robo88"></a><h2>json_module/json_get_string_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3214,7 +3214,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5fstring5fvec5fwith5fpath"></a>
-<a name="robo87"></a><h2>json_module/json_get_string_vec_with_path [ Functions ]</h2>
+<a name="robo89"></a><h2>json_module/json_get_string_vec_with_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3277,7 +3277,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fget5fstring5fwith5fpath"></a>
-<a name="robo88"></a><h2>json_module/json_get_string_with_path [ Functions ]</h2>
+<a name="robo90"></a><h2>json_module/json_get_string_with_path [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3306,15 +3306,15 @@
 <span class="line_number">5687 </span>
 <span class="line_number">5688 </span>    <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">5689 </span>
-<span class="line_number">5690 </span>    <span class="keyword">call</span> <a href="#robo72">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
+<span class="line_number">5690 </span>    <span class="keyword">call</span> <a href="#robo74">json_get_by_path</a><span class="sign">(</span>me<span class="sign">=</span>me<span class="sign">,</span> path<span class="sign">=</span>path<span class="sign">,</span> p<span class="sign">=</span>p<span class="sign">)</span>
 <span class="line_number">5691 </span>
 <span class="line_number">5692 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="sign">.</span><span class="keyword">not</span><span class="sign">.</span> <span class="keyword">associated</span><span class="sign">(</span>p<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
-<span class="line_number">5693 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo85">json_get_string</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
+<span class="line_number">5693 </span>        <span class="keyword">call</span> throw_exception<span class="sign">(</span><span class="squote">'Error in <a href="#robo87">json_get_string</a>:'</span><span class="sign">/</span><span class="sign">/</span><span class="sign">&amp;</span>
 <span class="line_number">5694 </span>                             <span class="squote">' Unable to resolve path: '</span><span class="sign">/</span><span class="sign">/</span><span class="keyword">trim</span><span class="sign">(</span>path<span class="sign">)</span><span class="sign">)</span>
 <span class="line_number">5695 </span>
 <span class="line_number">5696 </span>    <span class="keyword">else</span>
 <span class="line_number">5697 </span>
-<span class="line_number">5698 </span>        <span class="keyword">call</span> <a href="#robo85">json_get_string</a><span class="sign">(</span>p<span class="sign">,</span><span class="keyword">value</span><span class="sign">)</span>
+<span class="line_number">5698 </span>        <span class="keyword">call</span> <a href="#robo87">json_get_string</a><span class="sign">(</span>p<span class="sign">,</span><span class="keyword">value</span><span class="sign">)</span>
 <span class="line_number">5699 </span>        <span class="keyword">nullify</span><span class="sign">(</span>p<span class="sign">)</span>
 <span class="line_number">5700 </span>
 <span class="line_number">5701 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
@@ -3324,7 +3324,7 @@
 <span class="line_number">5705 </span>    <span class="keyword">else</span>
 <span class="line_number">5706 </span>        <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span>found<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">5707 </span>            found <span class="sign">=</span> <span class="sign">.</span>false<span class="sign">.</span>
-<span class="line_number">5708 </span>            <span class="keyword">call</span> <a href="#robo43">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">5708 </span>            <span class="keyword">call</span> <a href="#robo45">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">5709 </span>        <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">5710 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">5711 </span>
@@ -3336,7 +3336,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5finfo"></a>
-<a name="robo89"></a><h2>json_module/json_info [ Functions ]</h2>
+<a name="robo91"></a><h2>json_module/json_info [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3358,14 +3358,14 @@
 <span class="line_number">1521 </span>    <span class="keyword">integer</span><span class="sign">(</span><a href="#robo3">IK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span><span class="sign">,</span><span class="keyword">optional</span> <span class="sign">:</span><span class="sign">:</span> n_children
 <span class="line_number">1522 </span>
 <span class="line_number">1523 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span><a href="#robo6">var_type</a><span class="sign">)</span><span class="sign">)</span>    <a href="#robo6">var_type</a> <span class="sign">=</span> p<span class="sign">%</span><a href="#robo6">var_type</a>  <span class="comment">!variable type</span>
-<span class="line_number">1524 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span>n_children<span class="sign">)</span><span class="sign">)</span>  n_children <span class="sign">=</span> <a href="#robo44">json_count</a><span class="sign">(</span>p<span class="sign">)</span>  <span class="comment">!number of children</span>
+<span class="line_number">1524 </span>    <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">present</span><span class="sign">(</span>n_children<span class="sign">)</span><span class="sign">)</span>  n_children <span class="sign">=</span> <a href="#robo46">json_count</a><span class="sign">(</span>p<span class="sign">)</span>  <span class="comment">!number of children</span>
 <span class="line_number">1525 </span>
 <span class="line_number">1526 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_info</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5finitialize"></a>
-<a name="robo90"></a><h2>json_module/json_initialize [ Functions ]</h2>
+<a name="robo92"></a><h2>json_module/json_initialize [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3394,9 +3394,9 @@
 <span class="line_number">2061 </span>    <span class="keyword">integer</span><span class="sign">(</span><a href="#robo3">IK</a><span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> istat
 <span class="line_number">2062 </span>
 <span class="line_number">2063 </span>    <span class="comment">!clear any errors from previous runs:</span>
-<span class="line_number">2064 </span>    <span class="keyword">call</span> <a href="#robo43">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">2064 </span>    <span class="keyword">call</span> <a href="#robo45">json_clear_exceptions</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">2065 </span>
-<span class="line_number">2066 </span><span class="sign">#</span> ifdef <a href="#robo10">USE_UCS4</a>
+<span class="line_number">2066 </span><span class="sign">#</span> <span class="keyword">ifdef</span> <a href="#robo10">USE_UCS4</a>
 <span class="line_number">2067 </span>    <span class="comment">! reopen stdout and stderr with utf-8 encoding</span>
 <span class="line_number">2068 </span>    <span class="keyword">open</span><span class="sign">(</span>output_unit<span class="sign">,</span>encoding<span class="sign">=</span><span class="squote">'utf-8'</span><span class="sign">)</span>
 <span class="line_number">2069 </span>    <span class="keyword">open</span><span class="sign">(</span>error_unit<span class="sign">,</span> encoding<span class="sign">=</span><span class="squote">'utf-8'</span><span class="sign">)</span>
@@ -3435,7 +3435,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fparse5ffile"></a>
-<a name="robo91"></a><h2>json_module/json_parse_file [ Functions ]</h2>
+<a name="robo93"></a><h2>json_module/json_parse_file [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3485,7 +3485,7 @@
 <span class="line_number">6064 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo2">CK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">:</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">allocatable</span> <span class="sign">:</span><span class="sign">:</span> buffer
 <span class="line_number">6065 </span>
 <span class="line_number">6066 </span>    <span class="comment">!clear any exceptions and initialize:</span>
-<span class="line_number">6067 </span>    <span class="keyword">call</span> <a href="#robo90">json_initialize</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">6067 </span>    <span class="keyword">call</span> <a href="#robo92">json_initialize</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">6068 </span>
 <span class="line_number">6069 </span>    <span class="keyword">if</span> <span class="sign">(</span> <span class="keyword">present</span><span class="sign">(</span>unit<span class="sign">)</span> <span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">6070 </span>
@@ -3558,7 +3558,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fparse5fstring"></a>
-<a name="robo92"></a><h2>json_module/json_parse_string [ Functions ]</h2>
+<a name="robo94"></a><h2>json_module/json_parse_string [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3568,7 +3568,7 @@
 <p>    Parse the JSON string and populate the <a href="#robo12">json_value</a> tree.
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo91">json_parse_file</a>
+<p>    <a href="#robo93">json_parse_file</a>
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">6152 </span>    <span class="keyword">subroutine</span> <strong>json_parse_string</strong><span class="sign">(</span>p<span class="sign">,</span> str<span class="sign">)</span>
@@ -3584,7 +3584,7 @@
 <span class="line_number">6162 </span>    <span class="keyword">if</span> <span class="sign">(</span> exception_thrown <span class="sign">)</span> <span class="keyword">return</span> <span class="comment">! to caller</span>
 <span class="line_number">6163 </span>
 <span class="line_number">6164 </span>    <span class="comment">!clear any exceptions and initialize:</span>
-<span class="line_number">6165 </span>    <span class="keyword">call</span> <a href="#robo90">json_initialize</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">6165 </span>    <span class="keyword">call</span> <a href="#robo92">json_initialize</a><span class="sign">(</span><span class="sign">)</span>
 <span class="line_number">6166 </span>
 <span class="line_number">6167 </span>    buffer <span class="sign">=</span> str
 <span class="line_number">6168 </span>    iunit <span class="sign">=</span> 0    <span class="comment">!indicates that json data will be read from buffer</span>
@@ -3609,7 +3609,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fprint5f1"></a>
-<a name="robo93"></a><h2>json_module/json_print_1 [ Functions ]</h2>
+<a name="robo95"></a><h2>json_module/json_print_1 [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3646,7 +3646,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fprint5f2"></a>
-<a name="robo94"></a><h2>json_module/json_print_2 [ Functions ]</h2>
+<a name="robo96"></a><h2>json_module/json_print_2 [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3684,7 +3684,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fupdate5fdouble"></a>
-<a name="robo95"></a><h2>json_module/json_update_double [ Functions ]</h2>
+<a name="robo97"></a><h2>json_module/json_update_double [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3714,7 +3714,7 @@
 <span class="line_number">2908 </span>    <span class="keyword">call</span> <a href="#robo23">json_get</a><span class="sign">(</span>p<span class="sign">,</span>name<span class="sign">,</span>p_var<span class="sign">,</span>found<span class="sign">)</span>
 <span class="line_number">2909 </span>    <span class="keyword">if</span> <span class="sign">(</span>found<span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">2910 </span>
-<span class="line_number">2911 </span>        <span class="keyword">call</span> <a href="#robo89">json_info</a><span class="sign">(</span>p_var<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">)</span>
+<span class="line_number">2911 </span>        <span class="keyword">call</span> <a href="#robo91">json_info</a><span class="sign">(</span>p_var<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">)</span>
 <span class="line_number">2912 </span>        <span class="keyword">select</span> <span class="keyword">case</span> <span class="sign">(</span><a href="#robo6">var_type</a><span class="sign">)</span>
 <span class="line_number">2913 </span>        <span class="keyword">case</span> <span class="sign">(</span>json_null<span class="sign">,</span>json_logical<span class="sign">,</span>json_integer<span class="sign">,</span>json_double<span class="sign">,</span>json_string<span class="sign">)</span>
 <span class="line_number">2914 </span>            <span class="keyword">call</span> to_double<span class="sign">(</span>p_var<span class="sign">,</span>val<span class="sign">)</span>    <span class="comment">!update the value</span>
@@ -3733,7 +3733,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fupdate5finteger"></a>
-<a name="robo96"></a><h2>json_module/json_update_integer [ Functions ]</h2>
+<a name="robo98"></a><h2>json_module/json_update_integer [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3763,7 +3763,7 @@
 <span class="line_number">2981 </span>    <span class="keyword">call</span> <a href="#robo23">json_get</a><span class="sign">(</span>p<span class="sign">,</span>name<span class="sign">,</span>p_var<span class="sign">,</span>found<span class="sign">)</span>
 <span class="line_number">2982 </span>    <span class="keyword">if</span> <span class="sign">(</span>found<span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">2983 </span>
-<span class="line_number">2984 </span>        <span class="keyword">call</span> <a href="#robo89">json_info</a><span class="sign">(</span>p_var<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">)</span>
+<span class="line_number">2984 </span>        <span class="keyword">call</span> <a href="#robo91">json_info</a><span class="sign">(</span>p_var<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">)</span>
 <span class="line_number">2985 </span>        <span class="keyword">select</span> <span class="keyword">case</span> <span class="sign">(</span><a href="#robo6">var_type</a><span class="sign">)</span>
 <span class="line_number">2986 </span>        <span class="keyword">case</span> <span class="sign">(</span>json_null<span class="sign">,</span>json_logical<span class="sign">,</span>json_integer<span class="sign">,</span>json_double<span class="sign">,</span>json_string<span class="sign">)</span>
 <span class="line_number">2987 </span>            <span class="keyword">call</span> to_integer<span class="sign">(</span>p_var<span class="sign">,</span>val<span class="sign">)</span>    <span class="comment">!update the value</span>
@@ -3782,7 +3782,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fupdate5flogical"></a>
-<a name="robo97"></a><h2>json_module/json_update_logical [ Functions ]</h2>
+<a name="robo99"></a><h2>json_module/json_update_logical [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3812,7 +3812,7 @@
 <span class="line_number">2835 </span>    <span class="keyword">call</span> <a href="#robo23">json_get</a><span class="sign">(</span>p<span class="sign">,</span>name<span class="sign">,</span>p_var<span class="sign">,</span>found<span class="sign">)</span>
 <span class="line_number">2836 </span>    <span class="keyword">if</span> <span class="sign">(</span>found<span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">2837 </span>
-<span class="line_number">2838 </span>        <span class="keyword">call</span> <a href="#robo89">json_info</a><span class="sign">(</span>p_var<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">)</span>
+<span class="line_number">2838 </span>        <span class="keyword">call</span> <a href="#robo91">json_info</a><span class="sign">(</span>p_var<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">)</span>
 <span class="line_number">2839 </span>        <span class="keyword">select</span> <span class="keyword">case</span> <span class="sign">(</span><a href="#robo6">var_type</a><span class="sign">)</span>
 <span class="line_number">2840 </span>        <span class="keyword">case</span> <span class="sign">(</span>json_null<span class="sign">,</span>json_logical<span class="sign">,</span>json_integer<span class="sign">,</span>json_double<span class="sign">,</span>json_string<span class="sign">)</span>
 <span class="line_number">2841 </span>            <span class="keyword">call</span> to_logical<span class="sign">(</span>p_var<span class="sign">,</span>val<span class="sign">)</span>    <span class="comment">!update the value</span>
@@ -3831,7 +3831,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fupdate5fstring"></a>
-<a name="robo98"></a><h2>json_module/json_update_string [ Functions ]</h2>
+<a name="robo100"></a><h2>json_module/json_update_string [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3861,7 +3861,7 @@
 <span class="line_number">3054 </span>    <span class="keyword">call</span> <a href="#robo23">json_get</a><span class="sign">(</span>p<span class="sign">,</span>name<span class="sign">,</span>p_var<span class="sign">,</span>found<span class="sign">)</span>
 <span class="line_number">3055 </span>    <span class="keyword">if</span> <span class="sign">(</span>found<span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">3056 </span>
-<span class="line_number">3057 </span>        <span class="keyword">call</span> <a href="#robo89">json_info</a><span class="sign">(</span>p_var<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">)</span>
+<span class="line_number">3057 </span>        <span class="keyword">call</span> <a href="#robo91">json_info</a><span class="sign">(</span>p_var<span class="sign">,</span><a href="#robo6">var_type</a><span class="sign">)</span>
 <span class="line_number">3058 </span>        <span class="keyword">select</span> <span class="keyword">case</span> <span class="sign">(</span><a href="#robo6">var_type</a><span class="sign">)</span>
 <span class="line_number">3059 </span>        <span class="keyword">case</span> <span class="sign">(</span>json_null<span class="sign">,</span>json_logical<span class="sign">,</span>json_integer<span class="sign">,</span>json_double<span class="sign">,</span>json_string<span class="sign">)</span>
 <span class="line_number">3060 </span>            <span class="keyword">call</span> to_string<span class="sign">(</span>p_var<span class="sign">,</span>val<span class="sign">)</span>    <span class="comment">!update the value</span>
@@ -3880,14 +3880,14 @@
 
 <hr />
 <a name="json5fmodule2fjson5fupdate5fstring5fname5fascii"></a>
-<a name="robo99"></a><h2>json_module/json_update_string_name_ascii [ Functions ]</h2>
+<a name="robo101"></a><h2>json_module/json_update_string_name_ascii [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
 <p>    <strong>json_update_string_name_ascii</strong>
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo98">json_update_string</a>
+<p>    <a href="#robo100">json_update_string</a>
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">3110 </span>    <span class="keyword">subroutine</span> <strong>json_update_string_name_ascii</strong><span class="sign">(</span>p<span class="sign">,</span>name<span class="sign">,</span>val<span class="sign">,</span>found<span class="sign">)</span>
@@ -3899,21 +3899,21 @@
 <span class="line_number">3116 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo2">CK</a><span class="sign">,</span> <span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> val
 <span class="line_number">3117 </span>    <span class="keyword">logical</span><span class="sign">(</span><a href="#robo4">LK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span>              <span class="sign">:</span><span class="sign">:</span> found
 <span class="line_number">3118 </span>
-<span class="line_number">3119 </span>    <span class="keyword">call</span> <a href="#robo98">json_update_string</a><span class="sign">(</span>p<span class="sign">,</span><a href="#robo31">to_unicode</a><span class="sign">(</span>name<span class="sign">)</span><span class="sign">,</span>val<span class="sign">,</span>found<span class="sign">)</span>
+<span class="line_number">3119 </span>    <span class="keyword">call</span> <a href="#robo100">json_update_string</a><span class="sign">(</span>p<span class="sign">,</span><a href="#robo31">to_unicode</a><span class="sign">(</span>name<span class="sign">)</span><span class="sign">,</span>val<span class="sign">,</span>found<span class="sign">)</span>
 <span class="line_number">3120 </span>
 <span class="line_number">3121 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_update_string_name_ascii</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5fupdate5fstring5fval5fascii"></a>
-<a name="robo100"></a><h2>json_module/json_update_string_val_ascii [ Functions ]</h2>
+<a name="robo102"></a><h2>json_module/json_update_string_val_ascii [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
 <p>    <strong>json_update_string_val_ascii</strong>
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo98">json_update_string</a>
+<p>    <a href="#robo100">json_update_string</a>
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">3135 </span>    <span class="keyword">subroutine</span> <strong>json_update_string_val_ascii</strong><span class="sign">(</span>p<span class="sign">,</span>name<span class="sign">,</span>val<span class="sign">,</span>found<span class="sign">)</span>
@@ -3925,14 +3925,14 @@
 <span class="line_number">3141 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo1">CDK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> val
 <span class="line_number">3142 </span>    <span class="keyword">logical</span><span class="sign">(</span><a href="#robo4">LK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span>              <span class="sign">:</span><span class="sign">:</span> found
 <span class="line_number">3143 </span>
-<span class="line_number">3144 </span>    <span class="keyword">call</span> <a href="#robo98">json_update_string</a><span class="sign">(</span>p<span class="sign">,</span>name<span class="sign">,</span><a href="#robo31">to_unicode</a><span class="sign">(</span>val<span class="sign">)</span><span class="sign">,</span>found<span class="sign">)</span>
+<span class="line_number">3144 </span>    <span class="keyword">call</span> <a href="#robo100">json_update_string</a><span class="sign">(</span>p<span class="sign">,</span>name<span class="sign">,</span><a href="#robo31">to_unicode</a><span class="sign">(</span>val<span class="sign">)</span><span class="sign">,</span>found<span class="sign">)</span>
 <span class="line_number">3145 </span>
 <span class="line_number">3146 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_update_string_val_ascii</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5fdouble"></a>
-<a name="robo101"></a><h2>json_module/json_value_add_double [ Functions ]</h2>
+<a name="robo103"></a><h2>json_module/json_value_add_double [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -3974,7 +3974,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5fdouble5fvec"></a>
-<a name="robo102"></a><h2>json_module/json_value_add_double_vec [ Functions ]</h2>
+<a name="robo104"></a><h2>json_module/json_value_add_double_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4022,7 +4022,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5finteger"></a>
-<a name="robo103"></a><h2>json_module/json_value_add_integer [ Functions ]</h2>
+<a name="robo105"></a><h2>json_module/json_value_add_integer [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4064,7 +4064,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5finteger5fvec"></a>
-<a name="robo104"></a><h2>json_module/json_value_add_integer_vec [ Functions ]</h2>
+<a name="robo106"></a><h2>json_module/json_value_add_integer_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4112,7 +4112,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5flogical"></a>
-<a name="robo105"></a><h2>json_module/json_value_add_logical [ Functions ]</h2>
+<a name="robo107"></a><h2>json_module/json_value_add_logical [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4154,7 +4154,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5flogical5fvec"></a>
-<a name="robo106"></a><h2>json_module/json_value_add_logical_vec [ Functions ]</h2>
+<a name="robo108"></a><h2>json_module/json_value_add_logical_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4202,7 +4202,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5fmember"></a>
-<a name="robo107"></a><h2>json_module/json_value_add_member [ Functions ]</h2>
+<a name="robo109"></a><h2>json_module/json_value_add_member [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4247,7 +4247,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5fstring"></a>
-<a name="robo108"></a><h2>json_module/json_value_add_string [ Functions ]</h2>
+<a name="robo110"></a><h2>json_module/json_value_add_string [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4293,14 +4293,14 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5fstring5fname5fascii"></a>
-<a name="robo109"></a><h2>json_module/json_value_add_string_name_ascii [ Functions ]</h2>
+<a name="robo111"></a><h2>json_module/json_value_add_string_name_ascii [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
 <p>    <strong>json_value_add_string_name_ascii</strong>
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo108">json_value_add_string</a>
+<p>    <a href="#robo110">json_value_add_string</a>
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">3681 </span>    <span class="keyword">subroutine</span> <strong>json_value_add_string_name_ascii</strong><span class="sign">(</span>me<span class="sign">,</span> name<span class="sign">,</span> val<span class="sign">)</span>
@@ -4311,21 +4311,21 @@
 <span class="line_number">3686 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo1">CDK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> name
 <span class="line_number">3687 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo2">CK</a><span class="sign">,</span> <span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> val
 <span class="line_number">3688 </span>
-<span class="line_number">3689 </span>    <span class="keyword">call</span> <a href="#robo108">json_value_add_string</a><span class="sign">(</span>me<span class="sign">,</span> <a href="#robo31">to_unicode</a><span class="sign">(</span>name<span class="sign">)</span><span class="sign">,</span> val<span class="sign">)</span>
+<span class="line_number">3689 </span>    <span class="keyword">call</span> <a href="#robo110">json_value_add_string</a><span class="sign">(</span>me<span class="sign">,</span> <a href="#robo31">to_unicode</a><span class="sign">(</span>name<span class="sign">)</span><span class="sign">,</span> val<span class="sign">)</span>
 <span class="line_number">3690 </span>
 <span class="line_number">3691 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_value_add_string_name_ascii</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5fstring5fval5fascii"></a>
-<a name="robo110"></a><h2>json_module/json_value_add_string_val_ascii [ Functions ]</h2>
+<a name="robo112"></a><h2>json_module/json_value_add_string_val_ascii [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
 <p>    <strong>json_value_add_string_val_ascii</strong>
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo108">json_value_add_string</a>
+<p>    <a href="#robo110">json_value_add_string</a>
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">3705 </span>    <span class="keyword">subroutine</span> <strong>json_value_add_string_val_ascii</strong><span class="sign">(</span>me<span class="sign">,</span> name<span class="sign">,</span> val<span class="sign">)</span>
@@ -4336,14 +4336,14 @@
 <span class="line_number">3710 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo2">CK</a><span class="sign">,</span> <span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> name
 <span class="line_number">3711 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo1">CDK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> val
 <span class="line_number">3712 </span>
-<span class="line_number">3713 </span>    <span class="keyword">call</span> <a href="#robo108">json_value_add_string</a><span class="sign">(</span>me<span class="sign">,</span> name<span class="sign">,</span> <a href="#robo31">to_unicode</a><span class="sign">(</span>val<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number">3713 </span>    <span class="keyword">call</span> <a href="#robo110">json_value_add_string</a><span class="sign">(</span>me<span class="sign">,</span> name<span class="sign">,</span> <a href="#robo31">to_unicode</a><span class="sign">(</span>val<span class="sign">)</span><span class="sign">)</span>
 <span class="line_number">3714 </span>
 <span class="line_number">3715 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_value_add_string_val_ascii</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5fstring5fvec"></a>
-<a name="robo111"></a><h2>json_module/json_value_add_string_vec [ Functions ]</h2>
+<a name="robo113"></a><h2>json_module/json_value_add_string_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4418,14 +4418,14 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5fstring5fvec5fname5fascii"></a>
-<a name="robo112"></a><h2>json_module/json_value_add_string_vec_name_ascii [ Functions ]</h2>
+<a name="robo114"></a><h2>json_module/json_value_add_string_vec_name_ascii [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
 <p>    <strong>json_value_add_string_vec_name_ascii</strong>
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo111">json_value_add_string_vec</a>
+<p>    <a href="#robo113">json_value_add_string_vec</a>
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">3882 </span>    <span class="keyword">subroutine</span> <strong>json_value_add_string_vec_name_ascii</strong><span class="sign">(</span>me<span class="sign">,</span> name<span class="sign">,</span> val<span class="sign">,</span> trim_str<span class="sign">,</span> adjustl_str<span class="sign">)</span>
@@ -4438,21 +4438,21 @@
 <span class="line_number">3889 </span>    <span class="keyword">logical</span><span class="sign">(</span><a href="#robo4">LK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span><span class="sign">,</span><span class="keyword">optional</span>                   <span class="sign">:</span><span class="sign">:</span> trim_str
 <span class="line_number">3890 </span>    <span class="keyword">logical</span><span class="sign">(</span><a href="#robo4">LK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span><span class="sign">,</span><span class="keyword">optional</span>                   <span class="sign">:</span><span class="sign">:</span> adjustl_str
 <span class="line_number">3891 </span>
-<span class="line_number">3892 </span>    <span class="keyword">call</span> <a href="#robo111">json_value_add_string_vec</a><span class="sign">(</span>me<span class="sign">,</span> <a href="#robo31">to_unicode</a><span class="sign">(</span>name<span class="sign">)</span><span class="sign">,</span> val<span class="sign">,</span> trim_str<span class="sign">,</span> adjustl_str<span class="sign">)</span>
+<span class="line_number">3892 </span>    <span class="keyword">call</span> <a href="#robo113">json_value_add_string_vec</a><span class="sign">(</span>me<span class="sign">,</span> <a href="#robo31">to_unicode</a><span class="sign">(</span>name<span class="sign">)</span><span class="sign">,</span> val<span class="sign">,</span> trim_str<span class="sign">,</span> adjustl_str<span class="sign">)</span>
 <span class="line_number">3893 </span>
 <span class="line_number">3894 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_value_add_string_vec_name_ascii</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fadd5fstring5fvec5fval5fascii"></a>
-<a name="robo113"></a><h2>json_module/json_value_add_string_vec_val_ascii [ Functions ]</h2>
+<a name="robo115"></a><h2>json_module/json_value_add_string_vec_val_ascii [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
 <p>    <strong>json_value_add_string_vec_val_ascii</strong>
 </p>
 <p class="item_name">SEE ALSO</p>
-<p>    <a href="#robo111">json_value_add_string_vec</a>
+<p>    <a href="#robo113">json_value_add_string_vec</a>
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">3908 </span>    <span class="keyword">subroutine</span> <strong>json_value_add_string_vec_val_ascii</strong><span class="sign">(</span>me<span class="sign">,</span> name<span class="sign">,</span> val<span class="sign">,</span> trim_str<span class="sign">,</span> adjustl_str<span class="sign">)</span>
@@ -4465,14 +4465,14 @@
 <span class="line_number">3915 </span>    <span class="keyword">logical</span><span class="sign">(</span><a href="#robo4">LK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span><span class="sign">,</span><span class="keyword">optional</span>                   <span class="sign">:</span><span class="sign">:</span> trim_str
 <span class="line_number">3916 </span>    <span class="keyword">logical</span><span class="sign">(</span><a href="#robo4">LK</a><span class="sign">)</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span><span class="sign">,</span><span class="keyword">optional</span>                   <span class="sign">:</span><span class="sign">:</span> adjustl_str
 <span class="line_number">3917 </span>
-<span class="line_number">3918 </span>    <span class="keyword">call</span> <a href="#robo111">json_value_add_string_vec</a><span class="sign">(</span>me<span class="sign">,</span> name<span class="sign">,</span> <a href="#robo31">to_unicode</a><span class="sign">(</span>val<span class="sign">)</span><span class="sign">,</span> trim_str<span class="sign">,</span> adjustl_str<span class="sign">)</span>
+<span class="line_number">3918 </span>    <span class="keyword">call</span> <a href="#robo113">json_value_add_string_vec</a><span class="sign">(</span>me<span class="sign">,</span> name<span class="sign">,</span> <a href="#robo31">to_unicode</a><span class="sign">(</span>val<span class="sign">)</span><span class="sign">,</span> trim_str<span class="sign">,</span> adjustl_str<span class="sign">)</span>
 <span class="line_number">3919 </span>
 <span class="line_number">3920 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_value_add_string_vec_val_ascii</strong>
 </pre>
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fdestroy"></a>
-<a name="robo114"></a><h2>json_module/json_value_destroy [ Functions ]</h2>
+<a name="robo116"></a><h2>json_module/json_value_destroy [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4537,7 +4537,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fget5fby5findex"></a>
-<a name="robo115"></a><h2>json_module/json_value_get_by_index [ Functions ]</h2>
+<a name="robo117"></a><h2>json_module/json_value_get_by_index [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4592,7 +4592,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fget5fby5fname5fchars"></a>
-<a name="robo116"></a><h2>json_module/json_value_get_by_name_chars [ Functions ]</h2>
+<a name="robo118"></a><h2>json_module/json_value_get_by_name_chars [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4607,7 +4607,7 @@
 </p>
 <pre>     'a ' /= 'A ' /= 'a  '
 </pre>
-<p>    Note that the name is not parsed like it is in <a href="#robo72">json_get_by_path</a>.
+<p>    Note that the name is not parsed like it is in <a href="#robo74">json_get_by_path</a>.
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">4022 </span>    <span class="keyword">subroutine</span> <strong>json_value_get_by_name_chars</strong><span class="sign">(</span>me<span class="sign">,</span> name<span class="sign">,</span> p<span class="sign">)</span>
@@ -4627,7 +4627,7 @@
 <span class="line_number">4036 </span>        <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">associated</span><span class="sign">(</span>me<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
 <span class="line_number">4037 </span>
 <span class="line_number">4038 </span>            <span class="keyword">if</span> <span class="sign">(</span>me<span class="sign">%</span><a href="#robo6">var_type</a><span class="sign">=</span><span class="sign">=</span>json_object<span class="sign">)</span> <span class="keyword">then</span>
-<span class="line_number">4039 </span>                n_children <span class="sign">=</span> <a href="#robo44">json_count</a><span class="sign">(</span>me<span class="sign">)</span>
+<span class="line_number">4039 </span>                n_children <span class="sign">=</span> <a href="#robo46">json_count</a><span class="sign">(</span>me<span class="sign">)</span>
 <span class="line_number">4040 </span>                p <span class="sign">=</span><span class="sign">&gt;</span> me<span class="sign">%</span>children    <span class="comment">!start with first one</span>
 <span class="line_number">4041 </span>                <span class="keyword">do</span> i<span class="sign">=</span>1<span class="sign">,</span> n_children
 <span class="line_number">4042 </span>                    <span class="keyword">if</span> <span class="sign">(</span><span class="keyword">allocated</span><span class="sign">(</span>p<span class="sign">%</span>name<span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
@@ -4654,7 +4654,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fremove"></a>
-<a name="robo117"></a><h2>json_module/json_value_remove [ Functions ]</h2>
+<a name="robo119"></a><h2>json_module/json_value_remove [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4760,7 +4760,7 @@
 <span class="line_number">2477 </span>
 <span class="line_number">2478 </span>        <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">2479 </span>
-<span class="line_number">2480 </span>        <span class="keyword">if</span> <span class="sign">(</span>destroy_it<span class="sign">)</span> <span class="keyword">call</span> <a href="#robo114">json_value_destroy</a><span class="sign">(</span>me<span class="sign">)</span>
+<span class="line_number">2480 </span>        <span class="keyword">if</span> <span class="sign">(</span>destroy_it<span class="sign">)</span> <span class="keyword">call</span> <a href="#robo116">json_value_destroy</a><span class="sign">(</span>me<span class="sign">)</span>
 <span class="line_number">2481 </span>
 <span class="line_number">2482 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
 <span class="line_number">2483 </span>
@@ -4769,7 +4769,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fremove5fif5fpresent"></a>
-<a name="robo118"></a><h2>json_module/json_value_remove_if_present [ Functions ]</h2>
+<a name="robo120"></a><h2>json_module/json_value_remove_if_present [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4801,7 +4801,7 @@
 
 <hr />
 <a name="json5fmodule2fjson5fvalue5fto5fstring"></a>
-<a name="robo119"></a><h2>json_module/json_value_to_string [ Functions ]</h2>
+<a name="robo121"></a><h2>json_module/json_value_to_string [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4829,7 +4829,7 @@
 
 <hr />
 <a name="json5fmodule2fto5funi"></a>
-<a name="robo120"></a><h2>json_module/to_uni [ Functions ]</h2>
+<a name="robo122"></a><h2>json_module/to_uni [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4856,7 +4856,7 @@
 
 <hr />
 <a name="json5fmodule2fto5funi5fvec"></a>
-<a name="robo121"></a><h2>json_module/to_uni_vec [ Functions ]</h2>
+<a name="robo123"></a><h2>json_module/to_uni_vec [ Functions ]</h2>
 
 <p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
 <p class="item_name">NAME</p>
@@ -4866,7 +4866,7 @@
 <p>    Convert array of strings to unicode (<a href="#robo1">CDK</a> to <a href="#robo2">CK</a>).
 </p>
 <p class="item_name">NOTES</p>
-<p>    JW: may be able to remove this by making <a href="#robo120">to_uni</a> PURE ELEMENTAL ?
+<p>    JW: may be able to remove this by making <a href="#robo122">to_uni</a> PURE ELEMENTAL ?
 </p>
 <p class="item_name">AUTHOR</p>
 <p>    Izaak Beekman
@@ -4886,7 +4886,7 @@
 
 </div> <!-- content -->
 <div id="footer">
-<p>Generated from ./src/json_module.F90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.41 on Sun Mar 15 2015 21:08:08
+<p>Generated from ./src/json_module.F90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.41 on Sun Mar 15 2015 22:30:06
 </p>
 </div> <!-- footer -->
 </body>
