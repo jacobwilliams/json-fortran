@@ -1093,7 +1093,7 @@
 </p>
 <p class="item_name">SOURCE</p>
 <pre class="source"><span class="line_number">1002 </span>    <span class="keyword">interface</span> <strong>to_unicode</strong>
-<span class="line_number">1003 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span>  to_uni<span class="sign">,</span> to_uni_vec
+<span class="line_number">1003 </span>        <span class="keyword">module</span> <span class="keyword">procedure</span> <a href="#robo120">to_uni</a><span class="sign">,</span> <a href="#robo121">to_uni_vec</a>
 <span class="line_number">1004 </span>    <span class="keyword">end</span> <span class="keyword">interface</span>
 </pre>
 
@@ -4827,9 +4827,66 @@
 <span class="line_number">4112 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> <strong>json_value_to_string</strong>
 </pre>
 
+<hr />
+<a name="json5fmodule2fto5funi"></a>
+<a name="robo120"></a><h2>json_module/to_uni [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<p>    <strong>to_uni</strong>
+</p>
+<p class="item_name">DESCRIPTION</p>
+<p>    Convert string to unicode (<a href="#robo1">CDK</a> to <a href="#robo2">CK</a>).
+</p>
+<p class="item_name">AUTHOR</p>
+<p>    Izaak Beekman
+</p>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">7938 </span>    <span class="keyword">pure</span> <span class="keyword">function</span> <strong>to_uni</strong><span class="sign">(</span>str<span class="sign">)</span>
+<span class="line_number">7939 </span>
+<span class="line_number">7940 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number">7941 </span>
+<span class="line_number">7942 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo1">CDK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span> <span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> str
+<span class="line_number">7943 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo2">CK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="keyword">len</span><span class="sign">(</span>str<span class="sign">)</span><span class="sign">)</span>       <span class="sign">:</span><span class="sign">:</span> <strong>to_uni</strong>
+<span class="line_number">7944 </span>
+<span class="line_number">7945 </span>    <strong>to_uni</strong> <span class="sign">=</span> str
+<span class="line_number">7946 </span>
+<span class="line_number">7947 </span>    <span class="keyword">end</span> <span class="keyword">function</span> <strong>to_uni</strong>
+</pre>
+
+<hr />
+<a name="json5fmodule2fto5funi5fvec"></a>
+<a name="robo121"></a><h2>json_module/to_uni_vec [ Functions ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="#robo0">json_module</a> ] [ <a href="./robo_functions.html#robo_top_of_doc">Functions</a> ]</p>
+<p class="item_name">NAME</p>
+<p>    <strong>to_uni_vec</strong>
+</p>
+<p class="item_name">DESCRIPTION</p>
+<p>    Convert array of strings to unicode (<a href="#robo1">CDK</a> to <a href="#robo2">CK</a>).
+</p>
+<p class="item_name">NOTES</p>
+<p>    JW: may be able to remove this by making <a href="#robo120">to_uni</a> PURE ELEMENTAL ?
+</p>
+<p class="item_name">AUTHOR</p>
+<p>    Izaak Beekman
+</p>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">7967 </span>    <span class="keyword">pure</span> <span class="keyword">function</span> <strong>to_uni_vec</strong><span class="sign">(</span>str<span class="sign">)</span>
+<span class="line_number">7968 </span>
+<span class="line_number">7969 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number">7970 </span>
+<span class="line_number">7971 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo1">CDK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span> <span class="keyword">dimension</span><span class="sign">(</span><span class="sign">:</span><span class="sign">)</span><span class="sign">,</span> <span class="keyword">intent</span><span class="sign">(</span>in<span class="sign">)</span>   <span class="sign">:</span><span class="sign">:</span> str
+<span class="line_number">7972 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">kind</span><span class="sign">=</span><a href="#robo2">CK</a><span class="sign">,</span><span class="keyword">len</span><span class="sign">=</span><span class="keyword">len</span><span class="sign">(</span>str<span class="sign">)</span><span class="sign">)</span><span class="sign">,</span> <span class="keyword">dimension</span><span class="sign">(</span><span class="keyword">size</span><span class="sign">(</span>str<span class="sign">)</span><span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> <strong>to_uni_vec</strong>
+<span class="line_number">7973 </span>
+<span class="line_number">7974 </span>    <strong>to_uni_vec</strong> <span class="sign">=</span> str
+<span class="line_number">7975 </span>
+<span class="line_number">7976 </span>    <span class="keyword">end</span> <span class="keyword">function</span> <strong>to_uni_vec</strong>
+</pre>
+
 </div> <!-- content -->
 <div id="footer">
-<p>Generated from ./src/json_module.F90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.41 on Sun Mar 15 2015 20:59:08
+<p>Generated from ./src/json_module.F90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.41 on Sun Mar 15 2015 21:08:08
 </p>
 </div> <!-- footer -->
 </body>
