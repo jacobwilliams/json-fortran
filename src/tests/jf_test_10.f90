@@ -62,14 +62,14 @@ contains
 
     integer,intent(out) :: error_cnt
 
-    character(len=256),dimension(:),allocatable :: str_vec
+    character(kind=CK,len=256),dimension(:),allocatable :: str_vec
     type(json_file) :: f,f2
     type(json_value),pointer :: p
-    character(len=:),allocatable :: str
+    character(kind=CK,len=:),allocatable :: str
     logical :: found,lval
     integer :: var_type,n_children
 
-    character(len=*),parameter :: json_str = '{ "blah": 123 }'
+    character(kind=CK,len=*),parameter :: json_str = '{ "blah": 123 }'
 
     error_cnt = 0
     call json_initialize()
