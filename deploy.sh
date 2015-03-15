@@ -19,6 +19,7 @@ if [ ! "$TRAVIS" ]; then #not on travis, try a sane deploy of current branch's d
         [ -e "$BRANCH" ] && rm -r "$BRANCH" # wipe out old docs if they exist
         mkdir "$BRANCH"
         mkdir "$BRANCH/tests"
+        mkdir "$BRANCH/tests/introspection"
         FILES=$(find ../documentation -name '*.*')  #get all the files (including in subdirectories)
         for f in $FILES; do # add branch info to header and clean line endings
 	    sed '/[^#]robo_top_of_doc/ s;jsonfortran</a>;jsonfortran '"$BRANCH"'</a>;' $f | sed 's/ *$//' > "$BRANCH/${f##*documentation/}"
@@ -42,6 +43,7 @@ else #running under travis
             [ -e master ] && rm -r master # wipe out docs if they exist
             mkdir master
             mkdir master/tests
+            mkdir master/tests/introspection
             FILES=$(find ../documentation -name '*.*')  #get all the files (including in subdirectories)
             for f in $FILES; do # add branch info to header and clean line endings
 		sed '/[^#]robo_top_of_doc/ s;jsonfortran</a>;jsonfortran master</a>;' $f | sed 's/ *$//' > master/${f##*documentation/}
@@ -57,6 +59,7 @@ else #running under travis
 	    [ -e "$TRAVIS_TAG" ] && rm -r "$TRAVIS_TAG" # wipe out existing docs for tag if they exist
 	    mkdir "$TRAVIS_TAG"
 	    mkdir "$TRAVIS_TAG/tests"
+        mkdir "$TRAVIS_TAG/tests/introspection"
 	    # Add an entry in index.html for the new tag, assume none exists
 	    awk '/<!--Next stable release goes here-->/{print "<a href=\"./'"$TRAVIS_TAG"'/json_module_F90.html\" class=\"indexitem\" >'"$TRAVIS_TAG"'</a>"}1' index.html > index2.html && mv index2.html index.html
         FILES=$(find ../documentation -name '*.*')  #get all the files (including in subdirectories)

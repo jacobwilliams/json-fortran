@@ -69,7 +69,7 @@ contains
     logical :: found,lval
     integer :: var_type,n_children
 
-    character(kind=CK,len=*),parameter :: json_str = '{ "blah": 123 }'
+    character(kind=CDK,len=*),parameter :: json_str = '{ "blah": 123 }'
 
     error_cnt = 0
     call json_initialize()
