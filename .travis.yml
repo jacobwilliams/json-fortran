@@ -13,14 +13,14 @@ env:
   matrix:
       # CMake build with unit tests, no documentation, no coverage analysis
       # Allow to fail for now until tests are fixed
-    - BUILD_SCRIPT="mkdir cmake-build && cd cmake-build && cmake -DSKIP_DOC_GEN:BOOL=TRUE .. && make -j 4 && make test"
+    - BUILD_SCRIPT="mkdir cmake-build && cd cmake-build && cmake -DSKIP_DOC_GEN:BOOL=TRUE -DENABLE_UNICODE:BOOL=TRUE .. && make -j 4 && make test"
       SPECIFIC_DEPENDS="cmake nodejs"
       JLINT="yes"
       DOCS="no"
       FoBiS="no"
 
       # build with build.sh, make documentation, run unit tests and perform coverage analysis
-    - BUILD_SCRIPT="./build.sh"
+    - BUILD_SCRIPT="./build.sh --coverage --enable-unicode"
       SPECIFIC_DEPENDS="binutils"
       JLINT="no"
       DOCS="yes"
@@ -59,7 +59,7 @@ script:
 
 after_success:
   - cd $TRAVIS_BUILD_DIR
-  - if [[ $CODE_COVERAGE == [yY]* ]]; then gcov -o lib/ src/json_module.f90 && coveralls -n -b . ; fi
+  - if [[ $CODE_COVERAGE == [yY]* ]]; then gcov -o lib/ src/json_module.F90 && coveralls -n -b . ; fi
   - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
   - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"
   - ./deploy.sh #handles updating documentation for master branch as well as tags

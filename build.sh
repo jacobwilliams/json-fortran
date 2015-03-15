@@ -25,9 +25,11 @@ PROJECTNAME='jsonfortran'       # project name for robodoc (example: jsonfortran
 DOCDIR='./documentation/'       # build directory for documentation
 SRCDIR='./src/'                 # library source directory
 TESTDIR='./src/tests/'          # unit test source directory
+INTROSPECDIR='./src/tests/introspection/' # pre compile configuration tests directory
+UCS4TESTCODE='test_iso_10646_support.f90'
 BINDIR='./bin/'                 # build directory for unit tests
 LIBDIR='./lib/'                 # build directory for library
-MODCODE='json_module.f90'       # json module file name
+MODCODE='json_module.F90'       # json module file name
 LIBOUT='libjsonfortran.a'       # name of json library
 
 
@@ -35,10 +37,10 @@ LIBOUT='libjsonfortran.a'       # name of json library
 # warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure name. (R1214.4).
 # In the context of F2008 this is an erroneous warning.
 # See https://prd1idz.cps.intel.com/en-us/forums/topic/486629
-INTELCOMPILERFLAGS='-c -O2 -warn -stand f08 -diag-disable 7601 -traceback'
+INTELCOMPILERFLAGS='-c -O2 -warn -stand f08 -diag-disable 7601 -diag-disable 4013 -traceback'
 #INTELCOMPILERFLAGS='-c -O2 -warn -traceback -stand f08 -assume protect_parens -assume buffered_io -check all'
 
-GNUCOMPILERFLAGS='-c -O2 -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008'
+GNUCOMPILERFLAGS='-c -O2 -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008'
 
 FCOMPILER='gnu' #Set default compiler to gfortran
 
@@ -55,7 +57,7 @@ print_usage () {
     echo -e "\n\nUsage:\n"
     echo -e "${script_name} [--compiler {intel|gnu|<other>}] [--cflags '<custom compiler flags here>']\n\
          [--coverage [{yes|no}]] [--profile [{yes|no}]] [--skip-tests [{yes|no}]]\n\
-         [--skip-documentation [{yes|no}]] [--help]"
+         [--skip-documentation [{yes|no}]] [--enable-unicode [{yes|no}]] [--help]"
     echo ""
     echo -e "Any flags that take an optional yes or no argument will default to 'yes' when no\n\
 argument is passed. Additionally, A custom compiler may be passed to the 'compiler'\n\
@@ -93,6 +95,22 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
 	    FCOMPILERFLAGS="$2"
 	    # no good way to check that the user didn't do something questionable
 	    shift
+	    ;;
+	--enable-unicode)
+	    case $2 in
+		yes|Yes|YES)
+		    TRY_UNICODE="yes"
+		    shift
+		    ;;
+		no|No|NO)
+		    TRY_UNICODE="no"
+		    shift
+		    ;;
+		*)
+		    TRY_UNICODE="yes"
+		    # don't shift; $2 is next arg
+		    ;;
+	    esac
 	    ;;
 	--coverage) # enable coverage
 	    case $2 in
@@ -185,7 +203,16 @@ if [[ $CODE_PROFILE == [yY]* ]]; then
 fi
 
 if [[ $FCOMPILER == custom ]]; then
+    echo "Trying to compile with custom compiler, $FC"
     CUSTOM="-fc $FC"
+fi
+
+if [[ $TRY_UNICODE == [yY]* ]]; then
+    echo "Trying to compile library with Unicode/UCS4 support"
+    FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS}" -dbld "${BINDIR}" -s "${INTROSPECDIR}" -dmod ./ -dobj ./ -t ${UCS4TESTCODE} -o ${UCS4TESTCODE%.f90} -colors
+    if "${BINDIR}/${UCS4TESTCODE%.f90}"; then
+	DEFINES="-DUSE_UCS4 -Wunused-function"
+    fi
 fi
 
 #build the stand-alone library:
@@ -195,7 +222,7 @@ echo "Building library..."
 # work around for FoBiS.py PR #45
 [ -d "$LIBDIR" ] || mkdir "$LIBDIR"
 
-FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS}" ${COVERAGE} ${PROFILING} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
+FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
 
 #build the unit tests (uses the above library):
 if [[ $JF_SKIP_TESTS != [yY]* ]]; then
@@ -205,10 +232,10 @@ if [[ $JF_SKIP_TESTS != [yY]* ]]; then
     # FoBiS.py PR #45 work around
     [ -d "$BINDIR" ] || mkdir "$BINDIR"
 
-    for TEST in "${TESTDIR%/}"/jf_test_*.f90; do
+    for TEST in "${TESTDIR%/}"/jf_test_*.[fF]90; do
 	THIS_TEST=${TEST##*/}
-	echo "Build ${THIS_TEST%.f90}"
-	FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS}" ${COVERAGE} ${PROFILING} -dbld ${BINDIR} -s ${TESTDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${THIS_TEST} -o ${THIS_TEST%.f90} -colors
+	echo "Build ${THIS_TEST%.[fF]90}"
+	FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${BINDIR} -s ${TESTDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${THIS_TEST} -o ${THIS_TEST%.[fF]90} -colors
     done
 else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."

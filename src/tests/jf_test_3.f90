@@ -66,11 +66,11 @@ contains
 
     integer,intent(out) :: error_cnt
     integer :: ival
-    character(len=:),allocatable :: cval
+    character(kind=CK,len=:),allocatable :: cval
     real(wp) :: rval
     type(json_file) :: json    !the JSON structure read from the file:
     integer :: i
-    character(len=10) :: str
+    character(kind=CK,len=10) :: str
     real(wp),dimension(:),allocatable :: rvec
 
     error_cnt = 0

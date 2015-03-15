@@ -17,11 +17,11 @@ import sys
 env = Environment()
 
 if env['FORTRAN'] == 'gfortran':
-    env = Environment(F90FLAGS = '-O2 -fbacktrace -g -Wall -Wextra -Wno-maybe-uninitialized -pedantic -std=f2008 -J',)
+    env = Environment(F90FLAGS = '-O2 -fbacktrace -g -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008 -J',)
 elif env['FORTRAN'] == 'ifort':
     env = Environment(F90FLAGS = '-O2 -warn -stand f08 -diag-disable 7601 -traceback -module lib',)
 
-src = join('src','json_module.f90')
+src = join('src','json_module.F90')
 ar  = join('lib','libjsonfortran'+env['LIBSUFFIX'])
 sl  = join('lib','libjsonfortran'+env['SHLIBSUFFIX'])
 mod = join('lib','json_module.mod')  ## FORTRANMODSUFFIX
@@ -34,8 +34,7 @@ obj   = []
 exe   = []
 here = os.getcwd()
 os.chdir(join('src', 'tests'))
-for f in sorted(glob.glob("*")):
-    if not f.endswith('f90'): continue
+for f in sorted(glob.glob("*.[fF]90")):
     tests.append(join('src', 'tests', f))
     e = f[:-4]
     obj.append(join('src','tests',e+env['OBJSUFFIX']))
