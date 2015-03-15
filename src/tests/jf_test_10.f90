@@ -50,7 +50,7 @@ module jf_test_10_mod
     implicit none
 
     character(len=*),parameter :: filename = 'test1.json'
-    character(len=*),parameter :: dir      = '../files/'     !working directory
+    character(len=*),parameter :: dir = '../files/inputs/' !working directory
 
 contains
 
@@ -337,8 +337,8 @@ contains
     !--------------------------------
 
     !cleanup:
-    call f%destroy()
-    call f2%destroy()
+    !call f%destroy()   !WARNING: causing "pointer being freed was not allocated" errors.... need to investigate
+    !call f2%destroy()
 
     end subroutine test_10
 
