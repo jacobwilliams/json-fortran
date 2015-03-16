@@ -8,8 +8,50 @@
 #    Build the json-fortran library and unit tests.
 #
 #  USAGE
-#    build.sh         : build using gfortran
-#    build.sh -ifort  : build using ifort
+#    build.sh [--compiler {intel|gnu|<other>}] [--cflags '<custom compiler flags here>']
+#             [--coverage [{yes|no}]] [--profile [{yes|no}]] [--skip-tests [{yes|no}]]
+#             [--skip-documentation [{yes|no}]] [--enable-unicode [{yes|no}]] [--help]"
+#
+#    By default, if invoked without any flags, this build script will build the
+#    json-fortran library using gfortran,
+#        without :
+#            unicode support
+#            coverage flags
+#            profiling flags
+#        with :
+#            unit tests enabled
+#            documentation (if ROBODoc is installed)
+#
+#     More recent (right-most) flags will override preceding flags
+#     flags:
+#        --compiler : gnu or gfortran for gfortran, intel or ifort for intel compiler
+#                     A custom compiler may also be specified here, e.g. ftn
+#
+#        --cflags : Enter any aditiol/custom compiler flags here and make sure they are
+#                   properly quoted
+#
+#        --help : Print a usage message and exit.
+#
+#        The following flags all (optionally) accept an argument, "yes" or "no." If
+#        no argument is passed, "yes" will be assumed.
+#
+#        --enable-unicode [{yes|no}]: Request that the json-fortran be built with (or
+#                                     without) unicode/UCS4 support. If your compiler
+#                                     does NOT support ISO 10646/UCS4 and it was
+#                                     requested, then a warning is printed and the
+#                                     library is built without UCS4 support.
+#
+#        --coverage [{yes|no}]: Compile the library and tests with code coverage enabled
+#                               or disabled.
+#
+#        --profile [{yes|no}]: Compile the library and tests with code profiling enabled
+#                              or disabled
+#
+#        --skip-tests [{yes|no}]: Skip (or don't skip) building and running the json-
+#                                 fortran unit tests
+#
+#        --skip-documentation [{yes|no}]: Skip (or don't skip) building the json-
+#                                         fortran documentation using ROBODoc
 #
 #  REQUIRES
 #    FoBiS.py : https://github.com/szaghi/FoBiS      [version 1.2.5 or later required]
