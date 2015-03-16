@@ -7289,7 +7289,7 @@
         if (eof) then
             ! The file ended before array was finished:
             call throw_exception('Error in parse_array: '//&
-                                 'End iffile encountered when parsing an array.')
+                                 'End of file encountered when parsing an array.')
             exit
         else if (delimiter == c) then
             ! parse the next element
