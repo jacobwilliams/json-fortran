@@ -315,7 +315,7 @@
     character(kind=CK,len=*),parameter :: quotation_mark   = achar(34)
     character(kind=CK,len=*),parameter :: slash            = achar(47)
     character(kind=CK,len=*),parameter :: backslash        = achar(92)
-    character(kind=CK,len=*),parameter :: double_backslash = '\\'
+    character(kind=CK,len=*),parameter :: double_backslash = achar(92) // achar(92)
 
     ! Control characters, possibly in unicode
     integer, private :: i
