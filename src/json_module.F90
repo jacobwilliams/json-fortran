@@ -300,21 +300,22 @@
     character(kind=CDK,len=*),parameter,public :: json_ext = '.json'   !JSON file extension
 
     !special JSON characters
-    character(kind=CK,len=*),parameter :: space           = ' '
-    character(kind=CK,len=*),parameter :: start_object    = '{'
-    character(kind=CK,len=*),parameter :: end_object      = '}'
-    character(kind=CK,len=*),parameter :: start_array     = '['
-    character(kind=CK,len=*),parameter :: end_array       = ']'
-    character(kind=CK,len=*),parameter :: delimiter       = ','
-    character(kind=CK,len=*),parameter :: colon_char      = ':'
-    character(kind=CK,len=*),parameter :: bspace          = achar(8)
-    character(kind=CK,len=*),parameter :: horizontal_tab  = achar(9)
-    character(kind=CK,len=*),parameter :: newline         = achar(10)
-    character(kind=CK,len=*),parameter :: formfeed        = achar(12)
-    character(kind=CK,len=*),parameter :: carriage_return = achar(13)
-    character(kind=CK,len=*),parameter :: quotation_mark  = achar(34)
-    character(kind=CK,len=*),parameter :: slash           = achar(47)
-    character(kind=CK,len=*),parameter :: backslash       = achar(92)
+    character(kind=CK,len=*),parameter :: space            = ' '
+    character(kind=CK,len=*),parameter :: start_object     = '{'
+    character(kind=CK,len=*),parameter :: end_object       = '}'
+    character(kind=CK,len=*),parameter :: start_array      = '['
+    character(kind=CK,len=*),parameter :: end_array        = ']'
+    character(kind=CK,len=*),parameter :: delimiter        = ','
+    character(kind=CK,len=*),parameter :: colon_char       = ':'
+    character(kind=CK,len=*),parameter :: bspace           = achar(8)
+    character(kind=CK,len=*),parameter :: horizontal_tab   = achar(9)
+    character(kind=CK,len=*),parameter :: newline          = achar(10)
+    character(kind=CK,len=*),parameter :: formfeed         = achar(12)
+    character(kind=CK,len=*),parameter :: carriage_return  = achar(13)
+    character(kind=CK,len=*),parameter :: quotation_mark   = achar(34)
+    character(kind=CK,len=*),parameter :: slash            = achar(47)
+    character(kind=CK,len=*),parameter :: backslash        = achar(92)
+    character(kind=CK,len=*),parameter :: double_backslash = '\\'
 
     ! Control characters, possibly in unicode
     integer, private :: i
@@ -3747,7 +3748,7 @@
         c = str_in(i:i)    !get next character in the input string
 
         select case(c)
-        case(quotation_mark,backslash,slash)
+        case(quotation_mark,backslash,double_backslash,slash)
             str_out = str_out//backslash//c
         case(bspace)
             str_out = str_out//'\b'
@@ -5560,7 +5561,7 @@
                         !character after the escape character:
                         c = s( j+1 : j+1 )
 
-                        if (any(c == [quotation_mark,backslash,slash, &
+                        if (any(c == [quotation_mark,backslash,double_backslash,slash, &
                              to_unicode(['b','f','n','r','t'])])) then
 
                             !save the bit after the escape characters:
@@ -5571,7 +5572,7 @@
                             end if
 
                             select case(c)
-                            case (quotation_mark,backslash,slash)
+                            case (quotation_mark,backslash,double_backslash,slash)
                                 !use c as is
                             case (CK_'b')
                                  c = bspace
