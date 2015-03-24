@@ -5561,7 +5561,7 @@
                         !character after the escape character:
                         c = s( j+1 : j+1 )
 
-                        if (any(c == [quotation_mark,backslash,double_backslash,slash, &
+                        if (any(c == [quotation_mark,backslash,slash, &
                              to_unicode(['b','f','n','r','t'])])) then
 
                             !save the bit after the escape characters:
@@ -5572,7 +5572,7 @@
                             end if
 
                             select case(c)
-                            case (quotation_mark,backslash,double_backslash,slash)
+                            case (quotation_mark,backslash,slash)
                                 !use c as is
                             case (CK_'b')
                                  c = bspace
