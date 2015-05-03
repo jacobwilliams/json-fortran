@@ -130,86 +130,6 @@
     !*********************************************************
 
     !*********************************************************
-    !****M* json_module/STRING_KIND
-    !
-    !  NAME
-    !    STRING_KIND
-    !
-    !  DESCRIPTION
-    !    String kind preprocessor macro.
-    !
-    !  SOURCE
-# define STRING_KIND 'DEFAULT'
-    ! this is the string kind to use unless compiling with GFortran AND
-    ! UCS4/ISO 10646 support is requested
-# ifdef __GFORTRAN__
-#   ifdef USE_UCS4
-    ! gfortran compiler AND UCS4 support requested, & silence redefine warning:
-#     undef  STRING_KIND
-#     define STRING_KIND 'ISO_10646'
-#   endif
-# endif
-    !*********************************************************
-
-    !*********************************************************
-    !****M* json_module/FILE_ENCODING
-    !
-    !  NAME
-    !    FILE_ENCODING
-    !
-    !  DESCRIPTION
-    !    File encoding preprocessor macro.
-    !
-    !  SOURCE
-# define FILE_ENCODING
-    ! don't ask for utf-8 file encoding unless using UCS4
-    ! this may let us use unformatted stream io to read in files more quickly
-    ! even with unicode support turned on `inquire( ... encoding=FL_ENCODING)`
-    ! may be able to detect json files in which each character is exactly one
-    ! byte
-# ifdef __GFORTRAN__
-#   ifdef USE_UCS4
-    ! gfortran compiler AND UCS4 support requested, & silence redefine warning:
-    ! Make sure we output files with utf-8 encoding too
-#     undef FILE_ENCODING
-#     define FILE_ENCODING ,encoding='utf-8'
-#   endif
-# endif
-    !*********************************************************
-
-    !*********************************************************
-    !****d* json_module/CK
-    !
-    !  NAME
-    !    CK
-    !
-    !  DESCRIPTION
-    !    Default character kind used by json-fortran.
-    !    If ISO 10646 (UCS4) support is available, use that,
-    !    otherwise, gracefully fall back on 'DEFAULT' characters.
-    !    Currently only gfortran >= 4.9.2 will correctly support
-    !    UCS4 which is stored in 4 bytes.
-    !    (and perhaps others).
-    !
-    !  NOTES
-    !   CK and CDK are the json-fortran character kind and json-fortran default
-    !   character kind respectively. Client code must ensure characters of kind=CK
-    !   are used for all character variables and strings passed to the json-fortran
-    !   library *EXCEPT* for file names which must be of 'DEFAULT' character kind,
-    !   provided here as JDCK. In particular, any:
-    !   * json path
-    !   * character or string
-    !   * object name
-    !   passed to the json-fortran library *MUST* be of type CK.
-    !
-    !  SEE ALSO
-    !    STRING_KIND
-    !
-    !  SOURCE
-    integer,parameter,public :: CK = selected_char_kind( STRING_KIND )
-    !*********************************************************
-
-    !*********************************************************
     !****d* json_module/CDK
     !
     !  NAME
@@ -255,6 +175,82 @@
     !*********************************************************
 
     !*********************************************************
+    !****M* json_module/json_fortran_string_kind
+    !
+    !  NAME
+    !    json_fortran_string_kind
+    !
+    !  DESCRIPTION
+    !    String kind preprocessor macro.
+    !
+    !  SOURCE
+#if defined __GFORTRAN__ && defined USE_UCS4
+    ! gfortran compiler AND UCS4 support requested:
+    character(kind=CDK,len=*),parameter :: json_fortran_string_kind = 'ISO_10646'
+#else
+    ! this is the string kind to use unless compiling with GFortran AND
+    ! UCS4/ISO 10646 support is requested
+    character(kind=CDK,len=*),parameter :: json_fortran_string_kind = 'DEFAULT'
+#endif
+    !*********************************************************
+
+    !*********************************************************
+    !****d* json_module/CK
+    !
+    !  NAME
+    !    CK
+    !
+    !  DESCRIPTION
+    !    Default character kind used by json-fortran.
+    !    If ISO 10646 (UCS4) support is available, use that,
+    !    otherwise, gracefully fall back on 'DEFAULT' characters.
+    !    Currently only gfortran >= 4.9.2 will correctly support
+    !    UCS4 which is stored in 4 bytes.
+    !    (and perhaps others).
+    !
+    !  NOTES
+    !   CK and CDK are the json-fortran character kind and json-fortran default
+    !   character kind respectively. Client code must ensure characters of kind=CK
+    !   are used for all character variables and strings passed to the json-fortran
+    !   library *EXCEPT* for file names which must be of 'DEFAULT' character kind,
+    !   provided here as JDCK. In particular, any:
+    !   * json path
+    !   * character or string
+    !   * object name
+    !   passed to the json-fortran library *MUST* be of type CK.
+    !
+    !  SEE ALSO
+    !    STRING_KIND
+    !
+    !  SOURCE
+    integer,parameter,public :: CK = selected_char_kind(json_fortran_string_kind)
+    !*********************************************************
+
+    !*********************************************************
+    !****M* json_module/FILE_ENCODING
+    !
+    !  NAME
+    !    FILE_ENCODING
+    !
+    !  DESCRIPTION
+    !    File encoding preprocessor macro.
+    !
+    !  SOURCE
+#if defined __GFORTRAN__ && defined USE_UCS4
+    ! gfortran compiler AND UCS4 support requested, & silence redefine warning:
+    ! Make sure we output files with utf-8 encoding too
+#define FILE_ENCODING ,encoding='UTF-8'
+#else
+    ! don't ask for utf-8 file encoding unless using UCS4
+    ! this may let us use unformatted stream io to read in files more quickly
+    ! even with unicode support turned on `inquire( ... encoding=FL_ENCODING)`
+    ! may be able to detect json files in which each character is exactly one
+    ! byte
+#define FILE_ENCODING
+#endif
+    !*********************************************************
+
+    !*********************************************************
     !****M* json_module/MAYBEWRAP
     !
     !  NAME
@@ -294,6 +290,30 @@
 # else
 #   define MAYBEWRAP(PROCEDURE) PROCEDURE
 # endif
+    !*********************************************************
+
+    !*********************************************************
+    !****d* json_module/use_unformatted_stream
+    !
+    !  NAME
+    !    use_unformatted_stream
+    !
+    !  DESCRIPTION
+    !    If using GFortran and Unicode is enabled, then
+    !    JSON files are opened using access='STREAM' and
+    !    form='UNFORMATTED'.  This allows the file to 
+    !    be read faster.
+    !
+    !  SOURCE
+#if defined __GFORTRAN__ && defined USE_UCS4
+    logical,parameter :: use_unformatted_stream = .false.
+    character(kind=CDK,len=*),parameter :: access_spec = 'SEQUENTIAL'
+    character(kind=CDK,len=*),parameter :: form_spec   = 'FORMATTED'
+#else
+    logical,parameter :: use_unformatted_stream = .true.
+    character(kind=CDK,len=*),parameter :: access_spec = 'STREAM'
+    character(kind=CDK,len=*),parameter :: form_spec   = 'UNFORMATTED'
+#endif
     !*********************************************************
 
     !JSON file extension
@@ -341,6 +361,10 @@
     character(kind=CDK,len=*),parameter :: int_fmt  = '(I0)'       !minimum width format for integers
     character(kind=CK, len=*),parameter :: star     = '*'          !for invalid numbers
 
+     !for allocatable strings:
+     integer(IK),parameter :: chunk_size = 100  !allocate chunks of this size
+     integer(IK) :: ipos = 1    !next character to read
+
     !*********************************************************
     !****d* json_module/var_type
     !
@@ -377,7 +401,7 @@
     !  EXAMPLE
     !    Consider the following example:
     !     type(json_value),pointer :: p
-    !     call json_create_object(p)
+    !     call json_create_object(p,'')  !root
     !     call json_add(p,'year',1805)
     !     call json_add(p,'value',1.0d0)
     !     call json_print(p,'test.json')
@@ -2096,6 +2120,7 @@
     pushed_char  = ''
     char_count   = 0
     line_count   = 1
+    ipos         = 1
 
     end subroutine json_initialize
 !*****************************************************************************************
@@ -3736,34 +3761,74 @@
     character(kind=CK,len=*),intent(in)              :: str_in
     character(kind=CK,len=:),allocatable,intent(out) :: str_out
 
-    integer(IK) :: i
+    integer(IK) :: i,ipos
     character(kind=CK,len=1) :: c
 
-    str_out = ''
+    character(kind=CK,len=*),parameter :: specials = quotation_mark//&
+                                                     backslash//&
+                                                     slash//&
+                                                     bspace//&
+                                                     formfeed//&
+                                                     newline//&
+                                                     carriage_return//&
+                                                     horizontal_tab
 
-    !go through the string and look for special characters:
-    do i=1,len(str_in)
+    !Do a quick scan for the special characters,
+    ! if any are present, then process the string,
+    ! otherwise, return the string as is.
+    if (scan(str_in,specials)>0) then
 
-        c = str_in(i:i)    !get next character in the input string
+        str_out = repeat(space,chunk_size)
+        ipos = 1
 
-        select case(c)
-        case(quotation_mark,backslash,slash)
-            str_out = str_out//backslash//c
-        case(bspace)
-            str_out = str_out//'\b'
-        case(formfeed)
-            str_out = str_out//'\f'
-        case(newline)
-            str_out = str_out//'\n'
-        case(carriage_return)
-            str_out = str_out//'\r'
-        case(horizontal_tab)
-            str_out = str_out//'\t'
-        case default
-            str_out = str_out//c
-        end select
+        !go through the string and look for special characters:
+        do i=1,len(str_in)
 
-    end do
+            c = str_in(i:i)    !get next character in the input string
+
+            !if the string is not big enough, then add another chunk:
+            if (ipos+3>len(str_out)) str_out = str_out // repeat(space, chunk_size)
+
+            select case(c)
+            case(quotation_mark,backslash,slash)
+                str_out(ipos:ipos+1) = backslash//c
+                ipos = ipos + 2
+            case(bspace)
+                str_out(ipos:ipos+1) = '\b'
+                ipos = ipos + 2
+            case(formfeed)
+                str_out(ipos:ipos+1) = '\f'
+                ipos = ipos + 2
+            case(newline)
+                str_out(ipos:ipos+1) = '\n'
+                ipos = ipos + 2
+            case(carriage_return)
+                str_out(ipos:ipos+1) = '\r'
+                ipos = ipos + 2
+            case(horizontal_tab)
+                str_out(ipos:ipos+1) = '\t'
+                ipos = ipos + 2
+            case default
+                str_out(ipos:ipos) = c
+                ipos = ipos + 1
+            end select
+
+        end do
+
+        !trim the string if necessary:
+        if (ipos<len(str_out)+1) then
+            if (ipos==1) then
+                str_out = ''
+            else
+                str_out = str_out(1:ipos-1)
+            end if
+        end if
+
+    else
+
+        str_out = str_in
+
+    end if
 
     end subroutine escape_string
 !*****************************************************************************************
@@ -4144,6 +4209,7 @@
     end if
 
     end subroutine json_print_1
+!*****************************************************************************************
 
 !*****************************************************************************************
 !****f* json_module/json_print_2
@@ -6055,13 +6121,12 @@
 
     implicit none
 
-    character(kind=CDK,len=*),intent(in)         :: file  !JSON file name
-    type(json_value),pointer                     :: p     !output structure
-    integer(IK),intent(in),optional              :: unit  !file unit number (/= 0)
+    character(kind=CDK,len=*),intent(in) :: file  !JSON file name
+    type(json_value),pointer             :: p     !output structure
+    integer(IK),intent(in),optional      :: unit  !file unit number (/= 0)
 
     integer(IK) :: iunit, istat
     logical(LK) :: is_open
-    character(kind=CK,len=:),allocatable :: buffer
 
     !clear any exceptions and initialize:
     call json_initialize()
@@ -6084,10 +6149,13 @@
                     file        = file, &
                     status      = 'OLD', &
                     action      = 'READ', &
-                    form        = 'FORMATTED', &
-                    position    = 'REWIND', &
+                    form        = form_spec, &
+                    access      = access_spec, &
                     iostat      = istat &
                     FILE_ENCODING )
+        else
+            !if the file is already open, then we need to make sure
+            ! that it is open with the correct form/access/etc...
         end if
 
     else
@@ -6097,8 +6165,8 @@
                 file        = file, &
                 status      = 'OLD', &
                 action      = 'READ', &
-                form        = 'FORMATTED', &
-                position    = 'REWIND', &
+                form        = form_spec, &
+                access      = access_spec, &
                 iostat      = istat &
                 FILE_ENCODING )
 
@@ -6114,16 +6182,11 @@
         p%name = trim(file)  !use the file name
 
         ! parse as a value
-        buffer = ''
-        call parse_value(unit=iunit, str=buffer, value=p)
-
-        if ( exception_thrown ) call annotate_invalid_json(iunit,buffer)
-
-        ! cleanup:
-        if (allocated(buffer)) deallocate(buffer)
+        call parse_value(unit=iunit, str=CK_'', value=p)
+        if (exception_thrown) call annotate_invalid_json(iunit,CK_'')
 
         ! close the file if necessary
-        if (iunit/=0) close(unit=iunit, iostat=istat)
+        close(unit=iunit, iostat=istat)
 
     else
 
@@ -6156,31 +6219,26 @@
     type(json_value),pointer            :: p     !output structure
     character(kind=CK,len=*),intent(in) :: str   !string with JSON data
 
-    integer(IK) :: iunit
-    character(kind=CK,len=:),allocatable :: buffer
+    integer(IK),parameter :: iunit = 0 !indicates that json data will be read from buffer
 
-    if ( exception_thrown ) return ! to caller
+    if ( .not. exception_thrown ) then
 
-    !clear any exceptions and initialize:
-    call json_initialize()
+        !clear any exceptions and initialize:
+        call json_initialize()
 
-    buffer = str
-    iunit = 0    !indicates that json data will be read from buffer
+        ! create the value and associate the pointer
+        call json_value_create(p)
 
-    ! create the value and associate the pointer
-    call json_value_create(p)
+        ! Note: the name of the root json_value doesn't really matter,
+        !  but we'll allocate something here just in case.
+        p%name = ''
 
-    ! Note: the name of the root json_value doesn't really matter,
-    !  but we'll allocate something here just in case.
-    p%name = ''          !if reading it from the string
+        ! parse as a value
+        call parse_value(unit=iunit, str=str, value=p)
 
-    ! parse as a value
-    call parse_value(unit=iunit, str=buffer, value=p)
+        if (exception_thrown) call annotate_invalid_json(iunit,str)
 
-    if ( exception_thrown ) call annotate_invalid_json(iunit,str) ! always 0
-
-    ! cleanup:
-    if (allocated(buffer)) deallocate(buffer)
+    end if
 
     end subroutine json_parse_string
 !*****************************************************************************************
@@ -6246,7 +6304,11 @@
 
         if (iunit/=0) then
 
-            call get_current_line_from_file(iunit,line)
+            if (use_unformatted_stream) then
+                call get_current_line_from_file_stream(iunit,line)
+            else
+                call get_current_line_from_file_sequential(iunit,line)
+            end if
 
         else
 
@@ -6280,10 +6342,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/get_current_line_from_file
+!****if* json_module/get_current_line_from_file_sequential
 !
 !  NAME
-!    get_current_line_from_file
+!    get_current_line_from_file_sequential
 !
 !  DESCRIPTION
 !    Rewind the file to the beginning of the current line, and return this line.
@@ -6294,14 +6356,14 @@
 !
 !  SOURCE
 
-    subroutine get_current_line_from_file(iunit,line)
+    subroutine get_current_line_from_file_sequential(iunit,line)
 
     implicit none
 
     integer(IK),intent(in)                           :: iunit
     character(kind=CK,len=:),allocatable,intent(out) :: line
 
-    integer(IK),parameter              :: n_chunk = 256   ! chunk size [arbitrary]
+    integer(IK),parameter               :: n_chunk = 256   ! chunk size [arbitrary]
     character(kind=CDK,len=*),parameter :: nfmt = '(A256)' ! corresponding format statement
 
     character(kind=CK,len=n_chunk) :: chunk
@@ -6328,7 +6390,61 @@
         end do
     end if
 
-    end subroutine get_current_line_from_file
+    end subroutine get_current_line_from_file_sequential
+!*****************************************************************************************
+
+!*****************************************************************************************
+!****if* json_module/get_current_line_from_file_stream
+!
+!  NAME
+!    get_current_line_from_file_stream
+!
+!  DESCRIPTION
+!    Rewind the file to the beginning of the current line, and return this line.
+!    The file is assumed to be opened.
+!
+!  AUTHOR
+!    Jacob Williams
+!
+!  SOURCE
+
+    subroutine get_current_line_from_file_stream(iunit,line)
+
+    implicit none
+
+    integer(IK),intent(in)                           :: iunit
+    character(kind=CK,len=:),allocatable,intent(out) :: line
+
+    integer(IK) :: istart,iend,ios
+    character(kind=CK,len=1) :: c
+
+    !....update for the new STREAM version..... 
+      
+    !   !!! !!!! not quite right for EXAMPLE 6 case 2 .....  DOUBLE CHECK THIS...
+
+    istart = ipos
+    do 
+        if (istart<=1) then
+            istart = 1
+            exit
+        end if
+        read(iunit,pos=istart,iostat=ios) c
+        if (c==newline .or. ios/=0) then
+            if (istart/=1) istart = istart - 1
+            exit
+        end if
+        istart = istart-1  !rewind until the beginning of the line
+    end do
+    iend = ipos
+    do
+        read(iunit,pos=iend,iostat=ios) c
+        if (c==newline .or. ios/=0) exit
+        iend=iend+1
+    end do
+    allocate( character(kind=CK,len=iend-istart+1) :: line )
+    read(iunit,pos=istart,iostat=ios) line
+
+    end subroutine get_current_line_from_file_stream
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -6346,9 +6462,9 @@
 
     implicit none
 
-    integer(IK),intent(in)                             :: unit
-    character(kind=CK,len=:),allocatable,intent(inout) :: str  !only used if unit=0
-    type(json_value),pointer                           :: value
+    integer(IK),intent(in)                 :: unit
+    character(kind=CK,len=*),intent(in)    :: str  !only used if unit=0
+    type(json_value),pointer               :: value
 
     logical(LK) :: eof
     character(kind=CK,len=1) :: c
@@ -7159,9 +7275,9 @@
 
     implicit none
 
-    integer(IK), intent(in)  :: unit
-    character(kind=CK,len=:),allocatable,intent(inout) :: str
-    type(json_value),pointer :: parent
+    integer(IK),intent(in)              :: unit
+    character(kind=CK,len=*),intent(in) :: str
+    type(json_value),pointer            :: parent
 
     type(json_value),pointer :: pair
     logical(LK) :: eof
@@ -7222,8 +7338,8 @@
             return
         end if
 
-       ! another possible pair
-       c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        ! another possible pair
+        c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
         if (eof) then
             call throw_exception('Error in parse_object: '//&
                                  'End of file encountered when parsing an object')
@@ -7259,9 +7375,9 @@
 
     implicit none
 
-    integer(IK), intent(in)  :: unit
-    character(kind=CK,len=:),allocatable,intent(inout) :: str
-    type(json_value),pointer :: array
+    integer(IK),intent(in)              :: unit
+    character(kind=CK,len=*),intent(in) :: str
+    type(json_value),pointer            :: array
 
     type(json_value),pointer :: element
     logical(LK) :: eof
@@ -7327,7 +7443,7 @@
     implicit none
 
     integer(IK), intent(in)                            :: unit
-    character(kind=CK,len=:),allocatable,intent(inout) :: str
+    character(kind=CK,len=*),intent(in)                :: str
     character(kind=CK,len=:),allocatable,intent(out)   :: string
 
     logical(LK) :: eof, is_hex, escape
@@ -7335,12 +7451,16 @@
     character(kind=CK,len=4) :: hex
     integer(IK) :: i
 
+    !to speed up by reducing the number of character string reallocations:
+    integer(IK) :: ip !index to put next character
+
     !at least return a blank string if there is a problem:
-    string = ''
+    string = repeat(space, chunk_size)
 
     if (.not. exception_thrown) then
 
         !initialize:
+        ip = 1
         last = space
         is_hex = .false.
         escape = .false.
@@ -7356,16 +7476,20 @@
                 call throw_exception('Error in parse_string: Expecting end of string')
                 return
 
-            else if (quotation_mark == c .and. last /= backslash) then
+            else if (c==quotation_mark .and. last /= backslash) then
 
-                if (is_hex) call throw_exception('Error in parse_string: '//&
-                                                 'incomplete hex string: \u'//trim(hex))
+                if (is_hex) call throw_exception('Error in parse_string:'//&
+                                                 ' incomplete hex string: \u'//trim(hex))
                 exit
 
             else
 
+                !if the string is not big enough, then add another chunk:
+                if (ip>len(string)) string = string // repeat(space, chunk_size)
+
                 !append to string:
-                string = string//c
+                string(ip:ip) = c
+                ip = ip + 1
 
                 !hex validation:
                 if (is_hex) then  !accumulate the four characters after '\u'
@@ -7378,8 +7502,8 @@
                             hex = ''
                             is_hex = .false.
                         else
-                            call throw_exception('Error in parse_string: '//&
-                                                 'invalid hex string: \u'//trim(hex))
+                            call throw_exception('Error in parse_string:'//&
+                                                 ' invalid hex string: \u'//trim(hex))
                             exit
                         end if
                     end if
@@ -7406,7 +7530,42 @@
 
     end if
 
+    !trim the string if necessary:
+    if (ip<len(string)+1) then
+        if (ip==1) then
+            string = ''
+        else
+            string = string(1:ip-1)
+        end if
+    end if
+
     end subroutine parse_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!.... gfortran bug ..... some problem.....
+!*****************************************************************************************
+    pure subroutine add_character_to_string(str,ip,c)
+
+    implicit none
+
+    character(kind=CK,len=:),allocatable,intent(inout) :: str
+    integer(IK),intent(inout) :: ip
+    character(kind=CK,len=1),intent(in) :: c
+
+    if (allocated(str)) then
+        !resize string if necessary:
+        if (ip>len(str)) str = str // repeat(space, chunk_size)
+    else
+        str = repeat(space, chunk_size)
+        ip = 1
+    end if
+
+    !append to string:
+    str(ip:ip) = c
+    ip = ip + 1
+
+    end subroutine add_character_to_string
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -7424,9 +7583,9 @@
 
     implicit none
 
-    integer(IK), intent(in)                            :: unit
-    character(kind=CK,len=:),allocatable,intent(inout) :: str
-    character(kind=CK,len = *), intent(in)             :: chars
+    integer(IK), intent(in)              :: unit
+    character(kind=CK,len=*),intent(in)  :: str
+    character(kind=CK,len=*), intent(in) :: chars
 
     integer(IK) :: i, length
     logical(LK) :: eof
@@ -7439,12 +7598,12 @@
         do i = 1, length
             c = pop_char(unit, str=str, eof = eof, skip_ws = .true.)
             if (eof) then
-                call throw_exception('Error in parse_for_chars: '//&
-                                     'Unexpected end of file while parsing array.')
+                call throw_exception('Error in parse_for_chars:'//&
+                                     ' Unexpected end of file while parsing array.')
                 return
             else if (c /= chars(i:i)) then
-                call throw_exception('Error in parse_for_chars: '//&
-                                     'Unexpected character.: "'//c//'" '//chars(i:i))
+                call throw_exception('Error in parse_for_chars:'//&
+                                     ' Unexpected character.: "'//c//'" '//chars(i:i))
                 return
             end if
         end do
@@ -7476,9 +7635,9 @@
 
     implicit none
 
-    integer(IK),intent(in)                             :: unit
-    character(kind=CK,len=:),allocatable,intent(inout) :: str
-    type(json_value),pointer                           :: value
+    integer(IK),intent(in)              :: unit
+    character(kind=CK,len=*),intent(in) :: str
+    type(json_value),pointer            :: value
 
     character(kind=CK,len=:),allocatable :: tmp
     character(kind=CK,len=1) :: c
@@ -7488,9 +7647,13 @@
     logical(LK) :: first
     logical(LK) :: is_integer
 
+    !to speed up by reducing the number of character string reallocations:
+    integer(IK) :: ip !index to put next character
+
     if (.not. exception_thrown) then
 
-        tmp = ''
+        tmp = repeat(space, chunk_size)
+        ip = 1
         first = .true.
         is_integer = .true.  !assume it may be an integer, unless otherwise determined
 
@@ -7512,19 +7675,28 @@
                     if (is_integer .and. (.not. first)) is_integer = .false.
 
                     !add it to the string:
-                    tmp = tmp // c
+                    !tmp = tmp // c   !...original
+                    if (ip>len(tmp)) tmp = tmp // repeat(space, chunk_size)
+                    tmp(ip:ip) = c
+                    ip = ip + 1
 
                 case(CK_'.',CK_'E',CK_'e')    !can be present in real numbers
 
                     if (is_integer) is_integer = .false.
 
                     !add it to the string:
-                    tmp = tmp // c
+                    !tmp = tmp // c   !...original
+                    if (ip>len(tmp)) tmp = tmp // repeat(space, chunk_size)
+                    tmp(ip:ip) = c
+                    ip = ip + 1
 
                 case(CK_'0':CK_'9')    !valid characters for numbers
 
                     !add it to the string:
-                    tmp = tmp // c
+                    !tmp = tmp // c   !...original
+                    if (ip>len(tmp)) tmp = tmp // repeat(space, chunk_size)
+                    tmp(ip:ip) = c
+                    ip = ip + 1
 
                 case default
 
@@ -7579,22 +7751,20 @@
 
     implicit none
 
-    character(kind=CK,len=1)                           :: popped
-    integer(IK),intent(in)                             :: unit
-    character(kind=CK,len=:),allocatable,intent(inout) :: str  !only used if unit=0
-    logical(LK),intent(out)                            :: eof
-    logical(LK),intent(in),optional                    :: skip_ws
+    character(kind=CK,len=1)            :: popped
+    integer(IK),intent(in)              :: unit
+    character(kind=CK,len=*),intent(in) :: str  !only used if unit=0
+    logical(LK),intent(out)             :: eof
+    logical(LK),intent(in),optional     :: skip_ws
 
-    integer(IK) :: ios
+    integer(IK) :: ios,str_len
     character(kind=CK,len=1) :: c
     logical(LK) :: ignore
-    integer(IK) :: str_len
-    character(kind=CK,len=:),allocatable :: tmp  !workaround for bug in gfortran 4.9.2 compiler
 
     if (.not. exception_thrown) then
 
         eof = .false.
-        if (.not.present(skip_ws)) then
+        if (.not. present(skip_ws)) then
             ignore = .false.
         else
             ignore = skip_ws
@@ -7605,44 +7775,52 @@
             if (pushed_index > 0) then
 
                 ! there is a character pushed back on, most likely from the number parsing
+                ! NOTE: this can only occur if reading from a file when use_unformatted_stream=.false.
                 c = pushed_char(pushed_index:pushed_index)
                 pushed_index = pushed_index - 1
 
             else
 
                 if (unit/=0) then    !read from the file
-                    read (unit = unit, fmt = '(A1)', advance = 'NO', iostat = ios) c
+
+                    !read the next character:
+                    if (use_unformatted_stream) then
+                        read(unit=unit,pos=ipos,iostat=ios) c
+                    else
+                        read(unit=unit,fmt='(A1)',advance='NO',iostat=ios) c
+                    end if
+                    ipos = ipos + 1
+
+                    !....note: maybe try read the file in chunks...
+                    !.... or use asynchronous read with double buffering 
+                    !     (see Modern Fortran: Style and Usage)
+
                 else    !read from the string
-                    tmp = str   !!! copy to a temp variable to workaround a bug in gfortran 4.9.2
-                    str_len = len(tmp)   !length of the string
-                    if (str_len>0) then
-                        c = tmp(1:1)
-                        if (str_len>1) then
-                            tmp = tmp(2:str_len)  !remove the character that was read
-                        else
-                            tmp = ''    !that was the last one
-                        end if
-                        str = tmp
-                        deallocate(tmp)   !!!
+
+                    str_len = len(str)   !length of the string
+                    if (ipos<=str_len) then
+                        c = str(ipos:ipos)
                         ios = 0
                     else
                         ios = IOSTAT_END  !end of the string
                     end if
+                    ipos = ipos + 1
+
                 end if
 
                 char_count = char_count + 1    !character count in the current line
 
-                if (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
-
-                    char_count = 0
-                    line_count = line_count + 1
-                    cycle
-
-                else if (IS_IOSTAT_END(ios)) then  !end of file
+                if (IS_IOSTAT_END(ios)) then  !end of file
 
                     char_count = 0
                     eof = .true.
                     exit
+
+                elseif (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
+
+                    char_count = 0
+                    line_count = line_count + 1
+                    cycle
 
                 end if
 
@@ -7683,26 +7861,39 @@
 !  SEE ALSO
 !    pop_char
 !
+!  HISTORY
+!    Jacob Williams : 5/3/2015 : replaced original version of this routine.
+!
 !  SOURCE
 
     subroutine push_char(c)
 
     implicit none
 
-    character(kind=CK,len=1), intent(in) :: c
+    character(kind=CK,len=1),intent(in) :: c
 
     character(kind=CK,len=max_numeric_str_len) :: istr
 
     if (.not. exception_thrown) then
 
-        pushed_index = pushed_index + 1
+        if (use_unformatted_stream) then
 
-        if (pushed_index>0 .and. pushed_index<=len(pushed_char)) then
-            pushed_char(pushed_index:pushed_index) = c
+            !in this case, c is ignored, and we just
+            !decrement the stream position counter:
+            ipos = ipos - 1
+
         else
-            call integer_to_string(pushed_index,istr)
-            call throw_exception('Error in push_char: '//&
-                                 'invalid valid of pushed_index: '//trim(istr))
+
+            pushed_index = pushed_index + 1
+
+            if (pushed_index>0 .and. pushed_index<=len(pushed_char)) then
+                pushed_char(pushed_index:pushed_index) = c
+            else
+                call integer_to_string(pushed_index,istr)
+                call throw_exception('Error in push_char: '//&
+                                     'invalid valid of pushed_index: '//trim(istr))
+            end if
+
         end if
 
     end if
