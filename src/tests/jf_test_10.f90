@@ -247,6 +247,16 @@ contains
     else
         if (found) then
             write(error_unit,'(A)') '...success'
+
+            write(error_unit,'(A)') 'json_info...'
+            call json_info(p,var_type,n_children)
+            if (json_failed()) then
+                call json_print_error_message(error_unit)
+                error_cnt = error_cnt + 1
+            else
+                write(error_unit,'(A)') '...success'
+            end if
+
             write(error_unit,'(A)') 'json_remove_if_present...'
             call json_remove_if_present(p,'version.patch')
             if (json_failed()) then

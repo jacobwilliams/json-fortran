@@ -299,71 +299,70 @@
     !    use_unformatted_stream
     !
     !  DESCRIPTION
-    !    If using GFortran and Unicode is enabled, then
+    !    If Unicode is not enabled, then
     !    JSON files are opened using access='STREAM' and
     !    form='UNFORMATTED'.  This allows the file to 
     !    be read faster.
     !
+    !  SEE ALSO
+    !    * access_spec
+    !    * form_spec
+    !
     !  SOURCE
-#if defined __GFORTRAN__ && defined USE_UCS4
+#ifdef USE_UCS4
     logical,parameter :: use_unformatted_stream = .false.
-    character(kind=CDK,len=*),parameter :: access_spec = 'SEQUENTIAL'
-    character(kind=CDK,len=*),parameter :: form_spec   = 'FORMATTED'
 #else
     logical,parameter :: use_unformatted_stream = .true.
-    character(kind=CDK,len=*),parameter :: access_spec = 'STREAM'
-    character(kind=CDK,len=*),parameter :: form_spec   = 'UNFORMATTED'
 #endif
     !*********************************************************
 
-    !JSON file extension
-    character(kind=CDK,len=*),parameter,public :: json_ext = '.json'   !JSON file extension
+    !*********************************************************
+    !****d* json_module/access_spec
+    !
+    !  NAME
+    !    access_spec
+    !
+    !  DESCRIPTION
+    !    If Unicode is not enabled, then
+    !    JSON files are opened using access='STREAM' and
+    !    form='UNFORMATTED'.  This allows the file to 
+    !    be read faster.
+    !
+    !  SEE ALSO
+    !    * use_unformatted_stream
+    !    * form_spec
+    !
+    !  SOURCE
+#ifdef USE_UCS4
+    character(kind=CDK,len=*),parameter :: access_spec = 'SEQUENTIAL'
+#else
+    character(kind=CDK,len=*),parameter :: access_spec = 'STREAM'
+#endif
+    !*********************************************************
 
-    !special JSON characters
-    character(kind=CK,len=*),parameter :: space           = ' '
-    character(kind=CK,len=*),parameter :: start_object    = '{'
-    character(kind=CK,len=*),parameter :: end_object      = '}'
-    character(kind=CK,len=*),parameter :: start_array     = '['
-    character(kind=CK,len=*),parameter :: end_array       = ']'
-    character(kind=CK,len=*),parameter :: delimiter       = ','
-    character(kind=CK,len=*),parameter :: colon_char      = ':'
-    character(kind=CK,len=*),parameter :: bspace          = achar(8)
-    character(kind=CK,len=*),parameter :: horizontal_tab  = achar(9)
-    character(kind=CK,len=*),parameter :: newline         = achar(10)
-    character(kind=CK,len=*),parameter :: formfeed        = achar(12)
-    character(kind=CK,len=*),parameter :: carriage_return = achar(13)
-    character(kind=CK,len=*),parameter :: quotation_mark  = achar(34)
-    character(kind=CK,len=*),parameter :: slash           = achar(47)
-    character(kind=CK,len=*),parameter :: backslash       = achar(92)
-
-    ! Control characters, possibly in unicode
-    integer, private :: i
-    character(kind=CK,len=*),parameter :: control_chars(32) = [(achar(i),i=1,31), achar(127)]
-
-    !for indenting (Note: jsonlint.com uses 4 spaces)
-    integer(IK),parameter :: spaces_per_tab = 2
-
-    !find out the precision of the floating point number system
-    !and set safety factors
-    integer(IK),parameter :: rp_safety_factor = 1
-    integer(IK),parameter :: rp_addl_safety = 1
-    integer(IK),parameter :: real_precision = rp_safety_factor*precision(1.0_RK) + &
-                                              rp_addl_safety
-
-    !Get the number of possible digits in the exponent when using decimal number system
-    integer(IK),parameter :: real_exponent_digits = floor( 1 + log10( &
-                                  real(max(maxexponent(1.0_RK),abs(minexponent(1.0_RK))),&
-                                  kind=RK) ) )
-
-    !6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
-    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6
-    ! real format set by library initialization
-    character(kind=CDK,len=*),parameter :: int_fmt  = '(I0)'       !minimum width format for integers
-    character(kind=CK, len=*),parameter :: star     = '*'          !for invalid numbers
-
-     !for allocatable strings:
-     integer(IK),parameter :: chunk_size = 100  !allocate chunks of this size
-     integer(IK) :: ipos = 1    !next character to read
+    !*********************************************************
+    !****d* json_module/form_spec
+    !
+    !  NAME
+    !    form_spec
+    !
+    !  DESCRIPTION
+    !    If Unicode is not enabled, then
+    !    JSON files are opened using access='STREAM' and
+    !    form='UNFORMATTED'.  This allows the file to 
+    !    be read faster.
+    !
+    !  SEE ALSO
+    !    * use_unformatted_stream
+    !    * access_spec
+    !
+    !  SOURCE
+#ifdef USE_UCS4
+    character(kind=CDK,len=*),parameter :: form_spec   = 'FORMATTED'
+#else
+    character(kind=CDK,len=*),parameter :: form_spec   = 'UNFORMATTED'
+#endif
+    !*********************************************************
 
     !*********************************************************
     !****d* json_module/var_type
@@ -1075,14 +1074,65 @@
     public :: operator(==)
 # endif
 
-    !
-    ! Note: the following global variables make this module non thread safe.
-    !
+    !JSON file extension
+    character(kind=CDK,len=*),parameter,public :: json_ext = '.json'   !JSON file extension
+
+    !special JSON characters
+    character(kind=CK,len=*),parameter :: space           = ' '
+    character(kind=CK,len=*),parameter :: start_object    = '{'
+    character(kind=CK,len=*),parameter :: end_object      = '}'
+    character(kind=CK,len=*),parameter :: start_array     = '['
+    character(kind=CK,len=*),parameter :: end_array       = ']'
+    character(kind=CK,len=*),parameter :: delimiter       = ','
+    character(kind=CK,len=*),parameter :: colon_char      = ':'
+    character(kind=CK,len=*),parameter :: bspace          = achar(8)
+    character(kind=CK,len=*),parameter :: horizontal_tab  = achar(9)
+    character(kind=CK,len=*),parameter :: newline         = achar(10)
+    character(kind=CK,len=*),parameter :: formfeed        = achar(12)
+    character(kind=CK,len=*),parameter :: carriage_return = achar(13)
+    character(kind=CK,len=*),parameter :: quotation_mark  = achar(34)
+    character(kind=CK,len=*),parameter :: slash           = achar(47)
+    character(kind=CK,len=*),parameter :: backslash       = achar(92)
+
+    !These were parameters, but gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
+    !necessitates moving them here to be variables
+    character(kind=CK,len=4) :: null_str  = 'null'
+    character(kind=CK,len=4) :: true_str  = 'true'
+    character(kind=CK,len=5) :: false_str = 'false'
+
+    ! Control characters, possibly in unicode
+    integer, private :: i_
+    character(kind=CK,len=*),parameter :: control_chars(32) = [(achar(i_),i_=1,31), achar(127)]
+
+    !for indenting (Note: jsonlint.com uses 4 spaces)
+    integer(IK),parameter :: spaces_per_tab = 2
+
+    !find out the precision of the floating point number system
+    !and set safety factors
+    integer(IK),parameter :: rp_safety_factor = 1
+    integer(IK),parameter :: rp_addl_safety = 1
+    integer(IK),parameter :: real_precision = rp_safety_factor*precision(1.0_RK) + &
+                                              rp_addl_safety
+
+    !Get the number of possible digits in the exponent when using decimal number system
+    integer(IK),parameter :: real_exponent_digits = floor( 1 + log10( &
+                                  real(max(maxexponent(1.0_RK),abs(minexponent(1.0_RK))),&
+                                  kind=RK) ) )
+
+    !6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
+    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6
+    ! real format set by library initialization
+    character(kind=CDK,len=*),parameter :: int_fmt  = '(I0)' !minimum width format for integers
+    character(kind=CK, len=*),parameter :: star     = '*'    !for invalid numbers
 
     !real string printing:
     character(kind=CDK,len=:),allocatable :: real_fmt  !the format string to use for real numbers
                                                        ! [set in json_initialize]
     logical(LK) :: compact_real = .true.   !to use the "compact" form of real numbers for output
+
+    !
+    ! Note: the following global variables make this module non thread safe.
+    !
 
     !exception handling [private variables]
     logical(LK) :: is_verbose = .false.                 !if true, all exceptions are immediately printed to console
@@ -1095,11 +1145,9 @@
     integer(IK) :: pushed_index = 0
     character(kind=CK,len=10) :: pushed_char = ''  !JW : what is this magic number 10??
 
-    !These were parameters, but gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
-    !necessitates moving them here to be variables
-    character(kind=CK,len=4) :: null_str        = 'null'
-    character(kind=CK,len=4) :: true_str        = 'true'
-    character(kind=CK,len=5) :: false_str       = 'false'
+    !for allocatable strings:
+    integer(IK),parameter :: chunk_size = 100  !allocate chunks of this size
+    integer(IK) :: ipos = 1    !next character to read
 
     contains
 !*****************************************************************************************
@@ -6110,10 +6158,10 @@
 !    calls will automatically be cleared.
 !
 !  HISTORY
-!    Jacob Williams : 01/13/2015 : added read from string option.
-!    Izaak Beekman  : 03/08/2015 : moved read from string to separate
-!    subroutine, and error annotation
-!    to separate subroutine
+!    * Jacob Williams : 01/13/2015 : added read from string option.
+!    * Izaak Beekman  : 03/08/2015 : moved read from string to separate
+!      subroutine, and error annotation
+!      to separate subroutine.
 !
 !  SOURCE
 
