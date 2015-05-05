@@ -70,7 +70,9 @@ contains
     integer,intent(out) :: error_cnt
     character(kind=CK,len=:),allocatable :: cval
     type(json_file) :: json    !the JSON structure read from the file:
+# ifdef USE_UCS4
     type(json_file) :: clone
+# endif
 
     error_cnt = 0
     call json_initialize()
