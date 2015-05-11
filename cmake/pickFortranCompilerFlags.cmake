@@ -17,7 +17,7 @@ if ( NOT Fortran_FLAGS_INIT )
       # warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure
       # name. (R1214.4). In the context of F2008 this is an erroneous warning.
       # See https://prd1idz.cps.intel.com/en-us/forums/topic/486629
-      set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -warn -stand f08 -diag-disable 7601" )
+      set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -warn -stand f08 -diag-disable 7601 -diag-disable 5142" )
     endif ()
     if ( ENABLE_RUNTIME_CHECKS )
       set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check all" )

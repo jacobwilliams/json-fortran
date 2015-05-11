@@ -79,7 +79,7 @@ LIBOUT='libjsonfortran.a'       # name of json library
 # warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure name. (R1214.4).
 # In the context of F2008 this is an erroneous warning.
 # See https://prd1idz.cps.intel.com/en-us/forums/topic/486629
-INTELCOMPILERFLAGS='-c -O2 -warn -stand f08 -diag-disable 7601 -diag-disable 4013 -traceback'
+INTELCOMPILERFLAGS='-c -O2 -warn -stand f08 -diag-disable 7601 -diag-disable 4013 -diag-disable 5142 -traceback'
 #INTELCOMPILERFLAGS='-c -O2 -warn -traceback -stand f08 -assume protect_parens -assume buffered_io -check all'
 
 GNUCOMPILERFLAGS='-c -O2 -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008'

@@ -19,7 +19,7 @@ env = Environment()
 if env['FORTRAN'] == 'gfortran':
     env = Environment(F90FLAGS = '-O2 -fbacktrace -g -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008 -J',)
 elif env['FORTRAN'] == 'ifort':
-    env = Environment(F90FLAGS = '-O2 -warn -stand f08 -diag-disable 7601 -traceback -module lib',)
+    env = Environment(F90FLAGS = '-O2 -warn -stand f08 -diag-disable 7601 -diag-disable 5142 -traceback -module lib',)
 
 src = join('src','json_module.F90')
 ar  = join('lib','libjsonfortran'+env['LIBSUFFIX'])
