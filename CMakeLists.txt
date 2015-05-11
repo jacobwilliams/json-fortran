@@ -87,7 +87,7 @@ endif ()
 #---------------------------------------------
 # See if our compiler supports ISO 10646/UCS4
 #---------------------------------------------
-set ( ENABLE_UNICODE FLASE CACHE BOOL
+set ( ENABLE_UNICODE FALSE CACHE BOOL
   "Enable unicode/UCS4 support" )
 if ( ENABLE_UNICODE )
   try_run( UCS4_TEST_RUNS UCS4_TEST_COMPILES
