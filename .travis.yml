@@ -3,8 +3,6 @@ language: python
 python:
   - 2.7
 
-cache: apt
-
 # Build matrix: Run the three build systems and tests in parallel
 env:
   global:
@@ -35,13 +33,14 @@ env:
       FoBiS="no"
 
 before_install:
-  - ulimit -s unlimited
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - if [[ $SPECIFIC_DEPENDS == *cmake* ]]; then sudo apt-add-repository -y ppa:kalakris/cmake; fi
+  - sudo apt-get update -qq
+  - if [[ $JLINT == [yY]* ]]; then curl -sL https://deb.nodesource.com/setup | sudo bash -x - ; fi
   - if [[ $CHECK_README_PROGS == [yY]* ]]; then wget http://people.sc.fsu.edu/~jburkardt/f_src/f90split/f90split.f90; fi
   - if [[ $DOCS == [yY]* ]]; then export DEPENDS="$DEPENDS exuberant-ctags"; fi
-  - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
-  - if [[ $SPECIFIC_DEPENDS == *cmake* ]]; then sudo apt-add-repository -y ppa:kalakris/cmake; fi
-  - if [[ $JLINT == [yY]* ]]; then curl -sL https://deb.nodesource.com/setup | sudo bash -; else sudo apt-get update -qq; fi
   - if [[ $DOCS == [yY]* ]]; then wget http://launchpadlibrarian.net/70968359/robodoc_4.99.41-1_amd64.deb; fi
+  - ulimit -s unlimited
 
 install:
   - sudo apt-get install -y $SPECIFIC_DEPENDS $DEPENDS
