@@ -170,6 +170,15 @@ if ( NOT SKIP_DOC_GEN )
       COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using ROBODoc" )
     add_custom_target ( documentation ALL
       DEPENDS ${ROBODOC_OUTPUTS} )
+    set ( INSTALL_API_DOCUMENTATION TRUE
+      CACHE BOOL "Install ROBODoc generated documentation?" )
+    if ( INSTALL_API_DOCUMENTATION )
+      if ( USE_GNU_INSTALL_CONVENTION )
+	install ( DIRECTORY "${DOC_DIR}/" DESTINATION "${CMAKE_INSTALL_DOCDIR}" )
+      else ()
+	install ( DIRECTORY "${DOC_DIR}/" DESTINATION "${CMAKE_INSTALL_PREFIX}/${PACKAGE_VERSION}/doc" )
+      endif ()
+    endif ()
   else () # Not found
     message ( WARNING
       "ROBODoc not found! Please set the CMake cache variable ROBODOC to point to the installed ROBODoc binary, and reconfigure or disable building the documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/ If you do not wish to install ROBODoc and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
