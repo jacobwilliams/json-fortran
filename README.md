@@ -85,6 +85,7 @@ enable_language ( Fortran )
 project ( jf_test NONE )
 
 find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.1.0 REQUIRED )
+include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
 foreach ( UNIT_TEST ${JF_TEST_SRCS} )
