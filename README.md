@@ -53,7 +53,9 @@ various Fortran 2003 and Fortran 2008 features such as: allocatable
 strings, `newunit`, `generic`, `class`, and `abstract interface`.
 It has been successfully compiled with the [Intel Fortran compiler
 13.1.0](https://software.intel.com/en-us/non-commercial-software-development) (and greater) and the recent [4.9 release of the GNU gfortran
-compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9).
+compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9). It has also
+been reported that the library can be built (using the CMake build
+script) with the [NAG Fortran compiler 6.0](http://www.nag.com/nagware/NP/NP_desc.asp)
 
 Currently, several ways are provided to build the jsonfortran library
 (libjsonfortran).
