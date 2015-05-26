@@ -34,7 +34,7 @@ project ( jsonfortran NONE )
 # C.F. semver.org
 #----------------------------------
 set ( VERSION_MAJOR 4 )
-set ( VERSION_MINOR 0 )
+set ( VERSION_MINOR 1 )
 set ( VERSION_PATCH 0 )
 set ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 
@@ -49,27 +49,40 @@ set ( JF_TEST_UCS4_SUPPORT_SRC "${CMAKE_SOURCE_DIR}/src/tests/introspection/test
 # Collect all the mod files into their own
 # directory to ease installation issues
 #-----------------------------------------
-set ( MODULE_DIR "${CMAKE_BINARY_DIR}/lib" )
+set ( MODULE_DIR "${CMAKE_BINARY_DIR}/include" )
 
 #-------------------------------------
 # Define where our files get installed
 #-------------------------------------
+set ( USE_GNU_INSTALL_CONVENTION FALSE
+  CACHE BOOL
+  "Install library, module file and documentation to standard GNU locations. Do not use this if supporting multiple Fortran compilers" )
+
 # Set the package name to be specific to the compiler used, so that
 # versions compiled with different compilers can be installed in parallel
 string ( TOLOWER ${CMAKE_PROJECT_NAME}-${CMAKE_Fortran_COMPILER_ID} PACKAGE_NAME )
-string ( TOLOWER ${CMAKE_Fortran_COMPILER_ID}-compiler              FCOMPILER_DIR )
 set ( PACKAGE_VERSION "${PACKAGE_NAME}-${VERSION}" )
 
+if (USE_GNU_INSTALL_CONVENTION)
+  include(GNUInstallDirs)
+  set ( INSTALL_MOD_DIR "${CMAKE_INSTALL_INCLUDEDIR}" )
+  set ( INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}")
+  set( ABS_LIB_INSTALL_DIR "\${CMAKE_INSTALL_FULL_LIBDIR}" )
+else ()
+  # Most of this could be 'wrong' for Windows/Cygwin
+  set ( INSTALL_MOD_DIR    "${PACKAGE_VERSION}/lib" )
+  set ( INSTALL_LIB_DIR    "${INSTALL_MOD_DIR}" )
+  set( ABS_LIB_INSTALL_DIR "\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIB_DIR}" )
+endif ()
 
-# Most of this could be 'wrong' for Windows/Cygwin
-
-set ( INSTALL_MOD_DIR    "${PACKAGE_VERSION}/lib" )
-set ( INSTALL_LIB_DIR    "${INSTALL_MOD_DIR}" )
-set( ABS_LIB_INSTALL_DIR "\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIB_DIR}" )
 
 # Put package export CMake files where they can be found
 # use `find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} <version> REQUIRED )`
-set ( EXPORT_INSTALL_DIR "${PACKAGE_VERSION}/cmake" )
+if (USE_GNU_INSTALL_CONVENTION)
+  set ( EXPORT_INSTALL_DIR "${INSTALL_LIB_DIR}/cmake/${PACKAGE_VERSION}" )
+else ()
+  set ( EXPORT_INSTALL_DIR "${PACKAGE_VERSION}/cmake" )
+endif ()
 
 if ( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
   set ( ENABLE_DYLIBS_USE_RPATH TRUE CACHE BOOL
@@ -157,6 +170,15 @@ if ( NOT SKIP_DOC_GEN )
       COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using ROBODoc" )
     add_custom_target ( documentation ALL
       DEPENDS ${ROBODOC_OUTPUTS} )
+    set ( INSTALL_API_DOCUMENTATION TRUE
+      CACHE BOOL "Install ROBODoc generated documentation?" )
+    if ( INSTALL_API_DOCUMENTATION )
+      if ( USE_GNU_INSTALL_CONVENTION )
+	install ( DIRECTORY "${DOC_DIR}/" DESTINATION "${CMAKE_INSTALL_DOCDIR}" )
+      else ()
+	install ( DIRECTORY "${DOC_DIR}/" DESTINATION "${CMAKE_INSTALL_PREFIX}/${PACKAGE_VERSION}/doc" )
+      endif ()
+    endif ()
   else () # Not found
     message ( WARNING
       "ROBODoc not found! Please set the CMake cache variable ROBODOC to point to the installed ROBODoc binary, and reconfigure or disable building the documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/ If you do not wish to install ROBODoc and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
