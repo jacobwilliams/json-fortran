@@ -3,6 +3,27 @@ json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilli
 
 A Fortran 2008 JSON API
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
+**Table of Contents**
+
+- [json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)](#json-fortran-github-releasehttpsimgshieldsiogithubreleasejacobwilliamsjson-fortransvgstyleplastichttpsgithubcomjacobwilliamsjson-fortranreleaseslatest)
+    - [Status](#status)
+    - [Brief description](#brief-description)
+    - [Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)](#download-github-releasehttpsimgshieldsiogithubreleasejacobwilliamsjson-fortransvgstyleplastichttpsgithubcomjacobwilliamsjson-fortranreleases)
+    - [Building the library](#building-the-library)
+    - [Reading JSON from a file](#reading-json-from-a-file)
+    - [Reading JSON from a string](#reading-json-from-a-string)
+    - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
+    - [Writing a JSON file](#writing-a-json-file)
+    - [Building a JSON file from scratch](#building-a-json-file-from-scratch)
+    - [Documentation](#documentation)
+    - [Contributing [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](CONTRIBUTING.md)](#contributing-ready-in-backloghttpsbadgewaffleiojacobwilliamsjson-fortranpnglabelreadytitlereadycontributingmd)
+    - [License](#license)
+    - [Miscellaneous](#miscellaneous)
+
+<!-- markdown-toc end -->
+
+
 Status
 ------
 [![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
