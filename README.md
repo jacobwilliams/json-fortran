@@ -3,6 +3,27 @@ json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilli
 
 A Fortran 2008 JSON API
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
+**Table of Contents**
+
+- [json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)](#json-fortran-github-releasehttpsimgshieldsiogithubreleasejacobwilliamsjson-fortransvgstyleplastichttpsgithubcomjacobwilliamsjson-fortranreleaseslatest)
+    - [Status](#status)
+    - [Brief description](#brief-description)
+    - [Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)](#download-github-releasehttpsimgshieldsiogithubreleasejacobwilliamsjson-fortransvgstyleplastichttpsgithubcomjacobwilliamsjson-fortranreleases)
+    - [Building the library](#building-the-library)
+    - [Reading JSON from a file](#reading-json-from-a-file)
+    - [Reading JSON from a string](#reading-json-from-a-string)
+    - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
+    - [Writing a JSON file](#writing-a-json-file)
+    - [Building a JSON file from scratch](#building-a-json-file-from-scratch)
+    - [Documentation](#documentation)
+    - [Contributing [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](CONTRIBUTING.md)](#contributing-ready-in-backloghttpsbadgewaffleiojacobwilliamsjson-fortranpnglabelreadytitlereadycontributingmd)
+    - [License](#license)
+    - [Miscellaneous](#miscellaneous)
+
+<!-- markdown-toc end -->
+
+
 Status
 ------
 [![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
@@ -32,7 +53,9 @@ various Fortran 2003 and Fortran 2008 features such as: allocatable
 strings, `newunit`, `generic`, `class`, and `abstract interface`.
 It has been successfully compiled with the [Intel Fortran compiler
 13.1.0](https://software.intel.com/en-us/non-commercial-software-development) (and greater) and the recent [4.9 release of the GNU gfortran
-compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9).
+compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9). It has also
+been reported that the library can be built (using the CMake build
+script) with the [NAG Fortran compiler 6.0](http://www.nag.com/nagware/NP/NP_desc.asp)
 
 Currently, several ways are provided to build the jsonfortran library
 (libjsonfortran).
@@ -64,6 +87,7 @@ enable_language ( Fortran )
 project ( jf_test NONE )
 
 find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.1.0 REQUIRED )
+include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
 foreach ( UNIT_TEST ${JF_TEST_SRCS} )
