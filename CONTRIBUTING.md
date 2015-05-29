@@ -39,13 +39,15 @@ Looking to contribute something to [json-fortran](README.md)? **Here's how you c
 - Try not to pollute your pull request with unintended changes--keep them simple and small
 - Pull requests should address one issue at a time, and each commit should be a set of self contained, related changes. If you forget something in a commit, please use `git rebase -i <ref>^` to amend and/or squash erroneous commits. Here `<ref>` is the reference to to oldest commit needing to be modified (SHA, or `HEAD~4`, etc.)
 - Each commit should compile, and ideally pass the tests. Very complicated new features or fixes, may have commits that don't pass tests, if otherwise the commit history would include far to many changes in any given commit. Use an interactive rebase to fix any of these issues, as described above.
-- Pull requests should always be based on the upstream master, jacobwilliams/json-fortran:master. Please `rebase` your branch on top of the latest upstream master. Assuming you've added the upstream remote by running something like:
+- Pull requests should always be based on the upstream master,
+jacobwilliams/json-fortran:master. Please `rebase` your branch on top
+of the latest upstream master. Assuming you are on your branch and you've added the upstream remote by running something like:
 ```
 git remote add upstream git://github.com/jacobwilliams/json-fortran.git
 ```
 You can accomplish this by running:
 ```
-git rebase upstream
+git rebase upstream/master
 ```
 - Create a branch in your fork with a descriptive name that also includes the [issue number](https://github.com/jacobwilliams/json-fortran/issues), if applicable. For example, after forking the repo, you can run something like `git checkout -b Unicode-support-issue-35` before starting work on [issue #35 : Unicode support](https://github.com/jacobwilliams/json-fortran/issues/35)
 - When you're content with your changes, your commits are clean, self contained, with concise descriptive messages, and your changes compile and pass the tests, submit a pull request. We will review your changes, and may ask for certain modifications to be made.
