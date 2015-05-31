@@ -301,7 +301,7 @@
     !  DESCRIPTION
     !    If Unicode is not enabled, then
     !    JSON files are opened using access='STREAM' and
-    !    form='UNFORMATTED'.  This allows the file to 
+    !    form='UNFORMATTED'.  This allows the file to
     !    be read faster.
     !
     !  SEE ALSO
@@ -325,7 +325,7 @@
     !  DESCRIPTION
     !    If Unicode is not enabled, then
     !    JSON files are opened using access='STREAM' and
-    !    form='UNFORMATTED'.  This allows the file to 
+    !    form='UNFORMATTED'.  This allows the file to
     !    be read faster.
     !
     !  SEE ALSO
@@ -349,7 +349,7 @@
     !  DESCRIPTION
     !    If Unicode is not enabled, then
     !    JSON files are opened using access='STREAM' and
-    !    form='UNFORMATTED'.  This allows the file to 
+    !    form='UNFORMATTED'.  This allows the file to
     !    be read faster.
     !
     !  SEE ALSO
@@ -4810,6 +4810,8 @@
                                  ' string cannot be converted to an integer: '//trim(str))
         end if
 
+    else
+        ival = 0
     end if
 
     end function string_to_integer
@@ -6363,6 +6365,7 @@
             !get the current line from the string:
             ! [this is done by counting the newline characters]
             i_nl_prev = 0  !index of previous newline character
+            i_nl = 2  !just in case line_count = 0
             do i=1,line_count
                 i_nl = index(str(i_nl_prev+1:),newline)
                 if (i_nl==0) then   !last line - no newline character
@@ -6466,12 +6469,12 @@
     integer(IK) :: istart,iend,ios
     character(kind=CK,len=1) :: c
 
-    !....update for the new STREAM version..... 
-      
+    !....update for the new STREAM version.....
+
     !   !!! !!!! not quite right for EXAMPLE 6 case 2 .....  DOUBLE CHECK THIS...
 
     istart = ipos
-    do 
+    do
         if (istart<=1) then
             istart = 1
             exit
@@ -7576,15 +7579,16 @@
 
         end do
 
-    end if
 
-    !trim the string if necessary:
-    if (ip<len(string)+1) then
-        if (ip==1) then
-            string = ''
-        else
-            string = string(1:ip-1)
+        !trim the string if necessary:
+        if (ip<len(string)+1) then
+            if (ip==1) then
+                string = ''
+            else
+                string = string(1:ip-1)
+            end if
         end if
+
     end if
 
     end subroutine parse_string
@@ -7840,7 +7844,7 @@
                     ipos = ipos + 1
 
                     !....note: maybe try read the file in chunks...
-                    !.... or use asynchronous read with double buffering 
+                    !.... or use asynchronous read with double buffering
                     !     (see Modern Fortran: Style and Usage)
 
                 else    !read from the string
