@@ -6,20 +6,19 @@ A Fortran 2008 JSON API
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
 **Table of Contents**
 
-- [json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)](#json-fortran-github-releasehttpsimgshieldsiogithubreleasejacobwilliamsjson-fortransvgstyleplastichttpsgithubcomjacobwilliamsjson-fortranreleaseslatest)
-    - [Status](#status)
-    - [Brief description](#brief-description)
-    - [Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)](#download-github-releasehttpsimgshieldsiogithubreleasejacobwilliamsjson-fortransvgstyleplastichttpsgithubcomjacobwilliamsjson-fortranreleases)
-    - [Building the library](#building-the-library)
-    - [Reading JSON from a file](#reading-json-from-a-file)
-    - [Reading JSON from a string](#reading-json-from-a-string)
-    - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
-    - [Writing a JSON file](#writing-a-json-file)
-    - [Building a JSON file from scratch](#building-a-json-file-from-scratch)
-    - [Documentation](#documentation)
-    - [Contributing [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](CONTRIBUTING.md)](#contributing-ready-in-backloghttpsbadgewaffleiojacobwilliamsjson-fortranpnglabelreadytitlereadycontributingmd)
-    - [License](#license)
-    - [Miscellaneous](#miscellaneous)
+  - [Status](#status)
+  - [Brief description](#brief-description)
+  - [Download](#download-)
+  - [Building the library](#building-the-library)
+  - [Reading JSON from a file](#reading-json-from-a-file)
+  - [Reading JSON from a string](#reading-json-from-a-string)
+  - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
+  - [Writing a JSON file](#writing-a-json-file)
+  - [Building a JSON file from scratch](#building-a-json-file-from-scratch)
+  - [Documentation](#documentation)
+  - [Contributing](#contributing-)
+  - [License](#license)
+  - [Miscellaneous](#miscellaneous)
 
 <!-- markdown-toc end -->
 
@@ -34,17 +33,20 @@ Status
 [![In Progress](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=In%20Progress&title=In%20Progress)](https://waffle.io/jacobwilliams/json-fortran)
 [![Needs Review](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Needs%20Review&title=Needs%20Review)](https://waffle.io/jacobwilliams/json-fortran)
 
+[top](#json-fortran-)
 Brief description
 ---------------
 
 A user-friendly and object-oriented API for reading and writing JSON files, written in
 modern Fortran.  The source code is a single Fortran module file ([json_module.F90](https://github.com/jacobwilliams/json-fortran/blob/master/src/json_module.F90)).
 
+[top](#json-fortran-)
 Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
 --------------------
 
 Download the official versioned releases [here](https://github.com/jacobwilliams/json-fortran/releases/latest).  Or, get the latest development code from the master branch [here](https://github.com/jacobwilliams/json-fortran.git).
 
+[top](#json-fortran-)
 Building the library
 --------------------
 
@@ -86,7 +88,7 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.1.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.1.1 REQUIRED )
 include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
@@ -99,6 +101,7 @@ foreach ( UNIT_TEST ${JF_TEST_SRCS} )
 endforeach()
 ```
 
+[top](#json-fortran-)
 Reading JSON from a file
 ---------------
 
@@ -140,6 +143,7 @@ for more examples. The source files may be found in `src/tests/`.
     end program example1
 ```
 
+[top](#json-fortran-)
 Reading JSON from a string
 ---------------
 JSON can also be read directly from a character string like so:
@@ -159,6 +163,7 @@ After reading a JSON file, if you want to change the values of some of the varia
     call json%update('version.patch',0,found)  !change patch to 0
 ```
 
+[top](#json-fortran-)
 Writing a JSON file
 ---------------
 
@@ -169,6 +174,7 @@ To print the JSON file (either to a file or the console), the `print_file` metho
     call json%print_file(iunit)    !prints to the file connected to iunit
 ```
 
+[top](#json-fortran-)
 Building a JSON file from scratch
 ---------------
 
@@ -244,19 +250,23 @@ The code above produces the file:
 }
 ```
 
+[top](#json-fortran-)
 Documentation
 --------------
 
 The API documentation for the latest release version can be found [here](http://jacobwilliams.github.io/json-fortran).  The documentation can also be generated by processing the source files with [RoboDoc](http://rfsber.home.xs4all.nl/Robo/).  Note that both the shell script, CMake, and SCons will also generate these files automatically in the documentation folder, assuming you have RoboDoc installed.
 
+[top](#json-fortran-)
 Contributing [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](CONTRIBUTING.md)
 ------------
 Want to help?  Take a quick look at our [contributing guidelines](CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo).
 
+[top](#json-fortran-)
 License
 --------
 The json-fortran source code and related files and documentation are distributed under a permissive free software license (BSD-style).  See the [LICENSE](https://raw.githubusercontent.com/jacobwilliams/json-fortran/master/LICENSE) file for more details.
 
+[top](#json-fortran-)
 Miscellaneous
 ---------------
 
@@ -265,3 +275,5 @@ Miscellaneous
 * [json-fortran on Travis CI](https://travis-ci.org/jacobwilliams/json-fortran)
 * [json-fortran on Waffle.IO](https://waffle.io/jacobwilliams/json-fortran)
 * [json-fortran on Coveralls.IO](https://coveralls.io/r/jacobwilliams/json-fortran)
+
+[top](#json-fortran-)

@@ -197,6 +197,9 @@ set ( ENABLE_TESTS TRUE CACHE BOOL
 if ( ENABLE_TESTS )
   enable_testing()
 
+  # emulate GNU Autotools `make check`
+  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+
   find_program ( JSONLINT jsonlint )
   find_program ( DIFF     diff )
   file ( COPY "${CMAKE_SOURCE_DIR}/files"
@@ -235,8 +238,9 @@ if ( ENABLE_TESTS )
   set ( UNIT_TESTS '' )
   foreach ( UNIT_TEST ${JF_TEST_SRCS} )
     get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
-    add_executable ( ${TEST} ${UNIT_TEST} )
+    add_executable ( ${TEST} EXCLUDE_FROM_ALL ${UNIT_TEST} )
     target_link_libraries ( ${TEST} ${LIB_NAME} )
+    add_dependencies ( check ${TEST} )
     set_target_properties ( ${TEST}
       PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
