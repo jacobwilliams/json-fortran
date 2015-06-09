@@ -26,7 +26,7 @@ A Fortran 2008 JSON API
 Status
 ------
 [![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
-[![Coveralls branch](https://img.shields.io/coveralls/jacobwilliams/json-fortran/master.svg?style=plastic)](https://coveralls.io/r/jacobwilliams/json-fortran) <br/>
+[![codecov.io](http://codecov.io/github/jacobwilliams/json-fortran/coverage.svg?branch=master)](http://codecov.io/github/jacobwilliams/json-fortran?branch=master)<br/>
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Blocked by Vendor Bug](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=vendor%20bug&title=Blocked%20by%20Vendor%20Bug)](https://waffle.io/jacobwilliams/json-fortran)
 [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/#contributing-)
@@ -296,6 +296,6 @@ Miscellaneous
 * For more information about JSON, see: <http://www.json.org/>
 * [json-fortran on Travis CI](https://travis-ci.org/jacobwilliams/json-fortran)
 * [json-fortran on Waffle.IO](https://waffle.io/jacobwilliams/json-fortran)
-* [json-fortran on Coveralls.IO](https://coveralls.io/r/jacobwilliams/json-fortran)
+* [json-fortran on Codecov.IO](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
 
 [top](#json-fortran-)
