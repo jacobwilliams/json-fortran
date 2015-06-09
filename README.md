@@ -44,7 +44,29 @@ modern Fortran.  The source code is a single Fortran module file ([json_module.F
 Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
 --------------------
 
-Download the official versioned releases [here](https://github.com/jacobwilliams/json-fortran/releases/latest).  Or, get the latest development code from the master branch [here](https://github.com/jacobwilliams/json-fortran.git).
+Download the official versioned releases
+[here](https://github.com/jacobwilliams/json-fortran/releases/latest).
+Or, get the latest development code from the master branch
+[here](https://github.com/jacobwilliams/json-fortran.git).
+
+__NEWS:__ As of June 7, 2015,
+[json-fortran](https://github.com/jacobwilliams/json-fortran) can be
+downloaded and installed with the [homebrew](https://brew.sh) package
+manager on Mac OS X. Once [homebrew](https://brew.sh) is installed,
+make sure that the formulae are up to date, view the package options
+and caveates, and install the
+[json-fortran formula](http://braumeister.org/formula/json-fortran):
+
+```bash
+brew update
+brew info json-fortran
+brew install --with-unicode-support json-fortran
+```
+
+_Please note_, if you wish to support usage of json-fortran with
+multiple Fortran compilers, please follow the CMake installation
+instructions below, as the homebrew installation is only intended to
+support a single Fortran compiler. Cheers! :beers:
 
 [top](#json-fortran-)
 Building the library
@@ -66,9 +88,9 @@ Currently, several ways are provided to build the jsonfortran library
 
 * A [Visual Studio](http://www.visualstudio.com) project is included for building the library (and unit tests) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
-* An [SCons](http://www.scons.org) `SConstruct` file.  The library and unit tests are built by typing `scons` and tested by typing `scons test`. The library may be optionally installed by `scons install` or `sudo scons install`.
+* A [SCons](http://www.scons.org) `SConstruct` file.  The library and unit tests are built by typing `scons` and tested by typing `scons test`. The library may be optionally installed by `scons install` or `sudo scons install`.
 
-* Additionally, a [CMake](http://www.cmake.org) build
+* A [CMake](http://www.cmake.org) build
 system is provided. This build system has been tested on Mac and Linux
 using the Intel Fortran Compiler, gfortran 4.9, and NAG Fortran 6.0. It has not been
 tested on Windows. This CMake based build provides an install target,
