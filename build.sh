@@ -237,6 +237,7 @@ fi
 if [[ $CODE_COVERAGE == [yY]* ]]; then
     echo "Trying to compile with code coverage instrumentation."
     COVERAGE="-coverage"
+    FCOMPILERFLAGS+=' -O0'
 fi
 
 if [[ $CODE_PROFILE == [yY]* ]]; then
