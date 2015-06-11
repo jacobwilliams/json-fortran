@@ -53,11 +53,11 @@ install:
 
 script:
   - echo $BUILD_SCRIPT
-  - echo $BUILD_SCRIPT | bash -
+  - bash <<<$BUILD_SCRIPT
 
 after_success:
   - cd $TRAVIS_BUILD_DIR
-  - if [[ $CODE_COVERAGE == [yY]* ]]; then gcov -o lib/ src/json_module.F90 && bash <(curl -s https://codecov.io/bash) ; fi
+  - if [[ $CODE_COVERAGE == [yY]* ]]; then bash <(curl -s https://codecov.io/bash) ; fi
   - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
   - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"
   - ./deploy.sh #handles updating documentation for master branch as well as tags
