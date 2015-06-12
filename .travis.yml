@@ -9,13 +9,15 @@ env:
     - DEPENDS="gfortran-4.9"
     - CHECK_README_PROGS="yes"
   matrix:
-      # CMake build with unit tests, no documentation, no coverage analysis
-      # Allow to fail for now until tests are fixed
-    - BUILD_SCRIPT="mkdir cmake-build && cd cmake-build && cmake -DSKIP_DOC_GEN:BOOL=TRUE -DENABLE_UNICODE:BOOL=TRUE .. && make -j 4 check"
+      # CMake build with unit tests, no documentation, with coverage analysis
+      # No unicode so that coverage combined with the build script will cover unicode
+      # and non-unicode code paths
+    - BUILD_SCRIPT="mkdir cmake-build && cd cmake-build && cmake -DSKIP_DOC_GEN:BOOL=TRUE -DCMAKE_BUILD_TYPE=COVERAGE .. && make -j 4 check"
       SPECIFIC_DEPENDS="cmake nodejs"
       JLINT="yes"
       DOCS="no"
       FoBiS="no"
+      CODE_COVERAGE="yes"
 
       # build with build.sh, make documentation, run unit tests and perform coverage analysis
     - BUILD_SCRIPT="./build.sh --coverage --enable-unicode"
