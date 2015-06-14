@@ -1146,6 +1146,9 @@
     integer(IK),parameter :: chunk_size = 100  !allocate chunks of this size
     integer(IK) :: ipos = 1    !next character to read
 
+    !unit number to cause stuff to be output to strings rather than files
+    !See 9.5.6.12 in the F2003/08 standard
+    integer(IK),parameter :: unit2str = -1
     contains
 !*****************************************************************************************
 
@@ -1386,15 +1389,15 @@
     implicit none
 
     class(json_file),intent(inout)  :: me
-    integer(IK),intent(in)          :: iunit  !must be non-zero
+    integer(IK),intent(in)          :: iunit  !must not be -1
 
     integer(IK) :: i
     character(kind=CK,len=:),allocatable :: dummy
 
-    if (iunit/=0) then
+    if (iunit/=unit2str) then
         i = iunit
     else
-        call throw_exception('Error in json_file_print_1: iunit must be nonzero.')
+        call throw_exception('Error in json_file_print_1: iunit must not be -1.')
         return
     end if
 
@@ -4217,7 +4220,7 @@
     character(kind=CK,len=:),intent(out),allocatable :: str
 
     str = ''
-    call json_value_print(me, iunit=0, str=str, indent=1, colon=.true.)
+    call json_value_print(me, iunit=unit2str, str=str, indent=1, colon=.true.)
 
     end subroutine json_value_to_string
 !*****************************************************************************************
@@ -4232,7 +4235,7 @@
 !    Print the JSON structure to a file.
 !
 !  INPUT
-!    * iunit is the nonzero file unit (the file must already have been opened).
+!    * iunit is the file unit (the file must already have been opened, can't be -1).
 !
 !  AUTHOR
 !    Jacob Williams, 6/20/2014
@@ -4244,13 +4247,13 @@
     implicit none
 
     type(json_value),pointer,intent(in)  :: me
-    integer(IK),intent(in)               :: iunit    !must be non-zero
+    integer(IK),intent(in)               :: iunit    !must not be -1
     character(kind=CK,len=:),allocatable :: dummy
 
-    if (iunit/=0) then
+    if (iunit/=unit2str) then
         call json_value_print(me,iunit,str=dummy, indent=1, colon=.true.)
     else
-        call throw_exception('Error in json_print: iunit must be nonzero.')
+        call throw_exception('Error in json_print: iunit must not be -1.')
     end if
 
     end subroutine json_print_1
@@ -4321,7 +4324,7 @@
     logical(LK),intent(in),optional      :: need_comma        !if it needs a comma after it
     logical(LK),intent(in),optional      :: colon             !if the colon was just written
     character(kind=CK,len=:),intent(inout),allocatable :: str
-                                                      !if iunit==0, then the structure is
+                                                      !if iunit==unit2str (-1) then the structure is
                                                       ! printed to this string rather than
                                                       ! a file. This mode is used by
                                                       ! json_value_to_string.
@@ -4337,7 +4340,7 @@
     if (.not. exception_thrown) then
 
         !whether to write a string or a file (one or the other):
-        write_string = (iunit==0)
+        write_string = (iunit==unit2str)
         write_file = .not. write_string
 
         !if the comma will be printed after the value
