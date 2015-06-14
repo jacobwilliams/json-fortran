@@ -500,9 +500,6 @@
                                  MAYBEWRAP(json_file_get_logical_vec), &
                                  MAYBEWRAP(json_file_get_string_vec)
 
-
-
-
         generic,public :: update =>  MAYBEWRAP(json_file_update_integer),  &
                                      MAYBEWRAP(json_file_update_logical),  &
                                      MAYBEWRAP(json_file_update_real),     &
@@ -1437,7 +1434,7 @@
 
     implicit none
 
-    class(json_file),intent(inout)      :: me
+    class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: filename
 
     integer(IK) :: iunit,istat
@@ -6351,32 +6348,39 @@
 
         !draw the arrow string that points to the current character:
         arrow_str = repeat('-',max( 0, char_count - 1) )//'^'
+        
+        if (line_count>0 .and. char_count>0) then
 
-        if (iunit/=0) then
+            if (iunit/=0) then
 
-            if (use_unformatted_stream) then
-                call get_current_line_from_file_stream(iunit,line)
+                if (use_unformatted_stream) then
+                    call get_current_line_from_file_stream(iunit,line)
+                else
+                    call get_current_line_from_file_sequential(iunit,line)
+                end if
+
             else
-                call get_current_line_from_file_sequential(iunit,line)
+
+                !get the current line from the string:
+                ! [this is done by counting the newline characters]
+                i_nl_prev = 0  !index of previous newline character
+                i_nl = 2  !just in case line_count = 0
+                do i=1,line_count
+                    i_nl = index(str(i_nl_prev+1:),newline)
+                    if (i_nl==0) then   !last line - no newline character
+                        i_nl = len(str)+1
+                        exit
+                    end if
+                    i_nl = i_nl + i_nl_prev   !index of current newline character
+                    i_nl_prev = i_nl          !update for next iteration
+                end do
+                line = str(i_nl_prev+1 : i_nl-1)  !extract current line
+
             end if
 
         else
-
-            !get the current line from the string:
-            ! [this is done by counting the newline characters]
-            i_nl_prev = 0  !index of previous newline character
-            i_nl = 2  !just in case line_count = 0
-            do i=1,line_count
-                i_nl = index(str(i_nl_prev+1:),newline)
-                if (i_nl==0) then   !last line - no newline character
-                    i_nl = len(str)+1
-                    exit
-                end if
-                i_nl = i_nl + i_nl_prev   !index of current newline character
-                i_nl_prev = i_nl          !update for next iteration
-            end do
-            line = str(i_nl_prev+1 : i_nl-1)  !extract current line
-
+            !in this case, it was an empty line or file
+            line = ''
         end if
 
         !create the error message:
@@ -6469,9 +6473,7 @@
     integer(IK) :: istart,iend,ios
     character(kind=CK,len=1) :: c
 
-    !....update for the new STREAM version.....
-
-    !   !!! !!!! not quite right for EXAMPLE 6 case 2 .....  DOUBLE CHECK THIS...
+    !updated for the new STREAM version:
 
     istart = ipos
     do
