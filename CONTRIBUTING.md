@@ -32,6 +32,19 @@ Looking to contribute something to [json-fortran](README.md)? **Here's how you c
 ## Outstanding Work
 
 - Take a look at the [issues](https://github.com/jacobwilliams/json-fortran/issues) to see if there is an issue you'd like to help address. [Issues](https://github.com/jacobwilliams/json-fortran/issues) with the [ready label](https://github.com/jacobwilliams/json-fortran/issues?q=is%3Aopen+is%3Aissue+label%3A%22ready%22) or in the [ready column on waffle.io](https://waffle.io/jacobwilliams/json-fortran) are issues that are ready to be dealt with. (i.e., They are not blocked by other dependencies and are higher priority.)
+- Increasing the test coverage is another helpful way to
+  contribute. Please take a look at
+  [this wiki page](https://github.com/jacobwilliams/json-fortran/wiki/Coverage-Analysis)
+  for a list of uncovered procedures, and at the
+  [Codecov.io suggestions page](https://codecov.io/github/jacobwilliams/json-fortran/features/suggestions)
+  to find procedures and lines of code that are still uncovered by the
+  [unit tests](https://github.com/jacobwilliams/json-fortran/tree/master/src/tests). It
+  is worth pointing out that the majority of uncovered procedures are
+  internal, overloaded procedures and can only be exercised by calling
+  the corresponding generic procedure with input arguments that will
+  resolve to the specific procedure in question. Let's keep the
+  following graph trending upwards!
+  ![Codecov.io](http://codecov.io/github/jacobwilliams/json-fortran/branch.svg?branch=master)
 
 [top](#contributing-to-json-fortran)
 ## Pull Requests
@@ -40,7 +53,7 @@ Looking to contribute something to [json-fortran](README.md)? **Here's how you c
 - Pull requests should address one issue at a time, and each commit should be a set of self contained, related changes. If you forget something in a commit, please use `git rebase -i <ref>^` to amend and/or squash erroneous commits. Here `<ref>` is the reference to to oldest commit needing to be modified (SHA, or `HEAD~4`, etc.)
 - Each commit should compile, and ideally pass the tests. Very complicated new features or fixes, may have commits that don't pass tests, if otherwise the commit history would include far to many changes in any given commit. Use an interactive rebase to fix any of these issues, as described above.
 - Pull requests should always be based on the upstream master,
-jacobwilliams/json-fortran:master. Please `rebase` your branch on top
+`jacobwilliams/json-fortran:master`. Please `rebase` your branch on top
 of the latest upstream master. Assuming you are on your branch and you've added the upstream remote by running something like:
 ```
 git remote add upstream git://github.com/jacobwilliams/json-fortran.git
@@ -60,6 +73,19 @@ git rebase upstream/master
 - Each commit should address a single logical change and code base transformation.
 - Each commit **must** compile.
 - Each commit should pass the tests unless the feature being implemented or bug being fixed requires extensive changes that would result in a commit with too many different changes.
+- Each pull request should ensure that the proper unit tests have
+  been added to cover at least 90% of new or changed code and that the
+  overall coverage continues to increase.
+- New tests are added to the `src/tests` directory and are named
+  `jf_test_<#>.[Ff]90`. Each test is a stand alone Fortran program
+  which will automatically be compiled and linked against the
+  json-fortran library so long as it follows this naming
+  convention. If any of the tests fail, the test program should exit
+  with a non-zero return status, using the `stop 2` intrinsic
+  statement. (The Fortran standard does not require the 'processor' to
+  have or set a return value, but in practice all compilers respect
+  this convention. An integer other than `2` may be used, so long as
+  it is non-zero and supported by the processor.)
 - No extraneous white spaces are allowed to be introduced at line endings and all non binary files should end with a single new line. Run `git config core.whitespace trailing-space,space-before-tab,blank-at-eol,blank-at-eof` to setup the whitespace rules from within your fork, and then check for white space errors with `git diff --check` to see if you have accidentally introduced white space errors before committing. (You can also enable the sample `pre-commit` hook that ships with git, to prevent you from committing changes that introduce white space errors. See [this stackoverflow question](http://stackoverflow.com/questions/591923/make-git-automatically-remove-trailing-whitespace-before-committing/28446440)) for some tips on preventing the introduction of whitespace errors.
 - Please adhere to the code indentation and formatting as it currently exists, aligning common elements vertically, etc. Tab characters are not allowed. Indentations should be done with *4* space characters.
 - *Do NOT* allow your editor to make a bunch of indentation or white space changes, that will introduce non-substantive changes on lines that you have not actually edited.
