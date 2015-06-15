@@ -64,6 +64,7 @@ contains
     integer,intent(out) :: error_cnt
 
     type(json_value),pointer :: root,a,b,c,d,e,e1,e2,escaped_string
+    logical :: found
 
     error_cnt = 0
     call json_initialize()
@@ -249,6 +250,9 @@ contains
         error_cnt = error_cnt + 1
     end if
 
+    call json_add(root,'wacky string',['trim   ','  and  ',' adjust','   left'],&
+         trim_str=.true.,adjustl_str=.true.)
+
     nullify(a)  !don't need these anymore
     nullify(b)
     nullify(c)
@@ -263,6 +267,14 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+    ! look for the 'escaped string' entry
+    call json_get(root,'escaped string',escaped_string,found)
+    if (.not. found) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    ! remove the escaped string entry
+    if (found) call json_remove(escaped_string,destroy=.true.)
     call json_print(root,error_unit)  !print to stderr
     if (json_failed()) then
         call json_print_error_message(error_unit)
