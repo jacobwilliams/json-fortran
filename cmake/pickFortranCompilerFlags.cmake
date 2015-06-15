@@ -23,11 +23,10 @@ if ( NOT Fortran_FLAGS_INIT )
       set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check all" )
     endif ()
   elseif ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
-    set ( ENABLE_CODE_COVERAGE FALSE CACHE BOOL
-      "Compile with code coverage output enabled using gcov. May not work on Mac.")
-    if ( ENABLE_CODE_COVERAGE )
-      set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fprofile-arcs -ftest-coverage" )
-    endif ()
+    # add a coverage build configuration
+    set ( CMAKE_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES} "Coverage" )
+    set ( CMAKE_Fortran_FLAGS_COVERAGE "-fprofile-arcs -ftest-coverage -O0" CACHE STRING
+      "Fortran compiler flags for coverage configuration" )
     if ( ENABLE_BACK_TRACE )
       set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fbacktrace" )
     endif ()

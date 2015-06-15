@@ -63,7 +63,7 @@ contains
 
     integer,intent(out) :: error_cnt
 
-    type(json_value),pointer :: root,a,b,c,d,e,e1,e2
+    type(json_value),pointer :: root,a,b,c,d,e,e1,e2,escaped_string
 
     error_cnt = 0
     call json_initialize()
@@ -111,6 +111,7 @@ contains
 !            "int2": 2
 !        }
 !    ]
+!    "escaped string": "\\\/\b\f\n\r\t"
 !}
 
     !create a json structure:
@@ -200,6 +201,22 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+        call json_create_object(escaped_string,'escaped string')
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json_add(escaped_string,'escaped string',&
+         '\/'//&
+         achar(8)//&
+         achar(12)//&
+         achar(10)//&
+         achar(13)//&
+         achar(9))
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
 
     call json_add(root,a)
     if (json_failed()) then
@@ -226,6 +243,11 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+    call json_add(root,escaped_string)
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
 
     nullify(a)  !don't need these anymore
     nullify(b)
@@ -234,8 +256,14 @@ contains
     nullify(e)
     nullify(e1)
     nullify(e2)
+    nullify(escaped_string)
 
     call json_print(root,output_unit)  !print to the console
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json_print(root,error_unit)  !print to stderr
     if (json_failed()) then
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1

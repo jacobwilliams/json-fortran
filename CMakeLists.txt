@@ -15,10 +15,11 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 set ( CMAKE_CONFIGURATION_TYPES "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
 set ( CMAKE_BUILD_TYPE "Release"
   CACHE STRING "Select which configuration to build." )
-set_property ( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 
 enable_language ( Fortran )
 include ( "cmake/pickFortranCompilerFlags.cmake" )
+
+set_property ( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 
 # Check for in-source builds and error out if found
 # Provides an advanced option to allow in source builds
