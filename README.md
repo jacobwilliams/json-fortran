@@ -54,7 +54,7 @@ __NEWS:__ As of June 7, 2015,
 downloaded and installed with the [homebrew](https://brew.sh) package
 manager on Mac OS X. Once [homebrew](https://brew.sh) is installed,
 make sure that the formulae are up to date, view the package options
-and caveates, and install the
+and caveats, and install the
 [json-fortran formula](http://braumeister.org/formula/json-fortran):
 
 ```bash
@@ -170,7 +170,7 @@ Reading JSON from a string
 ---------------
 JSON can also be read directly from a character string like so:
 ```fortran
-    call json%load_from_string('{"name", "Leonidas"}')
+    call json%load_from_string('{"name": "Leonidas"}')
 ```
 
 Modifying variables in a JSON file
@@ -281,7 +281,7 @@ The API documentation for the latest release version can be found [here](http://
 [top](#json-fortran-)
 Contributing [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](CONTRIBUTING.md)
 ------------
-Want to help?  Take a quick look at our [contributing guidelines](CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo).
+Want to help?  Take a quick look at our [contributing guidelines](CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo)
 
 [top](#json-fortran-)
 License
