@@ -7600,32 +7600,6 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!.... gfortran bug ..... some problem.....
-!*****************************************************************************************
-    pure subroutine add_character_to_string(str,ip,c)
-
-    implicit none
-
-    character(kind=CK,len=:),allocatable,intent(inout) :: str
-    integer(IK),intent(inout) :: ip
-    character(kind=CK,len=1),intent(in) :: c
-
-    if (allocated(str)) then
-        !resize string if necessary:
-        if (ip>len(str)) str = str // repeat(space, chunk_size)
-    else
-        str = repeat(space, chunk_size)
-        ip = 1
-    end if
-
-    !append to string:
-    str(ip:ip) = c
-    ip = ip + 1
-
-    end subroutine add_character_to_string
-!*****************************************************************************************
-
-!*****************************************************************************************
 !****if* json_module/parse_for_chars
 !
 !  NAME

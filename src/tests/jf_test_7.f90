@@ -63,8 +63,12 @@ contains
 
     integer,intent(out) :: error_cnt
 
-    type(json_value),pointer :: root,a,b,c,d,e,e1,e2,escaped_string
+    type(json_value),pointer :: root,a,b,c,d,e,e1,e2,escaped_string,p
+    logical :: found
+    character(kind=CK,len=1), dimension(:), allocatable :: strvec
+    character(kind=CK,len=:), allocatable :: string
 
+    found=.false.
     error_cnt = 0
     call json_initialize()
     if (json_failed()) then
@@ -140,6 +144,12 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+    call json_get_child(a,'chars',p)
+    call json_get(p,strvec)
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
     call json_create_object(c,'c')
     if (json_failed()) then
         call json_print_error_message(error_unit)
@@ -201,23 +211,6 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-        call json_create_object(escaped_string,'escaped string')
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-    end if
-    call json_add(escaped_string,'escaped string',&
-         '\/'//&
-         achar(8)//&
-         achar(12)//&
-         achar(10)//&
-         achar(13)//&
-         achar(9))
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-    end if
-
     call json_add(root,a)
     if (json_failed()) then
         call json_print_error_message(error_unit)
@@ -243,7 +236,19 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(root,escaped_string)
+    call json_add(root,'escaped string',&
+         '\/'//&
+         achar(8)//&
+         achar(12)//&
+         achar(10)//&
+         achar(13)//&
+         achar(9))
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json_add(root,'wacky string',['trim   ','  and  ',' adjust','   left'],&
+         trim_str=.true.,adjustl_str=.true.)
     if (json_failed()) then
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -263,6 +268,21 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+    ! look for the 'escaped string' entry
+    call json_get(root,'escaped string',escaped_string,found)
+    if (json_failed() .or. .not. found) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json_get(escaped_string,string)
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    write(error_unit,'(A)') "Fetched unescaped 'escaped string': "//string
+
+    ! remove the escaped string entry
+    if (found) call json_remove(escaped_string,destroy=.true.)
     call json_print(root,error_unit)  !print to stderr
     if (json_failed()) then
         call json_print_error_message(error_unit)
