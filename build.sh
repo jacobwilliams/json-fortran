@@ -63,7 +63,8 @@
 
 set -e
 
-PROJECTNAME='jsonfortran'       # project name for robodoc (example: jsonfortran_2.0.0)
+#PROJECTNAME='jsonfortran'       # project name for robodoc (example: jsonfortran_2.0.0)
+FORDMD='json-fortran.md'        # FORD options file for building documentation
 DOCDIR='./documentation/'       # build directory for documentation
 SRCDIR='./src/'                 # library source directory
 TESTDIR='./src/tests/'          # unit test source directory
@@ -284,14 +285,16 @@ else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."
 fi
 
-#build the documentation with RoboDoc (if present):
+#build the documentation with ford (if present):
 echo ""
 if [[ $JF_SKIP_DOCS != [yY]* ]]; then
-    if hash robodoc 2>/dev/null; then
+    if hash ford 2>/dev/null; then
 	echo "Building documentation..."
-	robodoc --rc ./robodoc.rc --src ${SRCDIR} --doc ${DOCDIR} --documenttitle ${PROJECTNAME}
+	#robodoc --rc ./robodoc.rc --src ${SRCDIR} --doc ${DOCDIR} --documenttitle ${PROJECTNAME}
+	ford $FORDMD
     else
-	echo "ROBODoc not found! Cannot build documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/"
+	#echo "ROBODoc not found! Cannot build documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/"
+	echo "ford not found! Install using: sudo pip install ford"
     fi
 else
     echo "Skip building documentation since \$JF_SKIP_DOCS has been set to ${JF_SKIP_DOCS}."
