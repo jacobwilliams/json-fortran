@@ -41,7 +41,6 @@ before_install:
   - if [[ $JLINT == [yY]* ]]; then curl -sL https://deb.nodesource.com/setup | sudo bash -x - ; fi
   - if [[ $CHECK_README_PROGS == [yY]* ]]; then wget http://people.sc.fsu.edu/~jburkardt/f_src/f90split/f90split.f90; fi
   - if [[ $DOCS == [yY]* ]]; then export DEPENDS="$DEPENDS exuberant-ctags"; fi
-  - if [[ $DOCS == [yY]* ]]; then wget http://launchpadlibrarian.net/70968359/robodoc_4.99.41-1_amd64.deb; fi
   - ulimit -s unlimited
 
 install:
@@ -50,7 +49,7 @@ install:
   - sudo ln -fs /usr/bin/gfortran-4.9 /usr/bin/gfortran && gfortran --version
   - sudo ln -fs /usr/bin/gcov-4.9 /usr/bin/gcov && gcov --version
   - if [[ $FoBiS == [yY]* ]]; then sudo -H pip install FoBiS.py && FoBiS.py --version; fi
-  - if [[ $DOCS == [yY]* ]]; then sudo dpkg -i robodoc_4.99.41-1_amd64.deb && robodoc --version; fi
+  - if [[ $DOCS == [yY]* ]]; then sudo -H pip install ford && ford --version; fi
   - if [[ $CHECK_README_PROGS == [yY]* ]]; then gfortran -o f90split f90split.f90 && ./f90split README.md && shopt -s extglob && for f in !(README|CONTRIBUTING).md; do mv $f src/tests/jf_test_${f%.md}.f90; done; rm f90split.f90 f90split; fi
 
 script:

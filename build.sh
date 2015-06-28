@@ -290,11 +290,9 @@ echo ""
 if [[ $JF_SKIP_DOCS != [yY]* ]]; then
     if hash ford 2>/dev/null; then
 	echo "Building documentation..."
-	#robodoc --rc ./robodoc.rc --src ${SRCDIR} --doc ${DOCDIR} --documenttitle ${PROJECTNAME}
 	ford $FORDMD
     else
-	#echo "ROBODoc not found! Cannot build documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/"
-	echo "ford not found! Install using: sudo pip install ford"
+	echo "FORD not found! Install using: sudo pip install ford"
     fi
 else
     echo "Skip building documentation since \$JF_SKIP_DOCS has been set to ${JF_SKIP_DOCS}."
