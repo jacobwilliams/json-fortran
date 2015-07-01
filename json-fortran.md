@@ -6,7 +6,9 @@ summary: JSON-FORTRAN -- A Fortran 2008 JSON API
 author: Jacob Williams
 github: https://github.com/jacobwilliams
 predocmark_alt: >
-docmark_alt: <
+predocmark: <
+docmark_alt:
+docmark: !
 exclude_dir: tests
 exclude_dir: introspection
 display: public

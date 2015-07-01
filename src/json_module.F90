@@ -1,23 +1,37 @@
 !*****************************************************************************************
-!>author: Jacob Williams
+!> author: Jacob Williams
+!  license: BSD
 !
 !  JSON-FORTRAN: A Fortran 2008 JSON (JavaScript Object Notation) API.
 !
-!# See also
-!  * [json-fortran development site](http://github.com/jacobwilliams/json-fortran)
-!  * [json-fortran online documentation](http://jacobwilliams.github.io/json-fortran)
-!  * [JSON website](http://www.json.org/)
-!  * [JSON validator](http://jsonlint.com/)
+!  This module provides an interface for reading and writing JSON files.
+!
+!@note ```USE_UCS4``` is an optional preprocessor flag.
+!      When present, Unicode support is enabled. Note that this 
+!      is currently only supported with the gfortran compiler.
+!      Example: ```gfortran -DUSE_UCS4 ... ```
+#ifdef USE_UCS4
+!      The documentation given here assumes ```USE_UCS4``` **is** defined. 
+#else
+!      The documentation given here assumes ```USE_UCS4``` **is not** defined. 
+#endif
+!
+!@note ```CK``` and ```CDK``` are the json-fortran character kind and json-fortran default
+!      character kind respectively. Client code must ensure characters of kind=CK
+!      are used for all character variables and strings passed to the json-fortran
+!      library *EXCEPT* for file names which must be of ```'DEFAULT'``` character kind,
+!      provided here as ```CDK```. In particular, any: json path, character or string, or
+!      object name passed to the json-fortran library *MUST* be of type ```CK```.
 !
 !# License
 !
-!    json-fortran License:
+!  **json-fortran License:**
 !
 !    JSON-FORTRAN: A Fortran 2008 JSON API
 !
 !    http://github.com/jacobwilliams/json-fortran
 !
-!    Copyright (c) 2014, Jacob Williams
+!    Copyright (c) 2014-2015, Jacob Williams
 !
 !    All rights reserved.
 !
@@ -41,9 +55,7 @@
 !    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
-!    Original FSON License:
-!
-!    http://github.com/josephalevin/fson
+!  **Original FSON License:**
 !
 !    Copyright (c) 2012 Joseph A. Levin
 !
@@ -73,6 +85,12 @@
 !    Various Fortran 2003/2008 features are now used
 !    (e.g., allocatable strings, newunit, generic, class, and abstract interface).
 !  * Development continues at: [Github](http://github.com/jacobwilliams/json-fortran)
+!
+!# See also
+!  * [json-fortran development site](http://github.com/jacobwilliams/json-fortran)
+!  * [json-fortran online documentation](http://jacobwilliams.github.io/json-fortran)
+!  * [JSON website](http://www.json.org/)
+!  * [JSON validator](http://jsonlint.com/)
 
     module json_module
 
@@ -82,17 +100,6 @@
 
     private
 
-    !*********************************************************
-    !
-    !  USE_UCS4 is an optional preprocessor flag.
-    !  When present, Unicode support is enabled.
-    !
-    !  USAGE
-    !    When compiling:
-    !    * gfortran -DUSE_UCS4 ...
-    !
-    !*********************************************************
-
     integer,parameter :: RK = real64  !! Default real kind [8 bytes]
 
     integer,parameter :: IK = int32   !! Default integer kind [4 bytes].
@@ -101,21 +108,7 @@
     !> 
     !  Processor dependendant 'DEFAULT' character kind.
     !  This is 1 byte for the Intel and Gfortran compilers.
-    !
-    !# Notes
-    !  CK and CDK are the json-fortran character kind and json-fortran default
-    !  character kind respectively. Client code must ensure characters of kind=CK
-    !  are used for all character variables and strings passed to the json-fortran
-    !  library *EXCEPT* for file names which must be of 'DEFAULT' character kind,
-    !  provided here as CDK. In particular, any:
-    !   * file name
-    !   * format statement
-    !   * file path
-    !  passed to the json-fortran library *MUST* be of type CDK. This
-    !  will be the case for all string literals nor prepended with CK_ and only
-    !  if ISO 10646 is supported and enabled, will strings of kind CK be different
-    !  than CDK
-    !
+
     integer,parameter,public :: CDK = selected_char_kind('DEFAULT')
     !*********************************************************
 
@@ -152,17 +145,6 @@
     !  Currently only gfortran >= 4.9.2 will correctly support
     !  UCS4 which is stored in 4 bytes.
     !  (and perhaps others).
-    !
-    !# Notes
-    !  CK and CDK are the json-fortran character kind and json-fortran default
-    !  character kind respectively. Client code must ensure characters of kind=CK
-    !  are used for all character variables and strings passed to the json-fortran
-    !  library *EXCEPT* for file names which must be of 'DEFAULT' character kind,
-    !  provided here as JDCK. In particular, any:
-    !  * json path
-    !  * character or string
-    !  * object name
-    !  passed to the json-fortran library *MUST* be of type CK.
 
     integer,parameter,public :: CK = selected_char_kind(json_fortran_string_kind)
     !*********************************************************
@@ -841,8 +823,10 @@
                                               rp_addl_safety
 
     !Get the number of possible digits in the exponent when using decimal number system
+    integer(IK),parameter :: maxexp = maxexponent(1.0_RK)
+    integer(IK),parameter :: minexp = minexponent(1.0_RK)
     integer(IK),parameter :: real_exponent_digits = floor( 1 + log10( &
-                                  real(max(maxexponent(1.0_RK),abs(minexponent(1.0_RK))),&
+                                  real(max(maxexp,abs(maxexp)),&
                                   kind=RK) ) )
 
     !6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
@@ -884,7 +868,7 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Destroy the [[json_value]] type.
+!  Destroy the data within a [[json_value]], and rest type to json_unknown.
 
     subroutine destroy_json_data(d)
 
@@ -964,7 +948,7 @@
 
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: filename  !! the filename to open
-    integer(IK),intent(in),optional      :: unit      !! the unit to use
+    integer(IK),intent(in),optional      :: unit      !! the unit number to use
 
     call json_parse(file=filename, p=me%p, unit=unit)
 
@@ -2632,8 +2616,8 @@
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    integer(IK),intent(in)               :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    integer(IK),intent(in)               :: val    !! value
 
     call json_value_add_integer(me, to_unicode(name), val)
 
@@ -2654,8 +2638,8 @@
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    integer(IK),dimension(:),intent(in) :: val
+    character(kind=CK,len=*),intent(in) :: name   !! name of the variable
+    integer(IK),dimension(:),intent(in) :: val    !! value
 
     type(json_value),pointer :: var
     integer(IK) :: i    !counter
@@ -2687,8 +2671,8 @@
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    integer(IK),dimension(:),intent(in)  :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    integer(IK),dimension(:),intent(in)  :: val    !! value
 
     call json_value_add_integer_vec(me, to_unicode(name), val)
 
@@ -2709,8 +2693,8 @@
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    logical(LK),intent(in)              :: val
+    character(kind=CK,len=*),intent(in) :: name   !! name of the variable
+    logical(LK),intent(in)              :: val    !! value
 
     type(json_value),pointer :: var
 
@@ -2736,8 +2720,8 @@
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    logical(LK),intent(in)               :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    logical(LK),intent(in)               :: val    !! value
 
     call json_value_add_logical(me, to_unicode(name), val)
 
@@ -2758,8 +2742,8 @@
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    logical(LK),dimension(:),intent(in) :: val
+    character(kind=CK,len=*),intent(in) :: name  !! name of the vector
+    logical(LK),dimension(:),intent(in) :: val   !! value
 
     type(json_value),pointer :: var
     integer(IK) :: i    !counter
@@ -2791,8 +2775,8 @@
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    logical(LK),dimension(:),intent(in)  :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    logical(LK),dimension(:),intent(in)  :: val    !! value
 
     call json_value_add_logical_vec(me, to_unicode(name), val)
 
@@ -2813,8 +2797,8 @@
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    character(kind=CK,len=*),intent(in) :: val
+    character(kind=CK,len=*),intent(in) :: name  !! name of the variable
+    character(kind=CK,len=*),intent(in) :: val   !! value
 
     type(json_value),pointer :: var
     character(kind=CK,len=:),allocatable :: str
@@ -2844,8 +2828,8 @@
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    character(kind=CDK,len=*),intent(in) :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    character(kind=CDK,len=*),intent(in) :: val    !! value
 
     call json_value_add_string(me, to_unicode(name), to_unicode(val))
 
@@ -2861,8 +2845,8 @@
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    character(kind=CK, len=*),intent(in) :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    character(kind=CK, len=*),intent(in) :: val    !! value
 
     call json_value_add_string(me, to_unicode(name), val)
 
@@ -2878,8 +2862,8 @@
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CK, len=*),intent(in) :: name
-    character(kind=CDK,len=*),intent(in) :: val
+    character(kind=CK, len=*),intent(in) :: name   !! name of the variable
+    character(kind=CDK,len=*),intent(in) :: val    !! value
 
     call json_value_add_string(me, name, to_unicode(val))
 
@@ -5999,23 +5983,21 @@
 !
 !# History
 !  * Jacob Williams : 6/16/2014 : Added hex validation.
-!
 
     subroutine parse_string(unit, str, string)
 
     implicit none
 
-    integer(IK), intent(in)                            :: unit  !! file unit number (if parsing from a file)
-    character(kind=CK,len=*),intent(in)                :: str   !! JSON string (if parsing from a string)
-    character(kind=CK,len=:),allocatable,intent(out)   :: string
+    integer(IK),intent(in)                           :: unit  !! file unit number (if parsing from a file)
+    character(kind=CK,len=*),intent(in)              :: str   !! JSON string (if parsing from a string)
+    character(kind=CK,len=:),allocatable,intent(out) :: string
 
     logical(LK) :: eof, is_hex, escape
     character(kind=CK,len=1) :: c, last
     character(kind=CK,len=4) :: hex
     integer(IK) :: i
-
-    !to speed up by reducing the number of character string reallocations:
-    integer(IK) :: ip !index to put next character
+    integer(IK) :: ip !! index to put next character,
+                      !! to speed up by reducing the number of character string reallocations.
 
     !at least return a blank string if there is a problem:
     string = repeat(space, chunk_size)
@@ -6023,11 +6005,11 @@
     if (.not. exception_thrown) then
 
         !initialize:
-        ip = 1
-        last = space
+        ip     = 1
+        last   = space
         is_hex = .false.
         escape = .false.
-        i = 0
+        i      = 0
 
         do
 
@@ -6113,9 +6095,9 @@
 
     implicit none
 
-    integer(IK), intent(in)              :: unit   !! file unit number (if parsing from a file) 
-    character(kind=CK,len=*),intent(in)  :: str    !! JSON string (if parsing from a string)
-    character(kind=CK,len=*), intent(in) :: chars
+    integer(IK),intent(in)              :: unit   !! file unit number (if parsing from a file) 
+    character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
+    character(kind=CK,len=*),intent(in) :: chars  !! the string to check for.
 
     integer(IK) :: i, length
     logical(LK) :: eof
@@ -6371,7 +6353,6 @@
 !
 !# History
 !  * Jacob Williams : 5/3/2015 : replaced original version of this routine.
-!
 
     subroutine push_char(c)
 
@@ -6482,7 +6463,7 @@
 
     implicit none
 
-    character(kind=CK,len=*),intent(inout) :: str
+    character(kind=CK,len=*),intent(inout) :: str  !! string representation of a real number.
 
     character(kind=CK,len=len(str)) :: significand, expnt
     character(kind=CK,len=2) :: separator
