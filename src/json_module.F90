@@ -8042,7 +8042,7 @@
     decimal_pos = scan(str,CK_'.')
     if (exp_start /= 0) separator = str(exp_start:exp_start)
 
-    if (exp_start > 0 .and. exp_start < decimal_pos) then !signed, exponent-less float
+    if ( exp_start < decimal_pos ) then !possibly signed, exponent-less float
 
         significand = str
         sig_trim = len(trim(significand))
