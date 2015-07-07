@@ -7,13 +7,13 @@
 !  This module provides an interface for reading and writing JSON files.
 !
 !@note ```USE_UCS4``` is an optional preprocessor flag.
-!      When present, Unicode support is enabled. Note that this 
+!      When present, Unicode support is enabled. Note that this
 !      is currently only supported with the gfortran compiler.
 !      Example: ```gfortran -DUSE_UCS4 ... ```
 #ifdef USE_UCS4
-!      The documentation given here assumes ```USE_UCS4``` **is** defined. 
+!      The documentation given here assumes ```USE_UCS4``` **is** defined.
 #else
-!      The documentation given here assumes ```USE_UCS4``` **is not** defined. 
+!      The documentation given here assumes ```USE_UCS4``` **is not** defined.
 #endif
 !
 !@note ```CK``` and ```CDK``` are the json-fortran character kind and json-fortran default
@@ -105,7 +105,7 @@
     integer,parameter :: IK = int32   !! Default integer kind [4 bytes].
 
     !*********************************************************
-    !> 
+    !>
     !  Processor dependendant 'DEFAULT' character kind.
     !  This is 1 byte for the Intel and Gfortran compilers.
 
@@ -113,7 +113,7 @@
     !*********************************************************
 
     !*********************************************************
-    !> 
+    !>
     !  Default logical kind.
     !  This is 4 bytes for the Intel and Gfortran compilers
     !  (and perhaps others).
@@ -122,9 +122,9 @@
     !
     integer,parameter :: LK = logical_kinds(min(3,size(logical_kinds)))
     !*********************************************************
- 
+
     !*********************************************************
-    !> 
+    !>
     !  String kind preprocessor macro.
     !
 #if defined __GFORTRAN__ && defined USE_UCS4
@@ -138,7 +138,7 @@
     !*********************************************************
 
     !*********************************************************
-    !> 
+    !>
     !  Default character kind used by json-fortran.
     !  If ISO 10646 (UCS4) support is available, use that,
     !  otherwise, gracefully fall back on 'DEFAULT' characters.
@@ -202,7 +202,7 @@
     !*********************************************************
 
     !*********************************************************
-    !> 
+    !>
     !  If Unicode is not enabled, then
     !  JSON files are opened using access='STREAM' and
     !  form='UNFORMATTED'.  This allows the file to
@@ -216,7 +216,7 @@
     !*********************************************************
 
     !*********************************************************
-    !> 
+    !>
     !  If Unicode is not enabled, then
     !  JSON files are opened using access='STREAM' and
     !  form='UNFORMATTED'.  This allows the file to
@@ -230,7 +230,7 @@
     !*********************************************************
 
     !*********************************************************
-    !> 
+    !>
     !  If Unicode is not enabled, then
     !  JSON files are opened using access='STREAM' and
     !  form='UNFORMATTED'.  This allows the file to
@@ -258,7 +258,7 @@
     !*********************************************************
 
     !*********************************************************
-    !> 
+    !>
     !  Type used to construct the linked-list JSON structure.
     !  Normally, this should always be a pointer variable.
     !
@@ -279,7 +279,7 @@
         ![note: on Intel, the order of the variables below
         ! is significant to avoid the misaligned field warnings]
         sequence
-        
+
         private
 
         !for the linked list:
@@ -404,7 +404,7 @@
     !*********************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Array element callback function.  Used by [[json_get_array]].
 
     abstract interface
@@ -431,12 +431,12 @@
 # endif
 
     !*************************************************************************************
-    !> 
+    !>
     !  Get a child, either by index or name string.
     !  Both of these return a [[json_value]] pointer.
     !
     !@note Formerly, this was called json_value_get_child
-    
+
     interface json_get_child
         module procedure json_value_get_by_index
         module procedure MAYBEWRAP(json_value_get_by_name_chars)
@@ -444,11 +444,11 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Add objects to a linked list of [[json_value]]s.
     !
     !@note Formerly, this was called json_value_add
-    
+
     interface json_add
         module procedure json_value_add_member
         module procedure MAYBEWRAP(json_value_add_integer)
@@ -469,7 +469,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  These are like [[json_add]], except if a child with the same name is
     !  already present, then its value is simply updated.
     !  Note that currently, these only work for scalar variables.
@@ -478,7 +478,7 @@
     !
     !@note It should not be used to change the type of a variable in an array,
     !      or it may result in an invalid JSON file.
-    
+
     interface json_update
         module procedure MAYBEWRAP(json_update_logical),&
                          MAYBEWRAP(json_update_double),&
@@ -492,14 +492,14 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Get data from a [[json_value]] linked list.
     !
     !@note There are two versions (e.g. [[json_get_integer]] and [[json_get_integer_with_path]]).
     !      The first one gets the value from the [[json_value]] passed into the routine,
     !      while the second one gets the value from the [[json_value]] found by parsing the
     !      path.  The path version is split up into unicode and non-unicode versions.
-    
+
     interface json_get
         module procedure                       MAYBEWRAP(json_get_by_path)
         module procedure json_get_integer,     MAYBEWRAP(json_get_integer_with_path)
@@ -515,7 +515,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Print the json_value structure to an allocatable string.
 
     interface json_print_to_string
@@ -524,7 +524,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Print the [[json_value]] to a file.
     !
     !# Example
@@ -534,7 +534,7 @@
     !    !...
     !    call json_print(p,'test.json')  !this is [[json_print_2]]
     !```
-    
+
     interface json_print
         module procedure json_print_1    !input is unit number
         module procedure json_print_2    !input is file name
@@ -542,7 +542,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Destructor routine for a [[json_value]] pointer.
     !  This must be called explicitly if it is no longer needed,
     !  before it goes out of scope.  Otherwise, a memory leak will result.
@@ -585,7 +585,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Remove a [[json_value]] from a linked-list structure.
 
     interface json_remove
@@ -594,7 +594,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  If the child variable is present, then remove it.
 
     interface json_remove_if_present
@@ -620,7 +620,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Allocate a [[json_value]] pointer and make it an array variable.
     !  The pointer should not already be allocated.
     !
@@ -637,7 +637,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Allocate a [[json_value]] pointer and make it an object variable.
     !  The pointer should not already be allocated.
     !
@@ -657,7 +657,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Allocate a json_value pointer and make it a null variable.
     !  The pointer should not already be allocated.
     !
@@ -674,7 +674,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Allocate a json_value pointer and make it a string variable.
     !  The pointer should not already be allocated.
     !
@@ -691,7 +691,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Allocate a json_value pointer and make it an integer variable.
     !  The pointer should not already be allocated.
     !
@@ -708,7 +708,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Allocate a json_value pointer and make it a logical variable.
     !  The pointer should not already be allocated.
     !
@@ -725,7 +725,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Parse the JSON file and populate the [[json_value]] tree.
 
     interface json_parse
@@ -734,7 +734,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Convert a 'DEFAULT' kind character input to 'ISO_10646' kind and return it
 
     interface to_unicode
@@ -743,7 +743,7 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !> 
+    !>
     !  Throw an exception.
 
     interface throw_exception
@@ -775,7 +775,7 @@
     public :: json_remove                ! remove from a JSON structure
     public :: json_remove_if_present     ! remove from a JSON structure (if it is present)
     public :: json_update                ! update a value in a JSON structure
-    public :: json_print_error_message   ! 
+    public :: json_print_error_message   !
     public :: to_unicode                 ! Function to convert from 'DEFAULT' to 'ISO_10646' strings
 
 # ifdef USE_UCS4
@@ -858,10 +858,10 @@
     integer(IK),parameter :: chunk_size = 100  !! for allocatable strings: allocate chunks of this size
     integer(IK) :: ipos = 1                    !! for allocatable strings: next character to read
 
-    integer(IK),parameter :: unit2str = -1  !! unit number to cause stuff to be 
+    integer(IK),parameter :: unit2str = -1  !! unit number to cause stuff to be
                                             !! output to strings rather than files.
                                             !! See 9.5.6.12 in the F2003/08 standard
-    
+
     contains
 !*****************************************************************************************
 
@@ -982,7 +982,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_load_from_string]], where "str" is kind=CDK.
 
     subroutine wrap_json_file_load_from_string(me, str)
@@ -1000,7 +1000,7 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !  date: 1/11/2015
-!  
+!
 !  Print the JSON file to the console.
 
     subroutine json_file_print_to_console(me)
@@ -1019,7 +1019,7 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !  date: 12/9/2013
-!  
+!
 !  Prints the JSON file to the specified file unit number.
 
     subroutine json_file_print_1(me, iunit)
@@ -1153,7 +1153,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_variable_info]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_variable_info(me,path,found,var_type,n_children)
@@ -1212,7 +1212,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_get_object]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_object(me, path, p, found)
@@ -1250,7 +1250,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_get_integer]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_integer(me, path, val, found)
@@ -1270,7 +1270,7 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !  date: 1/20/2014
-!  
+!
 !  Get an integer vector from a JSON file.
 
     subroutine json_file_get_integer_vec(me, path, vec, found)
@@ -1288,7 +1288,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_get_integer_vec]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_integer_vec(me, path, vec, found)
@@ -1326,7 +1326,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_get_double]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_double (me, path, val, found)
@@ -1364,7 +1364,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_get_double_vec]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_double_vec(me, path, vec, found)
@@ -1402,7 +1402,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_get_logical]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_logical(me,path,val,found)
@@ -1440,7 +1440,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_get_logical_vec]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_logical_vec(me, path, vec, found)
@@ -1479,7 +1479,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_get_string]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_string(me, path, val, found)
@@ -1517,7 +1517,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_get_string_vec]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_string_vec(me, path, vec, found)
@@ -1642,7 +1642,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_throw_exception]], where "msg" is kind=CDK.
 
     subroutine wrap_json_throw_exception(msg)
@@ -1741,7 +1741,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Allocate a [[json_value]] pointer variable.
 !  This should be called before adding data to it.
 !
@@ -1952,7 +1952,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_value_remove_if_present]], where "name" is kind=CDK.
 
     subroutine wrap_json_value_remove_if_present(p,name)
@@ -1992,7 +1992,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_update_integer]], where "name" is kind=CDK.
 
     subroutine wrap_json_file_update_integer(me,name,val,found)
@@ -2033,7 +2033,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_update_logical]], where "name" is kind=CDK.
 
     subroutine wrap_json_file_update_logical(me,name,val,found)
@@ -2074,7 +2074,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_update_real]], where "name" is kind=CDK.
 
     subroutine wrap_json_file_update_real(me,name,val,found)
@@ -2115,7 +2115,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_update_string]], where "name" and "val" are kind=CDK.
 
     subroutine wrap_json_file_update_string(me,name,val,found)
@@ -2132,7 +2132,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_update_string]], where "name" is kind=CDK.
 
     subroutine json_file_update_string_name_ascii(me,name,val,found)
@@ -2149,7 +2149,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_file_update_string]], where "val" is kind=CDK.
 
     subroutine json_file_update_string_val_ascii(me,name,val,found)
@@ -2206,7 +2206,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_update_logical]], where "name" is kind=CDK.
 
     subroutine wrap_json_update_logical(p,name,val,found)
@@ -2264,7 +2264,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_update_double]], where "name" is kind=CDK.
 
     subroutine wrap_json_update_double(p,name,val,found)
@@ -2322,7 +2322,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_update_integer]], where "name" is kind=CDK.
 
     subroutine wrap_json_update_integer(p,name,val,found)
@@ -2380,7 +2380,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_update_string]], where "name" and "value" are kind=CDK.
 
     subroutine wrap_json_update_string(p,name,val,found)
@@ -2416,7 +2416,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_update_string]], where "val" is kind=CDK.
 
     subroutine json_update_string_val_ascii(p,name,val,found)
@@ -2434,7 +2434,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Adds "member" as a child of "me".
 
     subroutine json_value_add_member(me, member)
@@ -2504,7 +2504,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_value_add_double]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_double(me, name, val)
@@ -2559,7 +2559,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_value_add_double_vec]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_double_vec(me, name, val)
@@ -2608,7 +2608,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_value_add_integer]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_integer(me, name, val)
@@ -2712,7 +2712,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_value_add_logical]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_logical(me, name, val)
@@ -2767,7 +2767,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_value_add_logical_vec]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_logical_vec(me, name, val)
@@ -2820,7 +2820,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_value_add_string]] where "name" and "val" are kind=CDK.
 
     subroutine wrap_json_value_add_string(me, name, val)
@@ -3247,7 +3247,7 @@
 
     type(json_value),pointer,intent(in)  :: me
     integer(IK),intent(in)               :: iunit   !! the file unit (the file must already have been opened, can't be -1).
-   
+
     character(kind=CK,len=:),allocatable :: dummy
 
     if (iunit/=unit2str) then
@@ -3271,7 +3271,7 @@
 
     type(json_value),pointer,intent(in)  :: me
     character(kind=CDK,len=*),intent(in) :: filename  !! the filename to print to (should not already be open)
-    
+
     integer(IK) :: iunit,istat
 
     open(newunit=iunit,file=filename,status='REPLACE',iostat=istat FILE_ENCODING )
@@ -3739,7 +3739,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Convert a string into an integer.
 !
 !# History
@@ -3754,7 +3754,7 @@
 
     character(kind=CK,len=*),intent(in) :: str
     integer(IK) :: ival
-    
+
     character(kind=CDK,len=:),allocatable :: digits
     integer(IK) :: ndigits_digits,ndigits,ierr
 
@@ -3997,7 +3997,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_get_integer_vec_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_integer_vec_with_path(me, path, vec, found)
@@ -4099,7 +4099,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_get_double_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_double_with_path(me, path, value, found)
@@ -4209,7 +4209,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_get_double_vec_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_double_vec_with_path(me, path, vec, found)
@@ -4303,7 +4303,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_get_logical_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_logical_with_path(me, path, value, found)
@@ -4413,7 +4413,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_get_logical_vec_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_logical_vec_with_path(me, path, vec, found)
@@ -4645,7 +4645,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_get_string_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_string_with_path(me, path, value, found)
@@ -4773,7 +4773,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_get_string_vec_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_string_vec_with_path(me, path, vec, found)
@@ -4880,7 +4880,7 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> 
+!>
 !  Alternate version of [[json_get_array_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_array_with_path(me, path, array_callback, found)
@@ -5088,7 +5088,7 @@
 
         !draw the arrow string that points to the current character:
         arrow_str = repeat('-',max( 0, char_count - 1) )//'^'
-        
+
         if (line_count>0 .and. char_count>0) then
 
             if (iunit/=0) then
@@ -6095,7 +6095,7 @@
 
     implicit none
 
-    integer(IK),intent(in)              :: unit   !! file unit number (if parsing from a file) 
+    integer(IK),intent(in)              :: unit   !! file unit number (if parsing from a file)
     character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
     character(kind=CK,len=*),intent(in) :: chars  !! the string to check for.
 
