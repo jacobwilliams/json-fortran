@@ -138,41 +138,45 @@ set_target_properties ( ${LIB_NAME}
   Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR} )
 
 #-------------------------------------
-# Build the documentation with ROBODoc
+# Build the documentation with FORD
 #-------------------------------------
 set ( SKIP_DOC_GEN FALSE CACHE BOOL
-  "Disable building the API documentation with ROBODoc" )
+  "Disable building the API documentation with FORD" )
 if ( NOT SKIP_DOC_GEN )
-  find_program ( ROBODOC robodoc )
-  if ( ROBODOC ) # Found
-    set ( ROBODOC_OPTIONS --rc ${CMAKE_SOURCE_DIR}/robodoc.rc
-      CACHE STRING "Options passed to robodoc to control building the documentation" )
-    set ( DOC_DIR "${CMAKE_BINARY_DIR}/documentation" )
-    set ( REQUIRED_ROBODOC_OPTIONS
-      --src "${CMAKE_SOURCE_DIR}/src" --doc "${DOC_DIR}"
-      --documenttitle "${CMAKE_PROJECT_NAME}" )
-    # Dynamically generate the ROBODoc outputs list
-    message ( STATUS "Dynamically computing ROBODoc output information..." )
-    execute_process ( COMMAND ${CMAKE_COMMAND} -E remove_directory ${DOC_DIR}
-      COMMAND ${CMAKE_COMMAND} -E make_directory ${DOC_DIR}
-      COMMAND "${ROBODOC}" ${REQUIRED_ROBODOC_OPTIONS} ${ROBODOC_OPTIONS} )
-    file ( GLOB_RECURSE ROBODOC_OUTPUTS
-      "${DOC_DIR}/*" )
-    execute_process ( COMMAND ${CMAKE_COMMAND} -E remove_directory ${DOC_DIR} )
-    message ( STATUS "Done dynamically computing ROBODoc outputs." )
+  find_program ( FORD ford )
+  if ( FORD ) # Found
+    set ( DOC_DIR "${CMAKE_BINARY_DIR}/doc" )
+    set ( FORD_PROJECT_FILE "${CMAKE_SOURCE_DIR}/json-fortran.md" )
+    # Dynamically generate the FORD outputs list
+    message ( STATUS "Dynamically computing FORD output information..." )
+    if ( NOT (DEFINED FORD_OUTPUTS_CACHED) )
+      message ( STATUS "Running FORD to dynamically compute documentation outputs, this could take a while..." )
+      execute_process ( COMMAND ${CMAKE_COMMAND} -E remove_directory ${DOC_DIR}
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${DOC_DIR}
+	COMMAND "${FORD}" -d "${CMAKE_SOURCE_DIR}/src" -o "${DOC_DIR}" "${FORD_PROJECT_FILE}" OUTPUT_QUIET )
+    endif ()
+    file ( GLOB_RECURSE FORD_OUTPUTS
+      "${DOC_DIR}/*.html" )
+    file ( GLOB_RECURSE FORD_CLEAN_OUTPUTS
+      "${DOC_DIR}/*.*" )
+    if ( (DEFINED FORD_OUTPUTS) AND ( NOT ( "${FORD_OUTPUTS}" STREQUAL "" ) ) )
+      set ( FORD_OUTPUTS_CACHED "${FORD_OUTPUTS}"
+	CACHE INTERNAL "internal variable to attempt to prevent rebuilding FORD docs" FORCE )
+    endif ()
+    message ( STATUS "Done dynamically computing FORD outputs." )
 
     foreach ( SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} )
-      list ( APPEND ROBO_DEPENDS "${SRC_FILE}" )
+      list ( APPEND FORD_DEPENDS "${SRC_FILE}" )
     endforeach ( SRC_FILE )
-    add_custom_command ( OUTPUT ${ROBODOC_OUTPUTS}
-      COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOC_DIR}" # Ensure DOC_DIR exists at build time
-      COMMAND "${ROBODOC}" ${REQUIRED_ROBODOC_OPTIONS} ${ROBODOC_OPTIONS}
-      DEPENDS ${ROBO_DEPENDS}
-      COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using ROBODoc" )
+    add_custom_command ( OUTPUT ${FORD_OUTPUTS_CACHED}
+      COMMAND "${FORD}" -d "${CMAKE_SOURCE_DIR}/src" -o "${DOC_DIR}" "${FORD_PROJECT_FILE}"
+      MAIN_DEPENDENCY "${FORD_PROJECT_FILE}"
+      DEPENDS ${FORD_DEPENDS}
+      COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using FORD" )
     add_custom_target ( documentation ALL
-      DEPENDS ${ROBODOC_OUTPUTS} )
+      DEPENDS ${FORD_OUTPUTS} )
     set ( INSTALL_API_DOCUMENTATION TRUE
-      CACHE BOOL "Install ROBODoc generated documentation?" )
+      CACHE BOOL "Install FORD generated documentation?" )
     if ( INSTALL_API_DOCUMENTATION )
       if ( USE_GNU_INSTALL_CONVENTION )
 	install ( DIRECTORY "${DOC_DIR}/" DESTINATION "${CMAKE_INSTALL_DOCDIR}" )
@@ -182,7 +186,7 @@ if ( NOT SKIP_DOC_GEN )
     endif ()
   else () # Not found
     message ( WARNING
-      "ROBODoc not found! Please set the CMake cache variable ROBODOC to point to the installed ROBODoc binary, and reconfigure or disable building the documentation. ROBODoc can be installed from: http://www.xs4all.nl/~rfsber/Robo/ If you do not wish to install ROBODoc and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
+      "FORD not found! Please set the CMake cache variable FORD to point to the installed FORD executable, and reconfigure or disable building the documentation. FORD can be installed from PYPI with `sudo pip install FORD` or from <https://github.com/cmacmackin/ford> If you do not wish to install FORD and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
   endif ()
 endif ()
 
@@ -209,7 +213,7 @@ if ( ENABLE_TESTS )
   set ( DATA_DIR "${CMAKE_BINARY_DIR}/files" )
 
   set_directory_properties ( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
-    "${DATA_DIR}/test2.json;${DATA_DIR}/test4.json" )
+    "${DATA_DIR}/test2.json;${DATA_DIR}/test4.json;${FORD_CLEAN_OUTPUTS}" )
 
   # Validate input
   if ( JSONLINT )
@@ -222,7 +226,7 @@ if ( ENABLE_TESTS )
       get_filename_component ( TESTNAME "${VALID_JSON}" NAME )
       add_test ( NAME validate-${TESTNAME}
 	WORKING_DIRECTORY "${DATA_DIR}/inputs"
-	COMMAND ${JSONLINT} "${VALID_JSON}" )
+	COMMAND ${JSONLINT} "--allow=nonescape-characters" "${VALID_JSON}" )
     endforeach ()
 
     foreach ( INVALID ${INVALID_JSON} )
@@ -267,7 +271,7 @@ if ( ENABLE_TESTS )
       get_filename_component ( TESTNAME ${JSON_FILE} NAME )
       add_test ( NAME validate-output-${TESTNAME}
 	WORKING_DIRECTORY "${DATA_DIR}"
-	COMMAND ${JSONLINT} ${TESTNAME} )
+	COMMAND ${JSONLINT} "--allow=nonescape-characters" ${TESTNAME} )
       set_property ( TEST validate-output-${TESTNAME}
 	APPEND
 	PROPERTY
