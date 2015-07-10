@@ -2,7 +2,10 @@
 !> author: Jacob Williams
 !  license: BSD
 !
-!  JSON-FORTRAN: A Fortran 2008 JSON (JavaScript Object Notation) API.
+!# JSON-FORTRAN:
+!  A Fortran 2008 JSON (JavaScript Object Notation) API.
+!
+!  [TOC]
 !
 !  This module provides an interface for reading and writing JSON files.
 !
@@ -19,14 +22,20 @@
 !      The documentation given here assumes ```USE_UCS4``` **is not** defined.
 #endif
 !
-!@note ```CK``` and ```CDK``` are the json-fortran character kind and json-fortran default
-!      character kind respectively. Client code must ensure characters of kind=CK
-!      are used for all character variables and strings passed to the json-fortran
-!      library *EXCEPT* for file names which must be of ```'DEFAULT'``` character kind,
-!      provided here as ```CDK```. In particular, any: json path, character or string, or
-!      object name passed to the json-fortran library *MUST* be of type ```CK```.
+!@warning ```CK``` and ```CDK``` are the json-fortran character kind and json-fortran default
+!         character kind respectively. Client code **MUST** ensure characters of ```kind=CK```
+!         are used for all character variables and strings passed to the json-fortran
+!         library *EXCEPT* for file names which must be of ```'DEFAULT'``` character kind,
+!         provided here as ```CDK```. In particular, any variable that is a: json path, string
+!         value or object name passed to the json-fortran library **MUST** be of type ```CK```.
 !
-!# License
+!@note Most string literal constants of default kind are fine to pass as arguments to
+!      JSON-Fortran procedures since they have been overloaded to accept ```intent(in)```
+!      character arguments of the default (```CDK```) kind. If you find a procedure which does
+!      not accept an ```intent(in)``` literal string argument of default kind, please
+!      [file an issue](https://github.com/jacobwilliams/json-fortran/issues/new) on github.
+!
+!## License
 !
 !  **json-fortran License:**
 !
@@ -78,7 +87,7 @@
 !    OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 !    DEALINGS IN THE SOFTWARE.
 !
-!# History
+!## History
 !  * Joseph A. Levin : March 2012 : Original FSON code [retrieved on 12/2/2013].
 !  * Jacob Williams : 2/8/2014 : Extensive modifications to the original FSON code.
 !    The original F95 code was split into four files:
@@ -89,7 +98,7 @@
 !    (e.g., allocatable strings, newunit, generic, class, and abstract interface).
 !  * Development continues at: [Github](http://github.com/jacobwilliams/json-fortran)
 !
-!# See also
+!## See also
 !  * [json-fortran development site](http://github.com/jacobwilliams/json-fortran)
 !  * [json-fortran online documentation](http://jacobwilliams.github.io/json-fortran)
 !  * [JSON website](http://www.json.org/)
