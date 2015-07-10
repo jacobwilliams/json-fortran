@@ -145,6 +145,7 @@ set ( SKIP_DOC_GEN FALSE CACHE BOOL
 if ( NOT SKIP_DOC_GEN )
   find_program ( FORD ford )
   if ( FORD ) # Found
+    file ( COPY "${CMAKE_SOURCE_DIR}/media" DESTINATION "${CMAKE_BINARY_DIR}/" )
     set ( DOC_DIR "${CMAKE_BINARY_DIR}/doc" )
     set ( FORD_PROJECT_FILE "${CMAKE_SOURCE_DIR}/json-fortran.md" )
     # Dynamically generate the FORD outputs list

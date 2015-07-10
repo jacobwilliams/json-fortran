@@ -6,12 +6,15 @@
 !
 !  This module provides an interface for reading and writing JSON files.
 !
-!@note ```USE_UCS4``` is an optional preprocessor flag.
+!@note ```-DUSE_UCS4``` is an optional preprocessor flag.
 !      When present, Unicode support is enabled. Note that this
 !      is currently only supported with the gfortran compiler.
 !      Example: ```gfortran -DUSE_UCS4 ... ```
 #ifdef USE_UCS4
+#  pragma push_macro("USE_UCS4")
+#  undef USE_UCS4
 !      The documentation given here assumes ```USE_UCS4``` **is** defined.
+#  pragma pop_macro("USE_UCS4")
 #else
 !      The documentation given here assumes ```USE_UCS4``` **is not** defined.
 #endif
