@@ -2,7 +2,7 @@
 !> author: Jacob Williams
 !  license: BSD
 !
-!# JSON-FORTRAN:
+!# JSON-Fortran:
 !  A Fortran 2008 JSON (JavaScript Object Notation) API.
 !
 !  [TOC]
@@ -37,7 +37,7 @@
 !
 !## License
 !
-!  **json-fortran License:**
+!  **JSON-Fortran License:**
 !
 !    JSON-Fortran: A Fortran 2008 JSON API
 !
