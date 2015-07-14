@@ -51,7 +51,7 @@ install:
   - sudo ln -fs /usr/bin/gcov-4.9 /usr/bin/gcov && gcov --version
   - if [[ $FoBiS == [yY]* ]]; then sudo -H pip install FoBiS.py && FoBiS.py --version; fi
   - if [[ $DOCS == [yY]* ]]; then sudo dpkg -i robodoc_4.99.41-1_amd64.deb && robodoc --version; fi
-  - if [[ $CHECK_README_PROGS == [yY]* ]]; then gfortran -o f90split f90split.f90 && ./f90split README.md && shopt -s extglob && for f in !(README|CONTRIBUTING).md; do mv $f src/tests/jf_test_${f%.md}.f90; done; rm f90split.f90 f90split; fi
+  - if [[ $CHECK_README_PROGS == [yY]* ]]; then gfortran -o f90split f90split.f90 && ./f90split README.md && shopt -s extglob && for f in !(README|CONTRIBUTING|CHANGELOG).md; do mv $f src/tests/jf_test_${f%.md}.f90; done; rm f90split.f90 f90split; fi
 
 script:
   - echo $BUILD_SCRIPT
