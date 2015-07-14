@@ -7,7 +7,7 @@
 !    json_module
 !
 !  DESCRIPTION
-!    JSON-FORTRAN: A Fortran 2008 JSON (JavaScript Object Notation) API.
+!    JSON-Fortran: A Fortran 2008 JSON (JavaScript Object Notation) API.
 !
 !  SEE ALSO
 !    * http://github.com/jacobwilliams/json-fortran [json-fortran development site]
@@ -19,7 +19,7 @@
 !
 !    json-fortran License:
 !
-!    JSON-FORTRAN: A Fortran 2008 JSON API
+!    JSON-Fortran: A Fortran 2008 JSON API
 !
 !    http://github.com/jacobwilliams/json-fortran
 !
@@ -2225,7 +2225,7 @@
 
     if (is_verbose) then
         write(*,'(A)') '***********************'
-        write(*,'(A)') 'JSON-FORTRAN EXCEPTION: '//trim(msg)
+        write(*,'(A)') 'JSON-Fortran EXCEPTION: '//trim(msg)
         !call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)
         !call tracebackqq(-1) ! intel (requires "use ifcore" in this routine)
         write(*,'(A)') '***********************'
