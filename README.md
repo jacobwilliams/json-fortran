@@ -66,7 +66,7 @@ brew install --with-unicode-support json-fortran
 _Please note_, if you wish to support usage of json-fortran with
 multiple Fortran compilers, please follow the CMake installation
 instructions below, as the homebrew installation is only intended to
-support a single Fortran compiler. Cheers! :beers:
+support a single Fortran compiler. Cheers!
 
 [top](#json-fortran-)
 Building the library
