@@ -3,10 +3,30 @@ language: python
 python:
   - 2.7
 
+sudo: false
+
+cache:
+  apt: true
+  pip: true
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.local
+
+addons:
+  apt:
+    sources:
+      - kalakris-cmake
+      - ubuntu-toolchain-r-test
+    packages:
+      - gfortran-4.9
+      - gfortran-5
+      - binutils
+      - cmake
+      - python-pip
+
 # Build matrix: Run the three build systems and tests in parallel
 env:
   global:
-    - DEPENDS="gfortran-4.9"
     - CHECK_README_PROGS="yes"
   matrix:
       # CMake build with unit tests, no documentation, with coverage analysis
@@ -17,72 +37,40 @@ env:
       cd cmake-build &&
       cmake -DCMAKE_BUILD_TYPE=COVERAGE .. &&
       make -j 4 check"
-      SPECIFIC_DEPENDS="cmake nodejs"
-      JLINT="yes"
-      DOCS="yes"
-      FoBiS="no"
       CODE_COVERAGE="yes"
 
       # build with build.sh, make documentation, run unit tests and perform coverage analysis
     - BUILD_SCRIPT="./build.sh --coverage --enable-unicode"
-      SPECIFIC_DEPENDS="binutils"
-      JLINT="no"
-      DOCS="yes"
-      FoBiS="yes"
       CODE_COVERAGE="yes"
 
-      # test scons build, no documentation or jsonlint, run unit tests
-    - BUILD_SCRIPT="scons && scons test"
-      SPECIFIC_DEPENDS=""
-      JLINT="no"
-      DOCS="no"
-      FoBiS="no"
-
-before_install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - |
-    if [[ $SPECIFIC_DEPENDS == *cmake* ]]; then
-      sudo apt-add-repository -y ppa:kalakris/cmake
-    fi
-  - sudo apt-get update -qq
-  - |
-    if [[ $JLINT == [yY]* ]]; then
-      curl -sL https://deb.nodesource.com/setup | sudo bash -x -
-    fi
-  - |
-    if [[ $CHECK_README_PROGS == [yY]* ]]; then
-      wget http://people.sc.fsu.edu/~jburkardt/f_src/f90split/f90split.f90
-    fi
-  - |
-    if [[ $DOCS == [yY]* ]]; then
-      export DEPENDS="$DEPENDS exuberant-ctags"
-    fi
-  - ulimit -s unlimited
-
 install:
-  - sudo apt-get install -y $SPECIFIC_DEPENDS $DEPENDS
   - |
-    if [[ $JLINT == [yY]* ]]; then
-      sudo npm install -g jsonlint
+    if [[ ! -d "$HOME/.local/bin" ]]; then
+      mkdir "$HOME/.local/bin"
     fi
-  - sudo ln -fs /usr/bin/gfortran-4.9 /usr/bin/gfortran && gfortran --version
-  - sudo ln -fs /usr/bin/gcov-4.9 /usr/bin/gcov && gcov --version
+  - export PATH="$HOME/.local/bin:$PATH"
+  - export FC=/usr/bin/gfortran-4.9
+  - ln -fs /usr/bin/gfortran-4.9 "$HOME/.local/bin/gfortran" && gfortran --version
+  - ls -l /usr/bin/gfortran-4.9
+  - ln -fs /usr/bin/gcov-4.9 "$HOME/.local/bin/gcov" && gcov --version
   - |
-    if [[ $FoBiS == [yY]* ]]; then
-      sudo -H pip install FoBiS.py && FoBiS.py --version
+    if ! which f90split; then
+      wget http://people.sc.fsu.edu/~jburkardt/f_src/f90split/f90split.f90 && \
+      gfortran -o f90split f90split.f90 && \
+      mv f90split "$HOME/.local/bin/" && \
+      rm f90split.f90
     fi
-  - |
-    if [[ $DOCS == [yY]* ]]; then
-      sudo -H pip install ford && ford --version
-    fi
+  - which FoBiS.py || (pip install FoBiS.py && FoBiS.py --version)
+  - which ford || (pip install ford && ford --version)
+  - which jsonlint || (pip install git+https://github.com/dmeranda/demjson.git && jsonlint --version)
+
+before_script:
   - |
     if [[ $CHECK_README_PROGS == [yY]* ]]; then
-      gfortran -o f90split f90split.f90 && \
-      ./f90split README.md && \
+      f90split README.md && \
       for f in example*.md; do
         mv $f src/tests/jf_test_${f%.md}.f90
       done
-      rm f90split.f90 f90split
     fi
 
 script:
@@ -91,7 +79,10 @@ script:
 
 after_success:
   - cd $TRAVIS_BUILD_DIR
-  - if [[ $CODE_COVERAGE == [yY]* ]]; then bash <(curl -s https://codecov.io/bash) ; fi
+  - |
+    if [[ $CODE_COVERAGE == [yY]* ]]; then
+      bash <(curl -s https://codecov.io/bash)
+    fi
   - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
   - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"
 #broken for now#  - ./deploy.sh #handles updating documentation for master branch as well as tags
