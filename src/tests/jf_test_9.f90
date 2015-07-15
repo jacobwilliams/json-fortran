@@ -12,7 +12,7 @@
 !
 !  LICENSE
 !
-!    JSON-FORTRAN: A Fortran 2008 JSON API
+!    JSON-Fortran: A Fortran 2008 JSON API
 !
 !    https://github.com/jacobwilliams/json-fortran
 !
