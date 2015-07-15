@@ -20,7 +20,7 @@
 #            profiling flags
 #        with :
 #            unit tests enabled
-#            documentation (if ROBODoc is installed)
+#            documentation (if FORD is installed)
 #
 #     More recent (right-most) flags will override preceding flags
 #     flags:
@@ -51,11 +51,11 @@
 #                                 fortran unit tests
 #
 #        --skip-documentation [{yes|no}]: Skip (or don't skip) building the json-
-#                                         fortran documentation using ROBODoc
+#                                         fortran documentation using FORD
 #
 #  REQUIRES
 #    FoBiS.py : https://github.com/szaghi/FoBiS      [version 1.2.5 or later required]
-#    RoboDoc  : http://rfsber.home.xs4all.nl/Robo/   [version 4.99.38 is the one tested]
+#    FORD     : https://github.com/cmacmackin/ford   [version 3.0.2 is the one tested]
 #
 #  AUTHOR
 #    Jacob Williams : 12/27/2014
@@ -63,7 +63,6 @@
 
 set -e
 
-#PROJECTNAME='jsonfortran'       # project name for robodoc (example: jsonfortran_2.0.0)
 FORDMD='json-fortran.md'        # FORD options file for building documentation
 DOCDIR='./documentation/'       # build directory for documentation
 SRCDIR='./src/'                 # library source directory

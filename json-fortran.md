@@ -1,10 +1,15 @@
 project: json-fortran
+favicon: ./media/json-fortran-32x32.png
 project_dir: ./src
+macro: USE_UCS4
 output_dir: ./doc
+media_dir: ./media
 project_github: https://github.com/jacobwilliams/json-fortran
 summary: JSON-FORTRAN -- A Fortran 2008 JSON API
 author: Jacob Williams
 github: https://github.com/jacobwilliams
+website: http://degenerateconic.com
+twitter: https://twitter.com/degenerateconic
 predocmark_alt: >
 predocmark: <
 docmark_alt:
@@ -12,9 +17,20 @@ docmark: !
 exclude_dir: tests
 exclude_dir: introspection
 display: public
-display: protected
-display: private
+         protected
+         private
 source: true
+md_extensions: markdown.extensions.toc(anchorlink=True)
+               markdown.extensions.smarty(smart_quotes=False)
+
+<!-- Uncommenting these should work, but this actually causes issues
+
+*[API]: Application Programmable Interface
+*[JSON]: JavaScript Object Notation
+
+-->
+
+[TOC]
 
 # Brief description
 
