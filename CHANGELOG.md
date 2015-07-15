@@ -1,5 +1,17 @@
 # Change Log
 
+**Table of Contents**
+
+- [Change Log](#change-log)
+    - [Unreleased](#unreleased)
+    - [4.1.1 (2015-05-27)](#411-2015-05-27)
+    - [4.1.0 (2015-05-05)](#410-2015-05-05)
+    - [4.0.0 (2015-03-16)](#400-2015-03-16)
+    - [3.1.0 (2015-02-28)](#310-2015-02-28)
+    - [3.0.0 (2015-01-18)](#300-2015-01-18)
+    - [2.0.0 (2014-12-27)](#200-2014-12-27)
+    - [1.0.0 (2014-06-23)](#100-2014-06-23)
+
 ## [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
 [Full Changelog](https://github.com/jacobwilliams/json-fortran/compare/4.1.1...HEAD)
