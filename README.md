@@ -26,13 +26,17 @@ A Fortran 2008 JSON API
 Status
 ------
 [![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
-[![codecov.io](http://codecov.io/github/jacobwilliams/json-fortran/coverage.svg?branch=master)](http://codecov.io/github/jacobwilliams/json-fortran?branch=master)<br/>
+[![Codecov](https://img.shields.io/codecov/c/github/jacobwilliams/json-fortran.svg?style=plastic)](http://codecov.io/github/jacobwilliams/json-fortran?branch=master)
+
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Blocked by Vendor Bug](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=vendor%20bug&title=Blocked%20by%20Vendor%20Bug)](https://waffle.io/jacobwilliams/json-fortran)
 [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/#contributing)
 [![In Progress](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=In%20Progress&title=In%20Progress)](https://waffle.io/jacobwilliams/json-fortran)
 [![Needs Review](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Needs%20Review&title=Needs%20Review)](https://waffle.io/jacobwilliams/json-fortran)
 
+Take a look at the
+[CHANGELOG](https://github.com/jacobwilliams/json-fortran/blob/master/CHANGELOG.md#unreleased)
+for a list of changes since the latest release.
 [top](#json-fortran)
 
 Brief description
