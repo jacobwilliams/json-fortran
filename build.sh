@@ -237,7 +237,6 @@ fi
 if [[ $CODE_COVERAGE == [yY]* ]]; then
     echo "Trying to compile with code coverage instrumentation."
     COVERAGE="-coverage"
-    FCOMPILERFLAGS+=' -O0'
 fi
 
 if [[ $CODE_PROFILE == [yY]* ]]; then
@@ -261,9 +260,6 @@ fi
 #build the stand-alone library:
 echo ""
 echo "Building library..."
-
-# work around for FoBiS.py PR #45
-[ -d "$LIBDIR" ] || mkdir "$LIBDIR"
 
 FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
 

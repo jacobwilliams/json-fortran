@@ -1119,8 +1119,8 @@
     !6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
     integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6
     ! real format set by library initialization
-    character(kind=CDK,len=*),parameter :: int_fmt  = '(I0)' !minimum width format for integers
-    character(kind=CK, len=*),parameter :: star     = '*'    !for invalid numbers
+    character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !minimum width format for integers
+    character(kind=CK, len=*),parameter :: star     = '*'       !for invalid numbers
 
     !real string printing:
     character(kind=CDK,len=:),allocatable :: real_fmt  !the format string to use for real numbers
@@ -2153,13 +2153,13 @@
     ! set the default output/input format for reals:
     !  [this only needs to be done once, since it can't change]
     if (.not. allocated(real_fmt)) then
-                      write(w,'(I0)',iostat=istat) max_numeric_str_len
-        if (istat==0) write(d,'(I0)',iostat=istat) real_precision
-        if (istat==0) write(e,'(I0)',iostat=istat) real_exponent_digits
+                      write(w,'(ss,I0)',iostat=istat) max_numeric_str_len
+        if (istat==0) write(d,'(ss,I0)',iostat=istat) real_precision
+        if (istat==0) write(e,'(ss,I0)',iostat=istat) real_exponent_digits
         if (istat==0) then
-            real_fmt = '(E' // trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
+            real_fmt = '(ss,E' // trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
         else
-            real_fmt = '(E30.16E3)'  !just use this one (should never happen)
+            real_fmt = '(ss,E30.16E3)'  !just use this one (should never happen)
         end if
     end if
 
@@ -8042,7 +8042,7 @@
     decimal_pos = scan(str,CK_'.')
     if (exp_start /= 0) separator = str(exp_start:exp_start)
 
-    if (exp_start > 0 .and. exp_start < decimal_pos) then !signed, exponent-less float
+    if ( exp_start < decimal_pos ) then !possibly signed, exponent-less float
 
         significand = str
         sig_trim = len(trim(significand))
