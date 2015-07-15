@@ -52,6 +52,14 @@ Looking to contribute something to [json-fortran](README.md)? **Here's how you c
 - Try not to pollute your pull request with unintended changes--keep them simple and small
 - Pull requests should address one issue at a time, and each commit should be a set of self contained, related changes. If you forget something in a commit, please use `git rebase -i <ref>^` to amend and/or squash erroneous commits. Here `<ref>` is the reference to to oldest commit needing to be modified (SHA, or `HEAD~4`, etc.)
 - Each commit should compile, and ideally pass the tests. Very complicated new features or fixes, may have commits that don't pass tests, if otherwise the commit history would include far to many changes in any given commit. Use an interactive rebase to fix any of these issues, as described above.
+- Each commit should have a concise, descriptive message following the
+  guidlines laid out
+  [here](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
+- Make sure to document your changes in the
+  [CHANGELOG](https://github.com/jacobwilliams/json-fortran/blob/master/CHANGELOG.md)
+  under the
+  ['unreleased'](https://github.com/jacobwilliams/json-fortran/blob/master/CHANGELOG.md#unreleased)
+  heading.
 - Pull requests should always be based on the upstream master,
 `jacobwilliams/json-fortran:master`. Please `rebase` your branch on top
 of the latest upstream master. Assuming you are on your branch and you've added the upstream remote by running something like:

@@ -5,7 +5,7 @@ macro: USE_UCS4
 output_dir: ./doc
 media_dir: ./media
 project_github: https://github.com/jacobwilliams/json-fortran
-summary: JSON-FORTRAN -- A Fortran 2008 JSON API
+summary: JSON-Fortran -- A Fortran 2008 JSON API
 author: Jacob Williams
 github: https://github.com/jacobwilliams
 website: http://degenerateconic.com

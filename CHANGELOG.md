@@ -1,10 +1,33 @@
 # Change Log
 
+**Table of Contents**
+
+- [Change Log](#change-log)
+    - [Unreleased](#unreleased)
+    - [4.1.1 (2015-05-27)](#411-2015-05-27)
+    - [4.1.0 (2015-05-05)](#410-2015-05-05)
+    - [4.0.0 (2015-03-16)](#400-2015-03-16)
+    - [3.1.0 (2015-02-28)](#310-2015-02-28)
+    - [3.0.0 (2015-01-18)](#300-2015-01-18)
+    - [2.0.0 (2014-12-27)](#200-2014-12-27)
+    - [1.0.0 (2014-06-23)](#100-2014-06-23)
+
 ## [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
 [Full Changelog](https://github.com/jacobwilliams/json-fortran/compare/4.1.1...HEAD)
 
 **Enhancements**
+- Add a
+  [CHANGELOG](https://github.com/jacobwilliams/json-fortran/blob/master/CHANGELOG.md)
+  [\#120](https://github.com/jacobwilliams/json-fortran/issues/120)
+  via
+  [PR \#123](https://github.com/jacobwilliams/json-fortran/pull/123)
+  from [zbeekman](https://github.com/zbeekman)
+- Spell 'Fortran' correctly
+  [\#118](https://github.com/jacobwilliams/json-fortran/issues/118)
+  via
+  [PR \#124](https://github.com/jacobwilliams/json-fortran/pull/124)
+  from [zbeekman](https://github.com/zbeekman)
 - Migrate to
   [Codecov.io](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
   [\#106](https://github.com/jacobwilliams/json-fortran/issues/106)
@@ -19,6 +42,12 @@
 
 **Fixed issues:**
 
+- Fixed innacurate coverage reports via
+  [PR \#109](https://github.com/jacobwilliams/json-fortran/pull/109)
+  from [zbeekman](https://github.com/zbeekman)
+- Fixed a small consistency issue when outputing floating point
+  numbers via
+  [PR \#125](https://github.com/jacobwilliams/json-fortran/pull/125)
 - Problems writing JSON to `error_unit` (0) due to JSON-Fortran's
   special interpretation of `unit=0`
   [\#85](https://github.com/jacobwilliams/json-fortran/issues/85)
@@ -34,15 +63,12 @@
 - Documentation fixes & coverage improvements
   [\#112](https://github.com/jacobwilliams/json-fortran/pull/112)
   ([zbeekman](https://github.com/zbeekman))
-- Small FoBiS coverage fix
-  [\#109](https://github.com/jacobwilliams/json-fortran/pull/109)
-  ([zbeekman](https://github.com/zbeekman))
-
 
 
 ## [4.1.1](https://github.com/jacobwilliams/json-fortran/tree/4.1.1) (2015-05-27)
 
 [Full Changelog](https://github.com/jacobwilliams/json-fortran/compare/4.1.0...4.1.1)
+or [Download v4.1.1](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.1)
 
 **Enhancements**
 
@@ -78,6 +104,7 @@
 ## [4.1.0](https://github.com/jacobwilliams/json-fortran/tree/4.1.0) (2015-05-05)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.0.0...4.1.0)
+or [Download v4.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.0)
 
 **Enhancements:**
 
@@ -98,6 +125,7 @@
 ## [4.0.0](https://github.com/jacobwilliams/json-fortran/tree/4.0.0) (2015-03-16)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/3.1.0...4.0.0)
+or [Download v4.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/4.0.0)
 
 **Enhancements**
 
@@ -168,6 +196,7 @@
 ## [3.1.0](https://github.com/jacobwilliams/json-fortran/tree/3.1.0) (2015-02-28)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/3.0.0...3.1.0)
+or [Download v3.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/3.1.0)
 
 **Enhancements:**
 
@@ -239,6 +268,7 @@
 ## [3.0.0](https://github.com/jacobwilliams/json-fortran/tree/3.0.0) (2015-01-18)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/2.0.0...3.0.0)
+or [Download v3.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/3.0.0)
 
 **Fixed issues:**
 
@@ -273,6 +303,7 @@
 ## [2.0.0](https://github.com/jacobwilliams/json-fortran/tree/2.0.0) (2014-12-27)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/1.0.0...2.0.0)
+or [Download v2.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/2.0.0)
 
 **Enhancements:**
 - Significant changes to the API including new procedures
@@ -287,6 +318,8 @@
 
 
 ## [1.0.0](https://github.com/jacobwilliams/json-fortran/tree/1.0.0) (2014-06-23)
+
+[Download v1.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/1.0.0)
 
 **Enhancements:**
 

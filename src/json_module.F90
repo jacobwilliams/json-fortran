@@ -2,7 +2,7 @@
 !> author: Jacob Williams
 !  license: BSD
 !
-!# JSON-FORTRAN:
+!# JSON-Fortran:
 !  A Fortran 2008 JSON (JavaScript Object Notation) API.
 !
 !  [TOC]
@@ -22,12 +22,12 @@
 !      The documentation given here assumes ```USE_UCS4``` **is not** defined.
 #endif
 !
-!@warning ```CK``` and ```CDK``` are the json-fortran character kind and json-fortran default
+!@warning ```CK``` and ```CDK``` are the JSON-Fortran character kind and JSON-Fortran default
 !         character kind respectively. Client code **MUST** ensure characters of ```kind=CK```
-!         are used for all character variables and strings passed to the json-fortran
+!         are used for all character variables and strings passed to the JSON-Fortran
 !         library *EXCEPT* for file names which must be of ```'DEFAULT'``` character kind,
 !         provided here as ```CDK```. In particular, any variable that is a: json path, string
-!         value or object name passed to the json-fortran library **MUST** be of type ```CK```.
+!         value or object name passed to the JSON-Fortran library **MUST** be of type ```CK```.
 !
 !@note Most string literal constants of default kind are fine to pass as arguments to
 !      JSON-Fortran procedures since they have been overloaded to accept ```intent(in)```
@@ -37,7 +37,7 @@
 !
 !## License
 !
-!  **json-fortran License:**
+!  **JSON-Fortran License:**
 !
 !    JSON-Fortran: A Fortran 2008 JSON API
 !
@@ -151,7 +151,7 @@
 
     !*********************************************************
     !>
-    !  Default character kind used by json-fortran.
+    !  Default character kind used by JSON-Fortran.
     !  If ISO 10646 (UCS4) support is available, use that,
     !  otherwise, gracefully fall back on 'DEFAULT' characters.
     !  Currently only gfortran >= 4.9.2 will correctly support
@@ -1550,7 +1550,7 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Initialize the json-fortran module.
+!  Initialize the JSON-Fortran module.
 !  The routine must be called before any of the routines are used.
 !  It can also be called after using the module and encountering exceptions.
 !
