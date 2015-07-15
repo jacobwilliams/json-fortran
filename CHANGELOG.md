@@ -55,6 +55,7 @@
 ## [4.1.1](https://github.com/jacobwilliams/json-fortran/tree/4.1.1) (2015-05-27)
 
 [Full Changelog](https://github.com/jacobwilliams/json-fortran/compare/4.1.0...4.1.1)
+or [Download v4.1.1](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.1)
 
 **Enhancements**
 
@@ -90,6 +91,7 @@
 ## [4.1.0](https://github.com/jacobwilliams/json-fortran/tree/4.1.0) (2015-05-05)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.0.0...4.1.0)
+or [Download v4.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.0)
 
 **Enhancements:**
 
@@ -110,6 +112,7 @@
 ## [4.0.0](https://github.com/jacobwilliams/json-fortran/tree/4.0.0) (2015-03-16)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/3.1.0...4.0.0)
+or [Download v4.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/4.0.0)
 
 **Enhancements**
 
@@ -180,6 +183,7 @@
 ## [3.1.0](https://github.com/jacobwilliams/json-fortran/tree/3.1.0) (2015-02-28)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/3.0.0...3.1.0)
+or [Download v3.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/3.1.0)
 
 **Enhancements:**
 
@@ -251,6 +255,7 @@
 ## [3.0.0](https://github.com/jacobwilliams/json-fortran/tree/3.0.0) (2015-01-18)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/2.0.0...3.0.0)
+or [Download v3.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/3.0.0)
 
 **Fixed issues:**
 
@@ -285,6 +290,7 @@
 ## [2.0.0](https://github.com/jacobwilliams/json-fortran/tree/2.0.0) (2014-12-27)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/1.0.0...2.0.0)
+or [Download v2.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/2.0.0)
 
 **Enhancements:**
 - Significant changes to the API including new procedures
@@ -299,6 +305,8 @@
 
 
 ## [1.0.0](https://github.com/jacobwilliams/json-fortran/tree/1.0.0) (2014-06-23)
+
+[Download v1.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/1.0.0)
 
 **Enhancements:**
 
