@@ -17,6 +17,17 @@
 [Full Changelog](https://github.com/jacobwilliams/json-fortran/compare/4.1.1...HEAD)
 
 **Enhancements**
+- Add a
+  [CHANGELOG](https://github.com/jacobwilliams/json-fortran/blob/master/CHANGELOG.md)
+  [\#120](https://github.com/jacobwilliams/json-fortran/issues/120)
+  via
+  [PR \#123](https://github.com/jacobwilliams/json-fortran/pull/123)
+  from [zbeekman](https://github.com/zbeekman)
+- Spell 'Fortran' correctly
+  [\#118](https://github.com/jacobwilliams/json-fortran/issues/118)
+  via
+  [PR \#124](https://github.com/jacobwilliams/json-fortran/pull/124)
+  from [zbeekman](https://github.com/zbeekman)
 - Migrate to
   [Codecov.io](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
   [\#106](https://github.com/jacobwilliams/json-fortran/issues/106)
@@ -31,6 +42,12 @@
 
 **Fixed issues:**
 
+- Fixed innacurate coverage reports via
+  [PR \#109](https://github.com/jacobwilliams/json-fortran/pull/109)
+  from [zbeekman](https://github.com/zbeekman)
+- Fixed a small consistency issue when outputing floating point
+  numbers via
+  [PR \#125](https://github.com/jacobwilliams/json-fortran/pull/125)
 - Problems writing JSON to `error_unit` (0) due to JSON-Fortran's
   special interpretation of `unit=0`
   [\#85](https://github.com/jacobwilliams/json-fortran/issues/85)
@@ -46,10 +63,6 @@
 - Documentation fixes & coverage improvements
   [\#112](https://github.com/jacobwilliams/json-fortran/pull/112)
   ([zbeekman](https://github.com/zbeekman))
-- Small FoBiS coverage fix
-  [\#109](https://github.com/jacobwilliams/json-fortran/pull/109)
-  ([zbeekman](https://github.com/zbeekman))
-
 
 
 ## [4.1.1](https://github.com/jacobwilliams/json-fortran/tree/4.1.1) (2015-05-27)
