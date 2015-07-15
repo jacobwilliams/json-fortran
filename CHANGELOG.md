@@ -17,6 +17,12 @@
 [Full Changelog](https://github.com/jacobwilliams/json-fortran/compare/4.1.1...HEAD)
 
 **Enhancements**
+- Removed official SCons support to facilitate faster development
+  cycle,
+  [\#121](https://github.com/jacobwilliams/json-fortran/issues/121)
+  via
+  [PR \#130](https://github.com/jacobwilliams/json-fortran/pull/130)
+  from [zbeekman](https://github.com/zbeekman)
 - Add a
   [CHANGELOG](https://github.com/jacobwilliams/json-fortran/blob/master/CHANGELOG.md)
   [\#120](https://github.com/jacobwilliams/json-fortran/issues/120)
@@ -62,6 +68,10 @@
 
 - Documentation fixes & coverage improvements
   [\#112](https://github.com/jacobwilliams/json-fortran/pull/112)
+  ([zbeekman](https://github.com/zbeekman))
+- Speedier container based
+  [Travis-CI](https://travis-ci.org/jacobwilliams/json-fortran) builds
+  [\#130](https://github.com/jacobwilliams/json-fortran/pull/130)
   ([zbeekman](https://github.com/zbeekman))
 
 
