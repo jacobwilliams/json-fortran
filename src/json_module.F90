@@ -1,29 +1,49 @@
 !*****************************************************************************************
-    module json_module
-!*****************************************************************************************
-!****h* JSON/json_module
+!> author: Jacob Williams
+!  license: BSD
 !
-!  NAME
-!    json_module
+!# JSON-FORTRAN:
+!  A Fortran 2008 JSON (JavaScript Object Notation) API.
 !
-!  DESCRIPTION
-!    JSON-Fortran: A Fortran 2008 JSON (JavaScript Object Notation) API.
+!  [TOC]
 !
-!  SEE ALSO
-!    * http://github.com/jacobwilliams/json-fortran [json-fortran development site]
-!    * http://jacobwilliams.github.io/json-fortran [json-fortran online documentation]
-!    * http://www.json.org/ [JSON website]
-!    * http://jsonlint.com/ [JSON validator]
+!  This module provides an interface for reading and writing JSON files.
 !
-!  LICENSE
+!@note ```-DUSE_UCS4``` is an optional preprocessor flag.
+!      When present, Unicode support is enabled. Note that this
+!      is currently only supported with the gfortran compiler.
+!      Example: ```gfortran -DUSE_UCS4 ... ```
+#ifdef USE_UCS4
+#  pragma push_macro("USE_UCS4")
+#  undef USE_UCS4
+!      The documentation given here assumes ```USE_UCS4``` **is** defined.
+#  pragma pop_macro("USE_UCS4")
+#else
+!      The documentation given here assumes ```USE_UCS4``` **is not** defined.
+#endif
 !
-!    json-fortran License:
+!@warning ```CK``` and ```CDK``` are the json-fortran character kind and json-fortran default
+!         character kind respectively. Client code **MUST** ensure characters of ```kind=CK```
+!         are used for all character variables and strings passed to the json-fortran
+!         library *EXCEPT* for file names which must be of ```'DEFAULT'``` character kind,
+!         provided here as ```CDK```. In particular, any variable that is a: json path, string
+!         value or object name passed to the json-fortran library **MUST** be of type ```CK```.
+!
+!@note Most string literal constants of default kind are fine to pass as arguments to
+!      JSON-Fortran procedures since they have been overloaded to accept ```intent(in)```
+!      character arguments of the default (```CDK```) kind. If you find a procedure which does
+!      not accept an ```intent(in)``` literal string argument of default kind, please
+!      [file an issue](https://github.com/jacobwilliams/json-fortran/issues/new) on github.
+!
+!## License
+!
+!  **json-fortran License:**
 !
 !    JSON-Fortran: A Fortran 2008 JSON API
 !
 !    http://github.com/jacobwilliams/json-fortran
 !
-!    Copyright (c) 2014, Jacob Williams
+!    Copyright (c) 2014-2015, Jacob Williams
 !
 !    All rights reserved.
 !
@@ -47,9 +67,7 @@
 !    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 !    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
-!    Original FSON License:
-!
-!    http://github.com/josephalevin/fson
+!  **Original FSON License:**
 !
 !    Copyright (c) 2012 Joseph A. Levin
 !
@@ -69,121 +87,58 @@
 !    OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 !    DEALINGS IN THE SOFTWARE.
 !
-!  HISTORY
-!    * Joseph A. Levin : March 2012 : Original FSON code [retrieved on 12/2/2013].
-!    * Jacob Williams : 2/8/2014 : Extensive modifications to the original FSON code.
-!      The original F95 code was split into four files:
-!      fson_path_m.f95, fson_string_m.f95, fson_value_m.f95, and fson.f95.
-!      The new code has been extensively updated, refactored and combined into this
-!      one module (json_module.f90).
-!      Various Fortran 2003/2008 features are now used
-!      (e.g., allocatable strings, newunit, generic, class, and abstract interface).
-!    * Development continues at: http://github.com/jacobwilliams/json-fortran
+!## History
+!  * Joseph A. Levin : March 2012 : Original FSON code [retrieved on 12/2/2013].
+!  * Jacob Williams : 2/8/2014 : Extensive modifications to the original FSON code.
+!    The original F95 code was split into four files:
+!    fson_path_m.f95, fson_string_m.f95, fson_value_m.f95, and fson.f95.
+!    The new code has been extensively updated, refactored and combined into this
+!    one module (json_module.f90).
+!    Various Fortran 2003/2008 features are now used
+!    (e.g., allocatable strings, newunit, generic, class, and abstract interface).
+!  * Development continues at: [Github](http://github.com/jacobwilliams/json-fortran)
 !
-!*****************************************************************************************
+!## See also
+!  * [json-fortran development site](http://github.com/jacobwilliams/json-fortran)
+!  * [json-fortran online documentation](http://jacobwilliams.github.io/json-fortran)
+!  * [JSON website](http://www.json.org/)
+!  * [JSON validator](http://jsonlint.com/)
+
+    module json_module
+
     use,intrinsic :: iso_fortran_env
 
     implicit none
 
     private
 
-    !*********************************************************
-    !****M* json_module/USE_UCS4
-    !
-    !  NAME
-    !    USE_UCS4
-    !
-    !  DESCRIPTION
-    !    USE_UCS4 is an optional preprocessor flag.
-    !    When present, Unicode support is enabled.
-    !
-    !  USAGE
-    !    When compiling:
-    !    * gfortran -DUSE_UCS4 ...
-    !
-    !*********************************************************
+    integer,parameter :: RK = real64  !! Default real kind [8 bytes]
+
+    integer,parameter :: IK = int32   !! Default integer kind [4 bytes].
 
     !*********************************************************
-    !****d* json_module/RK
-    !
-    !  NAME
-    !    RK
-    !
-    !  DESCRIPTION
-    !    Default real kind [8 bytes].
-    !
-    !  SOURCE
-    integer,parameter :: RK = real64
-    !*********************************************************
+    !>
+    !  Processor dependendant 'DEFAULT' character kind.
+    !  This is 1 byte for the Intel and Gfortran compilers.
 
-    !*********************************************************
-    !****d* json_module/IK
-    !
-    !  NAME
-    !    IK
-    !
-    !  DESCRIPTION
-    !    Default integer kind [4 bytes].
-    !
-    !  SOURCE
-    integer,parameter :: IK = int32
-    !*********************************************************
-
-    !*********************************************************
-    !****d* json_module/CDK
-    !
-    !  NAME
-    !    CDK
-    !
-    !  DESCRIPTION
-    !    Processor dependendant 'DEFAULT' character kind.
-    !    This is 1 byte for the Intel and Gfortran compilers.
-    !
-    !  NOTES
-    !   CK and CDK are the json-fortran character kind and json-fortran default
-    !   character kind respectively. Client code must ensure characters of kind=CK
-    !   are used for all character variables and strings passed to the json-fortran
-    !   library *EXCEPT* for file names which must be of 'DEFAULT' character kind,
-    !   provided here as CDK. In particular, any:
-    !   * file name
-    !   * format statement
-    !   * file path
-    !   passed to the json-fortran library *MUST* be of type CDK. This
-    !   will be the case for all string literals nor prepended with CK_ and only
-    !   if ISO 10646 is supported and enabled, will strings of kind CK be different
-    !   than CDK
-    !
-    !  SOURCE
     integer,parameter,public :: CDK = selected_char_kind('DEFAULT')
     !*********************************************************
 
     !*********************************************************
-    !****d* json_module/LK
+    !>
+    !  Default logical kind.
+    !  This is 4 bytes for the Intel and Gfortran compilers
+    !  (and perhaps others).
+    !  The declaration ensures a valid kind
+    !  if the compiler doesn't have a logical_kinds(3).
     !
-    !  NAME
-    !    LK
-    !
-    !  DESCRIPTION
-    !    Default logical kind.
-    !    This is 4 bytes for the Intel and Gfortran compilers
-    !    (and perhaps others).
-    !    The declaration ensures a valid kind
-    !    if the compiler doesn't have a logical_kinds(3).
-    !
-    !  SOURCE
     integer,parameter :: LK = logical_kinds(min(3,size(logical_kinds)))
     !*********************************************************
 
     !*********************************************************
-    !****M* json_module/json_fortran_string_kind
+    !>
+    !  String kind preprocessor macro.
     !
-    !  NAME
-    !    json_fortran_string_kind
-    !
-    !  DESCRIPTION
-    !    String kind preprocessor macro.
-    !
-    !  SOURCE
 #if defined __GFORTRAN__ && defined USE_UCS4
     ! gfortran compiler AND UCS4 support requested:
     character(kind=CDK,len=*),parameter :: json_fortran_string_kind = 'ISO_10646'
@@ -195,47 +150,20 @@
     !*********************************************************
 
     !*********************************************************
-    !****d* json_module/CK
-    !
-    !  NAME
-    !    CK
-    !
-    !  DESCRIPTION
-    !    Default character kind used by json-fortran.
-    !    If ISO 10646 (UCS4) support is available, use that,
-    !    otherwise, gracefully fall back on 'DEFAULT' characters.
-    !    Currently only gfortran >= 4.9.2 will correctly support
-    !    UCS4 which is stored in 4 bytes.
-    !    (and perhaps others).
-    !
-    !  NOTES
-    !   CK and CDK are the json-fortran character kind and json-fortran default
-    !   character kind respectively. Client code must ensure characters of kind=CK
-    !   are used for all character variables and strings passed to the json-fortran
-    !   library *EXCEPT* for file names which must be of 'DEFAULT' character kind,
-    !   provided here as JDCK. In particular, any:
-    !   * json path
-    !   * character or string
-    !   * object name
-    !   passed to the json-fortran library *MUST* be of type CK.
-    !
-    !  SEE ALSO
-    !    STRING_KIND
-    !
-    !  SOURCE
+    !>
+    !  Default character kind used by json-fortran.
+    !  If ISO 10646 (UCS4) support is available, use that,
+    !  otherwise, gracefully fall back on 'DEFAULT' characters.
+    !  Currently only gfortran >= 4.9.2 will correctly support
+    !  UCS4 which is stored in 4 bytes.
+    !  (and perhaps others).
+
     integer,parameter,public :: CK = selected_char_kind(json_fortran_string_kind)
     !*********************************************************
 
     !*********************************************************
-    !****M* json_module/FILE_ENCODING
+    ! File encoding preprocessor macro.
     !
-    !  NAME
-    !    FILE_ENCODING
-    !
-    !  DESCRIPTION
-    !    File encoding preprocessor macro.
-    !
-    !  SOURCE
 #if defined __GFORTRAN__ && defined USE_UCS4
     ! gfortran compiler AND UCS4 support requested, & silence redefine warning:
     ! Make sure we output files with utf-8 encoding too
@@ -251,23 +179,16 @@
     !*********************************************************
 
     !*********************************************************
-    !****M* json_module/MAYBEWRAP
+    ! This C preprocessor macro will take a procedure name as an
+    ! input, and output either that same procedure name if the
+    ! code is compiled without USE_UCS4 being defined or it will
+    ! expand the procedure name to the original procedure name,
+    ! followed by a comma and then the original procedure name
+    ! with 'wrap_' prepended to it. This is suitable for creating
+    ! overloaded interfaces that will accept UCS4 character actual
+    ! arguments as well as DEFAULT/ASCII character arguments,
+    ! based on whether or not ISO 10646 is supported and requested.
     !
-    !  NAME
-    !    MAYBEWRAP
-    !
-    !  DESCRIPTION
-    !    This C preprocessor macro will take a procedure name as an
-    !    input, and output either that same procedure name if the
-    !    code is compiled without USE_UCS4 being defined or it will
-    !    expand the procedure name to the original procedure name,
-    !    followed by a comma and then the original procedure name
-    !    with 'wrap_' prepended to it. This is suitable for creating
-    !    overloaded interfaces that will accept UCS4 character actual
-    !    arguments as well as DEFAULT/ASCII character arguments,
-    !    based on whether or not ISO 10646 is supported and requested.
-    !
-    !  SOURCE
 # ifdef USE_UCS4
 #   ifdef __GFORTRAN__
     ! gfortran uses cpp in old-school compatibility mode so
@@ -293,22 +214,12 @@
     !*********************************************************
 
     !*********************************************************
-    !****d* json_module/use_unformatted_stream
+    !>
+    !  If Unicode is not enabled, then
+    !  JSON files are opened using access='STREAM' and
+    !  form='UNFORMATTED'.  This allows the file to
+    !  be read faster.
     !
-    !  NAME
-    !    use_unformatted_stream
-    !
-    !  DESCRIPTION
-    !    If Unicode is not enabled, then
-    !    JSON files are opened using access='STREAM' and
-    !    form='UNFORMATTED'.  This allows the file to
-    !    be read faster.
-    !
-    !  SEE ALSO
-    !    * access_spec
-    !    * form_spec
-    !
-    !  SOURCE
 #ifdef USE_UCS4
     logical,parameter :: use_unformatted_stream = .false.
 #else
@@ -317,22 +228,12 @@
     !*********************************************************
 
     !*********************************************************
-    !****d* json_module/access_spec
+    !>
+    !  If Unicode is not enabled, then
+    !  JSON files are opened using access='STREAM' and
+    !  form='UNFORMATTED'.  This allows the file to
+    !  be read faster.
     !
-    !  NAME
-    !    access_spec
-    !
-    !  DESCRIPTION
-    !    If Unicode is not enabled, then
-    !    JSON files are opened using access='STREAM' and
-    !    form='UNFORMATTED'.  This allows the file to
-    !    be read faster.
-    !
-    !  SEE ALSO
-    !    * use_unformatted_stream
-    !    * form_spec
-    !
-    !  SOURCE
 #ifdef USE_UCS4
     character(kind=CDK,len=*),parameter :: access_spec = 'SEQUENTIAL'
 #else
@@ -341,22 +242,12 @@
     !*********************************************************
 
     !*********************************************************
-    !****d* json_module/form_spec
+    !>
+    !  If Unicode is not enabled, then
+    !  JSON files are opened using access='STREAM' and
+    !  form='UNFORMATTED'.  This allows the file to
+    !  be read faster.
     !
-    !  NAME
-    !    form_spec
-    !
-    !  DESCRIPTION
-    !    If Unicode is not enabled, then
-    !    JSON files are opened using access='STREAM' and
-    !    form='UNFORMATTED'.  This allows the file to
-    !    be read faster.
-    !
-    !  SEE ALSO
-    !    * use_unformatted_stream
-    !    * access_spec
-    !
-    !  SOURCE
 #ifdef USE_UCS4
     character(kind=CDK,len=*),parameter :: form_spec   = 'FORMATTED'
 #else
@@ -365,49 +256,35 @@
     !*********************************************************
 
     !*********************************************************
-    !****d* json_module/var_type
     !
-    !  NAME
-    !    var_type
+    !  The types of JSON data.
     !
-    !  DESCRIPTION
-    !   The types of JSON data.
-    !
-    !   These are the values returned by the var_type arguments
-    !   of the routines json_file_variable_info and json_info.
-    !
-    !  SOURCE
-
-    integer(IK),parameter,public :: json_unknown   = 0
-    integer(IK),parameter,public :: json_null      = 1
-    integer(IK),parameter,public :: json_object    = 2
-    integer(IK),parameter,public :: json_array     = 3
-    integer(IK),parameter,public :: json_logical   = 4
-    integer(IK),parameter,public :: json_integer   = 5
-    integer(IK),parameter,public :: json_double    = 6
-    integer(IK),parameter,public :: json_string    = 7
+    integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_null      = 1  !! Null JSON data type (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_object    = 2  !! Object JSON data type (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_array     = 3  !! Array JSON data type (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_integer   = 5  !! Integer JSON data type (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_double    = 6  !! Double JSON data type (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_string    = 7  !! String JSON data type (see [[json_file_variable_info]] and [[json_info]])
     !*********************************************************
 
     !*********************************************************
-    !****c* json_module/json_value
+    !>
+    !  Type used to construct the linked-list JSON structure.
+    !  Normally, this should always be a pointer variable.
     !
-    !  NAME
-    !    json_value
+    !# Example
     !
-    !  DESCRIPTION
-    !    Type used to construct the linked-list json structure
+    !```fortran
+    !    type(json_value),pointer :: p
+    !    call json_create_object(p,'')  !root
+    !    call json_add(p,'year',1805)
+    !    call json_add(p,'value',1.0d0)
+    !    call json_print(p,'test.json')
+    !    call json_destroy(p)
+    !```
     !
-    !  EXAMPLE
-    !    Consider the following example:
-    !     type(json_value),pointer :: p
-    !     call json_create_object(p,'')  !root
-    !     call json_add(p,'year',1805)
-    !     call json_add(p,'value',1.0d0)
-    !     call json_print(p,'test.json')
-    !     call json_destroy(p)
-    !
-    !  SOURCE
-
     type,public :: json_value
 
         !force the constituents to be stored contiguously
@@ -415,57 +292,51 @@
         ! is significant to avoid the misaligned field warnings]
         sequence
 
+        private
+
         !for the linked list:
-        type(json_value),pointer :: previous => null()
-        type(json_value),pointer :: next     => null()
-        type(json_value),pointer :: parent   => null()
-        type(json_value),pointer :: children => null()
-        type(json_value),pointer :: tail     => null()
+        type(json_value),pointer :: previous => null()  !! previous item in the list
+        type(json_value),pointer :: next     => null()  !! next item in the list
+        type(json_value),pointer :: parent   => null()  !! parent item of this
+        type(json_value),pointer :: children => null()  !! first child item of this
+        type(json_value),pointer :: tail     => null()  !! last child item of this
 
-        !variable name:
-        character(kind=CK,len=:),allocatable :: name
+        character(kind=CK,len=:),allocatable :: name  !! variable name
 
-        !the data for this variable:
-        real(RK),allocatable                 :: dbl_value
-        logical(LK),allocatable              :: log_value
-        character(kind=CK,len=:),allocatable :: str_value
-        integer(IK),allocatable              :: int_value
+        real(RK),allocatable                 :: dbl_value  !! real data for this variable
+        logical(LK),allocatable              :: log_value  !! logical data for this variable
+        character(kind=CK,len=:),allocatable :: str_value  !! string data for this variable
+        integer(IK),allocatable              :: int_value  !! integer data for this variable
 
-        integer(IK) :: var_type = json_unknown  !variable type
+        integer(IK) :: var_type = json_unknown  !! variable type
 
-        integer(IK),private :: n_children = 0   !number of children
+        integer(IK),private :: n_children = 0   !! number of children
 
     end type json_value
     !*********************************************************
 
     !*********************************************************
-    !****c* json_module/json_file
+    !> author: Jacob Williams
+    !  date: 12/9/2013
     !
-    !  NAME
-    !    json_file
+    !  The json_file is the main public class that is
+    !  used to open a file and get data from it.
     !
-    !  DESCRIPTION
-    !    The json_file is the main public class that is
-    !    used to open a file and get data from it.
+    !# Example
     !
-    !  EXAMPLE
-    !    Consider the following example:
-    !     type(json_file) :: json
-    !     integer :: ival
-    !     real(real64) :: rval
-    !     character(len=:),allocatable :: cval
-    !     logical :: found
-    !     call json%load_file(filename='myfile.json')
-    !     call json%print_file() !print to the console
-    !     call json%get('var.i',ival,found)
-    !     call json%get('var.r(3)',rval,found)
-    !     call json%get('var.c',cval,found)
-    !     call json%destroy()
-    !
-    !  AUTHOR
-    !    Jacob Williams : 12/9/2013
-    !
-    !  SOURCE
+    !```fortran
+    !    type(json_file) :: json
+    !    integer :: ival
+    !    real(real64) :: rval
+    !    character(len=:),allocatable :: cval
+    !    logical :: found
+    !    call json%load_file(filename='myfile.json')
+    !    call json%print_file() !print to the console
+    !    call json%get('var.i',ival,found)
+    !    call json%get('var.r(3)',rval,found)
+    !    call json%get('var.c',cval,found)
+    !    call json%destroy()
+    !```
 
     type,public :: json_file
 
@@ -476,13 +347,13 @@
 
     contains
 
-        procedure,public :: load_file        => json_file_load
+        procedure,public :: load_file => json_file_load
 
         generic,  public :: load_from_string => MAYBEWRAP(json_file_load_from_string)
 
-        procedure,public :: destroy     => json_file_destroy
-        procedure,public :: move        => json_file_move_pointer
-        generic  ,public :: info        => MAYBEWRAP(json_file_variable_info)
+        procedure,public :: destroy => json_file_destroy
+        procedure,public :: move    => json_file_move_pointer
+        generic,public   :: info    => MAYBEWRAP(json_file_variable_info)
 
         procedure,public :: print_to_string => json_file_print_to_string
 
@@ -545,18 +416,9 @@
     !*********************************************************
 
     !*************************************************************************************
-    !****I* json_module/array_callback_func
-    !
-    !  NAME
-    !    array_callback_func
-    !
-    !  DESCRIPTION
-    !    Array element callback function.  Used by json_get_array.
-    !
-    !  SEE ALSO
-    !    json_get_array
-    !
-    !  SOURCE
+    !>
+    !  Array element callback function.  Used by [[json_get_array]].
+
     abstract interface
         subroutine array_callback_func(element, i, count)
             import :: json_value,IK
@@ -581,19 +443,12 @@
 # endif
 
     !*************************************************************************************
-    !****I* json_module/json_get_child
+    !>
+    !  Get a child, either by index or name string.
+    !  Both of these return a [[json_value]] pointer.
     !
-    !  NAME
-    !    json_get_child
-    !
-    !  DESCRIPTION
-    !    Get a child, either by index or name string.
-    !    Both of these return a json_value pointer.
-    !
-    !  NOTES
-    !    Formerly, this was called json_value_get_child
-    !
-    !  SOURCE
+    !@note Formerly, this was called json_value_get_child
+
     interface json_get_child
         module procedure json_value_get_by_index
         module procedure MAYBEWRAP(json_value_get_by_name_chars)
@@ -601,18 +456,11 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_add
+    !>
+    !  Add objects to a linked list of [[json_value]]s.
     !
-    !  NAME
-    !    json_add
-    !
-    !  DESCRIPTION
-    !    Add objects to a linked list of json_values.
-    !
-    !  NOTES
-    !    Formerly, this was called json_value_add
-    !
-    !  SOURCE
+    !@note Formerly, this was called json_value_add
+
     interface json_add
         module procedure json_value_add_member
         module procedure MAYBEWRAP(json_value_add_integer)
@@ -633,23 +481,16 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_update
+    !>
+    !  These are like [[json_add]], except if a child with the same name is
+    !  already present, then its value is simply updated.
+    !  Note that currently, these only work for scalar variables.
+    !  These routines can also change the variable's type (but an error will be
+    !  thrown if the existing variable is not a scalar).
     !
-    !  NAME
-    !    json_update
-    !
-    !  DESCRIPTION
-    !    These are like json_add, except if a child with the same name is
-    !    already present, then its value is simply updated.
-    !    Note that currently, these only work for scalar variables.
-    !    These routines can also change the variable's type (but an error will be
-    !    thrown if the existing variable is not a scalar).
-    !
-    !  NOTES
-    !    It should not be used to change the type of a variable in an array,
-    !    or it may result in an invalid JSON file.
-    !
-    !  SOURCE
+    !@note It should not be used to change the type of a variable in an array,
+    !      or it may result in an invalid JSON file.
+
     interface json_update
         module procedure MAYBEWRAP(json_update_logical),&
                          MAYBEWRAP(json_update_double),&
@@ -663,21 +504,14 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_get
+    !>
+    !  Get data from a [[json_value]] linked list.
     !
-    !  NAME
-    !    json_get
-    !
-    !  DESCRIPTION
-    !    Get data from a json_value linked list.
-    !
-    !  NOTES
-    !    There are two versions (e.g. json_get_integer and json_get_integer_with_path).
-    !    The first one gets the value from the json_value passed into the routine,
-    !    while the second one gets the value from the json_value found by parsing the
-    !    path.  The path version is split up into unicode and non-unicode versions.
-    !
-    !  SOURCE
+    !@note There are two versions (e.g. [[json_get_integer]] and [[json_get_integer_with_path]]).
+    !      The first one gets the value from the [[json_value]] passed into the routine,
+    !      while the second one gets the value from the [[json_value]] found by parsing the
+    !      path.  The path version is split up into unicode and non-unicode versions.
+
     interface json_get
         module procedure                       MAYBEWRAP(json_get_by_path)
         module procedure json_get_integer,     MAYBEWRAP(json_get_integer_with_path)
@@ -693,36 +527,26 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_print_to_string
-    !
-    !  NAME
-    !    json_print_to_string
-    !
-    !  DESCRIPTION
-    !    Print the json_value structure to an allocatable string.
-    !
-    !  SOURCE
+    !>
+    !  Print the json_value structure to an allocatable string.
+
     interface json_print_to_string
         module procedure json_value_to_string
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_print
+    !>
+    !  Print the [[json_value]] to a file.
     !
-    !  NAME
-    !    json_print
+    !# Example
     !
-    !  DESCRIPTION
-    !    Print the json_value to a file.
-    !
-    !  EXAMPLE
-    !    Consider the following example:
-    !     type(json_value) :: p
-    !     !...
-    !     call json_print(p,'test.json')  !this is json_print_2
-    !
-    !  SOURCE
+    !```fortran
+    !    type(json_value) :: p
+    !    !...
+    !    call json_print(p,'test.json')  !this is [[json_print_2]]
+    !```
+
     interface json_print
         module procedure json_print_1    !input is unit number
         module procedure json_print_2    !input is file name
@@ -730,18 +554,15 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_destroy
+    !>
+    !  Destructor routine for a [[json_value]] pointer.
+    !  This must be called explicitly if it is no longer needed,
+    !  before it goes out of scope.  Otherwise, a memory leak will result.
     !
-    !  NAME
-    !    json_destroy
+    !# Example
     !
-    !  DESCRIPTION
-    !    Destructor routine for a json_value pointer.
-    !    This must be called explicitly if it is no longer needed,
-    !    before it goes out of scope.  Otherwise, a memory leak will result.
-    !
-    !  EXAMPLE
-    !    Destroy the json_value pointer before the variable goes out of scope:
+    !  Destroy the [[json_value]] pointer before the variable goes out of scope:
+    !```fortran
     !     subroutine example1()
     !     type(json_value),pointer :: p
     !     call json_create_object(p,'')
@@ -749,10 +570,12 @@
     !     call json_print(p)
     !     call json_destroy(p)
     !     end subroutine example1
+    !```
     !
-    !    Note: it should NOT be called for a json_value pointer than has already been
-    !    added to another json_value structure, since doing so may render the
-    !    other structure invalid.  Consider the following example:
+    !  Note: it should NOT be called for a [[json_value]] pointer than has already been
+    !  added to another [[json_value]] structure, since doing so may render the
+    !  other structure invalid.  Consider the following example:
+    !```fortran
     !     subroutine example2(p)
     !     type(json_value),pointer,intent(out) :: p
     !     type(json_value),pointer :: q
@@ -766,313 +589,213 @@
     !     ! somewhere upstream by the caller of this routine.
     !     nullify(q) !OK, but not strictly necessary
     !     end subroutine example2
-    !
-    !  SOURCE
+    !```
+
     interface json_destroy
         module procedure json_value_destroy
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_remove
-    !
-    !  NAME
-    !    json_remove
-    !
-    !  DESCRIPTION
-    !    Remove a json_value from a linked-list structure.
-    !
-    !  SOURCE
+    !>
+    !  Remove a [[json_value]] from a linked-list structure.
+
     interface json_remove
         module procedure json_value_remove
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_remove_if_present
-    !
-    !  NAME
-    !    json_remove_if_present
-    !
-    !  DESCRIPTION
-    !    If the child variable is present, then remove it.
-    !
-    !  SOURCE
+    !>
+    !  If the child variable is present, then remove it.
+
     interface json_remove_if_present
         module procedure MAYBEWRAP(json_value_remove_if_present)
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_create_double
+    !>
+    !  Allocate a [[json_value]] pointer and make it a double variable.
+    !  The pointer should not already be allocated.
     !
-    !  NAME
-    !    json_create_double
+    !# Example
     !
-    !  DESCRIPTION
-    !    Allocate a json_value pointer and make it a double variable.
-    !    The pointer should not already be allocated.
-    !
-    !  EXAMPLE
-    !    Example usage:
-    !     type(json_value),pointer :: p
-    !     call json_create_double(p,'value',1.0d0)
-    !
-    !  AUTHOR
-    !    Jacob Williams
-    !
-    !  SOURCE
+    !```fortran
+    !    type(json_value),pointer :: p
+    !    call json_create_double(p,'value',1.0d0)
+    !```
+
     interface json_create_double
         module procedure  MAYBEWRAP(json_value_create_double)
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_create_array
+    !>
+    !  Allocate a [[json_value]] pointer and make it an array variable.
+    !  The pointer should not already be allocated.
     !
-    !  NAME
-    !    json_create_array
+    !# Example
     !
-    !  DESCRIPTION
-    !    Allocate a json_value pointer and make it an array variable.
-    !    The pointer should not already be allocated.
-    !
-    !  EXAMPLE
-    !    Example usage:
+    !```fortran
     !     type(json_value),pointer :: p
     !     call json_create(p,'arrayname')
-    !
-    !  AUTHOR
-    !    Jacob Williams
-    !
-    !  SOURCE
+    !```
+
     interface json_create_array
         module procedure  MAYBEWRAP(json_value_create_array)
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_create_object
+    !>
+    !  Allocate a [[json_value]] pointer and make it an object variable.
+    !  The pointer should not already be allocated.
     !
-    !  NAME
-    !    json_create_object
+    !# Example
     !
-    !  DESCRIPTION
-    !    Allocate a json_value pointer and make it an object variable.
-    !    The pointer should not already be allocated.
-    !
-    !  EXAMPLE
-    !    Example usage:
+    !```fortran
     !     type(json_value),pointer :: p
     !     call json_create(p,'objectname')
+    !```
     !
-    !  NOTES
-    !    The name is not significant for the root structure or an array element.
-    !    In those cases, an empty string can be used.
-    !
-    !  AUTHOR
-    !    Jacob Williams
-    !
-    !  SOURCE
+    !@note The name is not significant for the root structure or an array element.
+    !      In those cases, an empty string can be used.
+
     interface json_create_object
         module procedure  MAYBEWRAP(json_value_create_object)
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_create_null
+    !>
+    !  Allocate a json_value pointer and make it a null variable.
+    !  The pointer should not already be allocated.
     !
-    !  NAME
-    !    json_create_null
+    !# Example
     !
-    !  DESCRIPTION
-    !    Allocate a json_value pointer and make it a null variable.
-    !    The pointer should not already be allocated.
-    !
-    !  EXAMPLE
-    !    Example usage:
+    !```fortran
     !     type(json_value),pointer :: p
     !     call json_create_null(p,'value')
-    !
-    !  AUTHOR
-    !    Jacob Williams
-    !
-    !  SOURCE
+    !```
+
     interface json_create_null
         module procedure  MAYBEWRAP(json_value_create_null)
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_create_string
+    !>
+    !  Allocate a json_value pointer and make it a string variable.
+    !  The pointer should not already be allocated.
     !
-    !  NAME
-    !    json_create_string
+    !# Example
     !
-    !  DESCRIPTION
-    !    Allocate a json_value pointer and make it a string variable.
-    !    The pointer should not already be allocated.
-    !
-    !  EXAMPLE
-    !    Example usage:
+    !```fortran
     !     type(json_value),pointer :: p
     !     call json_create_string(p,'value','foobar')
-    !
-    !  AUTHOR
-    !    Jacob Williams
-    !
-    !  SOURCE
+    !```
+
     interface json_create_string
         module procedure  MAYBEWRAP(json_value_create_string)
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_create_integer
+    !>
+    !  Allocate a json_value pointer and make it an integer variable.
+    !  The pointer should not already be allocated.
     !
-    !  NAME
-    !    json_create_integer
+    !# Example
     !
-    !  DESCRIPTION
-    !    Allocate a json_value pointer and make it an integer variable.
-    !    The pointer should not already be allocated.
-    !
-    !  EXAMPLE
-    !    Example usage:
+    !```fortran
     !     type(json_value),pointer :: p
     !     call json_create_integer(p,'value',42)
-    !
-    !  AUTHOR
-    !    Jacob Williams
-    !
-    !  SOURCE
+    !```
+
     interface json_create_integer
         module procedure  MAYBEWRAP(json_value_create_integer)
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_create_logical
+    !>
+    !  Allocate a json_value pointer and make it a logical variable.
+    !  The pointer should not already be allocated.
     !
-    !  NAME
-    !    json_create_logical
+    !# Example
     !
-    !  DESCRIPTION
-    !    Allocate a json_value pointer and make it a logical variable.
-    !    The pointer should not already be allocated.
-    !
-    !  EXAMPLE
-    !    Example usage:
+    !```fortran
     !     type(json_value),pointer :: p
     !     call json_create_logical(p,'value',.true.)
-    !
-    !  AUTHOR
-    !    Jacob Williams
-    !
-    !  SOURCE
+    !```
+
     interface json_create_logical
         module procedure  MAYBEWRAP(json_value_create_logical)
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/json_parse
-    !
-    !  NAME
-    !    json_parse
-    !
-    !  DESCRIPTION
-    !    Parse the JSON file and populate the json_value tree.
-    !
-    !  INPUTS
-    !    The inputs can be:
-    !    * file and unit : the specified unit is used to read JSON from file.
-    !                      [note if unit is already open, then the filename is ignored]
-    !    * file          : JSON is read from file using internal unit number
-    !    * str           : JSON data is read from the string instead
-    !
-    !  EXAMPLE
-    !    Consider the following example:
-    !     type(json_value),pointer :: p
-    !     call json_parse(file='myfile.json', p=p)
-    !
-    !  NOTES
-    !    When calling this routine, any exceptions thrown from previous
-    !    calls will automatically be cleared.
-    !
-    !  HISTORY
-    !    Jacob Williams : 1/13/2015 : added read from string option.
-    !
-    !  SOURCE
+    !>
+    !  Parse the JSON file and populate the [[json_value]] tree.
+
     interface json_parse
        module procedure  json_parse_file, MAYBEWRAP(json_parse_string)
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****I* json_module/to_unicode
-    !
-    !  NAME
-    !    to_unicode
-    !
-    !  DESCRIPTION
-    !    Convert a 'DEFAULT' kind character input to 'ISO_10646' kind and return it
-    !
-    !  SOURCE
+    !>
+    !  Convert a 'DEFAULT' kind character input to 'ISO_10646' kind and return it
+
     interface to_unicode
         module procedure to_uni, to_uni_vec
     end interface
     !*************************************************************************************
 
     !*************************************************************************************
-    !****iI* json_module/throw_exception
-    !
-    !  NAME
-    !    throw_exception
-    !
-    !  DESCRIPTION
-    !    Throw an exception.
-    !
-    !  SOURCE
+    !>
+    !  Throw an exception.
+
     interface throw_exception
        module procedure MAYBEWRAP(json_throw_exception)
     end interface throw_exception
     !*************************************************************************************
 
     !public routines:
-    public :: json_add                   !add data to a JSON structure
-    public :: json_check_for_errors      !check for error and get error message
-    public :: json_clear_exceptions      !clear exceptions
-    public :: json_count                 !count the number of children
-    public :: json_create_array          !allocate a json_value array
-    public :: json_create_double         !allocate a json_value double
-    public :: json_create_integer        !allocate a json_value integer
-    public :: json_create_logical        !allocate a json_value logical
-    public :: json_create_null           !allocate a json_value null
-    public :: json_create_object         !allocate a json_value object
-    public :: json_create_string         !allocate a json_value string
-    public :: json_destroy               !clear a JSON structure (destructor)
-    public :: json_failed                !check for error
-    public :: json_get                   !get data from the JSON structure
-    public :: json_get_child             !get a child of a json_value
-    public :: json_info                  !get info about a json_value
-    public :: json_initialize            !to initialize the module
-    public :: json_parse                 !read a JSON file and populate the structure
-    public :: json_print                 !print the JSON structure to a file
-    public :: json_print_to_string       !write the JSON structure to a string
-    public :: json_remove                !remove from a JSON structure
-    public :: json_remove_if_present     !remove from a JSON structure (if it is present)
-    public :: json_update                !update a value in a JSON structure
-    public :: json_print_error_message
-    public :: to_unicode                 !Function to convert from 'DEFAULT' to 'ISO_10646' strings
+    public :: json_add                   ! add data to a JSON structure
+    public :: json_check_for_errors      ! check for error and get error message
+    public :: json_clear_exceptions      ! clear exceptions
+    public :: json_count                 ! count the number of children
+    public :: json_create_array          ! allocate a json_value array
+    public :: json_create_double         ! allocate a json_value double
+    public :: json_create_integer        ! allocate a json_value integer
+    public :: json_create_logical        ! allocate a json_value logical
+    public :: json_create_null           ! allocate a json_value null
+    public :: json_create_object         ! allocate a json_value object
+    public :: json_create_string         ! allocate a json_value string
+    public :: json_destroy               ! clear a JSON structure (destructor)
+    public :: json_failed                ! check for error
+    public :: json_get                   ! get data from the JSON structure
+    public :: json_get_child             ! get a child of a json_value
+    public :: json_info                  ! get info about a json_value
+    public :: json_initialize            ! to initialize the module
+    public :: json_parse                 ! read a JSON file and populate the structure
+    public :: json_print                 ! print the JSON structure to a file
+    public :: json_print_to_string       ! write the JSON structure to a string
+    public :: json_remove                ! remove from a JSON structure
+    public :: json_remove_if_present     ! remove from a JSON structure (if it is present)
+    public :: json_update                ! update a value in a JSON structure
+    public :: json_print_error_message   !
+    public :: to_unicode                 ! Function to convert from 'DEFAULT' to 'ISO_10646' strings
 
 # ifdef USE_UCS4
     public :: operator(//)
     public :: operator(==)
 # endif
 
-    !JSON file extension
-    character(kind=CDK,len=*),parameter,public :: json_ext = '.json'   !JSON file extension
+    character(kind=CDK,len=*),parameter,public :: json_ext = '.json'   !! JSON file extension
 
     !special JSON characters
     character(kind=CK,len=*),parameter :: space           = ' '
@@ -1112,8 +835,10 @@
                                               rp_addl_safety
 
     !Get the number of possible digits in the exponent when using decimal number system
+    integer(IK),parameter :: maxexp = maxexponent(1.0_RK)
+    integer(IK),parameter :: minexp = minexponent(1.0_RK)
     integer(IK),parameter :: real_exponent_digits = floor( 1 + log10( &
-                                  real(max(maxexponent(1.0_RK),abs(minexponent(1.0_RK))),&
+                                  real(max(maxexp,abs(maxexp)),&
                                   kind=RK) ) )
 
     !6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
@@ -1142,32 +867,20 @@
     integer(IK) :: pushed_index = 0
     character(kind=CK,len=10) :: pushed_char = ''  !JW : what is this magic number 10??
 
-    !for allocatable strings:
-    integer(IK),parameter :: chunk_size = 100  !allocate chunks of this size
-    integer(IK) :: ipos = 1    !next character to read
+    integer(IK),parameter :: chunk_size = 100  !! for allocatable strings: allocate chunks of this size
+    integer(IK) :: ipos = 1                    !! for allocatable strings: next character to read
 
-    !unit number to cause stuff to be output to strings rather than files
-    !See 9.5.6.12 in the F2003/08 standard
-    integer(IK),parameter :: unit2str = -1
+    integer(IK),parameter :: unit2str = -1  !! unit number to cause stuff to be
+                                            !! output to strings rather than files.
+                                            !! See 9.5.6.12 in the F2003/08 standard
+
     contains
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/destroy_json_data
+!> author: Jacob Williams
 !
-!  NAME
-!    destroy_json_data
-!
-!  USAGE
-!    call destroy_json_data(d)
-!
-!  DESCRIPTION
-!    Destroy the json_data type.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!  Destroy the data within a [[json_value]], and rest type to json_unknown.
 
     subroutine destroy_json_data(d)
 
@@ -1186,21 +899,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_destroy
+!> author: Jacob Williams
+!  date: 12/9/2013
 !
-!  NAME
-!    json_file_destroy
-!
-!  USAGE
-!    call me%destroy()
-!
-!  DESCRIPTION
-!    Destroy the JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 12/9/2013
-!
-!  SOURCE
+!  Destroy the [[json_file]].
 
     subroutine json_file_destroy(me)
 
@@ -1214,25 +916,13 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_move_pointer
+!> author: Jacob Williams
+!  date: 12/5/2014
 !
-!  NAME
-!    json_file_move_pointer
+!  Move the [[json_value]] pointer from one [[json_file]] to another.
+!  The "from" pointer is then nullified, but not destroyed.
 !
-!  USAGE
-!    call to%move(from)
-!
-!  DESCRIPTION
-!    Move the json_value pointer from one json_file to another.
-!    The "from" pointer is then nullified, but not destroyed.
-!
-!  NOTES
-!    If "from%p" is not associated, then an error is thrown.
-!
-!  AUTHOR
-!    Jacob Williams : 12/5/2014
-!
-!  SOURCE
+!@note If "from%p" is not associated, then an error is thrown.
 
     subroutine json_file_move_pointer(to,from)
 
@@ -1252,31 +942,25 @@
     end subroutine json_file_move_pointer
 
 !*****************************************************************************************
-!****f* json_module/json_file_load
+!> author: Jacob Williams
+!  date: 12/9/2013
 !
-!  NAME
-!    json_file_load
+!  Load the JSON data from a file.
 !
-!  DESCRIPTION
-!    Load a JSON file.
+!# Example
 !
-!  EXAMPLE
-!    Load a file:
+!```fortran
 !     type(json_file) :: f
 !     call f%load_file('my_file.json')
-!
-!  AUTHOR
-!    Jacob Williams : 12/9/2013
-!
-!  SOURCE
+!```
 
     subroutine json_file_load(me, filename, unit)
 
     implicit none
 
-    class(json_file),intent(inout)      :: me
-    character(kind=CDK,len=*),intent(in) :: filename
-    integer(IK),intent(in),optional     :: unit
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: filename  !! the filename to open
+    integer(IK),intent(in),optional      :: unit      !! the unit number to use
 
     call json_parse(file=filename, p=me%p, unit=unit)
 
@@ -1284,30 +968,25 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_load_from_string
+!> author: Jacob Williams
+!  date: 1/13/2015
 !
-!  NAME
-!    json_file_load_from_string
+!  Load the JSON data from a string.
 !
-!  DESCRIPTION
-!    Load the JSON data from a string.
+!# Example
 !
-!  EXAMPLE
-!    Load JSON from a string:
+!  Load JSON from a string:
+!```fortran
 !     type(json_file) :: f
 !     call f%load_from_string('{ "name": "Leonidas" }')
-!
-!  AUTHOR
-!    Jacob Williams : 1/13/2015
-!
-!  SOURCE
+!```
 
     subroutine json_file_load_from_string(me, str)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
-    character(kind=CK,len=*),intent(in) :: str
+    character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
 
     call json_parse(str=str, p=me%p)
 
@@ -1315,15 +994,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_load_from_string
-!
-!  NAME
-!    wrap_json_file_load_from_string
-!
-!  SEE ALSO
-!    json_file_load_from_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_load_from_string]], where "str" is kind=CDK.
 
     subroutine wrap_json_file_load_from_string(me, str)
 
@@ -1338,21 +1010,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_print_to_console
+!> author: Jacob Williams
+!  date: 1/11/2015
 !
-!  NAME
-!    json_file_print_to_console
-!
-!  USAGE
-!    call me%print_file()
-!
-!  DESCRIPTION
-!    Print the JSON file to the console.
-!
-!  AUTHOR
-!    Jacob Williams : 1/11/2015
-!
-!  SOURCE
+!  Print the JSON file to the console.
 
     subroutine json_file_print_to_console(me)
 
@@ -1368,77 +1029,55 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_print_1
+!> author: Jacob Williams
+!  date: 12/9/2013
 !
-!  NAME
-!    json_file_print_1
-!
-!  USAGE
-!    call me%print_file(iunit)
-!
-!  DESCRIPTION
-!    Prints the JSON file the specified (non zero) file unit.
-!
-!  AUTHOR
-!    Jacob Williams : 12/9/2013
-!
-!  SOURCE
+!  Prints the JSON file to the specified file unit number.
 
     subroutine json_file_print_1(me, iunit)
 
     implicit none
 
     class(json_file),intent(inout)  :: me
-    integer(IK),intent(in)          :: iunit  !must not be -1
+    integer(IK),intent(in)          :: iunit  !! file unit number (must not be -1)
 
     integer(IK) :: i
     character(kind=CK,len=:),allocatable :: dummy
 
     if (iunit/=unit2str) then
         i = iunit
+        call json_value_print(me%p,iunit=i,str=dummy,indent=1,colon=.true.)
     else
         call throw_exception('Error in json_file_print_1: iunit must not be -1.')
-        return
     end if
-
-    call json_value_print(me%p,iunit=i,str=dummy,indent=1,colon=.true.)
 
     end subroutine json_file_print_1
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_print_2
+!> author: Jacob Williams
+!  date: 1/11/2015
 !
-!  NAME
-!    json_file_print_2
+!  Print the JSON structure to the specified filename.
+!  The file is opened, printed, and then closed.
 !
-!  USAGE
-!    call me%print_file(filename)
-!
-!  DESCRIPTION
-!    Print the JSON structure to the specified filename.
-!    The file is opened, printed, and then closed.
-!
-!  EXAMPLE
-!    Example loading a JSON file, changing a value, and then printing
-!    result to a new file:
+!# Example
+!  Example loading a JSON file, changing a value, and then printing
+!  result to a new file:
+!```fortran
 !     type(json_file) :: f
 !     logical :: found
 !     call f%load_file('my_file.json')    !open the original file
 !     call f%update('version',4,found)    !change the value of a variable
 !     call f%print_file('my_file_2.json') !save file as new name
-!
-!  AUTHOR
-!    Jacob Williams : 1/11/2015
-!
-!  SOURCE
+!```
 
     subroutine json_file_print_2(me,filename)
 
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: filename
+    character(kind=CDK,len=*),intent(in) :: filename  !! filename to print to
 
     integer(IK) :: iunit,istat
 
@@ -1455,35 +1094,27 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_print_to_string
+!> author: Jacob Williams
+!  date: 1/11/2015
 !
-!  NAME
-!    json_file_print_to_string
+!  Print the JSON file to a string.
 !
-!  USAGE
-!    call me%print_to_string(str)
+!# Example
 !
-!  DESCRIPTION
-!    Print the JSON file to a string.
-!
-!  EXAMPLE
-!    Open a JSON file, and then print the contents to a string:
+!  Open a JSON file, and then print the contents to a string:
+!```fortran
 !     type(json_file) :: f
 !     character(kind=CK,len=:),allocatable :: str
 !     call f%load_file('my_file.json')
 !     call f%print_file(str)
-!
-!  AUTHOR
-!    Jacob Williams : 1/11/2015
-!
-!  SOURCE
+!```
 
     subroutine json_file_print_to_string(me,str)
 
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CK,len=:),allocatable,intent(out) :: str
+    character(kind=CK,len=:),allocatable,intent(out) :: str  !! string to print JSON data to
 
     call json_value_to_string(me%p,str)
 
@@ -1491,31 +1122,20 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_variable_info
+!> author: Jacob Williams
+!  date: 2/3/2014
 !
-!  NAME
-!    json_file_variable_info
-!
-!  USAGE
-!    call me%info(path,found,var_type,n_children)
-!
-!  DESCRIPTION
-!    Returns information about a variable in a file.
-!
-!  AUTHOR
-!    Jacob Williams : 2/3/2014
-!
-!  SOURCE
+!  Returns information about a variable in a [[json_file]].
 
     subroutine json_file_variable_info(me,path,found,var_type,n_children)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
-    character(kind=CK,len=*),intent(in) :: path
-    logical(LK),intent(out)             :: found
-    integer(IK),intent(out)             :: var_type
-    integer(IK),intent(out)             :: n_children
+    character(kind=CK,len=*),intent(in) :: path       !! path to the variable
+    logical(LK),intent(out)             :: found      !! the variable exists in the structure
+    integer(IK),intent(out)             :: var_type   !! variable type
+    integer(IK),intent(out)             :: n_children !! number of children
 
     type(json_value),pointer :: p
 
@@ -1545,15 +1165,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_variable_info
-!
-!  NAME
-!    wrap_json_file_variable_info
-!
-!  SEE ALSO
-!    json_file_variable_info
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_variable_info]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_variable_info(me,path,found,var_type,n_children)
 
@@ -1571,26 +1184,18 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_info
+!> author: Jacob Williams
+!  date: 2/13/2014
 !
-!  NAME
-!    json_info
-!
-!  DESCRIPTION
-!    Returns information about a json_value
-!
-!  AUTHOR
-!    Jacob Williams : 2/13/2014
-!
-!  SOURCE
+!  Returns information about a [[json_value]].
 
     subroutine json_info(p,var_type,n_children)
 
     implicit none
 
     type(json_value),pointer         :: p
-    integer(IK),intent(out),optional :: var_type
-    integer(IK),intent(out),optional :: n_children
+    integer(IK),intent(out),optional :: var_type   !! variable type
+    integer(IK),intent(out),optional :: n_children !! number of children
 
     if (present(var_type))    var_type = p%var_type  !variable type
     if (present(n_children))  n_children = json_count(p)  !number of children
@@ -1599,30 +1204,19 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_get_object
+!> author: Jacob Williams
+!  date: 2/3/2014
 !
-!  NAME
-!    json_file_get_object
-!
-!  USAGE
-!    call me%get(path,p,found)
-!
-!  DESCRIPTION
-!    Get a pointer to an object from a JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 2/3/2014
-!
-!  SOURCE
+!  Get a [[json_value]] pointer to an object from a JSON file.
 
     subroutine json_file_get_object(me, path, p, found)
 
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CK,len=*),intent(in)  :: path
-    type(json_value),pointer,intent(out) :: p
-    logical(LK),intent(out),optional     :: found
+    character(kind=CK,len=*),intent(in)  :: path   !! the path to the variable
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+    logical(LK),intent(out),optional     :: found  !! if it was really found
 
     call json_get_by_path(me%p, path=path, p=p, found=found)
 
@@ -1630,15 +1224,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_get_object
-!
-!  NAME
-!    wrap_json_file_get_object
-!
-!  SEE ALSO
-!    json_file_get_object
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_get_object]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_object(me, path, p, found)
 
@@ -1655,30 +1242,19 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_get_integer
+!> author: Jacob Williams
+!  date: 12/9/2013
 !
-!  NAME
-!    json_file_get_integer
-!
-!  USAGE
-!    call me%get(path,val)
-!
-!  DESCRIPTION
-!    Get an integer from a JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 12/9/2013
-!
-!  SOURCE
+!  Get an integer value from a JSON file.
 
     subroutine json_file_get_integer(me, path, val, found)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
-    character(kind=CK,len=*),intent(in) :: path
-    integer(IK),intent(out)             :: val
-    logical(LK),intent(out),optional    :: found
+    character(kind=CK,len=*),intent(in) :: path   !! the path to the variable
+    integer(IK),intent(out)             :: val    !! value
+    logical(LK),intent(out),optional    :: found  !! if it was really found
 
     call json_get(me%p, path=path, value=val, found=found)
 
@@ -1686,15 +1262,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_get_integer
-!
-!  NAME
-!    wrap_json_file_get_integer
-!
-!  SEE ALSO
-!    json_file_get_integer
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_get_integer]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_integer(me, path, val, found)
 
@@ -1711,30 +1280,19 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_get_integer_vec
+!> author: Jacob Williams
+!  date: 1/20/2014
 !
-!  NAME
-!    json_file_get_integer_vec
-!
-!  USAGE
-!    call me%get(path,vec)
-!
-!  DESCRIPTION
-!    Get an integer vector from a JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 1/20/2014
-!
-!  SOURCE
+!  Get an integer vector from a JSON file.
 
     subroutine json_file_get_integer_vec(me, path, vec, found)
 
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CK,len=*),intent(in)              :: path
-    integer(IK),dimension(:),allocatable,intent(out) :: vec
-    logical(LK),intent(out),optional                 :: found
+    character(kind=CK,len=*),intent(in)              :: path   !! the path to the variable
+    integer(IK),dimension(:),allocatable,intent(out) :: vec    !! the value vector
+    logical(LK),intent(out),optional                 :: found  !! if it was really found
 
     call json_get(me%p, path, vec, found)
 
@@ -1742,15 +1300,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_get_integer_vec
-!
-!  NAME
-!    wrap_json_file_get_integer_vec
-!
-!  SEE ALSO
-!    json_file_get_integer_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_get_integer_vec]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_integer_vec(me, path, vec, found)
 
@@ -1767,21 +1318,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_get_double
+!> author: Jacob Williams
+!  date: 12/9/2013
 !
-!  NAME
-!    json_file_get_double
-!
-!  USAGE
-!    call me%get(path,val,found)
-!
-!  DESCRIPTION
-!    Get a double from a JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 12/9/2013
-!
-!  SOURCE
+!  Get a real(RK) variable value from a JSON file.
 
     subroutine json_file_get_double (me, path, val, found)
 
@@ -1798,15 +1338,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_get_double
-!
-!  NAME
-!    wrap_json_file_get_double
-!
-!  SEE ALSO
-!    json_file_get_double
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_get_double]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_double (me, path, val, found)
 
@@ -1823,21 +1356,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_get_double_vec
+!> author: Jacob Williams
+!  date: 1/19/2014
 !
-!  NAME
-!    json_file_get_double_vec
-!
-!  USAGE
-!    call me%get(path,vec,found)
-!
-!  DESCRIPTION
-!    Get a double vector from a JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 1/19/2014
-!
-!  SOURCE
+!  Get a real(RK) vector from a JSON file.
 
     subroutine json_file_get_double_vec(me, path, vec, found)
 
@@ -1854,15 +1376,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_get_double_vec
-!
-!  NAME
-!    wrap_json_file_get_double_vec
-!
-!  SEE ALSO
-!    json_file_get_double_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_get_double_vec]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_double_vec(me, path, vec, found)
 
@@ -1879,21 +1394,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_get_logical
+!> author: Jacob Williams
+!  date: 12/9/2013
 !
-!  NAME
-!    json_file_get_logical
-!
-!  USAGE
-!    call me%get(path,val,found)
-!
-!  DESCRIPTION
-!    Get a logical from a JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 12/9/2013
-!
-!  SOURCE
+!  Get a logical(LK) value from a JSON file.
 
     subroutine json_file_get_logical(me,path,val,found)
 
@@ -1910,15 +1414,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_get_logical
-!
-!  NAME
-!    wrap_json_file_get_logical
-!
-!  SEE ALSO
-!    json_file_get_logical
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_get_logical]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_logical(me,path,val,found)
 
@@ -1935,21 +1432,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_get_logical_vec
+!> author: Jacob Williams
+!  date: 1/20/2014
 !
-!  NAME
-!    json_file_get_logical_vec
-!
-!  USAGE
-!    call me%get(path,vec)
-!
-!  DESCRIPTION
-!    Get a logical vector from a JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 1/20/2014
-!
-!  SOURCE
+!  Get a logical(LK) vector from a JSON file.
 
     subroutine json_file_get_logical_vec(me, path, vec, found)
 
@@ -1966,15 +1452,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_get_logical_vec
-!
-!  NAME
-!    wrap_json_file_get_logical_vec
-!
-!  SEE ALSO
-!    json_file_get_logical_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_get_logical_vec]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_logical_vec(me, path, vec, found)
 
@@ -1991,22 +1470,11 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_get_string
+!> author: Jacob Williams
+!  date: 12/9/2013
 !
-!  NAME
-!    json_file_get_string
-!
-!  USAGE
-!    call me%get(path,val)
-!
-!  DESCRIPTION
-!    Get a character string from a json file.
-!    The output val is an allocatable character string.
-!
-!  AUTHOR
-!    Jacob Williams : 12/9/2013
-!
-!  SOURCE
+!  Get a character string from a json file.
+!  The output val is an allocatable character string.
 
     subroutine json_file_get_string(me, path, val, found)
 
@@ -2023,15 +1491,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_get_string
-!
-!  NAME
-!    wrap_json_file_get_string
-!
-!  SEE ALSO
-!    json_file_get_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_get_string]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_string(me, path, val, found)
 
@@ -2048,21 +1509,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_get_string_vec
+!> author: Jacob Williams
+!  date: 1/19/2014
 !
-!  NAME
-!    json_file_get_string_vec
-!
-!  USAGE
-!    call me%get(path,vec)
-!
-!  DESCRIPTION
-!    Get a string vector from a JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 1/19/2014
-!
-!  SOURCE
+!  Get a string vector from a JSON file.
 
     subroutine json_file_get_string_vec(me, path, vec, found)
 
@@ -2079,15 +1529,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_get_string_vec
-!
-!  NAME
-!    wrap_json_file_get_string_vec
-!
-!  SEE ALSO
-!    json_file_get_string_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_get_string_vec]], where "path" is kind=CDK.
 
     subroutine wrap_json_file_get_string_vec(me, path, vec, found)
 
@@ -2104,30 +1547,22 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_initialize
+!> author: Jacob Williams
+!  date: 12/4/2013
 !
-!  NAME
-!    json_initialize
+!  Initialize the json-fortran module.
+!  The routine must be called before any of the routines are used.
+!  It can also be called after using the module and encountering exceptions.
 !
-!  DESCRIPTION
-!    Initialize the json-fortran module.
-!    The routine must be called before any of the routines are used.
-!    It can also be called after using the module and encountering exceptions.
-!
-!  AUTHOR
-!    Jacob Williams : 12/4/2013
-!
-!  MODIFIED
-!    Izaak Beekman : 02/24/2015
-!
-!  SOURCE
+!# Modified
+!  * Izaak Beekman : 02/24/2015
 
     subroutine json_initialize(verbose,compact_reals)
 
     implicit none
 
-    logical(LK),intent(in),optional :: verbose  !mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !to compact the real number strings for output
+    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
+    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output
 
     character(kind=CDK,len=10) :: w,d,e
     integer(IK) :: istat
@@ -2148,7 +1583,7 @@
 
     !optional inputs (if not present, values remains unchanged):
     if (present(verbose))       is_verbose   = verbose
-    if (present(compact_reals)) compact_real = compact_reals  !may be a bug here in Gfortran 5.0.0... check this...
+    if (present(compact_reals)) compact_real = compact_reals
 
     ! set the default output/input format for reals:
     !  [this only needs to be done once, since it can't change]
@@ -2174,18 +1609,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_clear_exceptions
+!> author: Jacob Williams
+!  date: 12/4/2013
 !
-!  NAME
-!    json_clear_exceptions
-!
-!  DESCRIPTION
-!    Clear exceptions in the JSON module.
-!
-!  AUTHOR
-!    Jacob Williams : 12/4/2013
-!
-!  SOURCE
+!  Clear exceptions in the JSON module.
 
     subroutine json_clear_exceptions()
 
@@ -2199,20 +1626,12 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/throw_exception
+!> author: Jacob Williams
+!  date: 12/4/2013
 !
-!  NAME
-!    throw_exception
-!
-!  DESCRIPTION
-!    Throw an exception in the JSON module.
-!    This routine sets the error flag, and prevents any subsequent routine
-!    from doing anything, until json_clear_exceptions is called.
-!
-!  AUTHOR
-!    Jacob Williams : 12/4/2013
-!
-!  SOURCE
+!  Throw an exception in the JSON module.
+!  This routine sets the error flag, and prevents any subsequent routine
+!  from doing anything, until [[json_clear_exceptions]] is called.
 
     subroutine json_throw_exception(msg)
 
@@ -2235,15 +1654,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_throw_exception
-!
-!  NAME
-!    wrap_json_throw_exception
-!
-!  SEE ALSO
-!    json_throw_exception
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_throw_exception]], where "msg" is kind=CDK.
 
     subroutine wrap_json_throw_exception(msg)
 
@@ -2257,19 +1669,17 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_check_for_errors
+!> author: Jacob Williams
+!  date: 12/4/2013
 !
-!  NAME
-!    json_check_for_errors
+!  Retrieve error code from the module.
+!  This should be called after [[json_parse]] to check for errors.
+!  If an error is thrown, before using the module again, [[json_initialize]]
+!  should be called to clean up before it is used again.
 !
-!  DESCRIPTION
-!    Retrieve error code from the module.
-!    This should be called after json_parse to check for errors.
-!    If an error is thrown, before using the module again, json_initialize
-!    should be called to clean up before it is used again.
+!# Example
 !
-!  EXAMPLE
-!    Consider the following example:
+!```fortran
 !     type(json_file) :: json
 !     logical :: status_ok
 !     character(kind=CK,len=:),allocatable :: error_msg
@@ -2280,21 +1690,17 @@
 !         call json_clear_exceptions()
 !         call json%destroy()
 !     end if
+!```
 !
-!  SEE ALSO
-!    json_failed
-!
-!  AUTHOR
-!    Jacob Williams : 12/4/2013
-!
-!  SOURCE
+!# See also
+!  * [[json_failed]]
 
     subroutine json_check_for_errors(status_ok, error_msg)
 
     implicit none
 
-    logical(LK),intent(out) :: status_ok
-    character(kind=CK,len=:),allocatable,intent(out) :: error_msg
+    logical(LK),intent(out) :: status_ok !! true if there were no errors
+    character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! the error message (if there were errors)
 
     status_ok = .not. exception_thrown
 
@@ -2312,35 +1718,29 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_failed
+!> author: Jacob Williams
+!  date: 12/5/2013
 !
-!  NAME
-!    json_failed
+!  Logical function to indicate if an exception has been thrown.
 !
-!  DESCRIPTION
-!    Logical function to indicate if an exception has been thrown.
+!# Example
 !
-!  EXAMPLE
-!    Consider the following example:
-!     type(json_file) :: json
-!     logical :: status_ok
-!     character(len=:),allocatable :: error_msg
-!     call json%load_file(filename='myfile.json')
-!     if (json_failed()) then
-!         call json_check_for_errors(status_ok, error_msg)
-!         write(*,*) 'Error: '//error_msg
-!         call json_clear_exceptions()
-!         call json%destroy()
-!     end if
+!```fortran
+!    type(json_file) :: json
+!    logical :: status_ok
+!    character(len=:),allocatable :: error_msg
+!    call json%load_file(filename='myfile.json')
+!    if (json_failed()) then
+!        call json_check_for_errors(status_ok, error_msg)
+!        write(*,*) 'Error: '//error_msg
+!        call json_clear_exceptions()
+!        call json%destroy()
+!    end if
+!```
 !
-!  SEE ALSO
-!    json_check_for_errors
+!# See also
+!  * [[json_check_for_errors]]
 !
-!  AUTHOR
-!    Jacob Williams : 12/5/2013
-!
-!  SOURCE
-
     function json_failed() result(failed)
 
     implicit none
@@ -2353,26 +1753,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_create
+!>
+!  Allocate a [[json_value]] pointer variable.
+!  This should be called before adding data to it.
 !
-!  NAME
-!    json_value_create
+!# Example
 !
-!  DESCRIPTION
-!    Allocate a json_value pointer variable.
-!    This should be called before adding data to it.
+!```fortran
+!    type(json_value),pointer :: var
+!    call json_value_create(var)
+!    call to_double(var,1.0d0)
+!```
 !
-!  EXAMPLE
-!    Consider the following example:
-!     type(json_value),pointer :: var
-!     call json_value_create(var)
-!     call to_double(var,1.0d0)
-!
-!  NOTES
-!    This routine does not check for exceptions.
-!    The pointer should not already be allocated.
-!
-!  SOURCE
+!# Notes
+!  1. This routine does not check for exceptions.
+!  2. The pointer should not already be allocated.
 
     subroutine json_value_create(p)
 
@@ -2387,27 +1782,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_destroy
+!> author: Jacob Williams
+!  date: 1/22/2014
 !
-!  NAME
-!    json_value_destroy
+!  Destroy a [[json_value]] linked-list structure.
 !
-!  DESCRIPTION
-!    Destroy a json_value linked-list structure.
-!
-!  AUTHOR
-!    Jacob Williams : 1/22/2014 : The original version of this
-!    routine was not properly freeing the memory.
-!    It has been rewritten.
-!
-!  SOURCE
+!@note The original FSON version of this
+!      routine was not properly freeing the memory.
+!      It was rewritten.
 
     recursive subroutine json_value_destroy(me,destroy_next)
 
     implicit none
 
     type(json_value),pointer :: me
-    logical(LK),intent(in),optional :: destroy_next  !if true, then me%next is also destroyed (default is true)
+    logical(LK),intent(in),optional :: destroy_next  !! if true, then me%next is also destroyed (default is true)
 
     logical(LK) :: des_next
     type(json_value), pointer :: p
@@ -2451,51 +1840,45 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_remove
+!> author: Jacob Williams
+!  date: 9/9/2014
 !
-!  NAME
-!    json_value_remove
+!  Remove a [[json_value]] (and all its children)
+!  from a linked-list structure, preserving the rest of the structure.
 !
-!  DESCRIPTION
-!    Remove a json_value (and all its children)
-!    from a linked-list structure, preserving the rest of the structure.
+!# Examples
 !
-!  INPUT
-!    * If destroy is not present, it is also destroyed.
-!    * If destroy is present and true, it is destroyed.
-!    * If destroy is present and false, it is not destroyed.
-!
-!  EXAMPLE
-!
-!    To extract an object from one json structure, and add it to another:
+!  To extract an object from one JSON structure, and add it to another:
+!```fortran
 !     type(json_value),pointer :: json1,json2,p
 !     logical :: found
 !     !create and populate json1 and json2
 !     call json_get(json1,'name',p,found)  ! get pointer to name element of json1
 !     call json_remove(p,destroy=.false.)  ! remove it from json1 (don't destroy)
 !     call json_add(json2,p)               ! add it to json2
+!```
 !
-!    To remove an object from a json structure (and destroy it):
+!  To remove an object from a JSON structure (and destroy it):
+!```fortran
 !     type(json_value),pointer :: json1,p
 !     logical :: found
 !     !create and populate json1
 !     call json_get(json1,'name',p,found)  ! get pointer to name element of json1
 !     call json_remove(p)                  ! remove and destroy it
+!```
 !
-!  AUTHOR
-!    Jacob Williams : 9/9/2014
+!# History
+!  * Jacob Williams : 12/28/2014 : added destroy optional argument.
 !
-!  HISTORY
-!    JW : 12/28/2014 : added destroy optional argument.
-!
-!  SOURCE
 
     subroutine json_value_remove(me,destroy)
 
     implicit none
 
     type(json_value),pointer        :: me
-    logical(LK),intent(in),optional :: destroy
+    logical(LK),intent(in),optional :: destroy  !! If destroy is not present, it is also destroyed.
+                                                !! If destroy is present and true, it is destroyed.
+                                                !! If destroy is present and false, it is not destroyed.
 
     type(json_value),pointer :: parent,previous,next
     logical(LK) :: destroy_it
@@ -2558,19 +1941,11 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_remove_if_present
+!> author: Jacob Williams
+!  date: 12/6/2014
 !
-!  NAME
-!    json_value_remove_if_present
-!
-!  DESCRIPTION
-!    Given the path string, remove the variable from
-!    the json_value structure, if it exists.
-!
-!  AUTHOR
-!    Jacob Williams : 12/6/2014
-!
-!  SOURCE
+!  Given the path string, remove the variable from
+!  the [[json_value]] structure, if it exists.
 
     subroutine json_value_remove_if_present(p,name)
 
@@ -2589,15 +1964,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_remove_if_present
-!
-!  NAME
-!    wrap_json_value_remove_if_present
-!
-!  SEE ALSO
-!    json_value_remove_if_present
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_remove_if_present]], where "name" is kind=CDK.
 
     subroutine wrap_json_value_remove_if_present(p,name)
 
@@ -2612,23 +1980,15 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_update_integer
+!> author: Jacob Williams
+!  date:1/10/2015
 !
-!  NAME
-!    json_file_update_integer
+!  Given the path string, if the variable is present in the file,
+!  and is a scalar, then update its value.
+!  If it is not present, then create it and set its value.
 !
-!  DESCRIPTION
-!    Given the path string, if the variable is present in the file,
-!    and is a scalar, then update its value.
-!    If it is not present, then create it and set its value.
-!
-!  SEE ALSO
-!    json_update_integer
-!
-!  AUTHOR
-!    Jacob Williams : 1/10/2015
-!
-!  SOURCE
+!# See also
+!  * [[json_update_integer]]
 
     subroutine json_file_update_integer(me,name,val,found)
     implicit none
@@ -2644,15 +2004,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_update_integer
-!
-!  NAME
-!    wrap_json_file_update_integer
-!
-!  SEE ALSO
-!    json_file_update_integer
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_update_integer]], where "name" is kind=CDK.
 
     subroutine wrap_json_file_update_integer(me,name,val,found)
     implicit none
@@ -2668,23 +2021,15 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_update_logical
+!> author: Jacob Williams
+!  date: 1/10/2015
 !
-!  NAME
-!    json_file_update_logical
+!  Given the path string, if the variable is present in the file,
+!  and is a scalar, then update its value.
+!  If it is not present, then create it and set its value.
 !
-!  DESCRIPTION
-!    Given the path string, if the variable is present in the file,
-!    and is a scalar, then update its value.
-!    If it is not present, then create it and set its value.
-!
-!  SEE ALSO
-!    json_update_logical
-!
-!  AUTHOR
-!    Jacob Williams : 1/10/2015
-!
-!  SOURCE
+!# See also
+!  * [[json_update_logical]]
 
     subroutine json_file_update_logical(me,name,val,found)
     implicit none
@@ -2700,15 +2045,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_update_logical
-!
-!  NAME
-!    wrap_json_file_update_logical
-!
-!  SEE ALSO
-!    json_file_update_logical
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_update_logical]], where "name" is kind=CDK.
 
     subroutine wrap_json_file_update_logical(me,name,val,found)
     implicit none
@@ -2724,23 +2062,15 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_update_real
+!> author: Jacob Williams
+!  date: 1/10/2015
 !
-!  NAME
-!    json_file_update_real
+!  Given the path string, if the variable is present in the file,
+!  and is a scalar, then update its value.
+!  If it is not present, then create it and set its value.
 !
-!  DESCRIPTION
-!    Given the path string, if the variable is present in the file,
-!    and is a scalar, then update its value.
-!    If it is not present, then create it and set its value.
-!
-!  SEE ALSO
-!    json_update_real
-!
-!  AUTHOR
-!    Jacob Williams : 1/10/2015
-!
-!  SOURCE
+!# See also
+!  * [[json_update_double]]
 
     subroutine json_file_update_real(me,name,val,found)
     implicit none
@@ -2756,15 +2086,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_update_real
-!
-!  NAME
-!    wrap_json_file_update_real
-!
-!  SEE ALSO
-!    json_file_update_real
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_update_real]], where "name" is kind=CDK.
 
     subroutine wrap_json_file_update_real(me,name,val,found)
     implicit none
@@ -2780,23 +2103,15 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_update_string
+!> author: Jacob Williams
+!  date: 1/10/2015
 !
-!  NAME
-!    json_file_update_string
+!  Given the path string, if the variable is present in the file,
+!  and is a scalar, then update its value.
+!  If it is not present, then create it and set its value.
 !
-!  DESCRIPTION
-!    Given the path string, if the variable is present in the file,
-!    and is a scalar, then update its value.
-!    If it is not present, then create it and set its value.
-!
-!  SEE ALSO
-!    json_update_string
-!
-!  AUTHOR
-!    Jacob Williams : 1/10/2015
-!
-!  SOURCE
+!# See also
+!  * [[json_update_string]]
 
     subroutine json_file_update_string(me,name,val,found)
     implicit none
@@ -2812,15 +2127,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_file_update_string
-!
-!  NAME
-!    wrap_json_file_update_string
-!
-!  SEE ALSO
-!    json_file_update_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_update_string]], where "name" and "val" are kind=CDK.
 
     subroutine wrap_json_file_update_string(me,name,val,found)
     implicit none
@@ -2836,12 +2144,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_update_string_name_ascii
-!
-!  NAME
-!    json_file_update_string_name_ascii
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_update_string]], where "name" is kind=CDK.
 
     subroutine json_file_update_string_name_ascii(me,name,val,found)
     implicit none
@@ -2857,12 +2161,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_file_update_string_val_ascii
-!
-!  NAME
-!    json_file_update_string_val_ascii
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_file_update_string]], where "val" is kind=CDK.
 
     subroutine json_file_update_string_val_ascii(me,name,val,found)
     implicit none
@@ -2878,20 +2178,12 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_update_logical
+!> author: Jacob Williams
+!  date: 12/6/2014
 !
-!  NAME
-!    json_update_logical
-!
-!  DESCRIPTION
-!    Given the path string, if the variable is present,
-!    and is a scalar, then update its value.
-!    If it is not present, then create it and set its value.
-!
-!  AUTHOR
-!    Jacob Williams : 12/6/2014
-!
-!  SOURCE
+!  Given the path string, if the variable is present,
+!  and is a scalar, then update its value.
+!  If it is not present, then create it and set its value.
 
     subroutine json_update_logical(p,name,val,found)
 
@@ -2926,15 +2218,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_update_logical
-!
-!  NAME
-!    wrap_json_update_logical
-!
-!  SEE ALSO
-!    json_update_logical
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_update_logical]], where "name" is kind=CDK.
 
     subroutine wrap_json_update_logical(p,name,val,found)
 
@@ -2951,20 +2236,12 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_update_double
+!> author: Jacob Williams
+!  date: 12/6/2014
 !
-!  NAME
-!    json_update_double
-!
-!  DESCRIPTION
-!    Given the path string, if the variable is present,
-!    and is a scalar, then update its value.
-!    If it is not present, then create it and set its value.
-!
-!  AUTHOR
-!    Jacob Williams : 12/6/2014
-!
-!  SOURCE
+!  Given the path string, if the variable is present,
+!  and is a scalar, then update its value.
+!  If it is not present, then create it and set its value.
 
     subroutine json_update_double(p,name,val,found)
 
@@ -2999,15 +2276,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_update_double
-!
-!  NAME
-!    wrap_json_update_double
-!
-!  SEE ALSO
-!    json_update_double
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_update_double]], where "name" is kind=CDK.
 
     subroutine wrap_json_update_double(p,name,val,found)
 
@@ -3024,20 +2294,12 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_update_integer
+!> author: Jacob Williams
+!  date: 12/6/2014
 !
-!  NAME
-!    json_update_integer
-!
-!  DESCRIPTION
-!    Given the path string, if the variable is present,
-!    and is a scalar, then update its value.
-!    If it is not present, then create it and set its value.
-!
-!  AUTHOR
-!    Jacob Williams : 12/6/2014
-!
-!  SOURCE
+!  Given the path string, if the variable is present,
+!  and is a scalar, then update its value.
+!  If it is not present, then create it and set its value.
 
     subroutine json_update_integer(p,name,val,found)
 
@@ -3072,15 +2334,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_update_integer
-!
-!  NAME
-!    wrap_json_update_integer
-!
-!  SEE ALSO
-!    json_update_integer
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_update_integer]], where "name" is kind=CDK.
 
     subroutine wrap_json_update_integer(p,name,val,found)
 
@@ -3097,20 +2352,12 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_update_string
+!> author: Jacob Williams
+!  date: 12/6/2014
 !
-!  NAME
-!    json_update_string
-!
-!  DESCRIPTION
-!    Given the path string, if the variable is present,
-!    and is a scalar, then update its value.
-!    If it is not present, then create it and set its value.
-!
-!  AUTHOR
-!    Jacob Williams : 12/6/2014
-!
-!  SOURCE
+!  Given the path string, if the variable is present,
+!  and is a scalar, then update its value.
+!  If it is not present, then create it and set its value.
 
     subroutine json_update_string(p,name,val,found)
 
@@ -3145,15 +2392,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_update_string
-!
-!  NAME
-!    wrap_json_update_string
-!
-!  SEE ALSO
-!    json_update_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_update_string]], where "name" and "value" are kind=CDK.
 
     subroutine wrap_json_update_string(p,name,val,found)
 
@@ -3170,15 +2410,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_update_string_name_ascii
-!
-!  NAME
-!    json_update_string_name_ascii
-!
-!  SEE ALSO
-!    json_update_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_update_string]], where "name" is kind=CDK.
 
     subroutine json_update_string_name_ascii(p,name,val,found)
 
@@ -3195,15 +2428,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_update_string_val_ascii
-!
-!  NAME
-!    json_update_string_val_ascii
-!
-!  SEE ALSO
-!    json_update_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_update_string]], where "val" is kind=CDK.
 
     subroutine json_update_string_val_ascii(p,name,val,found)
 
@@ -3220,21 +2446,15 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_member
-!
-!  NAME
-!    json_value_add_member
-!
-!  DESCRIPTION
-!    Adds the member as a child of me.
-!
-!  SOURCE
+!>
+!  Adds "member" as a child of "me".
 
     subroutine json_value_add_member(me, member)
 
     implicit none
 
-    type(json_value),pointer :: me, member
+    type(json_value),pointer :: me
+    type(json_value),pointer :: member  !! the child member to add
 
     if (.not. exception_thrown) then
 
@@ -3264,30 +2484,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_double
+!> author: Jacob Williams
+!  date: 1/19/2014
 !
-!  NAME
-!    json_value_add_double
+!  Add a real value child to the [[json_value]] variable
 !
-!  DESCRIPTION
-!    Add a real value to the structure.
-!
-!  NOTES
-!    This routine is part of the public API that can be
-!    used to build a JSON structure using data.
-!
-!  AUTHOR
-!    Jacob Williams : 1/19/2014
-!
-!  SOURCE
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
 
     subroutine json_value_add_double(me, name, val)
 
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    real(RK),intent(in)                 :: val
+    character(kind=CK,len=*),intent(in) :: name  !! variable name
+    real(RK),intent(in)                 :: val   !! real value
 
     type(json_value),pointer :: var
 
@@ -3305,23 +2516,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_add_double
-!
-!  NAME
-!    wrap_json_value_add_double
-!
-!  SEE ALSO
-!    json_value_add_double
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_double]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_double(me, name, val)
 
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    real(RK),intent(in)                  :: val
+    character(kind=CDK,len=*),intent(in) :: name  !! variable name
+    real(RK),intent(in)                  :: val   !! real value
 
     call json_value_add_double(me, to_unicode(name), val)
 
@@ -3329,22 +2533,13 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_double_vec
+!> author: Jacob Williams
+!  date: 1/20/2014
 !
-!  NAME
-!    json_value_add_double_vec
+!  Add a real vector to the structure.
 !
-!  DESCRIPTION
-!    Add a real vector to the structure.
-!
-!  NOTES
-!    This routine is part of the public API that can be
-!    used to build a JSON structure using data.
-!
-!  AUTHOR
-!    Jacob Williams : 1/20/2014
-!
-!  SOURCE
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
 
     subroutine json_value_add_double_vec(me, name, val)
 
@@ -3376,15 +2571,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_add_double_vec
-!
-!  NAME
-!    wrap_json_value_add_double_vec
-!
-!  SEE ALSO
-!    json_value_add_double_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_double_vec]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_double_vec(me, name, val)
 
@@ -3400,22 +2588,13 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_integer
+!> author: Jacob Williams
+!  date: 1/20/2014
 !
-!  NAME
-!    json_value_add_integer
+!  Add an integer value child to the [[json_value]] variable
 !
-!  DESCRIPTION
-!    Add an integer value to the structure.
-!
-!  NOTES
-!    This routine is part of the public API that can be
-!    used to build a JSON structure using data.
-!
-!  AUTHOR
-!    Jacob Williams : 1/20/2014
-!
-!  SOURCE
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
 
     subroutine json_value_add_integer(me, name, val)
 
@@ -3441,23 +2620,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_add_integer
-!
-!  NAME
-!    wrap_json_value_add_integer
-!
-!  SEE ALSO
-!    json_value_add_integer
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_integer]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_integer(me, name, val)
 
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    integer(IK),intent(in)               :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    integer(IK),intent(in)               :: val    !! value
 
     call json_value_add_integer(me, to_unicode(name), val)
 
@@ -3465,30 +2637,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_integer_vec
+!> author: Jacob Williams
+!  date: 1/20/2014
 !
-!  NAME
-!    json_value_add_integer_vec
+!  Add an integer vector to the structure.
 !
-!  DESCRIPTION
-!    Add an integer vector to the structure.
-!
-!  NOTES
-!    This routine is part of the public API that can be
-!    used to build a JSON structure using data.
-!
-!  AUTHOR
-!    Jacob Williams : 1/20/2014
-!
-!  SOURCE
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
 
     subroutine json_value_add_integer_vec(me, name, val)
 
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    integer(IK),dimension(:),intent(in) :: val
+    character(kind=CK,len=*),intent(in) :: name   !! name of the variable
+    integer(IK),dimension(:),intent(in) :: val    !! value
 
     type(json_value),pointer :: var
     integer(IK) :: i    !counter
@@ -3512,23 +2675,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_add_integer_vec
-!
-!  NAME
-!    wrap_json_value_add_integer_vec
-!
-!  SEE ALSO
-!    json_value_add_integer_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_integer_vec]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_integer_vec(me, name, val)
 
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    integer(IK),dimension(:),intent(in)  :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    integer(IK),dimension(:),intent(in)  :: val    !! value
 
     call json_value_add_integer_vec(me, to_unicode(name), val)
 
@@ -3536,30 +2692,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_logical
+!> author: Jacob Williams
+!  date: 1/20/2014
 !
-!  NAME
-!    json_value_add_logical
+!  Add a logical value child to the [[json_value]] variable
 !
-!  DESCRIPTION
-!    Add a logical value to the structure.
-!
-!  NOTES
-!    This routine is part of the public API that can be
-!    used to build a JSON structure using data.
-!
-!  AUTHOR
-!    Jacob Williams : 1/20/2014
-!
-!  SOURCE
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
 
     subroutine json_value_add_logical(me, name, val)
 
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    logical(LK),intent(in)              :: val
+    character(kind=CK,len=*),intent(in) :: name   !! name of the variable
+    logical(LK),intent(in)              :: val    !! value
 
     type(json_value),pointer :: var
 
@@ -3577,23 +2724,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_add_logical
-!
-!  NAME
-!    wrap_json_value_add_logical
-!
-!  SEE ALSO
-!    json_value_add_logical
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_logical]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_logical(me, name, val)
 
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    logical(LK),intent(in)               :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    logical(LK),intent(in)               :: val    !! value
 
     call json_value_add_logical(me, to_unicode(name), val)
 
@@ -3601,30 +2741,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_logical_vec
+!> author: Jacob Williams
+!  date: 1/20/2014
 !
-!  NAME
-!    json_value_add_logical_vec
+!  Add a logical vector to the structure.
 !
-!  DESCRIPTION
-!    Add a logical vector to the structure.
-!
-!  NOTES
-!    This routine is part of the public API that can be
-!    used to build a JSON structure using data.
-!
-!  AUTHOR
-!    Jacob Williams : 1/20/2014
-!
-!  SOURCE
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
 
     subroutine json_value_add_logical_vec(me, name, val)
 
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    logical(LK),dimension(:),intent(in) :: val
+    character(kind=CK,len=*),intent(in) :: name  !! name of the vector
+    logical(LK),dimension(:),intent(in) :: val   !! value
 
     type(json_value),pointer :: var
     integer(IK) :: i    !counter
@@ -3648,23 +2779,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_add_logical_vec
-!
-!  NAME
-!    wrap_json_value_add_logical_vec
-!
-!  SEE ALSO
-!    json_value_add_logical_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_logical_vec]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_add_logical_vec(me, name, val)
 
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    logical(LK),dimension(:),intent(in)  :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    logical(LK),dimension(:),intent(in)  :: val    !! value
 
     call json_value_add_logical_vec(me, to_unicode(name), val)
 
@@ -3672,30 +2796,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_string
+!> author: Jacob Williams
+!  date: 1/19/2014
 !
-!  NAME
-!    json_value_add_string
+!  Add a character string child to the [[json_value]] variable.
 !
-!  DESCRIPTION
-!    Add a character string the structure.
-!
-!  NOTES
-!    This routine is part of the public API that can be
-!    used to build a JSON structure using data.
-!
-!  AUTHOR
-!    Jacob Williams : 1/19/2014
-!
-!  SOURCE
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
 
     subroutine json_value_add_string(me, name, val)
 
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    character(kind=CK,len=*),intent(in) :: val
+    character(kind=CK,len=*),intent(in) :: name  !! name of the variable
+    character(kind=CK,len=*),intent(in) :: val   !! value
 
     type(json_value),pointer :: var
     character(kind=CK,len=:),allocatable :: str
@@ -3717,23 +2832,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_add_string
-!
-!  NAME
-!    wrap_json_value_add_string
-!
-!  SEE ALSO
-!    json_value_add_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_string]] where "name" and "val" are kind=CDK.
 
     subroutine wrap_json_value_add_string(me, name, val)
 
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    character(kind=CDK,len=*),intent(in) :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    character(kind=CDK,len=*),intent(in) :: val    !! value
 
     call json_value_add_string(me, to_unicode(name), to_unicode(val))
 
@@ -3741,23 +2849,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_string_name_ascii
-!
-!  NAME
-!    json_value_add_string_name_ascii
-!
-!  SEE ALSO
-!    json_value_add_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_string]] where "name" is kind=CDK.
 
     subroutine json_value_add_string_name_ascii(me, name, val)
 
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CDK,len=*),intent(in) :: name
-    character(kind=CK, len=*),intent(in) :: val
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+    character(kind=CK, len=*),intent(in) :: val    !! value
 
     call json_value_add_string(me, to_unicode(name), val)
 
@@ -3765,23 +2866,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_string_val_ascii
-!
-!  NAME
-!    json_value_add_string_val_ascii
-!
-!  SEE ALSO
-!    json_value_add_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_string]] where "val" is kind=CDK.
 
     subroutine json_value_add_string_val_ascii(me, name, val)
 
     implicit none
 
     type(json_value),pointer             :: me
-    character(kind=CK, len=*),intent(in) :: name
-    character(kind=CDK,len=*),intent(in) :: val
+    character(kind=CK, len=*),intent(in) :: name   !! name of the variable
+    character(kind=CDK,len=*),intent(in) :: val    !! value
 
     call json_value_add_string(me, name, to_unicode(val))
 
@@ -3789,18 +2883,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/escape_string
+!> author: Jacob Williams
+!  date: 1/21/2014
 !
-!  NAME
-!    escape_string
-!
-!  DESCRIPTION
-!    Add the escape characters to a string for adding to JSON.
-!
-!  AUTHOR
-!    Jacob Williams : 1/21/2014
-!
-!  SOURCE
+!  Add the escape characters to a string for adding to JSON.
 
     subroutine escape_string(str_in, str_out)
 
@@ -3882,32 +2968,23 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_string_vec
+!> author: Jacob Williams
+!  date: 1/19/2014
 !
-!  NAME
-!    json_value_add_string_vec
+!  Add an array of character strings to the structure.
 !
-!  DESCRIPTION
-!    Add an array of character strings to the structure.
-!
-!  NOTES
-!    This routine is part of the public API that can be
-!    used to build a JSON structure using data.
-!
-!  AUTHOR
-!    Jacob Williams : 1/19/2014
-!
-!  SOURCE
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
 
     subroutine json_value_add_string_vec(me, name, val, trim_str, adjustl_str)
 
     implicit none
 
     type(json_value),pointer                         :: me
-    character(kind=CK,len=*),intent(in)              :: name
-    character(kind=CK,len=*),dimension(:),intent(in) :: val
-    logical(LK),intent(in),optional                  :: trim_str
-    logical(LK),intent(in),optional                  :: adjustl_str
+    character(kind=CK,len=*),intent(in)              :: name        !! variable name
+    character(kind=CK,len=*),dimension(:),intent(in) :: val         !! array of strings
+    logical(LK),intent(in),optional                  :: trim_str    !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional                  :: adjustl_str !! if ADJUSTL() should be called for each element
 
     type(json_value),pointer :: var
     integer(IK) :: i
@@ -3956,15 +3033,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_add_string_vec
-!
-!  NAME
-!    wrap_json_value_add_string_vec
-!
-!  SEE ALSO
-!    json_value_add_string_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_string_vec]] where "name" and "val" are kind=CDK.
 
     subroutine wrap_json_value_add_string_vec(me, name, val, trim_str, adjustl_str)
 
@@ -3982,15 +3052,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_string_vec_name_ascii
-!
-!  NAME
-!    json_value_add_string_vec_name_ascii
-!
-!  SEE ALSO
-!    json_value_add_string_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_string_vec]] where "name" is kind=CDK.
 
     subroutine json_value_add_string_vec_name_ascii(me, name, val, trim_str, adjustl_str)
 
@@ -4008,15 +3071,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_add_string_vec_val_ascii
-!
-!  NAME
-!    json_value_add_string_vec_val_ascii
-!
-!  SEE ALSO
-!    json_value_add_string_vec
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_add_string_vec]] where "val" is kind=CDK.
 
     subroutine json_value_add_string_vec_val_ascii(me, name, val, trim_str, adjustl_str)
 
@@ -4034,26 +3090,19 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_count
+!>
+!  Count the number of children.
 !
-!  NAME
-!    json_count
-!
-!  DESCRIPTION
-!    Count the number of children.
-!
-!  HISTORY
-!    JW : 1/4/2014 : Original routine removed.
+!# History
+!  * JW : 1/4/2014 : Original routine removed.
 !    Now using n_children variable.
 !    Renamed from json_value_count.
-!
-!  SOURCE
 
     pure function json_count(me) result(count)
 
     implicit none
 
-    integer(IK)                         :: count
+    integer(IK)                         :: count  !! number of children
     type(json_value),pointer,intent(in) :: me
 
     count = me%n_children
@@ -4062,23 +3111,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_get_by_index
-!
-!  NAME
-!    json_value_get_by_index
-!
-!  DESCRIPTION
-!    Returns a child in the object or array given the index.
-!
-!  SOURCE
+!>
+!  Returns a child in the object or array given the index.
 
     subroutine json_value_get_by_index(me, idx, p)
 
     implicit none
 
-    type(json_value),pointer,intent(in) :: me
-    integer(IK),intent(in)              :: idx
-    type(json_value),pointer            :: p
+    type(json_value),pointer,intent(in) :: me   !! object or array JSON data
+    integer(IK),intent(in)              :: idx  !! index of the child
+    type(json_value),pointer            :: p    !! pointer to the child
 
     integer(IK) :: i
 
@@ -4116,29 +3158,24 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_get_by_name_chars
+!>
+!  Returns a child in the object or array given the name string.
 !
-!  NAME
-!    json_value_get_by_name_chars
-!
-!  DESCRIPTION
-!    Returns a child in the object or array given the name string.
-!
-!  NOTES
-!    It is a case-sensitive search, and the name string is not trimmed,
-!    So, for example,
+!  It is a case-sensitive search, and the name string is not trimmed.
+!  So, for example,
+!```fortran
 !     'a ' /= 'A ' /= 'a  '
-!    Note that the name is not parsed like it is in json_get_by_path.
+!```
 !
-!  SOURCE
+!@note The "name" input is not a path, and is not parsed like it is in [[json_get_by_path]].
 
     subroutine json_value_get_by_name_chars(me, name, p)
 
     implicit none
 
     type(json_value),pointer,intent(in) :: me
-    character(kind=CK,len=*),intent(in) :: name
-    type(json_value),pointer            :: p
+    character(kind=CK,len=*),intent(in) :: name  !! the name of a child of "me"
+    type(json_value),pointer            :: p     !! pointer to the child
 
     integer(IK) :: i,n_children
 
@@ -4175,15 +3212,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_get_by_name_chars
-!
-!  NAME
-!    wrap_json_value_get_by_name_chars
-!
-!  SEE ALSO
-!    json_value_get_by_name_chars
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_value_get_by_name_chars]] where "name" is kind=CDK.
 
     subroutine wrap_json_value_get_by_name_chars(me, name, p)
 
@@ -4199,25 +3229,17 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_value_to_string
+!> author: Jacob Williams
+!  date: 2/12/2014
 !
-!  NAME
-!    json_value_to_string
-!
-!  DESCRIPTION
-!    Print the JSON structure to an allocatable string.
-!
-!  AUTHOR
-!    Jacob Williams : 2/12/2014
-!
-!  SOURCE
+!  Print the [[json_value]] structure to an allocatable string.
 
     subroutine json_value_to_string(me,str)
 
     implicit none
 
     type(json_value),pointer,intent(in)              :: me
-    character(kind=CK,len=:),intent(out),allocatable :: str
+    character(kind=CK,len=:),intent(out),allocatable :: str  !! prints structure to this string
 
     str = ''
     call json_value_print(me, iunit=unit2str, str=str, indent=1, colon=.true.)
@@ -4226,28 +3248,18 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_print_1
+!> author: Jacob Williams
+!  date: 6/20/2014
 !
-!  NAME
-!    json_print_1
-!
-!  DESCRIPTION
-!    Print the JSON structure to a file.
-!
-!  INPUT
-!    * iunit is the file unit (the file must already have been opened, can't be -1).
-!
-!  AUTHOR
-!    Jacob Williams, 6/20/2014
-!
-!  SOURCE
+!  Print the [[json_value]] structure to a file.
 
     subroutine json_print_1(me,iunit)
 
     implicit none
 
     type(json_value),pointer,intent(in)  :: me
-    integer(IK),intent(in)               :: iunit    !must not be -1
+    integer(IK),intent(in)               :: iunit   !! the file unit (the file must already have been opened, can't be -1).
+
     character(kind=CK,len=:),allocatable :: dummy
 
     if (iunit/=unit2str) then
@@ -4260,28 +3272,18 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_print_2
+!> author: Jacob Williams
+!  date: 12/23/2014
 !
-!  NAME
-!    json_print_2
-!
-!  DESCRIPTION
-!    Print the JSON structure to a file.
-!
-!  INPUT
-!    Input is the filename.
-!
-!  AUTHOR
-!    Jacob Williams, 12/23/2014
-!
-!  SOURCE
+!  Print the [[json_value]] structure to a file.
 
     subroutine json_print_2(me,filename)
 
     implicit none
 
-    type(json_value),pointer,intent(in) :: me
-    character(kind=CDK,len=*),intent(in) :: filename
+    type(json_value),pointer,intent(in)  :: me
+    character(kind=CDK,len=*),intent(in) :: filename  !! the filename to print to (should not already be open)
+
     integer(IK) :: iunit,istat
 
     open(newunit=iunit,file=filename,status='REPLACE',iostat=istat FILE_ENCODING )
@@ -4297,37 +3299,30 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_print
+!>
+!  Print the JSON structure to a string or a file.
 !
-!  NAME
-!    json_value_print
-!
-!  DESCRIPTION
-!    Print the JSON structure to a string or a file.
-!
-!  NOTES
-!    * This is an internal routine called by the wrapper routines
-!      json_print and json_value_to_string
-!    * The reason the str argument is non-optional is because of a
-!      bug in v4.9 of the gfortran compiler.
-!
-!  SOURCE
+!# Notes
+!  * This is an internal routine called by the wrapper routines
+!    [[json_print]] and [[json_value_to_string]].
+!  * The reason the str argument is non-optional is because of a
+!    bug in v4.9 of the gfortran compiler.
 
     recursive subroutine json_value_print(me,iunit,str,indent,need_comma,colon,is_array_element)
 
     implicit none
 
     type(json_value),pointer,intent(in)  :: me
-    integer(IK),intent(in)               :: iunit             !file unit to write to (6=console)
-    integer(IK),intent(in),optional      :: indent            !indention level
-    logical(LK),intent(in),optional      :: is_array_element  !if this is an array element
-    logical(LK),intent(in),optional      :: need_comma        !if it needs a comma after it
-    logical(LK),intent(in),optional      :: colon             !if the colon was just written
+    integer(IK),intent(in)               :: iunit             !! file unit to write to (6=console)
+    integer(IK),intent(in),optional      :: indent            !! indention level
+    logical(LK),intent(in),optional      :: is_array_element  !! if this is an array element
+    logical(LK),intent(in),optional      :: need_comma        !! if it needs a comma after it
+    logical(LK),intent(in),optional      :: colon             !! if the colon was just written
     character(kind=CK,len=:),intent(inout),allocatable :: str
-                                                      !if iunit==unit2str (-1) then the structure is
-                                                      ! printed to this string rather than
-                                                      ! a file. This mode is used by
-                                                      ! json_value_to_string.
+                                                      !! if iunit==unit2str (-1) then the structure is
+                                                      !! printed to this string rather than
+                                                      !! a file. This mode is used by
+                                                      !! [[json_value_to_string]].
 
     character(kind=CK,len=max_numeric_str_len) :: tmp !for val to string conversions
     character(kind=CK,len=:),allocatable :: s
@@ -4560,36 +3555,31 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_by_path
+!>
+!  Returns the [[json_value]] pointer given the path string.
 !
-!  NAME
-!    json_get_by_path
+!# Example
 !
-!  USAGE
-!    call json_get(me,path,p,found)
-!
-!  DESCRIPTION
-!    Returns the json_value pointer given the path string.
-!
-!  EXAMPLE
-!    Consider the following example:
+!```fortran
 !     type(json_value),pointer :: dat,p
 !     logical :: found
 !     !...
 !     call json_get(dat,'data(2).version',p,found)
+!```
 !
-!  NOTES
-!    The following special characters are used to denote paths:
-!     $         - root
-!     @         - this
-!     .         - child object member
-!     [] or ()  - child array element
+!# Notes
+!  The following special characters are used to denote paths:
 !
-!    Thus, if any of these characters are present in the name key,
-!    this routine cannot be used to get the value.
-!    In that case, the json_get_child routines would need to be used.
+!```
+!  $         - root
+!  @         - this
+!  .         - child object member
+!  [] or ()  - child array element
+!```
 !
-!  SOURCE
+!  Thus, if any of these characters are present in the name key,
+!  this routine cannot be used to get the value.
+!  In that case, the [[json_get_child]] routines would need to be used.
 
     subroutine json_get_by_path(me, path, p, found)
 
@@ -4598,7 +3588,7 @@
     type(json_value),pointer,intent(in)  :: me
     character(kind=CK,len=*),intent(in)  :: path
     type(json_value),pointer,intent(out) :: p
-    logical(LK),intent(out),optional     :: found
+    logical(LK),intent(out),optional     :: found  !! true if it was found
 
     character(kind=CK,len=1),parameter :: start_array_alt = '('
     character(kind=CK,len=1),parameter :: end_array_alt   = ')'
@@ -4743,15 +3733,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_by_path
-!
-!  NAME
-!    wrap_json_get_by_path
-!
-!  SEE ALSO
-!    json_get_by_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_by_path]] where "path" is kind=CDK.
 
     subroutine wrap_json_get_by_path(me, path, p, found)
 
@@ -4768,31 +3751,24 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/string_to_integer
+!>
+!  Convert a string into an integer.
 !
-!  NAME
-!    string_to_integer
+!# History
+!  * Jacob Williams : 12/10/2013 : Rewrote routine.  Added error checking.
+!  * Modified by Izaak Beekman
 !
-!  DESCRIPTION
-!    Convert a string into an integer.
-!
-!  NOTES
-!    Replacement for the parse_integer function in the original code.
-!
-!  AUTHOR
-!    Jacob Williams : 12/10/2013 : Rewrote routine.  Added error checking.
-!
-!  SOURCE
+!@note Replacement for the parse_integer function in the original code.
 
     function string_to_integer(str) result(ival)
 
     implicit none
 
-    integer                             :: ival, ndigits_digits, ndigits
     character(kind=CK,len=*),intent(in) :: str
-    character(kind=CDK,len=:),allocatable :: digits
+    integer(IK) :: ival
 
-    integer(IK) :: ierr
+    character(kind=CDK,len=:),allocatable :: digits
+    integer(IK) :: ndigits_digits,ndigits,ierr
 
     if (.not. exception_thrown) then
 
@@ -4804,7 +3780,7 @@
         ! gfortran bug: '*' edit descriptor for ISO_10646 strings does bad stuff.
         read(str,'(I'//trim(digits)//')',iostat=ierr) ival   !string to integer
 
-        if (ierr/=0) then           !if there was an error
+        if (ierr/=0) then    !if there was an error
             ival = 0
             call throw_exception('Error in string_to_integer:'//&
                                  ' string cannot be converted to an integer: '//trim(str))
@@ -4818,18 +3794,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/string_to_double
+!> author: Jacob Williams
+!  date: 1/19/2014
 !
-!  NAME
-!    string_to_double
-!
-!  DESCRIPTION
-!    Convert a string into a double.
-!
-!  AUTHOR
-!    Jacob Williams : 1/19/2014
-!
-!  SOURCE
+!  Convert a string into a double.
 
     function string_to_double(str) result(rval)
 
@@ -4856,15 +3824,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_integer
-!
-!  NAME
-!    json_get_integer
-!
-!  DESCRIPTION
-!    Get an integer value from a json_value.
-!
-!  SOURCE
+!>
+!  Get an integer value from a [[json_value]].
 
     subroutine json_get_integer(me, value)
 
@@ -4896,15 +3857,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_integer_with_path
-!
-!  NAME
-!    json_get_integer_with_path
-!
-!  DESCRIPTION
-!    Get an integer value from a json_value.
-!
-!  SOURCE
+!>
+!  Get an integer value from a [[json_value]], given the path string.
 
     subroutine json_get_integer_with_path(me, path, value, found)
 
@@ -4947,15 +3901,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_integer_with_path
-!
-!  NAME
-!    wrap_json_get_integer_with_path
-!
-!  SEE ALSO
-!    json_get_integer_with_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_integer_with_path]], where "path" is kind=CDK.
 
     subroutine wrap_json_get_integer_with_path(me, path, value, found)
 
@@ -4972,18 +3919,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_integer_vec
+!> author: Jacob Williams
+!  date: 5/14/2014
 !
-!  NAME
-!    json_get_integer_vec
-!
-!  DESCRIPTION
-!    Get an integer vector from a JSON value.
-!
-!  AUTHOR
-!    Jacob Williams : 5/14/2014
-!
-!  SOURCE
+!  Get an integer vector from a [[json_value]].
 
     subroutine json_get_integer_vec(me, vec)
 
@@ -5026,15 +3965,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_integer_vec_with_path
-!
-!  NAME
-!    json_get_integer_vec_with_path
-!
-!  DESCRIPTION
-!    Get an integer vector from a JSON value.
-!
-!  SOURCE
+!>
+!  Get an integer vector from a [[json_value]], given the path string.
 
     subroutine json_get_integer_vec_with_path(me, path, vec, found)
 
@@ -5077,15 +4009,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_integer_vec_with_path
-!
-!  NAME
-!    wrap_json_get_integer_vec_with_path
-!
-!  SEE ALSO
-!    json_get_integer_vec_with_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_integer_vec_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_integer_vec_with_path(me, path, vec, found)
 
@@ -5102,22 +4027,15 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_double
-!
-!  NAME
-!    json_get_double
-!
-!  DESCRIPTION
-!    Get a double value from a json_value.
-!
-!  SOURCE
+!>
+!  Get a double value from a [[json_value]].
 
     subroutine json_get_double(me, value)
 
     implicit none
 
-    type(json_value),pointer           :: me
-    real(RK),intent(out)               :: value
+    type(json_value),pointer :: me
+    real(RK),intent(out)     :: value
 
     value = 0.0_RK
     if ( exception_thrown ) return
@@ -5144,15 +4062,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_double_with_path
-!
-!  NAME
-!    json_get_double_with_path
-!
-!  DESCRIPTION
-!    Get a double value from a json_value.
-!
-!  SOURCE
+!>
+!  Get a double value from a [[json_value]], given the path.
 
     subroutine json_get_double_with_path(me, path, value, found)
 
@@ -5200,15 +4111,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_double_with_path
-!
-!  NAME
-!    wrap_json_get_double_with_path
-!
-!  SEE ALSO
-!    json_get_double_with_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_double_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_double_with_path(me, path, value, found)
 
@@ -5225,18 +4129,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_double_vec
+!> author: Jacob Williams
+!  date: 5/14/2014
 !
-!  NAME
-!    json_get_double_vec
-!
-!  DESCRIPTION
-!    Get a double vector from a JSON value.
-!
-!  AUTHOR
-!    Jacob Williams : 5/14/2014
-!
-!  SOURCE
+!  Get a double vector from a [[json_value]].
 
     subroutine json_get_double_vec(me, vec)
 
@@ -5279,15 +4175,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_double_vec_with_path
-!
-!  NAME
-!    json_get_double_vec_with_path
-!
-!  DESCRIPTION
-!    Get a double vector from a JSON value.
-!
-!  SOURCE
+!>
+!  Get a double vector from a [[json_value]], given the path.
 
     subroutine json_get_double_vec_with_path(me, path, vec, found)
 
@@ -5332,15 +4221,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_double_vec_with_path
-!
-!  NAME
-!    wrap_json_get_double_vec_with_path
-!
-!  SEE ALSO
-!    json_get_double_vec_with_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_double_vec_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_double_vec_with_path(me, path, vec, found)
 
@@ -5357,15 +4239,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_logical
-!
-!  NAME
-!    json_get_logical
-!
-!  DESCRIPTION
-!    Get a logical value from a json_value.
-!
-!  SOURCE
+!>
+!  Get a logical value from a [[json_value]].
 
     subroutine json_get_logical(me, value)
 
@@ -5391,15 +4266,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_logical_with_path
-!
-!  NAME
-!    json_get_logical_with_path
-!
-!  DESCRIPTION
-!    Get a logical value from a json_value.
-!
-!  SOURCE
+!>
+!  Get a logical value from a [[json_value]], given the path.
 
     subroutine json_get_logical_with_path(me, path, value, found)
 
@@ -5447,15 +4315,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_logical_with_path
-!
-!  NAME
-!    wrap_json_get_logical_with_path
-!
-!  SEE ALSO
-!    json_get_logical_with_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_logical_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_logical_with_path(me, path, value, found)
 
@@ -5472,18 +4333,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_logical_vec
+!> author: Jacob Williams
+!  date: 5/14/2014
 !
-!  NAME
-!    json_get_logical_vec
-!
-!  DESCRIPTION
-!    Get a logical vector from a JSON value.
-!
-!  AUTHOR
-!    Jacob Williams : 5/14/2014
-!
-!  SOURCE
+!  Get a logical vector from [[json_value]].
 
     subroutine json_get_logical_vec(me, vec)
 
@@ -5526,15 +4379,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_logical_vec_with_path
-!
-!  NAME
-!    json_get_logical_vec_with_path
-!
-!  DESCRIPTION
-!    Get a logical vector from a JSON value.
-!
-!  SOURCE
+!>
+!  Get a logical vector from a [[json_value]], given the path.
 
     subroutine json_get_logical_vec_with_path(me, path, vec, found)
 
@@ -5579,15 +4425,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_logical_vec_with_path
-!
-!  NAME
-!    wrap_json_get_logical_vec_with_path
-!
-!  SEE ALSO
-!    json_get_logical_vec_with_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_logical_vec_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_logical_vec_with_path(me, path, vec, found)
 
@@ -5604,15 +4443,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_string
-!
-!  NAME
-!    json_get_string
-!
-!  DESCRIPTION
-!    Get a character string from a json_value.
-!
-!  SOURCE
+!>
+!  Get a character string from a [[json_value]].
 
     subroutine json_get_string(me, value)
 
@@ -5774,15 +4606,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_string_with_path
-!
-!  NAME
-!    json_get_string_with_path
-!
-!  DESCRIPTION
-!    Get a character string from a json_value.
-!
-!  SOURCE
+!>
+!  Get a character string from a [[json_value]], given the path.
 
     subroutine json_get_string_with_path(me, path, value, found)
 
@@ -5832,15 +4657,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_string_with_path
-!
-!  NAME
-!    wrap_json_get_string_with_path
-!
-!  SEE ALSO
-!    json_get_string_with_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_string_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_string_with_path(me, path, value, found)
 
@@ -5857,18 +4675,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_string_vec
+!> author: Jacob Williams
+!  date: 5/14/2014
 !
-!  NAME
-!    json_get_string_vec
-!
-!  DESCRIPTION
-!    Get a string vector from a JSON file.
-!
-!  AUTHOR
-!    Jacob Williams : 5/14/2014
-!
-!  SOURCE
+!  Get a string vector from a [[json_file]].
 
     subroutine json_get_string_vec(me, vec)
 
@@ -5920,15 +4730,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_string_vec_with_path
-!
-!  NAME
-!    json_get_string_vec_with_path
-!
-!  DESCRIPTION
-!    Get a string vector from a JSON file.
-!
-!  SOURCE
+!>
+!  Get a string vector from a [[json_file]], given the path.
 
     subroutine json_get_string_vec_with_path(me, path, vec, found)
 
@@ -5982,15 +4785,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_string_vec_with_path
-!
-!  NAME
-!    wrap_json_get_string_vec_with_path
-!
-!  SEE ALSO
-!    json_get_string_vec_with_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_string_vec_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_string_vec_with_path(me, path, vec, found)
 
@@ -6007,28 +4803,20 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_array
+!>
+!  This routine calls the user-supplied [[array_callback_func]] subroutine
+!      for each element in the array.
 !
-!  NAME
-!    json_get_array
-!
-!  DESCRIPTION
-!    This routine calls the user-supplied array_callback subroutine
-!    for each element in the array.
-!
-!  NOTES
-!    For integer, double, logical, and character arrays,
-!    a higher-level routine is provided (see json_get), so
-!    this routine does not have to be used for those cases.
-!
-!  SOURCE
+!@note For integer, double, logical, and character arrays,
+!      higher-level routines are provided (see [[json_get]]), so
+!      this routine does not have to be used for those cases.
 
     subroutine json_get_array(me, array_callback)
 
     implicit none
 
-    type(json_value),pointer,intent(in)          :: me
-    procedure(array_callback_func)               :: array_callback
+    type(json_value),pointer,intent(in) :: me
+    procedure(array_callback_func)      :: array_callback
 
     type(json_value),pointer :: element
     integer(IK) :: i, count
@@ -6059,16 +4847,9 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_get_array_with_path
-!
-!  NAME
-!    json_get_array_with_path
-!
-!  DESCRIPTION
-!    This routine calls the user-supplied array_callback subroutine
-!    for each element in the array.
-!
-!  SOURCE
+!>
+!  This routine calls the user-supplied array_callback subroutine
+!  for each element in the array (specified by the path).
 
     subroutine json_get_array_with_path(me, path, array_callback, found)
 
@@ -6111,15 +4892,8 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_get_array_with_path
-!
-!  NAME
-!    wrap_json_get_array_with_path
-!
-!  SEE ALSO
-!    json_get_array_with_path
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_get_array_with_path]], where "path" is kind=CDK
 
     subroutine wrap_json_get_array_with_path(me, path, array_callback, found)
 
@@ -6136,44 +4910,40 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_parse_file
+!>
+!  Parse the JSON file and populate the [[json_value]] tree.
 !
-!  NAME
-!    json_parse
+!# Inputs
 !
-!  DESCRIPTION
-!    Parse the JSON file and populate the json_value tree.
+!  The inputs can be:
 !
-!  INPUTS
-!    The inputs can be:
-!    * file and unit : the specified unit is used to read JSON from file.
-!                      [note if unit is already open, then the filename is ignored]
-!    * file          : JSON is read from file using internal unit number
+!  * file and unit : the specified unit is used to read JSON from file.
+!                    [note if unit is already open, then the filename is ignored]
+!  * file          : JSON is read from file using internal unit number
 !
-!  EXAMPLE
-!    Consider the following example:
-!     type(json_value),pointer :: p
-!     call json_parse(file='myfile.json', p=p)
+!# Example
 !
-!  NOTES
-!    When calling this routine, any exceptions thrown from previous
-!    calls will automatically be cleared.
+!```fortran
+!    type(json_value),pointer :: p
+!    call json_parse(file='myfile.json', p=p)
+!```
 !
-!  HISTORY
-!    * Jacob Williams : 01/13/2015 : added read from string option.
-!    * Izaak Beekman  : 03/08/2015 : moved read from string to separate
-!      subroutine, and error annotation
-!      to separate subroutine.
+!# History
+!  * Jacob Williams : 01/13/2015 : added read from string option.
+!  * Izaak Beekman  : 03/08/2015 : moved read from string to separate
+!    subroutine, and error annotation
+!    to separate subroutine.
 !
-!  SOURCE
+!@note When calling this routine, any exceptions thrown from previous
+!      calls will automatically be cleared.
 
     subroutine json_parse_file(file, p, unit)
 
     implicit none
 
-    character(kind=CDK,len=*),intent(in) :: file  !JSON file name
-    type(json_value),pointer             :: p     !output structure
-    integer(IK),intent(in),optional      :: unit  !file unit number (/= 0)
+    character(kind=CDK,len=*),intent(in) :: file  !! JSON file name
+    type(json_value),pointer             :: p     !! output structure
+    integer(IK),intent(in),optional      :: unit  !! file unit number (/= 0)
 
     integer(IK) :: iunit, istat
     logical(LK) :: is_open
@@ -6184,7 +4954,7 @@
     if ( present(unit) ) then
 
         if (unit==0) then
-            call throw_exception('Error in json_parse: unit number must not be 0.')
+            call throw_exception('Error in json_parse_file: unit number must not be 0.')
             return
         end if
 
@@ -6240,7 +5010,7 @@
 
     else
 
-        call throw_exception('Error in json_parse: Error opening file: '//trim(file))
+        call throw_exception('Error in json_parse_file: Error opening file: '//trim(file))
         nullify(p)
 
     end if
@@ -6249,25 +5019,18 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/json_parse_string
+!>
+!  Parse the JSON string and populate the [[json_value]] tree.
 !
-!  NAME
-!    json_parse_string
-!
-!  DESCRIPTION
-!    Parse the JSON string and populate the json_value tree.
-!
-!  SEE ALSO
-!    json_parse_file
-!
-!  SOURCE
+!# See also
+!  * [[json_parse_file]]
 
     subroutine json_parse_string(p, str)
 
     implicit none
 
-    type(json_value),pointer            :: p     !output structure
-    character(kind=CK,len=*),intent(in) :: str   !string with JSON data
+    type(json_value),pointer            :: p     !! output structure
+    character(kind=CK,len=*),intent(in) :: str   !! string with JSON data
 
     integer(IK),parameter :: iunit = 0 !indicates that json data will be read from buffer
 
@@ -6294,22 +5057,15 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_parse_string
-!
-!  NAME
-!    wrap_json_parse_string
-!
-!  SEE ALSO
-!    json_parse_string
-!
-!  SOURCE
+!>
+!  Alternate version of [[json_parse_string]], where "str" is kind=CDK.
 
     subroutine wrap_json_parse_string(p, str)
 
     implicit none
 
-    type(json_value),pointer             :: p     !output structure
-    character(kind=CDK,len=*),intent(in) :: str   !string with JSON data
+    type(json_value),pointer             :: p     !! output structure
+    character(kind=CDK,len=*),intent(in) :: str   !! string with JSON data
 
     call json_parse_string(p,to_unicode(str))
 
@@ -6317,23 +5073,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/annotate_invalid_json
-!
-!  NAME
-!    annotate_invalid_json
-!
-!  DESCRIPTION
-!    Generate a warning message if there was an error parsing a JSON
-!    file or string.
-!
-!  SOURCE
+!>
+!  Generate a warning message if there was an error parsing a JSON
+!  file or string.
 
     subroutine annotate_invalid_json(iunit,str)
 
     implicit none
 
-    integer(IK),intent(in) :: iunit
-    character(kind=CK,len=*),intent(in) :: str
+    integer(IK),intent(in) :: iunit             !! file unit number
+    character(kind=CK,len=*),intent(in) :: str  !! string with JSON data
 
     character(kind=CK,len=:),allocatable :: line, arrow_str
     character(kind=CK,len=10) :: line_str, char_str
@@ -6351,7 +5100,7 @@
 
         !draw the arrow string that points to the current character:
         arrow_str = repeat('-',max( 0, char_count - 1) )//'^'
-        
+
         if (line_count>0 .and. char_count>0) then
 
             if (iunit/=0) then
@@ -6400,26 +5149,18 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/get_current_line_from_file_sequential
+!> author: Jacob Williams
 !
-!  NAME
-!    get_current_line_from_file_sequential
-!
-!  DESCRIPTION
-!    Rewind the file to the beginning of the current line, and return this line.
-!    The file is assumed to be opened.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!  Rewind the file to the beginning of the current line, and return this line.
+!  The file is assumed to be opened.
+!  This is the SEQUENTIAL version (see also [[get_current_line_from_file_stream]]).
 
     subroutine get_current_line_from_file_sequential(iunit,line)
 
     implicit none
 
-    integer(IK),intent(in)                           :: iunit
-    character(kind=CK,len=:),allocatable,intent(out) :: line
+    integer(IK),intent(in)                           :: iunit  !! file unit number
+    character(kind=CK,len=:),allocatable,intent(out) :: line   !! current line
 
     integer(IK),parameter               :: n_chunk = 256   ! chunk size [arbitrary]
     character(kind=CDK,len=*),parameter :: nfmt = '(A256)' ! corresponding format statement
@@ -6452,26 +5193,18 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/get_current_line_from_file_stream
+!> author: Jacob Williams
 !
-!  NAME
-!    get_current_line_from_file_stream
-!
-!  DESCRIPTION
-!    Rewind the file to the beginning of the current line, and return this line.
-!    The file is assumed to be opened.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!  Rewind the file to the beginning of the current line, and return this line.
+!  The file is assumed to be opened.
+!  This is the STREAM version (see also [[get_current_line_from_file_sequential]]).
 
     subroutine get_current_line_from_file_stream(iunit,line)
 
     implicit none
 
-    integer(IK),intent(in)                           :: iunit
-    character(kind=CK,len=:),allocatable,intent(out) :: line
+    integer(IK),intent(in)                           :: iunit  !! file unit number
+    character(kind=CK,len=:),allocatable,intent(out) :: line   !! current line
 
     integer(IK) :: istart,iend,ios
     character(kind=CK,len=1) :: c
@@ -6504,23 +5237,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/parse_value
-!
-!  NAME
-!    parse_value
-!
-!  DESCRIPTION
-!    Core parsing routine.
-!
-!  SOURCE
+!>
+!  Core parsing routine.
 
     recursive subroutine parse_value(unit, str, value)
 
     implicit none
 
-    integer(IK),intent(in)                 :: unit
-    character(kind=CK,len=*),intent(in)    :: str  !only used if unit=0
-    type(json_value),pointer               :: value
+    integer(IK),intent(in)              :: unit   !! file unit number
+    character(kind=CK,len=*),intent(in) :: str    !! string containing JSON data (only used if unit=0)
+    type(json_value),pointer            :: value  !! JSON data that is extracted
 
     logical(LK) :: eof
     character(kind=CK,len=1) :: c
@@ -6611,32 +5337,24 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_create_logical
+!> author: Jacob Williams
 !
-!  NAME
-!    json_value_create_logical
+!  Allocate a [[json_value]] pointer and make it a logical(LK) variable.
+!  The pointer should not already be allocated.
 !
-!  DESCRIPTION
-!    Allocate a json_value pointer and make it a logical variable.
-!    The pointer should not already be allocated.
-!
-!  EXAMPLE
-!    Example usage:
+!# Example
+!```fortran
 !     type(json_value),pointer :: p
 !     call json_create(p,'value',.true.)
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!```
 
     subroutine json_value_create_logical(me,val,name)
 
     implicit none
 
     type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: name
-    logical(LK),intent(in)              :: val
+    character(kind=CK,len=*),intent(in) :: name  !! variable name
+    logical(LK),intent(in)              :: val   !! variable value
 
     call json_value_create(me)
     call to_logical(me,val,name)
@@ -6645,22 +5363,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_create_logical
+!> author: Izaak Beekman
 !
-!  NAME
-!    wrap_json_value_create_logical
-!
-!  DESCRIPTION
-!    Wrapper for json_value_create_logical so json_create_logical can
-!    be called with name of character kind 'DEFAULT' or 'ISO_10646'
-!
-!  SEE ALSO
-!    json_value_create_logical
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  Wrapper for [[json_value_create_logical]] so [[json_create_logical]] can
+!  be called with name of character kind 'DEFAULT' or 'ISO_10646'
 
     subroutine wrap_json_value_create_logical(me,val,name)
 
@@ -6676,24 +5382,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_create_integer
+!> author: Jacob Williams
 !
-!  NAME
-!    json_value_create_integer
+!  Allocate a [[json_value]] pointer and make it an integer(IK) variable.
+!  The pointer should not already be allocated.
 !
-!  DESCRIPTION
-!    Allocate a json_value pointer and make it an integer variable.
-!    The pointer should not already be allocated.
-!
-!  EXAMPLE
-!    Example usage:
+!# Example
+!```fortran
 !     type(json_value),pointer :: p
 !     call json_create(p,'value',1)
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!```
 
     subroutine json_value_create_integer(me,val,name)
 
@@ -6710,23 +5408,11 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_create_integer
+!> author: Izaak Beekman
 !
-!  NAME
-!    wrap_json_value_create_integer
-!
-!  DESCRIPTION
-!    A wrapper procedure for json_value_create_integer so that json_create_integer
-!    may be called with either a 'DEFAULT' or 'ISO_10646' character kind 'name'
-!    actual argument.
-!
-!  SEE ALSO
-!    json_value_create_integer
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  A wrapper procedure for [[json_value_create_integer]] so that [[json_create_integer]]
+!  may be called with either a 'DEFAULT' or 'ISO_10646' character kind 'name'
+!  actual argument.
 
     subroutine wrap_json_value_create_integer(me,val,name)
 
@@ -6742,24 +5428,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_create_double
+!> author: Jacob Williams
 !
-!  NAME
-!    json_value_create_double
+!  Allocate a [[json_value]] pointer and make it a real(RK) variable.
+!  The pointer should not already be allocated.
 !
-!  DESCRIPTION
-!    Allocate a json_value pointer and make it a double variable.
-!    The pointer should not already be allocated.
-!
-!  EXAMPLE
-!    Example usage:
+!# Example
+!```fortran
 !     type(json_value),pointer :: p
 !     call json_create(p,'value',1.0d0)
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!```
 
     subroutine json_value_create_double(me,val,name)
 
@@ -6776,23 +5454,11 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_create_double
+!> author: Izaak Beekman
 !
-!  NAME
-!    wrap_json_value_create_double
-!
-!  DESCRIPTION
-!    A wrapper for json_value_create_double so that json_create_double may be
-!    called with an actual argument corresponding to the dummy argument, 'name'
-!    that may be of 'DEFAULT' or 'ISO_10646' character kind.
-!
-!  SEE ALSO
-!    json_value_create_double
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  A wrapper for [[json_value_create_double]] so that [[json_create_double]] may be
+!  called with an actual argument corresponding to the dummy argument, 'name'
+!  that may be of 'DEFAULT' or 'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_double(me,val,name)
 
@@ -6808,24 +5474,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_create_string
+!> author: Jacob Williams
 !
-!  NAME
-!    json_value_create_string
+!  Allocate a json_value pointer and make it a string variable.
+!  The pointer should not already be allocated.
 !
-!  DESCRIPTION
-!    Allocate a json_value pointer and make it a string variable.
-!    The pointer should not already be allocated.
-!
-!  EXAMPLE
-!    Example usage:
+!# Example
+!```fortran
 !     type(json_value),pointer :: p
 !     call json_create(p,'value','hello')
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!```
 
     subroutine json_value_create_string(me,val,name)
 
@@ -6842,23 +5500,11 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_create_string
+!> author: Izaak Beekman
 !
-!  NAME
-!    wrap_json_value_create_string
-!
-!  DESCRIPTION
-!    Wrap json_value-create_string so that json_create_string may be called with actual
-!    character string arguments for 'name' and 'val' that are BOTH of 'DEFAULT' or
-!    'ISO_10646' character kind.
-!
-!  SEE ALSO
-!    json_value_create_string
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  Wrap [[json_value_create_string]] so that [[json_create_string]] may be called with actual
+!  character string arguments for 'name' and 'val' that are BOTH of 'DEFAULT' or
+!  'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_string(me,val,name)
 
@@ -6874,24 +5520,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_create_null
+!> author: Jacob Williams
 !
-!  NAME
-!    json_value_create_null
+!  Allocate a json_value pointer and make it a null variable.
+!  The pointer should not already be allocated.
 !
-!  DESCRIPTION
-!    Allocate a json_value pointer and make it a null variable.
-!    The pointer should not already be allocated.
-!
-!  EXAMPLE
-!    Example usage:
+!# Example
+!```fortran
 !     type(json_value),pointer :: p
 !     call json_create(p,'value')
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!```
 
     subroutine json_value_create_null(me,name)
 
@@ -6907,23 +5545,11 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_create_null
+!> author: Izaak Beekman
 !
-!  NAME
-!    wrap_json_value_create_null
-!
-!  DESCRIPTION
-!    Wrap json_value_create_null so that json_create_null may be called with an actual
-!    argument corresponding to the dummy argument 'name' that is either of 'DEFAULT' or
-!    'ISO_10646' character kind.
-!
-!  SEE ALSO
-!    json_value_create_null
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  Wrap [[json_value_create_null]] so that [[json_create_null]] may be called with an actual
+!  argument corresponding to the dummy argument 'name' that is either of 'DEFAULT' or
+!  'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_null(me,name)
 
@@ -6938,28 +5564,19 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_create_object
+!> author: Jacob Williams
 !
-!  NAME
-!    json_value_create_object
+!  Allocate a [[json_value]] pointer and make it an object variable.
+!  The pointer should not already be allocated.
 !
-!  DESCRIPTION
-!    Allocate a json_value pointer and make it an object variable.
-!    The pointer should not already be allocated.
-!
-!  EXAMPLE
-!    Example usage:
+!# Example
+!```fortran
 !     type(json_value),pointer :: p
 !     call json_create(p,'objectname')
+!```
 !
-!  NOTES
-!    The name is not significant for the root structure or an array element.
-!    In those cases, an empty string can be used.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!@note The name is not significant for the root structure or an array element.
+!      In those cases, an empty string can be used.
 
     subroutine json_value_create_object(me,name)
 
@@ -6975,23 +5592,11 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_create_object
+!> author: Izaak Beekman
 !
-!  NAME
-!    wrap_json_value_create_object
-!
-!  DESCRIPTION
-!    Wrap json_value_create_object so that json_create_object may be called with an actual
-!    argument corresponding to the dummy argument 'name' that is of either 'DEFAULT' or
-!    'ISO_10646' character kind.
-!
-!  SEE ALSO
-!    json_value_create_object
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  Wrap [[json_value_create_object]] so that [[json_create_object]] may be called with an actual
+!  argument corresponding to the dummy argument 'name' that is of either 'DEFAULT' or
+!  'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_object(me,name)
 
@@ -7006,24 +5611,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_value_create_array
+!> author: Jacob Williams
 !
-!  NAME
-!    json_value_create_array
+!  Allocate a [[json_value]] pointer and make it an array variable.
+!  The pointer should not already be allocated.
 !
-!  DESCRIPTION
-!    Allocate a json_value pointer and make it an array variable.
-!    The pointer should not already be allocated.
-!
-!  EXAMPLE
-!    Example usage:
+!# Example
+!```fortran
 !     type(json_value),pointer :: p
 !     call json_create(p,'arrayname')
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!```
 
     subroutine json_value_create_array(me,name)
 
@@ -7039,23 +5636,11 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/wrap_json_value_create_array
+!> author: Izaak Beekman
 !
-!  NAME
-!    wrap_json_value_create_array
-!
-!  DESCRIPTION
-!    A wrapper for json_value_create_array so that json_create_array may be called with
-!    an actual argument, corresponding to the dummy argument 'name', that is either of
-!    'DEFAULT' or 'ISO_10646' character kind.
-!
-!  SEE ALSO
-!    json_value_create_array
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  A wrapper for [[json_value_create_array]] so that [[json_create_array]] may be called with
+!  an actual argument, corresponding to the dummy argument 'name', that is either of
+!  'DEFAULT' or 'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_array(me,name)
 
@@ -7070,26 +5655,17 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/to_logical
+!> author: Jacob Williams
 !
-!  NAME
-!    to_logical
-!
-!  DESCRIPTION
-!    Change the variable to a logical.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!  Change the [[json_value]] variable to a logical.
 
     subroutine to_logical(me,val,name)
 
     implicit none
 
     type(json_value),intent(inout)               :: me
-    logical(LK),intent(in),optional              :: val
-    character(kind=CK,len=*),intent(in),optional :: name
+    logical(LK),intent(in),optional              :: val   !! if the value is also to be set (if not present, then .false. is used).
+    character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
     call destroy_json_data(me)
@@ -7108,26 +5684,17 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/to_integer
+!> author: Jacob Williams
 !
-!  NAME
-!    to_integer
-!
-!  DESCRIPTION
-!    Change the variable to an integer.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!  Change the [[json_value]] variable to an integer.
 
     subroutine to_integer(me,val,name)
 
     implicit none
 
     type(json_value),intent(inout)               :: me
-    integer(IK),intent(in),optional              :: val
-    character(kind=CK,len=*),intent(in),optional :: name
+    integer(IK),intent(in),optional              :: val   !! if the value is also to be set (if not present, then 0 is used).
+    character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
     call destroy_json_data(me)
@@ -7146,26 +5713,17 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/to_double
+!> author: Jacob Williams
 !
-!  NAME
-!    to_double
-!
-!  DESCRIPTION
-!    Change the variable to a double.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!  Change the [[json_value]] variable to a double.
 
     subroutine to_double(me,val,name)
 
     implicit none
 
     type(json_value),intent(inout)               :: me
-    real(RK),intent(in),optional                 :: val
-    character(kind=CK,len=*),intent(in),optional :: name
+    real(RK),intent(in),optional                 :: val   !! if the value is also to be set (if not present, then 0.0_rk is used).
+    character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
     call destroy_json_data(me)
@@ -7184,29 +5742,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/to_string
+!> author: Jacob Williams
 !
-!  NAME
-!    to_string
+!  Change the [[json_value]] variable to a string.
 !
-!  DESCRIPTION
-!    Change the variable to a string.
+!# Modified
+!  * Izaak Beekman : 02/24/2015
 !
-!  AUTHOR
-!    Jacob Williams
-!
-!  MODIFIED
-!    Izaak Beekman : 02/24/2015
-!
-!  SOURCE
 
     subroutine to_string(me,val,name)
 
     implicit none
 
     type(json_value),intent(inout)               :: me
-    character(kind=CK,len=*),intent(in),optional :: val
-    character(kind=CK,len=*),intent(in),optional :: name
+    character(kind=CK,len=*),intent(in),optional :: val   !! if the value is also to be set (if not present, then '' is used).
+    character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
     call destroy_json_data(me)
@@ -7224,25 +5774,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/to_null
+!> author: Jacob Williams
 !
-!  NAME
-!    to_null
-!
-!  DESCRIPTION
-!    Change the variable to a null.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!  Change the [[json_value]] variable to a null.
 
     subroutine to_null(me,name)
 
     implicit none
 
     type(json_value),intent(inout)               :: me
-    character(kind=CK,len=*),intent(in),optional :: name
+    character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
     call destroy_json_data(me)
@@ -7255,25 +5796,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/to_object
+!> author: Jacob Williams
 !
-!  NAME
-!    to_object
-!
-!  DESCRIPTION
-!    Change the variable to an object.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!  Change the [[json_value]] variable to an object.
 
     subroutine to_object(me,name)
 
     implicit none
 
     type(json_value),intent(inout)               :: me
-    character(kind=CK,len=*),intent(in),optional :: name
+    character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
     call destroy_json_data(me)
@@ -7286,25 +5818,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/to_array
+!> author: Jacob Williams
 !
-!  NAME
-!    to_array
-!
-!  DESCRIPTION
-!    Change the variable to an array.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!  Change the [[json_value]] variable to an array.
 
     subroutine to_array(me,name)
 
     implicit none
 
     type(json_value),intent(inout)               :: me
-    character(kind=CK,len=*),intent(in),optional :: name
+    character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
     call destroy_json_data(me)
@@ -7317,29 +5840,22 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/parse_object
-!
-!  NAME
-!    parse_object
-!
-!  DESCRIPTION
-!    Core parsing routine.
-!
-!  SOURCE
+!>
+!  Core parsing routine.
 
     recursive subroutine parse_object(unit, str, parent)
 
     implicit none
 
-    integer(IK),intent(in)              :: unit
-    character(kind=CK,len=*),intent(in) :: str
-    type(json_value),pointer            :: parent
+    integer(IK),intent(in)              :: unit    !! file unit number (if parsing from a file)
+    character(kind=CK,len=*),intent(in) :: str     !! JSON string (if parsing from a string)
+    type(json_value),pointer            :: parent  !! the parsed object will be added as a child of this
 
     type(json_value),pointer :: pair
     logical(LK) :: eof
     character(kind=CK,len=1) :: c
-    character(kind=CK,len=:),allocatable :: tmp  !this is a work-around for a bug
-                                                 !  in the gfortran 4.9 compiler.
+    character(kind=CK,len=:),allocatable :: tmp  !! this is a work-around for a bug
+                                                 !! in the gfortran 4.9 compiler.
 
     if (.not. exception_thrown) then
 
@@ -7417,22 +5933,15 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/parse_array
-!
-!  NAME
-!    parse_array
-!
-!  DESCRIPTION
-!   Core parsing routine.
-!
-!  SOURCE
+!>
+!  Core parsing routine.
 
     recursive subroutine parse_array(unit, str, array)
 
     implicit none
 
-    integer(IK),intent(in)              :: unit
-    character(kind=CK,len=*),intent(in) :: str
+    integer(IK),intent(in)              :: unit   !! file unit number (if parsing from a file)
+    character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
     type(json_value),pointer            :: array
 
     type(json_value),pointer :: element
@@ -7481,34 +5990,26 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/parse_string
+!>
+!  Parses a string while reading a JSON file.
 !
-!  NAME
-!    parse_string
-!
-!  DESCRIPTION
-!    Parses a string while reading a JSON file.
-!
-!  HISTORY
-!    JW : 6/16/2014 : added hex validation.
-!
-!  SOURCE
+!# History
+!  * Jacob Williams : 6/16/2014 : Added hex validation.
 
     subroutine parse_string(unit, str, string)
 
     implicit none
 
-    integer(IK), intent(in)                            :: unit
-    character(kind=CK,len=*),intent(in)                :: str
-    character(kind=CK,len=:),allocatable,intent(out)   :: string
+    integer(IK),intent(in)                           :: unit  !! file unit number (if parsing from a file)
+    character(kind=CK,len=*),intent(in)              :: str   !! JSON string (if parsing from a string)
+    character(kind=CK,len=:),allocatable,intent(out) :: string
 
     logical(LK) :: eof, is_hex, escape
     character(kind=CK,len=1) :: c, last
     character(kind=CK,len=4) :: hex
     integer(IK) :: i
-
-    !to speed up by reducing the number of character string reallocations:
-    integer(IK) :: ip !index to put next character
+    integer(IK) :: ip !! index to put next character,
+                      !! to speed up by reducing the number of character string reallocations.
 
     !at least return a blank string if there is a problem:
     string = repeat(space, chunk_size)
@@ -7516,11 +6017,11 @@
     if (.not. exception_thrown) then
 
         !initialize:
-        ip = 1
-        last = space
+        ip     = 1
+        last   = space
         is_hex = .false.
         escape = .false.
-        i = 0
+        i      = 0
 
         do
 
@@ -7584,7 +6085,6 @@
 
         end do
 
-
         !trim the string if necessary:
         if (ip<len(string)+1) then
             if (ip==1) then
@@ -7600,23 +6100,16 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/parse_for_chars
-!
-!  NAME
-!    parse_for_chars
-!
-!  DESCRIPTION
-!    Core parsing routine.
-!
-!  SOURCE
+!>
+!  Core parsing routine.
 
     subroutine parse_for_chars(unit, str, chars)
 
     implicit none
 
-    integer(IK), intent(in)              :: unit
-    character(kind=CK,len=*),intent(in)  :: str
-    character(kind=CK,len=*), intent(in) :: chars
+    integer(IK),intent(in)              :: unit   !! file unit number (if parsing from a file)
+    character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
+    character(kind=CK,len=*),intent(in) :: chars  !! the string to check for.
 
     integer(IK) :: i, length
     logical(LK) :: eof
@@ -7645,29 +6138,21 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/parse_number
+!> author: Jacob Williams
+!  date: 1/20/2014
 !
-!  NAME
+!  Read a numerical value from the file (or string).
+!  The routine will determine if it is an integer or a double, and
+!  allocate the type accordingly.
 !
-!  DESCRIPTION
-!    Read a numerical value from the file.
-!    The routine will determine if it is an integer or a double, and
-!    allocate the type accordingly.
-!
-!  NOTES
-!    Complete rewrite of the original FSON routine, which had some problems.
-!
-!  AUTHOR
-!    Jacob Williams : 1/20/2014
-!
-!  SOURCE
+!@note Complete rewrite of the original FSON routine, which had some problems.
 
     subroutine parse_number(unit, str, value)
 
     implicit none
 
-    integer(IK),intent(in)              :: unit
-    character(kind=CK,len=*),intent(in) :: str
+    integer(IK),intent(in)              :: unit   !! file unit number (if parsing from a file)
+    character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
     type(json_value),pointer            :: value
 
     character(kind=CK,len=:),allocatable :: tmp
@@ -7761,32 +6246,23 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/pop_char
+!>
+!  Get the next character from the file (or string).
 !
-!  NAME
-!    pop_char
+!# See also
+!  * [[push_char]]
 !
-!  DESCRIPTION
-!    Get the next character from the file (or string).
-!
-!  NOTES
-!    This routine ignores non-printing ASCII characters (iachar<=31) that
-!    are in strings.
-!
-!  SEE ALSO
-!    push_char
-!
-!  SOURCE
+!@note This routine ignores non-printing ASCII characters (iachar<=31) that are in strings.
 
     recursive function pop_char(unit, str, eof, skip_ws) result(popped)
 
     implicit none
 
-    character(kind=CK,len=1)            :: popped
-    integer(IK),intent(in)              :: unit
-    character(kind=CK,len=*),intent(in) :: str  !only used if unit=0
-    logical(LK),intent(out)             :: eof
-    logical(LK),intent(in),optional     :: skip_ws
+    character(kind=CK,len=1)            :: popped  !! the popped character.
+    integer(IK),intent(in)              :: unit    !! file unit number (if parsing from a file)
+    character(kind=CK,len=*),intent(in) :: str     !! JSON string (if parsing from a string) -- only used if unit=0
+    logical(LK),intent(out)             :: eof     !! true if the end of the file has been reached.
+    logical(LK),intent(in),optional     :: skip_ws !! to ignore whitespace.
 
     integer(IK) :: ios,str_len
     character(kind=CK,len=1) :: c
@@ -7881,21 +6357,14 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/push_char
+!>
+!  Core routine.
 !
-!  NAME
-!    push_char
+!# See also
+!  * [[pop_char]]
 !
-!  DESCRIPTION
-!    Core routine.
-!
-!  SEE ALSO
-!    pop_char
-!
-!  HISTORY
-!    Jacob Williams : 5/3/2015 : replaced original version of this routine.
-!
-!  SOURCE
+!# History
+!  * Jacob Williams : 5/3/2015 : replaced original version of this routine.
 
     subroutine push_char(c)
 
@@ -7933,25 +6402,17 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/integer_to_string
+!> author: Jacob Williams
+!  date: 12/4/2013
 !
-!  NAME
-!    integer_to_string
-!
-!  DESCRIPTION
-!    Convert an integer to a string.
-!
-!  AUTHOR
-!    Jacob Williams : 12/4/2013
-!
-!  SOURCE
+!  Convert an integer to a string.
 
     pure subroutine integer_to_string(ival,str)
 
     implicit none
 
-    integer(IK),intent(in)               :: ival
-    character(kind=CK,len=*),intent(out) :: str
+    integer(IK),intent(in)               :: ival  !! integer value.
+    character(kind=CK,len=*),intent(out) :: str   !! ival converted to a string.
 
     integer(IK) :: istat
 
@@ -7967,28 +6428,20 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/real_to_string
+!> author: Jacob Williams
+!  date: 12/4/2013
 !
-!  NAME
-!    real_to_string
+!  Convert a real value to a string.
 !
-!  DESCRIPTION
-!    Convert a real value to a string.
-!
-!  AUTHOR
-!    Jacob Williams : 12/4/2013
-!
-!  MODIFIED
-!    Izaak Beekman : 02/24/2015 : added the compact option.
-!
-!  SOURCE
+!# Modified
+!  * Izaak Beekman : 02/24/2015 : added the compact option.
 
     subroutine real_to_string(rval,str)
 
     implicit none
 
-    real(RK),intent(in)                  :: rval
-    character(kind=CK,len=*),intent(out) :: str
+    real(RK),intent(in)                  :: rval  !! real value.
+    character(kind=CK,len=*),intent(out) :: str   !! rval converted to a string.
 
     integer(IK) :: istat
 
@@ -8009,28 +6462,20 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/compact_real_string
+!> author: Izaak Beekman
+!  date: 02/24/2015
 !
-!  NAME
-!    compact_real_string
+!  Compact a string representing a real number, so that
+!  the same value is displayed with fewer characters.
 !
-!  DESCRIPTION
-!    Compact a string representing a real number, so that
-!    the same value is displayed with fewer characters.
-!
-!  SEE ALSO
-!    real_to_string
-!
-!  AUTHOR
-!    Izaak Beekman : 02/24/2015
-!
-!  SOURCE
+!# See also
+!  * [[real_to_string]]
 
     subroutine compact_real_string(str)
 
     implicit none
 
-    character(kind=CK,len=*),intent(inout) :: str
+    character(kind=CK,len=*),intent(inout) :: str  !! string representation of a real number.
 
     character(kind=CK,len=len(str)) :: significand, expnt
     character(kind=CK,len=2) :: separator
@@ -8093,32 +6538,25 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/valid_json_hex
+!> author: Jacob Williams
+!  date:6/14/2014
 !
-!  NAME
-!    valid_json_hex
+!  Returns true if the string is a valid 4-digit hex string.
 !
-!  DESCRIPTION
-!    Returns true if the string is a valid 4-digit hex string.
-!
-!  EXAMPLE
-!   Some examples:
+!# Examples
+!```fortran
 !    valid_json_hex('0000')  !returns true
 !    valid_json_hex('ABC4')  !returns true
 !    valid_json_hex('AB')    !returns false (< 4 characters)
 !    valid_json_hex('WXYZ')  !returns false (invalid characters)
-!
-!  AUTHOR
-!    Jacob Williams : 6/14/2014
-!
-!  SOURCE
+!```
 
     pure function valid_json_hex(str) result(valid)
 
     implicit none
 
-    logical(LK)                         :: valid
-    character(kind=CK,len=*),intent(in) :: str
+    logical(LK)                         :: valid  !! is str a value 4-digit hex string
+    character(kind=CK,len=*),intent(in) :: str    !! the string to check.
 
     integer(IK) :: n,i
 
@@ -8144,18 +6582,9 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/to_uni
+!> author: Izaak Beekman
 !
-!  NAME
-!    to_uni
-!
-!  DESCRIPTION
-!    Convert string to unicode (CDK to CK).
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  Convert string to unicode (CDK to CK).
 
     pure function to_uni(str)
 
@@ -8170,21 +6599,11 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****f* json_module/to_uni_vec
+!> author: Izaak Beekman
 !
-!  NAME
-!    to_uni_vec
+!  Convert array of strings to unicode (CDK to CK).
 !
-!  DESCRIPTION
-!    Convert array of strings to unicode (CDK to CK).
-!
-!  NOTES
-!    JW: may be able to remove this by making to_uni PURE ELEMENTAL ?
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!@note JW: may be able to remove this by making [[to_uni]] PURE ELEMENTAL ?
 
     pure function to_uni_vec(str)
 
@@ -8199,18 +6618,9 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/ucs4_join_default
+!> author: Izaak Beekman
 !
-!  NAME
-!    ucs4_join_default
-!
-!  DESCRIPTION
-!    CK//CDK operator.
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  CK//CDK operator.
 
     function ucs4_join_default(ucs4_str,def_str) result(res)
 
@@ -8226,18 +6636,9 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/default_join_ucs4
+!> author: Izaak Beekman
 !
-!  NAME
-!    default_join_ucs4
-!
-!  DESCRIPTION
-!    CDK//CK operator.
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  CDK//CK operator.
 
     function default_join_ucs4(def_str,ucs4_str) result(res)
 
@@ -8253,18 +6654,9 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/ucs4_comp_default
+!> author: Izaak Beekman
 !
-!  NAME
-!    ucs4_comp_default
-!
-!  DESCRIPTION
-!    CK==CDK operator.
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  CK==CDK operator.
 
     function ucs4_comp_default(ucs4_str,def_str) result(res)
 
@@ -8280,18 +6672,9 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/default_comp_ucs4
+!> author: Izaak Beekman
 !
-!  NAME
-!    default_comp_ucs4
-!
-!  DESCRIPTION
-!    CDK==CK operator.
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+!  CDK==CK operator.
 
     function default_comp_ucs4(def_str,ucs4_str) result(res)
 
@@ -8307,23 +6690,13 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!****if* json_module/json_print_error_message
+!> author: Jacob Williams
 !
-!  NAME
-!    print_error_message
+!  Print any error message, and then clear the exceptions.
 !
-!  DESCRIPTION
-!    Print any error message, and then clear the exceptions.
-!
-!  NOTES
-!    This routine is used by the unit tests.
-!    It was originally in json_example.f90, and was
-!    moved here 2/26/2015 by Izaak Beekman.
-!
-!  AUTHOR
-!    Jacob Williams
-!
-!  SOURCE
+!@note This routine is used by the unit tests.
+!      It was originally in json_example.f90, and was
+!      moved here 2/26/2015 by Izaak Beekman.
 
     subroutine json_print_error_message(io_unit)
 
