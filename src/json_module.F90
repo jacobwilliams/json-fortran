@@ -1573,18 +1573,44 @@
 !# Modified
 !  * Izaak Beekman : 02/24/2015
 
-    subroutine json_initialize(verbose,compact_reals)
+    subroutine json_initialize(verbose,compact_reals,print_signs,real_format)
 
     implicit none
 
     logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
     logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output
+    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
+    character(len=*,kind=CDK),intent(in),optional :: real_format
+    !! exponential (default), scientific, engineering or general
 
     character(kind=CDK,len=10) :: w,d,e
+    character(kind=CDK,len=2)  :: sgn, rl_edit_desc
     integer(IK) :: istat
+    logical(LK) :: sgn_prnt
+
 
     !clear any errors from previous runs:
     call json_clear_exceptions()
+
+    !set defaults
+    sgn_prnt = .false.
+    if ( present( print_signs) ) sgn_prnt = print_signs
+    if ( sgn_prnt ) then
+       sgn = 'sp'
+    else
+       sgn = 'ss'
+    end if
+
+    rl_edit_desc = 'E'
+    if ( present( real_format ) ) then
+       select case ( real_format )
+       case ('g','G','e','E','en','EN','es','ES')
+          rl_edit_desc = real_format
+       case default
+          call throw_exception('Invalid real format, "' // trim(real_format) // '", passed to json_initialize.'// &
+               new_line('a') // 'Acceptable formats are: "G", "E", "EN", and "ES".' )
+       end select
+    end if
 
 # ifdef USE_UCS4
     ! reopen stdout and stderr with utf-8 encoding
@@ -1608,9 +1634,9 @@
         if (istat==0) write(d,'(ss,I0)',iostat=istat) real_precision
         if (istat==0) write(e,'(ss,I0)',iostat=istat) real_exponent_digits
         if (istat==0) then
-            real_fmt = '(ss,E' // trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
+            real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
         else
-            real_fmt = '(ss,E30.16E3)'  !just use this one (should never happen)
+            real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // '30.16E3)'  !just use this one (should never happen)
         end if
     end if
 
