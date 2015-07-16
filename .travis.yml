@@ -19,7 +19,6 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - gfortran-4.9
-      - gfortran-5
       - binutils
       - cmake
       - python-pip
@@ -60,9 +59,10 @@ install:
       mv f90split "$HOME/.local/bin/" && \
       rm f90split.f90
     fi
-  - which FoBiS.py || (pip install FoBiS.py && FoBiS.py --version)
-  - which ford || (pip install ford && ford --version)
-  - which jsonlint || (pip install git+https://github.com/dmeranda/demjson.git && jsonlint --version)
+  - pip show pygooglechart || pip install pygooglechart
+  - pip show FoBiS.py || (pip install FoBiS.py && FoBiS.py --version)
+  - pip show ford || (pip install ford && ford --version)
+  - pip show jsonlint || (pip install git+https://github.com/dmeranda/demjson.git && jsonlint --version)
 
 before_script:
   - |
