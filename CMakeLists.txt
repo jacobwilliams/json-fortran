@@ -222,6 +222,8 @@ if ( ENABLE_TESTS )
     file ( GLOB INVALID_JSON "${DATA_DIR}/inputs/*invalid*.json" )
 
     list ( REMOVE_ITEM JSON_INPUTS ${INVALID_JSON} )
+    list ( REMOVE_ITEM JSON_INPUTS "${DATA_DIR}/inputs/big.json" ) # This takes too long and is valid
+                                                                   # JSON from a trusted source
 
     foreach ( VALID_JSON ${JSON_INPUTS} )
       get_filename_component ( TESTNAME "${VALID_JSON}" NAME )
