@@ -276,15 +276,27 @@
     !
     !# Example
     !
+    !  The following test program:
     !```fortran
+    !    program test
+    !     use json_module
+    !     implicit none
     !    type(json_value),pointer :: p
-    !    call json_create_object(p,'')  !root
-    !    call json_add(p,'year',1805)
-    !    call json_add(p,'value',1.0d0)
-    !    call json_print(p,'test.json')
-    !    call json_destroy(p)
+    !     call json_initialize()         !initialize the module
+    !     call json_create_object(p,'')  !create the root
+    !     call json_add(p,'year',1805)   !add some data
+    !     call json_add(p,'value',1.0d0) !add some data
+    !     call json_print(p,'test.json') !write it to a file
+    !     call json_destroy(p)           !cleanup
+    !    end program test
     !```
-    !
+    !  Produces the JSON file **test.json**:
+    !```json
+    !    {
+    !      "year": 1805,
+    !      "value": 0.1E+1
+    !    }
+    !```
     type,public :: json_value
 
         !force the constituents to be stored contiguously
@@ -325,25 +337,29 @@
     !# Example
     !
     !```fortran
+    !    program test
+    !     use json_module
+    !     implicit none
     !    type(json_file) :: json
     !    integer :: ival
     !    real(real64) :: rval
     !    character(len=:),allocatable :: cval
     !    logical :: found
+    !     call json_initialize()
     !    call json%load_file(filename='myfile.json')
     !    call json%print_file() !print to the console
     !    call json%get('var.i',ival,found)
     !    call json%get('var.r(3)',rval,found)
     !    call json%get('var.c',cval,found)
     !    call json%destroy()
+    !    end program test
     !```
 
     type,public :: json_file
 
         private
 
-        !the JSON structure read from the file:
-        type(json_value),pointer :: p => null()
+        type(json_value),pointer :: p => null()  !! the JSON structure read from the file
 
     contains
 
