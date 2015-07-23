@@ -338,14 +338,14 @@
     !
     !```fortran
     !    program test
-    !     use json_module
-    !     implicit none
+    !    use json_module
+    !    implicit none
     !    type(json_file) :: json
     !    integer :: ival
     !    real(real64) :: rval
     !    character(len=:),allocatable :: cval
     !    logical :: found
-    !     call json_initialize()
+    !    call json_initialize()
     !    call json%load_file(filename='myfile.json')
     !    call json%print_file() !print to the console
     !    call json%get('var.i',ival,found)
@@ -430,6 +430,28 @@
 
     end type json_file
     !*********************************************************
+
+    !*********************************************************
+    !> author: Izaak Beekman
+    !  date: 07/23/2015
+    !
+    !  Structure constructor to initialize a [[json_file(type)]] object
+    !  with an existing [[json_value]] object
+    !
+    ! # Example
+    !
+    ! ```fortran
+    ! ...
+    ! type(json_file)  :: my_file
+    ! type(json_value) :: json_object
+    ! ...
+    ! ! Construct a json_object
+    ! my_file = json_file(json_object)
+
+    interface json_file
+       module procedure initialize_json_file
+    end interface
+    !*************************************************************************************
 
     !*************************************************************************************
     !>
@@ -894,6 +916,22 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 07/23/2015
+!
+!  Cast a [[json_value]] object as a [[json_file(type)]] object
+
+    function initialize_json_file(p) result(file_object)
+    type(json_value), pointer, optional, intent(in) :: p
+    !! `json_value` object to cast as a `json_file` object
+    type(json_file) :: file_object
+
+    if (present(p)) file_object%p => p
+
+    end function initialize_json_file
+!*****************************************************************************************
+
+!*****************************************************************************************
 !> author: Jacob Williams
 !
 !  Destroy the data within a [[json_value]], and rest type to json_unknown.
@@ -918,7 +956,7 @@
 !> author: Jacob Williams
 !  date: 12/9/2013
 !
-!  Destroy the [[json_file]].
+!  Destroy the [[json_file(type)]].
 
     subroutine json_file_destroy(me)
 
@@ -935,7 +973,7 @@
 !> author: Jacob Williams
 !  date: 12/5/2014
 !
-!  Move the [[json_value]] pointer from one [[json_file]] to another.
+!  Move the [[json_value]] pointer from one [[json_file(type)]] to another.
 !  The "from" pointer is then nullified, but not destroyed.
 !
 !@note If "from%p" is not associated, then an error is thrown.
@@ -1141,7 +1179,7 @@
 !> author: Jacob Williams
 !  date: 2/3/2014
 !
-!  Returns information about a variable in a [[json_file]].
+!  Returns information about a variable in a [[json_file(type)]].
 
     subroutine json_file_variable_info(me,path,found,var_type,n_children)
 
@@ -4720,7 +4758,7 @@
 !> author: Jacob Williams
 !  date: 5/14/2014
 !
-!  Get a string vector from a [[json_file]].
+!  Get a string vector from a [[json_file(type)]].
 
     subroutine json_get_string_vec(me, vec)
 
@@ -4773,7 +4811,7 @@
 
 !*****************************************************************************************
 !>
-!  Get a string vector from a [[json_file]], given the path.
+!  Get a string vector from a [[json_file(type)]], given the path.
 
     subroutine json_get_string_vec_with_path(me, path, vec, found)
 
