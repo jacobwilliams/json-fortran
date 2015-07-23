@@ -152,6 +152,9 @@ contains
     call my_file%get('$array data.data',fetched_array)
     call check_errors(all(fetched_array == reshape(raw_array,[size(raw_array)])))
 
+    call my_file%get(tmp_json_ptr)
+    call check_errors(associated(tmp_json_ptr,root))
+
     contains
       subroutine check_errors(assertion)
         logical, optional, intent(in) :: assertion
