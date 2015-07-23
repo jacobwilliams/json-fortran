@@ -1,24 +1,27 @@
-json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)
+json-fortran
 ============
 
+[![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)
 A Fortran 2008 JSON API
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
 **Table of Contents**
 
-  - [Status](#status)
-  - [Brief description](#brief-description)
-  - [Download](#download)
-  - [Building the library](#building-the-library)
-  - [Reading JSON from a file](#reading-json-from-a-file)
-  - [Reading JSON from a string](#reading-json-from-a-string)
-  - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
-  - [Writing a JSON file](#writing-a-json-file)
-  - [Building a JSON file from scratch](#building-a-json-file-from-scratch)
-  - [Documentation](#documentation)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Miscellaneous](#miscellaneous)
+- [json-fortran](#json-fortran)
+    - [Status](#status)
+    - [Brief description](#brief-description)
+    - [Download](#download)
+    - [Building the library](#building-the-library)
+    - [Exapmle Usage](#exapmle-usage)
+        - [Reading JSON from a file](#reading-json-from-a-file)
+        - [Reading JSON from a string](#reading-json-from-a-string)
+        - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
+        - [Writing a JSON file](#writing-a-json-file)
+        - [Building a JSON file from scratch](#building-a-json-file-from-scratch)
+    - [Documentation](#documentation)
+    - [Contributing](#contributing)
+    - [License](#license)
+    - [Miscellaneous](#miscellaneous)
 
 <!-- markdown-toc end -->
 
@@ -47,8 +50,10 @@ modern Fortran.  The source code is a single Fortran module file ([json_module.F
 
 [top](#json-fortran)
 
-Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
+Download
 --------------------
+
+[![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
 
 Download the official versioned releases
 [here](https://github.com/jacobwilliams/json-fortran/releases/latest).
@@ -130,8 +135,11 @@ endforeach()
 
 [top](#json-fortran)
 
-Reading JSON from a file
+Exapmle Usage
 ---------------
+In this section the basic functionality of the JSON-Fortran library is illustrated.
+
+### Reading JSON from a file
 
 Reading a JSON file and getting data from it is fairly
 straightforward using the `json_file` class.  Here is an example.  See unit tests 1 and 3-6
@@ -173,8 +181,7 @@ for more examples. The source files may be found in `src/tests/`.
 
 [top](#json-fortran)
 
-Reading JSON from a string
----------------
+### Reading JSON from a string
 
 JSON can also be read directly from a character string like so:
 ```fortran
@@ -183,8 +190,7 @@ JSON can also be read directly from a character string like so:
 
 [top](#json-fortran)
 
-Modifying variables in a JSON file
----------------
+### Modifying variables in a JSON file
 
 After reading a JSON file, if you want to change the values of some of the variables, you can use the `update` method.  For the example above:
 
@@ -197,8 +203,7 @@ After reading a JSON file, if you want to change the values of some of the varia
 
 [top](#json-fortran)
 
-Writing a JSON file
----------------
+### Writing a JSON file
 
 To print the JSON file (either to a file or the console), the `print_file` method can be used.  For the above example:
 
@@ -209,8 +214,7 @@ To print the JSON file (either to a file or the console), the `print_file` metho
 
 [top](#json-fortran)
 
-Building a JSON file from scratch
----------------
+### Building a JSON file from scratch
 
 Constructing a JSON file element by element is slightly more complicated and involves the use
 of `json_value` pointers.  For more examples see unit tests 2, 4 and 7 in `src/tests/`.
@@ -297,8 +301,11 @@ shell script and CMake will also generate these files automatically in the docum
 
 [top](#json-fortran)
 
-Contributing [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md)
+Contributing
 ------------
+
+[![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md)
+
 Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo)
 
 [top](#json-fortran)
