@@ -1,3 +1,4 @@
+page_dir: pages
 project: json-fortran
 favicon: ./media/json-fortran-32x32.png
 project_dir: ./src
@@ -34,6 +35,13 @@ modern Fortran (Fortran 2003+).  The source code is a single Fortran module file
 # License
 
 The json-fortran source code and related files and documentation are distributed under a permissive free software license (BSD-style).  See the [LICENSE](https://raw.githubusercontent.com/jacobwilliams/json-fortran/master/LICENSE) file for more details.
+
+# Offficial Releases
+
+Browse the documentation for a particular release
+[here](|url|releases/index.html) or download the latest official
+release
+[here](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.1).
 
 # Miscellaneous
 

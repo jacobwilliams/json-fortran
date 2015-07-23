@@ -34,7 +34,7 @@ Looking to contribute something to [json-fortran](README.md)? **Here's how you c
 - Take a look at the [issues](https://github.com/jacobwilliams/json-fortran/issues) to see if there is an issue you'd like to help address. [Issues](https://github.com/jacobwilliams/json-fortran/issues) with the [ready label](https://github.com/jacobwilliams/json-fortran/issues?q=is%3Aopen+is%3Aissue+label%3A%22ready%22) or in the [ready column on waffle.io](https://waffle.io/jacobwilliams/json-fortran) are issues that are ready to be dealt with. (i.e., They are not blocked by other dependencies and are higher priority.)
 - Increasing the test coverage is another helpful way to
   contribute. Please take a look at
-  [this wiki page](https://github.com/jacobwilliams/json-fortran/wiki/Coverage-Analysis)
+  [the test coverage page](http://jacobwilliams.github.io/json-fortran/page/development-resources/json_module.F90.gcov.html)
   for a list of uncovered procedures, and at the
   [Codecov.io suggestions page](https://codecov.io/github/jacobwilliams/json-fortran/features/suggestions)
   to find procedures and lines of code that are still uncovered by the
