@@ -138,6 +138,20 @@ contains
     call json_get(me=root,path='array data.data',array_callback=get_3D_from_array)
     call check_errors(all(fetched_array == reshape(raw_array,[size(raw_array)])))
 
+    my_file = json_file(root)
+
+    call my_file%update('array data.description',CK_'vector data',found=existed)
+    call check_errors(existed)
+
+    call my_file%update(CK_'array data.description','Vector data',found=existed)
+    call check_errors(existed)
+
+    call my_file%get('SOS',sos)
+    call check_errors()
+
+    call my_file%get('$array data.data',fetched_array)
+    call check_errors(all(fetched_array == reshape(raw_array,[size(raw_array)])))
+
     contains
       subroutine check_errors(assertion)
         logical, optional, intent(in) :: assertion
