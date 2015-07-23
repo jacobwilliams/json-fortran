@@ -20,15 +20,9 @@ display: public
          protected
          private
 source: true
-md_extensions: markdown.extensions.toc(anchorlink=True)
+extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
+md_extensions: markdown.extensions.toc
                markdown.extensions.smarty(smart_quotes=False)
-
-<!-- Uncommenting these should work, but this actually causes issues
-
-*[API]: Application Programmable Interface
-*[JSON]: JavaScript Object Notation
-
--->
 
 [TOC]
 
@@ -44,3 +38,6 @@ The json-fortran source code and related files and documentation are distributed
 # Miscellaneous
 
 * For more information about JSON, see: <http://www.json.org/>
+
+*[API]: Application Programmable Interface
+*[JSON]: JavaScript Object Notation
