@@ -385,7 +385,8 @@
                                  MAYBEWRAP(json_file_get_integer_vec), &
                                  MAYBEWRAP(json_file_get_double_vec),  &
                                  MAYBEWRAP(json_file_get_logical_vec), &
-                                 MAYBEWRAP(json_file_get_string_vec)
+                                 MAYBEWRAP(json_file_get_string_vec),  &
+                                 json_file_get_root
 
         generic,public :: update =>  MAYBEWRAP(json_file_update_integer),  &
                                      MAYBEWRAP(json_file_update_logical),  &
@@ -412,6 +413,7 @@
         procedure :: MAYBEWRAP(json_file_get_double_vec)
         procedure :: MAYBEWRAP(json_file_get_logical_vec)
         procedure :: MAYBEWRAP(json_file_get_string_vec)
+        procedure :: json_file_get_root
 
         !update:
         procedure :: MAYBEWRAP(json_file_update_integer)
@@ -1275,6 +1277,24 @@
     call json_get_by_path(me%p, path=path, p=p, found=found)
 
     end subroutine json_file_get_object
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 7/23/2015
+!
+!  Get a [[json_value]] pointer to the JSON file root.
+
+    subroutine json_file_get_root(me,p)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+
+    p => me%p
+
+    end subroutine json_file_get_root
 !*****************************************************************************************
 
 !*****************************************************************************************
