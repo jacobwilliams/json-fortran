@@ -36,10 +36,11 @@ env:
       cd cmake-build &&
       cmake -DCMAKE_BUILD_TYPE=COVERAGE .. &&
       make -j 4 check"
-      CODE_COVERAGE="yes"
 
       # build with build.sh, make documentation, run unit tests and perform coverage analysis
-    - BUILD_SCRIPT="./build.sh --coverage --enable-unicode"
+    - >
+      BUILD_SCRIPT="./build.sh --coverage --skip-documentation &&
+      ./build.sh --coverage --enable-unicode"
       CODE_COVERAGE="yes"
 
 install:
@@ -81,7 +82,7 @@ after_success:
   - cd $TRAVIS_BUILD_DIR
   - |
     if [[ $CODE_COVERAGE == [yY]* ]]; then
-      bash <(curl -s https://codecov.io/bash)
+      bash <(curl -s https://codecov.io/bash) -f json_fortran.F90.gcov jf_test_*.[fF]90.gcov
     fi
   - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
   - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"

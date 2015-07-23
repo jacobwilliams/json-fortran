@@ -280,19 +280,6 @@ else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."
 fi
 
-#build the documentation with ford (if present):
-echo ""
-if [[ $JF_SKIP_DOCS != [yY]* ]]; then
-    if hash ford 2>/dev/null; then
-	echo "Building documentation..."
-	ford $FORDMD
-    else
-	echo "FORD not found! Install using: sudo pip install ford"
-    fi
-else
-    echo "Skip building documentation since \$JF_SKIP_DOCS has been set to ${JF_SKIP_DOCS}."
-fi
-
 # Run all the tests unless $JF_SKIP_TESTS
 echo ""
 if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
@@ -304,9 +291,49 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
     for TEST in jf_test_*; do
 	# It would be nice to run json output printed to stdout through jsonlint, however,
 	# some tests output more than one json structure and these need to be split
+	echo "Running ${TEST}"
 	./${TEST}
     done
+    cd -
     GLOBIGNORE="$OLD_IGNORES"
+    if [[ $CODE_COVERAGE = [yY]* ]] ; then
+	[ -f json_module.F90.gcov ] && rm json_module.F90.gcov
+	gcov -o $LIBDIR ${SRCDIR}${MODCODE}
+	if [[ $TRY_UNICODE = [yY]* ]] ; then
+	    # gcov/gfortran bug work around
+	    awk -F':' '{line=""; for(i=2;i<=NF;i++){line=line":"$i}; if (NR > 1) print $1 prevline; prevline=line}; END{print "        -"prevline}' json_module.F90.gcov > json_module.F90.gcov.fixed && \
+		mv json_module.F90.gcov{.fixed,}
+	    # rename so we can merge coverage info
+	    mv json_module.F90.gcov json_module-unicode.F90.gcov
+	else
+	    # rename so we can merge coverage info
+	    mv json_module.F90.gcov json_module-no-unicode.F90.gcov
+	fi
+	if [ -f json_module-unicode.F90.gcov ] && [ -f json_module-no-unicode.F90.gcov ]; then
+	    # merge them
+	    ./pages/development-resources/gccr.pl -n -c json_module-no-unicode.F90.gcov no-unicode \
+						  json_module-unicode.F90.gcov unicode > json_module.F90.gcov
+	else
+	    cp json_module-*-unicode.F90.gcov json_module.F90.gcov
+	fi
+	FoBiS.py rule -gcov_analyzer .
+	sed -i"bak" -E 's; \*\*([a-zA-Z]+[a-zA-Z0-9_]*)\*\*; \*\*[[\1]]\*\*;' json_module.F90.gcov.md
+	sed -i"bak" -E 's;, line ([0-9]+);, line [\1](https://github.com/jacobwilliams/json-fortran/blob/master/src/json_module.F90#L\1);' json_module.F90.gcov.md
+	gcov -o $BINDIR ${TESTDIR}*.[Ff]90
+    fi
 else
     echo "Skip running the unit tests since \$JF_SKIP_TESTS has been set to ${JF_SKIP_TESTS}."
+fi
+
+#build the documentation with ford (if present):
+echo ""
+if [[ $JF_SKIP_DOCS != [yY]* ]]; then
+    if hash ford 2>/dev/null; then
+	echo "Building documentation..."
+	ford $FORDMD
+    else
+	echo "FORD not found! Install using: sudo pip install ford"
+    fi
+else
+    echo "Skip building documentation since \$JF_SKIP_DOCS has been set to ${JF_SKIP_DOCS}."
 fi
