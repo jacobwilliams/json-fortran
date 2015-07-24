@@ -7,6 +7,7 @@ module jf_test_12_mod
 
     character(len=*),parameter :: dir = '../files/outputs/' !! Path to write JSON file to
     character(len=*),parameter :: file = 'array.json'       !! Filename to write
+    real(wp), parameter        :: TOL = 100*epsilon(1.0_wp) !! Tolerance for real comparisons
 
 contains
 
@@ -81,7 +82,7 @@ contains
     call check_errors()
 
     call json_get(root,'$.array data.data(1)',array_element)
-    call check_errors(array_element == 1.0_wp)
+    call check_errors(abs(array_element - 1.0_wp) <= TOL)
 
     call json_get(root,'@.array data.shape',fetched_shape)
     call check_errors(all(fetched_shape == shape))
@@ -129,14 +130,14 @@ contains
     call check_errors()
 
     call json_get(tmp_json_ptr,fetched_array)
-    call check_errors(all(fetched_array == reshape(raw_array,[size(raw_array)])))
+    call check_errors(all(abs(fetched_array - reshape(raw_array,[size(raw_array)])) <= TOL))
 
     call json_get(root,'array data.data',fetched_array)
-    call check_errors(all(fetched_array == reshape(raw_array,[size(raw_array)])))
+    call check_errors(all(abs(fetched_array - reshape(raw_array,[size(raw_array)])) <= TOL))
 
     raw_array = 0
     call json_get(me=root,path='array data.data',array_callback=get_3D_from_array)
-    call check_errors(all(fetched_array == reshape(raw_array,[size(raw_array)])))
+    call check_errors(all(abs(fetched_array - reshape(raw_array,[size(raw_array)])) <= TOL))
 
     my_file = json_file(root)
 
@@ -150,7 +151,7 @@ contains
     call check_errors()
 
     call my_file%get('$array data.data',fetched_array)
-    call check_errors(all(fetched_array == reshape(raw_array,[size(raw_array)])))
+    call check_errors(all(abs(fetched_array - reshape(raw_array,[size(raw_array)])) <= TOL))
 
     call my_file%get(tmp_json_ptr)
     call check_errors(associated(tmp_json_ptr,root))
@@ -169,14 +170,16 @@ contains
 
       subroutine get_3D_from_array(element, i, count)
         type(json_value), pointer , intent(in)   :: element
-        integer         , intent(in)             :: i        !index
-        integer         , intent(in)             :: count    !size of array
+        integer         , intent(in)             :: i        !!index
+        integer         , intent(in)             :: count    !!size of array
+        integer :: useless !! assign count to this to silence warnings
 
         ! let's pretend we're c programmers!
         call json_get( element, raw_array( &
              mod(i-1,imx) + 1, &            ! i index
              mod((i-1)/imx,jmx) + 1, &      ! j index
              mod((i-1)/imx/jmx,kmx) + 1 ) ) ! k inded
+        useless = count
       end subroutine
 
     end subroutine
