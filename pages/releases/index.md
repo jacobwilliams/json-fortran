@@ -5,7 +5,9 @@ title: Official Releases
 # Official Releases
 
 This is where to find the documentation corresponding to an official,
-tagged release.
+tagged release. If you are looking for the most current documentation
+of the `master` branch, please head back to the
+[main page](|url|/index.html).
 
 ## Latest Stable Release
 
@@ -19,7 +21,7 @@ tagged release.
 **Note:** There is currently no way to navigate back to the general/master
 documentation from the documentation for official releases other than
 using the browser's back button. Feel free to bookmark this page, or
-the [main project page](|url|index.html) for convenient navigation.
+the [main project page](|url|/index.html) for convenient navigation.
 
 * [4.1.1](http://jacobwilliams.github.io/json-fortran/4.1.1/json_module_F90.html)
    ([ROBODoc](https://github.com/gumpu/ROBODoc) generated documentation)

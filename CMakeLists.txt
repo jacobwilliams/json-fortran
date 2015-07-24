@@ -146,36 +146,49 @@ if ( NOT SKIP_DOC_GEN )
   find_program ( FORD ford )
   if ( FORD ) # Found
     file ( COPY "${CMAKE_SOURCE_DIR}/media" DESTINATION "${CMAKE_BINARY_DIR}/" )
+    file ( GLOB_RECURSE PAGES_FILES "${CMAKE_SOURCE_DIR}/pages/*.*")
     set ( DOC_DIR "${CMAKE_BINARY_DIR}/doc" )
+    set ( PAGES_DIR "${CMAKE_SOURCE_DIR}/pages" )
+    set ( PROJ_DIR "${CMAKE_SOURCE_DIR}/src" )
     set ( FORD_PROJECT_FILE "${CMAKE_SOURCE_DIR}/json-fortran.md" )
+    if ( ENABLE_UNICODE )
+      set ( MACRO_FLAG "-m USE_UCS4" )
+    else ()
+      set ( MACRO_FLAG "" )
+    endif ()
     # Dynamically generate the FORD outputs list
     message ( STATUS "Dynamically computing FORD output information..." )
     if ( NOT (DEFINED FORD_OUTPUTS_CACHED) )
       message ( STATUS "Running FORD to dynamically compute documentation outputs, this could take a while..." )
       execute_process ( COMMAND ${CMAKE_COMMAND} -E remove_directory ${DOC_DIR}
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${DOC_DIR}
-	COMMAND "${FORD}" -d "${CMAKE_SOURCE_DIR}/src" -o "${DOC_DIR}" "${FORD_PROJECT_FILE}" OUTPUT_QUIET )
+	COMMAND "${FORD}" -q ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${PAGE_DIR}" "${FORD_PROJECT_FILE}" OUTPUT_QUIET )
+    else ()
+      message ( STATUS "Re-using cached FORD outputs, rather than regenerating them" )
     endif ()
     file ( GLOB_RECURSE FORD_OUTPUTS
-      "${DOC_DIR}/*.html" )
+      "${DOC_DIR}/*.*" )
     file ( GLOB_RECURSE FORD_CLEAN_OUTPUTS
       "${DOC_DIR}/*.*" )
     if ( (DEFINED FORD_OUTPUTS) AND ( NOT ( "${FORD_OUTPUTS}" STREQUAL "" ) ) )
+      message ( STATUS "Caching FORD outputs" )
       set ( FORD_OUTPUTS_CACHED "${FORD_OUTPUTS}"
-	CACHE INTERNAL "internal variable to attempt to prevent rebuilding FORD docs" FORCE )
+	CACHE STRING "variable containing FORD outputs to prevent rebuilding FORD docs" FORCE )
     endif ()
     message ( STATUS "Done dynamically computing FORD outputs." )
 
-    foreach ( SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} )
-      list ( APPEND FORD_DEPENDS "${SRC_FILE}" )
-    endforeach ( SRC_FILE )
+    foreach ( DOC_SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} ${CMAKE_SOURCE_DIR}/README.md
+	${CMAKE_SOURCE_DIR}/CHANGELOG.md ${CMAKE_SOURCE_DIR}/CONTRIBUTING.md
+	${CMAKE_SOURCE_DIR}/LICENSE ${CMAKE_SOURCE_DIR}/json-fortran.md ${PAGES_FILES} )
+      list ( APPEND FORD_DEPENDS "${DOC_SRC_FILE}" )
+    endforeach ()
     add_custom_command ( OUTPUT ${FORD_OUTPUTS_CACHED}
-      COMMAND "${FORD}" -d "${CMAKE_SOURCE_DIR}/src" -o "${DOC_DIR}" "${FORD_PROJECT_FILE}"
+      COMMAND "${FORD}" ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${CMAKE_SOURCE_DIR}/pages" "${FORD_PROJECT_FILE}"
       MAIN_DEPENDENCY "${FORD_PROJECT_FILE}"
       DEPENDS ${FORD_DEPENDS}
       COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using FORD" )
     add_custom_target ( documentation ALL
-      DEPENDS ${FORD_OUTPUTS} )
+      DEPENDS ${FORD_OUTPUTS_CACHED} )
     set ( INSTALL_API_DOCUMENTATION TRUE
       CACHE BOOL "Install FORD generated documentation?" )
     if ( INSTALL_API_DOCUMENTATION )

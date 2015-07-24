@@ -1,8 +1,6 @@
-page_dir: pages
 project: json-fortran
 favicon: ./media/json-fortran-32x32.png
 project_dir: ./src
-macro: USE_UCS4
 output_dir: ./doc
 media_dir: ./media
 project_github: https://github.com/jacobwilliams/json-fortran
@@ -39,7 +37,7 @@ The json-fortran source code and related files and documentation are distributed
 # Offficial Releases
 
 Browse the documentation for a particular release
-[here](|url|releases/index.html) or download the latest official
+[here](|url|/page/releases/index.html) or download the latest official
 release
 [here](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.1).
 
