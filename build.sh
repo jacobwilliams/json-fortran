@@ -10,7 +10,8 @@
 #  USAGE
 #    build.sh [--compiler {intel|gnu|<other>}] [--cflags '<custom compiler flags here>']
 #             [--coverage [{yes|no}]] [--profile [{yes|no}]] [--skip-tests [{yes|no}]]
-#             [--skip-documentation [{yes|no}]] [--enable-unicode [{yes|no}]] [--help]"
+#             [--skip-documentation [{yes|no}]] [--enable-unicode [{yes|no}]] [--help]
+#             [--clean]
 #
 #    By default, if invoked without any flags, this build script will build the
 #    json-fortran library using gfortran,
@@ -31,6 +32,9 @@
 #                   properly quoted
 #
 #        --help : Print a usage message and exit.
+#
+#        --clean : Delete generated files and clean up after builds
+#
 #
 #        The following flags all (optionally) accept an argument, "yes" or "no." If
 #        no argument is passed, "yes" will be assumed.
@@ -220,6 +224,9 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
 	--help)
 	    print_usage
 	    exit 0
+	    ;;
+	--clean)
+	    rm -r src{,/tests}/*.o $DOCDIR* $LIBDIR* $BINDIR* *.gcov*
 	    ;;
 	*)
 	    echo "Unknown flag, \"$1\", passed to ${script_name}!" 2>&1
