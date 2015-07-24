@@ -64,7 +64,8 @@
 set -e
 
 FORDMD='json-fortran.md'        # FORD options file for building documentation
-DOCDIR='./documentation/'       # build directory for documentation
+DOCDIR='./doc/'                 # build directory for documentation
+PAGESDIR='./pages/'             # Directory for FORD "pages"
 SRCDIR='./src/'                 # library source directory
 TESTDIR='./src/tests/'          # unit test source directory
 INTROSPECDIR='./src/tests/introspection/' # pre compile configuration tests directory
@@ -330,7 +331,8 @@ echo ""
 if [[ $JF_SKIP_DOCS != [yY]* ]]; then
     if hash ford 2>/dev/null; then
 	echo "Building documentation..."
-	ford $FORDMD
+	[[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG="-m USE_UCS4"
+	ford $MACRO_FLAG -p $PAGESDIR $FORDMD
     else
 	echo "FORD not found! Install using: sudo pip install ford"
     fi

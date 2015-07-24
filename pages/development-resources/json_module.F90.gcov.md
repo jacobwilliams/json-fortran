@@ -10,7 +10,7 @@ title: Coverage Analysis
 The following report was automatically generated from
 [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) output by the
 [FoBiS.py](https://github.com/szaghi/FoBiS) Fortran build
-tool. [gccr.pl](|url|page/development-resources/gccr.pl) was used to
+tool. [gccr.pl](|url|/page/development-resources/gccr.pl) was used to
 merge [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) coverage
 reports, and can be obtained at <https://github.com/eel3/gccr>. If
 procedure coverage is at 100%, also have a look at the

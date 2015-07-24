@@ -80,10 +80,14 @@ script:
 
 after_success:
   - cd $TRAVIS_BUILD_DIR
-  - |
-    if [[ $CODE_COVERAGE == [yY]* ]]; then
-      bash <(curl -s https://codecov.io/bash) -f json_fortran.F90.gcov jf_test_*.[fF]90.gcov
-    fi
   - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
   - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"
 #broken for now#  - ./deploy.sh #handles updating documentation for master branch as well as tags
+  - (yes | rm -r doc gh-pages) || true # wipe out doc dirs to avoid confusing codecov
+  - |
+    if [[ $CODE_COVERAGE == [yY]* ]]; then
+      rm json_module-*unicode.F90.gcov || true
+      mv json_module.F90.gcov src/
+      mv jf_test*.[fF]90.gcov src/tests/
+      bash <(curl -s https://codecov.io/bash) -v -X gcov
+    fi
