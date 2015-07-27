@@ -2,7 +2,8 @@ title: Additional Documentation
 
 # Current Stable Release
 
-[**{!__VERSION__!}**](http://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html)
+[**{!__VERSION__!}**](
+http://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html)
 
 # Past Releases
 
