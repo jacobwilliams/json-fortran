@@ -34,14 +34,17 @@ env:
     - >
       BUILD_SCRIPT="mkdir cmake-build &&
       cd cmake-build &&
-      cmake -DCMAKE_BUILD_TYPE=COVERAGE .. &&
+      cmake .. &&
       make -j 4 check"
+      CODE_COVERAGE="no"
+      DEPLOY_DOCUMENTATION="no"
 
       # build with build.sh, make documentation, run unit tests and perform coverage analysis
     - >
       BUILD_SCRIPT="./build.sh --coverage --skip-documentation &&
       ./build.sh --coverage --enable-unicode"
       CODE_COVERAGE="yes"
+      DEPLOY_DOCUMENTATION="yes"
 
 install:
   - |
@@ -89,7 +92,7 @@ after_success:
   - cd $TRAVIS_BUILD_DIR
   - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
   - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"
-#broken for now#  - ./deploy.sh #handles updating documentation for master branch as well as tags
+  - [[ $DEPLOY_DOCUMENTATION == [yY]* ]] && ./deploy.sh #publish docs for master branch and tags
   - (yes | rm -r doc gh-pages) || true # wipe out doc dirs to avoid confusing codecov
   - |
     if [[ $CODE_COVERAGE == [yY]* ]]; then
