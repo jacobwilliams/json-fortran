@@ -84,7 +84,7 @@ or [Download v4.1.1](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 - Installation now possible with a [Homebrew](http://brew.sh)
   [package](http://braumeister.org/formula/json-fortran) on Mac OS X
-- [CMake](http://cmake.org) install option to use a more traditional
+- [CMake](http://www.cmake.org) install option to use a more traditional
   Gnu install structure (to support Homebrew installation)
   [PR \#101](https://github.com/jacobwilliams/json-fortran/pull/101)
   from [zbeekman](https://github.com/zbeekman)
