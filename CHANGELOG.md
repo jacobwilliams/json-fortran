@@ -48,10 +48,10 @@
 
 **Fixed issues:**
 
-- Fixed innacurate coverage reports via
+- Fixed inaccurate coverage reports via
   [PR \#109](https://github.com/jacobwilliams/json-fortran/pull/109)
   from [zbeekman](https://github.com/zbeekman)
-- Fixed a small consistency issue when outputing floating point
+- Fixed a small consistency issue when outputting floating point
   numbers via
   [PR \#125](https://github.com/jacobwilliams/json-fortran/pull/125)
 - Problems writing JSON to `error_unit` (0) due to JSON-Fortran's
@@ -118,7 +118,7 @@ or [Download v4.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 **Enhancements:**
 
-- Runtime speed improvements
+- Run-time speed improvements
   [\#75](https://github.com/jacobwilliams/json-fortran/issues/75)
   implemented in
   [PR \#93](https://github.com/jacobwilliams/json-fortran/pull/93)
@@ -180,7 +180,7 @@ or [Download v4.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 - Discrepancy with dummy argument attributes for
   path between `get` and `get_..._vec` procedures
   [\#79](https://github.com/jacobwilliams/json-fortran/issues/79)
-- Small bugfix for [CMake](http://www.cmake.org) install
+- Small bug fix for [CMake](http://www.cmake.org) install
   [\#68](https://github.com/jacobwilliams/json-fortran/pull/68)
   ([zbeekman](https://github.com/zbeekman))
 - JSON output files from tests are overwriting expected outputs and
@@ -220,7 +220,7 @@ or [Download v3.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
   from [jacobwilliams](https://github.com/jacobwilliams))
 - Read JSON structure from a character string
   [\#5](https://github.com/jacobwilliams/json-fortran/issues/5)
-- Adopeted official contributing guidelines and added a
+- Adopted official contributing guidelines and added a
   `CONTRIBUTING.md`
   [\#47](https://github.com/jacobwilliams/json-fortran/issues/47)
 
@@ -231,11 +231,11 @@ or [Download v3.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
   fixed by
   [PR \#54](https://github.com/jacobwilliams/json-fortran/pull/54)
   (from [zbeekman](https://github.com/zbeekman))
-- Segfaults and unexpexted behavior due to optional dummy arguments
+- Segfaults and unexpected behavior due to optional dummy arguments
   being dereferenced outside of `if (present(…))`
   [\#52](https://github.com/jacobwilliams/json-fortran/issues/52)
 - Documentation not being produced for tests because tests directory
-  should be subdirectory of src
+  should be sub-directory of src
   [\#49](https://github.com/jacobwilliams/json-fortran/issues/49)
 - Example 8 failing on gfortran 4.9.2
   [\#44](https://github.com/jacobwilliams/json-fortran/issues/44)
@@ -317,7 +317,7 @@ or [Download v2.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 **Enhancements:**
 - Significant changes to the API including new procedures
-- Code refactoring
+- Code re-factoring
 - SCons build added thanks to [@bruceravel](https://github.com/bruceravel)
 
 **Fixed issues:**
@@ -365,7 +365,7 @@ or [Download v2.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
   [ROBODoc](https://github.com/gumpu/ROBODoc) must be specified in
   CMakeLists.txt manually
   [\#17](https://github.com/jacobwilliams/json-fortran/issues/17)
-- Invalid json input files (`test1.json`, `test5.json`)
+- Invalid JSON input files (`test1.json`, `test5.json`)
   [\#10](https://github.com/jacobwilliams/json-fortran/issues/10),
   fixed by
   [PR \#11](https://github.com/jacobwilliams/json-fortran/pull/11)
@@ -373,7 +373,7 @@ or [Download v2.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 - `char()` is processor dependent, use `achar()`
   [\#20](https://github.com/jacobwilliams/json-fortran/pull/20)
   (pull request from [zbeekman](https://github.com/zbeekman))
-- Bugfix for [ROBODoc](https://github.com/gumpu/ROBODoc) documentation
+- Bug-fix for [ROBODoc](https://github.com/gumpu/ROBODoc) documentation
   generation with [CMake](http://www.cmake.org)
   [\#16](https://github.com/jacobwilliams/json-fortran/pull/16)
   (pull request from [zbeekman](https://github.com/zbeekman))

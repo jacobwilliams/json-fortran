@@ -1,4 +1,4 @@
-json-fortran
+JSON-Fortran
 ============
 
 [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)
@@ -7,12 +7,12 @@ A Fortran 2008 JSON API
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
 **Table of Contents**
 
-- [json-fortran](#json-fortran)
+- [JSON-Fortran](#json-fortran)
     - [Status](#status)
     - [Brief description](#brief-description)
     - [Download](#download)
     - [Building the library](#building-the-library)
-    - [Exapmle Usage](#exapmle-usage)
+    - [Example Usage](#example-usage)
         - [Reading JSON from a file](#reading-json-from-a-file)
         - [Reading JSON from a string](#reading-json-from-a-string)
         - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
@@ -135,7 +135,7 @@ endforeach()
 
 [top](#json-fortran)
 
-Exapmle Usage
+Example Usage
 ---------------
 In this section the basic functionality of the JSON-Fortran library is illustrated.
 
