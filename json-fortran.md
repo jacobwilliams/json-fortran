@@ -4,6 +4,7 @@ project_dir: ./src
 output_dir: ./doc
 media_dir: ./media
 project_github: https://github.com/jacobwilliams/json-fortran
+project_download: https://github.com/jacobwilliams/json-fortran/releases/latest
 summary: JSON-Fortran -- A Fortran 2008 JSON API
 author: Jacob Williams
 github: https://github.com/jacobwilliams

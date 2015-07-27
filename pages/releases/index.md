@@ -24,35 +24,34 @@ documentation from the documentation for official releases other than
 using the browser's back button. Feel free to bookmark this page, or
 the [main project page](|url|/index.html) for convenient navigation.
 
-* [4.1.1](http://jacobwilliams.github.io/json-fortran/4.1.1/json_module_F90.html)
+* [4.1.1](http://jacobwilliams.github.io/json-fortran/4.1.1/index.html)
    ([ROBODoc](https://github.com/gumpu/ROBODoc) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.1)
-* [4.1.0](http://jacobwilliams.github.io/json-fortran/4.1.0/json_module_F90.html)
+* [4.1.0](http://jacobwilliams.github.io/json-fortran/4.1.0/index.html)
    ([ROBODoc](https://github.com/gumpu/ROBODoc) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.0)
-* [4.0.0](http://jacobwilliams.github.io/json-fortran/4.0.0/json_module_F90.html)
+* [4.0.0](http://jacobwilliams.github.io/json-fortran/4.0.0/index.html)
    ([ROBODoc](https://github.com/gumpu/ROBODoc) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/4.0.0)
-* [3.1.0](http://jacobwilliams.github.io/json-fortran/3.1.0/json_module_f90.html)
+* [3.1.0](http://jacobwilliams.github.io/json-fortran/3.1.0/index.html)
    ([ROBODoc](https://github.com/gumpu/ROBODoc) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/3.1.0)
-* [3.0.0](http://jacobwilliams.github.io/json-fortran/3.0.0/json_module_f90.html)
+* [3.0.0](http://jacobwilliams.github.io/json-fortran/3.0.0/index.html)
    ([ROBODoc](https://github.com/gumpu/ROBODoc) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/3.0.0)
-* [2.0.0](http://jacobwilliams.github.io/json-fortran/2.0.0/json_module_f90.html)
+* [2.0.0](http://jacobwilliams.github.io/json-fortran/2.0.0/index.html)
    ([ROBODoc](https://github.com/gumpu/ROBODoc) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/2.0.0)
-* [1.0.0](http://jacobwilliams.github.io/json-fortran/1.0.0/json_module_f90.html)
+* [1.0.0](http://jacobwilliams.github.io/json-fortran/1.0.0/index.html)
    ([ROBODoc](https://github.com/gumpu/ROBODoc) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/1.0.0)
 
 # Development Version
 
 Documentation for the latest development version may be found at
-http://jacobwilliams.github.io/json-fortran or generated locally using
-the
-[build.sh](https://github.com/jacobwilliams/json-fortran/blob/master/build.sh)
-build script.
+<|url|> or generated locally using the
+[build.sh](|url|page/development-resources/build.sh.html) build
+script.
 
 # Release Notes
 
