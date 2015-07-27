@@ -5,7 +5,7 @@
 #    build.sh
 #
 #  DESCRIPTION
-#    Build the json-fortran library and unit tests.
+#    Build the JSON-Fortran library and unit tests.
 #
 #  USAGE
 #    build.sh [--compiler {intel|gnu|<other>}] [--cflags '<custom compiler flags here>']
@@ -14,7 +14,7 @@
 #             [--clean]
 #
 #    By default, if invoked without any flags, this build script will build the
-#    json-fortran library using gfortran,
+#    JSON-Fortran library using gfortran,
 #        without :
 #            unicode support
 #            coverage flags
@@ -39,7 +39,7 @@
 #        The following flags all (optionally) accept an argument, "yes" or "no." If
 #        no argument is passed, "yes" will be assumed.
 #
-#        --enable-unicode [{yes|no}]: Request that the json-fortran be built with (or
+#        --enable-unicode [{yes|no}]: Request that the JSON-Fortran be built with (or
 #                                     without) unicode/UCS4 support. If your compiler
 #                                     does NOT support ISO 10646/UCS4 and it was
 #                                     requested, then a warning is printed and the

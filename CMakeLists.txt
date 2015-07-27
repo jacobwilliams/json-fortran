@@ -3,11 +3,11 @@
 # Copy right (c) 2014, Izaak Beekman
 # All rights reserved.
 
-# This file is contributed to the json-fortran project, and
-# is licensed under the terms of json-fortran license. The json-fortran
+# This file is contributed to the JSON-Fortran project, and
+# is licensed under the terms of JSON-Fortran license. The JSON-Fortran
 # license is located in the LICENSE file which must be distributed with
 # this software. The contributing author, Izaak Beekman, retains all
-# rights permitted by the terms of the json-fortran license.
+# rights permitted by the terms of the JSON-Fortran license.
 
 cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 
@@ -202,7 +202,7 @@ if ( NOT SKIP_DOC_GEN )
     endif ()
   else () # Not found
     message ( WARNING
-      "FORD not found! Please set the CMake cache variable FORD to point to the installed FORD executable, and reconfigure or disable building the documentation. FORD can be installed from PYPI with `sudo pip install FORD` or from <https://github.com/cmacmackin/ford> If you do not wish to install FORD and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
+      "FORD not found! Please set the CMake cache variable FORD to point to the installed FORD executable, and reconfigure or disable building the documentation. FORD can be installed from PYPI with `sudo pip install FORD` or from <https://github.com/cmacmackin/ford> If you do not wish to install FORD and build the JSON-Fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
   endif ()
 endif ()
 
@@ -210,7 +210,7 @@ endif ()
 # Handle test related stuff
 #--------------------------
 set ( ENABLE_TESTS TRUE CACHE BOOL
-  "Enable the json-fortran tests." )
+  "Enable the JSON-Fortran tests." )
 
 #---------------------------------------------------------------------
 # Add some tests to ensure that the software is performing as expected
