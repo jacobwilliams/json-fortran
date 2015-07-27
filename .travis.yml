@@ -73,6 +73,13 @@ before_script:
         mv $f src/tests/jf_test_${f%.md}.f90
       done
     fi
+  - |
+    if [ "$TRAVIS_TAG" ]; then
+      if [[ "v$TRAVIS_TAG" != "v$(cat __VERSION__)" ]]; then
+        echo "ERROR: You are trying to tag a new release but have a version missmatch in \`__VERSION__\`"
+        false # throw an error
+      fi
+    fi
 
 script:
   - echo $BUILD_SCRIPT
