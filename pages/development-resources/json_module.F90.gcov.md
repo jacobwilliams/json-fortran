@@ -4,7 +4,7 @@ title: Coverage Analysis
 
 # Coverage analysis
 
-[![Codecov](https://img.shields.io/codecov/c/github/jacobwilliams/json-fortran.svg?style=plastic)](http://codecov.io/github/jacobwilliams/json-fortran?branch=master)
+[![Codecov](https://img.shields.io/codecov/c/github/jacobwilliams/json-fortran.svg?style=plastic)](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
 
 
 The following report was automatically generated from
@@ -21,6 +21,6 @@ which they are defined.
 If procedure coverage is at 100%, also have a look at the
 [Codecov.io coverage suggestions](https://codecov.io/github/jacobwilliams/json-fortran/features/suggestions).
 
-![Codecov.io](http://codecov.io/github/jacobwilliams/json-fortran/branch.svg?branch=master)
+![Codecov.io](https://codecov.io/github/jacobwilliams/json-fortran/branch.svg?branch=master)
 
 {!json_module.F90.gcov.md!}

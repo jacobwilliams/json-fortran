@@ -1,6 +1,6 @@
 # Contributing to [json-fortran](README.md)
 
-Looking to contribute something to [json-fortran](README.md)? **Here's how you can help.**
+Looking to contribute something to [json-fortran](https://github.com/jacobwilliams/json-fortran)? **Here's how you can help.**
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
 **Table of Contents**
@@ -44,7 +44,7 @@ Looking to contribute something to [json-fortran](README.md)? **Here's how you c
   the corresponding generic procedure with input arguments that will
   resolve to the specific procedure in question. Let's keep the
   following graph trending upwards!
-  ![Codecov.io](http://codecov.io/github/jacobwilliams/json-fortran/branch.svg?branch=master)
+  ![Codecov.io](https://codecov.io/github/jacobwilliams/json-fortran/branch.svg?branch=master)
 
 [top](#contributing-to-json-fortran)
 ## Pull Requests
