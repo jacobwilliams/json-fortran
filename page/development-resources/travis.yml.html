@@ -186,112 +186,112 @@
 <a href="https://travis-ci.org/jacobwilliams/json-fortran">Travis-CI</a> script
 used to perform continuous integration testing for <abbr title="JavaScript Object Notation">JSON</abbr>-Fortran, and
 trigger automatic documentation deployment.</p>
-<div class="codehilite"><pre><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">python</span>
+<div class="codehilite"><pre><span class="n">language</span><span class="o">:</span> <span class="n">python</span>
 
-<span class="l-Scalar-Plain">python</span><span class="p-Indicator">:</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">2.7</span>
+<span class="n">python</span><span class="o">:</span>
+  <span class="o">-</span> <span class="mf">2.7</span>
 
-<span class="l-Scalar-Plain">sudo</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+<span class="n">sudo</span><span class="o">:</span> <span class="kc">false</span>
 
-<span class="l-Scalar-Plain">cache</span><span class="p-Indicator">:</span>
-  <span class="l-Scalar-Plain">apt</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
-  <span class="l-Scalar-Plain">pip</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">true</span>
-  <span class="l-Scalar-Plain">directories</span><span class="p-Indicator">:</span>
-    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">$HOME/.cache/pip</span>
-    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">$HOME/.local</span>
+<span class="n">cache</span><span class="o">:</span>
+  <span class="n">apt</span><span class="o">:</span> <span class="kc">true</span>
+  <span class="n">pip</span><span class="o">:</span> <span class="kc">true</span>
+  <span class="n">directories</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">$HOME</span><span class="sr">/.cache/</span><span class="n">pip</span>
+    <span class="o">-</span> <span class="n">$HOME</span><span class="o">/.</span><span class="n">local</span>
 
-<span class="l-Scalar-Plain">addons</span><span class="p-Indicator">:</span>
-  <span class="l-Scalar-Plain">apt</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">sources</span><span class="p-Indicator">:</span>
-      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">kalakris-cmake</span>
-      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ubuntu-toolchain-r-test</span>
-    <span class="l-Scalar-Plain">packages</span><span class="p-Indicator">:</span>
-      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">gfortran-4.9</span>
-      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">binutils</span>
-      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">cmake</span>
-      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">python-pip</span>
+<span class="n">addons</span><span class="o">:</span>
+  <span class="n">apt</span><span class="o">:</span>
+    <span class="n">sources</span><span class="o">:</span>
+      <span class="o">-</span> <span class="n">kalakris</span><span class="o">-</span><span class="n">cmake</span>
+      <span class="o">-</span> <span class="n">ubuntu</span><span class="o">-</span><span class="n">toolchain</span><span class="o">-</span><span class="n">r</span><span class="o">-</span><span class="n">test</span>
+    <span class="n">packages</span><span class="o">:</span>
+      <span class="o">-</span> <span class="n">gfortran</span><span class="o">-</span><span class="mf">4.9</span>
+      <span class="o">-</span> <span class="n">binutils</span>
+      <span class="o">-</span> <span class="n">cmake</span>
+      <span class="o">-</span> <span class="n">python</span><span class="o">-</span><span class="n">pip</span>
 
-<span class="c1"># Build matrix: Run the three build systems and tests in parallel</span>
-<span class="l-Scalar-Plain">env</span><span class="p-Indicator">:</span>
-  <span class="l-Scalar-Plain">global</span><span class="p-Indicator">:</span>
-    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">CHECK_README_PROGS=&quot;yes&quot;</span>
-  <span class="l-Scalar-Plain">matrix</span><span class="p-Indicator">:</span>
-      <span class="c1"># CMake build with unit tests, no documentation, with coverage analysis</span>
-      <span class="c1"># No unicode so that coverage combined with the build script will cover unicode</span>
-      <span class="c1"># and non-unicode code paths</span>
-    <span class="p-Indicator">-</span> <span class="p-Indicator">&gt;</span>
-      <span class="no">BUILD_SCRIPT=&quot;mkdir cmake-build &amp;&amp;</span>
-      <span class="no">cd cmake-build &amp;&amp;</span>
-      <span class="no">cmake .. &amp;&amp;</span>
-      <span class="no">make -j 4 check&quot;</span>
-      <span class="no">CODE_COVERAGE=&quot;no&quot;</span>
-      <span class="no">DEPLOY_DOCUMENTATION=&quot;no&quot;</span>
+<span class="err">#</span> <span class="n">Build</span> <span class="n">matrix</span><span class="o">:</span> <span class="n">Run</span> <span class="n">the</span> <span class="n">three</span> <span class="n">build</span> <span class="n">systems</span> <span class="n">and</span> <span class="n">tests</span> <span class="k">in</span> <span class="n">parallel</span>
+<span class="n">env</span><span class="o">:</span>
+  <span class="n">global</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">CHECK_README_PROGS</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+  <span class="n">matrix</span><span class="o">:</span>
+      <span class="err">#</span> <span class="n">CMake</span> <span class="n">build</span> <span class="k">with</span> <span class="n">unit</span> <span class="n">tests</span><span class="o">,</span> <span class="n">no</span> <span class="n">documentation</span><span class="o">,</span> <span class="k">with</span> <span class="n">coverage</span> <span class="n">analysis</span>
+      <span class="err">#</span> <span class="n">No</span> <span class="n">unicode</span> <span class="n">so</span> <span class="n">that</span> <span class="n">coverage</span> <span class="n">combined</span> <span class="k">with</span> <span class="n">the</span> <span class="n">build</span> <span class="n">script</span> <span class="n">will</span> <span class="n">cover</span> <span class="n">unicode</span>
+      <span class="err">#</span> <span class="n">and</span> <span class="n">non</span><span class="o">-</span><span class="n">unicode</span> <span class="n">code</span> <span class="n">paths</span>
+    <span class="o">-</span> <span class="o">&gt;</span>
+      <span class="n">BUILD_SCRIPT</span><span class="o">=</span><span class="s2">&quot;mkdir cmake-build &amp;&amp;</span>
+<span class="s2">      cd cmake-build &amp;&amp;</span>
+<span class="s2">      cmake .. &amp;&amp;</span>
+<span class="s2">      make -j 4 check&quot;</span>
+      <span class="n">CODE_COVERAGE</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
+      <span class="n">DEPLOY_DOCUMENTATION</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
 
-      <span class="no"># build with build.sh, make documentation, run unit tests and perform coverage analysis</span>
-    <span class="p-Indicator">-</span> <span class="p-Indicator">&gt;</span>
-      <span class="no">BUILD_SCRIPT=&quot;./build.sh --coverage --skip-documentation &amp;&amp;</span>
-      <span class="no">./build.sh --coverage --enable-unicode&quot;</span>
-      <span class="no">CODE_COVERAGE=&quot;yes&quot;</span>
-      <span class="no">DEPLOY_DOCUMENTATION=&quot;yes&quot;</span>
+      <span class="err">#</span> <span class="n">build</span> <span class="k">with</span> <span class="n">build</span><span class="o">.</span><span class="na">sh</span><span class="o">,</span> <span class="n">make</span> <span class="n">documentation</span><span class="o">,</span> <span class="n">run</span> <span class="n">unit</span> <span class="n">tests</span> <span class="n">and</span> <span class="n">perform</span> <span class="n">coverage</span> <span class="n">analysis</span>
+    <span class="o">-</span> <span class="o">&gt;</span>
+      <span class="n">BUILD_SCRIPT</span><span class="o">=</span><span class="s2">&quot;./build.sh --coverage --skip-documentation &amp;&amp;</span>
+<span class="s2">      ./build.sh --coverage --enable-unicode&quot;</span>
+      <span class="n">CODE_COVERAGE</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+      <span class="n">DEPLOY_DOCUMENTATION</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
 
-<span class="l-Scalar-Plain">install</span><span class="p-Indicator">:</span>
-  <span class="p-Indicator">-</span> <span class="p-Indicator">|</span>
-    <span class="no">if [[ ! -d &quot;$HOME/.local/bin&quot; ]]; then</span>
-      <span class="no">mkdir &quot;$HOME/.local/bin&quot;</span>
-    <span class="no">fi</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">export PATH=&quot;$HOME/.local/bin:$PATH&quot;</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">export FC=/usr/bin/gfortran-4.9</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ln -fs /usr/bin/gfortran-4.9 &quot;$HOME/.local/bin/gfortran&quot; &amp;&amp; gfortran --version</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ls -l /usr/bin/gfortran-4.9</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ln -fs /usr/bin/gcov-4.9 &quot;$HOME/.local/bin/gcov&quot; &amp;&amp; gcov --version</span>
-  <span class="p-Indicator">-</span> <span class="p-Indicator">|</span>
-    <span class="no">if ! which f90split; then</span>
-      <span class="no">wget http://people.sc.fsu.edu/~jburkardt/f_src/f90split/f90split.f90 &amp;&amp; \</span>
-      <span class="no">gfortran -o f90split f90split.f90 &amp;&amp; \</span>
-      <span class="no">mv f90split &quot;$HOME/.local/bin/&quot; &amp;&amp; \</span>
-      <span class="no">rm f90split.f90</span>
-    <span class="no">fi</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">pip install --upgrade pygooglechart</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">(pip install --upgrade FoBiS.py &amp;&amp; FoBiS.py --version)</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">(pip install --upgrade ford &amp;&amp; ford --version)</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">(pip install --upgrade git+https://github.com/dmeranda/demjson.git &amp;&amp; jsonlint --version)</span>
+<span class="n">install</span><span class="o">:</span>
+  <span class="o">-</span> <span class="o">|</span>
+    <span class="k">if</span> <span class="o">[[</span> <span class="o">!</span> <span class="o">-</span><span class="n">d</span> <span class="s2">&quot;$HOME/.local/bin&quot;</span> <span class="o">]];</span> <span class="n">then</span>
+      <span class="n">mkdir</span> <span class="s2">&quot;$HOME/.local/bin&quot;</span>
+    <span class="n">fi</span>
+  <span class="o">-</span> <span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s2">&quot;$HOME/.local/bin:$PATH&quot;</span>
+  <span class="o">-</span> <span class="n">export</span> <span class="n">FC</span><span class="o">=/</span><span class="n">usr</span><span class="sr">/bin/g</span><span class="n">fortran</span><span class="o">-</span><span class="mf">4.9</span>
+  <span class="o">-</span> <span class="n">ln</span> <span class="o">-</span><span class="n">fs</span> <span class="sr">/usr/bin/gfortran-4.9 &quot;$HOME/.local/bin/g</span><span class="n">fortran</span><span class="s2">&quot; &amp;&amp; gfortran --version</span>
+<span class="s2">  - ls -l /usr/bin/gfortran-4.9</span>
+<span class="s2">  - ln -fs /usr/bin/gcov-4.9 &quot;</span><span class="n">$HOME</span><span class="sr">/.local/bin/g</span><span class="n">cov</span><span class="s2">&quot; &amp;&amp; gcov --version</span>
+<span class="s2">  - |</span>
+<span class="s2">    if ! which f90split; then</span>
+<span class="s2">      wget http://people.sc.fsu.edu/~jburkardt/f_src/f90split/f90split.f90 &amp;&amp; \</span>
+<span class="s2">      gfortran -o f90split f90split.f90 &amp;&amp; \</span>
+<span class="s2">      mv f90split &quot;</span><span class="n">$HOME</span><span class="sr">/.local/bin/</span><span class="s2">&quot; &amp;&amp; \</span>
+<span class="s2">      rm f90split.f90</span>
+<span class="s2">    fi</span>
+<span class="s2">  - pip install --upgrade pygooglechart</span>
+<span class="s2">  - (pip install --upgrade FoBiS.py &amp;&amp; FoBiS.py --version)</span>
+<span class="s2">  - (pip install --upgrade ford &amp;&amp; ford --version)</span>
+<span class="s2">  - (pip install --upgrade git+https://github.com/dmeranda/demjson.git &amp;&amp; jsonlint --version)</span>
 
-<span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
-  <span class="p-Indicator">-</span> <span class="p-Indicator">|</span>
-    <span class="no">if [[ $CHECK_README_PROGS == [yY]* ]]; then</span>
-      <span class="no">f90split README.md &amp;&amp; \</span>
-      <span class="no">for f in example*.md; do</span>
-        <span class="no">mv $f src/tests/jf_test_${f%.md}.f90</span>
-      <span class="no">done</span>
-    <span class="no">fi</span>
-  <span class="p-Indicator">-</span> <span class="p-Indicator">|</span>
-    <span class="no">if [ &quot;$TRAVIS_TAG&quot; ]; then</span>
-      <span class="no">if [[ &quot;v$TRAVIS_TAG&quot; != &quot;v$(cat __VERSION__)&quot; ]]; then</span>
-        <span class="no">echo &quot;ERROR: You are trying to tag a new release but have a version missmatch in \`__VERSION__\`&quot;</span>
-        <span class="no">false # throw an error</span>
-      <span class="no">fi</span>
-    <span class="no">fi</span>
+<span class="s2">before_script:</span>
+<span class="s2">  - |</span>
+<span class="s2">    if [[ $CHECK_README_PROGS == [yY]* ]]; then</span>
+<span class="s2">      f90split README.md &amp;&amp; \</span>
+<span class="s2">      for f in example*.md; do</span>
+<span class="s2">        mv $f src/tests/jf_test_${f%.md}.f90</span>
+<span class="s2">      done</span>
+<span class="s2">    fi</span>
+<span class="s2">  - |</span>
+<span class="s2">    if [ &quot;</span><span class="n">$TRAVIS_TAG</span><span class="s2">&quot; ]; then</span>
+<span class="s2">      if [[ &quot;</span><span class="n">v$TRAVIS_TAG</span><span class="s2">&quot; != &quot;</span><span class="n">v$</span><span class="o">(</span><span class="n">cat</span> <span class="n">__VERSION__</span><span class="o">)</span><span class="s2">&quot; ]]; then</span>
+<span class="s2">        echo &quot;</span><span class="n">ERROR</span><span class="o">:</span> <span class="n">You</span> <span class="n">are</span> <span class="n">trying</span> <span class="n">to</span> <span class="n">tag</span> <span class="n">a</span> <span class="k">new</span> <span class="n">release</span> <span class="n">but</span> <span class="n">have</span> <span class="n">a</span> <span class="n">version</span> <span class="n">missmatch</span> <span class="k">in</span> <span class="o">\</span><span class="err">`</span><span class="n">__VERSION__</span><span class="o">\</span><span class="err">`</span><span class="s2">&quot;</span>
+<span class="s2">        false # throw an error</span>
+<span class="s2">      fi</span>
+<span class="s2">    fi</span>
 
-<span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $BUILD_SCRIPT</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">bash &lt;&lt;&lt;$BUILD_SCRIPT</span>
+<span class="s2">script:</span>
+<span class="s2">  - echo $BUILD_SCRIPT</span>
+<span class="s2">  - bash &lt;&lt;&lt;$BUILD_SCRIPT</span>
 
-<span class="l-Scalar-Plain">after_success</span><span class="p-Indicator">:</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">cd $TRAVIS_BUILD_DIR</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.name &quot;TRAVIS-CI-for-$(git --no-pager show -s --format=&#39;%cn&#39; $TRAVIS_COMMIT)&quot;</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.email &quot;$(git --no-pager show -s --format=&#39;%ce&#39; $TRAVIS_COMMIT)&quot;</span>
-  <span class="p-Indicator">-</span> <span class="p-Indicator">|</span>
-    <span class="no">if [[ $DEPLOY_DOCUMENTATION == [yY]* ]]; then</span>
-      <span class="no">./deploy.sh #publish docs for master branch and tags</span>
-    <span class="no">fi</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">(yes | rm -r doc gh-pages) || true</span> <span class="c1"># wipe out doc dirs to avoid confusing codecov</span>
-  <span class="p-Indicator">-</span> <span class="p-Indicator">|</span>
-    <span class="no">if [[ $CODE_COVERAGE == [yY]* ]]; then</span>
-      <span class="no">rm json_module-*unicode.F90.gcov || true</span>
-      <span class="no">mv json_module.F90.gcov src/</span>
-      <span class="no">mv jf_test*.[fF]90.gcov src/tests/</span>
-      <span class="no">bash &lt;(curl -s https://codecov.io/bash) -v -X gcov</span>
-    <span class="no">fi</span>
+<span class="s2">after_success:</span>
+<span class="s2">  - cd $TRAVIS_BUILD_DIR</span>
+<span class="s2">  - git config --global user.name &quot;</span><span class="n">TRAVIS</span><span class="o">-</span><span class="n">CI</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">$</span><span class="o">(</span><span class="n">git</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">pager</span> <span class="n">show</span> <span class="o">-</span><span class="n">s</span> <span class="o">--</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;%cn&#39;</span> <span class="n">$TRAVIS_COMMIT</span><span class="o">)</span><span class="s2">&quot;</span>
+<span class="s2">  - git config --global user.email &quot;</span><span class="n">$</span><span class="o">(</span><span class="n">git</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">pager</span> <span class="n">show</span> <span class="o">-</span><span class="n">s</span> <span class="o">--</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;%ce&#39;</span> <span class="n">$TRAVIS_COMMIT</span><span class="o">)</span><span class="err">&quot;</span>
+  <span class="o">-</span> <span class="o">|</span>
+    <span class="k">if</span> <span class="o">[[</span> <span class="n">$DEPLOY_DOCUMENTATION</span> <span class="o">==</span> <span class="o">[</span><span class="n">yY</span><span class="o">]*</span> <span class="o">]];</span> <span class="n">then</span>
+      <span class="o">./</span><span class="n">deploy</span><span class="o">.</span><span class="na">sh</span> <span class="err">#</span><span class="n">publish</span> <span class="n">docs</span> <span class="k">for</span> <span class="n">master</span> <span class="n">branch</span> <span class="n">and</span> <span class="n">tags</span>
+    <span class="n">fi</span>
+  <span class="o">-</span> <span class="o">(</span><span class="n">yes</span> <span class="o">|</span> <span class="n">rm</span> <span class="o">-</span><span class="n">r</span> <span class="n">doc</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span><span class="o">)</span> <span class="o">||</span> <span class="kc">true</span> <span class="err">#</span> <span class="n">wipe</span> <span class="n">out</span> <span class="n">doc</span> <span class="n">dirs</span> <span class="n">to</span> <span class="n">avoid</span> <span class="n">confusing</span> <span class="n">codecov</span>
+  <span class="o">-</span> <span class="o">|</span>
+    <span class="k">if</span> <span class="o">[[</span> <span class="n">$CODE_COVERAGE</span> <span class="o">==</span> <span class="o">[</span><span class="n">yY</span><span class="o">]*</span> <span class="o">]];</span> <span class="n">then</span>
+      <span class="n">rm</span> <span class="n">json_module</span><span class="o">-*</span><span class="n">unicode</span><span class="o">.</span><span class="na">F90</span><span class="o">.</span><span class="na">gcov</span> <span class="o">||</span> <span class="kc">true</span>
+      <span class="n">mv</span> <span class="n">json_module</span><span class="o">.</span><span class="na">F90</span><span class="o">.</span><span class="na">gcov</span> <span class="n">src</span><span class="o">/</span>
+      <span class="n">mv</span> <span class="n">jf_test</span><span class="o">*.[</span><span class="n">fF</span><span class="o">]</span><span class="mi">90</span><span class="o">.</span><span class="na">gcov</span> <span class="n">src</span><span class="sr">/tests/</span>
+      <span class="n">bash</span> <span class="o">&lt;(</span><span class="n">curl</span> <span class="o">-</span><span class="n">s</span> <span class="n">https</span><span class="o">://</span><span class="n">codecov</span><span class="o">.</span><span class="na">io</span><span class="o">/</span><span class="n">bash</span><span class="o">)</span> <span class="o">-</span><span class="n">v</span> <span class="o">-</span><span class="n">X</span> <span class="n">gcov</span>
+    <span class="n">fi</span>
 </pre></div>
     </div>
   </div>
