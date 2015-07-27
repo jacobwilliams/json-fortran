@@ -198,9 +198,9 @@ currently reading.</p>
            <span class="o">[</span> <span class="s2">&quot;</span><span class="k">$(</span>ls -A <span class="nv">$TRAVIS_BUILD_DIR</span>/doc<span class="k">)</span><span class="s2">&quot;</span> <span class="o">]</span> <span class="p">;</span> <span class="k">then</span> <span class="c">#not empty</span>
             git clone --branch<span class="o">=</span>gh-pages https://<span class="si">${</span><span class="nv">GH_TOKEN</span><span class="si">}</span>@github.com/<span class="nv">$TRAVIS_REPO_SLUG</span> gh-pages
             <span class="nb">cd </span>gh-pages
-        <span class="nb">shopt</span> -s extglob <span class="c"># turn on extended globbing so we can match everything *except* tag documentation</span>
-        rm -r !<span class="o">([</span>0-9<span class="o">]</span>.<span class="o">[</span>0-9<span class="o">]</span>.<span class="o">[</span>0-9<span class="o">])</span> <span class="c"># all files not part of tag documentation</span>
-        cp -r <span class="s2">&quot;</span><span class="nv">$TRAVIS_BUILD_DIR</span><span class="s2">&quot;</span>/doc/* .
+        rm -r css favicon.png fonts index.html interface js lists media module page proc <span class="se">\</span>
+           program search.html sourcefile src tipuesearch <span class="nb">type</span>
+<span class="nb">        </span>cp -r <span class="s2">&quot;</span><span class="nv">$TRAVIS_BUILD_DIR</span><span class="s2">&quot;</span>/doc/* .
             git add -A <span class="c"># Add all the new files</span>
             git commit -m <span class="s2">&quot;Development documentation updated by travis job </span><span class="nv">$TRAVIS_JOB_NUMBER</span><span class="s2"> for commits </span><span class="nv">$TRAVIS_COMMIT_RANGE</span><span class="s2">&quot;</span>
             git push origin gh-pages

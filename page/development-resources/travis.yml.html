@@ -280,7 +280,10 @@ trigger automatic documentation deployment.</p>
   <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">cd $TRAVIS_BUILD_DIR</span>
   <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.name &quot;TRAVIS-CI-for-$(git --no-pager show -s --format=&#39;%cn&#39; $TRAVIS_COMMIT)&quot;</span>
   <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">git config --global user.email &quot;$(git --no-pager show -s --format=&#39;%ce&#39; $TRAVIS_COMMIT)&quot;</span>
-  <span class="p-Indicator">-</span> <span class="p-Indicator">[[</span> <span class="nv">$DEPLOY_DOCUMENTATION ==</span> <span class="p-Indicator">[</span><span class="nv">yY</span><span class="p-Indicator">]</span><span class="err">*</span> <span class="p-Indicator">]]</span> <span class="err">&amp;&amp;</span> <span class="l-Scalar-Plain">./deploy.sh</span> <span class="c1">#publish docs for master branch and tags</span>
+  <span class="p-Indicator">-</span> <span class="p-Indicator">|</span>
+    <span class="no">if [[ $DEPLOY_DOCUMENTATION == [yY]* ]]; then</span>
+      <span class="no">./deploy.sh #publish docs for master branch and tags</span>
+    <span class="no">fi</span>
   <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">(yes | rm -r doc gh-pages) || true</span> <span class="c1"># wipe out doc dirs to avoid confusing codecov</span>
   <span class="p-Indicator">-</span> <span class="p-Indicator">|</span>
     <span class="no">if [[ $CODE_COVERAGE == [yY]* ]]; then</span>
