@@ -6,17 +6,17 @@ title: Additional Documentation
 
 # Past Releases
 
-Docementation for official, tagged releases can be found
+Documentation for official, tagged releases can be found
 [here](releases/index.html), including the changelog, and download links.
 
-# DeveLopment Documentation
+# Development Documentation
 
 Additional documentation useful to JSON-Fortran contributors can be
-found [here](development-resources/index.html), including contributing guidlines
+found [here](development-resources/index.html), including contributing guidelines
 and test coverage reports.
 
 # General Documentation
 
 A [README](README.html), the same one that's posted on
-[Github](https://github.com/jacobwilliams/json-fortran), can be found
+[GitHub](https://github.com/jacobwilliams/json-fortran), can be found
 [here](README.html).

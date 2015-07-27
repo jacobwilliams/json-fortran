@@ -2,16 +2,16 @@ title: Release Checklist
 
 When tagging a new release please follow this checklist so that the
 documentation will be updated correctly, and version strings will
-remain accuracte.
+remain accurate.
 
 # Release Checklist
 
  1. Make sure you are working from the master branch: `git checkout master`
  1. Update the `CHANGELOG.md`
 	 1. Ensure that the changes listed under
-        [Unreleased](|url|/page/releases/index.html#Unreleased) are up
+        [Unreleased](|url|/page/releases/index.html#unreleased) are up
         to date and accurate.
-	     1. Look at the latest [changes commited to GitHub since the
+	     1. Look at the latest [changes committed to GitHub since the
             last release](https://github.com/jacobwilliams/json-fortran/compare/{!__VERSION__!}...HEAD),
             {!__VERSION__!}. This will only be accurate if you have
             not yet updated `__VERSION__`. If you *have* updated
@@ -20,11 +20,11 @@ remain accuracte.
 		 1. Run the
             [`github_changelog_generator`](https://github.com/skywinder/github-changelog-generator)
             as follows, and compare the output to the
-            [Unreleased](|url|/page/releases/index.html#Unreleased)
+            [unreleased](|url|/page/releases/index.html#unreleased)
             section of the `CHANGELOG.md`:
 			`github_changelog_generator -o Unreleased.md
             --unreleased-only --bugs-label "**Fixed issues:**"
-            --enhancement-lable "**Enhancements:**" --issues-lable
+            --enhancement-label "**Enhancements:**" --issues-label
             "**Fixed issues:**"` and make sure that you have a
             16-digit GitHub token stored in the environment variable
             `CHANGELOG_GITHUB_TOKEN`. Compare generated
@@ -47,7 +47,7 @@ remain accuracte.
  1. Add an entry in `pages/releases/index.md` under the "Past
     Releases" heading
      1. Copy/paste the most recent one listed and replace all
-        occurences of the old version string with the new version
+        occurrences of the old version string with the new version
         string
 	 1. Add `pages/releases/index.md` to the git index: `git add pages/releases/index.md`
  1. Update the version string in remaining files requiring manual edits:
@@ -57,8 +57,8 @@ remain accuracte.
      README.md`
  1. Commit the changes to the master branch: `git commit`
  1. Create the tag: `git tag <new version>`
- 1. [deploy.sh](|url|/page/development-resources/deploy.sh.html) will
-    publish the documentation for the latest tag from
+ 1. [deploy.sh](deploy.sh.html) will publish the documentation for the
+    latest tag from
     [Travis-CI](https://travis-ci.org/jacobwilliams/json-fortran) to
     https://jacobwilliams.github.io/json-fortran/<version>/ if all
     goes according to plan
@@ -74,7 +74,7 @@ remain accuracte.
 	 1. Add your fork as a pushable remote: `git remote add
         YOUR_USERNAME https://github.com/YOUR_USERNAME/homebrew.git`
 	 1. Make sure you're on the master branch: `git checkout master`
-	 1. Make sure eveything is up to date: `brew update` (this calls
+	 1. Make sure everything is up to date: `brew update` (this calls
         `git pull`)
 	 1. Create a new branch from the latest master branch with `git
         checkout -b YOUR_BRANCH_NAME origin/master`
@@ -84,7 +84,7 @@ remain accuracte.
         checksum at the top of the formula. These should be changed to
         correspond to the new version of the compressed tarball
         available on newly minted
-        [latest releaase page](https://github.com/jacobwilliams/json-fortran/releases/latest)
+        [latest release page](https://github.com/jacobwilliams/json-fortran/releases/latest)
 	 1. Test the changes to make sure that they will be accepted:
          1. `brew audit --strict --online json-fortran`
 		 1. `brew rm json-fortran`

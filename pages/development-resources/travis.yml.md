@@ -5,6 +5,6 @@ This is the
 used to perform continuous integration testing for JSON-Fortran, and
 trigger automatic documentation deployment.
 
-```YAML
+```yml
 {!.travis.yml!}
 ```
