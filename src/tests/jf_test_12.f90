@@ -5,8 +5,8 @@ module jf_test_12_mod
 
     implicit none
 
-    character(len=*),parameter :: dir = '../files/outputs/' !! Path to write JSON file to
-    character(len=*),parameter :: file = 'array.json'       !! Filename to write
+    character(len=*),parameter :: dir = '../files/' !! Path to write JSON file to
+    character(len=*),parameter :: file = 'test12.json'       !! Filename to write
     real(wp), parameter        :: TOL = 100*epsilon(1.0_wp) !! Tolerance for real comparisons
 
 contains
@@ -26,7 +26,7 @@ contains
     real(wp), allocatable :: fetched_array(:)
     character(kind=CK,len=:), allocatable :: description
     integer :: i,j,k                               !! loop indices
-    integer :: array_length
+    integer :: array_length, lun
     logical :: existed
     logical, allocatable :: SOS(:)
 
@@ -155,6 +155,11 @@ contains
 
     call my_file%get(tmp_json_ptr)
     call check_errors(associated(tmp_json_ptr,root))
+
+    open(file=dir//file,newunit=lun,form='formatted',action='write')
+    call my_file%print_file(lun)
+    call check_errors()
+    close(lun)
 
     contains
       subroutine check_errors(assertion)
