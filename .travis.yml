@@ -92,7 +92,10 @@ after_success:
   - cd $TRAVIS_BUILD_DIR
   - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
   - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"
-  - [[ $DEPLOY_DOCUMENTATION == [yY]* ]] && ./deploy.sh #publish docs for master branch and tags
+  - |
+    if [[ $DEPLOY_DOCUMENTATION == [yY]* ]]; then
+      ./deploy.sh #publish docs for master branch and tags
+    fi
   - (yes | rm -r doc gh-pages) || true # wipe out doc dirs to avoid confusing codecov
   - |
     if [[ $CODE_COVERAGE == [yY]* ]]; then
