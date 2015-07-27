@@ -17,6 +17,19 @@
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.1.1...HEAD)
 
 **Enhancements**
+- Added FORD documentation automatic deployment via
+  [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
+  from [zbeekman](https://github.com/zbeekman)
+- Added new version release checklist,
+  [\#122](https://github.com/jacobwilliams/json-fortran/issues/122)
+  via
+  [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
+  from [zbeekman](https://github.com/zbeekman)
+- Added finer control of real format printing,
+  [\#117](https://github.com/jacobwilliams/json-fortran/issues/117)
+  via
+  [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
+  from [zbeekman](https://github.com/zbeekman)
 - Removed official SCons support to facilitate faster development
   cycle,
   [\#121](https://github.com/jacobwilliams/json-fortran/issues/121)
@@ -47,7 +60,11 @@
   from [zbeekman](https://github.com/zbeekman)
 
 **Fixed issues:**
-
+- Fixed bad gcov reports being generated due to a gcov/gfortran bug,
+  [\#131](https://github.com/jacobwilliams/json-fortran/issues/131)
+  via
+  [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
+  from [zbeekman](https://github.com/zbeekman)
 - Fixed inaccurate coverage reports via
   [PR \#109](https://github.com/jacobwilliams/json-fortran/pull/109)
   from [zbeekman](https://github.com/zbeekman)
