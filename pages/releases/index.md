@@ -11,7 +11,8 @@ of the `master` branch, please head back to the
 
 ## Latest Stable Release
 
-**Documentation:** [4.1.1](http://jacobwilliams.github.io/json-fortran/4.1.1/json_module_F90.html)
+**Documentation:**
+  [{!__VERSION__!}](http://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html)
 
 **Download:**
 <https://github.com/jacobwilliams/json-fortran/releases/latest>

@@ -31,13 +31,15 @@ include ( "cmake/checkOutOfSource.cmake" )
 project ( jsonfortran NONE )
 
 #----------------------------------
-# Set version (semantic versioning)
+# Get version (semantic versioning)
 # C.F. semver.org
 #----------------------------------
-set ( VERSION_MAJOR 4 )
-set ( VERSION_MINOR 1 )
-set ( VERSION_PATCH 1 )
-set ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
+file ( STRINGS "${CMAKE_SOURCE_DIR}/__VERSION__" VERSION )
+string( REPLACE "." ";" VERSION_LIST ${VERSION} )
+list(GET VERSION_LIST 0 VERSION_MAJOR)
+list(GET VERSION_LIST 1 VERSION_MINOR)
+list(GET VERSION_LIST 2 VERSION_PATCH)
+message ( STATUS "CMake build configuration for JSON-Fortran ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 
 #-------------------------------------
 # Collect source files for the library
