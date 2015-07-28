@@ -322,7 +322,7 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
 	    ./pages/development-resources/gccr.pl -n -c json_module-no-unicode.F90.gcov no-unicode \
 						  json_module-unicode.F90.gcov unicode > json_module.F90.gcov
 	else
-	    cp json_module-*-unicode.F90.gcov json_module.F90.gcov
+	    cp json_module*-unicode.F90.gcov json_module.F90.gcov
 	fi
 	FoBiS.py rule -gcov_analyzer .
 	sed -i"bak" -E 's; \*\*([a-zA-Z]+[a-zA-Z0-9_]*)\*\*; \*\*[[\1]]\*\*;' json_module.F90.gcov.md

@@ -50,10 +50,14 @@ the [main project page](|url|/index.html) for convenient navigation.
 # Development Version
 
 Documentation for the latest development version may be found at
-<|url|> or generated locally using the
+<https://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html>
+or generated locally using the
 [build.sh](|url|/page/development-resources/build.sh.html) build
 script.
 
-# Release Notes
+# Changes Between Releases
+
+Included below is the changelog--a list of significant changes
+implemented between each release.
 
 {!CHANGELOG.md!}

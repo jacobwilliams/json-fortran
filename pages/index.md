@@ -2,13 +2,16 @@ title: Additional Documentation
 
 # Current Stable Release
 
+The latest stable release is
 [**{!__VERSION__!}**](
-http://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html)
+http://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html).[^1]
 
 # Past Releases
 
 Documentation for official, tagged releases can be found
-[here](releases/index.html), including the changelog, and download links.
+[here](releases/index.html), including the
+[changelog](|url|/page/releases/index.html#change-log), and download
+links.
 
 # Development Documentation
 
@@ -21,3 +24,9 @@ and test coverage reports.
 A [README](README.html), the same one that's posted on
 [GitHub](https://github.com/jacobwilliams/json-fortran), can be found
 [here](README.html).
+
+[^1]:
+    Documentation pages for a specific release do not contain links
+    back to this page and the master documentation. Please use your
+    browser's back button to navigate back to
+    <https://jacobwilliams.github.com/json-fortran/>.
