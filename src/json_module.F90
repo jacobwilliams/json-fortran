@@ -338,14 +338,14 @@
     !
     !```fortran
     !    program test
-    !     use json_module
-    !     implicit none
+    !    use json_module
+    !    implicit none
     !    type(json_file) :: json
     !    integer :: ival
     !    real(real64) :: rval
     !    character(len=:),allocatable :: cval
     !    logical :: found
-    !     call json_initialize()
+    !    call json_initialize()
     !    call json%load_file(filename='myfile.json')
     !    call json%print_file() !print to the console
     !    call json%get('var.i',ival,found)
@@ -385,7 +385,8 @@
                                  MAYBEWRAP(json_file_get_integer_vec), &
                                  MAYBEWRAP(json_file_get_double_vec),  &
                                  MAYBEWRAP(json_file_get_logical_vec), &
-                                 MAYBEWRAP(json_file_get_string_vec)
+                                 MAYBEWRAP(json_file_get_string_vec),  &
+                                 json_file_get_root
 
         generic,public :: update =>  MAYBEWRAP(json_file_update_integer),  &
                                      MAYBEWRAP(json_file_update_logical),  &
@@ -412,6 +413,7 @@
         procedure :: MAYBEWRAP(json_file_get_double_vec)
         procedure :: MAYBEWRAP(json_file_get_logical_vec)
         procedure :: MAYBEWRAP(json_file_get_string_vec)
+        procedure :: json_file_get_root
 
         !update:
         procedure :: MAYBEWRAP(json_file_update_integer)
@@ -430,6 +432,28 @@
 
     end type json_file
     !*********************************************************
+
+    !*********************************************************
+    !> author: Izaak Beekman
+    !  date: 07/23/2015
+    !
+    !  Structure constructor to initialize a [[json_file(type)]] object
+    !  with an existing [[json_value]] object
+    !
+    ! # Example
+    !
+    ! ```fortran
+    ! ...
+    ! type(json_file)  :: my_file
+    ! type(json_value) :: json_object
+    ! ...
+    ! ! Construct a json_object
+    ! my_file = json_file(json_object)
+
+    interface json_file
+       module procedure initialize_json_file
+    end interface
+    !*************************************************************************************
 
     !*************************************************************************************
     !>
@@ -894,6 +918,22 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 07/23/2015
+!
+!  Cast a [[json_value]] object as a [[json_file(type)]] object
+
+    function initialize_json_file(p) result(file_object)
+    type(json_value), pointer, optional, intent(in) :: p
+    !! `json_value` object to cast as a `json_file` object
+    type(json_file) :: file_object
+
+    if (present(p)) file_object%p => p
+
+    end function initialize_json_file
+!*****************************************************************************************
+
+!*****************************************************************************************
 !> author: Jacob Williams
 !
 !  Destroy the data within a [[json_value]], and rest type to json_unknown.
@@ -918,7 +958,7 @@
 !> author: Jacob Williams
 !  date: 12/9/2013
 !
-!  Destroy the [[json_file]].
+!  Destroy the [[json_file(type)]].
 
     subroutine json_file_destroy(me)
 
@@ -935,7 +975,7 @@
 !> author: Jacob Williams
 !  date: 12/5/2014
 !
-!  Move the [[json_value]] pointer from one [[json_file]] to another.
+!  Move the [[json_value]] pointer from one [[json_file(type)]] to another.
 !  The "from" pointer is then nullified, but not destroyed.
 !
 !@note If "from%p" is not associated, then an error is thrown.
@@ -1141,7 +1181,7 @@
 !> author: Jacob Williams
 !  date: 2/3/2014
 !
-!  Returns information about a variable in a [[json_file]].
+!  Returns information about a variable in a [[json_file(type)]].
 
     subroutine json_file_variable_info(me,path,found,var_type,n_children)
 
@@ -1237,6 +1277,24 @@
     call json_get_by_path(me%p, path=path, p=p, found=found)
 
     end subroutine json_file_get_object
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 7/23/2015
+!
+!  Get a [[json_value]] pointer to the JSON file root.
+
+    subroutine json_file_get_root(me,p)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+
+    p => me%p
+
+    end subroutine json_file_get_root
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1573,18 +1631,44 @@
 !# Modified
 !  * Izaak Beekman : 02/24/2015
 
-    subroutine json_initialize(verbose,compact_reals)
+    subroutine json_initialize(verbose,compact_reals,print_signs,real_format)
 
     implicit none
 
     logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
     logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output
+    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
+    character(len=*,kind=CDK),intent(in),optional :: real_format
+    !! exponential (default), scientific, engineering or general
 
     character(kind=CDK,len=10) :: w,d,e
+    character(kind=CDK,len=2)  :: sgn, rl_edit_desc
     integer(IK) :: istat
+    logical(LK) :: sgn_prnt
+
 
     !clear any errors from previous runs:
     call json_clear_exceptions()
+
+    !set defaults
+    sgn_prnt = .false.
+    if ( present( print_signs) ) sgn_prnt = print_signs
+    if ( sgn_prnt ) then
+       sgn = 'sp'
+    else
+       sgn = 'ss'
+    end if
+
+    rl_edit_desc = 'E'
+    if ( present( real_format ) ) then
+       select case ( real_format )
+       case ('g','G','e','E','en','EN','es','ES')
+          rl_edit_desc = real_format
+       case default
+          call throw_exception('Invalid real format, "' // trim(real_format) // '", passed to json_initialize.'// &
+               new_line('a') // 'Acceptable formats are: "G", "E", "EN", and "ES".' )
+       end select
+    end if
 
 # ifdef USE_UCS4
     ! reopen stdout and stderr with utf-8 encoding
@@ -1608,9 +1692,9 @@
         if (istat==0) write(d,'(ss,I0)',iostat=istat) real_precision
         if (istat==0) write(e,'(ss,I0)',iostat=istat) real_exponent_digits
         if (istat==0) then
-            real_fmt = '(ss,E' // trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
+            real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
         else
-            real_fmt = '(ss,E30.16E3)'  !just use this one (should never happen)
+            real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // '30.16E3)'  !just use this one (should never happen)
         end if
     end if
 
@@ -4694,7 +4778,7 @@
 !> author: Jacob Williams
 !  date: 5/14/2014
 !
-!  Get a string vector from a [[json_file]].
+!  Get a string vector from a [[json_file(type)]].
 
     subroutine json_get_string_vec(me, vec)
 
@@ -4747,7 +4831,7 @@
 
 !*****************************************************************************************
 !>
-!  Get a string vector from a [[json_file]], given the path.
+!  Get a string vector from a [[json_file(type)]], given the path.
 
     subroutine json_get_string_vec_with_path(me, path, vec, found)
 

@@ -19,7 +19,6 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - gfortran-4.9
-      - gfortran-5
       - binutils
       - cmake
       - python-pip
@@ -35,13 +34,17 @@ env:
     - >
       BUILD_SCRIPT="mkdir cmake-build &&
       cd cmake-build &&
-      cmake -DCMAKE_BUILD_TYPE=COVERAGE .. &&
+      cmake .. &&
       make -j 4 check"
-      CODE_COVERAGE="yes"
+      CODE_COVERAGE="no"
+      DEPLOY_DOCUMENTATION="no"
 
       # build with build.sh, make documentation, run unit tests and perform coverage analysis
-    - BUILD_SCRIPT="./build.sh --coverage --enable-unicode"
+    - >
+      BUILD_SCRIPT="./build.sh --coverage --skip-documentation &&
+      ./build.sh --coverage --enable-unicode"
       CODE_COVERAGE="yes"
+      DEPLOY_DOCUMENTATION="yes"
 
 install:
   - |
@@ -60,9 +63,10 @@ install:
       mv f90split "$HOME/.local/bin/" && \
       rm f90split.f90
     fi
-  - which FoBiS.py || (pip install FoBiS.py && FoBiS.py --version)
-  - which ford || (pip install ford && ford --version)
-  - which jsonlint || (pip install git+https://github.com/dmeranda/demjson.git && jsonlint --version)
+  - pip install --upgrade pygooglechart
+  - (pip install --upgrade FoBiS.py && FoBiS.py --version)
+  - (pip install --upgrade ford && ford --version)
+  - (pip install --upgrade git+https://github.com/dmeranda/demjson.git && jsonlint --version)
 
 before_script:
   - |
@@ -72,6 +76,13 @@ before_script:
         mv $f src/tests/jf_test_${f%.md}.f90
       done
     fi
+  - |
+    if [ "$TRAVIS_TAG" ]; then
+      if [[ "v$TRAVIS_TAG" != "v$(cat __VERSION__)" ]]; then
+        echo "ERROR: You are trying to tag a new release but have a version missmatch in \`__VERSION__\`"
+        false # throw an error
+      fi
+    fi
 
 script:
   - echo $BUILD_SCRIPT
@@ -79,10 +90,17 @@ script:
 
 after_success:
   - cd $TRAVIS_BUILD_DIR
-  - |
-    if [[ $CODE_COVERAGE == [yY]* ]]; then
-      bash <(curl -s https://codecov.io/bash)
-    fi
   - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
   - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"
-#broken for now#  - ./deploy.sh #handles updating documentation for master branch as well as tags
+  - |
+    if [[ $DEPLOY_DOCUMENTATION == [yY]* ]]; then
+      ./deploy.sh #publish docs for master branch and tags
+    fi
+  - (yes | rm -r doc gh-pages) || true # wipe out doc dirs to avoid confusing codecov
+  - |
+    if [[ $CODE_COVERAGE == [yY]* ]]; then
+      rm json_module-*unicode.F90.gcov || true
+      mv json_module.F90.gcov src/
+      mv jf_test*.[fF]90.gcov src/tests/
+      bash <(curl -s https://codecov.io/bash) -v -X gcov
+    fi

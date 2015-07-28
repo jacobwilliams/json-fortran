@@ -5,15 +5,16 @@
 #    build.sh
 #
 #  DESCRIPTION
-#    Build the json-fortran library and unit tests.
+#    Build the JSON-Fortran library and unit tests.
 #
 #  USAGE
 #    build.sh [--compiler {intel|gnu|<other>}] [--cflags '<custom compiler flags here>']
 #             [--coverage [{yes|no}]] [--profile [{yes|no}]] [--skip-tests [{yes|no}]]
-#             [--skip-documentation [{yes|no}]] [--enable-unicode [{yes|no}]] [--help]"
+#             [--skip-documentation [{yes|no}]] [--enable-unicode [{yes|no}]] [--help]
+#             [--clean]
 #
 #    By default, if invoked without any flags, this build script will build the
-#    json-fortran library using gfortran,
+#    JSON-Fortran library using gfortran,
 #        without :
 #            unicode support
 #            coverage flags
@@ -32,10 +33,13 @@
 #
 #        --help : Print a usage message and exit.
 #
+#        --clean : Delete generated files and clean up after builds
+#
+#
 #        The following flags all (optionally) accept an argument, "yes" or "no." If
 #        no argument is passed, "yes" will be assumed.
 #
-#        --enable-unicode [{yes|no}]: Request that the json-fortran be built with (or
+#        --enable-unicode [{yes|no}]: Request that the JSON-Fortran be built with (or
 #                                     without) unicode/UCS4 support. If your compiler
 #                                     does NOT support ISO 10646/UCS4 and it was
 #                                     requested, then a warning is printed and the
@@ -64,7 +68,8 @@
 set -e
 
 FORDMD='json-fortran.md'        # FORD options file for building documentation
-DOCDIR='./documentation/'       # build directory for documentation
+DOCDIR='./doc/'                 # build directory for documentation
+PAGESDIR='./pages/'             # Directory for FORD "pages"
 SRCDIR='./src/'                 # library source directory
 TESTDIR='./src/tests/'          # unit test source directory
 INTROSPECDIR='./src/tests/introspection/' # pre compile configuration tests directory
@@ -82,7 +87,7 @@ LIBOUT='libjsonfortran.a'       # name of json library
 INTELCOMPILERFLAGS='-c -O2 -warn -stand f08 -diag-disable 7601 -diag-disable 4013 -diag-disable 5142 -traceback'
 #INTELCOMPILERFLAGS='-c -O2 -warn -traceback -stand f08 -assume protect_parens -assume buffered_io -check all'
 
-GNUCOMPILERFLAGS='-c -O2 -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008'
+GNUCOMPILERFLAGS='-c -O2 -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008 -fno-omit-frame-pointer'
 
 FCOMPILER='gnu' #Set default compiler to gfortran
 
@@ -220,6 +225,9 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
 	    print_usage
 	    exit 0
 	    ;;
+	--clean)
+	    rm -r src{,/tests}/*.o $DOCDIR* $LIBDIR* $BINDIR* *.gcov*
+	    ;;
 	*)
 	    echo "Unknown flag, \"$1\", passed to ${script_name}!" 2>&1
 	    print_usage
@@ -280,19 +288,6 @@ else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."
 fi
 
-#build the documentation with ford (if present):
-echo ""
-if [[ $JF_SKIP_DOCS != [yY]* ]]; then
-    if hash ford 2>/dev/null; then
-	echo "Building documentation..."
-	ford $FORDMD
-    else
-	echo "FORD not found! Install using: sudo pip install ford"
-    fi
-else
-    echo "Skip building documentation since \$JF_SKIP_DOCS has been set to ${JF_SKIP_DOCS}."
-fi
-
 # Run all the tests unless $JF_SKIP_TESTS
 echo ""
 if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
@@ -304,9 +299,50 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
     for TEST in jf_test_*; do
 	# It would be nice to run json output printed to stdout through jsonlint, however,
 	# some tests output more than one json structure and these need to be split
+	echo "Running ${TEST}"
 	./${TEST}
     done
+    cd -
     GLOBIGNORE="$OLD_IGNORES"
+    if [[ $CODE_COVERAGE = [yY]* ]] ; then
+	[ -f json_module.F90.gcov ] && rm json_module.F90.gcov
+	gcov -o $LIBDIR ${SRCDIR}${MODCODE}
+	if [[ $TRY_UNICODE = [yY]* ]] ; then
+	    # gcov/gfortran bug work around
+	    awk -F':' '{line=""; for(i=2;i<=NF;i++){line=line":"$i}; if (NR > 1) print $1 prevline; prevline=line}; END{print "        -"prevline}' json_module.F90.gcov > json_module.F90.gcov.fixed && \
+		mv json_module.F90.gcov{.fixed,}
+	    # rename so we can merge coverage info
+	    mv json_module.F90.gcov json_module-unicode.F90.gcov
+	else
+	    # rename so we can merge coverage info
+	    mv json_module.F90.gcov json_module-no-unicode.F90.gcov
+	fi
+	if [ -f json_module-unicode.F90.gcov ] && [ -f json_module-no-unicode.F90.gcov ]; then
+	    # merge them
+	    ./pages/development-resources/gccr.pl -n -c json_module-no-unicode.F90.gcov no-unicode \
+						  json_module-unicode.F90.gcov unicode > json_module.F90.gcov
+	else
+	    cp json_module-*-unicode.F90.gcov json_module.F90.gcov
+	fi
+	FoBiS.py rule -gcov_analyzer .
+	sed -i"bak" -E 's; \*\*([a-zA-Z]+[a-zA-Z0-9_]*)\*\*; \*\*[[\1]]\*\*;' json_module.F90.gcov.md
+	sed -i"bak" -E 's;, line ([0-9]+);, line [\1](https://github.com/jacobwilliams/json-fortran/blob/master/src/json_module.F90#L\1);' json_module.F90.gcov.md
+	gcov -o $BINDIR ${TESTDIR}*.[Ff]90
+    fi
 else
     echo "Skip running the unit tests since \$JF_SKIP_TESTS has been set to ${JF_SKIP_TESTS}."
+fi
+
+#build the documentation with ford (if present):
+echo ""
+if [[ $JF_SKIP_DOCS != [yY]* ]]; then
+    if hash ford 2>/dev/null; then
+	echo "Building documentation..."
+	[[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG="-m USE_UCS4"
+	ford $MACRO_FLAG -p $PAGESDIR $FORDMD
+    else
+	echo "FORD not found! Install using: sudo pip install ford"
+    fi
+else
+    echo "Skip building documentation since \$JF_SKIP_DOCS has been set to ${JF_SKIP_DOCS}."
 fi

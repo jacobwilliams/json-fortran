@@ -1,4 +1,4 @@
-# Change Log
+## Change Log
 
 **Table of Contents**
 
@@ -12,11 +12,24 @@
     - [2.0.0 (2014-12-27)](#200-2014-12-27)
     - [1.0.0 (2014-06-23)](#100-2014-06-23)
 
-## [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
+### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Full Changelog](https://github.com/jacobwilliams/json-fortran/compare/4.1.1...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.1.1...HEAD)
 
 **Enhancements**
+- Added FORD documentation automatic deployment via
+  [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
+  from [zbeekman](https://github.com/zbeekman)
+- Added new version release checklist,
+  [\#122](https://github.com/jacobwilliams/json-fortran/issues/122)
+  via
+  [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
+  from [zbeekman](https://github.com/zbeekman)
+- Added finer control of real format printing,
+  [\#117](https://github.com/jacobwilliams/json-fortran/issues/117)
+  via
+  [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
+  from [zbeekman](https://github.com/zbeekman)
 - Removed official SCons support to facilitate faster development
   cycle,
   [\#121](https://github.com/jacobwilliams/json-fortran/issues/121)
@@ -47,11 +60,15 @@
   from [zbeekman](https://github.com/zbeekman)
 
 **Fixed issues:**
-
-- Fixed innacurate coverage reports via
+- Fixed bad gcov reports being generated due to a gcov/gfortran bug,
+  [\#131](https://github.com/jacobwilliams/json-fortran/issues/131)
+  via
+  [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
+  from [zbeekman](https://github.com/zbeekman)
+- Fixed inaccurate coverage reports via
   [PR \#109](https://github.com/jacobwilliams/json-fortran/pull/109)
   from [zbeekman](https://github.com/zbeekman)
-- Fixed a small consistency issue when outputing floating point
+- Fixed a small consistency issue when outputting floating point
   numbers via
   [PR \#125](https://github.com/jacobwilliams/json-fortran/pull/125)
 - Problems writing JSON to `error_unit` (0) due to JSON-Fortran's
@@ -75,16 +92,16 @@
   ([zbeekman](https://github.com/zbeekman))
 
 
-## [4.1.1](https://github.com/jacobwilliams/json-fortran/tree/4.1.1) (2015-05-27)
+### [4.1.1](https://github.com/jacobwilliams/json-fortran/tree/4.1.1) (2015-05-27)
 
-[Full Changelog](https://github.com/jacobwilliams/json-fortran/compare/4.1.0...4.1.1)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.1.0...4.1.1)
 or [Download v4.1.1](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.1)
 
 **Enhancements**
 
 - Installation now possible with a [Homebrew](http://brew.sh)
   [package](http://braumeister.org/formula/json-fortran) on Mac OS X
-- [CMake](http://cmake.org) install option to use a more traditional
+- [CMake](http://www.cmake.org) install option to use a more traditional
   Gnu install structure (to support Homebrew installation)
   [PR \#101](https://github.com/jacobwilliams/json-fortran/pull/101)
   from [zbeekman](https://github.com/zbeekman)
@@ -111,14 +128,14 @@ or [Download v4.1.1](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 
 
-## [4.1.0](https://github.com/jacobwilliams/json-fortran/tree/4.1.0) (2015-05-05)
+### [4.1.0](https://github.com/jacobwilliams/json-fortran/tree/4.1.0) (2015-05-05)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.0.0...4.1.0)
 or [Download v4.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/4.1.0)
 
 **Enhancements:**
 
-- Runtime speed improvements
+- Run-time speed improvements
   [\#75](https://github.com/jacobwilliams/json-fortran/issues/75)
   implemented in
   [PR \#93](https://github.com/jacobwilliams/json-fortran/pull/93)
@@ -132,7 +149,7 @@ or [Download v4.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 
 
-## [4.0.0](https://github.com/jacobwilliams/json-fortran/tree/4.0.0) (2015-03-16)
+### [4.0.0](https://github.com/jacobwilliams/json-fortran/tree/4.0.0) (2015-03-16)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/3.1.0...4.0.0)
 or [Download v4.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/4.0.0)
@@ -180,7 +197,7 @@ or [Download v4.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 - Discrepancy with dummy argument attributes for
   path between `get` and `get_..._vec` procedures
   [\#79](https://github.com/jacobwilliams/json-fortran/issues/79)
-- Small bugfix for [CMake](http://www.cmake.org) install
+- Small bug fix for [CMake](http://www.cmake.org) install
   [\#68](https://github.com/jacobwilliams/json-fortran/pull/68)
   ([zbeekman](https://github.com/zbeekman))
 - JSON output files from tests are overwriting expected outputs and
@@ -203,7 +220,7 @@ or [Download v4.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 
 
-## [3.1.0](https://github.com/jacobwilliams/json-fortran/tree/3.1.0) (2015-02-28)
+### [3.1.0](https://github.com/jacobwilliams/json-fortran/tree/3.1.0) (2015-02-28)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/3.0.0...3.1.0)
 or [Download v3.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/3.1.0)
@@ -220,7 +237,7 @@ or [Download v3.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
   from [jacobwilliams](https://github.com/jacobwilliams))
 - Read JSON structure from a character string
   [\#5](https://github.com/jacobwilliams/json-fortran/issues/5)
-- Adopeted official contributing guidelines and added a
+- Adopted official contributing guidelines and added a
   `CONTRIBUTING.md`
   [\#47](https://github.com/jacobwilliams/json-fortran/issues/47)
 
@@ -231,11 +248,11 @@ or [Download v3.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
   fixed by
   [PR \#54](https://github.com/jacobwilliams/json-fortran/pull/54)
   (from [zbeekman](https://github.com/zbeekman))
-- Segfaults and unexpexted behavior due to optional dummy arguments
+- Segfaults and unexpected behavior due to optional dummy arguments
   being dereferenced outside of `if (present(…))`
   [\#52](https://github.com/jacobwilliams/json-fortran/issues/52)
 - Documentation not being produced for tests because tests directory
-  should be subdirectory of src
+  should be sub-directory of src
   [\#49](https://github.com/jacobwilliams/json-fortran/issues/49)
 - Example 8 failing on gfortran 4.9.2
   [\#44](https://github.com/jacobwilliams/json-fortran/issues/44)
@@ -275,7 +292,7 @@ or [Download v3.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 
 
-## [3.0.0](https://github.com/jacobwilliams/json-fortran/tree/3.0.0) (2015-01-18)
+### [3.0.0](https://github.com/jacobwilliams/json-fortran/tree/3.0.0) (2015-01-18)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/2.0.0...3.0.0)
 or [Download v3.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/3.0.0)
@@ -310,14 +327,14 @@ or [Download v3.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 
 
-## [2.0.0](https://github.com/jacobwilliams/json-fortran/tree/2.0.0) (2014-12-27)
+### [2.0.0](https://github.com/jacobwilliams/json-fortran/tree/2.0.0) (2014-12-27)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/1.0.0...2.0.0)
 or [Download v2.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/2.0.0)
 
 **Enhancements:**
 - Significant changes to the API including new procedures
-- Code refactoring
+- Code re-factoring
 - SCons build added thanks to [@bruceravel](https://github.com/bruceravel)
 
 **Fixed issues:**
@@ -327,7 +344,7 @@ or [Download v2.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 
 
-## [1.0.0](https://github.com/jacobwilliams/json-fortran/tree/1.0.0) (2014-06-23)
+### [1.0.0](https://github.com/jacobwilliams/json-fortran/tree/1.0.0) (2014-06-23)
 
 [Download v1.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/1.0.0)
 
@@ -365,7 +382,7 @@ or [Download v2.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
   [ROBODoc](https://github.com/gumpu/ROBODoc) must be specified in
   CMakeLists.txt manually
   [\#17](https://github.com/jacobwilliams/json-fortran/issues/17)
-- Invalid json input files (`test1.json`, `test5.json`)
+- Invalid JSON input files (`test1.json`, `test5.json`)
   [\#10](https://github.com/jacobwilliams/json-fortran/issues/10),
   fixed by
   [PR \#11](https://github.com/jacobwilliams/json-fortran/pull/11)
@@ -373,7 +390,7 @@ or [Download v2.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 - `char()` is processor dependent, use `achar()`
   [\#20](https://github.com/jacobwilliams/json-fortran/pull/20)
   (pull request from [zbeekman](https://github.com/zbeekman))
-- Bugfix for [ROBODoc](https://github.com/gumpu/ROBODoc) documentation
+- Bug-fix for [ROBODoc](https://github.com/gumpu/ROBODoc) documentation
   generation with [CMake](http://www.cmake.org)
   [\#16](https://github.com/jacobwilliams/json-fortran/pull/16)
   (pull request from [zbeekman](https://github.com/zbeekman))

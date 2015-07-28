@@ -3,11 +3,11 @@
 # Copy right (c) 2014, Izaak Beekman
 # All rights reserved.
 
-# This file is contributed to the json-fortran project, and
-# is licensed under the terms of json-fortran license. The json-fortran
+# This file is contributed to the JSON-Fortran project, and
+# is licensed under the terms of JSON-Fortran license. The JSON-Fortran
 # license is located in the LICENSE file which must be distributed with
 # this software. The contributing author, Izaak Beekman, retains all
-# rights permitted by the terms of the json-fortran license.
+# rights permitted by the terms of the JSON-Fortran license.
 
 cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 
@@ -31,13 +31,15 @@ include ( "cmake/checkOutOfSource.cmake" )
 project ( jsonfortran NONE )
 
 #----------------------------------
-# Set version (semantic versioning)
+# Get version (semantic versioning)
 # C.F. semver.org
 #----------------------------------
-set ( VERSION_MAJOR 4 )
-set ( VERSION_MINOR 1 )
-set ( VERSION_PATCH 1 )
-set ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
+file ( STRINGS "${CMAKE_SOURCE_DIR}/__VERSION__" VERSION )
+string( REPLACE "." ";" VERSION_LIST ${VERSION} )
+list(GET VERSION_LIST 0 VERSION_MAJOR)
+list(GET VERSION_LIST 1 VERSION_MINOR)
+list(GET VERSION_LIST 2 VERSION_PATCH)
+message ( STATUS "CMake build configuration for JSON-Fortran ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 
 #-------------------------------------
 # Collect source files for the library
@@ -146,36 +148,49 @@ if ( NOT SKIP_DOC_GEN )
   find_program ( FORD ford )
   if ( FORD ) # Found
     file ( COPY "${CMAKE_SOURCE_DIR}/media" DESTINATION "${CMAKE_BINARY_DIR}/" )
+    file ( GLOB_RECURSE PAGES_FILES "${CMAKE_SOURCE_DIR}/pages/*.*")
     set ( DOC_DIR "${CMAKE_BINARY_DIR}/doc" )
+    set ( PAGES_DIR "${CMAKE_SOURCE_DIR}/pages" )
+    set ( PROJ_DIR "${CMAKE_SOURCE_DIR}/src" )
     set ( FORD_PROJECT_FILE "${CMAKE_SOURCE_DIR}/json-fortran.md" )
+    if ( ENABLE_UNICODE )
+      set ( MACRO_FLAG "-m USE_UCS4" )
+    else ()
+      set ( MACRO_FLAG "" )
+    endif ()
     # Dynamically generate the FORD outputs list
     message ( STATUS "Dynamically computing FORD output information..." )
     if ( NOT (DEFINED FORD_OUTPUTS_CACHED) )
       message ( STATUS "Running FORD to dynamically compute documentation outputs, this could take a while..." )
       execute_process ( COMMAND ${CMAKE_COMMAND} -E remove_directory ${DOC_DIR}
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${DOC_DIR}
-	COMMAND "${FORD}" -d "${CMAKE_SOURCE_DIR}/src" -o "${DOC_DIR}" "${FORD_PROJECT_FILE}" OUTPUT_QUIET )
+	COMMAND "${FORD}" -q ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${PAGE_DIR}" "${FORD_PROJECT_FILE}" OUTPUT_QUIET )
+    else ()
+      message ( STATUS "Re-using cached FORD outputs, rather than regenerating them" )
     endif ()
     file ( GLOB_RECURSE FORD_OUTPUTS
-      "${DOC_DIR}/*.html" )
+      "${DOC_DIR}/*.*" )
     file ( GLOB_RECURSE FORD_CLEAN_OUTPUTS
       "${DOC_DIR}/*.*" )
     if ( (DEFINED FORD_OUTPUTS) AND ( NOT ( "${FORD_OUTPUTS}" STREQUAL "" ) ) )
+      message ( STATUS "Caching FORD outputs" )
       set ( FORD_OUTPUTS_CACHED "${FORD_OUTPUTS}"
-	CACHE INTERNAL "internal variable to attempt to prevent rebuilding FORD docs" FORCE )
+	CACHE STRING "variable containing FORD outputs to prevent rebuilding FORD docs" FORCE )
     endif ()
     message ( STATUS "Done dynamically computing FORD outputs." )
 
-    foreach ( SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} )
-      list ( APPEND FORD_DEPENDS "${SRC_FILE}" )
-    endforeach ( SRC_FILE )
+    foreach ( DOC_SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} ${CMAKE_SOURCE_DIR}/README.md
+	${CMAKE_SOURCE_DIR}/CHANGELOG.md ${CMAKE_SOURCE_DIR}/CONTRIBUTING.md
+	${CMAKE_SOURCE_DIR}/LICENSE ${CMAKE_SOURCE_DIR}/json-fortran.md ${PAGES_FILES} )
+      list ( APPEND FORD_DEPENDS "${DOC_SRC_FILE}" )
+    endforeach ()
     add_custom_command ( OUTPUT ${FORD_OUTPUTS_CACHED}
-      COMMAND "${FORD}" -d "${CMAKE_SOURCE_DIR}/src" -o "${DOC_DIR}" "${FORD_PROJECT_FILE}"
+      COMMAND "${FORD}" ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${CMAKE_SOURCE_DIR}/pages" "${FORD_PROJECT_FILE}"
       MAIN_DEPENDENCY "${FORD_PROJECT_FILE}"
       DEPENDS ${FORD_DEPENDS}
       COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using FORD" )
     add_custom_target ( documentation ALL
-      DEPENDS ${FORD_OUTPUTS} )
+      DEPENDS ${FORD_OUTPUTS_CACHED} )
     set ( INSTALL_API_DOCUMENTATION TRUE
       CACHE BOOL "Install FORD generated documentation?" )
     if ( INSTALL_API_DOCUMENTATION )
@@ -187,7 +202,7 @@ if ( NOT SKIP_DOC_GEN )
     endif ()
   else () # Not found
     message ( WARNING
-      "FORD not found! Please set the CMake cache variable FORD to point to the installed FORD executable, and reconfigure or disable building the documentation. FORD can be installed from PYPI with `sudo pip install FORD` or from <https://github.com/cmacmackin/ford> If you do not wish to install FORD and build the json-fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
+      "FORD not found! Please set the CMake cache variable FORD to point to the installed FORD executable, and reconfigure or disable building the documentation. FORD can be installed from PYPI with `sudo pip install FORD` or from <https://github.com/cmacmackin/ford> If you do not wish to install FORD and build the JSON-Fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
   endif ()
 endif ()
 
@@ -195,7 +210,7 @@ endif ()
 # Handle test related stuff
 #--------------------------
 set ( ENABLE_TESTS TRUE CACHE BOOL
-  "Enable the json-fortran tests." )
+  "Enable the JSON-Fortran tests." )
 
 #---------------------------------------------------------------------
 # Add some tests to ensure that the software is performing as expected
@@ -222,6 +237,8 @@ if ( ENABLE_TESTS )
     file ( GLOB INVALID_JSON "${DATA_DIR}/inputs/*invalid*.json" )
 
     list ( REMOVE_ITEM JSON_INPUTS ${INVALID_JSON} )
+    list ( REMOVE_ITEM JSON_INPUTS "${DATA_DIR}/inputs/big.json" ) # This takes too long and is valid
+                                                                   # JSON from a trusted source
 
     foreach ( VALID_JSON ${JSON_INPUTS} )
       get_filename_component ( TESTNAME "${VALID_JSON}" NAME )

@@ -1,24 +1,27 @@
-json-fortran [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)
+JSON-Fortran
 ============
 
+[![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)
 A Fortran 2008 JSON API
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
 **Table of Contents**
 
-  - [Status](#status)
-  - [Brief description](#brief-description)
-  - [Download](#download)
-  - [Building the library](#building-the-library)
-  - [Reading JSON from a file](#reading-json-from-a-file)
-  - [Reading JSON from a string](#reading-json-from-a-string)
-  - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
-  - [Writing a JSON file](#writing-a-json-file)
-  - [Building a JSON file from scratch](#building-a-json-file-from-scratch)
-  - [Documentation](#documentation)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Miscellaneous](#miscellaneous)
+- [JSON-Fortran](#json-fortran)
+    - [Status](#status)
+    - [Brief description](#brief-description)
+    - [Download](#download)
+    - [Building the library](#building-the-library)
+    - [Example Usage](#example-usage)
+        - [Reading JSON from a file](#reading-json-from-a-file)
+        - [Reading JSON from a string](#reading-json-from-a-string)
+        - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
+        - [Writing a JSON file](#writing-a-json-file)
+        - [Building a JSON file from scratch](#building-a-json-file-from-scratch)
+    - [Documentation](#documentation)
+    - [Contributing](#contributing)
+    - [License](#license)
+    - [Miscellaneous](#miscellaneous)
 
 <!-- markdown-toc end -->
 
@@ -26,7 +29,7 @@ A Fortran 2008 JSON API
 Status
 ------
 [![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
-[![Codecov](https://img.shields.io/codecov/c/github/jacobwilliams/json-fortran.svg?style=plastic)](http://codecov.io/github/jacobwilliams/json-fortran?branch=master)
+[![Codecov](https://img.shields.io/codecov/c/github/jacobwilliams/json-fortran.svg?style=plastic)](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
 
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Blocked by Vendor Bug](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=vendor%20bug&title=Blocked%20by%20Vendor%20Bug)](https://waffle.io/jacobwilliams/json-fortran)
@@ -47,8 +50,10 @@ modern Fortran.  The source code is a single Fortran module file ([json_module.F
 
 [top](#json-fortran)
 
-Download [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
+Download
 --------------------
+
+[![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
 
 Download the official versioned releases
 [here](https://github.com/jacobwilliams/json-fortran/releases/latest).
@@ -57,8 +62,8 @@ Or, get the latest development code from the master branch
 
 __NEWS:__ As of June 7, 2015,
 [json-fortran](https://github.com/jacobwilliams/json-fortran) can be
-downloaded and installed with the [homebrew](https://brew.sh) package
-manager on Mac OS X. Once [homebrew](https://brew.sh) is installed,
+downloaded and installed with the [homebrew](http://brew.sh) package
+manager on Mac OS X. Once [homebrew](http://brew.sh) is installed,
 make sure that the formulae are up to date, view the package options
 and caveats, and install the
 [json-fortran formula](http://braumeister.org/formula/json-fortran):
@@ -83,7 +88,7 @@ The code requires a Fortran compiler that supports
 various Fortran 2003 and Fortran 2008 features such as: allocatable
 strings, `newunit`, `generic`, `class`, and `abstract interface`.
 It has been successfully compiled with the [Intel Fortran compiler
-13.1.0](https://software.intel.com/en-us/non-commercial-software-development) (and greater) and the recent [4.9 release of the GNU gfortran
+13.1.0](https://software.intel.com/en-us/articles/non-commercial-software-development) (and greater) and the recent [4.9 release of the GNU gfortran
 compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9). It has also
 been reported that the library can be built (using the CMake build
 script) with the [NAG Fortran compiler 6.0](http://www.nag.com/nagware/NP/NP_desc.asp)
@@ -93,7 +98,7 @@ Currently, several ways are provided to build the jsonfortran library
 
 * A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the unit tests.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
 
-* A [Visual Studio](http://www.visualstudio.com) project is included for building the library (and unit tests) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
+* A [Visual Studio](https://www.visualstudio.com) project is included for building the library (and unit tests) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
 * A [CMake](http://www.cmake.org) build
 system is provided. This build system has been tested on Mac and Linux
@@ -130,8 +135,11 @@ endforeach()
 
 [top](#json-fortran)
 
-Reading JSON from a file
+Example Usage
 ---------------
+In this section the basic functionality of the JSON-Fortran library is illustrated.
+
+### Reading JSON from a file
 
 Reading a JSON file and getting data from it is fairly
 straightforward using the `json_file` class.  Here is an example.  See unit tests 1 and 3-6
@@ -173,8 +181,7 @@ for more examples. The source files may be found in `src/tests/`.
 
 [top](#json-fortran)
 
-Reading JSON from a string
----------------
+### Reading JSON from a string
 
 JSON can also be read directly from a character string like so:
 ```fortran
@@ -183,8 +190,7 @@ JSON can also be read directly from a character string like so:
 
 [top](#json-fortran)
 
-Modifying variables in a JSON file
----------------
+### Modifying variables in a JSON file
 
 After reading a JSON file, if you want to change the values of some of the variables, you can use the `update` method.  For the example above:
 
@@ -197,8 +203,7 @@ After reading a JSON file, if you want to change the values of some of the varia
 
 [top](#json-fortran)
 
-Writing a JSON file
----------------
+### Writing a JSON file
 
 To print the JSON file (either to a file or the console), the `print_file` method can be used.  For the above example:
 
@@ -209,8 +214,7 @@ To print the JSON file (either to a file or the console), the `print_file` metho
 
 [top](#json-fortran)
 
-Building a JSON file from scratch
----------------
+### Building a JSON file from scratch
 
 Constructing a JSON file element by element is slightly more complicated and involves the use
 of `json_value` pointers.  For more examples see unit tests 2, 4 and 7 in `src/tests/`.
@@ -290,16 +294,19 @@ Documentation
 --------------
 
 The API documentation for the latest release version can be found
-[here](http://jacobwilliams.github.io/json-fortran).  The
+[here](http://jacobwilliams.github.io/json-fortran/).  The
 documentation can also be generated by processing the source files
 with [FORD](https://github.com/cmacmackin/ford).  Note that both the
 shell script and CMake will also generate these files automatically in the documentation folder, assuming you have FORD installed.
 
 [top](#json-fortran)
 
-Contributing [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md)
+Contributing
 ------------
-Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo)
+
+[![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md)
+
+Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo/)
 
 [top](#json-fortran)
 
