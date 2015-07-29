@@ -1,18 +1,9 @@
 !*******************************************************************************************************
-!****u* JSON/test_iso_10646_support
+!> author: Izaak Beekman
 !
-!  NAME
-!    test_iso_10646_support
-!
-!  DESCRIPTION
-!    This program is run when configuring the json-fortran build,
-!    to determine whether or not ISO 10646/UCS4 characters are
-!    supported by the compiler.
-!
-!  AUTHOR
-!    Izaak Beekman
-!
-!  SOURCE
+! This program is run when configuring the json-fortran build,
+! to determine whether or not ISO 10646/UCS4 characters are
+! supported by the compiler.
 
     program test_iso_10646_support
 
