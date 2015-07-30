@@ -548,7 +548,7 @@
     
     <div class="col-lg-9" id='text'>
     <h2>
-public  subroutine json_info(p, var_type, n_children)
+public  subroutine json_info(p, var_type, n_children, name)
 </h2>
     
   
@@ -612,6 +612,21 @@ public  subroutine json_info(p, var_type, n_children)
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><a class="anchor" name="var-name"></a>character(kind=CK,len=:),</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td>allocatable</td><td>::</td>
+  <td><strong>name</strong></td><td><p>variable name</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -638,16 +653,18 @@ public  subroutine json_info(p, var_type, n_children)
     
     <section>
     <h2><a class="anchor" name="src"></a>Source Code</h2>
-    <div class="highlight"><pre>    <span class="k">subroutine </span><span class="n">json_info</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">var_type</span><span class="p">,</span><span class="n">n_children</span><span class="p">)</span>
+    <div class="highlight"><pre>    <span class="k">subroutine </span><span class="n">json_info</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">var_type</span><span class="p">,</span><span class="n">n_children</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">implicit none</span>
 
 <span class="k">    type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span>         <span class="kd">::</span> <span class="n">p</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">var_type</span>   <span class="c">!! variable type</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">n_children</span> <span class="c">!! number of children</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">name</span> <span class="c">!! variable name</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">var_type</span><span class="p">))</span>    <span class="n">var_type</span> <span class="o">=</span> <span class="n">p</span><span class="p">%</span><span class="n">var_type</span>  <span class="c">!variable type</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">n_children</span><span class="p">))</span>  <span class="n">n_children</span> <span class="o">=</span> <span class="n">json_count</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>  <span class="c">!number of children</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">var_type</span><span class="p">))</span>    <span class="n">var_type</span>   <span class="o">=</span> <span class="n">p</span><span class="p">%</span><span class="n">var_type</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">n_children</span><span class="p">))</span>  <span class="n">n_children</span> <span class="o">=</span> <span class="n">json_count</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>        <span class="n">name</span>       <span class="o">=</span> <span class="n">p</span><span class="p">%</span><span class="n">name</span>
 
     <span class="k">end subroutine </span><span class="n">json_info</span>
 </pre></div>
