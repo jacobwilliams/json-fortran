@@ -65,7 +65,7 @@ contains
     character(kind=CK,len=256),dimension(:),allocatable :: str_vec
     type(json_file) :: f,f2
     type(json_value),pointer :: p
-    character(kind=CK,len=:),allocatable :: str
+    character(kind=CK,len=:),allocatable :: str,name
     logical :: found,lval
     integer :: var_type,n_children
 
@@ -249,7 +249,7 @@ contains
             write(error_unit,'(A)') '...success'
 
             write(error_unit,'(A)') 'json_info...'
-            call json_info(p,var_type,n_children)
+            call json_info(p,var_type,n_children,name)
             if (json_failed()) then
                 call json_print_error_message(error_unit)
                 error_cnt = error_cnt + 1

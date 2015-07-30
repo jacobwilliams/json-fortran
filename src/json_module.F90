@@ -1248,16 +1248,18 @@
 !
 !  Returns information about a [[json_value]].
 
-    subroutine json_info(p,var_type,n_children)
+    subroutine json_info(p,var_type,n_children,name)
 
     implicit none
 
     type(json_value),pointer         :: p
     integer(IK),intent(out),optional :: var_type   !! variable type
     integer(IK),intent(out),optional :: n_children !! number of children
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    if (present(var_type))    var_type = p%var_type  !variable type
-    if (present(n_children))  n_children = json_count(p)  !number of children
+    if (present(var_type))    var_type   = p%var_type
+    if (present(n_children))  n_children = json_count(p)
+    if (present(name))        name       = p%name
 
     end subroutine json_info
 !*****************************************************************************************
