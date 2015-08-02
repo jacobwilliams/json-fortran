@@ -209,6 +209,8 @@
       
       <a class="list-group-item" href="../module/json_module.html#var-spaces_per_tab">spaces_per_tab</a>
       
+      <a class="list-group-item" href="../module/json_module.html#var-compact_real">compact_real</a>
+      
       <a class="list-group-item" href="../module/json_module.html#var-rp_safety_factor">rp_safety_factor</a>
       
       <a class="list-group-item" href="../module/json_module.html#var-rp_addl_safety">rp_addl_safety</a>
@@ -228,8 +230,6 @@
       <a class="list-group-item" href="../module/json_module.html#var-star">star</a>
       
       <a class="list-group-item" href="../module/json_module.html#var-real_fmt">real_fmt</a>
-      
-      <a class="list-group-item" href="../module/json_module.html#var-compact_real">compact_real</a>
       
       <a class="list-group-item" href="../module/json_module.html#var-is_verbose">is_verbose</a>
       
@@ -1411,6 +1411,20 @@ DEALINGS IN THE SOFTWARE.
   
 <tr>
   
+  <td><a class="anchor" name="var-compact_real"></a>logical(kind=LK),</td>
+  
+  <td>private</td>
+  <td></td><td>::</td>
+  <td><strong>compact_real</strong></td><td> =</td><td>.true.</td><td><p>to use the "compact" form of real numbers for output</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><a class="anchor" name="var-rp_safety_factor"></a>integer(kind=IK),</td>
   
   <td>private,</td>
@@ -1499,7 +1513,7 @@ DEALINGS IN THE SOFTWARE.
   
   <td>private,</td>
   <td>parameter</td><td>::</td>
-  <td><strong>max_numeric_str_len</strong></td><td> =</td><td>real_precision+real_exponent_digits+6</td><td></td>
+  <td><strong>max_numeric_str_len</strong></td><td> =</td><td>real_precision+real_exponent_digits+6</td><td><p>6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra</p></td>
   
 </tr>
 
@@ -1513,7 +1527,7 @@ DEALINGS IN THE SOFTWARE.
   
   <td>private,</td>
   <td>parameter</td><td>::</td>
-  <td><strong>int_fmt</strong></td><td> =</td><td>'(ss,I0)'</td><td></td>
+  <td><strong>int_fmt</strong></td><td> =</td><td>'(ss,I0)'</td><td><p>minimum width format for integers</p></td>
   
 </tr>
 
@@ -1527,7 +1541,7 @@ DEALINGS IN THE SOFTWARE.
   
   <td>private,</td>
   <td>parameter</td><td>::</td>
-  <td><strong>star</strong></td><td> =</td><td>'*'</td><td></td>
+  <td><strong>star</strong></td><td> =</td><td>'*'</td><td><p>for invalid numbers</p></td>
   
 </tr>
 
@@ -1541,21 +1555,8 @@ DEALINGS IN THE SOFTWARE.
   
   <td>private,</td>
   <td>allocatable</td><td>::</td>
-  <td><strong>real_fmt</strong></td><td></td><td></td><td></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><a class="anchor" name="var-compact_real"></a>logical(kind=LK),</td>
-  
-  <td>private</td>
-  <td></td><td>::</td>
-  <td><strong>compact_real</strong></td><td> =</td><td>.true.</td><td></td>
+  <td><strong>real_fmt</strong></td><td></td><td></td><td><p>the format string to use for real numbers
+ it is set in <a href="../proc/json_initialize.html">json_initialize</a></p></td>
   
 </tr>
 
@@ -1569,7 +1570,7 @@ DEALINGS IN THE SOFTWARE.
   
   <td>private</td>
   <td></td><td>::</td>
-  <td><strong>is_verbose</strong></td><td> =</td><td>.false.</td><td></td>
+  <td><strong>is_verbose</strong></td><td> =</td><td>.false.</td><td><p>if true, all exceptions are immediately printed to console</p></td>
   
 </tr>
 
@@ -1583,7 +1584,7 @@ DEALINGS IN THE SOFTWARE.
   
   <td>private</td>
   <td></td><td>::</td>
-  <td><strong>exception_thrown</strong></td><td> =</td><td>.false.</td><td></td>
+  <td><strong>exception_thrown</strong></td><td> =</td><td>.true.</td><td><p>the error flag (by default, this is true to make sure that <a href="../proc/json_initialize.html">json_initialize</a> is called.</p></td>
   
 </tr>
 
@@ -1597,7 +1598,7 @@ DEALINGS IN THE SOFTWARE.
   
   <td>private,</td>
   <td>allocatable</td><td>::</td>
-  <td><strong>err_message</strong></td><td></td><td></td><td></td>
+  <td><strong>err_message</strong></td><td></td><td></td><td><p>the error message</p></td>
   
 </tr>
 
@@ -14056,7 +14057,7 @@ public  subroutine <a href='../proc/json_initialize.html'>json_initialize</a>(ve
   <td>optional</td>
   
   <td></td><td>::</td>
-  <td><strong>compact_reals</strong></td><td><p>to compact the real number strings for output</p></td>
+  <td><strong>compact_reals</strong></td><td><p>to compact the real number strings for output (default is true)</p></td>
   
 </tr>
 

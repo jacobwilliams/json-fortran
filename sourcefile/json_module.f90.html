@@ -1036,6 +1036,10 @@
     <span class="c">!for indenting (Note: jsonlint.com uses 4 spaces)</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">parameter</span> <span class="kd">::</span> <span class="n">spaces_per_tab</span> <span class="o">=</span> <span class="mi">2</span>
 
+    <span class="c">!Variables for real string printing:</span>
+    
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">compact_real</span> <span class="o">=</span> <span class="p">.</span><span class="n">true</span><span class="p">.</span>   <span class="c">!! to use the &quot;compact&quot; form of real numbers for output</span>
+    
     <span class="c">!find out the precision of the floating point number system</span>
     <span class="c">!and set safety factors</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">parameter</span> <span class="kd">::</span> <span class="n">rp_safety_factor</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1050,25 +1054,21 @@
                                   <span class="kt">real</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">maxexp</span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">maxexp</span><span class="p">)),&amp;</span>
                                   <span class="nb">kind</span><span class="o">=</span><span class="n">RK</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="c">!6 = sign + leading 0 + decimal + &#39;E&#39; + exponent sign + 1 extra</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">parameter</span> <span class="kd">::</span> <span class="n">max_numeric_str_len</span> <span class="o">=</span> <span class="n">real_precision</span> <span class="o">+</span> <span class="n">real_exponent_digits</span> <span class="o">+</span> <span class="mi">6</span>
-    <span class="c">! real format set by library initialization</span>
-    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">parameter</span> <span class="kd">::</span> <span class="n">int_fmt</span>  <span class="o">=</span> <span class="s1">&#39;(ss,I0)&#39;</span> <span class="c">!minimum width format for integers</span>
-    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span> <span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">parameter</span> <span class="kd">::</span> <span class="n">star</span>     <span class="o">=</span> <span class="s1">&#39;*&#39;</span>       <span class="c">!for invalid numbers</span>
-
-    <span class="c">!real string printing:</span>
-    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span> <span class="kd">::</span> <span class="n">real_fmt</span>  <span class="c">!the format string to use for real numbers</span>
-                                                       <span class="c">! [set in json_initialize]</span>
-    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">compact_real</span> <span class="o">=</span> <span class="p">.</span><span class="n">true</span><span class="p">.</span>   <span class="c">!to use the &quot;compact&quot; form of real numbers for output</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">parameter</span> <span class="kd">::</span> <span class="n">max_numeric_str_len</span> <span class="o">=</span> <span class="n">real_precision</span> <span class="o">+</span> <span class="n">real_exponent_digits</span> <span class="o">+</span> <span class="mi">6</span>  
+    <span class="c">!! 6 = sign + leading 0 + decimal + &#39;E&#39; + exponent sign + 1 extra</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">parameter</span> <span class="kd">::</span> <span class="n">int_fmt</span>  <span class="o">=</span> <span class="s1">&#39;(ss,I0)&#39;</span> <span class="c">!! minimum width format for integers</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span> <span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">parameter</span> <span class="kd">::</span> <span class="n">star</span>     <span class="o">=</span> <span class="s1">&#39;*&#39;</span>       <span class="c">!! for invalid numbers</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span> <span class="kd">::</span> <span class="n">real_fmt</span>  <span class="c">!! the format string to use for real numbers</span>
+                                                       <span class="c">!! it is set in [[json_initialize]]</span>
 
     <span class="c">!</span>
     <span class="c">! Note: the following global variables make this module non thread safe.</span>
     <span class="c">!</span>
 
     <span class="c">!exception handling [private variables]</span>
-    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">is_verbose</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>                 <span class="c">!if true, all exceptions are immediately printed to console</span>
-    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">exception_thrown</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>           <span class="c">!the error flag</span>
-    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span> <span class="kd">::</span> <span class="n">err_message</span> <span class="c">!the error message</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">is_verbose</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>                 <span class="c">!! if true, all exceptions are immediately printed to console</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">exception_thrown</span> <span class="o">=</span> <span class="p">.</span><span class="n">true</span><span class="p">.</span>            <span class="c">!! the error flag (by default, this is true to make sure that [[json_initialize]] is called.</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span> <span class="kd">::</span> <span class="n">err_message</span> <span class="c">!! the error message</span>
 
     <span class="c">!temp vars used when parsing lines in file [private variables]</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">char_count</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c">!character position in the current line</span>
@@ -1811,68 +1811,23 @@
 
     <span class="k">implicit none</span>
 
-<span class="k">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">verbose</span>       <span class="c">!! mainly useful for debugging (default is false)</span>
-    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">compact_reals</span> <span class="c">!! to compact the real number strings for output</span>
-    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">print_signs</span>   <span class="c">!! always print numeric sign (default is false)</span>
-    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">,</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">real_format</span>
-    <span class="c">!! exponential (default), scientific, engineering or general</span>
+<span class="k">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>               <span class="kd">::</span> <span class="n">verbose</span>       <span class="c">!! mainly useful for debugging (default is false)</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>               <span class="kd">::</span> <span class="n">compact_reals</span> <span class="c">!! to compact the real number strings for output (default is true)</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>               <span class="kd">::</span> <span class="n">print_signs</span>   <span class="c">!! always print numeric sign (default is false)</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">,</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">real_format</span>   <span class="c">!! exponential (default), scientific, engineering or general</span>
 
     <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="kd">::</span> <span class="n">w</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">e</span>
     <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">sgn</span><span class="p">,</span> <span class="n">rl_edit_desc</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">istat</span>
     <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sgn_prnt</span>
 
-
     <span class="c">!clear any errors from previous runs:</span>
     <span class="k">call </span><span class="n">json_clear_exceptions</span><span class="p">()</span>
-
-    <span class="c">!set defaults</span>
-    <span class="n">sgn_prnt</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
-    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">print_signs</span><span class="p">)</span> <span class="p">)</span> <span class="n">sgn_prnt</span> <span class="o">=</span> <span class="n">print_signs</span>
-    <span class="k">if</span> <span class="p">(</span> <span class="n">sgn_prnt</span> <span class="p">)</span> <span class="k">then</span>
-<span class="k">       </span><span class="n">sgn</span> <span class="o">=</span> <span class="s1">&#39;sp&#39;</span>
-    <span class="k">else</span>
-<span class="k">       </span><span class="n">sgn</span> <span class="o">=</span> <span class="s1">&#39;ss&#39;</span>
-    <span class="k">end if</span>
-
-<span class="k">    </span><span class="n">rl_edit_desc</span> <span class="o">=</span> <span class="s1">&#39;E&#39;</span>
-    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">real_format</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
-<span class="k">       select case</span> <span class="p">(</span> <span class="n">real_format</span> <span class="p">)</span>
-       <span class="k">case</span> <span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;e&#39;</span><span class="p">,</span><span class="s1">&#39;E&#39;</span><span class="p">,</span><span class="s1">&#39;en&#39;</span><span class="p">,</span><span class="s1">&#39;EN&#39;</span><span class="p">,</span><span class="s1">&#39;es&#39;</span><span class="p">,</span><span class="s1">&#39;ES&#39;</span><span class="p">)</span>
-          <span class="n">rl_edit_desc</span> <span class="o">=</span> <span class="n">real_format</span>
-       <span class="k">case </span><span class="n">default</span>
-          <span class="k">call </span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Invalid real format, &quot;&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">real_format</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;&quot;, passed to json_initialize.&#39;</span><span class="o">//</span> <span class="p">&amp;</span>
-               <span class="nb">new_line</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;Acceptable formats are: &quot;G&quot;, &quot;E&quot;, &quot;EN&quot;, and &quot;ES&quot;.&#39;</span> <span class="p">)</span>
-       <span class="k">end select</span>
-<span class="k">    end if</span>
-
-<span class="cp"># ifdef USE_UCS4</span>
-    <span class="c">! reopen stdout and stderr with utf-8 encoding</span>
-    <span class="k">open</span><span class="p">(</span><span class="n">output_unit</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-    <span class="k">open</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-<span class="cp"># endif</span>
 
     <span class="c">!Ensure gfortran bug work around &quot;parameters&quot; are set properly</span>
     <span class="n">null_str</span>  <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
     <span class="n">true_str</span>  <span class="o">=</span> <span class="s1">&#39;true&#39;</span>
     <span class="n">false_str</span> <span class="o">=</span> <span class="s1">&#39;false&#39;</span>
-
-    <span class="c">!optional inputs (if not present, values remains unchanged):</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">verbose</span><span class="p">))</span>       <span class="n">is_verbose</span>   <span class="o">=</span> <span class="n">verbose</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">compact_reals</span><span class="p">))</span> <span class="n">compact_real</span> <span class="o">=</span> <span class="n">compact_reals</span>
-
-    <span class="c">! set the default output/input format for reals:</span>
-    <span class="c">!  [this only needs to be done once, since it can&#39;t change]</span>
-    <span class="k">if</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="nb">allocated</span><span class="p">(</span><span class="n">real_fmt</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">                      write</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="s1">&#39;(ss,I0)&#39;</span><span class="p">,</span><span class="n">iostat</span><span class="o">=</span><span class="n">istat</span><span class="p">)</span> <span class="n">max_numeric_str_len</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">istat</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="s1">&#39;(ss,I0)&#39;</span><span class="p">,</span><span class="n">iostat</span><span class="o">=</span><span class="n">istat</span><span class="p">)</span> <span class="n">real_precision</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">istat</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="s1">&#39;(ss,I0)&#39;</span><span class="p">,</span><span class="n">iostat</span><span class="o">=</span><span class="n">istat</span><span class="p">)</span> <span class="n">real_exponent_digits</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">istat</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            </span><span class="n">real_fmt</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span> <span class="o">//</span> <span class="n">sgn</span> <span class="o">//</span> <span class="s1">&#39;,&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">rl_edit_desc</span><span class="p">)</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;.&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;E&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;)&#39;</span>
-        <span class="k">else</span>
-<span class="k">            </span><span class="n">real_fmt</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span> <span class="o">//</span> <span class="n">sgn</span> <span class="o">//</span> <span class="s1">&#39;,&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">rl_edit_desc</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;30.16E3)&#39;</span>  <span class="c">!just use this one (should never happen)</span>
-        <span class="k">end if</span>
-<span class="k">    end if</span>
 
     <span class="c">!Just in case, clear these global variables also:</span>
     <span class="n">pushed_index</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1881,7 +1836,58 @@
     <span class="n">line_count</span>   <span class="o">=</span> <span class="mi">1</span>
     <span class="n">ipos</span>         <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="k">end subroutine </span><span class="n">json_initialize</span>
+<span class="cp"># ifdef USE_UCS4</span>
+    <span class="c">! reopen stdout and stderr with utf-8 encoding</span>
+    <span class="k">open</span><span class="p">(</span><span class="n">output_unit</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="k">open</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+<span class="cp"># endif</span>
+
+    <span class="c">!verbose error printing:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">verbose</span><span class="p">))</span> <span class="n">is_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+    <span class="c">!Set the format for real numbers:</span>
+    <span class="c">! [if not changing it, then it remains the same]</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="nb">allocated</span><span class="p">(</span><span class="n">real_fmt</span><span class="p">))</span> <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="p">&amp;</span>  <span class="c">! if this hasn&#39;t been done yet</span>
+          <span class="nb">present</span><span class="p">(</span><span class="n">compact_reals</span><span class="p">)</span>     <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="p">&amp;</span>
+          <span class="nb">present</span><span class="p">(</span><span class="n">print_signs</span><span class="p">)</span>       <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="p">&amp;</span>
+          <span class="nb">present</span><span class="p">(</span><span class="n">real_format</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">        if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">compact_reals</span><span class="p">))</span> <span class="n">compact_real</span> <span class="o">=</span> <span class="n">compact_reals</span>  
+
+        <span class="c">!set defaults</span>
+        <span class="n">sgn_prnt</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">print_signs</span><span class="p">)</span> <span class="p">)</span> <span class="n">sgn_prnt</span> <span class="o">=</span> <span class="n">print_signs</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">sgn_prnt</span> <span class="p">)</span> <span class="k">then</span>
+<span class="k">           </span><span class="n">sgn</span> <span class="o">=</span> <span class="s1">&#39;sp&#39;</span>
+        <span class="k">else</span>
+<span class="k">           </span><span class="n">sgn</span> <span class="o">=</span> <span class="s1">&#39;ss&#39;</span>
+        <span class="k">end if</span>
+
+<span class="k">        </span><span class="n">rl_edit_desc</span> <span class="o">=</span> <span class="s1">&#39;E&#39;</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">real_format</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<span class="k">           select case</span> <span class="p">(</span> <span class="n">real_format</span> <span class="p">)</span>
+           <span class="k">case</span> <span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;e&#39;</span><span class="p">,</span><span class="s1">&#39;E&#39;</span><span class="p">,</span><span class="s1">&#39;en&#39;</span><span class="p">,</span><span class="s1">&#39;EN&#39;</span><span class="p">,</span><span class="s1">&#39;es&#39;</span><span class="p">,</span><span class="s1">&#39;ES&#39;</span><span class="p">)</span>
+              <span class="n">rl_edit_desc</span> <span class="o">=</span> <span class="n">real_format</span>
+           <span class="k">case </span><span class="n">default</span>
+              <span class="k">call </span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Invalid real format, &quot;&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">real_format</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;&quot;, passed to json_initialize.&#39;</span><span class="o">//</span> <span class="p">&amp;</span>
+                   <span class="nb">new_line</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;Acceptable formats are: &quot;G&quot;, &quot;E&quot;, &quot;EN&quot;, and &quot;ES&quot;.&#39;</span> <span class="p">)</span>
+           <span class="k">end select</span>
+<span class="k">        end if</span>
+
+        <span class="c">! set the default output/input format for reals:</span>
+                      <span class="k">write</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="s1">&#39;(ss,I0)&#39;</span><span class="p">,</span><span class="n">iostat</span><span class="o">=</span><span class="n">istat</span><span class="p">)</span> <span class="n">max_numeric_str_len</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">istat</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="s1">&#39;(ss,I0)&#39;</span><span class="p">,</span><span class="n">iostat</span><span class="o">=</span><span class="n">istat</span><span class="p">)</span> <span class="n">real_precision</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">istat</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="s1">&#39;(ss,I0)&#39;</span><span class="p">,</span><span class="n">iostat</span><span class="o">=</span><span class="n">istat</span><span class="p">)</span> <span class="n">real_exponent_digits</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">istat</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">real_fmt</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span> <span class="o">//</span> <span class="n">sgn</span> <span class="o">//</span> <span class="s1">&#39;,&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">rl_edit_desc</span><span class="p">)</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;.&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;E&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;)&#39;</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">real_fmt</span> <span class="o">=</span> <span class="s1">&#39;(&#39;</span> <span class="o">//</span> <span class="n">sgn</span> <span class="o">//</span> <span class="s1">&#39;,&#39;</span> <span class="o">//</span> <span class="nb">trim</span><span class="p">(</span><span class="n">rl_edit_desc</span><span class="p">)</span> <span class="o">//</span> <span class="s1">&#39;30.16E3)&#39;</span>  <span class="c">!just use this one (should never happen)</span>
+        <span class="k">end if</span>
+
+<span class="k">    end if</span>
+
+<span class="k">    end subroutine </span><span class="n">json_initialize</span>
 <span class="c">!*****************************************************************************************</span>
 
 <span class="c">!*****************************************************************************************</span>
@@ -1984,7 +1990,7 @@
 <span class="k">        if</span> <span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">err_message</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">            </span><span class="n">error_msg</span> <span class="o">=</span> <span class="n">err_message</span>
         <span class="k">else</span>
-<span class="k">            </span><span class="n">error_msg</span> <span class="o">=</span> <span class="s1">&#39;Unknown Error&#39;</span>
+<span class="k">            </span><span class="n">error_msg</span> <span class="o">=</span> <span class="s1">&#39;Error: json_initialize() must be called first to initialize the module.&#39;</span>
         <span class="k">end if</span>
 <span class="k">    else</span>
 <span class="k">        </span><span class="n">error_msg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
