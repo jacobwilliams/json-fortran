@@ -867,6 +867,10 @@
     !for indenting (Note: jsonlint.com uses 4 spaces)
     integer(IK),parameter :: spaces_per_tab = 2
 
+    !Variables for real string printing:
+    
+    logical(LK) :: compact_real = .true.   !! to use the "compact" form of real numbers for output
+    
     !find out the precision of the floating point number system
     !and set safety factors
     integer(IK),parameter :: rp_safety_factor = 1
@@ -881,25 +885,21 @@
                                   real(max(maxexp,abs(maxexp)),&
                                   kind=RK) ) )
 
-    !6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
-    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6
-    ! real format set by library initialization
-    character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !minimum width format for integers
-    character(kind=CK, len=*),parameter :: star     = '*'       !for invalid numbers
-
-    !real string printing:
-    character(kind=CDK,len=:),allocatable :: real_fmt  !the format string to use for real numbers
-                                                       ! [set in json_initialize]
-    logical(LK) :: compact_real = .true.   !to use the "compact" form of real numbers for output
+    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6  
+    !! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
+    character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !! minimum width format for integers
+    character(kind=CK, len=*),parameter :: star     = '*'       !! for invalid numbers
+    character(kind=CDK,len=:),allocatable :: real_fmt  !! the format string to use for real numbers
+                                                       !! it is set in [[json_initialize]]
 
     !
     ! Note: the following global variables make this module non thread safe.
     !
 
     !exception handling [private variables]
-    logical(LK) :: is_verbose = .false.                 !if true, all exceptions are immediately printed to console
-    logical(LK) :: exception_thrown = .false.           !the error flag
-    character(kind=CK,len=:),allocatable :: err_message !the error message
+    logical(LK) :: is_verbose = .false.                 !! if true, all exceptions are immediately printed to console
+    logical(LK) :: exception_thrown = .true.            !! the error flag (by default, this is true to make sure that [[json_initialize]] is called.
+    character(kind=CK,len=:),allocatable :: err_message !! the error message
 
     !temp vars used when parsing lines in file [private variables]
     integer(IK) :: char_count = 0    !character position in the current line
@@ -1642,40 +1642,30 @@
 
     implicit none
 
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(len=*,kind=CDK),intent(in),optional :: real_format
-    !! exponential (default), scientific, engineering or general
+    logical(LK),intent(in),optional               :: verbose       !! mainly useful for debugging (default is false)
+    logical(LK),intent(in),optional               :: compact_reals !! to compact the real number strings for output (default is true)
+    logical(LK),intent(in),optional               :: print_signs   !! always print numeric sign (default is false)
+    character(len=*,kind=CDK),intent(in),optional :: real_format   !! exponential (default), scientific, engineering or general
 
     character(kind=CDK,len=10) :: w,d,e
     character(kind=CDK,len=2)  :: sgn, rl_edit_desc
     integer(IK) :: istat
     logical(LK) :: sgn_prnt
 
-
     !clear any errors from previous runs:
     call json_clear_exceptions()
 
-    !set defaults
-    sgn_prnt = .false.
-    if ( present( print_signs) ) sgn_prnt = print_signs
-    if ( sgn_prnt ) then
-       sgn = 'sp'
-    else
-       sgn = 'ss'
-    end if
+    !Ensure gfortran bug work around "parameters" are set properly
+    null_str  = 'null'
+    true_str  = 'true'
+    false_str = 'false'
 
-    rl_edit_desc = 'E'
-    if ( present( real_format ) ) then
-       select case ( real_format )
-       case ('g','G','e','E','en','EN','es','ES')
-          rl_edit_desc = real_format
-       case default
-          call throw_exception('Invalid real format, "' // trim(real_format) // '", passed to json_initialize.'// &
-               new_line('a') // 'Acceptable formats are: "G", "E", "EN", and "ES".' )
-       end select
-    end if
+    !Just in case, clear these global variables also:
+    pushed_index = 0
+    pushed_char  = ''
+    char_count   = 0
+    line_count   = 1
+    ipos         = 1
 
 # ifdef USE_UCS4
     ! reopen stdout and stderr with utf-8 encoding
@@ -1683,18 +1673,40 @@
     open(error_unit, encoding='utf-8')
 # endif
 
-    !Ensure gfortran bug work around "parameters" are set properly
-    null_str  = 'null'
-    true_str  = 'true'
-    false_str = 'false'
+    !verbose error printing:
+    if (present(verbose)) is_verbose = verbose
 
-    !optional inputs (if not present, values remains unchanged):
-    if (present(verbose))       is_verbose   = verbose
-    if (present(compact_reals)) compact_real = compact_reals
+    !Set the format for real numbers:
+    ! [if not changing it, then it remains the same]
 
-    ! set the default output/input format for reals:
-    !  [this only needs to be done once, since it can't change]
-    if (.not. allocated(real_fmt)) then
+    if ( (.not. allocated(real_fmt)) .or. &  ! if this hasn't been done yet
+          present(compact_reals)     .or. &
+          present(print_signs)       .or. &
+          present(real_format) ) then
+
+        if (present(compact_reals)) compact_real = compact_reals  
+
+        !set defaults
+        sgn_prnt = .false.
+        if ( present( print_signs) ) sgn_prnt = print_signs
+        if ( sgn_prnt ) then
+           sgn = 'sp'
+        else
+           sgn = 'ss'
+        end if
+
+        rl_edit_desc = 'E'
+        if ( present( real_format ) ) then
+           select case ( real_format )
+           case ('g','G','e','E','en','EN','es','ES')
+              rl_edit_desc = real_format
+           case default
+              call throw_exception('Invalid real format, "' // trim(real_format) // '", passed to json_initialize.'// &
+                   new_line('a') // 'Acceptable formats are: "G", "E", "EN", and "ES".' )
+           end select
+        end if
+
+        ! set the default output/input format for reals:
                       write(w,'(ss,I0)',iostat=istat) max_numeric_str_len
         if (istat==0) write(d,'(ss,I0)',iostat=istat) real_precision
         if (istat==0) write(e,'(ss,I0)',iostat=istat) real_exponent_digits
@@ -1703,14 +1715,8 @@
         else
             real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // '30.16E3)'  !just use this one (should never happen)
         end if
-    end if
 
-    !Just in case, clear these global variables also:
-    pushed_index = 0
-    pushed_char  = ''
-    char_count   = 0
-    line_count   = 1
-    ipos         = 1
+    end if
 
     end subroutine json_initialize
 !*****************************************************************************************
@@ -1815,7 +1821,7 @@
         if (allocated(err_message)) then
             error_msg = err_message
         else
-            error_msg = 'Unknown Error'
+            error_msg = 'Error: json_initialize() must be called first to initialize the module.'
         end if
     else
         error_msg = ''

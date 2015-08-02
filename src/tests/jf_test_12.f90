@@ -18,23 +18,26 @@ module jf_test_12_mod
 contains
 
     subroutine test_12(error_cnt)
+    
+    implicit none
 
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
     integer,parameter :: imx = 5, jmx = 3, kmx = 4 !! dimensions for raw work array of primitive type
-    integer :: shape(3)                            !! shape of work array
-    integer, allocatable :: fetched_shape(:)       !! retrieved shape
-    type(json_value), pointer :: root, meta_array  !! json nodes to work with
-    type(json_value), pointer :: tmp_json_ptr
-    type(json_file) :: my_file
-    real(wp) :: raw_array(imx,jmx,kmx)             !! raw work array
-    real(wp) :: array_element
-    real(wp), allocatable :: fetched_array(:)
+    
+    integer,dimension(3)                  :: shape             !! shape of work array
+    integer, dimension(:), allocatable    :: fetched_shape     !! retrieved shape
+    type(json_value), pointer             :: root, meta_array  !! json nodes to work with
+    type(json_value), pointer             :: tmp_json_ptr
+    type(json_file)                       :: my_file
+    real(wp),dimension(imx,jmx,kmx)       :: raw_array         !! raw work array
+    real(wp)                              :: array_element
+    real(wp), dimension(:), allocatable   :: fetched_array
     character(kind=CK,len=:), allocatable :: description
-    integer :: i,j,k                               !! loop indices
-    integer :: array_length, lun
-    logical :: existed
-    logical, allocatable :: SOS(:)
+    integer                               :: i,j,k             !! loop indices
+    integer                               :: array_length, lun
+    logical                               :: existed
+    logical, dimension(:), allocatable    :: SOS
 
     error_cnt = 0
     call json_initialize(verbose=.true.,real_format='G')
@@ -178,7 +181,7 @@ contains
         if (present (assertion)) then
            if (.not. assertion) error_cnt = error_cnt + 1
         end if
-      end subroutine
+      end subroutine check_errors
 
       subroutine get_3D_from_array(element, i, count)
         type(json_value), pointer , intent(in)   :: element
@@ -192,9 +195,9 @@ contains
              mod((i-1)/imx,jmx) + 1, &      ! j index
              mod((i-1)/imx/jmx,kmx) + 1 ) ) ! k inded
         useless = count
-      end subroutine
+      end subroutine get_3D_from_array
 
-    end subroutine
+    end subroutine test_12
 
 end module jf_test_12_mod
 !*****************************************************************************************
@@ -210,5 +213,6 @@ program jf_test_12
     n_errors = 0
     call test_12(n_errors)
     if ( n_errors /= 0) stop 1
+    
 end program jf_test_12
 !*****************************************************************************************
