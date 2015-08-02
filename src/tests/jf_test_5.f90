@@ -1,50 +1,9 @@
-!*******************************************************************************************************
-!****u* JSON/jf_test_5
+!*****************************************************************************************
+!>
+! Module for the fifth unit test.
 !
-!  NAME
-!    jf_test_5
-!
-!  DESCRIPTION
-!    Fifth unit test
-!
-!  USES
-!    json_module
-!    iso_fortran_env (intrinsic)
-!
-!  HISTORY
-!    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
-!
-!  LICENSE
-!
-!    JSON-Fortran: A Fortran 2008 JSON API
-!
-!    https://github.com/jacobwilliams/json-fortran
-!
-!    Copyright (c) 2014, Jacob Williams
-!
-!    All rights reserved.
-!
-!    Redistribution and use in source and binary forms, with or without modification,
-!    are permitted provided that the following conditions are met:
-!    * Redistributions of source code must retain the above copyright notice, this
-!      list of conditions and the following disclaimer.
-!    * Redistributions in binary form must reproduce the above copyright notice, this
-!      list of conditions and the following disclaimer in the documentation and/or
-!      other materials provided with the distribution.
-!    * The names of its contributors may not be used to endorse or promote products
-!      derived from this software without specific prior written permission.
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-!    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-!    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-!    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-!    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-!    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-!    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-!    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-!    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-!    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-!
-!  SOURCE
+!# HISTORY
+!  * Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 
 module jf_test_5_mod
 
@@ -53,16 +12,16 @@ module jf_test_5_mod
 
     implicit none
 
-    character(len=*),parameter :: dir = '../files/inputs/'        !working directory
+    character(len=*),parameter :: dir = '../files/inputs/'   !! working directory
     character(len=*),parameter :: filename5 = 'test5.json'
 
 contains
 
     subroutine test_5(error_cnt)
 
-!    Github issue example: https://github.com/josephalevin/fson/issues/12
-!
-!    Read an existing file and extract some variables.
+    !! Github issue example: https://github.com/josephalevin/fson/issues/12
+    !!
+    !! Read an existing file and extract some variables.
 
     implicit none
 
@@ -144,8 +103,13 @@ contains
     end subroutine test_5
 
 end module jf_test_5_mod
+!*****************************************************************************************
 
+!*****************************************************************************************
 program jf_test_5
+
+    !! Fifth unit test.
+    
     use jf_test_5_mod , only: test_5
     implicit none
     integer :: n_errors
@@ -153,5 +117,6 @@ program jf_test_5
     call test_5(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_5
+!*****************************************************************************************
 
 !*******************************************************************************************************

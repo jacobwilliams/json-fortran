@@ -1,3 +1,9 @@
+!*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 07/27/2015
+!
+! Module for the 12th unit test.
+
 module jf_test_12_mod
 
     use json_module
@@ -5,8 +11,8 @@ module jf_test_12_mod
 
     implicit none
 
-    character(len=*),parameter :: dir = '../files/' !! Path to write JSON file to
-    character(len=*),parameter :: file = 'test12.json'       !! Filename to write
+    character(len=*),parameter :: dir = '../files/'         !! Path to write JSON file to
+    character(len=*),parameter :: file = 'test12.json'      !! Filename to write
     real(wp), parameter        :: TOL = 100*epsilon(1.0_wp) !! Tolerance for real comparisons
 
 contains
@@ -162,6 +168,7 @@ contains
     close(lun)
 
     contains
+    
       subroutine check_errors(assertion)
         logical, optional, intent(in) :: assertion
         if (json_failed()) then
@@ -189,13 +196,19 @@ contains
 
     end subroutine
 
-end module
+end module jf_test_12_mod
+!*****************************************************************************************
 
+!*****************************************************************************************
 program jf_test_12
+
+    !! 12th unit test.
+    
     use jf_test_12_mod, only: test_12
     implicit none
     integer :: n_errors
     n_errors = 0
     call test_12(n_errors)
     if ( n_errors /= 0) stop 1
-end program
+end program jf_test_12
+!*****************************************************************************************

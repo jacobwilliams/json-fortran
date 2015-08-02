@@ -1,50 +1,8 @@
-!*******************************************************************************************************
-!****u* JSON/jf_test_11
+!*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 3/13/2015
 !
-!  NAME
-!    jf_test_11
-!
-!  DESCRIPTION
-!    11th unit test to test unicode support if enabled
-!
-!  USES
-!    json_module
-!    iso_fortran_env (intrinsic)
-!
-!  HISTORY
-!    Izaak Beekman : created : 3/13/2015
-!
-!  LICENSE
-!
-!    JSON-Fortran: A Fortran 2008 JSON API
-!
-!    https://github.com/jacobwilliams/json-fortran
-!
-!    Copyright (c) 2014, Jacob Williams
-!
-!    All rights reserved.
-!
-!    Redistribution and use in source and binary forms, with or without modification,
-!    are permitted provided that the following conditions are met:
-!    * Redistributions of source code must retain the above copyright notice, this
-!      list of conditions and the following disclaimer.
-!    * Redistributions in binary form must reproduce the above copyright notice, this
-!      list of conditions and the following disclaimer in the documentation and/or
-!      other materials provided with the distribution.
-!    * The names of its contributors may not be used to endorse or promote products
-!      derived from this software without specific prior written permission.
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-!    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-!    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-!    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-!    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-!    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-!    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-!    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-!    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-!    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-!
-!  SOURCE
+! Module for the 11th unit test to test unicode support if enabled.
 
 module jf_test_11_mod
 
@@ -53,7 +11,7 @@ module jf_test_11_mod
 
     implicit none
 
-    character(len=*),parameter :: dir = '../files/inputs/'               !working directory
+    character(len=*),parameter :: dir = '../files/inputs/'  !! working directory
 # ifdef USE_UCS4
     character(len=*),parameter :: unicode_file = 'hello-world-ucs4.json'
 #endif
@@ -63,7 +21,7 @@ contains
 
     subroutine test_11(error_cnt)
 
-!   Read the file generated in jf_test_2, and extract some data from it.
+    !! Read the file and extract some data from it.
 
     implicit none
 
@@ -319,8 +277,13 @@ contains
     end subroutine test_11
 
 end module jf_test_11_mod
+!*****************************************************************************************
 
+!*****************************************************************************************
 program jf_test_11
+
+    !! 11th unit test.
+    
     use jf_test_11_mod , only: test_11
     implicit none
     integer :: n_errors
@@ -328,5 +291,4 @@ program jf_test_11
     call test_11(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_11
-
-!*******************************************************************************************************
+!*****************************************************************************************

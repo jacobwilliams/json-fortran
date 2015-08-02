@@ -1,46 +1,8 @@
-!*******************************************************************************************************
-!****u* JSON/jf_test_10
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 3/10/2015
 !
-!  NAME
-!    jf_test_10
-!
-!  DESCRIPTION
-!    Tenth unit test.
-!
-!  AUTHOR
-!    Jacob Williams : 3/10/3015
-!
-!  LICENSE
-!
-!    JSON-Fortran: A Fortran 2008 JSON API
-!
-!    https://github.com/jacobwilliams/json-fortran
-!
-!    Copyright (c) 2014, Jacob Williams
-!
-!    All rights reserved.
-!
-!    Redistribution and use in source and binary forms, with or without modification,
-!    are permitted provided that the following conditions are met:
-!    * Redistributions of source code must retain the above copyright notice, this
-!      list of conditions and the following disclaimer.
-!    * Redistributions in binary form must reproduce the above copyright notice, this
-!      list of conditions and the following disclaimer in the documentation and/or
-!      other materials provided with the distribution.
-!    * The names of its contributors may not be used to endorse or promote products
-!      derived from this software without specific prior written permission.
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-!    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-!    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-!    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-!    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-!    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-!    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-!    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-!    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-!    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-!
-!  SOURCE
+! Module for the tenth unit test.
 
 module jf_test_10_mod
 
@@ -56,7 +18,7 @@ contains
 
     subroutine test_10(error_cnt)
 
-!   Test some of the lesser-used features of the library
+    !! Test some of the lesser-used features of the library
 
     implicit none
 
@@ -353,8 +315,13 @@ contains
     end subroutine test_10
 
 end module jf_test_10_mod
+!*****************************************************************************************
 
+!*****************************************************************************************
 program jf_test_10
+
+    !! Tenth unit test.
+    
     use jf_test_10_mod , only: test_10
     implicit none
     integer :: n_errors
@@ -362,5 +329,4 @@ program jf_test_10
     call test_10(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_10
-
-!*******************************************************************************************************
+!*****************************************************************************************
