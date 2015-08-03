@@ -7,7 +7,7 @@
 module jf_test_14_mod
 
     use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
+    use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
     implicit none
     
@@ -58,11 +58,11 @@ contains
     end if 
     
     if (error_cnt==0) then
-        write(output_unit,'(A)') ''
-        write(output_unit,'(A)') ' All names changed to Fred:'
-        write(output_unit,'(A)') ''
+        write(error_unit,'(A)') ''
+        write(error_unit,'(A)') ' All names changed to Fred:'
+        write(error_unit,'(A)') ''
         call json_print(json,output_unit)
-        write(output_unit,'(A)') ''
+        write(error_unit,'(A)') ''
     end if
     
     call json_destroy(json)  !clean up
@@ -91,7 +91,7 @@ contains
     if (var_type==json_string .and. str=='name') then
         call json_get(p,'@',str)             ! get original name
         call json_update(p,'@','Fred',found) !change it
-        write(output_unit,'(A)') str//' name changed'
+        write(error_unit,'(A)') str//' name changed'
         icount = icount + 1
     end if
     
