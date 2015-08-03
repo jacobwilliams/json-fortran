@@ -5001,7 +5001,7 @@
             element => me%children  ! first one
             do i = 1, icount        ! call for each child
                 call json_traverse(element,traverse_callback)
-                if (finished) return
+                if (finished) exit
                 element => element%next
             end do
         end if
