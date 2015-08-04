@@ -10,7 +10,7 @@
     <meta name="author" content="Chris MacMackin" >
     <link rel="icon" href="../favicon.png">
 
-    <title>array_callback_func &ndash; JSON-Fortran</title>
+    <title>traverse_callback_func &ndash; JSON-Fortran</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -88,7 +88,7 @@
     
   
   <div class="row">
-    <h1>array_callback_func
+    <h1>traverse_callback_func
 	 <small>Abstract Interface</small>
     
     </h1>
@@ -112,7 +112,7 @@
   
      <li><a href='../module/json_module.html'>json_module</a></li>
   
-     <li class="active">array_callback_func</li>
+     <li class="active">traverse_callback_func</li>
   </ol>
   </div>
 </div>
@@ -157,7 +157,7 @@
     
     <h2>abstract interface <br>
     
-private  subroutine array_callback_func(element, i, count)
+private  subroutine traverse_callback_func(p, finished)
 </h2>    
     
 
@@ -183,12 +183,12 @@ private  subroutine array_callback_func(element, i, count)
   
 <tr>
   
-  <td><a class="anchor" name="var-element"></a>type(<a href='../type/json_value.html'>json_value</a>),</td>
+  <td><a class="anchor" name="var-p"></a>type(<a href='../type/json_value.html'>json_value</a>),</td>
   <td>intent(in),</td>
   <td></td>
   
   <td>pointer</td><td>::</td>
-  <td><strong>element</strong></td><td></td>
+  <td><strong>p</strong></td><td></td>
   
 </tr>
 
@@ -198,27 +198,12 @@ private  subroutine array_callback_func(element, i, count)
   
 <tr>
   
-  <td><a class="anchor" name="var-i"></a>integer(kind=IK),</td>
-  <td>intent(in)</td>
+  <td><a class="anchor" name="var-finished"></a>logical(kind=LK),</td>
+  <td>intent(out)</td>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>i</strong></td><td></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><a class="anchor" name="var-count"></a>integer(kind=IK),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
-  <td><strong>count</strong></td><td></td>
+  <td><strong>finished</strong></td><td></td>
   
 </tr>
 
@@ -229,7 +214,7 @@ private  subroutine array_callback_func(element, i, count)
     
     
     <h3>Description</h3>
-    <p>Array element callback function.  Used by <a href="../proc/json_get_array.html">json_get_array</a></p>
+    <p>Callback function used by <a href="../proc/json_traverse.html">json_traverse</a></p>
     
     <br>
 

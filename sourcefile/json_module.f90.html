@@ -625,17 +625,25 @@
     <span class="c">!*************************************************************************************</span>
 
     <span class="c">!*************************************************************************************</span>
-    <span class="c">!&gt;</span>
-    <span class="c">!  Array element callback function.  Used by [[json_get_array]].</span>
-
     <span class="k">abstract interface</span>
+<span class="k">    </span>
 <span class="k">        subroutine </span><span class="n">array_callback_func</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">count</span><span class="p">)</span>
+            <span class="c">!! Array element callback function.  Used by [[json_get_array]]</span>
             <span class="k">import</span> <span class="kd">::</span> <span class="n">json_value</span><span class="p">,</span><span class="n">IK</span>
             <span class="k">implicit none</span>
 <span class="k">            type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span> <span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">element</span>
             <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span>        <span class="c">!index</span>
             <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="nb">count</span>    <span class="c">!size of array</span>
         <span class="k">end subroutine </span><span class="n">array_callback_func</span>
+        
+        <span class="k">subroutine </span><span class="n">traverse_callback_func</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">finished</span><span class="p">)</span>
+            <span class="c">!! Callback function used by [[json_traverse]]</span>
+            <span class="k">import</span> <span class="kd">::</span> <span class="n">json_value</span><span class="p">,</span><span class="n">LK</span>
+            <span class="k">implicit none</span>
+<span class="k">            type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">p</span>
+            <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">finished</span>
+        <span class="k">end subroutine </span><span class="n">traverse_callback_func</span>
+       
     <span class="k">end interface</span>
     <span class="c">!*************************************************************************************</span>
 
@@ -996,6 +1004,7 @@
     <span class="k">public</span> <span class="kd">::</span> <span class="n">json_remove</span>                <span class="c">! remove from a JSON structure</span>
     <span class="k">public</span> <span class="kd">::</span> <span class="n">json_remove_if_present</span>     <span class="c">! remove from a JSON structure (if it is present)</span>
     <span class="k">public</span> <span class="kd">::</span> <span class="n">json_update</span>                <span class="c">! update a value in a JSON structure</span>
+    <span class="k">public</span> <span class="kd">::</span> <span class="n">json_traverse</span>              <span class="c">! to traverse all elements of a JSON structure</span>
     <span class="k">public</span> <span class="kd">::</span> <span class="n">json_print_error_message</span>   <span class="c">!</span>
     <span class="k">public</span> <span class="kd">::</span> <span class="n">to_unicode</span>                 <span class="c">! Function to convert from &#39;DEFAULT&#39; to &#39;ISO_10646&#39; strings</span>
 
@@ -5126,6 +5135,50 @@
     <span class="k">if</span> <span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">element</span><span class="p">))</span> <span class="k">nullify</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
 
     <span class="k">end subroutine </span><span class="n">json_get_array</span>
+<span class="c">!*****************************************************************************************</span>
+
+<span class="c">!*****************************************************************************************</span>
+<span class="c">!&gt; author: Jacob Williams</span>
+<span class="c">!  date: 09/02/2015</span>
+<span class="c">!</span>
+<span class="c">!  Traverse a JSON structure.</span>
+<span class="c">!  This routine calls the user-specified [[traverse_callback_func]] </span>
+<span class="c">!  for each element of the structure.</span>
+<span class="c">!</span>
+    <span class="k">recursive subroutine </span><span class="n">json_traverse</span><span class="p">(</span><span class="n">me</span><span class="p">,</span><span class="n">traverse_callback</span><span class="p">)</span>
+
+    <span class="k">implicit none</span>
+
+<span class="k">    type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">me</span>
+    <span class="k">procedure</span><span class="p">(</span><span class="n">traverse_callback_func</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">traverse_callback</span>
+
+    <span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span> <span class="kd">::</span> <span class="n">element</span>  <span class="c">!! a child element</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span>        <span class="c">!! counter</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">icount</span>   <span class="c">!! number of children</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">finished</span> <span class="c">!! can be used to stop the process</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">exception_thrown</span><span class="p">)</span> <span class="k">return</span>
+
+<span class="k">    call </span><span class="n">traverse_callback</span><span class="p">(</span><span class="n">me</span><span class="p">,</span><span class="n">finished</span><span class="p">)</span> <span class="c">! first call for this object</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">finished</span><span class="p">)</span> <span class="k">return</span>
+
+    <span class="c">!for arrays and objects, have to also call for all children:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">me</span><span class="p">%</span><span class="n">var_type</span><span class="o">==</span><span class="n">json_array</span> <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="n">me</span><span class="p">%</span><span class="n">var_type</span><span class="o">==</span><span class="n">json_object</span><span class="p">)</span> <span class="k">then</span>
+
+<span class="k">        </span><span class="n">icount</span> <span class="o">=</span> <span class="n">json_count</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="c">! number of children</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">icount</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">element</span> <span class="o">=&gt;</span> <span class="n">me</span><span class="p">%</span><span class="n">children</span>  <span class="c">! first one</span>
+            <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">icount</span>        <span class="c">! call for each child</span>
+                <span class="k">call </span><span class="n">json_traverse</span><span class="p">(</span><span class="n">element</span><span class="p">,</span><span class="n">traverse_callback</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">finished</span><span class="p">)</span> <span class="k">exit</span>
+<span class="k">                </span><span class="n">element</span> <span class="o">=&gt;</span> <span class="n">element</span><span class="p">%</span><span class="n">next</span>
+            <span class="k">end do</span>
+<span class="k">        end if</span>
+<span class="k">        nullify</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+    <span class="k">end if</span>
+
+<span class="k">    end subroutine </span><span class="n">json_traverse</span>
 <span class="c">!*****************************************************************************************</span>
 
 <span class="c">!*****************************************************************************************</span>

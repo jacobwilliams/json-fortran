@@ -318,6 +318,8 @@
       
       <a class="list-group-item" href="../module/json_module.html#intr-array_callback_func">array_callback_func</a>
       
+      <a class="list-group-item" href="../module/json_module.html#intr-traverse_callback_func">traverse_callback_func</a>
+      
     </div>
   </div>
   
@@ -610,6 +612,8 @@
       <a class="list-group-item" href="../module/json_module.html#proc-wrap_json_get_string_vec_with_path">wrap_json_get_string_vec_with_path</a>
       
       <a class="list-group-item" href="../module/json_module.html#proc-json_get_array">json_get_array</a>
+      
+      <a class="list-group-item" href="../module/json_module.html#proc-json_traverse">json_traverse</a>
       
       <a class="list-group-item" href="../module/json_module.html#proc-json_get_array_with_path">json_get_array_with_path</a>
       
@@ -9839,13 +9843,6 @@ private  subroutine <a href='../proc/wrap_json_throw_exception.html'>wrap_json_t
     
   </h3></div>
   
-  <div class="panel-body">
-    
-
-
-    <p>Array element callback function.  Used by <a href="../proc/json_get_array.html">json_get_array</a>.</p>
-  </div>
-  
   <ul class="list-group">
     <li class="list-group-item">
     
@@ -9918,6 +9915,84 @@ private  subroutine <a href='../interface/array_callback_func.html'>array_callba
       
     
     
+    
+    <h4>Description</h4>
+       
+       <p>Array element callback function.  Used by <a href="../proc/json_get_array.html">json_get_array</a></p>
+        
+
+    </li>
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><a class="anchor" name="intr-traverse_callback_func"></a><h3>abstract interface
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    <li class="list-group-item">
+    
+    
+    <h3>
+private  subroutine <a href='../interface/traverse_callback_func.html'>traverse_callback_func</a>(p, finished)
+</h3>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><a class="anchor" name="var-p"></a>type(<a href='../type/json_value.html'>json_value</a>),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>p</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><a class="anchor" name="var-finished"></a>logical(kind=LK),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>finished</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+    
+    <h4>Description</h4>
+       
+       <p>Callback function used by <a href="../proc/json_traverse.html">json_traverse</a></p>
         
 
     </li>
@@ -21419,6 +21494,75 @@ private  subroutine <a href='../proc/json_get_array.html'>json_get_array</a>(me,
        
        <p>This routine calls the user-supplied <a href="../interface/array_callback_func.html">array_callback_func</a> subroutine
       for each element in the array.</p>
+        
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><a class="anchor" name="proc-json_traverse"></a><h3>
+public recursive subroutine <a href='../proc/json_traverse.html'>json_traverse</a>(me, traverse_callback)
+</h3></div>
+  <div class="panel-body">
+       
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><a class="anchor" name="var-me"></a>type(<a href='../type/json_value.html'>json_value</a>),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>me</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><a class="anchor" name="var-traverse_callback"></a>procedure(<a href='../interface/traverse_callback_func.html'>traverse_callback_func</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>traverse_callback</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+    
+    <h4>Description</h4>
+       
+       <p>Traverse a <abbr title="JavaScript Object Notation--A human friendly syntax for storing and exchanging data">JSON</abbr> structure.
+  This routine calls the user-specified <a href="../interface/traverse_callback_func.html">traverse_callback_func</a> 
+  for each element of the structure.</p>
         
 
   </div>
