@@ -456,17 +456,25 @@
     !*************************************************************************************
 
     !*************************************************************************************
-    !>
-    !  Array element callback function.  Used by [[json_get_array]].
-
     abstract interface
+    
         subroutine array_callback_func(element, i, count)
+            !! Array element callback function.  Used by [[json_get_array]]
             import :: json_value,IK
             implicit none
             type(json_value), pointer,intent(in) :: element
             integer(IK),intent(in) :: i        !index
             integer(IK),intent(in) :: count    !size of array
         end subroutine array_callback_func
+        
+        subroutine traverse_callback_func(p,finished)
+            !! Callback function used by [[json_traverse]]
+            import :: json_value,LK
+            implicit none
+            type(json_value),pointer,intent(in) :: p
+            logical(LK),intent(out)             :: finished
+        end subroutine traverse_callback_func
+       
     end interface
     !*************************************************************************************
 
@@ -827,6 +835,7 @@
     public :: json_remove                ! remove from a JSON structure
     public :: json_remove_if_present     ! remove from a JSON structure (if it is present)
     public :: json_update                ! update a value in a JSON structure
+    public :: json_traverse              ! to traverse all elements of a JSON structure
     public :: json_print_error_message   !
     public :: to_unicode                 ! Function to convert from 'DEFAULT' to 'ISO_10646' strings
 
@@ -4957,6 +4966,50 @@
     if (associated(element)) nullify(element)
 
     end subroutine json_get_array
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 09/02/2015
+!
+!  Traverse a JSON structure.
+!  This routine calls the user-specified [[traverse_callback_func]] 
+!  for each element of the structure.
+!
+    recursive subroutine json_traverse(me,traverse_callback)
+
+    implicit none
+
+    type(json_value),pointer,intent(in) :: me
+    procedure(traverse_callback_func)   :: traverse_callback
+
+    type(json_value),pointer :: element  !! a child element
+    integer(IK) :: i        !! counter
+    integer(IK) :: icount   !! number of children
+    logical(LK) :: finished !! can be used to stop the process
+
+    if (exception_thrown) return
+
+    call traverse_callback(me,finished) ! first call for this object
+    if (finished) return
+
+    !for arrays and objects, have to also call for all children:
+    if (me%var_type==json_array .or. me%var_type==json_object) then
+
+        icount = json_count(me) ! number of children
+        if (icount>0) then
+            element => me%children  ! first one
+            do i = 1, icount        ! call for each child
+                call json_traverse(element,traverse_callback)
+                if (finished) exit
+                element => element%next
+            end do
+        end if
+        nullify(element)
+
+    end if
+
+    end subroutine json_traverse
 !*****************************************************************************************
 
 !*****************************************************************************************
