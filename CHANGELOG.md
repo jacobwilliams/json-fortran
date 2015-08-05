@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [4.2.0 (2015-08-03)](#420-2015-08-03)
     - [4.1.1 (2015-05-27)](#411-2015-05-27)
     - [4.1.0 (2015-05-05)](#410-2015-05-05)
     - [4.0.0 (2015-03-16)](#400-2015-03-16)
@@ -14,10 +15,20 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.1.1...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.2.0...HEAD)
+
+### [4.2.0](https://github.com/jacobwilliams/json-fortran/tree/4.2.0) (2015-08-03)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.1.1...4.2.0)
+or [Download v4.2.0](https://github.com/jacobwilliams/json-fortran/releases/tag/4.2.0)
 
 **Enhancements**
 
+- The ```exception_thrown``` flag is now true by default before the ```json_initialize``` routine is called to initialize the module.  [\#142](https://github.com/jacobwilliams/json-fortran/issues/142) ([jacobwilliams](https://github.com/jacobwilliams))
+- Updated ```json_info``` to get name of ```json_value``` variable.
+[\#141](https://github.com/jacobwilliams/json-fortran/issues/141) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a new routine (```json_traverse```) to traverse all nodes of a JSON structure [\#140](https://github.com/jacobwilliams/json-fortran/issues/140)
+via [PR \#144](https://github.com/jacobwilliams/json-fortran/pull/144) from  ([jacobwilliams](https://github.com/jacobwilliams))
 - Added FORD documentation automatic deployment via
   [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
   from [zbeekman](https://github.com/zbeekman)
@@ -30,7 +41,7 @@
   [\#117](https://github.com/jacobwilliams/json-fortran/issues/117)
   via
   [PR \#137](https://github.com/jacobwilliams/json-fortran/pull/137)
-  from [zbeekman](https://github.com/zbeekman)
+  from [zbeekman](https://github.com/zbeekman), and [\#143](https://github.com/jacobwilliams/json-fortran/issues/143) from [jacobwilliams](https://github.com/jacobwilliams)
 - Removed official SCons support to facilitate faster development
   cycle,
   [\#121](https://github.com/jacobwilliams/json-fortran/issues/121)
@@ -92,7 +103,6 @@
   [Travis-CI](https://travis-ci.org/jacobwilliams/json-fortran) builds
   [\#130](https://github.com/jacobwilliams/json-fortran/pull/130)
   ([zbeekman](https://github.com/zbeekman))
-
 
 ### [4.1.1](https://github.com/jacobwilliams/json-fortran/tree/4.1.1) (2015-05-27)
 
