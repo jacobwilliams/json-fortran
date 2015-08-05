@@ -57,9 +57,10 @@ chage log can be found on the
 
 * For more information about JSON, see: <http://www.json.org/>
 
-*[API]: Application Programming Interface--a set of routines, protocols, and tools for building software applications
-*[JSON]: JavaScript Object Notation--A human friendly syntax for storing and exchanging data
+*[API]: Application Programming Interface: a set of routines, protocols, and tools for building software applications
+*[JSON]: JavaScript Object Notation: A human friendly syntax for storing and exchanging data
 *[current stable release]: {!__VERSION__!}
+*[latest stable release]: {!__VERSION__!}
 
 [^1]:
     Documentation for a particular release does not contain links
