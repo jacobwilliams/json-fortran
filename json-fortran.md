@@ -27,8 +27,8 @@ md_extensions: markdown.extensions.toc
 # Brief description
 
 A user-friendly and object-oriented API for reading and writing JSON files, written in
-modern Fortran (Fortran 2003+).  The source code is a single Fortran
-module file
+modern Fortran (Fortran 2003+).  The source code is
+[a single Fortran module](|url|/module/json_module.html) file
 ([json_module.F90](|url|/sourcefile/json_module.f90.html)).
 
 # License
