@@ -1018,8 +1018,15 @@
 !# Example
 !
 !```fortran
-!     type(json_file) :: f
-!     call f%load_file('my_file.json')
+!     program main
+!      use json_module
+!      implicit none
+!      type(json_file) :: f
+!      call json_initialize()
+!      call f%load_file('my_file.json')
+!      !...
+!      call f%destroy()
+!     end program main
 !```
 
     subroutine json_file_load(me, filename, unit)
@@ -1028,7 +1035,7 @@
 
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: filename  !! the filename to open
-    integer(IK),intent(in),optional      :: unit      !! the unit number to use
+    integer(IK),intent(in),optional      :: unit      !! the unit number to use (if not present, a newunit is used)
 
     call json_parse(file=filename, p=me%p, unit=unit)
 
@@ -1770,7 +1777,7 @@
         !call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)
         !call tracebackqq(-1) ! intel (requires "use ifcore" in this routine)
         write(*,'(A)') '***********************'
-   end if
+    end if
 
     end subroutine json_throw_exception
 !*****************************************************************************************

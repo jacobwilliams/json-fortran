@@ -1187,8 +1187,15 @@
 <span class="c">!# Example</span>
 <span class="c">!</span>
 <span class="c">!```fortran</span>
-<span class="c">!     type(json_file) :: f</span>
-<span class="c">!     call f%load_file(&#39;my_file.json&#39;)</span>
+<span class="c">!     program main</span>
+<span class="c">!      use json_module</span>
+<span class="c">!      implicit none</span>
+<span class="c">!      type(json_file) :: f</span>
+<span class="c">!      call json_initialize()</span>
+<span class="c">!      call f%load_file(&#39;my_file.json&#39;)</span>
+<span class="c">!      !...</span>
+<span class="c">!      call f%destroy()</span>
+<span class="c">!     end program main</span>
 <span class="c">!```</span>
 
     <span class="k">subroutine </span><span class="n">json_file_load</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
@@ -1197,7 +1204,7 @@
 
 <span class="k">    class</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">me</span>
     <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">filename</span>  <span class="c">!! the filename to open</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>      <span class="kd">::</span> <span class="n">unit</span>      <span class="c">!! the unit number to use</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>      <span class="kd">::</span> <span class="n">unit</span>      <span class="c">!! the unit number to use (if not present, a newunit is used)</span>
 
     <span class="k">call </span><span class="n">json_parse</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">me</span><span class="p">%</span><span class="n">p</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>
 
@@ -1939,7 +1946,7 @@
         <span class="c">!call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)</span>
         <span class="c">!call tracebackqq(-1) ! intel (requires &quot;use ifcore&quot; in this routine)</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span> <span class="s1">&#39;***********************&#39;</span>
-   <span class="k">end if</span>
+    <span class="k">end if</span>
 
 <span class="k">    end subroutine </span><span class="n">json_throw_exception</span>
 <span class="c">!*****************************************************************************************</span>

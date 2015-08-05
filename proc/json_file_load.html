@@ -610,7 +610,7 @@ private  subroutine json_file_load(me, filename, unit)
   <td>optional</td>
   
   <td></td><td>::</td>
-  <td><strong>unit</strong></td><td><p>the unit number to use</p></td>
+  <td><strong>unit</strong></td><td><p>the unit number to use (if not present, a newunit is used)</p></td>
   
 </tr>
 
@@ -623,8 +623,15 @@ private  subroutine json_file_load(me, filename, unit)
     <h3>Description</h3>
     <p>Load the <abbr title="JavaScript Object Notation--A human friendly syntax for storing and exchanging data">JSON</abbr> data from a file.</p>
 <h1 id="example">Example</h1>
-<div class="codehilite"><pre>     <span class="k">type</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
-     <span class="k">call </span><span class="n">f</span><span class="p">%</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;my_file.json&#39;</span><span class="p">)</span>
+<div class="codehilite"><pre>     <span class="k">program </span><span class="n">main</span>
+      <span class="k">use </span><span class="n">json_module</span>
+      <span class="k">implicit none</span>
+<span class="k">      type</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+      <span class="k">call </span><span class="n">json_initialize</span><span class="p">()</span>
+      <span class="k">call </span><span class="n">f</span><span class="p">%</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;my_file.json&#39;</span><span class="p">)</span>
+      <span class="c">!...</span>
+      <span class="k">call </span><span class="n">f</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+     <span class="k">end program </span><span class="n">main</span>
 </pre></div>
     
     <br>
@@ -650,7 +657,7 @@ private  subroutine json_file_load(me, filename, unit)
 
 <span class="k">    class</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">me</span>
     <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">filename</span>  <span class="c">!! the filename to open</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>      <span class="kd">::</span> <span class="n">unit</span>      <span class="c">!! the unit number to use</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>      <span class="kd">::</span> <span class="n">unit</span>      <span class="c">!! the unit number to use (if not present, a newunit is used)</span>
 
     <span class="k">call </span><span class="n">json_parse</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">me</span><span class="p">%</span><span class="n">p</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>
 
