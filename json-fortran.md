@@ -14,8 +14,6 @@ predocmark_alt: >
 predocmark: <
 docmark_alt:
 docmark: !
-exclude_dir: tests
-exclude_dir: introspection
 display: public
          protected
          private
