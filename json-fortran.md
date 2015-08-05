@@ -36,7 +36,7 @@ module file
 The JSON-Fortran source code and related files and documentation are
 distributed under a permissive free software license (BSD-style).  See
 the
-[LICENSE](|url|/page/development-resources/LICENSE.html)
+[LICENSE](http://jacobwilliams.github.io/json-fortran/page/development-resources/LICENSE.html)
 file for more details.
 
 # Official Releases
@@ -45,13 +45,13 @@ The **current stable release** is **{!__VERSION__!}** and can be [downloaded
 on GitHub](https://github.com/jacobwilliams/json-fortran/releases/latest)
 or installed with [Homebrew](http://brew.sh) on Mac OSX. The
 documentation for the current version, **{!__VERSION__!}**, can be
-found [here](|url|/page/releases/{!__VERSION__!}/index.html)[^1], and a
+found [here](http://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html)[^1], and a
 list of changes from the previous version are
-[here](|url|/page/releases/index.html#change-log).
+[here](http://jacobwilliams.github.io/json-fortran/page/releases/index.html#change-log).
 
 A list of all past releases, links to their documentation, and the
 chage log can be found on the
-[releases page](|url|/page/releases/index.html).
+[releases page](http://jacobwilliams.github.io/json-fortran/page/releases/index.html).
 
 # Miscellaneous
 
@@ -64,4 +64,4 @@ chage log can be found on the
 [^1]:
     Documentation for a particular release does not contain links
     back to *general* documentation; use the browser's back button to
-    navigate back to <https://jacobwilliams.github.io/json-fortran/>
+    navigate back to <http://jacobwilliams.github.io/json-fortran/>
