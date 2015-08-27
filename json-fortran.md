@@ -18,7 +18,6 @@ display: public
          protected
          private
 source: true
-graph: true
 extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
 md_extensions: markdown.extensions.toc
                markdown.extensions.smarty(smart_quotes=False)
