@@ -1,4 +1,4 @@
-title: Additional Documentation
+title: Other Docs
 
 # Current Stable Release
 
