@@ -505,6 +505,15 @@
 
     !*************************************************************************************
     !>
+    !  Get the parent.
+    !  Returns a [[json_value]] pointer.
+    interface json_get_parent
+        module procedure json_value_get_parent
+    end interface json_get_parent
+    !*************************************************************************************
+
+    !*************************************************************************************
+    !>
     !  Add objects to a linked list of [[json_value]]s.
     !
     !@note Formerly, this was called json_value_add
@@ -827,6 +836,7 @@
     public :: json_failed                ! check for error
     public :: json_get                   ! get data from the JSON structure
     public :: json_get_child             ! get a child of a json_value
+    public :: json_get_parent            ! get the parent of a json_value
     public :: json_info                  ! get info about a json_value
     public :: json_initialize            ! to initialize the module
     public :: json_parse                 ! read a JSON file and populate the structure
@@ -3236,7 +3246,30 @@
 
     count = me%n_children
 
-    end function json_count
+	end function json_count
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 10/16/2015
+!
+!  Returns a pointer to the parent of a [[json_value]].
+!  If there is no parent, then a null() pointer is returned.
+
+    subroutine json_value_get_parent(me,p)
+
+    implicit none
+
+    type(json_value),pointer,intent(in) :: me   !! JSON object
+    type(json_value),pointer            :: p    !! pointer to the parent
+    
+    if (associated(me%parent)) then
+        p => me%parent
+    else
+        p => null()
+    end if
+    
+    end subroutine json_value_get_parent
 !*****************************************************************************************
 
 !*****************************************************************************************
