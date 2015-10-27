@@ -259,14 +259,21 @@
     !
     !  The types of JSON data.
     !
-    integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_null      = 1  !! Null JSON data type (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_object    = 2  !! Object JSON data type (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_array     = 3  !! Array JSON data type (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_integer   = 5  !! Integer JSON data type (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_double    = 6  !! Double JSON data type (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_string    = 7  !! String JSON data type (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type 
+	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_null      = 1  !! Null JSON data type
+	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_object    = 2  !! Object JSON data type
+	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_array     = 3  !! Array JSON data type
+	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type 
+	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_integer   = 5  !! Integer JSON data type
+	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_double    = 6  !! Double JSON data type
+	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter,public :: json_string    = 7  !! String JSON data type
     !*********************************************************
 
     !*********************************************************
@@ -916,8 +923,9 @@
     !
 
     !exception handling [private variables]
-    logical(LK) :: is_verbose = .false.                 !! if true, all exceptions are immediately printed to console
-    logical(LK) :: exception_thrown = .true.            !! the error flag (by default, this is true to make sure that [[json_initialize]] is called.
+    logical(LK) :: is_verbose = .false.        !! if true, all exceptions are immediately printed to console
+    logical(LK) :: exception_thrown = .true.   !! the error flag (by default, this is true to 
+	                                           !! make sure that [[json_initialize]] is called.
     character(kind=CK,len=:),allocatable :: err_message !! the error message
 
     !temp vars used when parsing lines in file [private variables]
@@ -1668,10 +1676,10 @@
 
     implicit none
 
-    logical(LK),intent(in),optional               :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional               :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional               :: print_signs   !! always print numeric sign (default is false)
-    character(len=*,kind=CDK),intent(in),optional :: real_format   !! exponential (default), scientific, engineering or general
+    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
+    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
+    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
+    character(len=*,kind=CDK),intent(in),optional :: real_format !! exponential (default), scientific, engineering or general
 
     character(kind=CDK,len=10) :: w,d,e
     character(kind=CDK,len=2)  :: sgn, rl_edit_desc
@@ -3246,7 +3254,7 @@
 
     count = me%n_children
 
-	end function json_count
+    end function json_count
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3754,6 +3762,9 @@
 
     character(kind=CK,len=1),parameter :: start_array_alt = '('
     character(kind=CK,len=1),parameter :: end_array_alt   = ')'
+    character(kind=CK,len=1),parameter :: root            = '$'
+    character(kind=CK,len=1),parameter :: this            = '@'
+    character(kind=CK,len=1),parameter :: child           = '.'
 
     integer(IK)              :: i,length,child_i
     character(kind=CK,len=1) :: c
@@ -3778,7 +3789,7 @@
             c = path(i:i)
 
             select case (c)
-            case (CK_'$')
+            case (root)
 
                 ! root
                 do while (associated (p%parent))
@@ -3786,13 +3797,13 @@
                 end do
                 child_i = i + 1
 
-            case (CK_'@')
+            case (this)
 
                 ! this
                 p => me
                 child_i = i + 1
 
-            case (CK_'.')
+            case (child)
 
                 ! get child member from p
                 if (child_i < i) then
