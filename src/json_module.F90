@@ -260,19 +260,19 @@
     !  The types of JSON data.
     !
     integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type 
-	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+                                                        !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_null      = 1  !! Null JSON data type
-	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+                                                        !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_object    = 2  !! Object JSON data type
-	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+                                                        !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_array     = 3  !! Array JSON data type
-	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+                                                        !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type 
-	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+                                                        !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_integer   = 5  !! Integer JSON data type
-	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+                                                        !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_double    = 6  !! Double JSON data type
-	                                                    !! (see [[json_file_variable_info]] and [[json_info]])
+                                                        !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_string    = 7  !! String JSON data type
     !*********************************************************
 
@@ -914,7 +914,7 @@
     integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6  
     !! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
     character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !! minimum width format for integers
-    character(kind=CK, len=*),parameter :: star     = '*'       !! for invalid numbers
+    character(kind=CK, len=*),parameter :: star     = '*' !! for invalid numbers and list-directed real output
     character(kind=CDK,len=:),allocatable :: real_fmt  !! the format string to use for real numbers
                                                        !! it is set in [[json_initialize]]
 
@@ -925,7 +925,7 @@
     !exception handling [private variables]
     logical(LK) :: is_verbose = .false.        !! if true, all exceptions are immediately printed to console
     logical(LK) :: exception_thrown = .true.   !! the error flag (by default, this is true to 
-	                                           !! make sure that [[json_initialize]] is called.
+                                               !! make sure that [[json_initialize]] is called.
     character(kind=CK,len=:),allocatable :: err_message !! the error message
 
     !temp vars used when parsing lines in file [private variables]
@@ -1717,6 +1717,16 @@
           present(compact_reals)     .or. &
           present(print_signs)       .or. &
           present(real_format) ) then
+        
+        !allow the special case where real format is '*':
+        ! [this overrides the other options]
+        if (present(real_format)) then
+            if (real_format==star) then
+                compact_real = .false.
+                real_fmt = star
+                return
+            end if
+        end if
 
         if (present(compact_reals)) compact_real = compact_reals  
 
@@ -3971,6 +3981,11 @@
 !  date: 1/19/2014
 !
 !  Convert a string into a double.
+!
+!# History
+!  * Jacob Williams, 10/27/2015 : Now using fmt=*, rather than
+!    fmt=real_fmt, since it doesn't work for some unusual cases
+!    (e.g., when str='1E-5').
 
     function string_to_double(str) result(rval)
 
@@ -3982,15 +3997,16 @@
     integer(IK) :: ierr
 
     if (.not. exception_thrown) then
-
-        read(str,fmt=real_fmt,iostat=ierr) rval    !string to double
-
+                
+        !string to double
+        read(str,fmt=*,iostat=ierr) rval    
+        
         if (ierr/=0) then    !if there was an error
             rval = 0.0_RK
             call throw_exception('Error in string_to_double:'//&
                                  ' string cannot be converted to a double: '//trim(str))
         end if
-
+        
     end if
 
     end function string_to_double
@@ -6652,6 +6668,7 @@
 !
 !# Modified
 !  * Izaak Beekman : 02/24/2015 : added the compact option.
+!  * Jacob Williams : 10/27/2015 : added the star option.
 
     subroutine real_to_string(rval,str)
 
@@ -6662,8 +6679,11 @@
 
     integer(IK) :: istat
 
-    !default format:
-    write(str,fmt=real_fmt,iostat=istat) rval
+    if (real_fmt==star) then
+        write(str,fmt=*,iostat=istat) rval
+    else
+        write(str,fmt=real_fmt,iostat=istat) rval
+    end if
 
     if (istat==0) then
 
