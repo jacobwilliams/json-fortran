@@ -25,7 +25,8 @@ contains
     character(kind=CK,len=:),allocatable :: str
     integer :: i
     
-    character(len=2),dimension(4),parameter :: fmts=['g ','e ','en','es'] !! format statements to test
+    character(len=2),dimension(5),parameter :: fmts=['g ','e ','en','es','* ']
+        !! format statements to test
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
