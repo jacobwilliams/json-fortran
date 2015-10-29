@@ -37,6 +37,17 @@ contains
     write(error_unit,'(A)') ''
 
     error_cnt = 0
+    
+    nullify(json)
+    nullify(p)
+    
+    call json_parse(json, '{"int": 1, "real": 2.0, "logical": true}')
+    call json_get(json,'real',   i)
+    call json_get(json,'logical',i)
+    call json_get(json,'integer',d)
+    call json_get(json,'logical',d)
+    call json_get(json,'integer',tf)
+    call json_get(json,'real',   tf)
         
     call json_check_for_errors(status_ok, error_msg)  !error condition true
     
@@ -65,15 +76,7 @@ contains
     call json_print(json,-1) !invalid input
     call json_print(json,filename='') !invalid input
 
-    call json_initialize()  !clear exceptions
-        
-    call json_parse(json, '{"int": 1, "real": 2.0, "logical": true}')
-    call json_get(json,'real',   i)
-    call json_get(json,'logical',i)
-    call json_get(json,'integer',d)
-    call json_get(json,'logical',d)
-    call json_get(json,'integer',tf)
-    call json_get(json,'real',   tf)
+    call json_initialize()  !clear exceptions        
             
     end subroutine test_15
 
