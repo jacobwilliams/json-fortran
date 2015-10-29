@@ -25,7 +25,7 @@ contains
 
     integer,intent(out) :: error_cnt
 
-    type(json_value),pointer    :: p, inp, traj
+    type(json_value),pointer    :: p, inp, traj, tmp1, tmp2
 
     integer :: iunit
 
@@ -64,6 +64,10 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+    
+    !test get_parent:
+    call json_get_parent(inp,tmp1)  !will be root
+    call json_get_parent(tmp1,tmp2) !has no parent -> null()
 
     !trajectory structure:
     call json_create_array(traj,'trajectory')    !an array
