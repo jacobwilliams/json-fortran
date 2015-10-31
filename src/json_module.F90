@@ -1004,7 +1004,8 @@
         allocate(to)
         
         !copy over the data variables:
-        
+        ! [note: the allocate() statements don't work here for the 
+        !  deferred-length characters in gfortran-4.9]
         if (allocated(from%name))      to%name = from%name
         if (allocated(from%dbl_value)) allocate(to%dbl_value,source=from%dbl_value)
         if (allocated(from%log_value)) allocate(to%log_value,source=from%log_value)
