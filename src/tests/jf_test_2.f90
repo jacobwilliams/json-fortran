@@ -25,9 +25,12 @@ contains
 
     integer,intent(out) :: error_cnt
 
-    type(json_value),pointer    :: p, inp, traj
+    type(json_value),pointer :: p, inp, traj, p_tmp, p_integer_array, p_clone
 
     integer :: iunit
+    character(len=:),allocatable :: name
+    integer :: ival,ival_clone
+    logical :: found
 
     error_cnt = 0
     call json_initialize()
@@ -144,6 +147,101 @@ contains
         error_cnt = error_cnt + 1
     end if
     close(iunit)
+    
+    !test the deep copy routine:
+    
+    write(error_unit,'(A)') 'json_clone test'
+    call json_clone(p,p_clone)
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else        
+        !now, change one and verify that they are independent:
+        call json_update(p_clone,'inputs.integer_scalar',100,found)
+        call json_get(p,'inputs.integer_scalar',ival)
+        call json_get(p_clone,'inputs.integer_scalar',ival_clone)
+        if (json_failed()) then
+            call json_print_error_message(error_unit)
+            error_cnt = error_cnt + 1
+        else
+            if (ival==1 .and. ival_clone==100) then
+                write(error_unit,'(A)') 'json_clone ... passed'
+            else
+                write(error_unit,'(A)') 'Error: ival /= ival_clone'
+                error_cnt = error_cnt + 1
+            end if
+        end if
+    end if
+    
+    !test some of the pointer routines:
+    write(error_unit,'(A)') 'Pointer routine tests'
+    call json_get(p,'inputs.integer_array',p_integer_array)
+    if (json_failed()) then
+        call json_print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+    
+        !get parent test:
+        call json_get_parent(p_integer_array,p_tmp)  !should be "inputs"
+        call json_info(p_tmp,name=name)
+        if (json_failed()) then
+            call json_print_error_message(error_unit)
+            error_cnt = error_cnt + 1
+        else
+            if (name=='inputs') then
+                write(error_unit,'(A)') 'json_get_parent ... passed'
+            else
+                write(error_unit,'(A)') 'Error: parent should be "inputs", is actually: '//trim(name)
+                error_cnt = error_cnt + 1
+            end if
+        end if
+        
+        !get next test:
+        call json_get_next(p_integer_array,p_tmp)  !should be "names"
+        call json_info(p_tmp,name=name)
+        if (json_failed()) then
+            call json_print_error_message(error_unit)
+            error_cnt = error_cnt + 1
+        else
+            if (name=='names') then
+                write(error_unit,'(A)') 'json_get_next ... passed'
+            else
+                write(error_unit,'(A)') 'Error: next should be "names", is actually: '//trim(name)
+                error_cnt = error_cnt + 1
+            end if
+        end if
+        
+        !get previous test:
+        call json_get_previous(p_integer_array,p_tmp)  !should be "integer_scalar"
+        call json_info(p_tmp,name=name)
+        if (json_failed()) then
+            call json_print_error_message(error_unit)
+            error_cnt = error_cnt + 1
+        else
+            if (name=='integer_scalar') then
+                write(error_unit,'(A)') 'json_get_previous ... passed'
+            else
+                write(error_unit,'(A)') 'Error: next should be "integer_scalar", is actually: '//trim(name)
+                error_cnt = error_cnt + 1
+            end if
+        end if
+
+        !get tail test:
+        call json_get_tail(p_integer_array,p_tmp)  !should be 99, the last element in the array
+        call json_get(p_tmp,ival)
+        if (json_failed()) then
+            call json_print_error_message(error_unit)
+            error_cnt = error_cnt + 1
+        else
+            if (ival==99) then
+                write(error_unit,'(A)') 'json_get_tail ... passed'
+            else
+                write(error_unit,'(A,1X,I5)') 'Error: tail value should be 99, is actually: ',ival
+                error_cnt = error_cnt + 1
+            end if
+        end if
+
+    end if
 
     !cleanup:
     call json_destroy(p)

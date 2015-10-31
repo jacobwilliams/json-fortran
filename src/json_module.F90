@@ -512,15 +512,6 @@
 
     !*************************************************************************************
     !>
-    !  Get the parent.
-    !  Returns a [[json_value]] pointer.
-    interface json_get_parent
-        module procedure json_value_get_parent
-    end interface json_get_parent
-    !*************************************************************************************
-
-    !*************************************************************************************
-    !>
     !  Add objects to a linked list of [[json_value]]s.
     !
     !@note Formerly, this was called json_value_add
@@ -677,7 +668,7 @@
         module procedure MAYBEWRAP(json_value_remove_if_present)
     end interface
     !*************************************************************************************
-
+  
     !*************************************************************************************
     !>
     !  Allocate a [[json_value]] pointer and make it a double variable.
@@ -840,10 +831,14 @@
     public :: json_create_object         ! allocate a json_value object
     public :: json_create_string         ! allocate a json_value string
     public :: json_destroy               ! clear a JSON structure (destructor)
+    public :: json_clone                 ! clone a JSON structure (deep copy)
     public :: json_failed                ! check for error
     public :: json_get                   ! get data from the JSON structure
     public :: json_get_child             ! get a child of a json_value
-    public :: json_get_parent            ! get the parent of a json_value
+    public :: json_get_parent            ! get pointer to json_value parent
+    public :: json_get_next              ! get pointer to json_value next
+    public :: json_get_previous          ! get pointer to json_value previous
+    public :: json_get_tail              ! get pointer to json_value tail
     public :: json_info                  ! get info about a json_value
     public :: json_initialize            ! to initialize the module
     public :: json_parse                 ! read a JSON file and populate the structure
@@ -945,6 +940,112 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!> author: Jacob Williams
+!  date: 10/31/2015
+!
+!  Create a deep copy of a [[json_value]] linked-list structure.
+!
+!# Example
+!
+!```fortran
+!    program test
+!     use json_module
+!     implicit none
+!     type(json_value),pointer :: j1, j2
+!     call json_initialize()
+!     call json_parse('../files/inputs/test1.json',j1)
+!     call json_clone(j1,j2) !now have two independent copies
+!     call json_destroy(j1)  !destroys j1, but j2 remains
+!     call json_print(j2,'j2.json')
+!     call json_destroy(j2)
+!    end program test
+!```
+
+    subroutine json_clone(from,to)
+
+    implicit none
+
+    type(json_value),pointer :: from  !! this is the structure to clone
+    type(json_value),pointer :: to    !! the clone is put here 
+                                      !! (it must not already be associated)
+    
+    !call the main function:
+    call json_value_clone_func(from,to)   
+                                      
+    end subroutine json_clone
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 10/31/2015
+!
+!  Recursive deep copy function called by [[json_clone]].
+!
+!@note If new data is added to the [[json_value]] type, 
+!      then this would need to be updated.
+    
+    recursive subroutine json_value_clone_func(from,to,parent,previous,next,children,tail)
+
+    implicit none
+
+    type(json_value),pointer          :: from     !! this is the structure to clone
+    type(json_value),pointer          :: to       !! the clone is put here 
+                                                  !! (it must not already be associated)
+    type(json_value),pointer,optional :: parent   !! to%parent
+    type(json_value),pointer,optional :: previous !! to%previous
+    type(json_value),pointer,optional :: next     !! to%next
+    type(json_value),pointer,optional :: children !! to%children
+    logical,optional                  :: tail     !! if "to" is the tail of its parent's children
+    
+    nullify(to)
+
+    if (associated(from)) then
+    
+        allocate(to)
+        
+        !copy over the data variables:
+        
+        if (allocated(from%name))      allocate(to%name,     source=from%name)
+        if (allocated(from%dbl_value)) allocate(to%dbl_value,source=from%dbl_value)
+        if (allocated(from%log_value)) allocate(to%log_value,source=from%log_value)
+        if (allocated(from%str_value)) allocate(to%str_value,source=from%str_value)
+        if (allocated(from%int_value)) allocate(to%int_value,source=from%int_value)
+        to%var_type   = from%var_type
+        to%n_children = from%n_children
+        
+        !allocate and associate the pointers as necessary:
+        
+        if (present(parent))      to%parent      => parent
+        if (present(previous))    to%previous    => previous
+        if (present(next))        to%next        => next
+        if (present(children))    to%children    => children
+        if (present(tail)) then
+            if (tail) to%parent%tail => to
+        end if
+        
+        if (associated(from%next)) then
+            allocate(to%next)
+            call json_value_clone_func(from%next,&
+                                       to%next,&
+                                       previous=to,&
+                                       parent=to%parent,&
+                                       tail=(.not. associated(from%next%next)))
+        end if
+
+        if (associated(from%children)) then
+            allocate(to%children)
+            call json_value_clone_func(from%children,&
+                                       to%children,&
+                                       parent=to,&
+                                       tail=(.not. associated(from%children%next))) 
+        end if
+        
+    end if
+
+    end subroutine json_value_clone_func
+!*****************************************************************************************
+
+!*****************************************************************************************
 !> author: Izaak Beekman
 !  date: 07/23/2015
 !
@@ -954,8 +1055,8 @@
     
     implicit none
     
-    type(json_value), pointer, optional, intent(in) :: p    !! `json_value` object to cast
-                                                            !! as a `json_file` object
+    type(json_value),pointer,optional,intent(in) :: p  !! `json_value` object to cast
+                                                       !! as a `json_file` object
     type(json_file) :: file_object
 
     if (present(p)) file_object%p => p
@@ -3274,20 +3375,73 @@
 !  Returns a pointer to the parent of a [[json_value]].
 !  If there is no parent, then a null() pointer is returned.
 
-    subroutine json_value_get_parent(me,p)
+    subroutine json_get_parent(me,p)
 
     implicit none
 
     type(json_value),pointer,intent(in) :: me   !! JSON object
-    type(json_value),pointer            :: p    !! pointer to the parent
+    type(json_value),pointer,intent(out) :: p   !! pointer to parent
     
-    if (associated(me%parent)) then
-        p => me%parent
-    else
-        p => null()
-    end if
+    p => me%parent
     
-    end subroutine json_value_get_parent
+    end subroutine json_get_parent
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 10/31/2015
+!
+!  Returns a pointer to the next of a [[json_value]].
+!  If there is no next, then a null() pointer is returned.
+
+    subroutine json_get_next(me,p)
+
+    implicit none
+
+    type(json_value),pointer,intent(in)  :: me   !! JSON object
+    type(json_value),pointer,intent(out) :: p    !! pointer to next
+    
+    p => me%next
+    
+    end subroutine json_get_next
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 10/31/2015
+!
+!  Returns a pointer to the previous of a [[json_value]].
+!  If there is no previous, then a null() pointer is returned.
+
+    subroutine json_get_previous(me,p)
+
+    implicit none
+
+    type(json_value),pointer,intent(in)  :: me   !! JSON object
+    type(json_value),pointer,intent(out) :: p    !! pointer to previous
+    
+    p => me%previous
+    
+    end subroutine json_get_previous
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 10/31/2015
+!
+!  Returns a pointer to the tail of a [[json_value]].
+!  If there is no tail, then a null() pointer is returned.
+
+    subroutine json_get_tail(me,p)
+
+    implicit none
+
+    type(json_value),pointer,intent(in) :: me    !! JSON object
+    type(json_value),pointer,intent(out) :: p    !! pointer to tail
+    
+    p => me%tail
+    
+    end subroutine json_get_tail
 !*****************************************************************************************
 
 !*****************************************************************************************
