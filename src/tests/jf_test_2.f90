@@ -152,6 +152,18 @@ contains
     
     write(error_unit,'(A)') 'json_clone test'
     call json_clone(p,p_clone)
+    
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '============='
+    write(error_unit,'(A)') ' p_clone'
+    write(error_unit,'(A)') '============='
+    call json_print(p_clone,error_unit)
+    write(error_unit,'(A)') '============='
+    write(error_unit,'(A)') ''
+    
+    if (.not. associated(p)) write(error_unit,'(A)') 'ERROR: p has become unassociated'
+    if (.not. associated(p_clone)) write(error_unit,'(A)') 'ERROR: p_clone is not associated'
+    
     if (json_failed()) then
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
