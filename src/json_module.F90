@@ -1005,10 +1005,10 @@
         
         !copy over the data variables:
         
-        if (allocated(from%name))      allocate(to%name,     source=from%name)
+        if (allocated(from%name))      to%name = from%name
         if (allocated(from%dbl_value)) allocate(to%dbl_value,source=from%dbl_value)
         if (allocated(from%log_value)) allocate(to%log_value,source=from%log_value)
-        if (allocated(from%str_value)) allocate(to%str_value,source=from%str_value)
+        if (allocated(from%str_value)) to%str_value = from%str_value
         if (allocated(from%int_value)) allocate(to%int_value,source=from%int_value)
         to%var_type   = from%var_type
         to%n_children = from%n_children
