@@ -28,7 +28,7 @@ contains
     type(json_value),pointer :: p, inp, traj, p_tmp, p_integer_array, p_clone
 
     integer :: iunit
-    character(len=:),allocatable :: name
+    character(kind=CK,len=:),allocatable :: name
     integer :: ival,ival_clone
     logical :: found
 
