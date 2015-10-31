@@ -158,8 +158,11 @@ contains
     else        
         !now, change one and verify that they are independent:
         call json_update(p_clone,'inputs.integer_scalar',100,found)
+        if (json_failed()) write(error_unit,'(A)') 'json_update Error for p_clone'
         call json_get(p,'inputs.integer_scalar',ival)
+        if (json_failed()) write(error_unit,'(A)') 'json_get Error for p'
         call json_get(p_clone,'inputs.integer_scalar',ival_clone)
+        if (json_failed()) write(error_unit,'(A)') 'json_get Error for p_clone'
         if (json_failed()) then
             call json_print_error_message(error_unit)
             error_cnt = error_cnt + 1
