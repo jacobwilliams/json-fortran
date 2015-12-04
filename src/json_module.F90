@@ -4797,156 +4797,162 @@
     type(json_value),pointer,intent(in)              :: me
     character(kind=CK,len=:),allocatable,intent(out) :: value
 
-    character(kind=CK ,len=:),allocatable :: s,pre,post
-    integer(IK) :: j,jprev,n
-    character(kind=CK,len=1) :: c
-
     value = ''
-    if ( exception_thrown) return
+    if (.not. exception_thrown) then
 
-    select case (me%var_type)
+        select case (me%var_type)
 
-    case (json_string)
+        case (json_string)
 
-        if (allocated(me%str_value)) then
+            if (allocated(me%str_value)) then
+                call unescape_string(me%str_value, value)
+            else
+               call throw_exception('Error in json_get_string:'//&
+                    ' me%str_value not allocated')
+            end if
 
-            !get the value as is:
-            s = me%str_value
+        case default
 
-            ! Now, have to remove the escape characters:
-            !
-            ! '\"'        quotation mark
-            ! '\\'        reverse solidus
-            ! '\/'        solidus
-            ! '\b'        backspace
-            ! '\f'        formfeed
-            ! '\n'        newline (LF)
-            ! '\r'        carriage return (CR)
-            ! '\t'        horizontal tab
-            ! '\uXXXX'    4 hexadecimal digits
-            !
+            call throw_exception('Error in json_get_string:'//&
+                 ' Unable to resolve value to characters: '//me%name)
 
-            !initialize:
-            n = len(s)
-            j = 1
+            ! Note: for the other cases, we could do val to string conversions.
 
-            do
+        end select
 
-                jprev = j                      !initialize
-                j = index(s(j:n),backslash)    !look for an escape character
+    end if
 
-                if (j>0) then            !an escape character was found
+    end subroutine json_get_string
+!*****************************************************************************************
 
-                    !index in full string of the escape character:
-                    j = j + (jprev-1)
+!*****************************************************************************************
+!>
+!  Remove the escape characters from a JSON string and return it.
+!
+!  The escaped characters are denoted by the '\' character:
+!````
+!    '\"'        quotation mark
+!    '\\'        reverse solidus
+!    '\/'        solidus
+!    '\b'        backspace
+!    '\f'        formfeed
+!    '\n'        newline (LF)
+!    '\r'        carriage return (CR)
+!    '\t'        horizontal tab
+!    '\uXXXX'    4 hexadecimal digits
+!````
 
-                    if (j<n) then
+    subroutine unescape_string(str_in, str_out)
 
-                        !save the bit before the escape character:
-                        if (j>1) then
-                            pre = s( 1 : j-1 )
+    implicit none
+
+    character(kind=CK,len=*),intent(in)              :: str_in  !! string as stored in a [[json_value]]
+    character(kind=CK,len=:),allocatable,intent(out) :: str_out !! decoded string
+
+    integer :: i   !! counter
+    integer :: n   !! length of str_in
+    integer :: m   !! length of str_out
+    character(kind=CK,len=1) :: c  !! for scanning each character in string
+
+    if (scan(str_in,backslash)>0) then
+
+        !there is at least one escape character, so process this string:
+
+        n = len(str_in)
+        str_out = repeat(space,n) !size the output string (will be trimmed later)
+        m = 0  !counter in str_out
+        i = 0  !counter in str_in
+
+        do
+
+            i = i + 1
+            if (i>n) exit ! finished
+            c = str_in(i:i) ! get next character in the string
+
+            if (c == backslash) then
+
+                if (i<n) then
+
+                    i = i + 1
+                    c = str_in(i:i) !character after the escape
+
+                    if (any(c == [quotation_mark,backslash,slash, &
+                         to_unicode(['b','f','n','r','t'])])) then
+
+                        select case(c)
+                        case (quotation_mark,backslash,slash)
+                            !use d as is
+                        case (CK_'b')
+                             c = bspace
+                        case (CK_'f')
+                             c = formfeed
+                        case (CK_'n')
+                             c = newline
+                        case (CK_'r')
+                             c = carriage_return
+                        case (CK_'t')
+                             c = horizontal_tab
+                        end select
+
+                        m = m + 1
+                        str_out(m:m) = c
+
+                    else if (c == 'u') then !expecting 4 hexadecimal digits after
+                                            !the escape character    [\uXXXX]
+
+                        !for now, we are just returning them as is
+                        ![not checking to see if it is a valid hex value]
+                        !
+                        ! Example:
+                        !   123456
+                        !   \uXXXX
+
+                        if (i+4<=n) then
+                            m = m + 1
+                            str_out(m:m+5) = str_in(i-1:i+4)
+                            i = i + 4
+                            m = m + 5
                         else
-                            pre = ''
-                        end if
-
-                        !character after the escape character:
-                        c = s( j+1 : j+1 )
-
-                        if (any(c == [quotation_mark,backslash,slash, &
-                             to_unicode(['b','f','n','r','t'])])) then
-
-                            !save the bit after the escape characters:
-                            if (j+2<n) then
-                                 post = s(j+2:n)
-                            else
-                                 post = ''
-                            end if
-
-                            select case(c)
-                            case (quotation_mark,backslash,slash)
-                                !use c as is
-                            case (CK_'b')
-                                 c = bspace
-                            case (CK_'f')
-                                 c = formfeed
-                            case (CK_'n')
-                                 c = newline
-                            case (CK_'r')
-                                 c = carriage_return
-                            case (CK_'t')
-                                 c = horizontal_tab
-                            end select
-
-                            s = pre//c//post
-
-                            n = n-1    !backslash character has been
-                                       ! removed from the string
-
-                        else if (c == 'u') then !expecting 4 hexadecimal digits after
-                                                !the escape character    [\uXXXX]
-
-                            !for now, we are just printing them as is
-                            ![not checking to see if it is a valid hex value]
-
-                            if (j+5<=n) then
-                                j=j+4
-                            else
-                                call throw_exception('Error in json_get_string:'//&
-                                                     ' Invalid hexadecimal sequence'//&
-                                                     ' in string: '//trim(c))
-                                exit
-                            end if
-
-                        else
-                            !unknown escape character
                             call throw_exception('Error in json_get_string:'//&
-                                                 ' unknown escape sequence in string "'//&
-                                                 trim(s)//'" ['//backslash//c//']')
-                            exit
+                                                 ' Invalid hexadecimal sequence'//&
+                                                 ' in string: '//str_in(i-1:))
+                            str_out = ''
+                            return
                         end if
-
-                        j=j+1    !go to the next character
-
-                        if (j>=n) exit    !finished
 
                     else
-                        !an escape character is the last character in
-                        ! the string [this may not be valid syntax,
-                        ! but just keep it]
-                        exit
+                        !unknown escape character
+                        call throw_exception('Error in json_get_string:'//&
+                                             ' unknown escape sequence in string "'//&
+                                             trim(str_in)//'" ['//backslash//c//']')
+                        str_out = ''
+                        return
                     end if
 
                 else
-                    exit    !no more escape characters in the string
+                    !an escape character is the last character in
+                    ! the string [this may not be valid syntax,
+                    ! but just keep it]
+                    m = m + 1
+                    str_out(m:m) = c
                 end if
 
-            end do
-
-            if (exception_thrown) then
-               if (allocated(value)) deallocate(value)
             else
-               value = s
+                m = m + 1
+                str_out(m:m) = c
             end if
 
-        else
-           call throw_exception('Error in json_get_string:'//&
-                ' me%value not allocated')
-        end if
+        end do
 
-    case default
-        call throw_exception('Error in json_get_string:'//&
-             ' Unable to resolve value to characters: '//me%name)
+        !trim trailing space:
+        str_out = str_out(1:m)
 
-        ! Note: for the other cases, we could do val to string conversions.
+    else
+        !there are no escape characters, so return as is:
+        str_out = str_in
+    end if
 
-    end select
-
-    !cleanup:
-    if (allocated(s)) deallocate(s)
-    if (allocated(pre)) deallocate(pre)
-    if (allocated(post)) deallocate(post)
-
-    end subroutine json_get_string
+    end subroutine unescape_string
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -6383,6 +6389,7 @@
 !
 !# History
 !  * Jacob Williams : 6/16/2014 : Added hex validation.
+!  * Jacob Williams : 12/3/2015 : Fixed some bugs.
 
     subroutine parse_string(unit, str, string)
 
@@ -6393,7 +6400,7 @@
     character(kind=CK,len=:),allocatable,intent(out) :: string
 
     logical(LK) :: eof, is_hex, escape
-    character(kind=CK,len=1) :: c, last
+    character(kind=CK,len=1) :: c
     character(kind=CK,len=4) :: hex
     integer(IK) :: i
     integer(IK) :: ip !! index to put next character,
@@ -6406,7 +6413,6 @@
 
         !initialize:
         ip     = 1
-        last   = space
         is_hex = .false.
         escape = .false.
         i      = 0
@@ -6421,7 +6427,7 @@
                 call throw_exception('Error in parse_string: Expecting end of string')
                 return
 
-            else if (c==quotation_mark .and. last /= backslash) then
+            else if (c==quotation_mark .and. .not. escape) then  !end of string
 
                 if (is_hex) call throw_exception('Error in parse_string:'//&
                                                  ' incomplete hex string: \u'//trim(hex))
@@ -6465,9 +6471,6 @@
                     end if
 
                 end if
-
-                !update for next char:
-                last = c
 
             end if
 
