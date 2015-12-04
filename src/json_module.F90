@@ -259,7 +259,7 @@
     !
     !  The types of JSON data.
     !
-    integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type 
+    integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_null      = 1  !! Null JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
@@ -267,7 +267,7 @@
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_array     = 3  !! Array JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type 
+    integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_integer   = 5  !! Integer JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
@@ -464,7 +464,7 @@
 
     !*************************************************************************************
     abstract interface
-    
+
         subroutine array_callback_func(element, i, count)
             !! Array element callback function.  Used by [[json_get_array]]
             import :: json_value,IK
@@ -473,7 +473,7 @@
             integer(IK),intent(in) :: i        !index
             integer(IK),intent(in) :: count    !size of array
         end subroutine array_callback_func
-        
+
         subroutine traverse_callback_func(p,finished)
             !! Callback function used by [[json_traverse]]
             import :: json_value,LK
@@ -481,7 +481,7 @@
             type(json_value),pointer,intent(in) :: p
             logical(LK),intent(out)             :: finished
         end subroutine traverse_callback_func
-       
+
     end interface
     !*************************************************************************************
 
@@ -668,7 +668,7 @@
         module procedure MAYBEWRAP(json_value_remove_if_present)
     end interface
     !*************************************************************************************
-  
+
     !*************************************************************************************
     !>
     !  Allocate a [[json_value]] pointer and make it a double variable.
@@ -889,9 +889,9 @@
     integer(IK),parameter :: spaces_per_tab = 2
 
     !Variables for real string printing:
-    
+
     logical(LK) :: compact_real = .true.   !! to use the "compact" form of real numbers for output
-    
+
     !find out the precision of the floating point number system
     !and set safety factors
     integer(IK),parameter :: rp_safety_factor = 1
@@ -906,7 +906,7 @@
                                   real(max(maxexp,abs(maxexp)),&
                                   kind=RK) ) )
 
-    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6  
+    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6
     !! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
     character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !! minimum width format for integers
     character(kind=CK, len=*),parameter :: star     = '*' !! for invalid numbers and list-directed real output
@@ -919,7 +919,7 @@
 
     !exception handling [private variables]
     logical(LK) :: is_verbose = .false.        !! if true, all exceptions are immediately printed to console
-    logical(LK) :: exception_thrown = .true.   !! the error flag (by default, this is true to 
+    logical(LK) :: exception_thrown = .true.   !! the error flag (by default, this is true to
                                                !! make sure that [[json_initialize]] is called.
     character(kind=CK,len=:),allocatable :: err_message !! the error message
 
@@ -966,12 +966,12 @@
     implicit none
 
     type(json_value),pointer :: from  !! this is the structure to clone
-    type(json_value),pointer :: to    !! the clone is put here 
+    type(json_value),pointer :: to    !! the clone is put here
                                       !! (it must not already be associated)
-    
+
     !call the main function:
-    call json_value_clone_func(from,to)   
-                                      
+    call json_value_clone_func(from,to)
+
     end subroutine json_clone
 !*****************************************************************************************
 
@@ -981,30 +981,30 @@
 !
 !  Recursive deep copy function called by [[json_clone]].
 !
-!@note If new data is added to the [[json_value]] type, 
+!@note If new data is added to the [[json_value]] type,
 !      then this would need to be updated.
-    
+
     recursive subroutine json_value_clone_func(from,to,parent,previous,next,children,tail)
 
     implicit none
 
     type(json_value),pointer          :: from     !! this is the structure to clone
-    type(json_value),pointer          :: to       !! the clone is put here 
+    type(json_value),pointer          :: to       !! the clone is put here
                                                   !! (it must not already be associated)
     type(json_value),pointer,optional :: parent   !! to%parent
     type(json_value),pointer,optional :: previous !! to%previous
     type(json_value),pointer,optional :: next     !! to%next
     type(json_value),pointer,optional :: children !! to%children
     logical,optional                  :: tail     !! if "to" is the tail of its parent's children
-    
+
     nullify(to)
 
     if (associated(from)) then
-    
+
         allocate(to)
-        
+
         !copy over the data variables:
-        ! [note: the allocate() statements don't work here for the 
+        ! [note: the allocate() statements don't work here for the
         !  deferred-length characters in gfortran-4.9]
         if (allocated(from%name))      to%name = from%name
         if (allocated(from%dbl_value)) allocate(to%dbl_value,source=from%dbl_value)
@@ -1013,9 +1013,9 @@
         if (allocated(from%int_value)) allocate(to%int_value,source=from%int_value)
         to%var_type   = from%var_type
         to%n_children = from%n_children
-        
+
         !allocate and associate the pointers as necessary:
-        
+
         if (present(parent))      to%parent      => parent
         if (present(previous))    to%previous    => previous
         if (present(next))        to%next        => next
@@ -1023,7 +1023,7 @@
         if (present(tail)) then
             if (tail) to%parent%tail => to
         end if
-        
+
         if (associated(from%next)) then
             allocate(to%next)
             call json_value_clone_func(from%next,&
@@ -1038,9 +1038,9 @@
             call json_value_clone_func(from%children,&
                                        to%children,&
                                        parent=to,&
-                                       tail=(.not. associated(from%children%next))) 
+                                       tail=(.not. associated(from%children%next)))
         end if
-        
+
     end if
 
     end subroutine json_value_clone_func
@@ -1053,9 +1053,9 @@
 !  Cast a [[json_value]] object as a [[json_file(type)]] object
 
     function initialize_json_file(p) result(file_object)
-    
+
     implicit none
-    
+
     type(json_value),pointer,optional,intent(in) :: p  !! `json_value` object to cast
                                                        !! as a `json_file` object
     type(json_file) :: file_object
@@ -1819,7 +1819,7 @@
           present(compact_reals)     .or. &
           present(print_signs)       .or. &
           present(real_format) ) then
-        
+
         !allow the special case where real format is '*':
         ! [this overrides the other options]
         if (present(real_format)) then
@@ -1830,7 +1830,7 @@
             end if
         end if
 
-        if (present(compact_reals)) compact_real = compact_reals  
+        if (present(compact_reals)) compact_real = compact_reals
 
         !set defaults
         sgn_prnt = .false.
@@ -3382,9 +3382,9 @@
 
     type(json_value),pointer,intent(in) :: me   !! JSON object
     type(json_value),pointer,intent(out) :: p   !! pointer to parent
-    
+
     p => me%parent
-    
+
     end subroutine json_get_parent
 !*****************************************************************************************
 
@@ -3401,9 +3401,9 @@
 
     type(json_value),pointer,intent(in)  :: me   !! JSON object
     type(json_value),pointer,intent(out) :: p    !! pointer to next
-    
+
     p => me%next
-    
+
     end subroutine json_get_next
 !*****************************************************************************************
 
@@ -3420,9 +3420,9 @@
 
     type(json_value),pointer,intent(in)  :: me   !! JSON object
     type(json_value),pointer,intent(out) :: p    !! pointer to previous
-    
+
     p => me%previous
-    
+
     end subroutine json_get_previous
 !*****************************************************************************************
 
@@ -3439,9 +3439,9 @@
 
     type(json_value),pointer,intent(in) :: me    !! JSON object
     type(json_value),pointer,intent(out) :: p    !! pointer to tail
-    
+
     p => me%tail
-    
+
     end subroutine json_get_tail
 !*****************************************************************************************
 
@@ -4152,16 +4152,16 @@
     integer(IK) :: ierr
 
     if (.not. exception_thrown) then
-                
+
         !string to double
-        read(str,fmt=*,iostat=ierr) rval    
-        
+        read(str,fmt=*,iostat=ierr) rval
+
         if (ierr/=0) then    !if there was an error
             rval = 0.0_RK
             call throw_exception('Error in string_to_double:'//&
                                  ' string cannot be converted to a double: '//trim(str))
         end if
-        
+
     end if
 
     end function string_to_double
@@ -4797,156 +4797,162 @@
     type(json_value),pointer,intent(in)              :: me
     character(kind=CK,len=:),allocatable,intent(out) :: value
 
-    character(kind=CK ,len=:),allocatable :: s,pre,post
-    integer(IK) :: j,jprev,n
-    character(kind=CK,len=1) :: c
-
     value = ''
-    if ( exception_thrown) return
+    if (.not. exception_thrown) then
 
-    select case (me%var_type)
+        select case (me%var_type)
 
-    case (json_string)
+        case (json_string)
 
-        if (allocated(me%str_value)) then
+            if (allocated(me%str_value)) then
+                call unescape_string(me%str_value, value)
+            else
+               call throw_exception('Error in json_get_string:'//&
+                    ' me%str_value not allocated')
+            end if
 
-            !get the value as is:
-            s = me%str_value
+        case default
 
-            ! Now, have to remove the escape characters:
-            !
-            ! '\"'        quotation mark
-            ! '\\'        reverse solidus
-            ! '\/'        solidus
-            ! '\b'        backspace
-            ! '\f'        formfeed
-            ! '\n'        newline (LF)
-            ! '\r'        carriage return (CR)
-            ! '\t'        horizontal tab
-            ! '\uXXXX'    4 hexadecimal digits
-            !
+            call throw_exception('Error in json_get_string:'//&
+                 ' Unable to resolve value to characters: '//me%name)
 
-            !initialize:
-            n = len(s)
-            j = 1
+            ! Note: for the other cases, we could do val to string conversions.
 
-            do
+        end select
 
-                jprev = j                      !initialize
-                j = index(s(j:n),backslash)    !look for an escape character
+    end if
 
-                if (j>0) then            !an escape character was found
+    end subroutine json_get_string
+!*****************************************************************************************
 
-                    !index in full string of the escape character:
-                    j = j + (jprev-1)
+!*****************************************************************************************
+!>
+!  Remove the escape characters from a JSON string and return it.
+!
+!  The escaped characters are denoted by the '\' character:
+!````
+!    '\"'        quotation mark
+!    '\\'        reverse solidus
+!    '\/'        solidus
+!    '\b'        backspace
+!    '\f'        formfeed
+!    '\n'        newline (LF)
+!    '\r'        carriage return (CR)
+!    '\t'        horizontal tab
+!    '\uXXXX'    4 hexadecimal digits
+!````
 
-                    if (j<n) then
+    subroutine unescape_string(str_in, str_out)
 
-                        !save the bit before the escape character:
-                        if (j>1) then
-                            pre = s( 1 : j-1 )
+    implicit none
+
+    character(kind=CK,len=*),intent(in)              :: str_in  !! string as stored in a [[json_value]]
+    character(kind=CK,len=:),allocatable,intent(out) :: str_out !! decoded string
+
+    integer :: i   !! counter
+    integer :: n   !! length of str_in
+    integer :: m   !! length of str_out
+    character(kind=CK,len=1) :: c  !! for scanning each character in string
+
+    if (scan(str_in,backslash)>0) then
+
+        !there is at least one escape character, so process this string:
+
+        n = len(str_in)
+        str_out = repeat(space,n) !size the output string (will be trimmed later)
+        m = 0  !counter in str_out
+        i = 0  !counter in str_in
+
+        do
+
+            i = i + 1
+            if (i>n) exit ! finished
+            c = str_in(i:i) ! get next character in the string
+
+            if (c == backslash) then
+
+                if (i<n) then
+
+                    i = i + 1
+                    c = str_in(i:i) !character after the escape
+
+                    if (any(c == [quotation_mark,backslash,slash, &
+                         to_unicode(['b','f','n','r','t'])])) then
+
+                        select case(c)
+                        case (quotation_mark,backslash,slash)
+                            !use d as is
+                        case (CK_'b')
+                             c = bspace
+                        case (CK_'f')
+                             c = formfeed
+                        case (CK_'n')
+                             c = newline
+                        case (CK_'r')
+                             c = carriage_return
+                        case (CK_'t')
+                             c = horizontal_tab
+                        end select
+
+                        m = m + 1
+                        str_out(m:m) = c
+
+                    else if (c == 'u') then !expecting 4 hexadecimal digits after
+                                            !the escape character    [\uXXXX]
+
+                        !for now, we are just returning them as is
+                        ![not checking to see if it is a valid hex value]
+                        !
+                        ! Example:
+                        !   123456
+                        !   \uXXXX
+
+                        if (i+4<=n) then
+                            m = m + 1
+                            str_out(m:m+5) = str_in(i-1:i+4)
+                            i = i + 4
+                            m = m + 5
                         else
-                            pre = ''
-                        end if
-
-                        !character after the escape character:
-                        c = s( j+1 : j+1 )
-
-                        if (any(c == [quotation_mark,backslash,slash, &
-                             to_unicode(['b','f','n','r','t'])])) then
-
-                            !save the bit after the escape characters:
-                            if (j+2<n) then
-                                 post = s(j+2:n)
-                            else
-                                 post = ''
-                            end if
-
-                            select case(c)
-                            case (quotation_mark,backslash,slash)
-                                !use c as is
-                            case (CK_'b')
-                                 c = bspace
-                            case (CK_'f')
-                                 c = formfeed
-                            case (CK_'n')
-                                 c = newline
-                            case (CK_'r')
-                                 c = carriage_return
-                            case (CK_'t')
-                                 c = horizontal_tab
-                            end select
-
-                            s = pre//c//post
-
-                            n = n-1    !backslash character has been
-                                       ! removed from the string
-
-                        else if (c == 'u') then !expecting 4 hexadecimal digits after
-                                                !the escape character    [\uXXXX]
-
-                            !for now, we are just printing them as is
-                            ![not checking to see if it is a valid hex value]
-
-                            if (j+5<=n) then
-                                j=j+4
-                            else
-                                call throw_exception('Error in json_get_string:'//&
-                                                     ' Invalid hexadecimal sequence'//&
-                                                     ' in string: '//trim(c))
-                                exit
-                            end if
-
-                        else
-                            !unknown escape character
                             call throw_exception('Error in json_get_string:'//&
-                                                 ' unknown escape sequence in string "'//&
-                                                 trim(s)//'" ['//backslash//c//']')
-                            exit
+                                                 ' Invalid hexadecimal sequence'//&
+                                                 ' in string: '//str_in(i-1:))
+                            str_out = ''
+                            return
                         end if
-
-                        j=j+1    !go to the next character
-
-                        if (j>=n) exit    !finished
 
                     else
-                        !an escape character is the last character in
-                        ! the string [this may not be valid syntax,
-                        ! but just keep it]
-                        exit
+                        !unknown escape character
+                        call throw_exception('Error in json_get_string:'//&
+                                             ' unknown escape sequence in string "'//&
+                                             trim(str_in)//'" ['//backslash//c//']')
+                        str_out = ''
+                        return
                     end if
 
                 else
-                    exit    !no more escape characters in the string
+                    !an escape character is the last character in
+                    ! the string [this may not be valid syntax,
+                    ! but just keep it]
+                    m = m + 1
+                    str_out(m:m) = c
                 end if
 
-            end do
-
-            if (exception_thrown) then
-               if (allocated(value)) deallocate(value)
             else
-               value = s
+                m = m + 1
+                str_out(m:m) = c
             end if
 
-        else
-           call throw_exception('Error in json_get_string:'//&
-                ' me%value not allocated')
-        end if
+        end do
 
-    case default
-        call throw_exception('Error in json_get_string:'//&
-             ' Unable to resolve value to characters: '//me%name)
+        !trim trailing space:
+        str_out = str_out(1:m)
 
-        ! Note: for the other cases, we could do val to string conversions.
+    else
+        !there are no escape characters, so return as is:
+        str_out = str_in
+    end if
 
-    end select
-
-    !cleanup:
-    if (allocated(s)) deallocate(s)
-    if (allocated(pre)) deallocate(pre)
-    if (allocated(post)) deallocate(post)
-
-    end subroutine json_get_string
+    end subroutine unescape_string
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5195,7 +5201,7 @@
 !  date: 09/02/2015
 !
 !  Traverse a JSON structure.
-!  This routine calls the user-specified [[traverse_callback_func]] 
+!  This routine calls the user-specified [[traverse_callback_func]]
 !  for each element of the structure.
 !
     recursive subroutine json_traverse(me,traverse_callback)
@@ -6383,6 +6389,7 @@
 !
 !# History
 !  * Jacob Williams : 6/16/2014 : Added hex validation.
+!  * Jacob Williams : 12/3/2015 : Fixed some bugs.
 
     subroutine parse_string(unit, str, string)
 
@@ -6393,7 +6400,7 @@
     character(kind=CK,len=:),allocatable,intent(out) :: string
 
     logical(LK) :: eof, is_hex, escape
-    character(kind=CK,len=1) :: c, last
+    character(kind=CK,len=1) :: c
     character(kind=CK,len=4) :: hex
     integer(IK) :: i
     integer(IK) :: ip !! index to put next character,
@@ -6406,7 +6413,6 @@
 
         !initialize:
         ip     = 1
-        last   = space
         is_hex = .false.
         escape = .false.
         i      = 0
@@ -6421,7 +6427,7 @@
                 call throw_exception('Error in parse_string: Expecting end of string')
                 return
 
-            else if (c==quotation_mark .and. last /= backslash) then
+            else if (c==quotation_mark .and. .not. escape) then  !end of string
 
                 if (is_hex) call throw_exception('Error in parse_string:'//&
                                                  ' incomplete hex string: \u'//trim(hex))
@@ -6465,9 +6471,6 @@
                     end if
 
                 end if
-
-                !update for next char:
-                last = c
 
             end if
 
