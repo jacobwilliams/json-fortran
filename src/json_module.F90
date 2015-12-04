@@ -259,7 +259,7 @@
     !
     !  The types of JSON data.
     !
-    integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type 
+    integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_null      = 1  !! Null JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
@@ -267,7 +267,7 @@
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_array     = 3  !! Array JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type 
+    integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter,public :: json_integer   = 5  !! Integer JSON data type
                                                         !! (see [[json_file_variable_info]] and [[json_info]])
@@ -464,7 +464,7 @@
 
     !*************************************************************************************
     abstract interface
-    
+
         subroutine array_callback_func(element, i, count)
             !! Array element callback function.  Used by [[json_get_array]]
             import :: json_value,IK
@@ -473,7 +473,7 @@
             integer(IK),intent(in) :: i        !index
             integer(IK),intent(in) :: count    !size of array
         end subroutine array_callback_func
-        
+
         subroutine traverse_callback_func(p,finished)
             !! Callback function used by [[json_traverse]]
             import :: json_value,LK
@@ -481,7 +481,7 @@
             type(json_value),pointer,intent(in) :: p
             logical(LK),intent(out)             :: finished
         end subroutine traverse_callback_func
-       
+
     end interface
     !*************************************************************************************
 
@@ -668,7 +668,7 @@
         module procedure MAYBEWRAP(json_value_remove_if_present)
     end interface
     !*************************************************************************************
-  
+
     !*************************************************************************************
     !>
     !  Allocate a [[json_value]] pointer and make it a double variable.
@@ -889,9 +889,9 @@
     integer(IK),parameter :: spaces_per_tab = 2
 
     !Variables for real string printing:
-    
+
     logical(LK) :: compact_real = .true.   !! to use the "compact" form of real numbers for output
-    
+
     !find out the precision of the floating point number system
     !and set safety factors
     integer(IK),parameter :: rp_safety_factor = 1
@@ -906,7 +906,7 @@
                                   real(max(maxexp,abs(maxexp)),&
                                   kind=RK) ) )
 
-    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6  
+    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6
     !! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
     character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !! minimum width format for integers
     character(kind=CK, len=*),parameter :: star     = '*' !! for invalid numbers and list-directed real output
@@ -919,7 +919,7 @@
 
     !exception handling [private variables]
     logical(LK) :: is_verbose = .false.        !! if true, all exceptions are immediately printed to console
-    logical(LK) :: exception_thrown = .true.   !! the error flag (by default, this is true to 
+    logical(LK) :: exception_thrown = .true.   !! the error flag (by default, this is true to
                                                !! make sure that [[json_initialize]] is called.
     character(kind=CK,len=:),allocatable :: err_message !! the error message
 
@@ -966,12 +966,12 @@
     implicit none
 
     type(json_value),pointer :: from  !! this is the structure to clone
-    type(json_value),pointer :: to    !! the clone is put here 
+    type(json_value),pointer :: to    !! the clone is put here
                                       !! (it must not already be associated)
-    
+
     !call the main function:
-    call json_value_clone_func(from,to)   
-                                      
+    call json_value_clone_func(from,to)
+
     end subroutine json_clone
 !*****************************************************************************************
 
@@ -981,30 +981,30 @@
 !
 !  Recursive deep copy function called by [[json_clone]].
 !
-!@note If new data is added to the [[json_value]] type, 
+!@note If new data is added to the [[json_value]] type,
 !      then this would need to be updated.
-    
+
     recursive subroutine json_value_clone_func(from,to,parent,previous,next,children,tail)
 
     implicit none
 
     type(json_value),pointer          :: from     !! this is the structure to clone
-    type(json_value),pointer          :: to       !! the clone is put here 
+    type(json_value),pointer          :: to       !! the clone is put here
                                                   !! (it must not already be associated)
     type(json_value),pointer,optional :: parent   !! to%parent
     type(json_value),pointer,optional :: previous !! to%previous
     type(json_value),pointer,optional :: next     !! to%next
     type(json_value),pointer,optional :: children !! to%children
     logical,optional                  :: tail     !! if "to" is the tail of its parent's children
-    
+
     nullify(to)
 
     if (associated(from)) then
-    
+
         allocate(to)
-        
+
         !copy over the data variables:
-        ! [note: the allocate() statements don't work here for the 
+        ! [note: the allocate() statements don't work here for the
         !  deferred-length characters in gfortran-4.9]
         if (allocated(from%name))      to%name = from%name
         if (allocated(from%dbl_value)) allocate(to%dbl_value,source=from%dbl_value)
@@ -1013,9 +1013,9 @@
         if (allocated(from%int_value)) allocate(to%int_value,source=from%int_value)
         to%var_type   = from%var_type
         to%n_children = from%n_children
-        
+
         !allocate and associate the pointers as necessary:
-        
+
         if (present(parent))      to%parent      => parent
         if (present(previous))    to%previous    => previous
         if (present(next))        to%next        => next
@@ -1023,7 +1023,7 @@
         if (present(tail)) then
             if (tail) to%parent%tail => to
         end if
-        
+
         if (associated(from%next)) then
             allocate(to%next)
             call json_value_clone_func(from%next,&
@@ -1038,9 +1038,9 @@
             call json_value_clone_func(from%children,&
                                        to%children,&
                                        parent=to,&
-                                       tail=(.not. associated(from%children%next))) 
+                                       tail=(.not. associated(from%children%next)))
         end if
-        
+
     end if
 
     end subroutine json_value_clone_func
@@ -1053,9 +1053,9 @@
 !  Cast a [[json_value]] object as a [[json_file(type)]] object
 
     function initialize_json_file(p) result(file_object)
-    
+
     implicit none
-    
+
     type(json_value),pointer,optional,intent(in) :: p  !! `json_value` object to cast
                                                        !! as a `json_file` object
     type(json_file) :: file_object
@@ -1819,7 +1819,7 @@
           present(compact_reals)     .or. &
           present(print_signs)       .or. &
           present(real_format) ) then
-        
+
         !allow the special case where real format is '*':
         ! [this overrides the other options]
         if (present(real_format)) then
@@ -1830,7 +1830,7 @@
             end if
         end if
 
-        if (present(compact_reals)) compact_real = compact_reals  
+        if (present(compact_reals)) compact_real = compact_reals
 
         !set defaults
         sgn_prnt = .false.
@@ -3382,9 +3382,9 @@
 
     type(json_value),pointer,intent(in) :: me   !! JSON object
     type(json_value),pointer,intent(out) :: p   !! pointer to parent
-    
+
     p => me%parent
-    
+
     end subroutine json_get_parent
 !*****************************************************************************************
 
@@ -3401,9 +3401,9 @@
 
     type(json_value),pointer,intent(in)  :: me   !! JSON object
     type(json_value),pointer,intent(out) :: p    !! pointer to next
-    
+
     p => me%next
-    
+
     end subroutine json_get_next
 !*****************************************************************************************
 
@@ -3420,9 +3420,9 @@
 
     type(json_value),pointer,intent(in)  :: me   !! JSON object
     type(json_value),pointer,intent(out) :: p    !! pointer to previous
-    
+
     p => me%previous
-    
+
     end subroutine json_get_previous
 !*****************************************************************************************
 
@@ -3439,9 +3439,9 @@
 
     type(json_value),pointer,intent(in) :: me    !! JSON object
     type(json_value),pointer,intent(out) :: p    !! pointer to tail
-    
+
     p => me%tail
-    
+
     end subroutine json_get_tail
 !*****************************************************************************************
 
@@ -4152,16 +4152,16 @@
     integer(IK) :: ierr
 
     if (.not. exception_thrown) then
-                
+
         !string to double
-        read(str,fmt=*,iostat=ierr) rval    
-        
+        read(str,fmt=*,iostat=ierr) rval
+
         if (ierr/=0) then    !if there was an error
             rval = 0.0_RK
             call throw_exception('Error in string_to_double:'//&
                                  ' string cannot be converted to a double: '//trim(str))
         end if
-        
+
     end if
 
     end function string_to_double
@@ -5195,7 +5195,7 @@
 !  date: 09/02/2015
 !
 !  Traverse a JSON structure.
-!  This routine calls the user-specified [[traverse_callback_func]] 
+!  This routine calls the user-specified [[traverse_callback_func]]
 !  for each element of the structure.
 !
     recursive subroutine json_traverse(me,traverse_callback)
