@@ -123,7 +123,7 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. size(str_vec)==5 .and. &
+        if (found .and. size(str_vec)==6 .and. &
             str_vec(1)=='..\path\to\files\file1.txt') then
             write(error_unit,'(A)') '...success'
         else
@@ -282,7 +282,7 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. size(str_vec)==5 .and. &
+        if (found .and. size(str_vec)==6 .and. &
             str_vec(1)=='..\path\to\files\file1.txt') then
             write(error_unit,'(A)') '...success'
         else
@@ -304,7 +304,7 @@ contains
     else
         write(error_unit,'(A)') '...success'
     end if
-    
+
 
     !--------------------------------
 
@@ -321,7 +321,7 @@ end module jf_test_10_mod
 program jf_test_10
 
     !! Tenth unit test.
-    
+
     use jf_test_10_mod , only: test_10
     implicit none
     integer :: n_errors
