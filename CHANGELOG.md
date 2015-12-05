@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [4.3.0 (2015-12-05)](#430-2015-12-05)
     - [4.2.0 (2015-08-03)](#420-2015-08-03)
     - [4.1.1 (2015-05-27)](#411-2015-05-27)
     - [4.1.0 (2015-05-05)](#410-2015-05-05)
@@ -15,7 +16,30 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.2.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.3.0...HEAD)
+
+### [4.3.0](https://github.com/jacobwilliams/json-fortran/tree/4.3.0) (2015-12-05)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.2.0...4.3.0)
+or [Download v4.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/4.3.0)
+
+**Enhancements:**
+
+- Added routines for getting the `parent`, `next`, `previous`, and `tail` pointers [\#161](https://github.com/jacobwilliams/json-fortran/issues/161) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a deep copy routine for `json_value` structures [\#160](https://github.com/jacobwilliams/json-fortran/issues/160) ([jacobwilliams](https://github.com/jacobwilliams))
+- Updated the Visual Studio solution to VS 2013. Also removed the test projects (it now just compiles the library) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Rewrote logic for decoding strings, and fixed bugs related to parsing strings with certain escape character combinations [\#164](https://github.com/jacobwilliams/json-fortran/issues/164) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed a bug where some real numbers weren't being read in properly. Also added an option to output real numbers with `fmt=*` formatting [\#157](https://github.com/jacobwilliams/json-fortran/issues/157) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Merged pull requests:**
+
+- Minor documentation change. [\#153](https://github.com/jacobwilliams/json-fortran/pull/153) ([jacobwilliams](https://github.com/jacobwilliams))
+- Enabled FORD graphs in documentation. [\#149](https://github.com/jacobwilliams/json-fortran/pull/149) ([jacobwilliams](https://github.com/jacobwilliams))
+- Tag documentation fix [\#147](https://github.com/jacobwilliams/json-fortran/pull/147) ([zbeekman](https://github.com/zbeekman))
+- Fix url in 4.2.0 tag documentation [\#146](https://github.com/jacobwilliams/json-fortran/pull/146) ([zbeekman](https://github.com/zbeekman))
 
 ### [4.2.0](https://github.com/jacobwilliams/json-fortran/tree/4.2.0) (2015-08-03)
 
