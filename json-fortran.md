@@ -1,3 +1,4 @@
+---
 project: JSON-Fortran
 favicon: ./media/json-fortran-32x32.png
 project_dir: ./src
@@ -21,19 +22,24 @@ display: public
          private
 source: true
 extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
-md_extensions: markdown.extensions.toc
+md_extensions: markdown.extensions.toc(anchorlink=True)
                markdown.extensions.smarty(smart_quotes=False)
+---
+
+--------------------
 
 [TOC]
 
-# Brief description
+Brief description
+-----------------
 
 A user-friendly and object-oriented API for reading and writing JSON files, written in
 modern Fortran (Fortran 2003+).  The source code is a single Fortran
 module file
 ([json_module.F90](|url|/sourcefile/json_module.f90.html)).
 
-# License
+License
+-------
 
 The JSON-Fortran source code and related files and documentation are
 distributed under a permissive free software license (BSD-style).  See
@@ -41,7 +47,8 @@ the
 [LICENSE](|url|/page/development-resources/LICENSE.html)
 file for more details.
 
-# Official Releases
+Official Releases
+-----------------
 
 The **current stable release** is **{!__VERSION__!}** and can be [downloaded
 on GitHub](https://github.com/jacobwilliams/json-fortran/releases/latest)
@@ -55,7 +62,8 @@ A list of all past releases, links to their documentation, and the
 chage log can be found on the
 [releases page](|url|/page/releases/index.html).
 
-# Miscellaneous
+Miscellaneous
+-------------
 
 * For more information about JSON, see: <http://www.json.org/>
 
