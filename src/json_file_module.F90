@@ -299,9 +299,6 @@
 
     class(json_file),intent(inout)  :: me
 
-    !character(kind=CK,len=:),allocatable :: dummy
-
-    !call json_value_print(me%p,iunit=output_unit,str=dummy,indent=1,colon=.true.)
     call json_print(me%p,iunit=output_unit)
 
     end subroutine json_file_print_to_console
@@ -320,12 +317,7 @@
     class(json_file),intent(inout)  :: me
     integer(IK),intent(in)          :: iunit  !! file unit number (must not be -1)
 
-    !integer(IK) :: i
-    !character(kind=CK,len=:),allocatable :: dummy
-
     if (iunit/=unit2str) then
-        !i = iunit
-        !call json_value_print(me%p,iunit=i,str=dummy,indent=1,colon=.true.)
         call json_print(me%p,iunit=iunit)
     else
         call throw_exception('Error in json_file_print_1: iunit must not be -1.')
@@ -359,18 +351,7 @@
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: filename  !! filename to print to
 
-    integer(IK) :: iunit,istat
-
-    !...note: why not just call [[json_print_2]] here?
-
-    open(newunit=iunit,file=filename,status='REPLACE',iostat=istat FILE_ENCODING )
-    if (istat==0) then
-        call me%print_file(iunit)    !call the other routine
-        close(iunit,iostat=istat)
-    else
-        call throw_exception('Error in json_file_print_2: could not open file: '//&
-                              trim(filename))
-    end if
+    call json_print(me%p,filename)
 
     end subroutine json_file_print_2
 !*****************************************************************************************

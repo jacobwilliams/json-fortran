@@ -28,7 +28,7 @@
 !      JSON-Fortran procedures since they have been overloaded to accept ```intent(in)```
 !      character arguments of the default (```CDK```) kind. If you find a procedure which does
 !      not accept an ```intent(in)``` literal string argument of default kind, please
-!      [file an issue](https://github.com/jacobwilliams/json-fortran/issues/new) on github.
+!      [file an issue](https://github.com/jacobwilliams/json-fortran/issues/new) on GitHub.
 
     module json_kinds
 

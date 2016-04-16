@@ -15,13 +15,14 @@
     character(kind=CK,len=*),parameter,public :: star = '*' !! for invalid numbers and
                                                             !! list-directed real output
 
-    !*************************************************************************************
+    !******************************************************
     !>
-    !  Convert a 'DEFAULT' kind character input to 'ISO_10646' kind and return it
+    !  Convert a 'DEFAULT' kind character input to
+    !  'ISO_10646' kind and return it
     interface to_unicode
         module procedure to_uni, to_uni_vec
     end interface
-    !*************************************************************************************
+    !******************************************************
 
 # ifdef USE_UCS4
     !******************************************************
@@ -32,6 +33,7 @@
        module procedure ucs4_join_default, default_join_ucs4
     end interface
     public :: operator(//)
+    !******************************************************
 
     !******************************************************
     !>
@@ -41,11 +43,11 @@
        module procedure ucs4_comp_default, default_comp_ucs4
     end interface
     public :: operator(==)
+    !******************************************************
 # endif
 
     public :: integer_to_string
     public :: real_to_string
-    public :: compact_real_string
     public :: valid_json_hex
     public :: to_unicode
 
