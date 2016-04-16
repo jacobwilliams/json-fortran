@@ -7,6 +7,7 @@
 
 module jf_test_2_mod
 
+    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -147,12 +148,12 @@ contains
         error_cnt = error_cnt + 1
     end if
     close(iunit)
-    
+
     !test the deep copy routine:
-    
+
     write(error_unit,'(A)') 'json_clone test'
     call json_clone(p,p_clone)
-    
+
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '============='
     write(error_unit,'(A)') ' p_clone'
@@ -160,14 +161,14 @@ contains
     call json_print(p_clone,error_unit)
     write(error_unit,'(A)') '============='
     write(error_unit,'(A)') ''
-    
+
     if (.not. associated(p)) write(error_unit,'(A)') 'ERROR: p has become unassociated'
     if (.not. associated(p_clone)) write(error_unit,'(A)') 'ERROR: p_clone is not associated'
-    
+
     if (json_failed()) then
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
-    else        
+    else
         !now, change one and verify that they are independent:
         call json_update(p_clone,'inputs.integer_scalar',100,found)
         if (json_failed()) write(error_unit,'(A)') 'json_update Error for p_clone'
@@ -187,7 +188,7 @@ contains
             end if
         end if
     end if
-    
+
     !test some of the pointer routines:
     write(error_unit,'(A)') 'Pointer routine tests'
     call json_get(p,'inputs.integer_array',p_integer_array)
@@ -195,7 +196,7 @@ contains
         call json_print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
-    
+
         !get parent test:
         call json_get_parent(p_integer_array,p_tmp)  !should be "inputs"
         call json_info(p_tmp,name=name)
@@ -210,7 +211,7 @@ contains
                 error_cnt = error_cnt + 1
             end if
         end if
-        
+
         !get next test:
         call json_get_next(p_integer_array,p_tmp)  !should be "names"
         call json_info(p_tmp,name=name)
@@ -225,7 +226,7 @@ contains
                 error_cnt = error_cnt + 1
             end if
         end if
-        
+
         !get previous test:
         call json_get_previous(p_integer_array,p_tmp)  !should be "integer_scalar"
         call json_info(p_tmp,name=name)
@@ -339,7 +340,7 @@ end module jf_test_2_mod
 program jf_test_2
 
     !! Second unit test.
-    
+
     use jf_test_2_mod , only: test_2
     implicit none
     integer :: n_errors

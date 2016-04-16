@@ -7,9 +7,9 @@
     module json_file_module
 
     use,intrinsic :: iso_fortran_env
-    use json_value_module
     use json_kinds
     use json_string_utilities
+    use json_value_module
 
     implicit none
 
@@ -179,7 +179,7 @@
 
     class(json_file),intent(inout) :: me
 
-    if (associated(me%p)) call json_value_destroy(me%p)
+    if (associated(me%p)) call json_destroy(me%p)
 
     end subroutine json_file_destroy
 !*****************************************************************************************
@@ -298,9 +298,10 @@
 
     class(json_file),intent(inout)  :: me
 
-    character(kind=CK,len=:),allocatable :: dummy
+    !character(kind=CK,len=:),allocatable :: dummy
 
-    call json_value_print(me%p,iunit=output_unit,str=dummy,indent=1,colon=.true.)
+    !call json_value_print(me%p,iunit=output_unit,str=dummy,indent=1,colon=.true.)
+    call json_print(me%p,iunit=output_unit)
 
     end subroutine json_file_print_to_console
 !*****************************************************************************************
@@ -318,12 +319,13 @@
     class(json_file),intent(inout)  :: me
     integer(IK),intent(in)          :: iunit  !! file unit number (must not be -1)
 
-    integer(IK) :: i
-    character(kind=CK,len=:),allocatable :: dummy
+    !integer(IK) :: i
+    !character(kind=CK,len=:),allocatable :: dummy
 
     if (iunit/=unit2str) then
-        i = iunit
-        call json_value_print(me%p,iunit=i,str=dummy,indent=1,colon=.true.)
+        !i = iunit
+        !call json_value_print(me%p,iunit=i,str=dummy,indent=1,colon=.true.)
+        call json_print(me%p,iunit=iunit)
     else
         call throw_exception('Error in json_file_print_1: iunit must not be -1.')
     end if
@@ -357,6 +359,8 @@
     character(kind=CDK,len=*),intent(in) :: filename  !! filename to print to
 
     integer(IK) :: iunit,istat
+
+    !...note: why not just call [[json_print_2]] here?
 
     open(newunit=iunit,file=filename,status='REPLACE',iostat=istat FILE_ENCODING )
     if (istat==0) then
@@ -393,7 +397,7 @@
     class(json_file),intent(inout)                   :: me
     character(kind=CK,len=:),allocatable,intent(out) :: str  !! string to print JSON data to
 
-    call json_value_to_string(me%p,str)
+    call json_print_to_string(me%p,str)
 
     end subroutine json_file_print_to_string
 !*****************************************************************************************

@@ -6,6 +6,7 @@
 
 module jf_test_9_mod
 
+    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -119,19 +120,19 @@ contains
     !!@warning Will this routine work if the file contains unicode characters??
 
     implicit none
- 
+
     character(len=*),intent(in) :: filename
     character(len=:),allocatable,intent(out) :: str
- 
+
     integer :: iunit,istat,filesize
- 
+
     open( newunit = iunit,&
           file    = filename,&
           status  = 'OLD',&
           form    = 'UNFORMATTED',&
           access  = 'STREAM',&
           iostat  = istat )
- 
+
     if (istat==0) then
         inquire(file=filename, size=filesize)
         if (filesize>0) then
@@ -141,7 +142,7 @@ contains
             close(iunit, iostat=istat)
         end if
     end if
- 
+
     end subroutine read_file
 
 end module jf_test_9_mod
@@ -151,7 +152,7 @@ end module jf_test_9_mod
 program jf_test_9
 
     !! Ninth unit test.
-    
+
     use jf_test_9_mod , only: test_9
     implicit none
     integer :: n_errors

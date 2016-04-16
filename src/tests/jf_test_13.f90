@@ -6,6 +6,7 @@
 
 module jf_test_13_mod
 
+    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
@@ -14,17 +15,17 @@ module jf_test_13_mod
 contains
 
     subroutine test_13(error_cnt)
-    
+
     !! Tests different real format strings using repeated calls to [[json_initialize]].
-    
+
     implicit none
 
     integer,intent(out) :: error_cnt !! report number of errors to caller
-    
+
     type(json_file)  :: my_file
     character(kind=CK,len=:),allocatable :: str
     integer :: i
-    
+
     character(len=2),dimension(5),parameter :: fmts=['g ','e ','en','es','* ']
         !! format statements to test
 
@@ -35,11 +36,11 @@ contains
     write(error_unit,'(A)') ''
 
     error_cnt = 0
-    
+
     do i=1,size(fmts)
-    
+
         call json_initialize(real_format=trim(fmts(i)))
-    
+
         call my_file%load_from_string('{ "value": 1234.56789 }')
         if (json_failed()) then
             call json_print_error_message(error_unit)
@@ -52,11 +53,11 @@ contains
         else
             write(output_unit,'(A)') str
         end if
-    
+
         call my_file%destroy()
-    
+
     end do
-    
+
     end subroutine test_13
 
 end module jf_test_13_mod
@@ -66,12 +67,12 @@ end module jf_test_13_mod
 program jf_test_13
 
     !! 13th unit test.
-    
+
     use jf_test_13_mod, only: test_13
     implicit none
     integer :: n_errors
     call test_13(n_errors)
     if ( n_errors /= 0) stop 1
-    
+
 end program jf_test_13
 !*****************************************************************************************

@@ -7,6 +7,7 @@
 
 module jf_test_6_mod
 
+    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -73,7 +74,7 @@ end module jf_test_6_mod
 program jf_test_6
 
     !! Sixth unit test.
-    
+
     use jf_test_6_mod , only: test_6
     implicit none
     integer :: n_errors

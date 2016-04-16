@@ -1,5 +1,7 @@
 !*****************************************************************************************
-!>
+!> author: Jacob Williams
+!  license: BSD
+!
 !  JSON-Fortran kind definitions.
 !
 !@note ```-DUSE_UCS4``` is an optional preprocessor flag.

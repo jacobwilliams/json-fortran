@@ -7,6 +7,7 @@
 
 module jf_test_3_mod
 
+    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -128,7 +129,7 @@ end module jf_test_3_mod
 program jf_test_3
 
     !! Third unit test.
-    
+
     use jf_test_3_mod , only: test_3
     implicit none
     integer :: n_errors

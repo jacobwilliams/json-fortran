@@ -6,6 +6,7 @@
 
 module jf_test_12_mod
 
+    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -18,13 +19,13 @@ module jf_test_12_mod
 contains
 
     subroutine test_12(error_cnt)
-    
+
     implicit none
 
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
     integer,parameter :: imx = 5, jmx = 3, kmx = 4 !! dimensions for raw work array of primitive type
-    
+
     integer,dimension(3)                  :: shape             !! shape of work array
     integer, dimension(:), allocatable    :: fetched_shape     !! retrieved shape
     type(json_value), pointer             :: root, meta_array  !! json nodes to work with
@@ -171,7 +172,7 @@ contains
     close(lun)
 
     contains
-    
+
       subroutine check_errors(assertion)
         logical, optional, intent(in) :: assertion
         if (json_failed()) then
@@ -206,13 +207,13 @@ end module jf_test_12_mod
 program jf_test_12
 
     !! 12th unit test.
-    
+
     use jf_test_12_mod, only: test_12
     implicit none
     integer :: n_errors
     n_errors = 0
     call test_12(n_errors)
     if ( n_errors /= 0) stop 1
-    
+
 end program jf_test_12
 !*****************************************************************************************

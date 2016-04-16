@@ -579,7 +579,8 @@
     public :: json_print_error_message   !
 
     !... so it can be used in json_file_module ...
-    public :: json_value_print
+    !public :: json_value_print
+    public :: throw_exception
 
     character(kind=CDK,len=*),parameter,public :: json_ext = '.json'   !! JSON file extension
 
@@ -770,11 +771,10 @@
     end subroutine json_value_clone_func
 !*****************************************************************************************
 
-
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Destroy the data within a [[json_value]], and rest type to `json_unknown`.
+!  Destroy the data within a [[json_value]], and reset type to `json_unknown`.
 
     subroutine destroy_json_data(d)
 

@@ -7,6 +7,7 @@
 
 module jf_test_4_mod
 
+    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -21,7 +22,7 @@ contains
 
     !! Populate a JSON structure, write it to a file,
     !! then read it.
-    !! 
+    !!
     !! Also tests the json_value_to_string routine to write
     !! the file to a character string.
 
@@ -136,7 +137,7 @@ end module jf_test_4_mod
 program jf_test_4
 
     !! Fourth unit test.
-    
+
     use jf_test_4_mod , only: test_4
     implicit none
     integer :: n_errors

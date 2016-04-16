@@ -7,6 +7,7 @@
 
 module jf_test_1_mod
 
+    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -249,13 +250,13 @@ end module jf_test_1_mod
 program jf_test_1
 
     !! First unit test.
-    
+
     use jf_test_1_mod , only: test_1
     implicit none
     integer :: n_errors
     n_errors = 0
     call test_1(n_errors)
     if (n_errors /= 0) stop 1
-    
+
 end program jf_test_1
 !*****************************************************************************************

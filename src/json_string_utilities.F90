@@ -1,6 +1,9 @@
 !*****************************************************************************************
-!>
+!> author: Jacob Williams
+!  license: BSD
+!
 !  JSON-Fortran support module for string manipulation.
+!  This is a low-level module not meant to be used by a JSON-Fortran user.
 
     module json_string_utilities
 
