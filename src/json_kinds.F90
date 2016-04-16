@@ -83,7 +83,6 @@
     !  Currently only gfortran >= 4.9.2 will correctly support
     !  UCS4 which is stored in 4 bytes.
     !  (and perhaps others).
-
     integer,parameter,public :: CK = selected_char_kind(json_fortran_string_kind)
     !*********************************************************
 

@@ -8,6 +8,7 @@
 
     use,intrinsic :: iso_fortran_env
     use json_kinds
+    use json_parameters, only: unit2str
     use json_string_utilities
     use json_value_module
 

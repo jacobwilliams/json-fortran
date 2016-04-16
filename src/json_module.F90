@@ -13,6 +13,7 @@
 
     use json_value_module
     use json_file_module
+    use json_string_utilities
 
     implicit none
 

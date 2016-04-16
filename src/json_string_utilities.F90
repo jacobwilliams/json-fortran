@@ -3,7 +3,6 @@
 !  license: BSD
 !
 !  JSON-Fortran support module for string manipulation.
-!  This is a low-level module not meant to be used by a JSON-Fortran user.
 
     module json_string_utilities
 
@@ -25,17 +24,22 @@
     !*************************************************************************************
 
 # ifdef USE_UCS4
-    ! Provide a means to convert to UCS4 while concatenating UCS4 and default strings
+    !******************************************************
+    !>
+    ! Provide a means to convert to UCS4 while
+    ! concatenating UCS4 and default strings
     interface operator(//)
        module procedure ucs4_join_default, default_join_ucs4
     end interface
+    public :: operator(//)
 
-    ! Provide a string comparison operator that works with mixed kinds
+    !******************************************************
+    !>
+    ! Provide a string comparison operator that works
+    ! with mixed kinds
     interface operator(==)
        module procedure ucs4_comp_default, default_comp_ucs4
     end interface
-
-    public :: operator(//)
     public :: operator(==)
 # endif
 
@@ -43,12 +47,6 @@
     public :: real_to_string
     public :: compact_real_string
     public :: valid_json_hex
-    public :: to_uni
-    public :: to_uni_vec
-    public :: ucs4_join_default
-    public :: default_join_ucs4
-    public :: ucs4_comp_default
-    public :: default_comp_ucs4
     public :: to_unicode
 
     contains
@@ -65,7 +63,7 @@
     implicit none
 
     integer(IK),intent(in)               :: ival    !! integer value.
-    character(kind=CK,len=*),intent(in)  :: int_fmt !! format for integers
+    character(kind=CDK,len=*),intent(in) :: int_fmt !! format for integers
     character(kind=CK,len=*),intent(out) :: str     !! ival converted to a string.
 
     integer(IK) :: istat
@@ -96,7 +94,7 @@
     implicit none
 
     real(RK),intent(in)                  :: rval         !! real value.
-    character(kind=CDK,len=*),intent(in) :: real_fmt
+    character(kind=CDK,len=*),intent(in) :: real_fmt     !! format for real numbers
     logical(LK),intent(in)               :: compact_real !! compact the string so that it is
                                                          !! displayed with fewer characters
     character(kind=CK,len=*),intent(out) :: str          !! rval converted to a string.
@@ -110,11 +108,9 @@
     end if
 
     if (istat==0) then
-
         !in this case, the default string will be compacted,
         ! so that the same value is displayed with fewer characters.
         if (compact_real) call compact_real_string(str)
-
     else
         str = repeat(star,len(str))
     end if
@@ -345,7 +341,7 @@
     character(kind=CK, len=*), intent(in) :: ucs4_str
     logical(LK) :: res
 
-    res = ( to_unicode(def_str) == ucs4_str)
+    res = (to_unicode(def_str) == ucs4_str)
 
     end function default_comp_ucs4
 !*****************************************************************************************

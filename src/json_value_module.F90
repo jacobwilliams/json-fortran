@@ -80,8 +80,9 @@
 
     module json_value_module
 
-    use,intrinsic :: iso_fortran_env, only: iostat_end
+    use,intrinsic :: iso_fortran_env, only: iostat_end,error_unit,output_unit
     use json_kinds
+    use json_parameters
     use json_string_utilities
 
     implicit none
@@ -577,89 +578,30 @@
     public :: json_update                ! update a value in a JSON structure
     public :: json_traverse              ! to traverse all elements of a JSON structure
     public :: json_print_error_message   !
-
-    !... so it can be used in json_file_module ...
-    !public :: json_value_print
     public :: throw_exception
-
-    character(kind=CDK,len=*),parameter,public :: json_ext = '.json'   !! JSON file extension
-
-    !special JSON characters
-    character(kind=CK,len=*),parameter :: space           = ' '
-    character(kind=CK,len=*),parameter :: start_object    = '{'
-    character(kind=CK,len=*),parameter :: end_object      = '}'
-    character(kind=CK,len=*),parameter :: start_array     = '['
-    character(kind=CK,len=*),parameter :: end_array       = ']'
-    character(kind=CK,len=*),parameter :: delimiter       = ','
-    character(kind=CK,len=*),parameter :: colon_char      = ':'
-    character(kind=CK,len=*),parameter :: bspace          = achar(8)
-    character(kind=CK,len=*),parameter :: horizontal_tab  = achar(9)
-    character(kind=CK,len=*),parameter :: newline         = achar(10)
-    character(kind=CK,len=*),parameter :: formfeed        = achar(12)
-    character(kind=CK,len=*),parameter :: carriage_return = achar(13)
-    character(kind=CK,len=*),parameter :: quotation_mark  = achar(34)
-    character(kind=CK,len=*),parameter :: slash           = achar(47)
-    character(kind=CK,len=*),parameter :: backslash       = achar(92)
-
-    !These were parameters, but gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
-    !necessitates moving them here to be variables
-    character(kind=CK,len=4) :: null_str  = 'null'
-    character(kind=CK,len=4) :: true_str  = 'true'
-    character(kind=CK,len=5) :: false_str = 'false'
-
-    ! Control characters, possibly in unicode
-    integer, private :: i_
-    character(kind=CK,len=*),parameter :: control_chars(32) = [(achar(i_),i_=1,31), achar(127)]
-
-    !for indenting (Note: jsonlint.com uses 4 spaces)
-    integer(IK),parameter :: spaces_per_tab = 2
-
-    !Variables for real string printing:
-
-    logical(LK) :: compact_real = .true.   !! to use the "compact" form of real numbers for output
-
-    !find out the precision of the floating point number system
-    !and set safety factors
-    integer(IK),parameter :: rp_safety_factor = 1
-    integer(IK),parameter :: rp_addl_safety = 1
-    integer(IK),parameter :: real_precision = rp_safety_factor*precision(1.0_RK) + &
-                                              rp_addl_safety
-
-    !Get the number of possible digits in the exponent when using decimal number system
-    integer(IK),parameter :: maxexp = maxexponent(1.0_RK)
-    integer(IK),parameter :: minexp = minexponent(1.0_RK)
-    integer(IK),parameter :: real_exponent_digits = floor( 1 + log10( &
-                                  real(max(maxexp,abs(maxexp)),&
-                                  kind=RK) ) )
-
-    integer(IK),parameter :: max_numeric_str_len = real_precision + real_exponent_digits + 6
-    !! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
-    character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !! minimum width format for integers
-    character(kind=CDK,len=:),allocatable :: real_fmt  !! the format string to use for real numbers
-                                                       !! it is set in [[json_initialize]]
 
     !
     ! Note: the following global variables make this module non thread safe.
     !
 
+    !Variables for real string printing:
+    logical(LK) :: compact_real = .true.   !! to use the "compact" form of real numbers for output
+    character(kind=CDK,len=:),allocatable :: real_fmt  !! the format string to use for real numbers
+                                                       !! it is set in [[json_initialize]]
+
     !exception handling [private variables]
-    logical(LK) :: is_verbose = .false.        !! if true, all exceptions are immediately printed to console
-    logical(LK),public :: exception_thrown = .true.   !! the error flag (by default, this is true to
-                                               !! make sure that [[json_initialize]] is called.
+    logical(LK) :: is_verbose = .false.                 !! if true, all exceptions are immediately printed to console
+    logical(LK),public :: exception_thrown = .true.     !! the error flag (by default, this is true to
+                                                        !! make sure that [[json_initialize]] is called.
     character(kind=CK,len=:),allocatable :: err_message !! the error message
 
     !temp vars used when parsing lines in file [private variables]
-    integer(IK) :: char_count = 0    !character position in the current line
-    integer(IK) :: line_count = 1    !lines read counter
+    integer(IK) :: char_count = 0    !! character position in the current line
+    integer(IK) :: line_count = 1    !! lines read counter
     integer(IK) :: pushed_index = 0
     character(kind=CK,len=10) :: pushed_char = ''  !JW : what is this magic number 10??
 
-    integer(IK),parameter :: chunk_size = 100  !! for allocatable strings: allocate chunks of this size
-    integer(IK) :: ipos = 1                    !! for allocatable strings: next character to read
-
-    integer(IK),parameter,public :: unit2str = -1  !! unit number to cause stuff to be
-                                            !! output to strings rather than files.
-                                            !! See 9.5.6.12 in the F2003/08 standard
+    integer(IK) :: ipos = 1  !! for allocatable strings: next character to read
 
     contains
 !*****************************************************************************************
@@ -842,6 +784,7 @@
     !clear any errors from previous runs:
     call json_clear_exceptions()
 
+    !JW note: do we need this?.....
     !Ensure gfortran bug work around "parameters" are set properly
     null_str  = 'null'
     true_str  = 'true'
@@ -945,18 +888,24 @@
 
     subroutine json_throw_exception(msg)
 
+#ifdef __INTEL_COMPILER
+    use ifcore, only: tracebackqq
+#endif
+
     implicit none
 
-    character(kind=CK,len=*),intent(in) :: msg    !the error message
+    character(kind=CK,len=*),intent(in) :: msg    !! the error message
 
     exception_thrown = .true.
     err_message = trim(msg)
 
     if (is_verbose) then
         write(*,'(A)') '***********************'
-        write(*,'(A)') 'JSON-Fortran EXCEPTION: '//trim(msg)
+        write(*,'(A)') 'JSON-Fortran Exception: '//trim(msg)
         !call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)
-        !call tracebackqq(-1) ! intel (requires "use ifcore" in this routine)
+#ifdef __INTEL_COMPILER
+        call tracebackqq(-1)  ! print a traceback and return
+#endif
         write(*,'(A)') '***********************'
     end if
 
@@ -971,7 +920,7 @@
 
     implicit none
 
-    character(kind=CDK,len=*),intent(in) :: msg    !the error message
+    character(kind=CDK,len=*),intent(in) :: msg    !! the error message
 
     call json_throw_exception(to_unicode(msg))
 
