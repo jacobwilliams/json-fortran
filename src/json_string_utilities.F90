@@ -7,13 +7,11 @@
     module json_string_utilities
 
     use json_kinds
+    use json_parameters, only: star
 
     implicit none
 
     private
-
-    character(kind=CK,len=*),parameter,public :: star = '*' !! for invalid numbers and
-                                                            !! list-directed real output
 
     !******************************************************
     !>

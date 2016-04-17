@@ -37,6 +37,9 @@
     character(kind=CK,len=*),parameter :: slash           = achar(47)
     character(kind=CK,len=*),parameter :: backslash       = achar(92)
 
+    character(kind=CK,len=*),parameter,public :: star = '*' !! for invalid numbers and
+                                                            !! list-directed real output
+
     !These were parameters, but gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
     !necessitates moving them here to be variables
     character(kind=CK,len=4),protected :: null_str  = 'null'
