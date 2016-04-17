@@ -23,6 +23,11 @@
     character(kind=CK,len=*),parameter :: end_array       = ']'
     character(kind=CK,len=*),parameter :: delimiter       = ','
     character(kind=CK,len=*),parameter :: colon_char      = ':'
+    character(kind=CK,len=*),parameter :: start_array_alt = '('  !! for [[json_get_by_path]]
+    character(kind=CK,len=*),parameter :: end_array_alt   = ')'  !! for [[json_get_by_path]]
+    character(kind=CK,len=*),parameter :: root            = '$'  !! for [[json_get_by_path]]
+    character(kind=CK,len=*),parameter :: this            = '@'  !! for [[json_get_by_path]]
+    character(kind=CK,len=*),parameter :: child           = '.'  !! for [[json_get_by_path]]
     character(kind=CK,len=*),parameter :: bspace          = achar(8)
     character(kind=CK,len=*),parameter :: horizontal_tab  = achar(9)
     character(kind=CK,len=*),parameter :: newline         = achar(10)
@@ -34,9 +39,9 @@
 
     !These were parameters, but gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
     !necessitates moving them here to be variables
-    character(kind=CK,len=4) :: null_str  = 'null'
-    character(kind=CK,len=4) :: true_str  = 'true'
-    character(kind=CK,len=5) :: false_str = 'false'
+    character(kind=CK,len=4),protected :: null_str  = 'null'
+    character(kind=CK,len=4),protected :: true_str  = 'true'
+    character(kind=CK,len=5),protected :: false_str = 'false'
 
     integer, private :: i_      !! just a counter for control_chars array
     character(kind=CK,len=*),dimension(32),parameter :: control_chars = &
@@ -67,6 +72,8 @@
     integer(IK),parameter :: unit2str = -1  !! unit number to cause stuff to be
                                             !! output to strings rather than files.
                                             !! See 9.5.6.12 in the F2003/08 standard
+
+    integer(IK),parameter,public :: seq_chunk_size = 256 !! chunk size for reading sequential files
 
     end module json_parameters
 !*****************************************************************************************

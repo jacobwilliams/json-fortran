@@ -264,12 +264,12 @@
         module procedure MAYBEWRAP(json_value_add_logical_vec)
         module procedure MAYBEWRAP(json_value_add_string)
         module procedure MAYBEWRAP(json_value_add_string_vec)
-#     ifdef USE_UCS4
+#ifdef USE_UCS4
         module procedure json_value_add_string_name_ascii
         module procedure json_value_add_string_val_ascii
         module procedure json_value_add_string_vec_name_ascii
         module procedure json_value_add_string_vec_val_ascii
-#     endif
+#endif
     end interface json_add
     !*************************************************************************************
 
@@ -289,10 +289,10 @@
                          MAYBEWRAP(json_update_double),&
                          MAYBEWRAP(json_update_integer),&
                          MAYBEWRAP(json_update_string)
-#     ifdef USE_UCS4
+#ifdef USE_UCS4
         module procedure json_update_string_name_ascii
         module procedure json_update_string_val_ascii
-#     endif
+#endif
     end interface json_update
     !*************************************************************************************
 
@@ -784,11 +784,14 @@
     !clear any errors from previous runs:
     call json_clear_exceptions()
 
-    !JW note: do we need this?.....
+    !
+    !JW comment out for now (these are now protected variables in another module)
+    ! for thread-save version, we won't be able to have global variables.........
+    !
     !Ensure gfortran bug work around "parameters" are set properly
-    null_str  = 'null'
-    true_str  = 'true'
-    false_str = 'false'
+    !null_str  = 'null'
+    !true_str  = 'true'
+    !false_str = 'false'
 
     !Just in case, clear these global variables also:
     pushed_index = 0
@@ -797,11 +800,11 @@
     line_count   = 1
     ipos         = 1
 
-# ifdef USE_UCS4
+#ifdef USE_UCS4
     ! reopen stdout and stderr with utf-8 encoding
     open(output_unit,encoding='utf-8')
     open(error_unit, encoding='utf-8')
-# endif
+#endif
 
     !verbose error printing:
     if (present(verbose)) is_verbose = verbose
@@ -1055,7 +1058,8 @@
     implicit none
 
     type(json_value),pointer :: me
-    logical(LK),intent(in),optional :: destroy_next  !! if true, then me%next is also destroyed (default is true)
+    logical(LK),intent(in),optional :: destroy_next  !! if true, then me%next
+                                                     !! is also destroyed (default is true)
 
     logical(LK) :: des_next
     type(json_value), pointer :: p
@@ -1819,7 +1823,7 @@
     logical(LK),dimension(:),intent(in) :: val   !! value
 
     type(json_value),pointer :: var
-    integer(IK) :: i    !counter
+    integer(IK) :: i    !! counter
 
     !create the variable as an array:
     call json_value_create(var)
@@ -2727,13 +2731,9 @@
     type(json_value),pointer,intent(out) :: p
     logical(LK),intent(out),optional     :: found  !! true if it was found
 
-    character(kind=CK,len=1),parameter :: start_array_alt = '('
-    character(kind=CK,len=1),parameter :: end_array_alt   = ')'
-    character(kind=CK,len=1),parameter :: root            = '$'
-    character(kind=CK,len=1),parameter :: this            = '@'
-    character(kind=CK,len=1),parameter :: child           = '.'
-
-    integer(IK)              :: i,length,child_i
+    integer(IK)              :: i
+    integer(IK)              :: length
+    integer(IK)              :: child_i
     character(kind=CK,len=1) :: c
     logical(LK)              :: array
     type(json_value),pointer :: tmp
@@ -4358,10 +4358,7 @@
     integer(IK),intent(in)                           :: iunit  !! file unit number
     character(kind=CK,len=:),allocatable,intent(out) :: line   !! current line
 
-    integer(IK),parameter               :: n_chunk = 256   ! chunk size [arbitrary]
-    character(kind=CDK,len=*),parameter :: nfmt = '(A256)' ! corresponding format statement
-
-    character(kind=CK,len=n_chunk) :: chunk
+    character(kind=CK,len=seq_chunk_size) :: chunk
     integer(IK) :: istat,isize
 
     !initialize:
@@ -4374,12 +4371,12 @@
     ![the line is read in chunks until the end of the line is reached]
     if (istat==0) then
         do
-            isize=0
-            read(iunit,fmt=nfmt,advance='NO',size=isize,iostat=istat) chunk
+            isize = 0
+            read(iunit,fmt='(A)',advance='NO',size=isize,iostat=istat) chunk
             if (istat==0) then
                 line = line//chunk
             else
-                if (isize>0 .and. isize<=n_chunk) line = line//chunk(1:isize)
+                if (isize>0 .and. isize<=seq_chunk_size) line = line//chunk(1:isize)
                 exit
             end if
         end do
@@ -4404,8 +4401,6 @@
 
     integer(IK) :: istart,iend,ios
     character(kind=CK,len=1) :: c
-
-    !updated for the new STREAM version:
 
     istart = ipos
     do
@@ -4446,8 +4441,8 @@
 
     logical(LK) :: eof
     character(kind=CK,len=1) :: c
-    character(kind=CK,len=:),allocatable :: tmp  !this is a work-around for a bug
-                                                 ! in the gfortran 4.9 compiler.
+    character(kind=CK,len=:),allocatable :: tmp  !! this is a work-around for a bug
+                                                 !! in the gfortran 4.9 compiler.
 
     if (.not. exception_thrown) then
 
