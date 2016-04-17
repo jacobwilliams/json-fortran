@@ -22,7 +22,7 @@
     end interface
     !******************************************************
 
-# ifdef USE_UCS4
+#ifdef USE_UCS4
     !******************************************************
     !>
     ! Provide a means to convert to UCS4 while
@@ -42,7 +42,7 @@
     end interface
     public :: operator(==)
     !******************************************************
-# endif
+#endif
 
     public :: integer_to_string
     public :: real_to_string
