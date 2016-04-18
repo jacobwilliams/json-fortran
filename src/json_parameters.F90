@@ -4,6 +4,11 @@
 !
 !  Other parameters used by JSON-Fortran.
 !  This is a low-level module not meant to be used by a JSON-Fortran user.
+!
+!## License
+!  * JSON-Fortran is released under a BSD-style license.
+!    See the [LICENSE](https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE)
+!    file for details.
 
     module json_parameters
 

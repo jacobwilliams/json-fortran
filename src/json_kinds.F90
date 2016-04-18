@@ -4,6 +4,11 @@
 !
 !  JSON-Fortran kind definitions.
 !
+!## License
+!  * JSON-Fortran is released under a BSD-style license.
+!    See the [LICENSE](https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE)
+!    file for details.
+!
 !@note ```-DUSE_UCS4``` is an optional preprocessor flag.
 !      When present, Unicode support is enabled. Note that this
 !      is currently only supported with the gfortran compiler.

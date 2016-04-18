@@ -2,81 +2,15 @@
 !> author: Jacob Williams
 !  license: BSD
 !
-!# JSON-Fortran:
-!  A Fortran 2008 JSON (JavaScript Object Notation) API.
-!
-!  [TOC]
-!
-!  This module provides an interface for reading and writing JSON files.
+!  This module provides a low-level interface for manipulation of JSON data.
+!  The two public entities are [[json_value]], and [[json_core]].
+!  The [[json_file_module]] provides a higher-level interface to some
+!  of these routines.
 !
 !## License
-!
-!  **JSON-Fortran License:**
-!
-!    JSON-Fortran: A Fortran 2008 JSON API
-!
-!    http://github.com/jacobwilliams/json-fortran
-!
-!    Copyright (c) 2014-2015, Jacob Williams
-!
-!    All rights reserved.
-!
-!    Redistribution and use in source and binary forms, with or without modification,
-!    are permitted provided that the following conditions are met:
-!    * Redistributions of source code must retain the above copyright notice, this
-!      list of conditions and the following disclaimer.
-!    * Redistributions in binary form must reproduce the above copyright notice, this
-!      list of conditions and the following disclaimer in the documentation and/or
-!      other materials provided with the distribution.
-!    * The names of its contributors may not be used to endorse or promote products
-!      derived from this software without specific prior written permission.
-!    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-!    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-!    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-!    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-!    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-!    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-!    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-!    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-!    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-!    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-!
-!  **Original FSON License:**
-!
-!    Copyright (c) 2012 Joseph A. Levin
-!
-!    Permission is hereby granted, free of charge, to any person obtaining a copy of this
-!    software and associated documentation files (the "Software"), to deal in the Software
-!    without restriction, including without limitation the rights to use, copy, modify, merge,
-!    publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-!    persons to whom the Software is furnished to do so, subject to the following conditions:
-!
-!    The above copyright notice and this permission notice shall be included in all copies or
-!    substantial portions of the Software.
-!
-!    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-!    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-!    PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-!    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT
-!    OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-!    DEALINGS IN THE SOFTWARE.
-!
-!## History
-!  * Joseph A. Levin : March 2012 : Original FSON code [retrieved on 12/2/2013].
-!  * Jacob Williams : 2/8/2014 : Extensive modifications to the original FSON code.
-!    The original F95 code was split into four files:
-!    fson_path_m.f95, fson_string_m.f95, fson_value_m.f95, and fson.f95.
-!    The new code has been extensively updated, refactored and combined into this
-!    one module (json_module.f90).
-!    Various Fortran 2003/2008 features are now used
-!    (e.g., allocatable strings, newunit, generic, class, and abstract interface).
-!  * Development continues at: [Github](http://github.com/jacobwilliams/json-fortran)
-!
-!## See also
-!  * [json-fortran development site](http://github.com/jacobwilliams/json-fortran)
-!  * [json-fortran online documentation](http://jacobwilliams.github.io/json-fortran)
-!  * [JSON website](http://www.json.org/)
-!  * [JSON validator](http://jsonlint.com/)
+!  * JSON-Fortran is released under a BSD-style license.
+!    See the [LICENSE](https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE)
+!    file for details.
 
     module json_value_module
 
@@ -435,8 +369,10 @@
         !# Example
         !
         !````fortran
+        !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json_create_double(p,'value',1.0d0)
+        !    call json%initialize()
+        !    call json%create_double(p,'value',1.0d0)
         !````
         generic,public :: create_double => MAYBEWRAP(json_value_create_double)
         procedure :: MAYBEWRAP(json_value_create_double)
@@ -448,8 +384,10 @@
         !# Example
         !
         !````fortran
-        !     type(json_value),pointer :: p
-        !     call json_create(p,'arrayname')
+        !    type(json_core) :: json
+        !    type(json_value),pointer :: p
+        !    call json%initialize()
+        !    call json%create_array(p,'arrayname')
         !````
         generic,public :: create_array => MAYBEWRAP(json_value_create_array)
         procedure :: MAYBEWRAP(json_value_create_array)
@@ -461,8 +399,10 @@
         !# Example
         !
         !````fortran
-        !     type(json_value),pointer :: p
-        !     call json_create(p,'objectname')
+        !    type(json_core) :: json
+        !    type(json_value),pointer :: p
+        !    call json%initialize()
+        !    call json%create_object(p,'objectname')
         !````
         !
         !@note The name is not significant for the root structure or an array element.
@@ -477,8 +417,10 @@
         !# Example
         !
         !````fortran
-        !     type(json_value),pointer :: p
-        !     call json_create_null(p,'value')
+        !    type(json_core) :: json
+        !    type(json_value),pointer :: p
+        !    call json%initialize()
+        !    call json%create_null(p,'value')
         !````
         generic,public :: create_null => MAYBEWRAP(json_value_create_null)
         procedure :: MAYBEWRAP(json_value_create_null)
@@ -490,8 +432,10 @@
         !# Example
         !
         !````fortran
-        !     type(json_value),pointer :: p
-        !     call json_create_string(p,'value','foobar')
+        !    type(json_core) :: json
+        !    type(json_value),pointer :: p
+        !    call json%initialize()
+        !    call json%create_string(p,'value','foobar')
         !````
         generic,public :: create_string => MAYBEWRAP(json_value_create_string)
         procedure :: MAYBEWRAP(json_value_create_string)
@@ -503,8 +447,10 @@
         !# Example
         !
         !````fortran
-        !     type(json_value),pointer :: p
-        !     call json_create_integer(p,'value',42)
+        !    type(json_core) :: json
+        !    type(json_value),pointer :: p
+        !    call json%initialize()
+        !    call json%create_integer(p,'value',42)
         !````
         generic,public :: create_integer => MAYBEWRAP(json_value_create_integer)
         procedure :: MAYBEWRAP(json_value_create_integer)
@@ -516,8 +462,10 @@
         !# Example
         !
         !````fortran
-        !     type(json_value),pointer :: p
-        !     call json_create_logical(p,'value',.true.)
+        !    type(json_core) :: json
+        !    type(json_value),pointer :: p
+        !    call json%initialize()
+        !    call json%create_logical(p,'value',.true.)
         !````
         generic,public :: create_logical => MAYBEWRAP(json_value_create_logical)
         procedure :: MAYBEWRAP(json_value_create_logical)
@@ -570,16 +518,14 @@
     !*************************************************************************************
     abstract interface
 
-        !...todo ... these probably need [[json_core]] also ...
-
         subroutine array_callback_func(json, element, i, count)
             !! Array element callback function.  Used by [[json_get_array]]
             import :: json_value,json_core,IK
             implicit none
             class(json_core),intent(inout)       :: json
             type(json_value), pointer,intent(in) :: element
-            integer(IK),intent(in)               :: i        !index
-            integer(IK),intent(in)               :: count    !size of array
+            integer(IK),intent(in)               :: i        !! index
+            integer(IK),intent(in)               :: count    !! size of array
         end subroutine array_callback_func
 
         subroutine traverse_callback_func(json,p,finished)
@@ -588,7 +534,7 @@
             implicit none
             class(json_core),intent(inout)      :: json
             type(json_value),pointer,intent(in) :: p
-            logical(LK),intent(out)             :: finished
+            logical(LK),intent(out)             :: finished  !! set true to stop traversing
         end subroutine traverse_callback_func
 
     end interface
@@ -1010,7 +956,7 @@
 !> author: Jacob Williams
 !  date: 12/5/2013
 !
-!  Logical function to indicate if an exception has been thrown.
+!  Logical function to indicate if an exception has been thrown in a [[json_core]].
 !
 !# Example
 !
@@ -1019,8 +965,8 @@
 !    logical :: status_ok
 !    character(len=:),allocatable :: error_msg
 !    call json%load_file(filename='myfile.json')
-!    if (json_failed()) then
-!        call json_check_for_errors(status_ok, error_msg)
+!    if (json%failed()) then
+!        call json%check_for_errors(status_ok, error_msg)
 !        write(*,*) 'Error: '//error_msg
 !        call json%clear_exceptions()
 !        call json%destroy()
@@ -1050,6 +996,7 @@
 !# Example
 !
 !````fortran
+!    type(json_core) :: json
 !    type(json_value),pointer :: var
 !    call json%create(var)
 !    call to_double(var,1.0d0)
@@ -1057,7 +1004,7 @@
 !
 !# Notes
 !  1. This routine does not check for exceptions.
-!  2. The pointer should not already be allocated.
+!  2. The pointer should not already be allocated, or a memory leak will occur.
 
     subroutine json_value_create(json,p)
 
@@ -1143,21 +1090,25 @@
 !
 !  To extract an object from one JSON structure, and add it to another:
 !````fortran
+!     type(json_core) :: json
 !     type(json_value),pointer :: json1,json2,p
 !     logical :: found
+!     call json%initialize()
 !     !create and populate json1 and json2
 !     call json%get(json1,'name',p,found)  ! get pointer to name element of json1
-!     call json_remove(p,destroy=.false.)  ! remove it from json1 (don't destroy)
+!     call json%remove(p,destroy=.false.)  ! remove it from json1 (don't destroy)
 !     call json%add(json2,p)               ! add it to json2
 !````
 !
 !  To remove an object from a JSON structure (and destroy it):
 !````fortran
+!     type(json_core) :: json
 !     type(json_value),pointer :: json1,p
 !     logical :: found
+!     call json%initialize()
 !     !create and populate json1
 !     call json%get(json1,'name',p,found)  ! get pointer to name element of json1
-!     call json_remove(p)                  ! remove and destroy it
+!     call json%remove(p)                  ! remove and destroy it
 !````
 !
 !# History
@@ -1260,7 +1211,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_remove_if_present]], where "name" is kind=CDK.
+!  Alternate version of [[json_value_remove_if_present]], where `name` is kind=CDK.
 
     subroutine wrap_json_value_remove_if_present(json,p,name)
 
@@ -1318,7 +1269,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_logical]], where "name" is kind=CDK.
+!  Alternate version of [[json_update_logical]], where `name` is kind=CDK.
 
     subroutine wrap_json_update_logical(json,p,name,val,found)
 
@@ -1378,7 +1329,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_double]], where "name" is kind=CDK.
+!  Alternate version of [[json_update_double]], where `name` is kind=CDK.
 
     subroutine wrap_json_update_double(json,p,name,val,found)
 
@@ -1438,7 +1389,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_integer]], where "name" is kind=CDK.
+!  Alternate version of [[json_update_integer]], where `name` is kind=CDK.
 
     subroutine wrap_json_update_integer(json,p,name,val,found)
 
@@ -1498,7 +1449,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_string]], where "name" and "value" are kind=CDK.
+!  Alternate version of [[json_update_string]], where `name` and `value` are kind=CDK.
 
     subroutine wrap_json_update_string(json,p,name,val,found)
 
@@ -1517,7 +1468,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_string]], where "name" is kind=CDK.
+!  Alternate version of [[json_update_string]], where `name` is kind=CDK.
 
     subroutine json_update_string_name_ascii(json,p,name,val,found)
 
@@ -1536,7 +1487,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_string]], where "val" is kind=CDK.
+!  Alternate version of [[json_update_string]], where `val` is kind=CDK.
 
     subroutine json_update_string_val_ascii(json,p,name,val,found)
 
@@ -1627,7 +1578,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_double]] where "name" is kind=CDK.
+!  Alternate version of [[json_value_add_double]] where `name` is kind=CDK.
 
     subroutine wrap_json_value_add_double(json,me,name,val)
 
@@ -1684,7 +1635,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_double_vec]] where "name" is kind=CDK.
+!  Alternate version of [[json_value_add_double_vec]] where `name` is kind=CDK.
 
     subroutine wrap_json_value_add_double_vec(json, me, name, val)
 
@@ -1735,7 +1686,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_integer]] where "name" is kind=CDK.
+!  Alternate version of [[json_value_add_integer]] where `name` is kind=CDK.
 
     subroutine wrap_json_value_add_integer(json, me, name, val)
 
@@ -1792,7 +1743,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_integer_vec]] where "name" is kind=CDK.
+!  Alternate version of [[json_value_add_integer_vec]] where `name` is kind=CDK.
 
     subroutine wrap_json_value_add_integer_vec(json, me, name, val)
 
@@ -1843,7 +1794,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_logical]] where "name" is kind=CDK.
+!  Alternate version of [[json_value_add_logical]] where `name` is kind=CDK.
 
     subroutine wrap_json_value_add_logical(json, me, name, val)
 
@@ -1900,7 +1851,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_logical_vec]] where "name" is kind=CDK.
+!  Alternate version of [[json_value_add_logical_vec]] where `name` is kind=CDK.
 
     subroutine wrap_json_value_add_logical_vec(json, me, name, val)
 
@@ -1955,7 +1906,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_string]] where "name" and "val" are kind=CDK.
+!  Alternate version of [[json_value_add_string]] where `name` and `val` are kind=CDK.
 
     subroutine wrap_json_value_add_string(json, me, name, val)
 
@@ -1973,7 +1924,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_string]] where "name" is kind=CDK.
+!  Alternate version of [[json_value_add_string]] where `name` is kind=CDK.
 
     subroutine json_value_add_string_name_ascii(json, me, name, val)
 
@@ -1991,7 +1942,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_string]] where "val" is kind=CDK.
+!  Alternate version of [[json_value_add_string]] where `val` is kind=CDK.
 
     subroutine json_value_add_string_val_ascii(json, me, name, val)
 
@@ -2075,7 +2026,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_string_vec]] where "name" and "val" are kind=CDK.
+!  Alternate version of [[json_value_add_string_vec]] where `name` and `val` are kind=CDK.
 
     subroutine wrap_json_value_add_string_vec(json, me, name, val, trim_str, adjustl_str)
 
@@ -2095,7 +2046,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_string_vec]] where "name" is kind=CDK.
+!  Alternate version of [[json_value_add_string_vec]] where `name` is kind=CDK.
 
     subroutine json_value_add_string_vec_name_ascii(json, me, name, val, trim_str, adjustl_str)
 
@@ -2115,7 +2066,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_add_string_vec]] where "val" is kind=CDK.
+!  Alternate version of [[json_value_add_string_vec]] where `val` is kind=CDK.
 
     subroutine json_value_add_string_vec_val_ascii(json, me, name, val, trim_str, adjustl_str)
 
@@ -2293,7 +2244,7 @@
 !     'a ' /= 'A ' /= 'a  '
 !````
 !
-!@note The "name" input is not a path, and is not parsed like it is in [[json_get_by_path]].
+!@note The `name` input is not a path, and is not parsed like it is in [[json_get_by_path]].
 
     subroutine json_value_get_by_name_chars(json, me, name, p)
 
@@ -2340,7 +2291,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_get_by_name_chars]] where "name" is kind=CDK.
+!  Alternate version of [[json_value_get_by_name_chars]] where `name` is kind=CDK.
 
     subroutine wrap_json_value_get_by_name_chars(json, me, name, p)
 
