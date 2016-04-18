@@ -45,11 +45,6 @@ contains
     character(len=:),allocatable :: str
 
     error_cnt = 0
-    call json_initialize()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-    end if
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -62,12 +57,12 @@ contains
     write(error_unit,'(A)') 'Loading file: '//trim(filename)
 
     call cpu_time(tstart)
-    call f%load_file(dir//filename)
+    call f%load_file(dir//filename) ! will automatically call initialize() with defaults
     call cpu_time(tend)
     write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time: ',tend-tstart,' sec'
 
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') 'File successfully read'
@@ -94,8 +89,8 @@ contains
         call f%load_from_string(str)
         call cpu_time(tend)
         write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time to parse: ',tend-tstart,' sec'
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (f%failed()) then
+            call f%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
             write(error_unit,'(A)') 'File successfully read'
@@ -159,5 +154,6 @@ program jf_test_9
     n_errors = 0
     call test_9(n_errors)
     if (n_errors /= 0) stop 1
+
 end program jf_test_9
 !*****************************************************************************************

@@ -50,9 +50,6 @@
     character(kind=CK,len=*),dimension(32),parameter :: control_chars = &
         [(achar(i_),i_=1,31), achar(127)] !! Control characters, possibly in unicode
 
-    !for indenting (Note: this could also be a user input...)
-    integer(IK),parameter :: spaces_per_tab = 2
-
     !find out the precision of the floating point number system
     !and set safety factors
     integer(IK),parameter :: rp_safety_factor = 1
@@ -77,6 +74,8 @@
                                             !! See 9.5.6.12 in the F2003/08 standard
 
     integer(IK),parameter,public :: seq_chunk_size = 256 !! chunk size for reading sequential files
+
+    integer(IK),parameter,public :: pushed_char_size = 10 !! magic number
 
     end module json_parameters
 !*****************************************************************************************

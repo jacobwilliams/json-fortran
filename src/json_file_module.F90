@@ -22,8 +22,14 @@
     !> author: Jacob Williams
     !  date: 12/9/2013
     !
-    !  The json_file is the main public class that is
+    !  The `json_file` is the main public class that is
     !  used to open a file and get data from it.
+    !
+    !  A `json_file` contains only two items: an instance of a [[json_core]],
+    !  which use used for all data manipulation, and a [[json_value]],
+    !  which is used to construct the linked-list data structure.
+    !  Note that most methods in the `json_file` class are simply wrappers
+    !  to the lower-level routines in the [[json_value_module]].
     !
     !# Example
     !
@@ -36,7 +42,7 @@
     !    real(real64) :: rval
     !    character(len=:),allocatable :: cval
     !    logical :: found
-    !    call json_initialize()
+    !    call json%initialize(compact_reals=.true.)
     !    call json%load_file(filename='myfile.json')
     !    call json%print_file() !print to the console
     !    call json%get('var.i',ival,found)
@@ -50,9 +56,13 @@
 
         private
 
+        type(json_core) :: json !! the instance of the [[json_core]] factory used for this file
+
         type(json_value),pointer :: p => null()  !! the JSON structure read from the file
 
     contains
+
+        procedure,public :: initialize => initialize_json_core_in_file
 
         procedure,public :: load_file => json_file_load
 
@@ -61,6 +71,12 @@
         procedure,public :: destroy => json_file_destroy
         procedure,public :: move    => json_file_move_pointer
         generic,public   :: info    => MAYBEWRAP(json_file_variable_info)
+
+        !error checking:
+        procedure,public :: failed => json_file_failed
+        procedure,public :: print_error_message => json_file_print_error_message
+        procedure,public :: check_for_errors => json_file_check_for_errors
+        procedure,public :: clear_exceptions => json_file_clear_exceptions
 
         procedure,public :: print_to_string => json_file_print_to_string
 
@@ -150,18 +166,113 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> author: Izaak Beekman
-!  date: 07/23/2015
-!
-!  Cast a [[json_value]] object as a [[json_file(type)]] object
+!>
+!  Check error status in the file.
 
-    function initialize_json_file(p) result(file_object)
+    pure function json_file_failed(me) result(failed)
 
     implicit none
 
+    class(json_file),intent(in) :: me
+    logical(LK)                 :: failed  !! will be true if there has been an error.
+
+    failed = me%json%failed()
+
+    end function json_file_failed
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Retrieve error status and message from the class.
+
+    subroutine json_file_check_for_errors(me,status_ok,error_msg)
+
+    implicit none
+
+    class(json_file),intent(inout) :: me
+    logical(LK),intent(out) :: status_ok !! true if there were no errors
+    character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! the error message (if there were errors)
+
+    call me%json%check_for_errors(status_ok,error_msg)
+
+    end subroutine json_file_check_for_errors
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Clear exceptions in the class.
+
+    pure subroutine json_file_clear_exceptions(me)
+
+    implicit none
+
+    class(json_file),intent(inout) :: me
+
+    call me%json%clear_exceptions()
+
+    end subroutine json_file_clear_exceptions
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  This is a wrapper for [[json_print_error_message]].
+
+    subroutine json_file_print_error_message(me,io_unit)
+
+    implicit none
+
+    class(json_file),intent(inout) :: me
+    integer, intent(in), optional  :: io_unit
+
+    call me%json%print_error_message(io_unit)
+
+    end subroutine json_file_print_error_message
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Initialize the [[json_core]] for this [[json_file]].
+!  This is just a wrapper for [[json_initialize]].
+!
+!@note: This does not destroy the data in the file.
+
+    subroutine initialize_json_core_in_file(me,verbose,compact_reals,print_signs,real_format,spaces_per_tab)
+
+    implicit none
+
+    class(json_file),intent(inout) :: me
+    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
+    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
+    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
+    character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
+    integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+
+    call me%json%initialize(verbose,compact_reals,print_signs,real_format,spaces_per_tab)
+
+    end subroutine initialize_json_core_in_file
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 07/23/2015
+!
+!  Cast a [[json_value]] object as a [[json_file(type)]] object.
+!  It also calls the `initialize()` method.
+
+    function initialize_json_file(p,verbose,compact_reals,print_signs,real_format,spaces_per_tab) result(file_object)
+
+    implicit none
+
+    type(json_file) :: file_object
     type(json_value),pointer,optional,intent(in) :: p  !! `json_value` object to cast
                                                        !! as a `json_file` object
-    type(json_file) :: file_object
+    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
+    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
+    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
+    character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
+    integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+
+    call file_object%initialize(verbose,compact_reals,print_signs,real_format,spaces_per_tab)
 
     if (present(p)) file_object%p => p
 
@@ -180,7 +291,7 @@
 
     class(json_file),intent(inout) :: me
 
-    if (associated(me%p)) call json_destroy(me%p)
+    if (associated(me%p)) call me%json%destroy(me%p)
 
     end subroutine json_file_destroy
 !*****************************************************************************************
@@ -202,11 +313,21 @@
     class(json_file),intent(inout) :: from
 
     if (associated(from%p)) then
-        to%p => from%p
-        nullify(from%p)
+
+        if (from%failed()) then
+            !Don't get the data if the FROM file has an
+            !active exception, since it may not be valid.
+            call to%json%throw_exception('Error in json_file_move_pointer: '//&
+                                         'error exception in FROM file.')
+        else
+            call to%initialize()  !initialize and clear any exceptions that may be present
+            to%p => from%p
+            nullify(from%p)
+        end if
+
     else
-        call throw_exception('Error in json_file_move_pointer: '//&
-                             'pointer is not associated.')
+        call to%json%throw_exception('Error in json_file_move_pointer: '//&
+                                     'pointer is not associated.')
     end if
 
     end subroutine json_file_move_pointer
@@ -225,7 +346,6 @@
 !      use json_module
 !      implicit none
 !      type(json_file) :: f
-!      call json_initialize()
 !      call f%load_file('my_file.json')
 !      !...
 !      call f%destroy()
@@ -240,7 +360,7 @@
     character(kind=CDK,len=*),intent(in) :: filename  !! the filename to open
     integer(IK),intent(in),optional      :: unit      !! the unit number to use (if not present, a newunit is used)
 
-    call json_parse(file=filename, p=me%p, unit=unit)
+    call me%json%parse(file=filename, p=me%p, unit=unit)
 
     end subroutine json_file_load
 !*****************************************************************************************
@@ -266,7 +386,7 @@
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
 
-    call json_parse(str=str, p=me%p)
+    call me%json%parse(str=str, p=me%p)
 
     end subroutine json_file_load_from_string
 !*****************************************************************************************
@@ -282,7 +402,7 @@
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: str
 
-    call json_file_load_from_string(me,to_unicode(str))
+    call me%load_from_string(to_unicode(str))
 
     end subroutine wrap_json_file_load_from_string
 !*****************************************************************************************
@@ -299,7 +419,7 @@
 
     class(json_file),intent(inout)  :: me
 
-    call json_print(me%p,iunit=output_unit)
+    call me%json%print(me%p,iunit=output_unit)
 
     end subroutine json_file_print_to_console
 !*****************************************************************************************
@@ -318,9 +438,9 @@
     integer(IK),intent(in)          :: iunit  !! file unit number (must not be -1)
 
     if (iunit/=unit2str) then
-        call json_print(me%p,iunit=iunit)
+        call me%json%print(me%p,iunit=iunit)
     else
-        call throw_exception('Error in json_file_print_1: iunit must not be -1.')
+        call me%json%throw_exception('Error in json_file_print_1: iunit must not be -1.')
     end if
 
     end subroutine json_file_print_1
@@ -351,7 +471,7 @@
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: filename  !! filename to print to
 
-    call json_print(me%p,filename)
+    call me%json%print(me%p,filename)
 
     end subroutine json_file_print_2
 !*****************************************************************************************
@@ -379,7 +499,7 @@
     class(json_file),intent(inout)                   :: me
     character(kind=CK,len=:),allocatable,intent(out) :: str  !! string to print JSON data to
 
-    call json_print_to_string(me%p,str)
+    call me%json%print_to_string(me%p,str)
 
     end subroutine json_file_print_to_string
 !*****************************************************************************************
@@ -411,7 +531,7 @@
     if (found) then
 
         !get info:
-        call json_info(p,var_type,n_children)
+        call me%json%info(p,var_type,n_children)
 
     else
 
@@ -441,29 +561,9 @@
     integer(IK),intent(out)              :: var_type
     integer(IK),intent(out)              :: n_children
 
-    call json_file_variable_info(me,to_unicode(path),found,var_type,n_children)
+    call me%info(to_unicode(path),found,var_type,n_children)
 
     end subroutine wrap_json_file_variable_info
-!*****************************************************************************************
-
-!*****************************************************************************************
-!> author: Jacob Williams
-!  date: 2/3/2014
-!
-!  Get a [[json_value]] pointer to an object from a JSON file.
-
-    subroutine json_file_get_object(me, path, p, found)
-
-    implicit none
-
-    class(json_file),intent(inout)       :: me
-    character(kind=CK,len=*),intent(in)  :: path   !! the path to the variable
-    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
-    logical(LK),intent(out),optional     :: found  !! if it was really found
-
-    call json_get(me%p, path=path, p=p, found=found)
-
-    end subroutine json_file_get_object
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -487,6 +587,26 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!> author: Jacob Williams
+!  date: 2/3/2014
+!
+!  Get a [[json_value]] pointer to an object from a JSON file.
+
+    subroutine json_file_get_object(me, path, p, found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path   !! the path to the variable
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+    logical(LK),intent(out),optional     :: found  !! if it was really found
+
+    call me%json%get(me%p, path=path, p=p, found=found)
+
+    end subroutine json_file_get_object
+!*****************************************************************************************
+
+!*****************************************************************************************
 !>
 !  Alternate version of [[json_file_get_object]], where "path" is kind=CDK.
 
@@ -499,7 +619,7 @@
     type(json_value),pointer,intent(out) :: p
     logical(LK),intent(out),optional     :: found
 
-    call json_file_get_object(me, to_unicode(path), p, found)
+    call me%get(to_unicode(path), p, found)
 
     end subroutine wrap_json_file_get_object
 !*****************************************************************************************
@@ -519,7 +639,7 @@
     integer(IK),intent(out)             :: val    !! value
     logical(LK),intent(out),optional    :: found  !! if it was really found
 
-    call json_get(me%p, path=path, value=val, found=found)
+    call me%json%get(me%p, path=path, value=val, found=found)
 
     end subroutine json_file_get_integer
 !*****************************************************************************************
@@ -537,7 +657,7 @@
     integer(IK),intent(out)              :: val
     logical(LK),intent(out),optional     :: found
 
-    call json_file_get_integer(me, to_unicode(path), val, found)
+    call me%get(to_unicode(path), val, found)
 
     end subroutine wrap_json_file_get_integer
 !*****************************************************************************************
@@ -557,7 +677,7 @@
     integer(IK),dimension(:),allocatable,intent(out) :: vec    !! the value vector
     logical(LK),intent(out),optional                 :: found  !! if it was really found
 
-    call json_get(me%p, path, vec, found)
+    call me%json%get(me%p, path, vec, found)
 
     end subroutine json_file_get_integer_vec
 !*****************************************************************************************
@@ -575,7 +695,7 @@
     integer(IK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
 
-    call json_file_get_integer_vec(me, to_unicode(path), vec, found)
+    call me%get(to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_integer_vec
 !*****************************************************************************************
@@ -595,7 +715,7 @@
     real(RK),intent(out)                :: val
     logical(LK),intent(out),optional    :: found
 
-    call json_get(me%p, path=path, value=val, found=found)
+    call me%json%get(me%p, path=path, value=val, found=found)
 
     end subroutine json_file_get_double
 !*****************************************************************************************
@@ -613,7 +733,7 @@
     real(RK),intent(out)                 :: val
     logical(LK),intent(out),optional     :: found
 
-    call json_file_get_double(me, to_unicode(path), val, found)
+    call me%get(to_unicode(path), val, found)
 
     end subroutine wrap_json_file_get_double
 !*****************************************************************************************
@@ -633,7 +753,7 @@
     real(RK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional              :: found
 
-    call json_get(me%p, path, vec, found)
+    call me%json%get(me%p, path, vec, found)
 
     end subroutine json_file_get_double_vec
 !*****************************************************************************************
@@ -651,7 +771,7 @@
     real(RK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional              :: found
 
-    call json_file_get_double_vec(me, to_unicode(path), vec, found)
+    call me%get(to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_double_vec
 !*****************************************************************************************
@@ -671,7 +791,7 @@
     logical(LK),intent(out)              :: val
     logical(LK),intent(out),optional     :: found
 
-    call json_get(me%p, path=path, value=val, found=found)
+    call me%json%get(me%p, path=path, value=val, found=found)
 
     end subroutine json_file_get_logical
 !*****************************************************************************************
@@ -689,7 +809,7 @@
     logical(LK),intent(out)              :: val
     logical(LK),intent(out),optional     :: found
 
-    call json_file_get_logical(me, to_unicode(path), val, found)
+    call me%get(to_unicode(path), val, found)
 
     end subroutine wrap_json_file_get_logical
 !*****************************************************************************************
@@ -709,7 +829,7 @@
     logical(LK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
 
-    call json_get(me%p, path, vec, found)
+    call me%json%get(me%p, path, vec, found)
 
     end subroutine json_file_get_logical_vec
 !*****************************************************************************************
@@ -727,7 +847,7 @@
     logical(LK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
 
-    call json_file_get_logical_vec(me, to_unicode(path), vec, found)
+    call me%get(to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_logical_vec
 !*****************************************************************************************
@@ -748,7 +868,7 @@
     character(kind=CK,len=:),allocatable,intent(out) :: val
     logical(LK),intent(out),optional                 :: found
 
-    call json_get(me%p, path=path, value=val, found=found)
+    call me%json%get(me%p, path=path, value=val, found=found)
 
     end subroutine json_file_get_string
 !*****************************************************************************************
@@ -766,7 +886,7 @@
     character(kind=CK,len=:),allocatable,intent(out) :: val
     logical(LK),intent(out),optional                 :: found
 
-    call json_file_get_string(me, to_unicode(path), val, found)
+    call me%get(to_unicode(path), val, found)
 
     end subroutine wrap_json_file_get_string
 !*****************************************************************************************
@@ -786,7 +906,7 @@
     character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                              :: found
 
-    call json_get(me%p, path, vec, found)
+    call me%json%get(me%p, path, vec, found)
 
     end subroutine json_file_get_string_vec
 !*****************************************************************************************
@@ -804,7 +924,7 @@
     character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                              :: found
 
-    call json_file_get_string_vec(me, to_unicode(path), vec, found)
+    call me%get(to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_string_vec
 !*****************************************************************************************
@@ -821,6 +941,7 @@
 !  * [[json_update_integer]]
 
     subroutine json_file_update_integer(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)      :: me
@@ -828,7 +949,7 @@
     integer(IK),intent(in)              :: val
     logical(LK),intent(out)             :: found
 
-    if (.not. exception_thrown) call json_update(me%p,name,val,found)
+    if (.not. me%json%failed()) call me%json%update(me%p,name,val,found)
 
     end subroutine json_file_update_integer
 !*****************************************************************************************
@@ -838,6 +959,7 @@
 !  Alternate version of [[json_file_update_integer]], where "name" is kind=CDK.
 
     subroutine wrap_json_file_update_integer(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)       :: me
@@ -845,7 +967,7 @@
     integer(IK),intent(in)               :: val
     logical(LK),intent(out)              :: found
 
-    call json_file_update_integer(me,to_unicode(name),val,found)
+    call me%update(to_unicode(name),val,found)
 
     end subroutine wrap_json_file_update_integer
 !*****************************************************************************************
@@ -862,6 +984,7 @@
 !  * [[json_update_logical]]
 
     subroutine json_file_update_logical(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)      :: me
@@ -869,7 +992,7 @@
     logical(LK),intent(in)              :: val
     logical(LK),intent(out)             :: found
 
-    if (.not. exception_thrown) call json_update(me%p,name,val,found)
+    if (.not. me%json%failed()) call me%json%update(me%p,name,val,found)
 
     end subroutine json_file_update_logical
 !*****************************************************************************************
@@ -879,6 +1002,7 @@
 !  Alternate version of [[json_file_update_logical]], where "name" is kind=CDK.
 
     subroutine wrap_json_file_update_logical(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)       :: me
@@ -886,7 +1010,7 @@
     logical(LK),intent(in)               :: val
     logical(LK),intent(out)              :: found
 
-    call json_file_update_logical(me,to_unicode(name),val,found)
+    call me%update(to_unicode(name),val,found)
 
     end subroutine wrap_json_file_update_logical
 !*****************************************************************************************
@@ -903,6 +1027,7 @@
 !  * [[json_update_double]]
 
     subroutine json_file_update_real(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)      :: me
@@ -910,7 +1035,7 @@
     real(RK),intent(in)                 :: val
     logical(LK),intent(out)             :: found
 
-    if (.not. exception_thrown) call json_update(me%p,name,val,found)
+    if (.not. me%json%failed()) call me%json%update(me%p,name,val,found)
 
     end subroutine json_file_update_real
 !*****************************************************************************************
@@ -920,6 +1045,7 @@
 !  Alternate version of [[json_file_update_real]], where "name" is kind=CDK.
 
     subroutine wrap_json_file_update_real(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)       :: me
@@ -927,7 +1053,7 @@
     real(RK),intent(in)                  :: val
     logical(LK),intent(out)              :: found
 
-    call json_file_update_real(me,to_unicode(name),val,found)
+    call me%update(to_unicode(name),val,found)
 
     end subroutine wrap_json_file_update_real
 !*****************************************************************************************
@@ -944,6 +1070,7 @@
 !  * [[json_update_string]]
 
     subroutine json_file_update_string(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)      :: me
@@ -951,7 +1078,7 @@
     character(kind=CK,len=*),intent(in) :: val
     logical(LK),intent(out)             :: found
 
-    if (.not. exception_thrown) call json_update(me%p,name,val,found)
+    if (.not. me%json%failed()) call me%json%update(me%p,name,val,found)
 
     end subroutine json_file_update_string
 !*****************************************************************************************
@@ -961,6 +1088,7 @@
 !  Alternate version of [[json_file_update_string]], where "name" and "val" are kind=CDK.
 
     subroutine wrap_json_file_update_string(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)       :: me
@@ -968,7 +1096,7 @@
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call json_file_update_string(me,to_unicode(name),to_unicode(val),found)
+    call me%update(to_unicode(name),to_unicode(val),found)
 
     end subroutine wrap_json_file_update_string
 !*****************************************************************************************
@@ -978,6 +1106,7 @@
 !  Alternate version of [[json_file_update_string]], where "name" is kind=CDK.
 
     subroutine json_file_update_string_name_ascii(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)       :: me
@@ -985,7 +1114,7 @@
     character(kind=CK, len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call json_file_update_string(me,to_unicode(name),val,found)
+    call me%update(to_unicode(name),val,found)
 
     end subroutine json_file_update_string_name_ascii
 !*****************************************************************************************
@@ -995,6 +1124,7 @@
 !  Alternate version of [[json_file_update_string]], where "val" is kind=CDK.
 
     subroutine json_file_update_string_val_ascii(me,name,val,found)
+
     implicit none
 
     class(json_file),intent(inout)       :: me
@@ -1002,7 +1132,7 @@
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call json_file_update_string(me,name,to_unicode(val),found)
+    call me%update(name,to_unicode(val),found)
 
     end subroutine json_file_update_string_val_ascii
 !*****************************************************************************************

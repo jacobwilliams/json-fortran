@@ -28,7 +28,8 @@ contains
 
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
-    type(json_value),pointer  :: json
+    type(json_core) :: json
+    type(json_value),pointer  :: p
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -39,17 +40,17 @@ contains
     error_cnt = 0
     icount = 0 !number of name changes (should be 2)
 
-    call json_initialize() !initialize the module
+    call json%initialize() !initialize the module
 
-    call json_parse(dir//filename1,json)  !read the file
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%parse(dir//filename1,p)  !read the file
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
-    call json_traverse(json,rename) !traverse all nodes in the structure
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%traverse(p,rename) !traverse all nodes in the structure
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -62,36 +63,37 @@ contains
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') ' All names changed to Fred:'
         write(error_unit,'(A)') ''
-        call json_print(json,output_unit)
+        call json%print(p,output_unit)
         write(error_unit,'(A)') ''
     end if
 
-    call json_destroy(json)  !clean up
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%destroy(p)  !clean up
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
     end subroutine test_14
 
-    subroutine rename(p,finished)  !! change all "name" variable values to "Fred"
+    subroutine rename(json,p,finished)  !! change all "name" variable values to "Fred"
 
     implicit none
 
+    class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: p
-    logical,intent(out) :: finished
+    logical,intent(out)                 :: finished
 
     integer :: var_type
     character(kind=CK,len=:),allocatable :: str
     logical :: found
 
     !get info about this variable:
-    call json_info(p,var_type=var_type,name=str)
+    call json%info(p,var_type=var_type,name=str)
 
     !it must be a string named "name":
     if (var_type==json_string .and. str=='name') then
-        call json_get(p,'@',str)             ! get original name
-        call json_update(p,'@','Fred',found) !change it
+        call json%get(p,'@',str)             ! get original name
+        call json%update(p,'@','Fred',found) ! change it
         write(error_unit,'(A)') str//' name changed'
         icount = icount + 1
     end if

@@ -34,9 +34,9 @@ contains
     logical :: found
 
     error_cnt = 0
-    call json_initialize()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%initialize()
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -49,9 +49,9 @@ contains
     ! parse the json file:
     write(error_unit,'(A)') 'load file...'
     call json%load_file(filename = dir//filename5)
-    if (json_failed()) then
+    if (json%failed()) then
 
-        call json_print_error_message(error_unit)
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
 
     else
@@ -59,8 +59,8 @@ contains
         ! print the parsed data to the console:
         write(error_unit,'(A)') 'print file...'
         call json%print_file()
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
 
@@ -70,22 +70,22 @@ contains
 
         write(error_unit,'(A)') '--------------------------'
         call json%get('Correl.ID2', vv, found)
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
         if (found) write(error_unit,'(A,I5)') 'vv = ',vv
 
         call json%get('Correl.ID1', vvv, found)
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
         if (found) write(error_unit,'(A,*(I5,1X))') 'vvv= ',vvv
 
         call json%get('Prior[3].mode', d, found)
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
         if (found) write(error_unit,'(A,E30.16)') 'd  = ',d
@@ -96,8 +96,8 @@ contains
 
     ! clean up
     call json%destroy()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -117,7 +117,6 @@ program jf_test_5
     n_errors = 0
     call test_5(n_errors)
     if (n_errors /= 0) stop 1
+
 end program jf_test_5
 !*****************************************************************************************
-
-!*******************************************************************************************************

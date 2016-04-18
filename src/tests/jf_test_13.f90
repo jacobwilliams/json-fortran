@@ -39,16 +39,16 @@ contains
 
     do i=1,size(fmts)
 
-        call json_initialize(real_format=trim(fmts(i)))
+        call my_file%initialize(real_format=trim(fmts(i)))
 
         call my_file%load_from_string('{ "value": 1234.56789 }')
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (my_file%failed()) then
+            call my_file%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
         call my_file%print_to_string(str)
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (my_file%failed()) then
+            call my_file%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
             write(output_unit,'(A)') str

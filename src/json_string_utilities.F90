@@ -7,7 +7,7 @@
     module json_string_utilities
 
     use json_kinds
-    use json_parameters, only: star
+    use json_parameters
 
     implicit none
 
@@ -48,6 +48,7 @@
     public :: real_to_string
     public :: valid_json_hex
     public :: to_unicode
+    public :: escape_string
 
     contains
 !*****************************************************************************************
@@ -192,6 +193,91 @@
     end if
 
     end subroutine compact_real_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/21/2014
+!
+!  Add the escape characters to a string for adding to JSON.
+
+    subroutine escape_string(str_in, str_out)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in)              :: str_in
+    character(kind=CK,len=:),allocatable,intent(out) :: str_out
+
+    integer(IK) :: i,ipos
+    character(kind=CK,len=1) :: c
+
+    character(kind=CK,len=*),parameter :: specials = quotation_mark//&
+                                                     backslash//&
+                                                     slash//&
+                                                     bspace//&
+                                                     formfeed//&
+                                                     newline//&
+                                                     carriage_return//&
+                                                     horizontal_tab
+
+    !Do a quick scan for the special characters,
+    ! if any are present, then process the string,
+    ! otherwise, return the string as is.
+    if (scan(str_in,specials)>0) then
+
+        str_out = repeat(space,chunk_size)
+        ipos = 1
+
+        !go through the string and look for special characters:
+        do i=1,len(str_in)
+
+            c = str_in(i:i)    !get next character in the input string
+
+            !if the string is not big enough, then add another chunk:
+            if (ipos+3>len(str_out)) str_out = str_out // repeat(space, chunk_size)
+
+            select case(c)
+            case(quotation_mark,backslash,slash)
+                str_out(ipos:ipos+1) = backslash//c
+                ipos = ipos + 2
+            case(bspace)
+                str_out(ipos:ipos+1) = '\b'
+                ipos = ipos + 2
+            case(formfeed)
+                str_out(ipos:ipos+1) = '\f'
+                ipos = ipos + 2
+            case(newline)
+                str_out(ipos:ipos+1) = '\n'
+                ipos = ipos + 2
+            case(carriage_return)
+                str_out(ipos:ipos+1) = '\r'
+                ipos = ipos + 2
+            case(horizontal_tab)
+                str_out(ipos:ipos+1) = '\t'
+                ipos = ipos + 2
+            case default
+                str_out(ipos:ipos) = c
+                ipos = ipos + 1
+            end select
+
+        end do
+
+        !trim the string if necessary:
+        if (ipos<len(str_out)+1) then
+            if (ipos==1) then
+                str_out = ''
+            else
+                str_out = str_out(1:ipos-1)
+            end if
+        end if
+
+    else
+
+        str_out = str_in
+
+    end if
+
+    end subroutine escape_string
 !*****************************************************************************************
 
 !*****************************************************************************************
