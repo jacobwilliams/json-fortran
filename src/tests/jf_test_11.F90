@@ -34,11 +34,6 @@ contains
 # endif
 
     error_cnt = 0
-    !call json_initialize()
-    !if (json_failed()) then
-    !    call json_print_error_message(error_unit)
-    !    error_cnt = error_cnt + 1
-    !end if
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -156,13 +151,13 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'destroy...'
     call json%destroy()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
     call clone%destroy()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (clone%failed()) then
+        call clone%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -291,6 +286,6 @@ program jf_test_11
     n_errors = 0
     call test_11(n_errors)
     if (n_errors /= 0) stop 1
-    
+
 end program jf_test_11
 !*****************************************************************************************

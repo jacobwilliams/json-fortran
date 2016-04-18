@@ -92,6 +92,7 @@
     !>
     !  Type used to construct the linked-list JSON structure.
     !  Normally, this should always be a pointer variable.
+    !  This type should only be used by an instance of [[json_core]].
     !
     !# Example
     !
@@ -178,19 +179,25 @@
 
         integer(IK) :: spaces_per_tab = 2    !! number of spaces for indenting
 
-        logical(LK) :: compact_real = .true.   !! to use the "compact" form of real numbers for output
-        character(kind=CDK,len=:),allocatable :: real_fmt  !! the format string to use for real numbers
-                                                           !! it is set in [[json_initialize]]
+        logical(LK) :: compact_real = .true.  !! to use the "compact" form of real
+                                              !! numbers for output
+        character(kind=CDK,len=:),allocatable :: real_fmt  !! the format string to use
+                                                           !! for real numbers. it is
+                                                           !! set in [[json_initialize]]
 
-        logical(LK) :: is_verbose = .false.        !! if true, all exceptions are immediately printed to console
-        logical(LK) :: exception_thrown = .true.   !! the error flag (by default, this is true to
-                                                   !! make sure that [[json_initialize]] is called.
+        logical(LK) :: is_verbose = .false.        !! if true, all exceptions are
+                                                   !! immediately printed to console
+        logical(LK) :: exception_thrown = .true.   !! the error flag (by default,
+                                                   !! this is true to make sure that
+                                                   !! [[json_initialize]] is called so
+                                                   !! that the `real_fmt` can be set.
         character(kind=CK,len=:),allocatable :: err_message !! the error message
 
         integer(IK) :: char_count = 0    !! character position in the current line
         integer(IK) :: line_count = 1    !! lines read counter
         integer(IK) :: pushed_index = 0  !! used when parsing lines in file
-        character(kind=CK,len=pushed_char_size) :: pushed_char = ''  !! used when parsing lines in file
+        character(kind=CK,len=pushed_char_size) :: pushed_char = ''  !! used when parsing
+                                                                     !! lines in file
 
         integer(IK) :: ipos = 1 !! for allocatable strings: next character to read
 
@@ -198,7 +205,8 @@
 
         private
 
-        generic,public :: get_child => json_value_get_by_index, MAYBEWRAP(json_value_get_by_name_chars)
+        generic,public :: get_child => json_value_get_by_index, &
+                                       MAYBEWRAP(json_value_get_by_name_chars)
         procedure,private :: json_value_get_by_index
         procedure,private :: MAYBEWRAP(json_value_get_by_name_chars)
 
@@ -214,10 +222,10 @@
                                  MAYBEWRAP(json_value_add_string), &
                                  MAYBEWRAP(json_value_add_string_vec)
 #ifdef USE_UCS4
-        generic,public :: add =>   json_value_add_string_name_ascii, &
-                                        json_value_add_string_val_ascii, &
-                                        json_value_add_string_vec_name_ascii, &
-                                        json_value_add_string_vec_val_ascii
+        generic,public :: add => json_value_add_string_name_ascii, &
+                                 json_value_add_string_val_ascii, &
+                                 json_value_add_string_vec_name_ascii, &
+                                 json_value_add_string_vec_val_ascii
 #endif
 
     procedure,private :: json_value_add_member
@@ -237,8 +245,8 @@
 #endif
 
         !>
-        !  These are like [[json_add]], except if a child with the same name is
-        !  already present, then its value is simply updated.
+        !  These are like the `add` methods, except if a child with the
+        !  same name is already present, then its value is simply updated.
         !  Note that currently, these only work for scalar variables.
         !  These routines can also change the variable's type (but an error will be
         !  thrown if the existing variable is not a scalar).
@@ -251,8 +259,8 @@
                                     MAYBEWRAP(json_update_integer),&
                                     MAYBEWRAP(json_update_string)
 #ifdef USE_UCS4
-            generic,public :: update => json_update_string_name_ascii,&
-                                        json_update_string_val_ascii
+        generic,public :: update => json_update_string_name_ascii,&
+                                    json_update_string_val_ascii
 #endif
         procedure,private :: MAYBEWRAP(json_update_logical)
         procedure,private :: MAYBEWRAP(json_update_double)
@@ -306,8 +314,8 @@
         !    !...
         !    call json%print(p,'test.json')  !this is [[json_print_2]]
         !````
-        generic,public :: print => json_value_print,json_print_1,json_print_2
-        procedure :: json_value_print,json_print_1,json_print_2
+        generic,public :: print => json_print_1,json_print_2
+        procedure :: json_print_1,json_print_2
 
         !>
         !  Destructor routine for a [[json_value]] pointer.
@@ -497,6 +505,7 @@
         procedure,public :: print_error_message => json_print_error_message !! simply routine to print error messages
 
         !other private routines:
+        procedure :: json_value_print
         procedure :: string_to_integer
         procedure :: string_to_double
         procedure :: unescape_string
@@ -907,7 +916,7 @@
 !  date: 12/4/2013
 !
 !  Retrieve error code from the [[json_core]].
-!  This should be called after [[json_parse]] to check for errors.
+!  This should be called after `parse` to check for errors.
 !  If an error is thrown, before using the class again, [[json_initialize]]
 !  should be called to clean up before it is used again.
 !
@@ -2322,7 +2331,7 @@
     character(kind=CK,len=:),intent(out),allocatable :: str  !! prints structure to this string
 
     str = ''
-    call json%print(me, iunit=unit2str, str=str, indent=1, colon=.true.)
+    call json%json_value_print(me, iunit=unit2str, str=str, indent=1, colon=.true.)
 
     end subroutine json_value_to_string
 !*****************************************************************************************
@@ -2344,7 +2353,7 @@
     character(kind=CK,len=:),allocatable :: dummy
 
     if (iunit/=unit2str) then
-        call json%print(me,iunit,str=dummy, indent=1, colon=.true.)
+        call json%json_value_print(me,iunit,str=dummy, indent=1, colon=.true.)
     else
         call json%throw_exception('Error in json_print_1: iunit must not be -1.')
     end if
@@ -2385,8 +2394,7 @@
 !  Print the JSON structure to a string or a file.
 !
 !# Notes
-!  * This is an internal routine called by the wrapper routines
-!    [[json_print]] and [[json_value_to_string]].
+!  * This is an internal routine called by the various wrapper routines.
 !  * The reason the str argument is non-optional is because of a
 !    bug in v4.9 of the gfortran compiler.
 
@@ -2489,7 +2497,7 @@
                     end if
 
                     ! recursive print of the element
-                    call json%print(element, iunit=iunit, indent=tab + 1, &
+                    call json%json_value_print(element, iunit=iunit, indent=tab + 1, &
                                     need_comma=i<count, colon=.true., str=str)
 
                     ! get the next child the list:
@@ -2521,7 +2529,7 @@
                 do i = 1, count
 
                     ! recursive print of the element
-                    call json%print(element, iunit=iunit, indent=tab,&
+                    call json%json_value_print(element, iunit=iunit, indent=tab,&
                                     need_comma=i<count, is_array_element=.true., str=str)
 
                     ! get the next child the list:
@@ -2662,7 +2670,7 @@
 !
 !  Thus, if any of these characters are present in the name key,
 !  this routine cannot be used to get the value.
-!  In that case, the [[json_get_child]] routines would need to be used.
+!  In that case, the `get_child` methods would need to be used.
 
     subroutine json_get_by_path(json, me, path, p, found)
 
@@ -3945,7 +3953,7 @@
 !      for each element in the array.
 !
 !@note For integer, double, logical, and character arrays,
-!      higher-level routines are provided (see [[json_get]]), so
+!      higher-level routines are provided (see `get` methods), so
 !      this routine does not have to be used for those cases.
 
     subroutine json_get_array(json, me, array_callback)
@@ -4109,8 +4117,9 @@
 !# Example
 !
 !````fortran
+!    type(json_core) :: json
 !    type(json_value),pointer :: p
-!    call json_parse(file='myfile.json', p=p)
+!    call json%parse(file='myfile.json', p=p)
 !````
 !
 !# History
@@ -4241,7 +4250,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_parse_string]], where "str" is kind=CDK.
+!  Alternate version of [[json_parse_string]], where `str` is kind=CDK.
 
     subroutine wrap_json_parse_string(json, p, str)
 
@@ -4547,7 +4556,7 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  Wrapper for [[json_value_create_logical]] so [[json_create_logical]] can
+!  Wrapper for [[json_value_create_logical]] so `create_logical` method can
 !  be called with name of character kind 'DEFAULT' or 'ISO_10646'
 
     subroutine wrap_json_value_create_logical(json,me,val,name)
@@ -4594,9 +4603,9 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  A wrapper procedure for [[json_value_create_integer]] so that [[json_create_integer]]
-!  may be called with either a 'DEFAULT' or 'ISO_10646' character kind 'name'
-!  actual argument.
+!  A wrapper procedure for [[json_value_create_integer]] so that `create_integer`
+!  method may be called with either a 'DEFAULT' or 'ISO_10646' character kind
+!  `name` actual argument.
 
     subroutine wrap_json_value_create_integer(json,me,val,name)
 
@@ -4642,9 +4651,9 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  A wrapper for [[json_value_create_double]] so that [[json_create_double]] may be
-!  called with an actual argument corresponding to the dummy argument, 'name'
-!  that may be of 'DEFAULT' or 'ISO_10646' character kind.
+!  A wrapper for [[json_value_create_double]] so that `create_double` method
+!  may be called with an actual argument corresponding to the dummy argument,
+!  `name` that may be of 'DEFAULT' or 'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_double(json,me,val,name)
 
@@ -4690,9 +4699,9 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  Wrap [[json_value_create_string]] so that [[json_create_string]] may be called with actual
-!  character string arguments for 'name' and 'val' that are BOTH of 'DEFAULT' or
-!  'ISO_10646' character kind.
+!  Wrap [[json_value_create_string]] so that `create_string` method may be called
+!  with actual character string arguments for `name` and `val` that are BOTH of
+!  'DEFAULT' or 'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_string(json,me,val,name)
 
@@ -4737,9 +4746,9 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  Wrap [[json_value_create_null]] so that [[json_create_null]] may be called with an actual
-!  argument corresponding to the dummy argument 'name' that is either of 'DEFAULT' or
-!  'ISO_10646' character kind.
+!  Wrap [[json_value_create_null]] so that `create_null` method may be called with
+!  an actual argument corresponding to the dummy argument `name` that is either
+!  of 'DEFAULT' or 'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_null(json,me,name)
 
@@ -4786,9 +4795,9 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  Wrap [[json_value_create_object]] so that [[json_create_object]] may be called with an actual
-!  argument corresponding to the dummy argument 'name' that is of either 'DEFAULT' or
-!  'ISO_10646' character kind.
+!  Wrap [[json_value_create_object]] so that `create_object` method may be called
+!  with an actual argument corresponding to the dummy argument `name` that is of
+!  either 'DEFAULT' or 'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_object(json,me,name)
 
@@ -4832,9 +4841,9 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  A wrapper for [[json_value_create_array]] so that [[json_create_array]] may be called with
-!  an actual argument, corresponding to the dummy argument 'name', that is either of
-!  'DEFAULT' or 'ISO_10646' character kind.
+!  A wrapper for [[json_value_create_array]] so that `create_array` method may be
+!  called with an actual argument, corresponding to the dummy argument `name`,
+!  that is either of 'DEFAULT' or 'ISO_10646' character kind.
 
     subroutine wrap_json_value_create_array(json,me,name)
 
