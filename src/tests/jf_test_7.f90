@@ -7,6 +7,7 @@
 
 module jf_test_7_mod
 
+    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -22,6 +23,7 @@ contains
 
     integer,intent(out) :: error_cnt
 
+    type(json_core) :: json       !! factory for manipulating `json_value` pointers
     type(json_value),pointer :: root,a,b,c,d,e,e1,e2,escaped_string,p
     logical :: found
     character(kind=CK,len=1), dimension(:), allocatable :: strvec
@@ -29,9 +31,9 @@ contains
 
     found=.false.
     error_cnt = 0
-    call json_initialize()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%initialize()
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -78,138 +80,138 @@ contains
 !}
 
     !create a json structure:
-    call json_create_object(root,'root')
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%create_object(root,'root')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_create_object(a,'a')
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%create_object(a,'a')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(a,'ints', [1,2,3])
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(a,'ints', [1,2,3])
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_create_object(b,'b')
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%create_object(b,'b')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(a,'chars', ['a','b','c'])
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(a,'chars', ['a','b','c'])
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_get_child(a,'chars',p)
-    call json_get(p,strvec)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%get_child(a,'chars',p)
+    call json%get(p,strvec)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_create_object(c,'c')
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%create_object(c,'c')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(c,'val1', 1066)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(c,'val1', 1066)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_create_object(d,'d')
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%create_object(d,'d')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(d,'val2', 1815)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(d,'val2', 1815)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
-    call json_create_array(e,'array')   !objects in an array
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%create_array(e,'array')   !objects in an array
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_create_object(e1,'')
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%create_object(e1,'')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(e1,'int1', 1)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(e1,'int1', 1)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_create_object(e2,'')
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%create_object(e2,'')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(e2,'int1', 1)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(e2,'int1', 1)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(e2,'int2', 2)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(e2,'int2', 2)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(e,e1)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(e,e1)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(e,e2)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(e,e2)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(root,a)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(root,a)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(root,b)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(root,b)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(b,c)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(b,c)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(root,d)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(root,d)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(root,e)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%add(root,e)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(root,'escaped string',&
+    call json%add(root,'escaped string',&
          '\/'//&
          achar(8)//&
          achar(12)//&
          achar(10)//&
          achar(13)//&
          achar(9))
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_add(root,'wacky string',['trim   ','  and  ',' adjust','   left'],&
+    call json%add(root,'wacky string',['trim   ','  and  ',' adjust','   left'],&
          trim_str=.true.,adjustl_str=.true.)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -222,35 +224,35 @@ contains
     nullify(e2)
     nullify(escaped_string)
 
-    call json_print(root,output_unit)  !print to the console
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%print(root,output_unit)  !print to the console
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
     ! look for the 'escaped string' entry
-    call json_get(root,'escaped string',escaped_string,found)
-    if (json_failed() .or. .not. found) then
-        call json_print_error_message(error_unit)
+    call json%get(root,'escaped string',escaped_string,found)
+    if (json%failed() .or. .not. found) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json_get(escaped_string,string)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%get(escaped_string,string)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
     write(error_unit,'(A)') "Fetched unescaped 'escaped string': "//string
 
     ! remove the escaped string entry
-    if (found) call json_remove(escaped_string,destroy=.true.)
-    call json_print(root,error_unit)  !print to stderr
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (found) call json%remove(escaped_string,destroy=.true.)
+    call json%print(root,error_unit)  !print to stderr
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
-    call json_destroy(root)  !cleanup
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%destroy(root)  !cleanup
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -263,14 +265,13 @@ end module jf_test_7_mod
 program jf_test_7
 
     !! Seventh unit test.
-    
+
     use jf_test_7_mod , only: test_7
     implicit none
     integer :: n_errors
     n_errors = 0
     call test_7(n_errors)
     if (n_errors /= 0) stop 1
+
 end program jf_test_7
 !*****************************************************************************************
-
-!*******************************************************************************************************

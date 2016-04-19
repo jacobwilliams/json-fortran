@@ -27,7 +27,7 @@ addons:
 # Build matrix: Run the three build systems and tests in parallel
 env:
   global:
-    - CHECK_README_PROGS="yes"
+    - CHECK_README_PROGS="no"
   matrix:
       # CMake build with unit tests, no documentation, with coverage analysis
       # No unicode so that coverage combined with the build script will cover unicode
@@ -41,10 +41,11 @@ env:
       DEPLOY_DOCUMENTATION="no"
 
       # build with build.sh, make documentation, run unit tests and perform coverage analysis
+      # JW note: disabled coverage for testing purposes !!!! need to fix !!!!
     - >
-      BUILD_SCRIPT="./build.sh --coverage --skip-documentation &&
-      ./build.sh --coverage --enable-unicode"
-      CODE_COVERAGE="yes"
+      BUILD_SCRIPT="./build.sh --skip-documentation &&
+      ./build.sh --enable-unicode"
+      CODE_COVERAGE="no"
       DEPLOY_DOCUMENTATION="yes"
 
 install:

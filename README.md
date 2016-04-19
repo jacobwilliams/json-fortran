@@ -12,19 +12,12 @@ A Fortran 2008 JSON API
     - [Brief description](#brief-description)
     - [Download](#download)
     - [Building the library](#building-the-library)
-    - [Example Usage](#example-usage)
-        - [Reading JSON from a file](#reading-json-from-a-file)
-        - [Reading JSON from a string](#reading-json-from-a-string)
-        - [Modifying variables in a JSON file](#modifying-variables-in-a-json-file)
-        - [Writing a JSON file](#writing-a-json-file)
-        - [Building a JSON file from scratch](#building-a-json-file-from-scratch)
     - [Documentation](#documentation)
     - [Contributing](#contributing)
     - [License](#license)
     - [Miscellaneous](#miscellaneous)
 
 <!-- markdown-toc end -->
-
 
 Status
 ------
@@ -40,6 +33,7 @@ Status
 Take a look at the
 [CHANGELOG](https://github.com/jacobwilliams/json-fortran/blob/master/CHANGELOG.md#unreleased)
 for a list of changes since the latest release.
+
 [top](#json-fortran)
 
 Brief description
@@ -120,7 +114,7 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.2.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.3.0 REQUIRED )
 include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
@@ -135,161 +129,6 @@ endforeach()
 
 [top](#json-fortran)
 
-Example Usage
----------------
-In this section the basic functionality of the JSON-Fortran library is illustrated.
-
-### Reading JSON from a file
-
-Reading a JSON file and getting data from it is fairly
-straightforward using the `json_file` class.  Here is an example.  See unit tests 1 and 3-6
-for more examples. The source files may be found in `src/tests/`.
-
-```fortran
-    program example1
-
-        use json_module
-
-        type(json_file) :: json
-        logical :: found
-        integer :: i,j,k
-
-        ! initialize the module
-        call json_initialize()
-
-        ! read the file
-        call json%load_file(filename = '../files/inputs/test1.json')
-
-        ! print the file to the console
-        call json%print_file()
-
-        ! extract data from the file
-        ! [found can be used to check if the data was really there]
-        call json%get('version.major', i, found)
-        if ( .not. found ) stop 1
-        call json%get('version.minor', j, found)
-        if ( .not. found ) stop 1
-        call json%get('data(1).number', k, found)
-        if ( .not. found ) stop 1
-
-        ! clean up
-        call json%destroy()
-        if (json_failed()) stop 1
-
-    end program example1
-```
-
-[top](#json-fortran)
-
-### Reading JSON from a string
-
-JSON can also be read directly from a character string like so:
-```fortran
-    call json%load_from_string('{"name": "Leonidas"}')
-```
-
-[top](#json-fortran)
-
-### Modifying variables in a JSON file
-
-After reading a JSON file, if you want to change the values of some of the variables, you can use the `update` method.  For the example above:
-
-```fortran
-    ! [found can be used to check if the data was really there]
-    call json%update('version.major',9,found)  !change major version to 9
-    call json%update('version.minor',0,found)  !change minor version to 0
-    call json%update('version.patch',0,found)  !change patch to 0
-```
-
-[top](#json-fortran)
-
-### Writing a JSON file
-
-To print the JSON file (either to a file or the console), the `print_file` method can be used.  For the above example:
-
-```fortran
-    call json%print_file()         !prints to the console
-    call json%print_file(iunit)    !prints to the file connected to iunit
-```
-
-[top](#json-fortran)
-
-### Building a JSON file from scratch
-
-Constructing a JSON file element by element is slightly more complicated and involves the use
-of `json_value` pointers.  For more examples see unit tests 2, 4 and 7 in `src/tests/`.
-
-```fortran
-    program example2
-
-        use,intrinsic :: iso_fortran_env, only: wp => real64
-
-        use json_module
-
-        type(json_value),pointer :: p, inp
-
-        ! initialize the module
-        call json_initialize()
-
-        ! initialize the structure:
-        call json_create_object(p,'')
-
-        ! add an "inputs" object to the structure:
-        call json_create_object(inp,'inputs')
-        call json_add(p, inp) !add it to the root
-
-        ! add some data to inputs:
-        call json_add(inp, 't0', 0.1_wp)
-        call json_add(inp, 'tf', 1.1_wp)
-        call json_add(inp, 'x0', 9999.0000d0)
-        call json_add(inp, 'integer_scalar', 787)
-        call json_add(inp, 'integer_array', [2,4,99])
-        call json_add(inp, 'names', ['aaa','bbb','ccc'])
-        call json_add(inp, 'logical_scalar', .true.)
-        call json_add(inp, 'logical_vector', [.true., .false., .true.])
-        nullify(inp)  !don't need this anymore
-
-        ! write the file:
-        call json_print(p,'../files/example2.json')
-
-        !cleanup:
-        call json_destroy(p)
-        if (json_failed()) stop 1
-
-    end program example2
-```
-
-The code above produces the file:
-
-```JSON
-{
-  "inputs": {
-    "t0": 0.1E+0,
-    "tf": 0.11E+1,
-    "x0": 0.9999E+4,
-    "integer_scalar": 787,
-    "integer_array": [
-      2,
-      4,
-      99
-    ],
-    "names": [
-      "aaa",
-      "bbb",
-      "ccc"
-    ],
-    "logical_scalar": true,
-    "logical_vector": [
-      true,
-      false,
-      true
-    ]
-  }
-}
-```
-
-[top](#json-fortran)
-
 Documentation
 --------------
 
@@ -298,6 +137,8 @@ The API documentation for the latest release version can be found
 documentation can also be generated by processing the source files
 with [FORD](https://github.com/cmacmackin/ford).  Note that both the
 shell script and CMake will also generate these files automatically in the documentation folder, assuming you have FORD installed.
+
+Some examples can also be found on the [wiki](https://github.com/jacobwilliams/json-fortran/wiki/Example-Usage).
 
 [top](#json-fortran)
 
