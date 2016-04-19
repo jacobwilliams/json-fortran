@@ -54,6 +54,7 @@
     public :: valid_json_hex
     public :: to_unicode
     public :: escape_string
+    public :: lowercase_character
 
     contains
 !*****************************************************************************************
@@ -306,7 +307,8 @@
     logical(LK)                         :: valid  !! is str a value 4-digit hex string
     character(kind=CK,len=*),intent(in) :: str    !! the string to check.
 
-    integer(IK) :: n,i
+    integer(IK) :: n  !! length of `str`
+    integer(IK) :: i  !! counter
 
     !an array of the valid hex characters:
     character(kind=CK,len=1),dimension(22),parameter :: valid_chars = &
@@ -435,6 +437,25 @@
     res = (to_unicode(def_str) == ucs4_str)
 
     end function default_comp_ucs4
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Return the lowercase version of the character.
+
+    pure function lowercase_character(c) result(c_lower)
+
+    implicit none
+
+    character(kind=CDK,len=1),intent(in) :: c
+    character(kind=CDK,len=1)            :: c_lower
+
+    integer :: i  !! index in array
+
+    i = index(upper,c)
+    c_lower = merge(lower(i:i),c,i>0)
+
+    end function lowercase_character
 !*****************************************************************************************
 
     end module json_string_utilities

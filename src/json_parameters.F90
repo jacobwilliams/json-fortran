@@ -42,8 +42,17 @@
     character(kind=CK,len=*),parameter :: slash           = achar(47)
     character(kind=CK,len=*),parameter :: backslash       = achar(92)
 
+    character(kind=CDK,len=*),parameter,public :: default_real_fmt = '(ss,E26.16E4)'
+        !! default real number format statement
+
     character(kind=CK,len=*),parameter,public :: star = '*' !! for invalid numbers and
                                                             !! list-directed real output
+
+    !these are default character kind:
+    character(kind=CDK,len=*),parameter,public :: upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        !! uppercase characters
+    character(kind=CDK,len=*),parameter,public :: lower = 'abcdefghijklmnopqrstuvwxyz'
+        !! lowercase characters
 
     !These were parameters, but gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
     !necessitates moving them here to be variables

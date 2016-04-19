@@ -104,12 +104,11 @@
     !     implicit none
     !     type(json_core) :: json
     !     type(json_value),pointer :: p
-    !     call json%initialize()         !initialize the class
-    !     call json%create_object(p,'')  !create the root
-    !     call json%add(p,'year',1805)   !add some data
-    !     call json%add(p,'value',1.0d0) !add some data
-    !     call json%print(p,'test.json') !write it to a file
-    !     call json%destroy(p)           !cleanup
+    !     call json%create_object(p,'')   !create the root
+    !     call json%add(p,'year',1805)    !add some data
+    !     call json%add(p,'value',1.0_RK) !add some data
+    !     call json%print(p,'test.json')  !write it to a file
+    !     call json%destroy(p)            !cleanup
     !    end program test
     !````
     !
@@ -164,12 +163,11 @@
     !     implicit none
     !     type(json_core) :: json     !<--have to declare this
     !     type(json_value),pointer :: p
-    !     call json%initialize()         !initialize this instance
-    !     call json%create_object(p,'')  !create the root
-    !     call json%add(p,'year',1805)   !add some data
-    !     call json%add(p,'value',1.0d0) !add some data
-    !     call json%print(p,'test.json') !write it to a file
-    !     call json%destroy(p)           !cleanup
+    !     call json%create_object(p,'')   !create the root
+    !     call json%add(p,'year',1805)    !add some data
+    !     call json%add(p,'value',1.0_RK) !add some data
+    !     call json%print(p,'test.json')  !write it to a file
+    !     call json%destroy(p)            !cleanup
     !    end program test
     !    type,public :: json_core
     !````
@@ -181,16 +179,19 @@
 
         logical(LK) :: compact_real = .true.  !! to use the "compact" form of real
                                               !! numbers for output
-        character(kind=CDK,len=:),allocatable :: real_fmt  !! the format string to use
-                                                           !! for real numbers. it is
-                                                           !! set in [[json_initialize]]
+        character(kind=CDK,len=:),allocatable :: real_fmt   !! the format string to use
+                                                            !! for converting real numbers to strings.
+                                                            !! It can be set in [[json_initialize]],
+                                                            !! and used in [[json_value_print]]
+                                                            !! If not set, then `default_real_fmt`
+                                                            !! is used instead.
 
         logical(LK) :: is_verbose = .false.        !! if true, all exceptions are
-                                                   !! immediately printed to console
-        logical(LK) :: exception_thrown = .true.   !! the error flag (by default,
-                                                   !! this is true to make sure that
-                                                   !! [[json_initialize]] is called so
-                                                   !! that the `real_fmt` can be set.
+                                                   !! immediately printed to console.
+        logical(LK) :: exception_thrown = .false.  !! The error flag. Will be set to true
+                                                   !! when an error is thrown in the class.
+                                                   !! Many of the methods will check this
+                                                   !! and return immediately if it is true.
         character(kind=CK,len=:),allocatable :: err_message !! the error message
 
         integer(IK) :: char_count = 0    !! character position in the current line
@@ -199,7 +200,7 @@
         character(kind=CK,len=pushed_char_size) :: pushed_char = ''  !! used when parsing
                                                                      !! lines in file
 
-        integer(IK) :: ipos = 1 !! for allocatable strings: next character to read
+        integer(IK) :: ipos = 1  !! for allocatable strings: next character to read
 
         contains
 
@@ -329,7 +330,6 @@
         !     subroutine example1()
         !     type(json_core) :: json
         !     type(json_value),pointer :: p
-        !     call json%initialize()
         !     call json%create_object(p,'')
         !     call json%add(p,'year',2015)
         !     call json%print(p)
@@ -345,7 +345,6 @@
         !     type(json_core) :: json
         !     type(json_value),pointer,intent(out) :: p
         !     type(json_value),pointer :: q
-        !     call json%initialize()
         !     call json%create_object(p,'')
         !     call json%add(p,'year',2015)
         !     call json%create_object(q,'q')
@@ -379,8 +378,7 @@
         !````fortran
         !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json%initialize()
-        !    call json%create_double(p,'value',1.0d0)
+        !    call json%create_double(p,'value',1.0_RK)
         !````
         generic,public :: create_double => MAYBEWRAP(json_value_create_double)
         procedure :: MAYBEWRAP(json_value_create_double)
@@ -394,7 +392,6 @@
         !````fortran
         !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json%initialize()
         !    call json%create_array(p,'arrayname')
         !````
         generic,public :: create_array => MAYBEWRAP(json_value_create_array)
@@ -409,7 +406,6 @@
         !````fortran
         !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json%initialize()
         !    call json%create_object(p,'objectname')
         !````
         !
@@ -427,7 +423,6 @@
         !````fortran
         !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json%initialize()
         !    call json%create_null(p,'value')
         !````
         generic,public :: create_null => MAYBEWRAP(json_value_create_null)
@@ -442,7 +437,6 @@
         !````fortran
         !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json%initialize()
         !    call json%create_string(p,'value','foobar')
         !````
         generic,public :: create_string => MAYBEWRAP(json_value_create_string)
@@ -457,7 +451,6 @@
         !````fortran
         !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json%initialize()
         !    call json%create_integer(p,'value',42)
         !````
         generic,public :: create_integer => MAYBEWRAP(json_value_create_integer)
@@ -472,7 +465,6 @@
         !````fortran
         !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json%initialize()
         !    call json%create_logical(p,'value',.true.)
         !````
         generic,public :: create_logical => MAYBEWRAP(json_value_create_logical)
@@ -500,7 +492,7 @@
         procedure,public :: get_previous        => json_get_previous        !! get pointer to json_value previous
         procedure,public :: get_tail            => json_get_tail            !! get pointer to json_value tail
         procedure,public :: info                => json_info                !! get info about a json_value
-        procedure,public :: initialize          => json_initialize          !! to initialize the module
+        procedure,public :: initialize          => json_initialize          !! to initialize some parsing parameters
         procedure,public :: traverse            => json_traverse            !! to traverse all elements of a JSON structure
         procedure,public :: print_error_message => json_print_error_message !! simply routine to print error messages
 
@@ -566,7 +558,6 @@
 !     implicit none
 !     type(json_core) :: json
 !     type(json_value),pointer :: j1, j2
-!     call json%initialize()
 !     call json%parse('../files/inputs/test1.json',j1)
 !     call json%clone(j1,j2) !now have two independent copies
 !     call json%destroy(j1)  !destroys j1, but j2 remains
@@ -725,9 +716,11 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Initialize the JSON-Fortran module.
-!  The routine must be called before any of the [[json_core]] methods are used.
-!  It can also be called after encountering an exception, or to reset some
+!  Initialize the [[json_core]] instance.
+!  The routine may be called before any of the [[json_core]] methods are used in
+!  order to specify certain parameters. If it is not called, then the defaults
+!  are used. This routine is also called internally by various routines.
+!  It can also be called to clear exceptions, or to reset some
 !  of the variables (note that only the arguments present are changed).
 !
 !# Modified
@@ -897,7 +890,7 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_throw_exception]], where "msg" is kind=CDK.
+!  Alternate version of [[json_throw_exception]], where `msg` is kind=CDK.
 
     subroutine wrap_json_throw_exception(json,msg)
 
@@ -952,7 +945,7 @@
         if (allocated(json%err_message)) then
             error_msg = json%err_message
         else
-            error_msg = 'Error: initialize() must be called first to initialize the class.'
+            error_msg = 'Unknown error.'
         end if
     else
         error_msg = ''
@@ -970,21 +963,36 @@
 !# Example
 !
 !````fortran
-!    type(json_file) :: json
+!    type(json_core) :: json
+!    type(json_value),pointer :: p
 !    logical :: status_ok
 !    character(len=:),allocatable :: error_msg
-!    call json%load_file(filename='myfile.json')
+!    call json%parse(filename='myfile.json',p)
 !    if (json%failed()) then
 !        call json%check_for_errors(status_ok, error_msg)
 !        write(*,*) 'Error: '//error_msg
 !        call json%clear_exceptions()
-!        call json%destroy()
+!        call json%destroy(p)
+!    end if
+!````
+!
+!  Note that [[json_file]] contains a wrapper for this routine, which is used like:
+!````fortran
+!    type(json_file) :: f
+!    logical :: status_ok
+!    character(len=:),allocatable :: error_msg
+!    call f%load_file(filename='myfile.json')
+!    if (f%failed()) then
+!        call f%check_for_errors(status_ok, error_msg)
+!        write(*,*) 'Error: '//error_msg
+!        call f%clear_exceptions()
+!        call f%destroy()
 !    end if
 !````
 !
 !# See also
 !  * [[json_check_for_errors]]
-!
+
     pure function json_failed(json) result(failed)
 
     implicit none
@@ -1008,7 +1016,7 @@
 !    type(json_core) :: json
 !    type(json_value),pointer :: var
 !    call json%create(var)
-!    call to_double(var,1.0d0)
+!    call to_double(var,1.0_RK)
 !````
 !
 !# Notes
@@ -1102,7 +1110,6 @@
 !     type(json_core) :: json
 !     type(json_value),pointer :: json1,json2,p
 !     logical :: found
-!     call json%initialize()
 !     !create and populate json1 and json2
 !     call json%get(json1,'name',p,found)  ! get pointer to name element of json1
 !     call json%remove(p,destroy=.false.)  ! remove it from json1 (don't destroy)
@@ -1114,7 +1121,6 @@
 !     type(json_core) :: json
 !     type(json_value),pointer :: json1,p
 !     logical :: found
-!     call json%initialize()
 !     !create and populate json1
 !     call json%get(json1,'name',p,found)  ! get pointer to name element of json1
 !     call json%remove(p)                  ! remove and destroy it
@@ -2575,7 +2581,12 @@
 
         case (json_double)
 
-            call real_to_string(me%dbl_value,json%real_fmt,json%compact_real,tmp)
+            if (allocated(json%real_fmt)) then
+                call real_to_string(me%dbl_value,json%real_fmt,json%compact_real,tmp)
+            else
+                !use the default format (user has not called initialize() or specified one):
+                call real_to_string(me%dbl_value,default_real_fmt,json%compact_real,tmp)
+            end if
 
             call write_it( s//trim(tmp), comma=print_comma )
 
@@ -2592,16 +2603,15 @@
 
     contains
 
-    !
-    ! write the string to the file (or the output string)
-    !
         subroutine write_it(s,advance,comma)
+
+        !! write the string to the file (or the output string)
 
         implicit none
 
-        character(kind=CK,len=*),intent(in) :: s        !string to print
-        logical(LK),intent(in),optional     :: advance  !to add line break or not
-        logical(LK),intent(in),optional     :: comma    !print comma after the string
+        character(kind=CK,len=*),intent(in) :: s        !! string to print
+        logical(LK),intent(in),optional     :: advance  !! to add line break or not
+        logical(LK),intent(in),optional     :: comma    !! print comma after the string
 
         logical(LK) :: add_line_break, add_comma
         character(kind=CK,len=:),allocatable :: s2
@@ -2652,10 +2662,10 @@
 !# Example
 !
 !````fortran
-!     type(json_value),pointer :: dat,p
-!     logical :: found
-!     !...
-!     call json%get(dat,'data(2).version',p,found)
+!    type(json_value),pointer :: dat,p
+!    logical :: found
+!    !...
+!    call json%get(dat,'data(2).version',p,found)
 !````
 !
 !# Notes
@@ -2678,7 +2688,7 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: me
-    character(kind=CK,len=*),intent(in)  :: path
+    character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
     type(json_value),pointer,intent(out) :: p
     logical(LK),intent(out),optional     :: found  !! true if it was found
 
@@ -4630,7 +4640,7 @@
 !# Example
 !````fortran
 !     type(json_value),pointer :: p
-!     call json_create(p,'value',1.0d0)
+!     call json_create(p,'value',1.0_RK)
 !````
 
     subroutine json_value_create_double(json,me,val,name)

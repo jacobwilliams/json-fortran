@@ -4,8 +4,9 @@
 !
 !  A Fortran 2008 JSON (JavaScript Object Notation) API.
 !
-!  This module provides access to the [[json_value_module]] and [[json_file_module]],
-!  Either one can be used separately, or both can be used by using this module.
+!  This module provides access to [[json_kinds]], [[json_value_module]] and
+!  [[json_file_module]].  Either one can be used separately, or all can be
+!  used by using this module.
 !
 !## License
 !  * JSON-Fortran is released under a BSD-style license.
@@ -33,9 +34,9 @@
 
     module json_module
 
+    use json_kinds
     use json_value_module
     use json_file_module
-    use json_string_utilities
 
     implicit none
 
