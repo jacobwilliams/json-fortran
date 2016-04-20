@@ -20,9 +20,9 @@ display: public
          private
 source: true
 graph: true
+exclude_dir: tests
 extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
-md_extensions: markdown.extensions.toc(anchorlink=True)
-               markdown.extensions.smarty(smart_quotes=False)
+md_extensions: markdown.extensions.smarty(smart_quotes=False)
 ---
 
 --------------------

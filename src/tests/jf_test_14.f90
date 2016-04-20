@@ -6,7 +6,6 @@
 
 module jf_test_14_mod
 
-    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
@@ -84,7 +83,7 @@ contains
     logical,intent(out)                 :: finished
 
     integer :: var_type
-    character(kind=CK,len=:),allocatable :: str
+    character(kind=json_CK,len=:),allocatable :: str
     logical :: found
 
     !get info about this variable:

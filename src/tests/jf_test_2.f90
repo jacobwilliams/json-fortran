@@ -1,13 +1,12 @@
 !*****************************************************************************************
 !>
-! Module for the second unit test.
+!  Module for the second unit test.
 !
 !# HISTORY
 !  * Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 
 module jf_test_2_mod
 
-    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -30,7 +29,7 @@ contains
     type(json_value),pointer :: p, inp, traj, p_tmp, p_integer_array, p_clone
 
     integer :: iunit
-    character(kind=CK,len=:),allocatable :: name
+    character(kind=json_CK,len=:),allocatable :: name
     integer :: ival,ival_clone
     logical :: found
 

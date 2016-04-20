@@ -40,12 +40,22 @@
 
     !******************************************************
     !>
-    ! Provide a string comparison operator that works
+    ! Provide a string `==` operator that works
     ! with mixed kinds
     interface operator(==)
        module procedure ucs4_comp_default, default_comp_ucs4
     end interface
     public :: operator(==)
+    !******************************************************
+
+    !******************************************************
+    !>
+    ! Provide a string `/=` operator that works
+    ! with mixed kinds
+    interface operator(/=)
+       module procedure ucs4_neq_default, default_neq_ucs4
+    end interface
+    public :: operator(/=)
     !******************************************************
 #endif
 
@@ -370,7 +380,7 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  CK//CDK operator.
+!  `CK`//`CDK` operator.
 
     function ucs4_join_default(ucs4_str,def_str) result(res)
 
@@ -388,7 +398,7 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  CDK//CK operator.
+!  `CDK`//`CK` operator.
 
     function default_join_ucs4(def_str,ucs4_str) result(res)
 
@@ -406,7 +416,7 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  CK==CDK operator.
+!  `CK`==`CDK` operator.
 
     function ucs4_comp_default(ucs4_str,def_str) result(res)
 
@@ -424,7 +434,7 @@
 !*****************************************************************************************
 !> author: Izaak Beekman
 !
-!  CDK==CK operator.
+!  `CDK`==`CK` operator.
 
     function default_comp_ucs4(def_str,ucs4_str) result(res)
 
@@ -437,6 +447,42 @@
     res = (to_unicode(def_str) == ucs4_str)
 
     end function default_comp_ucs4
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  `CK`/=`CDK` operator.
+
+    function ucs4_neq_default(ucs4_str,def_str) result(res)
+
+    implicit none
+
+    character(kind=CK, len=*), intent(in) :: ucs4_str
+    character(kind=CDK,len=*), intent(in) :: def_str
+    logical(LK) :: res
+
+    res = ( ucs4_str /= to_unicode(def_str) )
+
+    end function ucs4_neq_default
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  `CDK`/=`CK` operator.
+
+    function default_neq_ucs4(def_str,ucs4_str) result(res)
+
+    implicit none
+
+    character(kind=CDK,len=*), intent(in) :: def_str
+    character(kind=CK, len=*), intent(in) :: ucs4_str
+    logical(LK) :: res
+
+    res = (to_unicode(def_str) /= ucs4_str)
+
+    end function default_neq_ucs4
 !*****************************************************************************************
 
 !*****************************************************************************************

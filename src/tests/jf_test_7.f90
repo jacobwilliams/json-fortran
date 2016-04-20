@@ -1,13 +1,12 @@
 !*****************************************************************************************
 !>
-! Module for the seventh unit test.
+!  Module for the seventh unit test.
 !
 !# HISTORY
 !  * Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 
 module jf_test_7_mod
 
-    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -26,8 +25,8 @@ contains
     type(json_core) :: json       !! factory for manipulating `json_value` pointers
     type(json_value),pointer :: root,a,b,c,d,e,e1,e2,escaped_string,p
     logical :: found
-    character(kind=CK,len=1), dimension(:), allocatable :: strvec
-    character(kind=CK,len=:), allocatable :: string
+    character(kind=json_CK,len=1), dimension(:), allocatable :: strvec
+    character(kind=json_CK,len=:), allocatable :: string
 
     found=.false.
     error_cnt = 0
