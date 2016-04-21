@@ -64,6 +64,7 @@
     public :: valid_json_hex
     public :: to_unicode
     public :: escape_string
+    public :: unescape_string
     public :: lowercase_character
 
     contains
@@ -294,6 +295,137 @@
     end if
 
     end subroutine escape_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Remove the escape characters from a JSON string and return it.
+!
+!  The escaped characters are denoted by the '\' character:
+!````
+!    '\"'        quotation mark
+!    '\\'        reverse solidus
+!    '\/'        solidus
+!    '\b'        backspace
+!    '\f'        formfeed
+!    '\n'        newline (LF)
+!    '\r'        carriage return (CR)
+!    '\t'        horizontal tab
+!    '\uXXXX'    4 hexadecimal digits
+!````
+
+    subroutine unescape_string(str_in, str_out, error_message)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in)              :: str_in  !! string as stored in a [[json_value]]
+    character(kind=CK,len=:),allocatable,intent(out) :: str_out !! decoded string
+    character(kind=CK,len=:),allocatable,intent(out) :: error_message !! will be allocated if there was an error
+
+    integer :: i   !! counter
+    integer :: n   !! length of str_in
+    integer :: m   !! length of str_out
+    character(kind=CK,len=1) :: c  !! for scanning each character in string
+
+    if (scan(str_in,backslash)>0) then
+
+        !there is at least one escape character, so process this string:
+
+        n = len(str_in)
+        str_out = repeat(space,n) !size the output string (will be trimmed later)
+        m = 0  !counter in str_out
+        i = 0  !counter in str_in
+
+        do
+
+            i = i + 1
+            if (i>n) exit ! finished
+            c = str_in(i:i) ! get next character in the string
+
+            if (c == backslash) then
+
+                if (i<n) then
+
+                    i = i + 1
+                    c = str_in(i:i) !character after the escape
+
+                    if (any(c == [quotation_mark,backslash,slash, &
+                         to_unicode(['b','f','n','r','t'])])) then
+
+                        select case(c)
+                        case (quotation_mark,backslash,slash)
+                            !use d as is
+                        case (CK_'b')
+                             c = bspace
+                        case (CK_'f')
+                             c = formfeed
+                        case (CK_'n')
+                             c = newline
+                        case (CK_'r')
+                             c = carriage_return
+                        case (CK_'t')
+                             c = horizontal_tab
+                        end select
+
+                        m = m + 1
+                        str_out(m:m) = c
+
+                    else if (c == 'u') then !expecting 4 hexadecimal digits after
+                                            !the escape character    [\uXXXX]
+
+                        !for now, we are just returning them as is
+                        ![not checking to see if it is a valid hex value]
+                        !
+                        ! Example:
+                        !   123456
+                        !   \uXXXX
+
+                        if (i+4<=n) then
+                            m = m + 1
+                            str_out(m:m+5) = str_in(i-1:i+4)
+                            i = i + 4
+                            m = m + 5
+                        else
+                            error_message = 'Error in unescape_string:'//&
+                                                 ' Invalid hexadecimal sequence'//&
+                                                 ' in string: '//str_in(i-1:)
+                            if (allocated(str_out)) deallocate(str_out)
+                            return
+                        end if
+
+                    else
+                        !unknown escape character
+                        error_message = 'Error in unescape_string:'//&
+                                             ' unknown escape sequence in string "'//&
+                                             trim(str_in)//'" ['//backslash//c//']'
+                        if (allocated(str_out)) deallocate(str_out)
+                        return
+                    end if
+
+                else
+                    !an escape character is the last character in
+                    ! the string [this may not be valid syntax,
+                    ! but just keep it]
+                    m = m + 1
+                    str_out(m:m) = c
+                end if
+
+            else
+                m = m + 1
+                str_out(m:m) = c
+            end if
+
+        end do
+
+        !trim trailing space:
+        str_out = str_out(1:m)
+
+    else
+        !there are no escape characters, so return as is:
+        str_out = str_in
+    end if
+
+    end subroutine unescape_string
 !*****************************************************************************************
 
 !*****************************************************************************************
