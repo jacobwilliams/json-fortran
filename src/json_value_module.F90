@@ -296,16 +296,25 @@
             json_get_string,      MAYBEWRAP(json_get_string_with_path),      &
             json_get_string_vec,  MAYBEWRAP(json_get_string_vec_with_path),  &
             json_get_array,       MAYBEWRAP(json_get_array_with_path)
+        procedure,private :: json_get_integer
+        procedure,private :: json_get_integer_vec
+        procedure,private :: json_get_double
+        procedure,private :: json_get_double_vec
+        procedure,private :: json_get_logical
+        procedure,private :: json_get_logical_vec
+        procedure,private :: json_get_string
+        procedure,private :: json_get_string_vec
+        procedure,private :: json_get_array
         procedure,private :: MAYBEWRAP(json_get_by_path)
-        procedure,private :: json_get_integer,MAYBEWRAP(json_get_integer_with_path)
-        procedure,private :: json_get_integer_vec,MAYBEWRAP(json_get_integer_vec_with_path)
-        procedure,private :: json_get_double,MAYBEWRAP(json_get_double_with_path)
-        procedure,private :: json_get_double_vec,MAYBEWRAP(json_get_double_vec_with_path)
-        procedure,private :: json_get_logical,MAYBEWRAP(json_get_logical_with_path)
-        procedure,private :: json_get_logical_vec,MAYBEWRAP(json_get_logical_vec_with_path)
-        procedure,private :: json_get_string,MAYBEWRAP(json_get_string_with_path)
-        procedure,private :: json_get_string_vec,MAYBEWRAP(json_get_string_vec_with_path)
-        procedure,private :: json_get_array,MAYBEWRAP(json_get_array_with_path)
+        procedure,private :: MAYBEWRAP(json_get_integer_with_path)
+        procedure,private :: MAYBEWRAP(json_get_integer_vec_with_path)
+        procedure,private :: MAYBEWRAP(json_get_double_with_path)
+        procedure,private :: MAYBEWRAP(json_get_double_vec_with_path)
+        procedure,private :: MAYBEWRAP(json_get_logical_with_path)
+        procedure,private :: MAYBEWRAP(json_get_logical_vec_with_path)
+        procedure,private :: MAYBEWRAP(json_get_string_with_path)
+        procedure,private :: MAYBEWRAP(json_get_string_vec_with_path)
+        procedure,private :: MAYBEWRAP(json_get_array_with_path)
 
         procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]] structure to an allocatable string
 
@@ -321,7 +330,8 @@
         !    call json%print(p,'test.json')  !this is [[json_print_2]]
         !````
         generic,public :: print => json_print_1,json_print_2
-        procedure :: json_print_1,json_print_2
+        procedure :: json_print_1
+        procedure :: json_print_2
 
         !>
         !  Destructor routine for a [[json_value]] pointer.
@@ -478,7 +488,8 @@
         !>
         !  Parse the JSON file and populate the [[json_value]] tree.
         generic,public :: parse => json_parse_file, MAYBEWRAP(json_parse_string)
-        procedure :: json_parse_file, MAYBEWRAP(json_parse_string)
+        procedure :: json_parse_file
+        procedure :: MAYBEWRAP(json_parse_string)
 
         !>
         !  Throw an exception.
@@ -892,7 +903,7 @@
         write(*,'(A)') 'JSON-Fortran Exception: '//trim(msg)
         !call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)
 #ifdef __INTEL_COMPILER
-        call tracebackqq(-1)  ! print a traceback and return
+        call tracebackqq(user_exit_code=-1)  ! print a traceback and return
 #endif
         write(*,'(A)') '***********************'
     end if
