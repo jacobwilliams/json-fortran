@@ -25,13 +25,19 @@ contains
 
     integer,intent(out) :: error_cnt
 
+    type(json_value),pointer :: p, inp, traj, tmp1, tmp2, p_tmp, p_integer_array, p_clone
     type(json_core) :: json  !! factory for manipulating `json_value` pointers
-    type(json_value),pointer :: p, inp, traj, p_tmp, p_integer_array, p_clone
 
     integer :: iunit
     character(kind=json_CK,len=:),allocatable :: name
     integer :: ival,ival_clone
     logical :: found
+
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '================================='
+    write(error_unit,'(A)') '   EXAMPLE 2'
+    write(error_unit,'(A)') '================================='
+    write(error_unit,'(A)') ''
 
     error_cnt = 0
     call json%initialize()
@@ -39,12 +45,6 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-
-    write(error_unit,'(A)') ''
-    write(error_unit,'(A)') '================================='
-    write(error_unit,'(A)') '   EXAMPLE 2'
-    write(error_unit,'(A)') '================================='
-    write(error_unit,'(A)') ''
 
     !root:
     call json%create_object(p,dir//filename2)    ! create the value and associate the pointer
@@ -68,6 +68,10 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+
+    !test get_parent:
+    call json%get_parent(inp,tmp1)  !will be root
+    call json%get_parent(tmp1,tmp2) !has no parent -> null()
 
     !trajectory structure:
     call json%create_array(traj,'trajectory')    !an array
@@ -348,5 +352,6 @@ program jf_test_2
     n_errors = 0
     call test_2(n_errors)
     if (n_errors /= 0) stop 1
+
 end program jf_test_2
 !*****************************************************************************************

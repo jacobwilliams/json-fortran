@@ -12,7 +12,7 @@ module jf_test_11_mod
     implicit none
 
     character(len=*),parameter :: dir = '../files/inputs/'  !! working directory
-# ifdef USE_UCS4
+#ifdef USE_UCS4
     character(len=*),parameter :: unicode_file = 'hello-world-ucs4.json'
 #endif
     character(len=*),parameter :: ascii_equivalent = 'hello-world-ascii.json'

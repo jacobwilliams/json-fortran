@@ -32,18 +32,18 @@ contains
     character(kind=json_CK,len=10) :: str
     real(wp),dimension(:),allocatable :: rvec
 
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '================================='
+    write(error_unit,'(A)') '   EXAMPLE 3'
+    write(error_unit,'(A)') '================================='
+    write(error_unit,'(A)') ''
+
     error_cnt = 0
     call json%initialize()
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-
-    write(error_unit,'(A)') ''
-    write(error_unit,'(A)') '================================='
-    write(error_unit,'(A)') '   EXAMPLE 3'
-    write(error_unit,'(A)') '================================='
-    write(error_unit,'(A)') ''
 
     ! parse the json file:
     write(error_unit,'(A)') ''
