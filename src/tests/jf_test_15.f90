@@ -7,8 +7,8 @@
 
 module jf_test_15_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
+    use json_module, CK => json_CK
+    use, intrinsic :: iso_fortran_env , only: error_unit,output_unit,wp=>real64
 
     implicit none
 
@@ -27,7 +27,7 @@ contains
     type(json_file) :: file1, file2
     logical :: found,status_ok
     integer :: var_type,i,n_children
-    real(RK) :: d
+    real(wp) :: d
     logical :: tf
     character(kind=CK,len=:),allocatable :: error_msg
 
