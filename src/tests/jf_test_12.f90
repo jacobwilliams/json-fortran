@@ -149,7 +149,7 @@ contains
     call json%get(me=root,path='array data.data',array_callback=get_3D_from_array)
     call check_errors(all(abs(fetched_array - reshape(raw_array,[size(raw_array)])) <= TOL))
 
-    my_file = json_file(root)
+    my_file = json_file(root,verbose=.true.,real_format='G')
 
     call my_file%update('array data.description',CK_'vector data',found=existed)
     call check_file_errors(existed)
