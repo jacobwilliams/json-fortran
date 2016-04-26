@@ -202,6 +202,11 @@
 
         integer(IK) :: ipos = 1  !! for allocatable strings: next character to read
 
+        logical :: strict_type_checking = .false. !! if true, then no type conversions are done
+                                                  !! in the `get` routines if the actual variable
+                                                  !! type is different from the return type (for
+                                                  !! example, integer to double).
+
         contains
 
         private
@@ -291,16 +296,25 @@
             json_get_string,      MAYBEWRAP(json_get_string_with_path),      &
             json_get_string_vec,  MAYBEWRAP(json_get_string_vec_with_path),  &
             json_get_array,       MAYBEWRAP(json_get_array_with_path)
+        procedure,private :: json_get_integer
+        procedure,private :: json_get_integer_vec
+        procedure,private :: json_get_double
+        procedure,private :: json_get_double_vec
+        procedure,private :: json_get_logical
+        procedure,private :: json_get_logical_vec
+        procedure,private :: json_get_string
+        procedure,private :: json_get_string_vec
+        procedure,private :: json_get_array
         procedure,private :: MAYBEWRAP(json_get_by_path)
-        procedure,private :: json_get_integer,MAYBEWRAP(json_get_integer_with_path)
-        procedure,private :: json_get_integer_vec,MAYBEWRAP(json_get_integer_vec_with_path)
-        procedure,private :: json_get_double,MAYBEWRAP(json_get_double_with_path)
-        procedure,private :: json_get_double_vec,MAYBEWRAP(json_get_double_vec_with_path)
-        procedure,private :: json_get_logical,MAYBEWRAP(json_get_logical_with_path)
-        procedure,private :: json_get_logical_vec,MAYBEWRAP(json_get_logical_vec_with_path)
-        procedure,private :: json_get_string,MAYBEWRAP(json_get_string_with_path)
-        procedure,private :: json_get_string_vec,MAYBEWRAP(json_get_string_vec_with_path)
-        procedure,private :: json_get_array,MAYBEWRAP(json_get_array_with_path)
+        procedure,private :: MAYBEWRAP(json_get_integer_with_path)
+        procedure,private :: MAYBEWRAP(json_get_integer_vec_with_path)
+        procedure,private :: MAYBEWRAP(json_get_double_with_path)
+        procedure,private :: MAYBEWRAP(json_get_double_vec_with_path)
+        procedure,private :: MAYBEWRAP(json_get_logical_with_path)
+        procedure,private :: MAYBEWRAP(json_get_logical_vec_with_path)
+        procedure,private :: MAYBEWRAP(json_get_string_with_path)
+        procedure,private :: MAYBEWRAP(json_get_string_vec_with_path)
+        procedure,private :: MAYBEWRAP(json_get_array_with_path)
 
         procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]] structure to an allocatable string
 
@@ -316,7 +330,8 @@
         !    call json%print(p,'test.json')  !this is [[json_print_2]]
         !````
         generic,public :: print => json_print_1,json_print_2
-        procedure :: json_print_1,json_print_2
+        procedure :: json_print_1
+        procedure :: json_print_2
 
         !>
         !  Destructor routine for a [[json_value]] pointer.
@@ -473,7 +488,8 @@
         !>
         !  Parse the JSON file and populate the [[json_value]] tree.
         generic,public :: parse => json_parse_file, MAYBEWRAP(json_parse_string)
-        procedure :: json_parse_file, MAYBEWRAP(json_parse_string)
+        procedure :: json_parse_file
+        procedure :: MAYBEWRAP(json_parse_string)
 
         !>
         !  Throw an exception.
@@ -481,7 +497,6 @@
         procedure :: MAYBEWRAP(json_throw_exception)
 
         !public routines:
-        procedure,public :: create              => json_value_create        !! allocate a [[json_value]] pointer
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
         procedure,public :: count               => json_count               !! count the number of children
@@ -500,7 +515,6 @@
         procedure :: json_value_print
         procedure :: string_to_integer
         procedure :: string_to_double
-        procedure :: unescape_string
         procedure :: parse_value
         procedure :: parse_number
         procedure :: parse_string
@@ -717,6 +731,7 @@
 !  date: 12/4/2013
 !
 !  Initialize the [[json_core]] instance.
+!
 !  The routine may be called before any of the [[json_core]] methods are used in
 !  order to specify certain parameters. If it is not called, then the defaults
 !  are used. This routine is also called internally by various routines.
@@ -726,7 +741,9 @@
 !# Modified
 !  * Izaak Beekman : 02/24/2015
 
-    subroutine json_initialize(json,verbose,compact_reals,print_signs,real_format,spaces_per_tab)
+    subroutine json_initialize(json,verbose,compact_reals,&
+                               print_signs,real_format,spaces_per_tab,&
+                               strict_type_checking)
 
     implicit none
 
@@ -736,6 +753,9 @@
     logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
     character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
     integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
+                                                            !! conversions are done for the `get` routines
+                                                            !! (default is false)
 
     character(kind=CDK,len=10) :: w,d,e
     character(kind=CDK,len=2)  :: sgn, rl_edit_desc
@@ -772,6 +792,9 @@
 
     !verbose error printing:
     if (present(verbose)) json%is_verbose = verbose
+
+    !type checking:
+    if (present(strict_type_checking)) json%strict_type_checking = strict_type_checking
 
     !Set the format for real numbers:
     ! [if not changing it, then it remains the same]
@@ -880,7 +903,7 @@
         write(*,'(A)') 'JSON-Fortran Exception: '//trim(msg)
         !call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)
 #ifdef __INTEL_COMPILER
-        call tracebackqq(-1)  ! print a traceback and return
+        call tracebackqq(user_exit_code=-1)  ! print a traceback and return
 #endif
         write(*,'(A)') '***********************'
     end if
@@ -1013,9 +1036,8 @@
 !# Example
 !
 !````fortran
-!    type(json_core) :: json
 !    type(json_value),pointer :: var
-!    call json%create(var)
+!    call json_value_create(var)
 !    call to_double(var,1.0_RK)
 !````
 !
@@ -1023,12 +1045,11 @@
 !  1. This routine does not check for exceptions.
 !  2. The pointer should not already be allocated, or a memory leak will occur.
 
-    subroutine json_value_create(json,p)
+    subroutine json_value_create(p)
 
     implicit none
 
-    class(json_core),intent(inout) :: json
-    type(json_value),pointer       :: p
+    type(json_value),pointer :: p
 
     nullify(p)
     allocate(p)
@@ -1579,7 +1600,7 @@
     type(json_value),pointer :: var
 
     !create the variable:
-    call json%create(var)
+    call json_value_create(var)
     call to_double(var,val,name)
 
     !add it:
@@ -1631,7 +1652,7 @@
     integer(IK) :: i
 
     !create the variable as an array:
-    call json%create(var)
+    call json_value_create(var)
     call to_array(var,name)
 
     !populate the array:
@@ -1687,7 +1708,7 @@
     type(json_value),pointer :: var
 
     !create the variable:
-    call json%create(var)
+    call json_value_create(var)
     call to_integer(var,val,name)
 
     !add it:
@@ -1739,7 +1760,7 @@
     integer(IK) :: i    !counter
 
     !create the variable as an array:
-    call json%create(var)
+    call json_value_create(var)
     call to_array(var,name)
 
     !populate the array:
@@ -1795,7 +1816,7 @@
     type(json_value),pointer :: var
 
     !create the variable:
-    call json%create(var)
+    call json_value_create(var)
     call to_logical(var,val,name)
 
     !add it:
@@ -1847,7 +1868,7 @@
     integer(IK) :: i    !! counter
 
     !create the variable as an array:
-    call json%create(var)
+    call json_value_create(var)
     call to_array(var,name)
 
     !populate the array:
@@ -1907,7 +1928,7 @@
     call escape_string(val, str)
 
     !create the variable:
-    call json%create(var)
+    call json_value_create(var)
     call to_string(var,str,name)
 
     !add it:
@@ -2011,7 +2032,7 @@
     end if
 
     !create the variable as an array:
-    call json%create(var)
+    call json_value_create(var)
     call to_array(var,name)
 
     !populate the array:
@@ -2868,7 +2889,7 @@
 
     class(json_core),intent(inout)      :: json
     character(kind=CK,len=*),intent(in) :: str
-    integer(IK) :: ival
+    integer(IK)                         :: ival
 
     character(kind=CDK,len=:),allocatable :: digits
     integer(IK) :: ndigits_digits,ndigits,ierr
@@ -2885,8 +2906,9 @@
 
         if (ierr/=0) then    !if there was an error
             ival = 0
-            call json%throw_exception('Error in string_to_integer:'//&
-                                 ' string cannot be converted to an integer: '//trim(str))
+            call json%throw_exception('Error in string_to_integer: '//&
+                                 'string cannot be converted to an integer: '//&
+                                 trim(str))
         end if
 
     else
@@ -2912,10 +2934,10 @@
     implicit none
 
     class(json_core),intent(inout)      :: json
-    real(RK)                            :: rval
     character(kind=CK,len=*),intent(in) :: str
+    real(RK)                            :: rval
 
-    integer(IK) :: ierr
+    integer(IK) :: ierr  !! read iostat error code
 
     if (.not. json%exception_thrown) then
 
@@ -2924,10 +2946,13 @@
 
         if (ierr/=0) then    !if there was an error
             rval = 0.0_RK
-            call json%throw_exception('Error in string_to_double:'//&
-                                 ' string cannot be converted to a double: '//trim(str))
+            call json%throw_exception('Error in string_to_double: '//&
+                                      'string cannot be converted to a double: '//&
+                                      trim(str))
         end if
 
+    else
+        rval = 0.0_RK
     end if
 
     end function string_to_double
@@ -2948,21 +2973,29 @@
     value = 0
     if ( json%exception_thrown ) return
 
-    select case(me%var_type)
-    case (json_integer)
+    if (me%var_type == json_integer) then
         value = me%int_value
-    case (json_double)
-        value = int(me%dbl_value)
-    case (json_logical)
-        if (me%log_value) then
-            value = 1
+    else
+        if (json%strict_type_checking) then
+            call json%throw_exception('Error in get_integer:'//&
+                 ' Unable to resolve value to integer: '//me%name)
         else
-            value = 0
+            !type conversions
+            select case(me%var_type)
+            case (json_double)
+                value = int(me%dbl_value)
+            case (json_logical)
+                if (me%log_value) then
+                    value = 1
+                else
+                    value = 0
+                end if
+            case default
+                call json%throw_exception('Error in get_integer:'//&
+                     ' Unable to resolve value to integer: '//me%name)
+            end select
         end if
-    case default
-        call json%throw_exception('Error in get_integer:'//&
-             ' Unable to resolve value to integer: '//me%name)
-    end select
+    end if
 
     end subroutine json_get_integer
 !*****************************************************************************************
@@ -3161,23 +3194,29 @@
     value = 0.0_RK
     if ( json%exception_thrown ) return
 
-    select case (me%var_type)
-    case (json_integer)
-        value = me%int_value
-    case (json_double)
+    if (me%var_type == json_double) then
         value = me%dbl_value
-    case (json_logical)
-        if (me%log_value) then
-            value = 1.0_RK
+    else
+        if (json%strict_type_checking) then
+            call json%throw_exception('Error in json_get_double:'//&
+                                      ' Unable to resolve value to double: '//me%name)
         else
-            value = 0.0_RK
+            !type conversions
+            select case (me%var_type)
+            case (json_integer)
+                value = me%int_value
+            case (json_logical)
+                if (me%log_value) then
+                    value = 1.0_RK
+                else
+                    value = 0.0_RK
+                end if
+            case default
+                call json%throw_exception('Error in json_get_double:'//&
+                                          ' Unable to resolve value to double: '//me%name)
+            end select
         end if
-    case default
-
-        call json%throw_exception('Error in json_get_double:'//&
-                             ' Unable to resolve value to double: '//me%name)
-
-    end select
+    end if
 
     end subroutine json_get_double
 !*****************************************************************************************
@@ -3383,15 +3422,25 @@
     value = .false.
     if ( json%exception_thrown ) return
 
-    select case (me%var_type)
-    case (json_integer)
-        value = (me%int_value > 0)
-    case (json_logical)
-        value = me % log_value
-    case default
-        call json%throw_exception('Error in json_get_logical:'//&
-                             ' Unable to resolve value to logical: '//me%name)
-    end select
+    if (me%var_type == json_logical) then
+        value = me%log_value
+    else
+        if (json%strict_type_checking) then
+            call json%throw_exception('Error in json_get_logical: '//&
+                                      'Unable to resolve value to logical: '//&
+                                      me%name)
+        else
+            !type conversions
+            select case (me%var_type)
+            case (json_integer)
+                value = (me%int_value > 0)
+            case default
+                call json%throw_exception('Error in json_get_logical: '//&
+                                          'Unable to resolve value to logical: '//&
+                                          me%name)
+            end select
+        end if
+    end if
 
     end subroutine json_get_logical
 !*****************************************************************************************
@@ -3594,6 +3643,8 @@
     type(json_value),pointer,intent(in)              :: me
     character(kind=CK,len=:),allocatable,intent(out) :: value
 
+    character(kind=CK,len=:),allocatable :: error_message  !! for [[unescape_string]]
+
     value = ''
     if (.not. json%exception_thrown) then
 
@@ -3602,16 +3653,22 @@
         case (json_string)
 
             if (allocated(me%str_value)) then
-                call json%unescape_string(me%str_value, value)
+                call unescape_string(me%str_value, value, error_message)
+                if (allocated(error_message)) then
+                    call json%throw_exception(error_message)
+                    deallocate(error_message)
+                    value = ''
+                end if
             else
-               call json%throw_exception('Error in json_get_string:'//&
-                    ' me%str_value not allocated')
+               call json%throw_exception('Error in json_get_string: '//&
+                                         'me%str_value not allocated')
             end if
 
         case default
 
-            call json%throw_exception('Error in json_get_string:'//&
-                 ' Unable to resolve value to characters: '//me%name)
+            call json%throw_exception('Error in json_get_string: '//&
+                                      'Unable to resolve value to characters: '//&
+                                      me%name)
 
             ! Note: for the other cases, we could do val to string conversions.
 
@@ -3620,137 +3677,6 @@
     end if
 
     end subroutine json_get_string
-!*****************************************************************************************
-
-!*****************************************************************************************
-!>
-!  Remove the escape characters from a JSON string and return it.
-!
-!  The escaped characters are denoted by the '\' character:
-!````
-!    '\"'        quotation mark
-!    '\\'        reverse solidus
-!    '\/'        solidus
-!    '\b'        backspace
-!    '\f'        formfeed
-!    '\n'        newline (LF)
-!    '\r'        carriage return (CR)
-!    '\t'        horizontal tab
-!    '\uXXXX'    4 hexadecimal digits
-!````
-
-    subroutine unescape_string(json, str_in, str_out)
-
-    implicit none
-
-    class(json_core),intent(inout)                   :: json
-    character(kind=CK,len=*),intent(in)              :: str_in  !! string as stored in a [[json_value]]
-    character(kind=CK,len=:),allocatable,intent(out) :: str_out !! decoded string
-
-    integer :: i   !! counter
-    integer :: n   !! length of str_in
-    integer :: m   !! length of str_out
-    character(kind=CK,len=1) :: c  !! for scanning each character in string
-
-    if (scan(str_in,backslash)>0) then
-
-        !there is at least one escape character, so process this string:
-
-        n = len(str_in)
-        str_out = repeat(space,n) !size the output string (will be trimmed later)
-        m = 0  !counter in str_out
-        i = 0  !counter in str_in
-
-        do
-
-            i = i + 1
-            if (i>n) exit ! finished
-            c = str_in(i:i) ! get next character in the string
-
-            if (c == backslash) then
-
-                if (i<n) then
-
-                    i = i + 1
-                    c = str_in(i:i) !character after the escape
-
-                    if (any(c == [quotation_mark,backslash,slash, &
-                         to_unicode(['b','f','n','r','t'])])) then
-
-                        select case(c)
-                        case (quotation_mark,backslash,slash)
-                            !use d as is
-                        case (CK_'b')
-                             c = bspace
-                        case (CK_'f')
-                             c = formfeed
-                        case (CK_'n')
-                             c = newline
-                        case (CK_'r')
-                             c = carriage_return
-                        case (CK_'t')
-                             c = horizontal_tab
-                        end select
-
-                        m = m + 1
-                        str_out(m:m) = c
-
-                    else if (c == 'u') then !expecting 4 hexadecimal digits after
-                                            !the escape character    [\uXXXX]
-
-                        !for now, we are just returning them as is
-                        ![not checking to see if it is a valid hex value]
-                        !
-                        ! Example:
-                        !   123456
-                        !   \uXXXX
-
-                        if (i+4<=n) then
-                            m = m + 1
-                            str_out(m:m+5) = str_in(i-1:i+4)
-                            i = i + 4
-                            m = m + 5
-                        else
-                            call json%throw_exception('Error in unescape_string:'//&
-                                                 ' Invalid hexadecimal sequence'//&
-                                                 ' in string: '//str_in(i-1:))
-                            str_out = ''
-                            return
-                        end if
-
-                    else
-                        !unknown escape character
-                        call json%throw_exception('Error in unescape_string:'//&
-                                             ' unknown escape sequence in string "'//&
-                                             trim(str_in)//'" ['//backslash//c//']')
-                        str_out = ''
-                        return
-                    end if
-
-                else
-                    !an escape character is the last character in
-                    ! the string [this may not be valid syntax,
-                    ! but just keep it]
-                    m = m + 1
-                    str_out(m:m) = c
-                end if
-
-            else
-                m = m + 1
-                str_out(m:m) = c
-            end if
-
-        end do
-
-        !trim trailing space:
-        str_out = str_out(1:m)
-
-    else
-        !there are no escape characters, so return as is:
-        str_out = str_in
-    end if
-
-    end subroutine unescape_string
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -4200,7 +4126,7 @@
     if (istat==0) then
 
         ! create the value and associate the pointer
-        call json%create(p)
+        call json_value_create(p)
 
         ! Note: the name of the root json_value doesn't really matter,
         !  but we'll allocate something here just in case.
@@ -4244,7 +4170,7 @@
     call json%initialize()
 
     ! create the value and associate the pointer
-    call json%create(p)
+    call json_value_create(p)
 
     ! Note: the name of the root json_value doesn't really matter,
     !  but we'll allocate something here just in case.
@@ -4557,7 +4483,7 @@
     character(kind=CK,len=*),intent(in) :: name  !! variable name
     logical(LK),intent(in)              :: val   !! variable value
 
-    call json%create(me)
+    call json_value_create(me)
     call to_logical(me,val,name)
 
     end subroutine json_value_create_logical
@@ -4604,7 +4530,7 @@
     character(kind=CK,len=*),intent(in) :: name
     integer(IK),intent(in)              :: val
 
-    call json%create(me)
+    call json_value_create(me)
     call to_integer(me,val,name)
 
     end subroutine json_value_create_integer
@@ -4652,7 +4578,7 @@
     character(kind=CK,len=*),intent(in) :: name
     real(RK),intent(in)                 :: val
 
-    call json%create(me)
+    call json_value_create(me)
     call to_double(me,val,name)
 
     end subroutine json_value_create_double
@@ -4700,7 +4626,7 @@
     character(kind=CK,len=*),intent(in) :: name
     character(kind=CK,len=*),intent(in) :: val
 
-    call json%create(me)
+    call json_value_create(me)
     call to_string(me,val,name)
 
     end subroutine json_value_create_string
@@ -4747,7 +4673,7 @@
     type(json_value),pointer            :: me
     character(kind=CK,len=*),intent(in) :: name
 
-    call json%create(me)
+    call json_value_create(me)
     call to_null(me,name)
 
     end subroutine json_value_create_null
@@ -4796,7 +4722,7 @@
     type(json_value),pointer            :: me
     character(kind=CK,len=*),intent(in) :: name
 
-    call json%create(me)
+    call json_value_create(me)
     call to_object(me,name)
 
     end subroutine json_value_create_object
@@ -4842,7 +4768,7 @@
     type(json_value),pointer            :: me
     character(kind=CK,len=*),intent(in) :: name
 
-    call json%create(me)
+    call json_value_create(me)
     call to_array(me,name)
 
     end subroutine json_value_create_array
@@ -5091,7 +5017,7 @@
             ! end of an empty object
             return
         else if (quotation_mark == c) then
-            call json%create(pair)
+            call json_value_create(pair)
             call json%parse_string(unit, str, tmp)   !write to a tmp variable because of
             pair % name = tmp                   ! a bug in 4.9 gfortran compiler.
             deallocate(tmp)
@@ -5170,7 +5096,7 @@
 
         ! try to parse an element value
         nullify(element)
-        call json%create(element)
+        call json_value_create(element)
         call json%parse_value(unit, str, element)
         if (json%exception_thrown) then
             if (associated(element)) call json%destroy(element)

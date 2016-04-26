@@ -1,13 +1,12 @@
 !*****************************************************************************************
 !>
-! Module for the sixth unit test.
+!  Module for the sixth unit test.
 !
 !# HISTORY
 !  * Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
 
 module jf_test_6_mod
 
-    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 

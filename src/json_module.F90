@@ -4,9 +4,23 @@
 !
 !  A Fortran 2008 JSON (JavaScript Object Notation) API.
 !
-!  This module provides access to [[json_kinds]], [[json_value_module]] and
-!  [[json_file_module]].  Either one can be used separately, or all can be
-!  used by using this module.
+!  This module provides access to [[json_value_module]] and
+!  [[json_file_module]]. For normal JSON-Fortran use, using this module
+!  is all that is necessary.
+!
+!  Note that this module renames the kind definition variables from [[json_kinds]]
+!  from [`RK`, `IK`, `LK`, `CK`, and `CDK`] to [`json_RK`, `json_IK`, `json_LK`,
+!  `json_CK`, and `json_CDK`] so as to avoid namespace pollution with short
+!  variable names.
+!
+#ifdef USE_UCS4
+#pragma push_macro("USE_UCS4")
+#undef USE_UCS4
+!  Since ```USE_UCS4``` **is** defined, this module also exports the
+!  operators `==`, `/=`, and `//` from [[json_string_utilities]] for
+!  `CK` and `CDK` operations.
+#pragma pop_macro("USE_UCS4")
+#endif
 !
 !## License
 !  * JSON-Fortran is released under a BSD-style license.
@@ -14,7 +28,8 @@
 !    file for details.
 !
 !## History
-!  * Joseph A. Levin : March 2012 : Original FSON code [retrieved on 12/2/2013].
+!  * Joseph A. Levin : March 2012 : Original [FSON](https://github.com/josephalevin/fson)
+!    code [retrieved on 12/2/2013].
 !  * Jacob Williams : 2/8/2014 : Extensive modifications to the original FSON code.
 !    The original F95 code was split into four files:
 !    fson_path_m.f95, fson_string_m.f95, fson_value_m.f95, and fson.f95.
@@ -34,7 +49,16 @@
 
     module json_module
 
-    use json_kinds
+    use json_kinds, only: json_RK  => RK, &
+                          json_IK  => IK, &
+                          json_LK  => LK, &
+                          json_CK  => CK, &
+                          json_CDK => CDK
+#ifdef USE_UCS4
+    use json_string_utilities, only: operator(==),&
+                                     operator(//),&
+                                     operator(/=)
+#endif
     use json_value_module
     use json_file_module
 

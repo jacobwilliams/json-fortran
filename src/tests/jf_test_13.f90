@@ -6,7 +6,6 @@
 
 module jf_test_13_mod
 
-    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
@@ -22,8 +21,8 @@ contains
 
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
-    type(json_file)  :: my_file
-    character(kind=CK,len=:),allocatable :: str
+    type(json_file) :: my_file
+    character(kind=json_CK,len=:),allocatable :: str
     integer :: i
 
     character(len=2),dimension(5),parameter :: fmts=['g ','e ','en','es','* ']

@@ -7,7 +7,6 @@
 
 module jf_test_3_mod
 
-    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -26,11 +25,11 @@ contains
 
     integer,intent(out) :: error_cnt
     integer :: ival
-    character(kind=CK,len=:),allocatable :: cval
+    character(kind=json_CK,len=:),allocatable :: cval
     real(wp) :: rval
     type(json_file) :: json    !the JSON structure read from the file:
     integer :: i
-    character(kind=CK,len=10) :: str
+    character(kind=json_CK,len=10) :: str
     real(wp),dimension(:),allocatable :: rvec
 
     write(error_unit,'(A)') ''

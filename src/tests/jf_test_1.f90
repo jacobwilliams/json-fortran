@@ -7,7 +7,6 @@
 
 module jf_test_1_mod
 
-    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -29,7 +28,7 @@ contains
     type(json_core) :: core       !! factory for manipulating `json_value` pointers
     integer,intent(out) :: error_cnt
     integer :: ival
-    character(kind=CK,len=:),allocatable :: cval
+    character(kind=json_CK,len=:),allocatable :: cval
     real(wp) :: rval
     logical :: found
 

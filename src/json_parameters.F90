@@ -43,7 +43,8 @@
     character(kind=CK,len=*),parameter :: backslash       = achar(92)
 
     character(kind=CDK,len=*),parameter,public :: default_real_fmt = '(ss,E26.16E4)'
-        !! default real number format statement
+        !! default real number format statement (for writing real values to strings and files).
+        !! Note that this can be overridden by calling [[json_initialize]].
 
     character(kind=CK,len=*),parameter,public :: star = '*' !! for invalid numbers and
                                                             !! list-directed real output
@@ -56,9 +57,9 @@
 
     !These were parameters, but gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
     !necessitates moving them here to be variables
-    character(kind=CK,len=4),protected :: null_str  = 'null'
-    character(kind=CK,len=4),protected :: true_str  = 'true'
-    character(kind=CK,len=5),protected :: false_str = 'false'
+    character(kind=CK,len=4),protected :: null_str  = 'null'  !! JSON Null variable string
+    character(kind=CK,len=4),protected :: true_str  = 'true'  !! JSON logical True string
+    character(kind=CK,len=5),protected :: false_str = 'false' !! JSON logical False string
 
     integer, private :: i_      !! just a counter for control_chars array
     character(kind=CK,len=*),dimension(32),parameter :: control_chars = &

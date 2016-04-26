@@ -241,7 +241,9 @@
 !
 !@note: This does not destroy the data in the file.
 
-    subroutine initialize_json_core_in_file(me,verbose,compact_reals,print_signs,real_format,spaces_per_tab)
+    subroutine initialize_json_core_in_file(me,verbose,compact_reals,&
+                                            print_signs,real_format,spaces_per_tab,&
+                                            strict_type_checking)
 
     implicit none
 
@@ -251,8 +253,13 @@
     logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
     character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
     integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
+                                                            !! conversions are done for the `get` routines
+                                                            !! (default is false)
 
-    call me%json%initialize(verbose,compact_reals,print_signs,real_format,spaces_per_tab)
+    call me%json%initialize(verbose,compact_reals,&
+                            print_signs,real_format,spaces_per_tab,&
+                            strict_type_checking)
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
@@ -264,7 +271,9 @@
 !  Cast a [[json_value]] object as a [[json_file(type)]] object.
 !  It also calls the `initialize()` method.
 
-    function initialize_json_file(p,verbose,compact_reals,print_signs,real_format,spaces_per_tab) result(file_object)
+    function initialize_json_file(p,verbose,compact_reals,&
+                                  print_signs,real_format,spaces_per_tab,&
+                                  strict_type_checking) result(file_object)
 
     implicit none
 
@@ -276,8 +285,13 @@
     logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
     character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
     integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
+                                                            !! conversions are done for the `get` routines
+                                                            !! (default is false)
 
-    call file_object%initialize(verbose,compact_reals,print_signs,real_format,spaces_per_tab)
+    call file_object%initialize(verbose,compact_reals,&
+                                print_signs,real_format,spaces_per_tab,&
+                                strict_type_checking)
 
     if (present(p)) file_object%p => p
 

@@ -6,7 +6,6 @@
 
 module jf_test_11_mod
 
-    use json_kinds
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
@@ -27,7 +26,7 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
-    character(kind=CK,len=:),allocatable :: cval
+    character(kind=json_CK,len=:),allocatable :: cval
     type(json_file) :: json    !the JSON structure read from the file:
 # ifdef USE_UCS4
     type(json_file) :: clone
