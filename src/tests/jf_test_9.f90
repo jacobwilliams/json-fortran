@@ -44,11 +44,6 @@ contains
     character(len=:),allocatable :: str
 
     error_cnt = 0
-    call json_initialize()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-    end if
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -61,12 +56,12 @@ contains
     write(error_unit,'(A)') 'Loading file: '//trim(filename)
 
     call cpu_time(tstart)
-    call f%load_file(dir//filename)
+    call f%load_file(dir//filename) ! will automatically call initialize() with defaults
     call cpu_time(tend)
     write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time: ',tend-tstart,' sec'
 
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') 'File successfully read'
@@ -93,8 +88,8 @@ contains
         call f%load_from_string(str)
         call cpu_time(tend)
         write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time to parse: ',tend-tstart,' sec'
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (f%failed()) then
+            call f%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
             write(error_unit,'(A)') 'File successfully read'
@@ -119,19 +114,19 @@ contains
     !!@warning Will this routine work if the file contains unicode characters??
 
     implicit none
- 
+
     character(len=*),intent(in) :: filename
     character(len=:),allocatable,intent(out) :: str
- 
+
     integer :: iunit,istat,filesize
- 
+
     open( newunit = iunit,&
           file    = filename,&
           status  = 'OLD',&
           form    = 'UNFORMATTED',&
           access  = 'STREAM',&
           iostat  = istat )
- 
+
     if (istat==0) then
         inquire(file=filename, size=filesize)
         if (filesize>0) then
@@ -141,7 +136,7 @@ contains
             close(iunit, iostat=istat)
         end if
     end if
- 
+
     end subroutine read_file
 
 end module jf_test_9_mod
@@ -151,12 +146,13 @@ end module jf_test_9_mod
 program jf_test_9
 
     !! Ninth unit test.
-    
+
     use jf_test_9_mod , only: test_9
     implicit none
     integer :: n_errors
     n_errors = 0
     call test_9(n_errors)
     if (n_errors /= 0) stop 1
+
 end program jf_test_9
 !*****************************************************************************************

@@ -1,6 +1,6 @@
 !*****************************************************************************************
 !>
-! Module for the sixth unit test.
+!  Module for the sixth unit test.
 !
 !# HISTORY
 !  * Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
@@ -31,9 +31,9 @@ contains
                                                         'invalid2.json']
 
     error_cnt = 0
-    call json_initialize()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%initialize()
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -50,16 +50,16 @@ contains
         write(error_unit,'(A)') 'load file: '//trim(files(i))
         write(error_unit,'(A)') ''
         call json%load_file(filename = dir//trim(files(i)))
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
         else
             write(error_unit,'(A)') 'An error should have been raised!'
             error_cnt = error_cnt + 1
         end if
         ! clean up
         call json%destroy()
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
     end do
@@ -73,14 +73,13 @@ end module jf_test_6_mod
 program jf_test_6
 
     !! Sixth unit test.
-    
+
     use jf_test_6_mod , only: test_6
     implicit none
     integer :: n_errors
     n_errors = 0
     call test_6(n_errors)
     if (n_errors /= 0) stop 1
+
 end program jf_test_6
 !*****************************************************************************************
-
-!*******************************************************************************************************

@@ -24,19 +24,20 @@ contains
 
     integer,intent(out) :: error_cnt
 
-    character(kind=CK,len=256),dimension(:),allocatable :: str_vec
+    character(kind=json_CK,len=256),dimension(:),allocatable :: str_vec
     type(json_file) :: f,f2
     type(json_value),pointer :: p
-    character(kind=CK,len=:),allocatable :: str,name
+    type(json_core) :: json       !! factory for manipulating `json_value` pointers
+    character(kind=json_CK,len=:),allocatable :: str,name
     logical :: found,lval
     integer :: var_type,n_children
 
-    character(kind=CDK,len=*),parameter :: json_str = '{ "blah": 123 }'
+    character(kind=json_CDK,len=*),parameter :: json_str = '{ "blah": 123 }'
 
     error_cnt = 0
-    call json_initialize()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%initialize()
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -48,9 +49,9 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Loading file: '//trim(filename)//'...'
 
-    call f%load_file(dir//filename)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call f%load_file(dir//filename)  ! will call initialize()
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') '...success'
@@ -58,9 +59,10 @@ contains
     write(error_unit,'(A)') ''
 
     write(error_unit,'(A)') 'json_file_move_pointer...'
+    call f2%initialize()
     call f2%move(f)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') '...success'
@@ -68,8 +70,8 @@ contains
 
     write(error_unit,'(A)') 'json_file_load_from_string...'
     call f%load_from_string(json_str)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') '...success'
@@ -77,8 +79,8 @@ contains
 
     write(error_unit,'(A)') 'json_file_print_to_string...'
     call f%print_to_string(str)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') '...success'
@@ -86,8 +88,8 @@ contains
 
     write(error_unit,'(A)') 'json_file_variable_info...'
     call f%info('blah',found,var_type,n_children)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
@@ -101,8 +103,8 @@ contains
 
     write(error_unit,'(A)') 'json_file_get_logical...'
     call f2%get('data(1).tf1',lval,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
@@ -118,8 +120,8 @@ contains
 
     write(error_unit,'(A)') 'json_file_get_string_vec...'
     call f2%get('files',str_vec,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
@@ -134,8 +136,8 @@ contains
 
     write(error_unit,'(A)') 'json_file_update_logical [variable present]...'
     call f2%update('data(1).tf1',.false.,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         if (found) then
@@ -147,8 +149,8 @@ contains
     end if
     write(error_unit,'(A)') 'json_file_update_logical [variable not present]...'
     call f2%update('new_logical',.true.,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') '...success'
@@ -156,8 +158,8 @@ contains
 
     write(error_unit,'(A)') 'json_file_update_real [variable present]...'
     call f2%update('data[2].real',100.0d0,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         if (found) then
@@ -169,8 +171,8 @@ contains
     end if
     write(error_unit,'(A)') 'json_file_update_real [variable not present]...'
     call f2%update('new_real',1776.0d0,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') '...success'
@@ -178,8 +180,8 @@ contains
 
     write(error_unit,'(A)') 'json_file_update_string [variable present]...'
     call f2%update('version.string','10.0.0',found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         if (found) then
@@ -191,8 +193,8 @@ contains
     end if
     write(error_unit,'(A)') 'json_file_update_string [variable not present]...'
     call f2%update('new_string','foo',found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') '...success'
@@ -203,26 +205,26 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'json_file_get_integer...'
     call f2%get('$',p,found)  !get root
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         if (found) then
             write(error_unit,'(A)') '...success'
 
             write(error_unit,'(A)') 'json_info...'
-            call json_info(p,var_type,n_children,name)
-            if (json_failed()) then
-                call json_print_error_message(error_unit)
+            call json%info(p,var_type,n_children,name)
+            if (json%failed()) then
+                call json%print_error_message(error_unit)
                 error_cnt = error_cnt + 1
             else
                 write(error_unit,'(A)') '...success'
             end if
 
             write(error_unit,'(A)') 'json_remove_if_present...'
-            call json_remove_if_present(p,'version.patch')
-            if (json_failed()) then
-                call json_print_error_message(error_unit)
+            call json%remove_if_present(p,'version.patch')
+            if (json%failed()) then
+                call json%print_error_message(error_unit)
                 error_cnt = error_cnt + 1
             else
                 write(error_unit,'(A)') '...success'
@@ -234,9 +236,9 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_update_logical...'
-    call json_update(p,'data(1).tf1',.true.,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%update(p,'data(1).tf1',.true.,found)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         if (found) then
@@ -248,9 +250,9 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_update_double...'
-    call json_update(p,'data(2).real',-1.0d0,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%update(p,'data(2).real',-1.0d0,found)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         if (found) then
@@ -262,9 +264,9 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_get_logical...'
-    call json_get(p,'data(1).tf1',lval,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%get(p,'data(1).tf1',lval,found)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         if (found) then
@@ -276,9 +278,9 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_get_string_vec...'
-    call json_get(p,'files',str_vec,found)
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%get(p,'files',str_vec,found)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
@@ -292,19 +294,18 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_create...'
-    write(error_unit,'(A)') 'json_create_logical...'; call json_destroy(p); call json_create_logical(p,.true.,'foo')
-    write(error_unit,'(A)') 'json_create_integer...'; call json_destroy(p); call json_create_integer(p,1000,'foo')
-    write(error_unit,'(A)') 'json_create_double ...'; call json_destroy(p); call json_create_double (p,9.0d0,'foo')
-    write(error_unit,'(A)') 'json_create_string ...'; call json_destroy(p); call json_create_string (p,'foo','bar')
-    write(error_unit,'(A)') 'json_create_null   ...'; call json_destroy(p); call json_create_null   (p,'foo')
-    write(error_unit,'(A)') 'json_create_object ...'; call json_destroy(p); call json_create_object (p,'foo')
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    write(error_unit,'(A)') 'json_create_logical...'; call json%destroy(p); call json%create_logical(p,.true.,'foo')
+    write(error_unit,'(A)') 'json_create_integer...'; call json%destroy(p); call json%create_integer(p,1000,'foo')
+    write(error_unit,'(A)') 'json_create_double ...'; call json%destroy(p); call json%create_double (p,9.0d0,'foo')
+    write(error_unit,'(A)') 'json_create_string ...'; call json%destroy(p); call json%create_string (p,'foo','bar')
+    write(error_unit,'(A)') 'json_create_null   ...'; call json%destroy(p); call json%create_null   (p,'foo')
+    write(error_unit,'(A)') 'json_create_object ...'; call json%destroy(p); call json%create_object (p,'foo')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     else
         write(error_unit,'(A)') '...success'
     end if
-
 
     !--------------------------------
 
@@ -328,5 +329,6 @@ program jf_test_10
     n_errors = 0
     call test_10(n_errors)
     if (n_errors /= 0) stop 1
+
 end program jf_test_10
 !*****************************************************************************************

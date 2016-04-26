@@ -25,17 +25,17 @@ contains
 
     integer,intent(out) :: error_cnt
     integer :: ival
-    character(kind=CK,len=:),allocatable :: cval
+    character(kind=json_CK,len=:),allocatable :: cval
     real(wp) :: rval
     type(json_file) :: json    !the JSON structure read from the file:
     integer :: i
-    character(kind=CK,len=10) :: str
+    character(kind=json_CK,len=10) :: str
     real(wp),dimension(:),allocatable :: rvec
 
     error_cnt = 0
-    call json_initialize()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    call json%initialize()
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -51,9 +51,9 @@ contains
 
     call json%load_file(filename = dir//filename2)
 
-    if (json_failed()) then    !if there was an error reading the file
+    if (json%failed()) then    !if there was an error reading the file
 
-        call json_print_error_message(error_unit)
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
 
     else
@@ -63,8 +63,8 @@ contains
         !get scalars:
         write(error_unit,'(A)') ''
         call json%get('inputs.integer_scalar', ival)
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
             write(error_unit,'(A,1X,I5)') 'inputs.integer_scalar = ',ival
@@ -72,8 +72,8 @@ contains
         !get one element from a vector:
         write(error_unit,'(A)') ''
         call json%get('trajectory(1).DATA(2)', rval)
-        if (json_failed()) then
-            call json_print_error_message(error_unit)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
             write(error_unit,'(A,1X,F30.16)') 'trajectory(1).DATA(2) = ',rval
@@ -86,9 +86,9 @@ contains
 
             write(error_unit,'(A)') ''
             call json%get('trajectory('//trim(str)//').VARIABLE', cval)
-            if (json_failed()) then
+            if (json%failed()) then
 
-                call json_print_error_message(error_unit)
+                call json%print_error_message(error_unit)
                 error_cnt = error_cnt + 1
 
             else
@@ -97,8 +97,8 @@ contains
 
                 !...get the vector using the callback method:
                 call json%get('trajectory('//trim(str)//').DATA', rvec)
-                if (json_failed()) then
-                    call json_print_error_message(error_unit)
+                if (json%failed()) then
+                    call json%print_error_message(error_unit)
                     error_cnt = error_cnt + 1
                 else
                     write(error_unit,'(A,1X,*(F30.16,1X))') 'trajectory('//trim(str)//').DATA = ',rvec
@@ -114,8 +114,8 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'destroy...'
     call json%destroy()
-    if (json_failed()) then
-        call json_print_error_message(error_unit)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -128,12 +128,13 @@ end module jf_test_3_mod
 program jf_test_3
 
     !! Third unit test.
-    
+
     use jf_test_3_mod , only: test_3
     implicit none
     integer :: n_errors
     n_errors = 0
     call test_3(n_errors)
     if (n_errors /= 0) stop 1
+
 end program jf_test_3
 !*****************************************************************************************
