@@ -320,10 +320,6 @@
 !
 !  Cast a [[json_value]] pointer and a [[json_core]] object
 !  as a [[json_file(type)]] object.
-!
-!@note [[initialize_json_core]], [[json_initialize]],
-!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
-!      all have a similar interface.
 
     function initialize_json_file_v2(json_value_object, json_core_object) &
                                         result(file_object)
@@ -342,17 +338,33 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date: 12/9/2013
 !
-!  Destroy the [[json_file(type)]].
+!  Destroy the [[json_value]] data in a [[json_file(type)]].
+!  This must be done when the variable is no longer needed,
+!  or will be reused to open a different file.
+!  Otherwise a memory leak will occur.
+!
+!  Optionally, also destroy the [[json_core]] instance (this
+!  is not necessary to prevent memory leaks, since a [[json_core]]
+!  does not use pointers).
+!
+!### History
+!  * 12/9/2013 : Created
+!  * 4/26/2016 : Added optional `destroy_core` argument
 
-    subroutine json_file_destroy(me)
+    subroutine json_file_destroy(me,destroy_core)
 
     implicit none
 
     class(json_file),intent(inout) :: me
+    logical,intent(in),optional :: destroy_core  !! to also destroy the [[json_core]].
+                                                 !! default is to leave it as is.
 
     if (associated(me%p)) call me%json%destroy(me%p)
+
+    if (present(destroy_core)) then
+        if (destroy_core) call me%json%destroy()
+    end if
 
     end subroutine json_file_destroy
 !*****************************************************************************************
