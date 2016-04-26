@@ -150,20 +150,28 @@
     !  date: 07/23/2015
     !
     !  Structure constructor to initialize a [[json_file(type)]] object
-    !  with an existing [[json_value]] object
+    !  with an existing [[json_value]] object, and either the [[json_core]]
+    !  settings or a [[json_core]] instance.
     !
     !# Example
     !
     !```fortran
     ! ...
     ! type(json_file)  :: my_file
-    ! type(json_value) :: json_object
+    ! type(json_value),pointer :: json_object
+    ! type(json_core) :: json_core_object
     ! ...
-    ! ! Construct a json_object
-    ! my_file = json_file(json_object)
+    ! ! Construct a json_object:
+    ! !could do this:
+    !   my_file = json_file(json_object)
+    ! !or:
+    !   my_file = json_file(json_object,verbose=.true.)
+    ! !or:
+    !   my_file = json_file(json_object,json_core_object)
     !```
     interface json_file
-       module procedure initialize_json_file
+       module procedure :: initialize_json_file
+       module procedure :: initialize_json_file_v2
     end interface
     !*************************************************************************************
 
@@ -240,6 +248,10 @@
 !  This is just a wrapper for [[json_initialize]].
 !
 !@note: This does not destroy the data in the file.
+!
+!@note [[initialize_json_core]], [[json_initialize]],
+!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      all have a similar interface.
 
     subroutine initialize_json_core_in_file(me,verbose,compact_reals,&
                                             print_signs,real_format,spaces_per_tab,&
@@ -270,6 +282,10 @@
 !
 !  Cast a [[json_value]] object as a [[json_file(type)]] object.
 !  It also calls the `initialize()` method.
+!
+!@note [[initialize_json_core]], [[json_initialize]],
+!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      all have a similar interface.
 
     function initialize_json_file(p,verbose,compact_reals,&
                                   print_signs,real_format,spaces_per_tab,&
@@ -296,6 +312,32 @@
     if (present(p)) file_object%p => p
 
     end function initialize_json_file
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/26/2016
+!
+!  Cast a [[json_value]] pointer and a [[json_core]] object
+!  as a [[json_file(type)]] object.
+!
+!@note [[initialize_json_core]], [[json_initialize]],
+!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      all have a similar interface.
+
+    function initialize_json_file_v2(json_value_object, json_core_object) &
+                                        result(file_object)
+
+    implicit none
+
+    type(json_file)                     :: file_object
+    type(json_value),pointer,intent(in) :: json_value_object
+    type(json_core),intent(in)          :: json_core_object
+
+    file_object%p    => json_value_object
+    file_object%json = json_core_object
+
+    end function initialize_json_file_v2
 !*****************************************************************************************
 
 !*****************************************************************************************

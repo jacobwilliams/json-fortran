@@ -530,6 +530,22 @@
     end type json_core
     !*********************************************************
 
+    !*********************************************************
+    !>
+    !  Structure constructor to initialize a
+    !  [[json_core]] object
+    !
+    !# Example
+    !
+    !```fortran
+    ! type(json_file)  :: json_core
+    ! json_core = json_core()
+    !```
+    interface json_core
+       module procedure initialize_json_core
+    end interface
+    !*********************************************************
+
     !*************************************************************************************
     abstract interface
 
@@ -556,6 +572,187 @@
     !*************************************************************************************
 
     contains
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/17/2016
+!
+!  Destructor for the [[json_core]] type.
+
+    subroutine destroy_json_core(me)
+
+    implicit none
+
+    class(json_core),intent(out) :: me
+
+    end subroutine destroy_json_core
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/26/2016
+!
+!  Function constructor for a [[json_core]].
+!  This is just a wrapper for [[json_initialize]].
+!
+!@note [[initialize_json_core]], [[json_initialize]],
+!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      all have a similar interface.
+
+    function initialize_json_core(verbose,compact_reals,&
+                                  print_signs,real_format,spaces_per_tab,&
+                                  strict_type_checking) result(json_core_object)
+
+    implicit none
+
+    type(json_core) :: json_core_object
+    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
+    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
+    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
+    character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
+    integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
+                                                            !! conversions are done for the `get` routines
+                                                            !! (default is false)
+
+    call json_core_object%initialize(verbose,compact_reals,&
+                                print_signs,real_format,spaces_per_tab,&
+                                strict_type_checking)
+
+    end function initialize_json_core
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 12/4/2013
+!
+!  Initialize the [[json_core]] instance.
+!
+!  The routine may be called before any of the [[json_core]] methods are used in
+!  order to specify certain parameters. If it is not called, then the defaults
+!  are used. This routine is also called internally by various routines.
+!  It can also be called to clear exceptions, or to reset some
+!  of the variables (note that only the arguments present are changed).
+!
+!# Modified
+!  * Izaak Beekman : 02/24/2015
+!
+!@note [[initialize_json_core]], [[json_initialize]],
+!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      all have a similar interface.
+
+    subroutine json_initialize(json,verbose,compact_reals,&
+                               print_signs,real_format,spaces_per_tab,&
+                               strict_type_checking)
+
+    implicit none
+
+    class(json_core),intent(inout)  :: json
+    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
+    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
+    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
+    character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
+    integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
+                                                            !! conversions are done for the `get` routines
+                                                            !! (default is false)
+
+    character(kind=CDK,len=10) :: w,d,e
+    character(kind=CDK,len=2)  :: sgn, rl_edit_desc
+    integer(IK) :: istat
+    logical(LK) :: sgn_prnt
+
+    !reset exception to false:
+    call json%clear_exceptions()
+
+    !
+    !JW comment out for now (these are now protected variables in another module)
+    ! for thread-save version, we won't be able to have global variables.........
+    !
+    !Ensure gfortran bug work around "parameters" are set properly
+    !null_str  = 'null'
+    !true_str  = 'true'
+    !false_str = 'false'
+
+    !Just in case, clear these global variables also:
+    json%pushed_index = 0
+    json%pushed_char  = ''
+    json%char_count   = 0
+    json%line_count   = 1
+    json%ipos         = 1
+
+#ifdef USE_UCS4
+    ! reopen stdout and stderr with utf-8 encoding
+    open(output_unit,encoding='utf-8')
+    open(error_unit, encoding='utf-8')
+#endif
+
+    !spaces per tab:
+    if (present(spaces_per_tab)) json%spaces_per_tab = spaces_per_tab
+
+    !verbose error printing:
+    if (present(verbose)) json%is_verbose = verbose
+
+    !type checking:
+    if (present(strict_type_checking)) json%strict_type_checking = strict_type_checking
+
+    !Set the format for real numbers:
+    ! [if not changing it, then it remains the same]
+
+    if ( (.not. allocated(json%real_fmt)) .or. &  ! if this hasn't been done yet
+          present(compact_reals) .or. &
+          present(print_signs)   .or. &
+          present(real_format) ) then
+
+        !allow the special case where real format is '*':
+        ! [this overrides the other options]
+        if (present(real_format)) then
+            if (real_format==star) then
+                json%compact_real = .false.
+                json%real_fmt = star
+                return
+            end if
+        end if
+
+        if (present(compact_reals)) json%compact_real = compact_reals
+
+        !set defaults
+        sgn_prnt = .false.
+        if ( present( print_signs) ) sgn_prnt = print_signs
+        if ( sgn_prnt ) then
+           sgn = 'sp'
+        else
+           sgn = 'ss'
+        end if
+
+        rl_edit_desc = 'E'
+        if ( present( real_format ) ) then
+           select case ( real_format )
+           case ('g','G','e','E','en','EN','es','ES')
+              rl_edit_desc = real_format
+           case default
+              call json%throw_exception('Invalid real format, "' // &
+                        trim(real_format) // '", passed to json_initialize.'// &
+                        new_line('a') // 'Acceptable formats are: "G", "E", "EN", and "ES".' )
+           end select
+        end if
+
+        ! set the default output/input format for reals:
+                      write(w,'(ss,I0)',iostat=istat) max_numeric_str_len
+        if (istat==0) write(d,'(ss,I0)',iostat=istat) real_precision
+        if (istat==0) write(e,'(ss,I0)',iostat=istat) real_exponent_digits
+        if (istat==0) then
+            json%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) //&
+                            trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
+        else
+            json%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // &
+                            '30.16E3)'  !just use this one (should never happen)
+        end if
+
+    end if
+
+    end subroutine json_initialize
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -709,149 +906,6 @@
     if (present(name))        name       = p%name
 
     end subroutine json_info
-!*****************************************************************************************
-
-!*****************************************************************************************
-!> author: Jacob Williams
-!  date: 4/17/2016
-!
-!  Destructor for the [[json_core]] type.
-
-    subroutine destroy_json_core(me)
-
-    implicit none
-
-    class(json_core),intent(out) :: me
-
-    end subroutine destroy_json_core
-!*****************************************************************************************
-
-!*****************************************************************************************
-!> author: Jacob Williams
-!  date: 12/4/2013
-!
-!  Initialize the [[json_core]] instance.
-!
-!  The routine may be called before any of the [[json_core]] methods are used in
-!  order to specify certain parameters. If it is not called, then the defaults
-!  are used. This routine is also called internally by various routines.
-!  It can also be called to clear exceptions, or to reset some
-!  of the variables (note that only the arguments present are changed).
-!
-!# Modified
-!  * Izaak Beekman : 02/24/2015
-
-    subroutine json_initialize(json,verbose,compact_reals,&
-                               print_signs,real_format,spaces_per_tab,&
-                               strict_type_checking)
-
-    implicit none
-
-    class(json_core),intent(inout)  :: json
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
-                                                            !! conversions are done for the `get` routines
-                                                            !! (default is false)
-
-    character(kind=CDK,len=10) :: w,d,e
-    character(kind=CDK,len=2)  :: sgn, rl_edit_desc
-    integer(IK) :: istat
-    logical(LK) :: sgn_prnt
-
-    !reset exception to false:
-    call json%clear_exceptions()
-
-    !
-    !JW comment out for now (these are now protected variables in another module)
-    ! for thread-save version, we won't be able to have global variables.........
-    !
-    !Ensure gfortran bug work around "parameters" are set properly
-    !null_str  = 'null'
-    !true_str  = 'true'
-    !false_str = 'false'
-
-    !Just in case, clear these global variables also:
-    json%pushed_index = 0
-    json%pushed_char  = ''
-    json%char_count   = 0
-    json%line_count   = 1
-    json%ipos         = 1
-
-#ifdef USE_UCS4
-    ! reopen stdout and stderr with utf-8 encoding
-    open(output_unit,encoding='utf-8')
-    open(error_unit, encoding='utf-8')
-#endif
-
-    !spaces per tab:
-    if (present(spaces_per_tab)) json%spaces_per_tab = spaces_per_tab
-
-    !verbose error printing:
-    if (present(verbose)) json%is_verbose = verbose
-
-    !type checking:
-    if (present(strict_type_checking)) json%strict_type_checking = strict_type_checking
-
-    !Set the format for real numbers:
-    ! [if not changing it, then it remains the same]
-
-    if ( (.not. allocated(json%real_fmt)) .or. &  ! if this hasn't been done yet
-          present(compact_reals) .or. &
-          present(print_signs)   .or. &
-          present(real_format) ) then
-
-        !allow the special case where real format is '*':
-        ! [this overrides the other options]
-        if (present(real_format)) then
-            if (real_format==star) then
-                json%compact_real = .false.
-                json%real_fmt = star
-                return
-            end if
-        end if
-
-        if (present(compact_reals)) json%compact_real = compact_reals
-
-        !set defaults
-        sgn_prnt = .false.
-        if ( present( print_signs) ) sgn_prnt = print_signs
-        if ( sgn_prnt ) then
-           sgn = 'sp'
-        else
-           sgn = 'ss'
-        end if
-
-        rl_edit_desc = 'E'
-        if ( present( real_format ) ) then
-           select case ( real_format )
-           case ('g','G','e','E','en','EN','es','ES')
-              rl_edit_desc = real_format
-           case default
-              call json%throw_exception('Invalid real format, "' // &
-                        trim(real_format) // '", passed to json_initialize.'// &
-                        new_line('a') // 'Acceptable formats are: "G", "E", "EN", and "ES".' )
-           end select
-        end if
-
-        ! set the default output/input format for reals:
-                      write(w,'(ss,I0)',iostat=istat) max_numeric_str_len
-        if (istat==0) write(d,'(ss,I0)',iostat=istat) real_precision
-        if (istat==0) write(e,'(ss,I0)',iostat=istat) real_exponent_digits
-        if (istat==0) then
-            json%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) //&
-                            trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
-        else
-            json%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // &
-                            '30.16E3)'  !just use this one (should never happen)
-        end if
-
-    end if
-
-    end subroutine json_initialize
 !*****************************************************************************************
 
 !*****************************************************************************************
