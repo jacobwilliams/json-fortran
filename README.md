@@ -39,8 +39,8 @@ for a list of changes since the latest release.
 Brief description
 ---------------
 
-A user-friendly and object-oriented API for reading and writing JSON files, written in
-modern Fortran.  The source code is a single Fortran module file ([json_module.F90](https://github.com/jacobwilliams/json-fortran/blob/master/src/json_module.F90)).
+A user-friendly, thread-safe, and object-oriented API for reading and writing [JSON](http://json.org) files, written in
+modern Fortran.
 
 [top](#json-fortran)
 
@@ -68,7 +68,7 @@ brew info json-fortran
 brew install --with-unicode-support json-fortran
 ```
 
-_Please note_, if you wish to support usage of json-fortran with
+_Please note_, if you wish to support usage of JSON-Fortran with
 multiple Fortran compilers, please follow the CMake installation
 instructions below, as the homebrew installation is only intended to
 support a single Fortran compiler. Cheers!
@@ -90,7 +90,7 @@ script) with the [NAG Fortran compiler 6.0](http://www.nag.com/nagware/NP/NP_des
 Currently, several ways are provided to build the jsonfortran library
 (libjsonfortran).
 
-* A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the json-fortran library and the unit tests.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
+* A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the JSON-Fortran library and the unit tests.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
 
 * A [Visual Studio](https://www.visualstudio.com) project is included for building the library (and unit tests) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
@@ -99,14 +99,14 @@ system is provided. This build system has been tested on Mac and Linux
 using the Intel Fortran Compiler, gfortran 4.9, and NAG Fortran 6.0. It has not been
 tested on Windows. This CMake based build provides an install target,
 and exports from both the install location and the build location so
-that building and using json-fortran in another CMake based project is
+that building and using JSON-Fortran in another CMake based project is
 trivial. To get started with the CMake based build, set the
 environment variable `FC` to point to your Fortran compiler, and
 create a build directory. Then `(cmake-gui|ccmake|cmake)
 /path/to/json-fortran-root` to configure, `make` to build and `make
 install` to optionally install. As long as the project is built with
 CMake, other CMake projects can find it and link against it. For example,
-if you have a second copy of the json-fortran project tree, and want to build the unit tests
+if you have a second copy of the JSON-Fortran project tree, and want to build the unit tests
 linking against those compiled/installed by the first copy:
 
 ```CMake
@@ -153,14 +153,14 @@ Want to help?  Take a quick look at our [contributing guidelines](https://github
 
 License
 --------
-The json-fortran source code and related files and documentation are distributed under a permissive free software license (BSD-style).  See the [LICENSE](https://raw.githubusercontent.com/jacobwilliams/json-fortran/master/LICENSE) file for more details.
+The JSON-Fortran source code and related files and documentation are distributed under a permissive free software license (BSD-style).  See the [LICENSE](https://raw.githubusercontent.com/jacobwilliams/json-fortran/master/LICENSE) file for more details.
 
 [top](#json-fortran)
 
 Miscellaneous
 ---------------
 
-* This code is a fork and extensive upgrade of the Fortran 95 [FSON](https://github.com/josephalevin/fson) code. The reason for the split was to be able to incorporate object-oriented and other nice features of the Fortran 2003 and 2008 standards.  Many thanks to the original authors of FSON.
+* JSON-Fortran is a fork and extensive upgrade of the Fortran 95 [FSON](https://github.com/josephalevin/fson) code. The reason for the split was to be able to incorporate object-oriented and other nice features of the Fortran 2003 and 2008 standards.  Many thanks to the original authors of FSON.
 * For more information about JSON, see: <http://www.json.org/>
 * [json-fortran on Travis CI](https://travis-ci.org/jacobwilliams/json-fortran)
 * [json-fortran on Waffle.IO](https://waffle.io/jacobwilliams/json-fortran)
