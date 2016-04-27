@@ -150,20 +150,28 @@
     !  date: 07/23/2015
     !
     !  Structure constructor to initialize a [[json_file(type)]] object
-    !  with an existing [[json_value]] object
+    !  with an existing [[json_value]] object, and either the [[json_core]]
+    !  settings or a [[json_core]] instance.
     !
     !# Example
     !
     !```fortran
     ! ...
     ! type(json_file)  :: my_file
-    ! type(json_value) :: json_object
+    ! type(json_value),pointer :: json_object
+    ! type(json_core) :: json_core_object
     ! ...
-    ! ! Construct a json_object
-    ! my_file = json_file(json_object)
+    ! ! Construct a json_object:
+    ! !could do this:
+    !   my_file = json_file(json_object)
+    ! !or:
+    !   my_file = json_file(json_object,verbose=.true.)
+    ! !or:
+    !   my_file = json_file(json_object,json_core_object)
     !```
     interface json_file
-       module procedure initialize_json_file
+       module procedure :: initialize_json_file
+       module procedure :: initialize_json_file_v2
     end interface
     !*************************************************************************************
 
@@ -240,6 +248,10 @@
 !  This is just a wrapper for [[json_initialize]].
 !
 !@note: This does not destroy the data in the file.
+!
+!@note [[initialize_json_core]], [[json_initialize]],
+!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      all have a similar interface.
 
     subroutine initialize_json_core_in_file(me,verbose,compact_reals,&
                                             print_signs,real_format,spaces_per_tab,&
@@ -270,6 +282,10 @@
 !
 !  Cast a [[json_value]] object as a [[json_file(type)]] object.
 !  It also calls the `initialize()` method.
+!
+!@note [[initialize_json_core]], [[json_initialize]],
+!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      all have a similar interface.
 
     function initialize_json_file(p,verbose,compact_reals,&
                                   print_signs,real_format,spaces_per_tab,&
@@ -300,17 +316,55 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date: 12/9/2013
+!  date: 4/26/2016
 !
-!  Destroy the [[json_file(type)]].
+!  Cast a [[json_value]] pointer and a [[json_core]] object
+!  as a [[json_file(type)]] object.
 
-    subroutine json_file_destroy(me)
+    function initialize_json_file_v2(json_value_object, json_core_object) &
+                                        result(file_object)
+
+    implicit none
+
+    type(json_file)                     :: file_object
+    type(json_value),pointer,intent(in) :: json_value_object
+    type(json_core),intent(in)          :: json_core_object
+
+    file_object%p    => json_value_object
+    file_object%json = json_core_object
+
+    end function initialize_json_file_v2
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Destroy the [[json_value]] data in a [[json_file(type)]].
+!  This must be done when the variable is no longer needed,
+!  or will be reused to open a different file.
+!  Otherwise a memory leak will occur.
+!
+!  Optionally, also destroy the [[json_core]] instance (this
+!  is not necessary to prevent memory leaks, since a [[json_core]]
+!  does not use pointers).
+!
+!### History
+!  * 12/9/2013 : Created
+!  * 4/26/2016 : Added optional `destroy_core` argument
+
+    subroutine json_file_destroy(me,destroy_core)
 
     implicit none
 
     class(json_file),intent(inout) :: me
+    logical,intent(in),optional :: destroy_core  !! to also destroy the [[json_core]].
+                                                 !! default is to leave it as is.
 
     if (associated(me%p)) call me%json%destroy(me%p)
+
+    if (present(destroy_core)) then
+        if (destroy_core) call me%json%destroy()
+    end if
 
     end subroutine json_file_destroy
 !*****************************************************************************************
