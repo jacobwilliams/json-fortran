@@ -1159,7 +1159,7 @@
                     me%n_children = me%n_children - 1
                     call json_value_destroy(json,p,.false.)
                 else
-                    call json%throw_exception('Error in json_value_destroy: '&
+                    call json%throw_exception('Error in json_value_destroy: '//&
                                               'Malformed JSON linked list')
                     exit
                 end if
@@ -2564,7 +2564,7 @@
                 p => me%children    !start with first one
                 do i=1, n_children
                     if (.not. associated(p)) then
-                        call json%throw_exception('Error in json_value_get_by_name_chars: '&
+                        call json%throw_exception('Error in json_value_get_by_name_chars: '//&
                                                   'Malformed JSON linked list')
                         return
                     end if
