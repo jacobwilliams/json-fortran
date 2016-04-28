@@ -1305,6 +1305,12 @@
 !         Only the simple cases where p1/p2 or p2/p1 are parent/child
 !         are currently checked.
 !
+!@warning There are also other situations where using this routine would
+!         produce a malformed JSON structure, such as swapping an array
+!         with one of its children. This is not checked for.
+!
+!@note If `p1` and `p2` have a common parent, it is always safe to swap them.
+!
 !@warning This is a work-in-progress and has not yet been fully validated.
 
     subroutine json_value_swap(json,p1,p2)
@@ -1315,10 +1321,8 @@
     type(json_value),pointer       :: p1
     type(json_value),pointer       :: p2
 
-    logical :: same_parent,first_last
-    type(json_value),pointer :: p1_par_first,p1_par_last,p2_par_first,p2_par_last
+    logical :: same_parent,first_last,adjacent
     type(json_value),pointer :: a,b
-    logical :: adjacent
 
     if (json%exception_thrown) return
 
@@ -1331,7 +1335,6 @@
 
             !TODO Need to check *all* the `children` pointers, so make sure
             !     cases like p1%child%...%child => p2 don't occur...
-            !     .... or is that case OK? ....
             if (associated(p1%parent,p2) .or. associated(p2%parent,p1)) then
                 call json%throw_exception('Error in json_value_swap: '//&
                                           'cannot swap a parent/child pair')
@@ -1341,6 +1344,7 @@
                                 associated(p2%parent) .and. &
                                 associated(p1%parent,p2%parent) )
                 if (same_parent) then
+                    !if p1,p2 are the first,last or last,first children of a common parent
                     first_last = (associated(p1%parent%children,p1) .and. &
                                   associated(p2%parent%tail,p2)) .or. &
                                  (associated(p1%parent%tail,p1) .and. &
@@ -1356,67 +1360,29 @@
                     !this is all we have to do for the parent in this case:
                     call swap_pointers(p1%parent%children,p2%parent%tail)
 
-                elseif (same_parent .and. .not. first_last) then
+                else if (same_parent .and. .not. first_last) then
 
                     if (associated(p1%parent%children,p1)) then
-                        ! if p1 is the first child of its parent:
-                        p1%parent%children => p2
-                    elseif (associated(p1%parent%children,p2)) then
-                        ! if p2 is the first child of its parent:
-                        p1%parent%children => p1
+                        p1%parent%children => p2 ! p1 is the first child of the parent
+                    else if (associated(p1%parent%children,p2)) then
+                        p1%parent%children => p1 ! p2 is the first child of the parent
                     end if
                     if (associated(p1%parent%tail,p1)) then
-                        ! if p1 is the last child of its parent:
-                        p1%parent%tail => p2
-                    elseif (associated(p1%parent%tail,p2)) then
-                        p1%parent%tail => p1
+                        p1%parent%tail => p2 ! p1 is the last child of the parent
+                    else if (associated(p1%parent%tail,p2)) then
+                        p1%parent%tail => p1 ! p2 is the last child of the parent
                     end if
 
                 else ! general case: different parents
 
-                    !... see if we can clean this up ...
-
-                    p1_par_first => null()
-                    p1_par_last  => null()
-                    p2_par_first => null()
-                    p2_par_last  => null()
                     if (associated(p1%parent)) then
-                        if (associated(p1%parent%children,p1)) then
-                            ! if p1 is the first child of its parent:
-                            p1_par_first => p2
-                        else
-                            p1_par_first => p1%parent%children !no change
-                        end if
-                        if (associated(p1%parent%tail,p1)) then
-                            ! if p1 is the last child of its parent:
-                            p1_par_last => p2
-                        else
-                            p1_par_last => p1%parent%tail ! no change
-                        end if
+                        if (associated(p1%parent%children,p1)) p1%parent%children => p2
+                        if (associated(p1%parent%tail,p1))     p1%parent%tail     => p2
                     end if
                     if (associated(p2%parent)) then
-                        if (associated(p2%parent%children,p2)) then
-                            ! if p2 is the first child of its parent:
-                            p2_par_first => p1
-                        else
-                            p2_par_first => p2%parent%children !no change
-                        end if
-                        if (associated(p2%parent%tail,p2)) then
-                            ! if p2 is the last child of its parent:
-                            p2_par_last => p1
-                        else
-                            p2_par_last => p2%parent%tail !no change
-                        end if
+                        if (associated(p2%parent%children,p2)) p2%parent%children => p1
+                        if (associated(p2%parent%tail,p2))     p2%parent%tail     => p1
                     end if
-                    if (associated(p1%parent)) then
-                        p1%parent%children  => p1_par_first
-                        p1%parent%tail      => p1_par_last
-                    end if
-                    if (associated(p2%parent)) then
-                        p2%parent%children  => p2_par_first
-                        p2%parent%tail      => p2_par_last
-                    end if
-
                     call swap_pointers(p1%parent, p2%parent)
 
                 end if
@@ -5743,7 +5709,7 @@
                     eof = .true.
                     exit
 
-                elseif (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
+                else if (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
 
                     json%char_count = 0
                     json%line_count = json%line_count + 1
