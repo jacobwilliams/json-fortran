@@ -7,7 +7,7 @@
 
 module jf_test_16_mod
 
-    use json_module
+    use json_module, CK => json_CK
     use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
     implicit none
@@ -99,7 +99,7 @@ contains
     type(json_core),intent(inout) :: json
     type(json_value),pointer,intent(in) :: p
 
-    character(len=:),allocatable :: p_name, name
+    character(kind=CK,len=:),allocatable :: p_name, name
     type(json_value),pointer :: q,r
     integer :: n_children,i
 
