@@ -48,6 +48,7 @@ Download
 --------------------
 
 [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
+[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg?maxAge=2592000)](http://braumeister.org/formula/json-fortran)
 
 Download the official versioned releases
 [here](https://github.com/jacobwilliams/json-fortran/releases/latest).
