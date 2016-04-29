@@ -376,10 +376,6 @@
         procedure :: destroy_json_core
 
         !>
-        !  Remove a [[json_value]] from a linked-list structure.
-        procedure,public :: remove => json_value_remove
-
-        !>
         !  If the child variable is present, then remove it.
         generic,public :: remove_if_present => MAYBEWRAP(json_value_remove_if_present)
         procedure :: MAYBEWRAP(json_value_remove_if_present)
@@ -492,22 +488,16 @@
         procedure :: MAYBEWRAP(json_parse_string)
 
         !>
-        !  Swap two [[json_value]] pointers in a structure
-        !  (or two different structures).
-        generic,public :: swap => json_value_swap
-        procedure :: json_value_swap
-
-        !>
-        !  Check if a [[json_value]] is a child of another.
-        generic,public :: is_child_of => json_value_is_child_of
-        procedure :: json_value_is_child_of
-
-        !>
         !  Throw an exception.
         generic,public :: throw_exception => MAYBEWRAP(json_throw_exception)
         procedure :: MAYBEWRAP(json_throw_exception)
 
-        !public routines:
+        !>
+        !  Rename a [[json_value]] variable.
+        generic,public :: rename => MAYBEWRAP(json_value_rename)
+        procedure :: MAYBEWRAP(json_value_rename)
+
+        procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
         procedure,public :: count               => json_count               !! count the number of children
@@ -521,6 +511,9 @@
         procedure,public :: initialize          => json_initialize          !! to initialize some parsing parameters
         procedure,public :: traverse            => json_traverse            !! to traverse all elements of a JSON structure
         procedure,public :: print_error_message => json_print_error_message !! simply routine to print error messages
+        procedure,public :: swap                => json_value_swap          !! Swap two [[json_value]] pointers
+                                                                            !! in a structure (or two different structures).
+        procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a child of another.
 
         !other private routines:
         procedure :: json_value_print
@@ -914,9 +907,53 @@
 
     if (present(var_type))    var_type   = p%var_type
     if (present(n_children))  n_children = json%count(p)
-    if (present(name))        name       = p%name
+    if (present(name)) then
+        if (allocated(p%name)) then
+            name = p%name
+        else
+            name = ''
+        end if
+    end if
 
     end subroutine json_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/29/2016
+!
+!  Rename a [[json_value]].
+
+    subroutine json_value_rename(json,p,name)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p
+    character(kind=CK,len=*),intent(in) :: name !! new variable name
+
+    p%name = name
+
+    end subroutine json_value_rename
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/29/2016
+!
+!  Alternate version of [[json_value_rename]], where `name` is kind=CDK.
+
+    subroutine wrap_json_value_rename(json,p,name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p
+    character(kind=CDK,len=*),intent(in) :: name !! new variable name
+
+    call json%rename(p,to_unicode(name))
+
+    end subroutine wrap_json_value_rename
 !*****************************************************************************************
 
 !*****************************************************************************************
