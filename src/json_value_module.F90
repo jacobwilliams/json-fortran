@@ -498,6 +498,11 @@
         procedure :: json_value_swap
 
         !>
+        !  Check if a [[json_value]] is a child of another.
+        generic,public :: is_child_of => json_value_is_child_of
+        procedure :: json_value_is_child_of
+
+        !>
         !  Throw an exception.
         generic,public :: throw_exception => MAYBEWRAP(json_throw_exception)
         procedure :: MAYBEWRAP(json_throw_exception)
@@ -1299,19 +1304,15 @@
 !      [[json_value]] linked list (so the normal `parent`, `previous`,
 !      `next`, etc. pointers are properly associated if necessary).
 !
-!@warning This should not be used to swap an element with one of its
-!         direct children (along the first in the lists), since that would
-!         produce a circular linkage. A check should be added for this...
-!         Only the simple cases where p1/p2 or p2/p1 are parent/child
-!         are currently checked.
+!@warning This cannot be used to swap a parent/child pair, since that
+!         could lead to a circular linkage. An exception is thrown if
+!         this is tried.
 !
-!@warning There are also other situations where using this routine would
-!         produce a malformed JSON structure, such as swapping an array
-!         with one of its children. This is not checked for.
+!@warning There are also other situations where using this routine may
+!         produce a malformed JSON structure, such as moving an array
+!         element outside of an array. This is not checked for.
 !
 !@note If `p1` and `p2` have a common parent, it is always safe to swap them.
-!
-!@warning This is a work-in-progress and has not yet been fully validated.
 
     subroutine json_value_swap(json,p1,p2)
 
@@ -1333,18 +1334,18 @@
         !aren't pointing to the same thing:
         if (.not. associated(p1,p2)) then
 
-            !TODO Need to check *all* the `children` pointers, so make sure
-            !     cases like p1%child%...%child => p2 don't occur...
-            if (associated(p1%parent,p2) .or. associated(p2%parent,p1)) then
+            !we will not allow swapping an item with one of its descendants:
+            if (json%is_child_of(p1,p2) .or. json%is_child_of(p2,p1)) then
                 call json%throw_exception('Error in json_value_swap: '//&
-                                          'cannot swap a parent/child pair')
+                                          'cannot swap an item with one of its descendants')
             else
 
                 same_parent = ( associated(p1%parent) .and. &
                                 associated(p2%parent) .and. &
                                 associated(p1%parent,p2%parent) )
                 if (same_parent) then
-                    !if p1,p2 are the first,last or last,first children of a common parent
+                    !if p1,p2 are the first,last or last,first
+                    !children of a common parent
                     first_last = (associated(p1%parent%children,p1) .and. &
                                   associated(p2%parent%tail,p2)) .or. &
                                  (associated(p1%parent%tail,p1) .and. &
@@ -1445,6 +1446,48 @@
         end subroutine swap_pointers
 
     end subroutine json_value_swap
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/28/2016
+!
+!  Returns True if `p2` is a descendant of `p1`
+!  (i.e, a child, or a child of child, etc.)
+
+    function json_value_is_child_of(json,p1,p2) result(is_child_of)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p1
+    type(json_value),pointer       :: p2
+    logical                        :: is_child_of
+
+    is_child_of = .false.
+
+    if (associated(p1) .and. associated(p2)) then
+        if (associated(p1%children)) then
+            call json%traverse(p1%children,is_child_of_callback)
+        end if
+    end if
+
+    contains
+
+    subroutine is_child_of_callback(json,p,finished)
+    !! Traverse until `p` is `p2`.
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p
+    logical(LK),intent(out)             :: finished
+
+    is_child_of = associated(p,p2)
+    finished = is_child_of  ! stop searching if found
+
+    end subroutine is_child_of_callback
+
+    end function json_value_is_child_of
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -4155,6 +4198,11 @@
         count = json%count(me)
         element => me%children
         do i = 1, count ! callback for each child
+            if (.not. associated(element)) then
+                call json%throw_exception('Error in json_get_array: '//&
+                                          'Malformed JSON linked list')
+                return
+            end if
             call array_callback(json, element, i, count)
             element => element%next
         end do
@@ -4173,13 +4221,13 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date: 09/02/2015
+!  date: 4/28/2016
 !
 !  Traverse a JSON structure.
 !  This routine calls the user-specified [[traverse_callback_func]]
 !  for each element of the structure.
-!
-    recursive subroutine json_traverse(json,me,traverse_callback)
+
+    subroutine json_traverse(json,me,traverse_callback)
 
     implicit none
 
@@ -4187,31 +4235,50 @@
     type(json_value),pointer,intent(in) :: me
     procedure(traverse_callback_func)   :: traverse_callback
 
-    type(json_value),pointer :: element  !! a child element
-    integer(IK) :: i        !! counter
-    integer(IK) :: icount   !! number of children
     logical(LK) :: finished !! can be used to stop the process
 
-    if (json%exception_thrown) return
+    if (.not. json%exception_thrown) call traverse(me)
 
-    call traverse_callback(json,me,finished) ! first call for this object
-    if (finished) return
+    contains
 
-    !for arrays and objects, have to also call for all children:
-    if (me%var_type==json_array .or. me%var_type==json_object) then
+        recursive subroutine traverse(p)
 
-        icount = json%count(me) ! number of children
-        if (icount>0) then
-            element => me%children  ! first one
-            do i = 1, icount        ! call for each child
-                call json%traverse(element,traverse_callback)
-                if (finished) exit
-                element => element%next
-            end do
+        !! recursive [[json_value]] traversal.
+
+        implicit none
+
+        type(json_value),pointer,intent(in) :: p
+
+        type(json_value),pointer :: element  !! a child element
+        integer(IK) :: i        !! counter
+        integer(IK) :: icount   !! number of children
+
+        if (json%exception_thrown) return
+        call traverse_callback(json,p,finished) ! first call for this object
+        if (finished) return
+
+        !for arrays and objects, have to also call for all children:
+        if (p%var_type==json_array .or. p%var_type==json_object) then
+
+            icount = json%count(p) ! number of children
+            if (icount>0) then
+                element => p%children   ! first one
+                do i = 1, icount        ! call for each child
+                    if (.not. associated(element)) then
+                        call json%throw_exception('Error in json_traverse: '//&
+                                                  'Malformed JSON linked list')
+                        return
+                    end if
+                    call traverse(element)
+                    if (finished) exit
+                    element => element%next
+                end do
+            end if
+            nullify(element)
+
         end if
-        nullify(element)
 
-    end if
+        end subroutine traverse
 
     end subroutine json_traverse
 !*****************************************************************************************

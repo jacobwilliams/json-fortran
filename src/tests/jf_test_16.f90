@@ -36,20 +36,18 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Original:'
     call json%parse(p, '{"cities": ["New York","Los Angeles","Chicago"], '//&
-                       '"value": 1, "flag": true, "struct":{"vec":[1,2,3]}}')
+                       '"value": 1, "iflag": true, "struct":{"vec":[1,2,3]}}')
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    !call print_tree(json,p)
     call json%print(p,error_unit)
 
     write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'Swap: cities <-> flag'
+    write(error_unit,'(A)') 'Swap: cities <-> iflag'
     call json%get(p,'cities',p1)
-    call json%get(p,'flag',p2)
+    call json%get(p,'iflag',p2)
     call json%swap(p1,p2)
-    !call print_tree(json,p)
     call json%print(p,output_unit)
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -59,11 +57,10 @@ contains
     nullify(p2)
 
     write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'Swap: flag <-> value'
-    call json%get(p,'flag',p1)
+    write(error_unit,'(A)') 'Swap: iflag <-> value'
+    call json%get(p,'iflag',p1)
     call json%get(p,'value',p2)
     call json%swap(p1,p2)
-    !call print_tree(json,p)
     call json%print(p,output_unit)
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -73,11 +70,10 @@ contains
     nullify(p2)
 
     write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'Swap: flag <-> struct.vec'
-    call json%get(p,'flag',p1)
+    write(error_unit,'(A)') 'Swap: iflag <-> struct.vec'
+    call json%get(p,'iflag',p1)
     call json%get(p,'struct.vec',p2)
     call json%swap(p1,p2)
-    !call print_tree(json,p)
     call json%print(p,output_unit)
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -88,57 +84,55 @@ contains
 
     call json%destroy(p)
 
-    end subroutine test_16
+    !...........................................................................
+    ! another case
 
-    subroutine print_tree(json,p)
-
-    !! just for debugging. Print some info about the structure.
-
-    implicit none
-
-    type(json_core),intent(inout) :: json
-    type(json_value),pointer,intent(in) :: p
-
-    character(kind=CK,len=:),allocatable :: p_name, name
-    type(json_value),pointer :: q,r
-    integer :: n_children,i
-
-    write(*,*) ''
-    write(*,*) '------------'
-    call json%info(p,name=p_name,n_children=n_children)
-    write(*,*) 'name:       '//p_name
-    write(*,*) 'n_children: ',n_children
-
-    call json%get_parent(p,q)
-    if (associated(q)) then
-        call json%info(q,name=name)
-        write(*,*) 'root parent: '//name
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '.....................................'
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Original:'
+    call json%parse(p, '{ "stats": { "iflag": 0, "str": "ok" },'//&
+                        '"vars": [{ "label": "r", "value": 0.0 }, '//&
+                                 '{ "label": "v", "value": 0.0 }],'//&
+                        '"empty": { } }')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
     end if
+    call json%print(p,error_unit)
 
-    do i=1,n_children
-        call json%get_child(p, i, q)
-        if (associated(q)) then
-            call json%info(q,name=name)
-            write(*,*) 'child ',i,name
-            call json%get_previous(q,r)
-            if (associated(r)) then
-                call json%info(r,name=name)
-                write(*,*) '   prev ',i,name
-            end if
-            call json%get_next(q,r)
-            if (associated(r)) then
-                call json%info(r,name=name)
-                write(*,*) '   next ',i,name
-            end if
-        else
-            call json%print_error_message(error_unit)
-            exit
-        end if
-    end do
-    write(*,*) '------------'
-    write(*,*) ''
+    !this one is not allowed, and should fail:
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Swap: vars(1).label <-> vars'
+    call json%get(p,'vars(1).label',p1)
+    call json%get(p,'vars',p2)
+    call json%swap(p1,p2)
+    call json%print(p,output_unit)
+    if (.not. json%failed()) then
+        write(error_unit,'(A)') 'Error: this should have failed.'
+        error_cnt = error_cnt + 1
+    else
+        write(error_unit,'(A)') 'Success: This operation is not allowed.'
+        call json%clear_exceptions()
+    end if
+    nullify(p1)
+    nullify(p2)
 
-    end subroutine print_tree
+    !this one should work:
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Swap: empty <-> stat.str'
+    call json%get(p,'empty',p1)
+    call json%get(p,'stat.str',p2)
+    call json%swap(p1,p2)
+    call json%print(p,output_unit)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    nullify(p1)
+    nullify(p2)
+
+    end subroutine test_16
 
 end module jf_test_16_mod
 !*****************************************************************************************
