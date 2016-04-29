@@ -120,9 +120,9 @@ contains
 
     !this one should work:
     write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'Swap: empty <-> stat.str'
+    write(error_unit,'(A)') 'Swap: empty <-> stats.str'
     call json%get(p,'empty',p1)
-    call json%get(p,'stat.str',p2)
+    call json%get(p,'stats.str',p2)
     call json%swap(p1,p2)
     call json%print(p,output_unit)
     if (json%failed()) then
