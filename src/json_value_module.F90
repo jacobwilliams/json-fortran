@@ -492,6 +492,17 @@
         procedure :: MAYBEWRAP(json_parse_string)
 
         !>
+        !  Swap two [[json_value]] pointers in a structure
+        !  (or two different structures).
+        generic,public :: swap => json_value_swap
+        procedure :: json_value_swap
+
+        !>
+        !  Check if a [[json_value]] is a child of another.
+        generic,public :: is_child_of => json_value_is_child_of
+        procedure :: json_value_is_child_of
+
+        !>
         !  Throw an exception.
         generic,public :: throw_exception => MAYBEWRAP(json_throw_exception)
         procedure :: MAYBEWRAP(json_throw_exception)
@@ -1148,9 +1159,15 @@
         if (associated(me%children)) then
             do while (me%n_children > 0)
                 p => me%children
-                me%children => me%children%next
-                me%n_children = me%n_children - 1
-                call json_value_destroy(json,p,.false.)
+                if (associated(p)) then
+                    me%children => me%children%next
+                    me%n_children = me%n_children - 1
+                    call json_value_destroy(json,p,.false.)
+                else
+                    call json%throw_exception('Error in json_value_destroy: '//&
+                                              'Malformed JSON linked list')
+                    exit
+                end if
             end do
             nullify(me%children)
             nullify(p)
@@ -1203,7 +1220,6 @@
 !
 !# History
 !  * Jacob Williams : 12/28/2014 : added destroy optional argument.
-!
 
     subroutine json_value_remove(json,me,destroy)
 
@@ -1273,6 +1289,205 @@
     end if
 
     end subroutine json_value_remove
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/26/2016
+!
+!  Swap two elements in a JSON structure.
+!  All of the children are carried along as well.
+!
+!@note If both are not associated, then an error is thrown.
+!
+!@note The assumption here is that both variables are part of a valid
+!      [[json_value]] linked list (so the normal `parent`, `previous`,
+!      `next`, etc. pointers are properly associated if necessary).
+!
+!@warning This cannot be used to swap a parent/child pair, since that
+!         could lead to a circular linkage. An exception is thrown if
+!         this is tried.
+!
+!@warning There are also other situations where using this routine may
+!         produce a malformed JSON structure, such as moving an array
+!         element outside of an array. This is not checked for.
+!
+!@note If `p1` and `p2` have a common parent, it is always safe to swap them.
+
+    subroutine json_value_swap(json,p1,p2)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p1
+    type(json_value),pointer       :: p2
+
+    logical :: same_parent,first_last,adjacent
+    type(json_value),pointer :: a,b
+
+    if (json%exception_thrown) return
+
+    !both have to be associated:
+    if (associated(p1) .and. associated(p2)) then
+
+        !simple check to make sure that they both
+        !aren't pointing to the same thing:
+        if (.not. associated(p1,p2)) then
+
+            !we will not allow swapping an item with one of its descendants:
+            if (json%is_child_of(p1,p2) .or. json%is_child_of(p2,p1)) then
+                call json%throw_exception('Error in json_value_swap: '//&
+                                          'cannot swap an item with one of its descendants')
+            else
+
+                same_parent = ( associated(p1%parent) .and. &
+                                associated(p2%parent) .and. &
+                                associated(p1%parent,p2%parent) )
+                if (same_parent) then
+                    !if p1,p2 are the first,last or last,first
+                    !children of a common parent
+                    first_last = (associated(p1%parent%children,p1) .and. &
+                                  associated(p2%parent%tail,p2)) .or. &
+                                 (associated(p1%parent%tail,p1) .and. &
+                                  associated(p2%parent%children,p2))
+                else
+                    first_last = .false.
+                end if
+
+                !first, we fix children,tail pointers:
+
+                if (same_parent .and. first_last) then
+
+                    !this is all we have to do for the parent in this case:
+                    call swap_pointers(p1%parent%children,p2%parent%tail)
+
+                else if (same_parent .and. .not. first_last) then
+
+                    if (associated(p1%parent%children,p1)) then
+                        p1%parent%children => p2 ! p1 is the first child of the parent
+                    else if (associated(p1%parent%children,p2)) then
+                        p1%parent%children => p1 ! p2 is the first child of the parent
+                    end if
+                    if (associated(p1%parent%tail,p1)) then
+                        p1%parent%tail => p2 ! p1 is the last child of the parent
+                    else if (associated(p1%parent%tail,p2)) then
+                        p1%parent%tail => p1 ! p2 is the last child of the parent
+                    end if
+
+                else ! general case: different parents
+
+                    if (associated(p1%parent)) then
+                        if (associated(p1%parent%children,p1)) p1%parent%children => p2
+                        if (associated(p1%parent%tail,p1))     p1%parent%tail     => p2
+                    end if
+                    if (associated(p2%parent)) then
+                        if (associated(p2%parent%children,p2)) p2%parent%children => p1
+                        if (associated(p2%parent%tail,p2))     p2%parent%tail     => p1
+                    end if
+                    call swap_pointers(p1%parent, p2%parent)
+
+                end if
+
+                !now, have to fix previous,next pointers:
+
+                !first, see if they are adjacent:
+                adjacent = associated(p1%next,p2) .or. &
+                           associated(p2%next,p1)
+                if (associated(p2%next,p1)) then    !p2,p1
+                    a => p2
+                    b => p1
+                else    !p1,p2 (or not adjacent)
+                    a => p1
+                    b => p2
+                end if
+                if (associated(a%previous)) a%previous%next => b
+                if (associated(b%next))     b%next%previous => a
+
+                if (adjacent) then
+                    !a comes before b in the original list
+                    b%previous => a%previous
+                    a%next     => b%next
+                    a%previous => b
+                    b%next     => a
+                else
+                    if (associated(a%next))       a%next%previous => b
+                    if (associated(b%previous))   b%previous%next => a
+                    call swap_pointers(a%previous,b%previous)
+                    call swap_pointers(a%next,    b%next)
+                end if
+
+            end if
+
+        else
+            call json%throw_exception('Error in json_value_swap: '//&
+                                      'both pointers must be associated')
+        end if
+
+    end if
+
+    contains
+
+        pure subroutine swap_pointers(s1,s2)
+
+        implicit none
+
+        type(json_value),pointer,intent(inout) :: s1
+        type(json_value),pointer,intent(inout) :: s2
+
+        type(json_value),pointer :: tmp  !! temporary pointer
+
+        if (.not. associated(s1,s2)) then
+            tmp => s1
+            s1  => s2
+            s2  => tmp
+            nullify(tmp)
+        end if
+
+        end subroutine swap_pointers
+
+    end subroutine json_value_swap
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/28/2016
+!
+!  Returns True if `p2` is a descendant of `p1`
+!  (i.e, a child, or a child of child, etc.)
+
+    function json_value_is_child_of(json,p1,p2) result(is_child_of)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p1
+    type(json_value),pointer       :: p2
+    logical                        :: is_child_of
+
+    is_child_of = .false.
+
+    if (associated(p1) .and. associated(p2)) then
+        if (associated(p1%children)) then
+            call json%traverse(p1%children,is_child_of_callback)
+        end if
+    end if
+
+    contains
+
+    subroutine is_child_of_callback(json,p,finished)
+    !! Traverse until `p` is `p2`.
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p
+    logical(LK),intent(out)             :: finished
+
+    is_child_of = associated(p,p2)
+    finished = is_child_of  ! stop searching if found
+
+    end subroutine is_child_of_callback
+
+    end function json_value_is_child_of
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2305,7 +2520,7 @@
                     p => p%next
                 else
                     call json%throw_exception('Error in json_value_get_by_index:'//&
-                                         ' p%next is not associated.')
+                                              ' p%next is not associated.')
                     nullify(p)
                     return
                 end if
@@ -2357,6 +2572,11 @@
                 n_children = json%count(me)
                 p => me%children    !start with first one
                 do i=1, n_children
+                    if (.not. associated(p)) then
+                        call json%throw_exception('Error in json_value_get_by_name_chars: '//&
+                                                  'Malformed JSON linked list')
+                        return
+                    end if
                     if (allocated(p%name)) then
                         if (p%name == name) return
                     end if
@@ -2565,6 +2785,12 @@
                 element => me%children
                 do i = 1, count
 
+                    if (.not. associated(element)) then
+                        call json%throw_exception('Error in json_value_print: '//&
+                                                  'Malformed JSON linked list')
+                        return
+                    end if
+
                     ! print the name
                     if (allocated(element%name)) then
                         call write_it(repeat(space, spaces)//quotation_mark//&
@@ -2608,6 +2834,12 @@
                 nullify(element)
                 element => me%children
                 do i = 1, count
+
+                    if (.not. associated(element)) then
+                        call json%throw_exception('Error in json_value_print: '//&
+                                                  'Malformed JSON linked list')
+                        return
+                    end if
 
                     ! recursive print of the element
                     call json%json_value_print(element, iunit=iunit, indent=tab,&
@@ -3966,6 +4198,11 @@
         count = json%count(me)
         element => me%children
         do i = 1, count ! callback for each child
+            if (.not. associated(element)) then
+                call json%throw_exception('Error in json_get_array: '//&
+                                          'Malformed JSON linked list')
+                return
+            end if
             call array_callback(json, element, i, count)
             element => element%next
         end do
@@ -3984,13 +4221,13 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date: 09/02/2015
+!  date: 4/28/2016
 !
 !  Traverse a JSON structure.
 !  This routine calls the user-specified [[traverse_callback_func]]
 !  for each element of the structure.
-!
-    recursive subroutine json_traverse(json,me,traverse_callback)
+
+    subroutine json_traverse(json,me,traverse_callback)
 
     implicit none
 
@@ -3998,31 +4235,50 @@
     type(json_value),pointer,intent(in) :: me
     procedure(traverse_callback_func)   :: traverse_callback
 
-    type(json_value),pointer :: element  !! a child element
-    integer(IK) :: i        !! counter
-    integer(IK) :: icount   !! number of children
     logical(LK) :: finished !! can be used to stop the process
 
-    if (json%exception_thrown) return
+    if (.not. json%exception_thrown) call traverse(me)
 
-    call traverse_callback(json,me,finished) ! first call for this object
-    if (finished) return
+    contains
 
-    !for arrays and objects, have to also call for all children:
-    if (me%var_type==json_array .or. me%var_type==json_object) then
+        recursive subroutine traverse(p)
 
-        icount = json%count(me) ! number of children
-        if (icount>0) then
-            element => me%children  ! first one
-            do i = 1, icount        ! call for each child
-                call json%traverse(element,traverse_callback)
-                if (finished) exit
-                element => element%next
-            end do
+        !! recursive [[json_value]] traversal.
+
+        implicit none
+
+        type(json_value),pointer,intent(in) :: p
+
+        type(json_value),pointer :: element  !! a child element
+        integer(IK) :: i        !! counter
+        integer(IK) :: icount   !! number of children
+
+        if (json%exception_thrown) return
+        call traverse_callback(json,p,finished) ! first call for this object
+        if (finished) return
+
+        !for arrays and objects, have to also call for all children:
+        if (p%var_type==json_array .or. p%var_type==json_object) then
+
+            icount = json%count(p) ! number of children
+            if (icount>0) then
+                element => p%children   ! first one
+                do i = 1, icount        ! call for each child
+                    if (.not. associated(element)) then
+                        call json%throw_exception('Error in json_traverse: '//&
+                                                  'Malformed JSON linked list')
+                        return
+                    end if
+                    call traverse(element)
+                    if (finished) exit
+                    element => element%next
+                end do
+            end if
+            nullify(element)
+
         end if
-        nullify(element)
 
-    end if
+        end subroutine traverse
 
     end subroutine json_traverse
 !*****************************************************************************************
@@ -5520,7 +5776,7 @@
                     eof = .true.
                     exit
 
-                elseif (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
+                else if (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
 
                     json%char_count = 0
                     json%line_count = json%line_count + 1
