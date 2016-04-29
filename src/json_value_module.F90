@@ -4204,6 +4204,7 @@
                 return
             end if
             call array_callback(json, element, i, count)
+            if (json%exception_thrown) exit
             element => element%next
         end do
     case default
@@ -4270,7 +4271,7 @@
                         return
                     end if
                     call traverse(element)
-                    if (finished) exit
+                    if (finished .or. json%exception_thrown) exit
                     element => element%next
                 end do
             end if
