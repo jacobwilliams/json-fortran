@@ -672,7 +672,7 @@
 
     !
     !JW comment out for now (these are now protected variables in another module)
-    ! for thread-save version, we won't be able to have global variables.........
+    ! for thread-safe version, we won't be able to have global variables.........
     !
     !Ensure gfortran bug work around "parameters" are set properly
     !null_str  = 'null'
@@ -1001,13 +1001,13 @@
     json%err_message = trim(msg)
 
     if (json%is_verbose) then
-        write(*,'(A)') '***********************'
-        write(*,'(A)') 'JSON-Fortran Exception: '//trim(msg)
+        write(output_unit,'(A)') '***********************'
+        write(output_unit,'(A)') 'JSON-Fortran Exception: '//trim(msg)
         !call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)
 #ifdef __INTEL_COMPILER
         call tracebackqq(user_exit_code=-1)  ! print a traceback and return
 #endif
-        write(*,'(A)') '***********************'
+        write(output_unit,'(A)') '***********************'
     end if
 
     end subroutine json_throw_exception
@@ -5932,7 +5932,7 @@
         if (present(io_unit)) then
             write(io_unit,'(A)') error_msg
         else
-            write(*,'(A)') error_msg
+            write(output_unit,'(A)') error_msg
         end if
         deallocate(error_msg)
         call json%clear_exceptions()
