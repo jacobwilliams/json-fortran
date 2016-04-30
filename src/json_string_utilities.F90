@@ -225,8 +225,12 @@
     character(kind=CK,len=*),intent(in)              :: str_in
     character(kind=CK,len=:),allocatable,intent(out) :: str_out
 
-    integer(IK) :: i,ipos
+    integer(IK) :: i
+    integer(IK) :: ipos
     character(kind=CK,len=1) :: c
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: tmp !! workaround for bug in gfortran 6.1
+#endif
 
     character(kind=CK,len=*),parameter :: specials = quotation_mark//&
                                                      backslash//&
@@ -284,7 +288,12 @@
             if (ipos==1) then
                 str_out = ''
             else
-                str_out = str_out(1:ipos-1)
+#if defined __GFORTRAN__
+                tmp = str_out(1:ipos-1)      !workaround for bug in gfortran 6.1
+                str_out = tmp
+#else
+                str_out = str_out(1:ipos-1)  !original
+#endif
             end if
         end if
 
