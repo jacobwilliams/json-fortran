@@ -461,7 +461,7 @@
     integer(IK) :: n  !! length of `str`
     integer(IK) :: i  !! counter
 
-    !an array of the valid hex characters:
+    !> an array of the valid hex characters
     character(kind=CK,len=1),dimension(22),parameter :: valid_chars = &
         [ (achar(i),i=48,57), & ! decimal digits
           (achar(i),i=65,70), & ! capital A-F

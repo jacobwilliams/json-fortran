@@ -672,7 +672,7 @@
 
     !
     !JW comment out for now (these are now protected variables in another module)
-    ! for thread-save version, we won't be able to have global variables.........
+    ! for thread-safe version, we won't be able to have global variables.........
     !
     !Ensure gfortran bug work around "parameters" are set properly
     !null_str  = 'null'
@@ -1001,13 +1001,13 @@
     json%err_message = trim(msg)
 
     if (json%is_verbose) then
-        write(*,'(A)') '***********************'
-        write(*,'(A)') 'JSON-Fortran Exception: '//trim(msg)
+        write(output_unit,'(A)') '***********************'
+        write(output_unit,'(A)') 'JSON-Fortran Exception: '//trim(msg)
         !call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)
 #ifdef __INTEL_COMPILER
         call tracebackqq(user_exit_code=-1)  ! print a traceback and return
 #endif
-        write(*,'(A)') '***********************'
+        write(output_unit,'(A)') '***********************'
     end if
 
     end subroutine json_throw_exception
@@ -4724,8 +4724,10 @@
 
     logical(LK) :: eof
     character(kind=CK,len=1) :: c
+#if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp  !! this is a work-around for a bug
                                                  !! in the gfortran 4.9 compiler.
+#endif
 
     if (.not. json%exception_thrown) then
 
@@ -4766,9 +4768,13 @@
 
                 select case (value%var_type)
                 case (json_string)
-                    call json%parse_string(unit, str, tmp) !write to a tmp variable because of
-                    value%str_value = tmp                  ! a bug in 4.9 gfortran compiler.
-                    deallocate(tmp)                        !
+#if defined __GFORTRAN__
+                    call json%parse_string(unit,str,tmp)  ! write to a tmp variable because of
+                    value%str_value = tmp                 ! a bug in 4.9 gfortran compiler.
+                    deallocate(tmp)                       !
+#else
+                    call json%parse_string(unit, str, value%str_value)
+#endif
                 end select
 
             case (CK_'t') !true_str(1:1) gfortran bug work around
@@ -5343,8 +5349,10 @@
     type(json_value),pointer :: pair
     logical(LK) :: eof
     character(kind=CK,len=1) :: c
+#if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp  !! this is a work-around for a bug
                                                  !! in the gfortran 4.9 compiler.
+#endif
 
     if (.not. json%exception_thrown) then
 
@@ -5366,9 +5374,13 @@
             return
         else if (quotation_mark == c) then
             call json_value_create(pair)
-            call json%parse_string(unit, str, tmp)   !write to a tmp variable because of
-            pair % name = tmp                   ! a bug in 4.9 gfortran compiler.
+#if defined __GFORTRAN__
+            call json%parse_string(unit,str,tmp)   ! write to a tmp variable because of
+            pair%name = tmp                        ! a bug in 4.9 gfortran compiler.
             deallocate(tmp)
+#else
+            call json%parse_string(unit,str,pair%name)
+#endif
             if (json%exception_thrown) then
                 call json%destroy(pair)
                 return
@@ -5920,7 +5932,7 @@
         if (present(io_unit)) then
             write(io_unit,'(A)') error_msg
         else
-            write(*,'(A)') error_msg
+            write(output_unit,'(A)') error_msg
         end if
         deallocate(error_msg)
         call json%clear_exceptions()
