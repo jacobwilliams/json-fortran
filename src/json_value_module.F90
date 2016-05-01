@@ -202,10 +202,16 @@
 
         integer(IK) :: ipos = 1  !! for allocatable strings: next character to read
 
-        logical :: strict_type_checking = .false. !! if true, then no type conversions are done
-                                                  !! in the `get` routines if the actual variable
-                                                  !! type is different from the return type (for
-                                                  !! example, integer to double).
+        logical(LK) :: strict_type_checking = .false. !! if true, then no type conversions are done
+                                                      !! in the `get` routines if the actual variable
+                                                      !! type is different from the return type (for
+                                                      !! example, integer to double).
+
+        logical(LK) :: trailing_spaces_significant = .false.    !! for name and path comparisons, is trailing
+                                                                !! space to be considered significant.
+
+        logical(LK) :: case_sensitive_keys = .true.    !! for name and path comparisons, are they
+                                                       !! case sensitive.
 
         contains
 
@@ -516,6 +522,7 @@
         procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a child of another.
 
         !other private routines:
+        procedure :: name_equal
         procedure :: json_value_print
         procedure :: string_to_integer
         procedure :: string_to_double
@@ -606,7 +613,9 @@
 
     function initialize_json_core(verbose,compact_reals,&
                                   print_signs,real_format,spaces_per_tab,&
-                                  strict_type_checking) result(json_core_object)
+                                  strict_type_checking,&
+                                  trailing_spaces_significant,&
+                                  case_sensitive_keys) result(json_core_object)
 
     implicit none
 
@@ -614,15 +623,21 @@
     logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
     logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
     logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
+    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
     logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
                                                             !! conversions are done for the `get` routines
                                                             !! (default is false)
+    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
+                                                                    !! space to be considered significant.
+    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
+                                                            !! case sensitive.
 
     call json_core_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
-                                strict_type_checking)
+                                strict_type_checking,&
+                                trailing_spaces_significant,&
+                                case_sensitive_keys)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -648,7 +663,9 @@
 
     subroutine json_initialize(json,verbose,compact_reals,&
                                print_signs,real_format,spaces_per_tab,&
-                               strict_type_checking)
+                               strict_type_checking,&
+                               trailing_spaces_significant,&
+                               case_sensitive_keys)
 
     implicit none
 
@@ -656,11 +673,15 @@
     logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
     logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
     logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
+    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
     logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
                                                             !! conversions are done for the `get` routines
                                                             !! (default is false)
+    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
+                                                                    !! space to be considered significant.
+    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
+                                                            !! case sensitive.
 
     character(kind=CDK,len=10) :: w,d,e
     character(kind=CDK,len=2)  :: sgn, rl_edit_desc
@@ -669,15 +690,6 @@
 
     !reset exception to false:
     call json%clear_exceptions()
-
-    !
-    !JW comment out for now (these are now protected variables in another module)
-    ! for thread-safe version, we won't be able to have global variables.........
-    !
-    !Ensure gfortran bug work around "parameters" are set properly
-    !null_str  = 'null'
-    !true_str  = 'true'
-    !false_str = 'false'
 
     !Just in case, clear these global variables also:
     json%pushed_index = 0
@@ -692,14 +704,17 @@
     open(error_unit, encoding='utf-8')
 #endif
 
-    !spaces per tab:
-    if (present(spaces_per_tab)) json%spaces_per_tab = spaces_per_tab
-
-    !verbose error printing:
-    if (present(verbose)) json%is_verbose = verbose
-
-    !type checking:
-    if (present(strict_type_checking)) json%strict_type_checking = strict_type_checking
+    !various optional inputs:
+    if (present(spaces_per_tab)) &
+        json%spaces_per_tab = spaces_per_tab
+    if (present(verbose)) &
+        json%is_verbose = verbose
+    if (present(strict_type_checking)) &
+        json%strict_type_checking = strict_type_checking
+    if (present(trailing_spaces_significant)) &
+        json%trailing_spaces_significant = trailing_spaces_significant
+    if (present(case_sensitive_keys)) &
+        json%case_sensitive_keys = case_sensitive_keys
 
     !Set the format for real numbers:
     ! [if not changing it, then it remains the same]
@@ -757,6 +772,45 @@
     end if
 
     end subroutine json_initialize
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/30/2016
+!
+!  Returns true if `name` is equal to `p%name`, using the specified
+!  settings for case sensitivity and trailing whitespace.
+
+    function name_equal(json,p,name) result(is_equal)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),intent(in)         :: p        !! the json object
+    character(kind=CK,len=*),intent(in) :: name     !! the name to check for
+    logical                             :: is_equal !! true if the string are lexically equal
+
+    if (allocated(p%name)) then
+
+        !must be the same length if we are treating
+        !trailing spaces as significant, so do a
+        !quick test of this first:
+        if (json%trailing_spaces_significant) then
+            is_equal = len(p%name) == len(name)
+            if (.not. is_equal) return
+        end if
+
+        if (json%case_sensitive_keys) then
+            is_equal = p%name == name
+        else
+            is_equal = lowercase_string(p%name) == lowercase_string(name)
+        end if
+
+    else
+        is_equal = name == '' ! check a blank name
+    end if
+
+    end function name_equal
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2580,11 +2634,8 @@
 !>
 !  Returns a child in the object or array given the name string.
 !
-!  It is a case-sensitive search, and the name string is not trimmed.
-!  So, for example,
-!````fortran
-!     'a ' /= 'A ' /= 'a  '
-!````
+!  The name search can be case-sensitive or not, and can have significant trailing
+!  whitespace or not, depending on the settings in the [[json_core]] class.
 !
 !@note The `name` input is not a path, and is not parsed like it is in [[json_get_by_path]].
 
@@ -2615,7 +2666,8 @@
                         return
                     end if
                     if (allocated(p%name)) then
-                        if (p%name == name) return
+                        !name string matching routine:
+                        if (json%name_equal(p,name)) return
                     end if
                     p => p%next
                 end do
@@ -3054,7 +3106,12 @@
 
         array = .false.
 
-        length = len_trim(path)
+        !keep trailing space or not:
+        if (json%trailing_spaces_significant) then
+            length = len(path)
+        else
+            length = len_trim(path)
+        end if
 
         do i=1, length
 

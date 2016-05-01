@@ -23,7 +23,7 @@ contains
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
     type(json_core) :: json
-    type(json_value),pointer :: p,p1,p2,q
+    type(json_value),pointer :: p,p1,p2
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
