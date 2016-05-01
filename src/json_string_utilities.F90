@@ -65,7 +65,7 @@
     public :: to_unicode
     public :: escape_string
     public :: unescape_string
-    public :: lowercase_character
+    public :: lowercase_string
 
     contains
 !*****************************************************************************************
@@ -154,6 +154,7 @@
 
     character(kind=CK,len=len(str)) :: significand, expnt
     character(kind=CK,len=2) :: separator
+
     integer(IK) :: exp_start,decimal_pos,sig_trim,exp_trim,i
 
     str = adjustl(str)
@@ -523,7 +524,7 @@
 !
 !  `CK`//`CDK` operator.
 
-    function ucs4_join_default(ucs4_str,def_str) result(res)
+    pure function ucs4_join_default(ucs4_str,def_str) result(res)
 
     implicit none
 
@@ -541,7 +542,7 @@
 !
 !  `CDK`//`CK` operator.
 
-    function default_join_ucs4(def_str,ucs4_str) result(res)
+    pure function default_join_ucs4(def_str,ucs4_str) result(res)
 
     implicit none
 
@@ -559,7 +560,7 @@
 !
 !  `CK`==`CDK` operator.
 
-    function ucs4_comp_default(ucs4_str,def_str) result(res)
+    pure elemental function ucs4_comp_default(ucs4_str,def_str) result(res)
 
     implicit none
 
@@ -577,7 +578,7 @@
 !
 !  `CDK`==`CK` operator.
 
-    function default_comp_ucs4(def_str,ucs4_str) result(res)
+    pure elemental function default_comp_ucs4(def_str,ucs4_str) result(res)
 
     implicit none
 
@@ -595,7 +596,7 @@
 !
 !  `CK`/=`CDK` operator.
 
-    function ucs4_neq_default(ucs4_str,def_str) result(res)
+    pure elemental function ucs4_neq_default(ucs4_str,def_str) result(res)
 
     implicit none
 
@@ -613,7 +614,7 @@
 !
 !  `CDK`/=`CK` operator.
 
-    function default_neq_ucs4(def_str,ucs4_str) result(res)
+    pure elemental function default_neq_ucs4(def_str,ucs4_str) result(res)
 
     implicit none
 
@@ -627,22 +628,50 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!>
-!  Return the lowercase version of the character.
+!> author: Jacob Williams
+!
+!  Return the lowercase version of the `CK` character.
 
-    pure function lowercase_character(c) result(c_lower)
+    pure elemental function lowercase_character(c) result(c_lower)
 
     implicit none
 
-    character(kind=CDK,len=1),intent(in) :: c
-    character(kind=CDK,len=1)            :: c_lower
+    character(kind=CK,len=1),intent(in) :: c
+    character(kind=CK,len=1)            :: c_lower
 
-    integer :: i  !! index in array
+    integer :: i  !! index in uppercase array
 
     i = index(upper,c)
     c_lower = merge(lower(i:i),c,i>0)
 
     end function lowercase_character
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Returns lowercase version of the `CK` string.
+
+    pure elemental function lowercase_string(str) result(s_lower)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in) :: str      !! input string
+    character(kind=CK,len=(len(str)))   :: s_lower  !! lowercase version of the string
+
+    integer :: i  !! counter
+    integer :: n  !! length of input string
+
+    s_lower = ''
+    n = len_trim(str)
+
+    if (n>0) then
+        do concurrent (i=1:n)
+            s_lower(i:i) = lowercase_character(str(i:i))
+        end do
+    end if
+
+    end function lowercase_string
 !*****************************************************************************************
 
     end module json_string_utilities

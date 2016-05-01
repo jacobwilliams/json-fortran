@@ -49,26 +49,34 @@
     character(kind=CK,len=*),parameter,public :: star = '*' !! for invalid numbers and
                                                             !! list-directed real output
 
-    !these are default character kind:
-    character(kind=CDK,len=*),parameter,public :: upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        !! uppercase characters
-    character(kind=CDK,len=*),parameter,public :: lower = 'abcdefghijklmnopqrstuvwxyz'
-        !! lowercase characters
+#if defined __GFORTRAN__
+    !not parameters due to gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
+    character(kind=CK,len=26),protected :: upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' !! uppercase characters
+    character(kind=CK,len=26),protected :: lower = 'abcdefghijklmnopqrstuvwxyz' !! lowercase characters
+#else
+    character(kind=CK,len=*),parameter,public :: upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' !! uppercase characters
+    character(kind=CK,len=*),parameter,public :: lower = 'abcdefghijklmnopqrstuvwxyz' !! lowercase characters
+#endif
 
-    !These were parameters, but gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
-    !necessitates moving them here to be variables
+#if defined __GFORTRAN__
+    !not parameters due to gfortran bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65141)
     character(kind=CK,len=4),protected :: null_str  = 'null'  !! JSON Null variable string
     character(kind=CK,len=4),protected :: true_str  = 'true'  !! JSON logical True string
     character(kind=CK,len=5),protected :: false_str = 'false' !! JSON logical False string
+#else
+    character(kind=CK,len=*),parameter,public :: null_str  = 'null'  !! JSON Null variable string
+    character(kind=CK,len=*),parameter,public :: true_str  = 'true'  !! JSON logical True string
+    character(kind=CK,len=*),parameter,public :: false_str = 'false' !! JSON logical False string
+#endif
 
-    integer, private :: i_      !! just a counter for control_chars array
+    integer, private :: i_      !! just a counter for `control_chars` array
     character(kind=CK,len=*),dimension(32),parameter :: control_chars = &
         [(achar(i_),i_=1,31), achar(127)] !! Control characters, possibly in unicode
 
     !find out the precision of the floating point number system
     !and set safety factors
-    integer(IK),parameter :: rp_safety_factor = 1
-    integer(IK),parameter :: rp_addl_safety = 1
+    integer(IK),parameter :: rp_safety_factor = 1_IK
+    integer(IK),parameter :: rp_addl_safety = 1_IK
     integer(IK),parameter :: real_precision = rp_safety_factor*precision(1.0_RK) + &
                                               rp_addl_safety
 
@@ -83,14 +91,14 @@
         !! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
     character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !! minimum width format for integers
 
-    integer(IK),parameter :: chunk_size = 100  !! for allocatable strings: allocate chunks of this size
-    integer(IK),parameter :: unit2str = -1  !! unit number to cause stuff to be
-                                            !! output to strings rather than files.
-                                            !! See 9.5.6.12 in the F2003/08 standard
+    integer(IK),parameter :: chunk_size = 100_IK  !! for allocatable strings: allocate chunks of this size
+    integer(IK),parameter :: unit2str = -1_IK  !! unit number to cause stuff to be
+                                               !! output to strings rather than files.
+                                               !! See 9.5.6.12 in the F2003/08 standard
 
-    integer(IK),parameter,public :: seq_chunk_size = 256 !! chunk size for reading sequential files
+    integer(IK),parameter,public :: seq_chunk_size = 256_IK !! chunk size for reading sequential files
 
-    integer(IK),parameter,public :: pushed_char_size = 10 !! magic number
+    integer(IK),parameter,public :: pushed_char_size = 10_IK !! magic number
 
     end module json_parameters
 !*****************************************************************************************

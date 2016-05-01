@@ -255,7 +255,9 @@
 
     subroutine initialize_json_core_in_file(me,verbose,compact_reals,&
                                             print_signs,real_format,spaces_per_tab,&
-                                            strict_type_checking)
+                                            strict_type_checking,&
+                                            trailing_spaces_significant,&
+                                            case_sensitive_keys)
 
     implicit none
 
@@ -263,15 +265,21 @@
     logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
     logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
     logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
+    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
     logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
                                                             !! conversions are done for the `get` routines
                                                             !! (default is false)
+    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
+                                                                    !! space to be considered significant.
+    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
+                                                            !! case sensitive.
 
     call me%json%initialize(verbose,compact_reals,&
                             print_signs,real_format,spaces_per_tab,&
-                            strict_type_checking)
+                            strict_type_checking,&
+                            trailing_spaces_significant,&
+                            case_sensitive_keys)
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
@@ -289,7 +297,9 @@
 
     function initialize_json_file(p,verbose,compact_reals,&
                                   print_signs,real_format,spaces_per_tab,&
-                                  strict_type_checking) result(file_object)
+                                  strict_type_checking,&
+                                  trailing_spaces_significant,&
+                                  case_sensitive_keys) result(file_object)
 
     implicit none
 
@@ -299,15 +309,21 @@
     logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
     logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
     logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(len=*,kind=CDK),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer,intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
+    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
+    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
     logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
                                                             !! conversions are done for the `get` routines
                                                             !! (default is false)
+    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
+                                                                    !! space to be considered significant.
+    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
+                                                            !! case sensitive.
 
     call file_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
-                                strict_type_checking)
+                                strict_type_checking,&
+                                trailing_spaces_significant,&
+                                case_sensitive_keys)
 
     if (present(p)) file_object%p => p
 

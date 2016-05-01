@@ -1,6 +1,6 @@
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date: 4/29/2017
+!  date: 4/29/2016
 !
 ! Module for the 17th unit test.
 ! Test the `rename` function.
@@ -53,7 +53,7 @@ contains
         error_cnt = error_cnt + 1
     end if
     nullify(q)
-    !verifty that it was renamed:
+    !verify that it was renamed:
     call json%get(p,'cities',q)
     if (json%failed()) then
         call json%print_error_message(error_unit)
