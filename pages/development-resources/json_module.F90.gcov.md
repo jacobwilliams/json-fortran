@@ -22,14 +22,8 @@ If procedure coverage is at 100%, also have a look at the
 
 ![Codecov.io](https://codecov.io/github/jacobwilliams/json-fortran/branch.svg?branch=master)
 
-### json_string_utilities
-
 {!json_string_utilities.F90.gcov.md!}
 
-### json_value_module
-
 {!json_value_module.F90.gcov.md!}
-
-### json_file_module
 
 {!json_file_module.F90.gcov.md!}

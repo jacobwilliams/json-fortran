@@ -330,7 +330,7 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
         FoBiS.py rule -gcov_analyzer .
         for SRCFILE in json_string_utilities.F90 json_value_module.F90 json_file_module.F90 ; do
             sed -i"bak" -E 's; \*\*([a-zA-Z]+[a-zA-Z0-9_]*)\*\*; \*\*[[\1]]\*\*;' ${SRCFILE}.gcov.md
-            sed -i"bak" -E 's;, line ([0-9]+);, line [\1](https://github.com/jacobwilliams/json-fortran/blob/master/src/${SRCFILE}#L\1);' ${SRCFILE}.gcov.md
+            sed -i"bak" -E "s;, line ([0-9]+);, line [\1](https://github.com/jacobwilliams/json-fortran/blob/master/src/${SRCFILE}#L\1);" ${SRCFILE}.gcov.md
         done
         gcov -o $BINDIR ${TESTDIR}*.[Ff]90
     fi
