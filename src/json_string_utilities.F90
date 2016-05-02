@@ -82,7 +82,7 @@
 
     integer(IK),intent(in)               :: ival    !! integer value.
     character(kind=CDK,len=*),intent(in) :: int_fmt !! format for integers
-    character(kind=CK,len=*),intent(out) :: str     !! ival converted to a string.
+    character(kind=CK,len=*),intent(out) :: str     !! `ival` converted to a string.
 
     integer(IK) :: istat
 
@@ -115,7 +115,7 @@
     character(kind=CDK,len=*),intent(in) :: real_fmt     !! format for real numbers
     logical(LK),intent(in)               :: compact_real !! compact the string so that it is
                                                          !! displayed with fewer characters
-    character(kind=CK,len=*),intent(out) :: str          !! rval converted to a string.
+    character(kind=CK,len=*),intent(out) :: str          !! `rval` converted to a string.
 
     integer(IK) :: istat
 
@@ -152,10 +152,14 @@
 
     character(kind=CK,len=*),intent(inout) :: str  !! string representation of a real number.
 
-    character(kind=CK,len=len(str)) :: significand, expnt
+    character(kind=CK,len=len(str)) :: significand
+    character(kind=CK,len=len(str)) :: expnt
     character(kind=CK,len=2) :: separator
-
-    integer(IK) :: exp_start,decimal_pos,sig_trim,exp_trim,i
+    integer(IK) :: exp_start
+    integer(IK) :: decimal_pos
+    integer(IK) :: sig_trim
+    integer(IK) :: exp_trim
+    integer(IK) :: i  !! counter
 
     str = adjustl(str)
     exp_start = scan(str,CK_'eEdD')
@@ -226,9 +230,11 @@
     character(kind=CK,len=*),intent(in)              :: str_in
     character(kind=CK,len=:),allocatable,intent(out) :: str_out
 
-    integer(IK) :: i
-    integer(IK) :: ipos
-    character(kind=CK,len=1) :: c
+    integer(IK) :: i    !! counter
+    integer(IK) :: ipos !! accumulated string size
+                        !! (so we can allocate it in chunks for
+                        !! greater runtime efficiency)
+    character(kind=CK,len=1) :: c  !! for reading `str_in` one character at a time.
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp !! workaround for bug in gfortran 6.1
 #endif
