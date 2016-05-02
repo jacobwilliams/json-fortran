@@ -6,7 +6,6 @@ title: Coverage Analysis
 
 [![Codecov](https://img.shields.io/codecov/c/github/jacobwilliams/json-fortran.svg?style=plastic)](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
 
-
 The following report was automatically generated from
 [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) output by the
 [FoBiS.py](https://github.com/szaghi/FoBiS) Fortran build
@@ -23,4 +22,14 @@ If procedure coverage is at 100%, also have a look at the
 
 ![Codecov.io](https://codecov.io/github/jacobwilliams/json-fortran/branch.svg?branch=master)
 
-{!json_module.F90.gcov.md!}
+### json_string_utilities
+
+{!json_string_utilities.F90.gcov.md!}
+
+### json_value_module
+
+{!json_value_module.F90.gcov.md!}
+
+### json_file_module
+
+{!json_file_module.F90.gcov.md!}
