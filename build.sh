@@ -117,122 +117,122 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
     key="$1" # Command line args are key-value pairs or value-less keys
 
     case $key in #find known keys
-	--compiler) #pick the compiler. Defaults to gfortran, but intel or custom compilers can be used
-	    case "$2" in
-		intel|Intel|INTEL|ifort)
-		    FCOMPILER='Intel'
-		    FCOMPILERFLAGS="$INTELCOMPILERFLAGS"
-		    shift
-		    ;;
-		gnu|Gnu|GNU|gfortran|Gfortran|GFortran|GFORTRAN)
-		    FCOMPILER='gnu'
-		    FCOMPILERFLAGS="$GNUCOMPILERFLAGS"
-		    shift
-		    ;;
-		*)
-		    FCOMPILER="custom"
-		    echo "Warning: Trying to build with unsupported compiler, $2." 1>&2
-		    echo "Please ensure you set appropriate --cflags and (single) quote them" 1>&2
-		    FC="$2"
-		    shift
-		    ;;
-	    esac
-	    ;;
-	--cflags)
-	    FCOMPILERFLAGS="$2"
-	    # no good way to check that the user didn't do something questionable
-	    shift
-	    ;;
-	--enable-unicode)
-	    case $2 in
-		yes|Yes|YES)
-		    TRY_UNICODE="yes"
-		    shift
-		    ;;
-		no|No|NO)
-		    TRY_UNICODE="no"
-		    shift
-		    ;;
-		*)
-		    TRY_UNICODE="yes"
-		    # don't shift; $2 is next arg
-		    ;;
-	    esac
-	    ;;
-	--coverage) # enable coverage
-	    case $2 in
-		yes|Yes|YES)
-		    CODE_COVERAGE="yes"
-		    shift
-		    ;;
-		no|No|NO)
-		    CODE_COVERAGE="no"
-		    shift
-		    ;;
-		*)
-		    CODE_COVERAGE="yes"
-		    # don't shift because $2 is some other flag
-		    ;;
-	    esac
-	    ;;
-	--profile) #nable profiling
-	    case $2 in
-		yes|Yes|YES)
-		    CODE_PROFILE="yes"
-		    shift
-		    ;;
-		no|No|NO)
-		    CODE_PROFILE="no"
-		    shift
-		    ;;
-		*)
-		    CODE_PROFILE="yes"
-		    # don't shift because $2 is some other flag
-		    ;;
-		esac
-	    ;;
-	--skip-tests) # skip tests
-	    case $2 in
-		yes|Yes|YES)
-		    JF_SKIP_TESTS="yes"
-		    shift
-		    ;;
-		no|No|NO)
-		    JF_SKIP_TESTS="no"
-		    shift
-		    ;;
-		*)
-		    JF_SKIP_TESTS="yes"
-		    ;;
-	    esac
-	    ;;
-	--skip-documentation)
-	    case $2 in
-		yes|Yes|YES)
-		    JF_SKIP_DOCS="yes"
-		    shift
-		    ;;
-		no|No|NO)
-		    JF_SKIP_DOCSS="no"
-		    shift
-		    ;;
-		*)
-		    JF_SKIP_DOCS="yes"
-		    ;;
-	    esac
-	    ;;
-	--help)
-	    print_usage
-	    exit 0
-	    ;;
-	--clean)
-	    rm -r src{,/tests}/*.o $DOCDIR* $LIBDIR* $BINDIR* *.gcov*
-	    ;;
-	*)
-	    echo "Unknown flag, \"$1\", passed to ${script_name}!" 2>&1
-	    print_usage
-	    exit 1
-	    ;;
+    --compiler) #pick the compiler. Defaults to gfortran, but intel or custom compilers can be used
+        case "$2" in
+        intel|Intel|INTEL|ifort)
+            FCOMPILER='Intel'
+            FCOMPILERFLAGS="$INTELCOMPILERFLAGS"
+            shift
+            ;;
+        gnu|Gnu|GNU|gfortran|Gfortran|GFortran|GFORTRAN)
+            FCOMPILER='gnu'
+            FCOMPILERFLAGS="$GNUCOMPILERFLAGS"
+            shift
+            ;;
+        *)
+            FCOMPILER="custom"
+            echo "Warning: Trying to build with unsupported compiler, $2." 1>&2
+            echo "Please ensure you set appropriate --cflags and (single) quote them" 1>&2
+            FC="$2"
+            shift
+            ;;
+        esac
+        ;;
+    --cflags)
+        FCOMPILERFLAGS="$2"
+        # no good way to check that the user didn't do something questionable
+        shift
+        ;;
+    --enable-unicode)
+        case $2 in
+        yes|Yes|YES)
+            TRY_UNICODE="yes"
+            shift
+            ;;
+        no|No|NO)
+            TRY_UNICODE="no"
+            shift
+            ;;
+        *)
+            TRY_UNICODE="yes"
+            # don't shift; $2 is next arg
+            ;;
+        esac
+        ;;
+    --coverage) # enable coverage
+        case $2 in
+        yes|Yes|YES)
+            CODE_COVERAGE="yes"
+            shift
+            ;;
+        no|No|NO)
+            CODE_COVERAGE="no"
+            shift
+            ;;
+        *)
+            CODE_COVERAGE="yes"
+            # don't shift because $2 is some other flag
+            ;;
+        esac
+        ;;
+    --profile) #nable profiling
+        case $2 in
+        yes|Yes|YES)
+            CODE_PROFILE="yes"
+            shift
+            ;;
+        no|No|NO)
+            CODE_PROFILE="no"
+            shift
+            ;;
+        *)
+            CODE_PROFILE="yes"
+            # don't shift because $2 is some other flag
+            ;;
+        esac
+        ;;
+    --skip-tests) # skip tests
+        case $2 in
+        yes|Yes|YES)
+            JF_SKIP_TESTS="yes"
+            shift
+            ;;
+        no|No|NO)
+            JF_SKIP_TESTS="no"
+            shift
+            ;;
+        *)
+            JF_SKIP_TESTS="yes"
+            ;;
+        esac
+        ;;
+    --skip-documentation)
+        case $2 in
+        yes|Yes|YES)
+            JF_SKIP_DOCS="yes"
+            shift
+            ;;
+        no|No|NO)
+            JF_SKIP_DOCSS="no"
+            shift
+            ;;
+        *)
+            JF_SKIP_DOCS="yes"
+            ;;
+        esac
+        ;;
+    --help)
+        print_usage
+        exit 0
+        ;;
+    --clean)
+        rm -r src{,/tests}/*.o $DOCDIR* $LIBDIR* $BINDIR* *.gcov*
+        ;;
+    *)
+        echo "Unknown flag, \"$1\", passed to ${script_name}!" 2>&1
+        print_usage
+        exit 1
+        ;;
     esac
     shift # look at next argument
 done # with argument parsing loop
@@ -261,7 +261,7 @@ if [[ $TRY_UNICODE == [yY]* ]]; then
     echo "Trying to compile library with Unicode/UCS4 support"
     FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS}" -dbld "${BINDIR}" -s "${INTROSPECDIR}" -dmod ./ -dobj ./ -t ${UCS4TESTCODE} -o ${UCS4TESTCODE%.f90} -colors
     if "${BINDIR}/${UCS4TESTCODE%.f90}"; then
-	DEFINES="-DUSE_UCS4 -Wunused-function"
+    DEFINES="-DUSE_UCS4 -Wunused-function"
     fi
 fi
 
@@ -280,9 +280,9 @@ if [[ $JF_SKIP_TESTS != [yY]* ]]; then
     [ -d "$BINDIR" ] || mkdir "$BINDIR"
 
     for TEST in "${TESTDIR%/}"/jf_test_*.[fF]90; do
-	THIS_TEST=${TEST##*/}
-	echo "Build ${THIS_TEST%.[fF]90}"
-	FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${BINDIR} -s ${TESTDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${THIS_TEST} -o ${THIS_TEST%.[fF]90} -colors
+    THIS_TEST=${TEST##*/}
+    echo "Build ${THIS_TEST%.[fF]90}"
+    FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${BINDIR} -s ${TESTDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${THIS_TEST} -o ${THIS_TEST%.[fF]90} -colors
     done
 else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."
@@ -297,37 +297,42 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
     GLOBIGNORE='*.*'
     #
     for TEST in jf_test_*; do
-	# It would be nice to run json output printed to stdout through jsonlint, however,
-	# some tests output more than one json structure and these need to be split
-	echo "Running ${TEST}"
-	./${TEST}
+        # It would be nice to run json output printed to stdout through jsonlint, however,
+        # some tests output more than one json structure and these need to be split
+        echo "Running ${TEST}"
+        ./${TEST}
     done
     cd -
     GLOBIGNORE="$OLD_IGNORES"
     if [[ $CODE_COVERAGE = [yY]* ]] ; then
-	[ -f json_module.F90.gcov ] && rm json_module.F90.gcov
-	gcov -o $LIBDIR ${SRCDIR}${MODCODE}
-	if [[ $TRY_UNICODE = [yY]* ]] ; then
-	    # gcov/gfortran bug work around
-	    awk -F':' '{line=""; for(i=2;i<=NF;i++){line=line":"$i}; if (NR > 1) print $1 prevline; prevline=line}; END{print "        -"prevline}' json_module.F90.gcov > json_module.F90.gcov.fixed && \
-		mv json_module.F90.gcov{.fixed,}
-	    # rename so we can merge coverage info
-	    mv json_module.F90.gcov json_module-unicode.F90.gcov
-	else
-	    # rename so we can merge coverage info
-	    mv json_module.F90.gcov json_module-no-unicode.F90.gcov
-	fi
-	if [ -f json_module-unicode.F90.gcov ] && [ -f json_module-no-unicode.F90.gcov ]; then
-	    # merge them
-	    ./pages/development-resources/gccr.pl -n -c json_module-no-unicode.F90.gcov no-unicode \
-						  json_module-unicode.F90.gcov unicode > json_module.F90.gcov
-	else
-	    cp json_module*-unicode.F90.gcov json_module.F90.gcov
-	fi
-	FoBiS.py rule -gcov_analyzer .
-	sed -i"bak" -E 's; \*\*([a-zA-Z]+[a-zA-Z0-9_]*)\*\*; \*\*[[\1]]\*\*;' json_module.F90.gcov.md
-	sed -i"bak" -E 's;, line ([0-9]+);, line [\1](https://github.com/jacobwilliams/json-fortran/blob/master/src/json_module.F90#L\1);' json_module.F90.gcov.md
-	gcov -o $BINDIR ${TESTDIR}*.[Ff]90
+        for SRCFILE in json_string_utilities.F90 json_value_module.F90 json_file_module.F90 ; do
+            [ -f ${SRCDIR}${SRCFILE}.gcov ] && rm ${SRCDIR}${SRCFILE}.gcov
+            gcov -o $LIBDIR ${SRCDIR}${SRCFILE}
+            if [[ $TRY_UNICODE = [yY]* ]] ; then
+                # gcov/gfortran bug work around
+                awk -F':' '{line=""; for(i=2;i<=NF;i++){line=line":"$i}; if (NR > 1) print $1 prevline; prevline=line}; END{print "        -"prevline}' ${SRCFILE}.gcov > ${SRCFILE}.gcov.fixed && \
+                mv ${SRCFILE}.gcov{.fixed,}
+                # rename so we can merge coverage info
+                mv ${SRCFILE}.gcov ${SRCFILE}-unicode.gcov
+            else
+                # rename so we can merge coverage info
+                mv ${SRCFILE}.gcov ${SRCFILE}-no-unicode.gcov
+            fi
+            if [ -f ${SRCFILE}-unicode.gcov ] && [ -f ${SRCFILE}-no-unicode.gcov ]; then
+                # merge them
+                ./pages/development-resources/gccr.pl -n -c ${SRCFILE}-no-unicode.gcov no-unicode \
+                                  ${SRCFILE}-unicode.gcov unicode > ${SRCFILE}.gcov
+            else
+                cp ${SRCFILE}*-unicode.gcov ${SRCFILE}.gcov
+            fi
+        done
+
+        FoBiS.py rule -gcov_analyzer .
+        for SRCFILE in json_string_utilities.F90 json_value_module.F90 json_file_module.F90 ; do
+            sed -i"bak" -E 's; \*\*([a-zA-Z]+[a-zA-Z0-9_]*)\*\*; \*\*[[\1]]\*\*;' ${SRCFILE}.gcov.md
+            sed -i"bak" -E 's;, line ([0-9]+);, line [\1](https://github.com/jacobwilliams/json-fortran/blob/master/src/${SRCFILE}#L\1);' ${SRCFILE}.gcov.md
+        done
+        gcov -o $BINDIR ${TESTDIR}*.[Ff]90
     fi
 else
     echo "Skip running the unit tests since \$JF_SKIP_TESTS has been set to ${JF_SKIP_TESTS}."
@@ -337,11 +342,11 @@ fi
 echo ""
 if [[ $JF_SKIP_DOCS != [yY]* ]]; then
     if hash ford 2>/dev/null; then
-	echo "Building documentation..."
-	[[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG="-m USE_UCS4"
-	ford $MACRO_FLAG -p $PAGESDIR $FORDMD
+    echo "Building documentation..."
+    [[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG="-m USE_UCS4"
+    ford $MACRO_FLAG -p $PAGESDIR $FORDMD
     else
-	echo "FORD not found! Install using: sudo pip install ford"
+    echo "FORD not found! Install using: sudo pip install ford"
     fi
 else
     echo "Skip building documentation since \$JF_SKIP_DOCS has been set to ${JF_SKIP_DOCS}."

@@ -41,11 +41,10 @@ env:
       DEPLOY_DOCUMENTATION="no"
 
       # build with build.sh, make documentation, run unit tests and perform coverage analysis
-      # JW note: disabled coverage for testing purposes !!!! need to fix !!!!
     - >
-      BUILD_SCRIPT="./build.sh --skip-documentation &&
-      ./build.sh --enable-unicode"
-      CODE_COVERAGE="no"
+      BUILD_SCRIPT="./build.sh --coverage --skip-documentation &&
+      ./build.sh --coverage --enable-unicode"
+      CODE_COVERAGE="yes"
       DEPLOY_DOCUMENTATION="yes"
 
 install:
@@ -102,8 +101,8 @@ after_success:
   - (yes | rm -r doc gh-pages) || true # wipe out doc dirs to avoid confusing codecov
   - |
     if [[ $CODE_COVERAGE == [yY]* ]]; then
-      rm json_module-*unicode.F90.gcov || true
-      mv json_module.F90.gcov src/
+      rm json_*-*unicode.F90.gcov || true
+      mv json_*.F90.gcov src/
       mv jf_test*.[fF]90.gcov src/tests/
       bash <(curl -s https://codecov.io/bash) -v -X gcov
     fi
