@@ -22,7 +22,7 @@ A Fortran 2008 JSON API
 Status
 ------
 [![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
-[![Codecov](https://img.shields.io/codecov/c/github/jacobwilliams/json-fortran.svg?style=plastic)](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
+[![Codecov](https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobwilliams/json-fortran)
 
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Blocked by Vendor Bug](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=vendor%20bug&title=Blocked%20by%20Vendor%20Bug)](https://waffle.io/jacobwilliams/json-fortran)

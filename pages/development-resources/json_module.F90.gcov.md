@@ -4,7 +4,7 @@ title: Coverage Analysis
 
 # Coverage analysis
 
-[![Codecov](https://img.shields.io/codecov/c/github/jacobwilliams/json-fortran.svg?style=plastic)](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
+[![Codecov](https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobwilliams/json-fortran)
 
 The following report was automatically generated from
 [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) output by the
