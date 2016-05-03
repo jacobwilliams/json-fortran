@@ -791,7 +791,7 @@
     class(json_core),intent(inout)      :: json
     type(json_value),intent(in)         :: p        !! the json object
     character(kind=CK,len=*),intent(in) :: name     !! the name to check for
-    logical                             :: is_equal !! true if the string are lexically equal
+    logical(LK)                         :: is_equal !! true if the string are lexically equal
 
     if (allocated(p%name)) then
 
@@ -1556,9 +1556,11 @@
     class(json_core),intent(inout) :: json
     type(json_value),pointer       :: p1
     type(json_value),pointer       :: p2
-    logical                        :: is_child_of
+    logical(LK)                    :: is_child_of
 
     is_child_of = .false.
+
+    if (json%exception_thrown) return
 
     if (associated(p1) .and. associated(p2)) then
         if (associated(p1%children)) then
