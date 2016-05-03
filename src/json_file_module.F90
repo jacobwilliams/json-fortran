@@ -170,8 +170,7 @@
     !   my_file = json_file(json_object,json_core_object)
     !```
     interface json_file
-       module procedure :: initialize_json_file
-       module procedure :: initialize_json_file_v2
+       module procedure initialize_json_file, initialize_json_file_v2
     end interface
     !*************************************************************************************
 
