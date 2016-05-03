@@ -66,6 +66,21 @@ contains
     call file1%info('this path does not exist',found,var_type,n_children)
     call file1%initialize()
 
+    call file1%check_for_errors(status_ok,error_msg)
+    call file1%clear_exceptions()
+    call file1%destroy()
+    file1 = json_file(p2,json)  !constructor
+    call file1%destroy(destroy_core=.true.)
+
+    call json%initialize(   verbose=.false.,&
+                            compact_reals=.true.,&
+                            print_signs=.false.,&
+                            real_format='E',&
+                            spaces_per_tab=4,&
+                            strict_type_checking=.true.,&
+                            trailing_spaces_significant=.false.,&
+                            case_sensitive_keys=.true.)
+
     call json%get_child(p2,-99,p)  !invalid index
     call json%initialize()  !clear exceptions
 
