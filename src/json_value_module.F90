@@ -520,6 +520,9 @@
         procedure,public :: swap                => json_value_swap          !! Swap two [[json_value]] pointers
                                                                             !! in a structure (or two different structures).
         procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a child of another.
+        procedure,public :: validate            => json_value_validate      !! Check that a [[json_value]] linked list is valid
+                                                                            !! (i.e., is properly constructed). This may be
+                                                                            !! useful if it has been constructed externally.
 
         !other private routines:
         procedure :: name_equal
@@ -1579,6 +1582,206 @@
     end subroutine is_child_of_callback
 
     end function json_value_is_child_of
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 5/2/2016
+!
+!  Validate a [[json_value]] linked list by checking to make sure
+!  all the pointers are properly associated, arrays and objects
+!  have the correct number of children, and the correct data is
+!  allocated for the variable types.
+!
+!  It recursively traverses the entire structure and checks every element.
+!
+!@note This routine does not check or throw any exceptions.
+
+    subroutine json_value_validate(json,p,is_valid,error_msg)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p
+    logical(LK),intent(out)              :: is_valid  !! True if the structure is valid.
+    character(kind=CK,len=:),allocatable :: error_msg !! if not valid, this will contain
+                                                      !! a description of the problem
+
+    if (associated(p)) then
+        is_valid = .true.
+        call check_if_valid(p,require_parent=associated(p%parent))
+    else
+        error_msg = 'The pointer is not associated'
+        is_valid = .false.
+    end if
+
+    contains
+
+    recursive subroutine check_if_valid(p,require_parent)
+
+        implicit none
+
+        type(json_value),pointer,intent(in) :: p
+        logical,intent(in) :: require_parent !! the first one may be a root (so no parent),
+                                             !! but all descendants must have a parent.
+
+        integer :: i !! counter
+        type(json_value),pointer :: element
+        type(json_value),pointer :: previous
+
+        if (is_valid .and. associated(p)) then
+
+            ! data type:
+            select case (p%var_type)
+            case(json_null,json_object,json_array)
+                if (allocated(p%log_value) .or. allocated(p%int_value) .or. &
+                    allocated(p%dbl_value) .or. allocated(p%str_value)) then
+                    error_msg = 'incorrect data allocated for '//&
+                                'json_null, json_object, or json_array variable type'
+                    is_valid = .false.
+                    return
+                end if
+            case(json_logical)
+                if (.not. allocated(p%log_value)) then
+                    error_msg = 'log_value should be allocated for json_logical variable type'
+                    is_valid = .false.
+                    return
+                else if (allocated(p%int_value) .or. &
+                    allocated(p%dbl_value) .or. allocated(p%str_value)) then
+                    error_msg = 'incorrect data allocated for json_logical variable type'
+                    is_valid = .false.
+                    return
+                end if
+            case(json_integer)
+                if (.not. allocated(p%int_value)) then
+                    error_msg = 'int_value should be allocated for json_integer variable type'
+                    is_valid = .false.
+                    return
+                else if (allocated(p%log_value) .or. &
+                    allocated(p%dbl_value) .or. allocated(p%str_value)) then
+                    error_msg = 'incorrect data allocated for json_integer variable type'
+                    is_valid = .false.
+                    return
+                end if
+            case(json_double)
+                if (.not. allocated(p%dbl_value)) then
+                    error_msg = 'dbl_value should be allocated for json_double variable type'
+                    is_valid = .false.
+                    return
+                else if (allocated(p%log_value) .or. allocated(p%int_value) .or. &
+                    allocated(p%str_value)) then
+                    error_msg = 'incorrect data allocated for json_double variable type'
+                    is_valid = .false.
+                    return
+                end if
+            case(json_string)
+                if (.not. allocated(p%str_value)) then
+                    error_msg = 'str_value should be allocated for json_string variable type'
+                    is_valid = .false.
+                    return
+                else if (allocated(p%log_value) .or. allocated(p%int_value) .or. &
+                    allocated(p%dbl_value)) then
+                    error_msg = 'incorrect data allocated for json_string variable type'
+                    is_valid = .false.
+                    return
+                end if
+            case default
+                error_msg = 'invalid JSON variable type'
+                is_valid = .false.
+                return
+            end select
+
+            if (require_parent .and. .not. associated(p%parent)) then
+                error_msg = 'parent pointer is not associated'
+                is_valid = .false.
+                return
+            end if
+
+            if (.not. allocated(p%name)) then
+                if (associated(p%parent)) then
+                    if (p%parent%var_type/=json_array) then
+                        error_msg = 'JSON variable must have a name if not an '//&
+                                    'array element or the root'
+                        is_valid = .false.
+                        return
+                    end if
+                end if
+            end if
+
+            if (associated(p%children) .neqv. associated(p%tail)) then
+                error_msg = 'both children and tail pointers must be associated'
+                is_valid = .false.
+                return
+            end if
+
+            ! now, check next one:
+            if (associated(p%next)) then
+                call check_if_valid(p%next,require_parent=require_parent)
+            end if
+
+            if (associated(p%children)) then
+
+                if (p%var_type/=json_array .and. p%var_type/=json_object) then
+                    error_msg = 'only arrays and objects can have children'
+                    is_valid = .false.
+                    return
+                end if
+
+                ! first validate children pointers:
+
+                previous => null()
+                element => p%children
+                do i = 1, p%n_children
+                    if (.not. associated(element%parent,p)) then
+                        error_msg = 'child''s parent pointer not properly associated'
+                        is_valid = .false.
+                        return
+                    end if
+                    if (i==1 .and. associated(element%previous)) then
+                        error_msg = 'first child shouldn''t have a previous'
+                        is_valid = .false.
+                        return
+                    end if
+                    if (i<p%n_children .and. .not. associated(element%next)) then
+                        error_msg = 'not enough children'
+                        is_valid = .false.
+                        return
+                    end if
+                    if (i==p%n_children .and. associated(element%next)) then
+                        error_msg = 'too many children'
+                        is_valid = .false.
+                        return
+                    end if
+                    if (i>1) then
+                        if (.not. associated(previous,element%previous)) then
+                            error_msg = 'previous pointer not properly associated'
+                            is_valid = .false.
+                            return
+                        end if
+                    end if
+                    if (i==p%n_children .and. &
+                        .not. associated(element%parent%tail,element)) then
+                        error_msg = 'parent''s tail pointer not properly associated'
+                        is_valid = .false.
+                        return
+                    end if
+                    if (i<p%n_children) then
+                        !setup next case:
+                        previous => element
+                        element => element%next
+                    end if
+                end do
+
+                !now check all the children:
+                call check_if_valid(p%children,require_parent=.true.)
+
+            end if
+
+        end if
+
+    end subroutine check_if_valid
+
+    end subroutine json_value_validate
 !*****************************************************************************************
 
 !*****************************************************************************************
