@@ -112,7 +112,6 @@ contains
         write(error_unit,'(A)') 'Error: this should have failed.'
         error_cnt = error_cnt + 1
     else
-        write(error_unit,'(A)') 'Success: This operation is not allowed.'
         call json%clear_exceptions()
     end if
     nullify(p1)
@@ -131,6 +130,86 @@ contains
     end if
     nullify(p1)
     nullify(p2)
+
+    call json%destroy(p)
+
+    !...........................................................................
+    ! other special cases:
+
+    !swap first and last items in a list
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '.....................................'
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Original:'
+    call json%parse(p, '{ "color": "red", "width": 10, "height": 2 }')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%print(p,error_unit)
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Swap: color <-> height'
+    call json%get(p,'color',p1)
+    call json%get(p,'height',p2)
+    call json%swap(p1,p2)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%print(p,output_unit)
+    nullify(p1)
+    nullify(p2)
+    call json%destroy(p)
+
+    !p2 is first child:
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '.....................................'
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Original:'
+    call json%parse(p, '{ "color": "red", "width": 10, "height": 2 }')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%print(p,error_unit)
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Swap: width <-> color'
+    call json%get(p,'width',p1)
+    call json%get(p,'color',p2)
+    call json%swap(p1,p2)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%print(p,output_unit)
+    nullify(p1)
+    nullify(p2)
+    call json%destroy(p)
+
+    !p2 is last child:
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '.....................................'
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Original:'
+    call json%parse(p, '{ "color": "red", "width": 10, "height": 2 }')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%print(p,error_unit)
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Swap: width <-> height'
+    call json%get(p,'width',p1)
+    call json%get(p,'height',p2)
+    call json%swap(p1,p2)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%print(p,output_unit)
+    nullify(p1)
+    nullify(p2)
+    call json%destroy(p)
 
     end subroutine test_16
 
