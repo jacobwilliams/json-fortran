@@ -14,7 +14,6 @@ please carefully read the
 [LICENSE](|url|/page/development-resources/LICENSE.html) before using
 JSON-Fortran in an application, or contributing code.
 
-
 # Test Coverage Information
 
 The best place to start when trying to increase test coverage, is to
@@ -32,8 +31,9 @@ scripts used in building and testing JSON-Fortran, as well as
 deploying documentation and managing test coverage information.
 
 - [`build.sh`](build.sh.html)
-- [`.travis.yml`](travis.yml.html)
 - [`deploy.sh`](deploy.sh.html)
+- [`.travis.yml`](travis.yml.html)
+- [`codecov.yml`](codecov.yml.html)
 - [`gccr.pl`](gccr.pl.html)
 
 # Release Checklist
