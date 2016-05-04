@@ -32,6 +32,8 @@ contains
     character(kind=json_CK,len=:),allocatable :: name
     integer :: ival,ival_clone
     logical :: found
+    logical :: is_valid
+    character(kind=json_CK,len=:),allocatable :: error_msg
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -141,6 +143,15 @@ contains
     call add_variables_to_input(json, traj, 'Vy', 'km/s', 'J2000', 'EARTH', [2.0e-3_wp, 20.0e-3_wp, 3.0e-3_wp], error_cnt )
     call add_variables_to_input(json, traj, 'Vz', 'km/s', 'J2000', 'EARTH', [3.0e-3_wp, 30.0e-3_wp, 40.0e-3_wp], error_cnt )
     nullify(traj)
+
+    !validate it:
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'validating...'
+    call json%validate(p,is_valid,error_msg)
+    if (.not. is_valid) then
+        write(error_unit,'(A)') 'Error: p is not a valid JSON linked list: '//error_msg
+        error_cnt = error_cnt + 1
+    end if
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'writing file '//trim(dir//filename2)//'...'
