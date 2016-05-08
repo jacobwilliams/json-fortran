@@ -2699,6 +2699,7 @@
     if (associated(p)) then
         parent => p%parent
     else
+        nullify(parent)
         call json%throw_exception('Error in json_get_parent: '//&
                                   'pointer is not associated.')
     end if
@@ -2724,6 +2725,7 @@
     if (associated(p)) then
         next => p%next
     else
+        nullify(next)
         call json%throw_exception('Error in json_get_next: '//&
                                   'pointer is not associated.')
     end if
@@ -2749,6 +2751,7 @@
     if (associated(p)) then
         previous => p%previous
     else
+        nullify(previous)
         call json%throw_exception('Error in json_get_previous: '//&
                                   'pointer is not associated.')
     end if
@@ -2775,6 +2778,7 @@
     if (associated(p)) then
         tail => p%tail
     else
+        nullify(tail)
         call json%throw_exception('Error in json_get_tail: '//&
                                   'pointer is not associated.')
     end if
@@ -2846,6 +2850,7 @@
     if (associated(p)) then
         child => p%children
     else
+        nullify(child)
         call json%throw_exception('Error in json_value_get_child: '//&
                                   'pointer is not associated.')
     end if
