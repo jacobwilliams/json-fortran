@@ -65,6 +65,8 @@
 
         type(json_value),pointer :: p => null()  !! the JSON structure read from the file
 
+        logical :: finalize = .true. !! if true, the finalizer will destroy the data
+                                     !! in the class (both `p` and `json`).
     contains
 
         procedure,public :: initialize => initialize_json_core_in_file
@@ -142,6 +144,8 @@
         procedure :: json_file_print_1
         procedure :: json_file_print_2
 
+        final :: finalize_json_file
+
     end type json_file
     !*********************************************************
 
@@ -175,6 +179,24 @@
     !*************************************************************************************
 
     contains
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Finalizer for [[json_file]] class.
+!  The finalizer is only called if `finalize` is true in the class.
+!
+!  Just a wrapper for [[json_file_destroy]].
+
+    subroutine finalize_json_file(me)
+
+    implicit none
+
+    type(json_file),intent(inout) :: me
+
+    if (me%finalize) call me%destroy(destroy_core=.true.)
+
+    end subroutine finalize_json_file
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -256,7 +278,8 @@
                                             print_signs,real_format,spaces_per_tab,&
                                             strict_type_checking,&
                                             trailing_spaces_significant,&
-                                            case_sensitive_keys)
+                                            case_sensitive_keys,&
+                                            finalize)
 
     implicit none
 
@@ -273,12 +296,17 @@
                                                                     !! space to be considered significant.
     logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
                                                             !! case sensitive.
+    logical(LK),intent(in),optional :: finalize             !! if true, the JSON data in the file will
+                                                            !! be destroyed when the variable goes out
+                                                            !! of scope [the default is true].
 
     call me%json%initialize(verbose,compact_reals,&
                             print_signs,real_format,spaces_per_tab,&
                             strict_type_checking,&
                             trailing_spaces_significant,&
                             case_sensitive_keys)
+
+    if (present(finalize)) me%finalize = finalize
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
@@ -298,7 +326,7 @@
                                   print_signs,real_format,spaces_per_tab,&
                                   strict_type_checking,&
                                   trailing_spaces_significant,&
-                                  case_sensitive_keys) result(file_object)
+                                  case_sensitive_keys,finalize) result(file_object)
 
     implicit none
 
@@ -317,6 +345,9 @@
                                                                     !! space to be considered significant.
     logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
                                                             !! case sensitive.
+    logical(LK),intent(in),optional :: finalize             !! if true, the JSON data in the file will
+                                                            !! be destroyed when the variable goes out
+                                                            !! of scope [the default is true].
 
     call file_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
@@ -325,6 +356,7 @@
                                 case_sensitive_keys)
 
     if (present(p)) file_object%p => p
+    if (present(finalize)) file_object%finalize = finalize
 
     end function initialize_json_file
 !*****************************************************************************************
@@ -336,7 +368,8 @@
 !  Cast a [[json_value]] pointer and a [[json_core]] object
 !  as a [[json_file(type)]] object.
 
-    function initialize_json_file_v2(json_value_object, json_core_object) &
+    function initialize_json_file_v2(json_value_object,json_core_object,&
+                                        finalize) &
                                         result(file_object)
 
     implicit none
@@ -344,9 +377,13 @@
     type(json_file)                     :: file_object
     type(json_value),pointer,intent(in) :: json_value_object
     type(json_core),intent(in)          :: json_core_object
+    logical(LK),intent(in),optional     :: finalize  !! if true, the JSON data in the file will
+                                                     !! be destroyed when the variable goes out
+                                                     !! of scope [the default is true].
 
     file_object%p    => json_value_object
     file_object%json = json_core_object
+    if (present(finalize)) file_object%finalize = finalize
 
     end function initialize_json_file_v2
 !*****************************************************************************************
@@ -366,6 +403,9 @@
 !### History
 !  * 12/9/2013 : Created
 !  * 4/26/2016 : Added optional `destroy_core` argument
+!
+!@note This routine will be called automatically when the variable
+!      goes out of scope if `finalize` is true (which it is by default).
 
     subroutine json_file_destroy(me,destroy_core)
 
@@ -373,7 +413,7 @@
 
     class(json_file),intent(inout) :: me
     logical,intent(in),optional :: destroy_core  !! to also destroy the [[json_core]].
-                                                 !! default is to leave it as is.
+                                                 !! [default is to leave it as is].
 
     if (associated(me%p)) call me%json%destroy(me%p)
 
