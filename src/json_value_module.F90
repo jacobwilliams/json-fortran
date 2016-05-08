@@ -218,9 +218,11 @@
         private
 
         generic,public :: get_child => json_value_get_by_index, &
+                                       json_value_get_child,&
                                        MAYBEWRAP(json_value_get_by_name_chars)
         procedure,private :: json_value_get_by_index
         procedure,private :: MAYBEWRAP(json_value_get_by_name_chars)
+        procedure,private :: json_value_get_child
 
         !>
         !  Add objects to a linked list of [[json_value]]s.
@@ -1180,7 +1182,8 @@
     implicit none
 
     class(json_core),intent(in) :: json
-    logical(LK) :: failed
+    logical(LK)                 :: failed  !! will be true if an exception
+                                           !! has been thrown.
 
     failed = json%exception_thrown
 
@@ -2660,15 +2663,20 @@
 !    Now using n_children variable.
 !    Renamed from json_value_count.
 
-    pure function json_count(json,p) result(count)
+    function json_count(json,p) result(count)
 
     implicit none
 
-    class(json_core),intent(in)         :: json
+    class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: p
     integer(IK)                         :: count  !! number of children
 
-    count = p%n_children
+    if (associated(p)) then
+        count = p%n_children
+    else
+        call json%throw_exception('Error in json_count: '//&
+                                  'pointer is not associated.')
+    end if
 
     end function json_count
 !*****************************************************************************************
@@ -2684,11 +2692,16 @@
 
     implicit none
 
-    class(json_core),intent(in)          :: json
+    class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p        !! JSON object
     type(json_value),pointer,intent(out) :: parent   !! pointer to parent
 
-    parent => p%parent
+    if (associated(p)) then
+        parent => p%parent
+    else
+        call json%throw_exception('Error in json_get_parent: '//&
+                                  'pointer is not associated.')
+    end if
 
     end subroutine json_get_parent
 !*****************************************************************************************
@@ -2704,11 +2717,16 @@
 
     implicit none
 
-    class(json_core),intent(in)          :: json
-    type(json_value),pointer,intent(in)  :: p      !! JSON object
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p       !! JSON object
     type(json_value),pointer,intent(out) :: next    !! pointer to next
 
-    next => p%next
+    if (associated(p)) then
+        next => p%next
+    else
+        call json%throw_exception('Error in json_get_next: '//&
+                                  'pointer is not associated.')
+    end if
 
     end subroutine json_get_next
 !*****************************************************************************************
@@ -2724,11 +2742,16 @@
 
     implicit none
 
-    class(json_core),intent(in)          :: json
+    class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p        !! JSON object
     type(json_value),pointer,intent(out) :: previous !! pointer to previous
 
-    previous => p%previous
+    if (associated(p)) then
+        previous => p%previous
+    else
+        call json%throw_exception('Error in json_get_previous: '//&
+                                  'pointer is not associated.')
+    end if
 
     end subroutine json_get_previous
 !*****************************************************************************************
@@ -2745,11 +2768,16 @@
 
     implicit none
 
-    class(json_core),intent(in)          :: json
+    class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p        !! JSON object
     type(json_value),pointer,intent(out) :: tail     !! pointer to tail
 
-    tail => p%tail
+    if (associated(p)) then
+        tail => p%tail
+    else
+        call json%throw_exception('Error in json_get_tail: '//&
+                                  'pointer is not associated.')
+    end if
 
     end subroutine json_get_tail
 !*****************************************************************************************
@@ -2800,6 +2828,29 @@
     end if
 
     end subroutine json_value_get_by_index
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns pointer to the first child of the object
+!  (or null() if it is not associated).
+
+    subroutine json_value_get_child(json, p, child)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p      !! object or array JSON data
+    type(json_value),pointer            :: child  !! pointer to the child
+
+    if (associated(p)) then
+        child => p%children
+    else
+        call json%throw_exception('Error in json_value_get_child: '//&
+                                  'pointer is not associated.')
+    end if
+
+    end subroutine json_value_get_child
 !*****************************************************************************************
 
 !*****************************************************************************************
