@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [5.0.0 (2016-05-09)](#500-2016-05-09)
     - [4.3.0 (2015-12-05)](#430-2015-12-05)
     - [4.2.0 (2015-08-03)](#420-2015-08-03)
     - [4.1.1 (2015-05-27)](#411-2015-05-27)
@@ -16,7 +17,41 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.3.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.0...HEAD)
+
+### [5.0.0](https://github.com/jacobwilliams/json-fortran/tree/5.0.0) (2016-05-09)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.3.0...5.0.0)
+or [Download v5.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.0)
+
+See also [this Wiki page](https://github.com/jacobwilliams/json-fortran/wiki/5.0-Changes) on how to update your code to be compatible with this release.
+
+**Enhancements:**
+
+- Split `json_module` into multiple files. [\#168](https://github.com/jacobwilliams/json-fortran/issues/168) [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- The library is now thread safe [\#36](https://github.com/jacobwilliams/json-fortran/issues/36) [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `initialize()`, `failed()`, `print_error_message()`, `check_to_errors()`, and `clear_exceptions()` to the `json_file` class. [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- The number of spaces for indenting can now be user specified. [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- Updates for Visual Studio project [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a `validate()` method for validating JSON linked lists [\#196](https://github.com/jacobwilliams/json-fortran/issues/196) [\#197](https://github.com/jacobwilliams/json-fortran/pull/197) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added some additional error checks for malformed JSON linked lists [\#182](https://github.com/jacobwilliams/json-fortran/pull/182) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a new routine `is_child_of` to check if one `json_value` is a descendant of another [\#182](https://github.com/jacobwilliams/json-fortran/pull/182) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new options for case-insensitive searching of names/paths, as well as the option to consider trailing space significant [\#185](https://github.com/jacobwilliams/json-fortran/issues/185) [\#192](https://github.com/jacobwilliams/json-fortran/pull/192) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a routine to enable swapping of elements in a `json_value` linked list [\#177](https://github.com/jacobwilliams/json-fortran/issues/177) [\#182](https://github.com/jacobwilliams/json-fortran/pull/182) ([jacobwilliams](https://github.com/jacobwilliams))
+- Rename parameters `RK`, `IK`, `LK`, `CK`, and `CDK` using less generic names (`json_RK`, `json_IK`, `json_LK`, `json_CK`, and `json_CDK`) [\#172](https://github.com/jacobwilliams/json-fortran/issues/172) ([jacobwilliams](https://github.com/jacobwilliams))
+- Calling the `initialize()` method (which is now in `json_core` and    `json_file`) is no longer mandatory [\#171](https://github.com/jacobwilliams/json-fortran/issues/171) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a `rename()` method for renaming a `json_value` variable [\#184](https://github.com/jacobwilliams/json-fortran/issues/184) [\#187](https://github.com/jacobwilliams/json-fortran/pull/187) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added some compiler directives so that workarounds for Gfortran bugs are not used for other compilers [\#190](https://github.com/jacobwilliams/json-fortran/issues/190) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added option for strict typing for `get` routines [\#173](https://github.com/jacobwilliams/json-fortran/issues/173) ([jacobwilliams](https://github.com/jacobwilliams))
+- Various cosmetic changes and renaming of some of the dummy arguments in some procedures. [\#198](https://github.com/jacobwilliams/json-fortran/pull/198) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added checks to avoid unnecessary looping when traversing arrays if an exception is thrown [\#183](https://github.com/jacobwilliams/json-fortran/pull/183) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a new `get_child` method to get the first child. [9d4f736] ([jacobwilliams](https://github.com/jacobwilliams))
+- Added some additional error checks for unassociated pointers [9d4f736] ([jacobwilliams](https://github.com/jacobwilliams))
+- Ensure null pointers are returned for some error cases [838f476] ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed Issues**
+
+- Fixed a bug in the `traverse()` routine, where the `finished` output flag was not being correctly checked [\#182](https://github.com/jacobwilliams/json-fortran/pull/182) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [4.3.0](https://github.com/jacobwilliams/json-fortran/tree/4.3.0) (2015-12-05)
 
