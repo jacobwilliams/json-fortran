@@ -343,8 +343,8 @@ echo ""
 if [[ $JF_SKIP_DOCS != [yY]* ]]; then
     if hash ford 2>/dev/null; then
     echo "Building documentation..."
-    [[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG="-m USE_UCS4"
-    ford $MACRO_FLAG -p $PAGESDIR $FORDMD
+    [[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG=("-m" "USE_UCS4")
+    ford --debug "${MACRO_FLAG[@]}" -p "$PAGESDIR" "$FORDMD"
     else
     echo "FORD not found! Install using: sudo pip install ford"
     fi
