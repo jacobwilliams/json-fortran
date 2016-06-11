@@ -163,6 +163,13 @@ if ( NOT SKIP_DOC_GEN )
     else ()
       set ( MACRO_FLAG "" )
     endif ()
+    # Pick the preprocessor to use based on the Fortran compiler
+    if ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel" )
+      set ( FPP "fpp\n" )
+    else ()
+      set ( FPP "gfortran -E\n" ) # default to gfortran -E for gfortran and unsupported compilers
+    endif ()
+    file ( WRITE "${CMAKE_BINARY_DIR}/preprocessor-def.md" "${FPP}" )
     # Dynamically generate the FORD outputs list
     message ( STATUS "Dynamically computing FORD output information..." )
     if ( NOT (DEFINED FORD_OUTPUTS_CACHED) )

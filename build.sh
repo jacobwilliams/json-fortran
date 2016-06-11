@@ -78,7 +78,7 @@ BINDIR='./bin/'                 # build directory for unit tests
 LIBDIR='./lib/'                 # build directory for library
 MODCODE='json_module.F90'       # json module file name
 LIBOUT='libjsonfortran.a'       # name of json library
-
+FPP="gfortran -E"               # default to gfortran -E pre-processing
 
 # The following warning might be triggered by ifort unless explicitly silenced:
 # warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure name. (R1214.4).
@@ -122,11 +122,13 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
         intel|Intel|INTEL|ifort)
             FCOMPILER='Intel'
             FCOMPILERFLAGS="$INTELCOMPILERFLAGS"
+	    FPP="fpp"
             shift
             ;;
         gnu|Gnu|GNU|gfortran|Gfortran|GFortran|GFORTRAN)
             FCOMPILER='gnu'
             FCOMPILERFLAGS="$GNUCOMPILERFLAGS"
+	    FPP="gfortran -E"
             shift
             ;;
         *)
@@ -134,6 +136,7 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
             echo "Warning: Trying to build with unsupported compiler, $2." 1>&2
             echo "Please ensure you set appropriate --cflags and (single) quote them" 1>&2
             FC="$2"
+	    FPP="gfortran -E" # try gfortran to preprocess as a default
             shift
             ;;
         esac
@@ -344,6 +347,7 @@ if [[ $JF_SKIP_DOCS != [yY]* ]]; then
     if hash ford 2>/dev/null; then
     echo "Building documentation..."
     [[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG=("-m" "USE_UCS4")
+    echo "$FPP" > preprocessor-def.md # Override via include in project file, until FORD gets CLI for this
     ford --debug "${MACRO_FLAG[@]}" -p "$PAGESDIR" "$FORDMD"
     else
     echo "FORD not found! Install using: sudo pip install ford"
