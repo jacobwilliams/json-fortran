@@ -1,5 +1,6 @@
 ---
 project: JSON-Fortran
+preprocessor: {!preprocessor-def.md!}
 favicon: ./media/json-fortran-32x32.png
 project_dir: ./src
 output_dir: ./doc
