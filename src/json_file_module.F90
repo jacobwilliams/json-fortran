@@ -61,16 +61,15 @@
 
         private
 
-        type(json_core),public :: core !! The instance of the [[json_core]]
-                                       !! factory used for this file.
-                                       !! Note that this is public, so it can
-                                       !! also be used by the user.
-
+        type(json_core) :: core !! The instance of the [[json_core]] factory used for this file.
         type(json_value),pointer :: p => null()  !! the JSON structure read from the file
 
     contains
 
-        procedure,public :: initialize => initialize_json_core_in_file
+        generic,public :: initialize => initialize_json_core_in_file,&
+                                        set_json_core_in_file
+
+        procedure,public :: get_core => get_json_core_in_file
 
         procedure,public :: load_file => json_file_load
 
@@ -112,8 +111,19 @@
                                     json_file_update_string_val_ascii
 #endif
 
+        !traverse
+        procedure,public :: traverse => json_file_traverse
+
+        ! ***************************************************
+        ! private routines
+        ! ***************************************************
+
         !load from string:
         procedure :: MAYBEWRAP(json_file_load_from_string)
+
+        !initialize
+        procedure :: initialize_json_core_in_file
+        procedure :: set_json_core_in_file
 
         !git info:
         procedure :: MAYBEWRAP(json_file_variable_info)
@@ -144,9 +154,6 @@
         procedure :: json_file_print_to_console
         procedure :: json_file_print_1
         procedure :: json_file_print_2
-
-        !traverse
-        procedure,public :: traverse => json_file_traverse
 
     end type json_file
     !*********************************************************
@@ -287,6 +294,44 @@
                             case_sensitive_keys)
 
     end subroutine initialize_json_core_in_file
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Set the [[json_core]] for this [[json_file]].
+!
+!@note: This does not destroy the data in the file.
+!
+!@note: This one is used if you want to initialize the file with
+!       an already-existing [[json_core]] (presumably, this was already
+!       initialized by a call to [[initialize_json_core]] or similar).
+
+    subroutine set_json_core_in_file(me,core)
+
+    implicit none
+
+    class(json_file),intent(inout) :: me
+    type(json_core),intent(in)     :: core
+
+    me%core = core
+
+    end subroutine set_json_core_in_file
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Get a copy of the [[json_core]] in this [[json_file]].
+
+    subroutine get_json_core_in_file(me,core)
+
+    implicit none
+
+    class(json_file),intent(in) :: me
+    type(json_core),intent(out) :: core
+
+    core = me%core
+
+    end subroutine get_json_core_in_file
 !*****************************************************************************************
 
 !*****************************************************************************************
