@@ -14,6 +14,7 @@ module jf_test_14_mod
     character(len=*),parameter :: dir = '../files/inputs/'  !! working directory
     character(len=*),parameter :: filename1 = 'test1.json'  !! the file to read
     integer :: icount = 0  !! a count of the number of "name" variables found
+    character(len=:),allocatable :: new_name  !! name to change to
 
 contains
 
@@ -29,6 +30,7 @@ contains
 
     type(json_core) :: json
     type(json_value),pointer  :: p
+    type(json_file) :: f
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -37,7 +39,9 @@ contains
     write(error_unit,'(A)') ''
 
     error_cnt = 0
+
     icount = 0 !number of name changes (should be 2)
+    new_name = 'Fred'  !change all names to this
 
     call json%initialize() !initialize the module
 
@@ -60,7 +64,7 @@ contains
 
     if (error_cnt==0) then
         write(error_unit,'(A)') ''
-        write(error_unit,'(A)') ' All names changed to Fred:'
+        write(error_unit,'(A)') ' All names changed to '//new_name//':'
         write(error_unit,'(A)') ''
         call json%print(p,output_unit)
         write(error_unit,'(A)') ''
@@ -69,6 +73,40 @@ contains
     call json%destroy(p)  !clean up
     if (json%failed()) then
         call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+
+    ! now, test traversal from a json_file:
+    new_name = 'Bob'
+    icount = 0
+    call f%initialize()
+    call f%load_file(dir//filename1)  !read the file
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call f%traverse(rename) !traverse all nodes in the structure
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+
+    if (icount/=2) then
+        write(error_unit,'(A)') 'Error: should be 2 "name" variables in this file: '//filename1
+        error_cnt = error_cnt + 1
+    end if
+
+    if (error_cnt==0) then
+        write(error_unit,'(A)') ''
+        write(error_unit,'(A)') ' All names changed to '//new_name//':'
+        write(error_unit,'(A)') ''
+        call f%print_file(output_unit)
+        write(error_unit,'(A)') ''
+    end if
+
+    call f%destroy()  ! clean up
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 
@@ -91,9 +129,9 @@ contains
 
     !it must be a string named "name":
     if (var_type==json_string .and. str=='name') then
-        call json%get(p,'@',str)             ! get original name
-        call json%update(p,'@','Fred',found) ! change it
-        write(error_unit,'(A)') str//' name changed'
+        call json%get(p,'@',str)               ! get original name
+        call json%update(p,'@',new_name,found) ! change it
+        write(error_unit,'(A)') str//' name changed to '//new_name
         icount = icount + 1
     end if
 
