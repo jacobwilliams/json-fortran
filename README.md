@@ -114,7 +114,7 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 5.0.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 5.0.1 REQUIRED )
 include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
@@ -122,7 +122,7 @@ foreach ( UNIT_TEST ${JF_TEST_SRCS} )
   get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
   add_executable ( ${TEST} ${UNIT_TEST} )
   target_link_libraries ( ${TEST} jsonfortran-static )
-  # or for linking against the dynamic/shareed library:
+  # or for linking against the dynamic/shared library:
   # target_link_libraries ( ${TEST} jsonfortran ) # instead
 endforeach()
 ```

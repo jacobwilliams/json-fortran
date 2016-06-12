@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [5.0.1 (2016-06-11)](#501-2016-06-11)
     - [5.0.0 (2016-05-09)](#500-2016-05-09)
     - [4.3.0 (2015-12-05)](#430-2015-12-05)
     - [4.2.0 (2015-08-03)](#420-2015-08-03)
@@ -17,7 +18,23 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.1...HEAD)
+
+### [5.0.1](https://github.com/jacobwilliams/json-fortran/tree/5.0.1) (2016-06-11)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.0...5.0.1)
+or [Download v5.0.1](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.1)
+
+*Note: This release contains no changes to the library, only the build system and documentation.*
+
+**Fixed issues:**
+
+- FORD now uses the Intel preprocessor when library is built with the Intel compiler [\#205](https://github.com/jacobwilliams/json-fortran/issues/205)
+- ShellCheck script files [\#181](https://github.com/jacobwilliams/json-fortran/issues/181)
+
+**Merged pull requests:**
+
+- De-lint shell scripts with ShellCheck, debug FORD upgrade, and various updates to documentation and build system.  [\#201](https://github.com/jacobwilliams/json-fortran/pull/201) ([zbeekman](https://github.com/zbeekman))
 
 ### [5.0.0](https://github.com/jacobwilliams/json-fortran/tree/5.0.0) (2016-05-09)
 
