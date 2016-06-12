@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [5.0.2 (2016-06-11)](#502-2016-06-11)
     - [5.0.1 (2016-06-11)](#501-2016-06-11)
     - [5.0.0 (2016-05-09)](#500-2016-05-09)
     - [4.3.0 (2015-12-05)](#430-2015-12-05)
@@ -18,7 +19,14 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.1...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.2...HEAD)
+
+### [5.0.2](https://github.com/jacobwilliams/json-fortran/tree/5.0.2) (2016-06-11)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.1...5.0.2)
+or [Download v5.0.2](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.2)
+
+Minor documentation fix.
 
 ### [5.0.1](https://github.com/jacobwilliams/json-fortran/tree/5.0.1) (2016-06-11)
 
