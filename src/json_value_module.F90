@@ -565,7 +565,7 @@
     !*************************************************************************************
     abstract interface
 
-        subroutine array_callback_func(json, element, i, count)
+        subroutine json_array_callback_func(json, element, i, count)
             !! Array element callback function.  Used by [[json_get_array]]
             import :: json_value,json_core,IK
             implicit none
@@ -573,18 +573,20 @@
             type(json_value),pointer,intent(in)  :: element
             integer(IK),intent(in)               :: i        !! index
             integer(IK),intent(in)               :: count    !! size of array
-        end subroutine array_callback_func
+        end subroutine json_array_callback_func
 
-        subroutine traverse_callback_func(json,p,finished)
+        subroutine json_traverse_callback_func(json,p,finished)
             !! Callback function used by [[json_traverse]]
             import :: json_value,json_core,LK
             implicit none
             class(json_core),intent(inout)      :: json
             type(json_value),pointer,intent(in) :: p
             logical(LK),intent(out)             :: finished  !! set true to stop traversing
-        end subroutine traverse_callback_func
+        end subroutine json_traverse_callback_func
 
     end interface
+    public :: json_array_callback_func
+    public :: json_traverse_callback_func
     !*************************************************************************************
 
     contains
@@ -4487,7 +4489,7 @@
 
 !*****************************************************************************************
 !>
-!  This routine calls the user-supplied [[array_callback_func]] subroutine
+!  This routine calls the user-supplied [[json_array_callback_func]] subroutine
 !      for each element in the array.
 !
 !@note For integer, double, logical, and character arrays,
@@ -4500,7 +4502,7 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
-    procedure(array_callback_func)      :: array_callback
+    procedure(json_array_callback_func) :: array_callback
 
     type(json_value),pointer :: element !! temp variable for getting elements
     integer(IK) :: i      !! counter
@@ -4542,16 +4544,16 @@
 !  date: 4/28/2016
 !
 !  Traverse a JSON structure.
-!  This routine calls the user-specified [[traverse_callback_func]]
+!  This routine calls the user-specified [[json_traverse_callback_func]]
 !  for each element of the structure.
 
     subroutine json_traverse(json,p,traverse_callback)
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer,intent(in) :: p
-    procedure(traverse_callback_func)   :: traverse_callback
+    class(json_core),intent(inout)         :: json
+    type(json_value),pointer,intent(in)    :: p
+    procedure(json_traverse_callback_func) :: traverse_callback
 
     logical(LK) :: finished !! can be used to stop the process
 
@@ -4613,7 +4615,7 @@
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
     character(kind=CK,len=*),intent(in) :: path
-    procedure(array_callback_func)      :: array_callback
+    procedure(json_array_callback_func) :: array_callback
     logical(LK),intent(out),optional    :: found
 
     type(json_value),pointer :: p
@@ -4658,7 +4660,7 @@
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: me
     character(kind=CDK,len=*),intent(in) :: path
-    procedure(array_callback_func)       :: array_callback
+    procedure(json_array_callback_func)  :: array_callback
     logical(LK),intent(out),optional     :: found
 
     call json%get(me, to_unicode(path), array_callback, found)
