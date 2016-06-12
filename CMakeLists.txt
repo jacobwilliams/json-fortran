@@ -163,13 +163,20 @@ if ( NOT SKIP_DOC_GEN )
     else ()
       set ( MACRO_FLAG "" )
     endif ()
+    # Pick the preprocessor to use based on the Fortran compiler
+    if ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel" )
+      set ( FPP "fpp\n" )
+    else ()
+      set ( FPP "gfortran -E\n" ) # default to gfortran -E for gfortran and unsupported compilers
+    endif ()
+    file ( WRITE "${CMAKE_BINARY_DIR}/preprocessor-def.md" "${FPP}" )
     # Dynamically generate the FORD outputs list
     message ( STATUS "Dynamically computing FORD output information..." )
     if ( NOT (DEFINED FORD_OUTPUTS_CACHED) )
       message ( STATUS "Running FORD to dynamically compute documentation outputs, this could take a while..." )
       execute_process ( COMMAND ${CMAKE_COMMAND} -E remove_directory ${DOC_DIR}
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${DOC_DIR}
-	COMMAND "${FORD}" -q ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${PAGE_DIR}" "${FORD_PROJECT_FILE}" OUTPUT_QUIET )
+	COMMAND "${FORD}" --debug -q ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${PAGE_DIR}" "${FORD_PROJECT_FILE}" OUTPUT_QUIET )
     else ()
       message ( STATUS "Re-using cached FORD outputs, rather than regenerating them" )
     endif ()
@@ -190,7 +197,7 @@ if ( NOT SKIP_DOC_GEN )
       list ( APPEND FORD_DEPENDS "${DOC_SRC_FILE}" )
     endforeach ()
     add_custom_command ( OUTPUT ${FORD_OUTPUTS_CACHED}
-      COMMAND "${FORD}" ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${CMAKE_SOURCE_DIR}/pages" "${FORD_PROJECT_FILE}"
+      COMMAND "${FORD}" --debug ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${CMAKE_SOURCE_DIR}/pages" "${FORD_PROJECT_FILE}"
       MAIN_DEPENDENCY "${FORD_PROJECT_FILE}"
       DEPENDS ${FORD_DEPENDS}
       COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using FORD" )

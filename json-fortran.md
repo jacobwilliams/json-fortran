@@ -1,5 +1,6 @@
 ---
 project: JSON-Fortran
+preprocessor: {!preprocessor-def.md!}
 favicon: ./media/json-fortran-32x32.png
 project_dir: ./src
 output_dir: ./doc
@@ -20,6 +21,9 @@ display: public
          private
 source: true
 graph: true
+coloured_edges: true
+print_creation_date: true
+creation_date: %Y-%m-%d %H:%M %z
 exclude_dir: tests
 extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
 md_extensions: markdown.extensions.toc(anchorlink=False)

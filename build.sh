@@ -59,13 +59,13 @@
 #
 #  REQUIRES
 #    FoBiS.py : https://github.com/szaghi/FoBiS      [version 1.2.5 or later required]
-#    FORD     : https://github.com/cmacmackin/ford   [version 3.0.2 is the one tested]
+#    FORD     : https://github.com/cmacmackin/ford   [version 4.0.0 or later]
 #
 #  AUTHOR
 #    Jacob Williams : 12/27/2014
 #
 
-set -e
+set -o errexit
 
 FORDMD='json-fortran.md'        # FORD options file for building documentation
 DOCDIR='./doc/'                 # build directory for documentation
@@ -78,7 +78,7 @@ BINDIR='./bin/'                 # build directory for unit tests
 LIBDIR='./lib/'                 # build directory for library
 MODCODE='json_module.F90'       # json module file name
 LIBOUT='libjsonfortran.a'       # name of json library
-
+FPP="gfortran -E"               # default to gfortran -E pre-processing
 
 # The following warning might be triggered by ifort unless explicitly silenced:
 # warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure name. (R1214.4).
@@ -97,7 +97,7 @@ FCOMPILER='gnu' #Set default compiler to gfortran
 #       e.g., "./build.sh --compiler intel --coverage no --compiler gnu --coverage" will
 #       perform the build with the GFORTRAN compiler, and coverage analysis
 
-script_name="$(basename $0)"
+script_name="$(basename "$0")"
 
 # usage message
 print_usage () {
@@ -122,11 +122,13 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
         intel|Intel|INTEL|ifort)
             FCOMPILER='Intel'
             FCOMPILERFLAGS="$INTELCOMPILERFLAGS"
+	    FPP="fpp"
             shift
             ;;
         gnu|Gnu|GNU|gfortran|Gfortran|GFortran|GFORTRAN)
             FCOMPILER='gnu'
             FCOMPILERFLAGS="$GNUCOMPILERFLAGS"
+	    FPP="gfortran -E"
             shift
             ;;
         *)
@@ -134,6 +136,7 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
             echo "Warning: Trying to build with unsupported compiler, $2." 1>&2
             echo "Please ensure you set appropriate --cflags and (single) quote them" 1>&2
             FC="$2"
+	    FPP="gfortran -E" # try gfortran to preprocess as a default
             shift
             ;;
         esac
@@ -213,7 +216,7 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
             shift
             ;;
         no|No|NO)
-            JF_SKIP_DOCSS="no"
+            JF_SKIP_DOCS="no"
             shift
             ;;
         *)
@@ -226,7 +229,7 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
         exit 0
         ;;
     --clean)
-        rm -r src{,/tests}/*.o $DOCDIR* $LIBDIR* $BINDIR* *.gcov*
+        rm -r -- src{,/tests}/*.o $DOCDIR* $LIBDIR* $BINDIR* *.gcov*
         ;;
     *)
         echo "Unknown flag, \"$1\", passed to ${script_name}!" 2>&1
@@ -254,12 +257,12 @@ fi
 
 if [[ $FCOMPILER == custom ]]; then
     echo "Trying to compile with custom compiler, $FC"
-    CUSTOM="-fc $FC"
+    CUSTOM=("-fc" "$FC")
 fi
 
 if [[ $TRY_UNICODE == [yY]* ]]; then
     echo "Trying to compile library with Unicode/UCS4 support"
-    FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS}" -dbld "${BINDIR}" -s "${INTROSPECDIR}" -dmod ./ -dobj ./ -t ${UCS4TESTCODE} -o ${UCS4TESTCODE%.f90} -colors
+    FoBiS.py build -ch -compiler "${FCOMPILER}" "${CUSTOM[@]}" -cflags "${FCOMPILERFLAGS}" -dbld "${BINDIR}" -s "${INTROSPECDIR}" -dmod ./ -dobj ./ -t "${UCS4TESTCODE}" -o "${UCS4TESTCODE%.f90}" -colors
     if "${BINDIR}/${UCS4TESTCODE%.f90}"; then
     DEFINES="-DUSE_UCS4 -Wunused-function"
     fi
@@ -269,7 +272,7 @@ fi
 echo ""
 echo "Building library..."
 
-FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
+FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
 
 #build the unit tests (uses the above library):
 if [[ $JF_SKIP_TESTS != [yY]* ]]; then
@@ -282,7 +285,7 @@ if [[ $JF_SKIP_TESTS != [yY]* ]]; then
     for TEST in "${TESTDIR%/}"/jf_test_*.[fF]90; do
     THIS_TEST=${TEST##*/}
     echo "Build ${THIS_TEST%.[fF]90}"
-    FoBiS.py build -ch -compiler ${FCOMPILER} ${CUSTOM} -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${BINDIR} -s ${TESTDIR} -i ${LIBDIR} -libs ${LIBDIR}/${LIBOUT} -dmod ./ -dobj ./ -t ${THIS_TEST} -o ${THIS_TEST%.[fF]90} -colors
+    FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld "${BINDIR}" -s "${TESTDIR}" -i "${LIBDIR}" -libs "${LIBDIR}/${LIBOUT}" -dmod ./ -dobj ./ -t "${THIS_TEST}" -o "${THIS_TEST%.[fF]90}" -colors
     done
 else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."
@@ -292,17 +295,17 @@ fi
 echo ""
 if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
     echo "Running tests..."
-    cd "$BINDIR"
     OLD_IGNORES="$GLOBIGNORE"
+    # run next commands in subshell to avoid `cd -`
+    (cd "$BINDIR"
     GLOBIGNORE='*.*'
     #
     for TEST in jf_test_*; do
         # It would be nice to run json output printed to stdout through jsonlint, however,
         # some tests output more than one json structure and these need to be split
         echo "Running ${TEST}"
-        ./${TEST}
-    done
-    cd -
+        "./${TEST}"
+    done)
     GLOBIGNORE="$OLD_IGNORES"
     if [[ $CODE_COVERAGE = [yY]* ]] ; then
         for SRCFILE in json_string_utilities.F90 json_value_module.F90 json_file_module.F90 ; do
@@ -343,8 +346,9 @@ echo ""
 if [[ $JF_SKIP_DOCS != [yY]* ]]; then
     if hash ford 2>/dev/null; then
     echo "Building documentation..."
-    [[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG="-m USE_UCS4"
-    ford $MACRO_FLAG -p $PAGESDIR $FORDMD
+    [[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG=("-m" "USE_UCS4")
+    echo "$FPP" > preprocessor-def.md # Override via include in project file, until FORD gets CLI for this
+    ford --debug "${MACRO_FLAG[@]}" -p "$PAGESDIR" "$FORDMD"
     else
     echo "FORD not found! Install using: sudo pip install ford"
     fi
