@@ -144,7 +144,7 @@ via [PR \#144](https://github.com/jacobwilliams/json-fortran/pull/144) from  ([j
   [PR \#124](https://github.com/jacobwilliams/json-fortran/pull/124)
   from [zbeekman](https://github.com/zbeekman)
 - Migrate to
-  [Codecov.io](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
+  [Codecov.io](https://codecov.io/gh/jacobwilliams/json-fortran)
   [\#106](https://github.com/jacobwilliams/json-fortran/issues/106)
   via [PR \#107](https://github.com/jacobwilliams/json-fortran/pull/107)
   from [zbeekman](https://github.com/zbeekman)

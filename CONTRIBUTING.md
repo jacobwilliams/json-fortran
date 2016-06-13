@@ -36,7 +36,7 @@ Looking to contribute something to [JSON-Fortran](https://github.com/jacobwillia
   contribute. Please take a look at
   [the test coverage page](http://jacobwilliams.github.io/json-fortran/page/development-resources/json_module.F90.gcov.html)
   for a list of uncovered procedures, and at the
-  [Codecov.io suggestions page](https://codecov.io/github/jacobwilliams/json-fortran/features/suggestions)
+  [Codecov.io coverage status](https://codecov.io/gh/jacobwilliams/json-fortran)
   to find procedures and lines of code that are still uncovered by the
   [unit tests](https://github.com/jacobwilliams/json-fortran/tree/master/src/tests). It
   is worth pointing out that the majority of uncovered procedures are
@@ -44,7 +44,7 @@ Looking to contribute something to [JSON-Fortran](https://github.com/jacobwillia
   the corresponding generic procedure with input arguments that will
   resolve to the specific procedure in question. Let's keep the
   following graph trending upwards!
-  ![Codecov.io](https://codecov.io/github/jacobwilliams/json-fortran/branch.svg?branch=master)
+  ![Codecov.io](https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graphs/commits.svg)
 
 [top](#contributing-to-json-fortran)
 ## Pull Requests
