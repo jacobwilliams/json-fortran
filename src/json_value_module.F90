@@ -505,6 +505,12 @@
         generic,public :: rename => MAYBEWRAP(json_value_rename)
         procedure :: MAYBEWRAP(json_value_rename)
 
+        !>
+        !  get info about a json_value
+        generic,public :: info => json_info, MAYBEWRAP(json_info_by_path)
+        procedure :: json_info
+        procedure :: MAYBEWRAP(json_info_by_path)
+
         procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
@@ -515,7 +521,6 @@
         procedure,public :: get_next            => json_get_next            !! get pointer to json_value next
         procedure,public :: get_previous        => json_get_previous        !! get pointer to json_value previous
         procedure,public :: get_tail            => json_get_tail            !! get pointer to json_value tail
-        procedure,public :: info                => json_info                !! get info about a json_value
         procedure,public :: initialize          => json_initialize          !! to initialize some parsing parameters
         procedure,public :: traverse            => json_traverse            !! to traverse all elements of a JSON structure
         procedure,public :: print_error_message => json_print_error_message !! simply routine to print error messages
@@ -977,6 +982,177 @@
     end if
 
     end subroutine json_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!
+!  Returns information about a [[json_value]], given the path.
+!
+!### See also
+!  * [[json_info]]
+
+    subroutine json_info_by_path(json,p,path,found,var_type,n_children,name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p          !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path       !! path to the variable
+    logical(LK),intent(out),optional     :: found      !! true if it was found
+    integer(IK),intent(out),optional     :: var_type   !! variable type
+    integer(IK),intent(out),optional     :: n_children !! number of children
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    type(json_value),pointer :: p_var
+    logical(LK) :: p_var_found
+
+    call json%get(p,path,p_var,found)
+
+    !check if it was found:
+    if (present(found)) then
+        if (.not. found) then
+            if (present(var_type))   var_type   = json_unknown
+            if (present(n_children)) n_children = 0
+            if (present(name))       name       = ''
+            return
+        end if
+    else
+        if (json%failed()) return
+    end if
+
+    !get info:
+    call json%info(p_var,var_type,n_children,name)
+
+    end subroutine json_info_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_info_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_info_by_path(json,p,path,found,var_type,n_children,name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p          !! a JSON linked list
+    character(kind=CDK,len=*),intent(in) :: path       !! path to the variable
+    logical(LK),intent(out),optional     :: found      !! true if it was found
+    integer(IK),intent(out),optional     :: var_type   !! variable type
+    integer(IK),intent(out),optional     :: n_children !! number of children
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    call json%info(p,to_unicode(path),found,var_type,n_children,name)
+
+    end subroutine wrap_json_info_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 10/16/2015
+!
+!  Alternate version of [[json_info]] that returns matrix
+!  information about a [[json_value]].
+!
+!  A [[json_value]] is a valid rank 2 matrix if all of the following are true:
+!
+!  * The var_type is *json_array*
+!  * Each child is also a *json_array*, each of which has the same number of elements
+!  * Each individual element has the same variable type (integer, logical, etc.)
+!
+!  The idea here is that if it is a valid matrix, it can be interoperable with
+!  a Fortran rank 2 array of the same type.
+!
+!# Example
+!
+!  The following example is an array with `var_type=json_integer`, `n_sets=3`, and `set_size=4`
+!
+!```json
+!    {
+!        "matrix": [
+!            [1,2,3,4],
+!            [5,6,7,8],
+!            [9,10,11,12]
+!        ]
+!    }
+!```
+
+    subroutine json_matrix_info(json,p,is_matrix,var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_core),intent(inout)   :: json
+    type(json_value),pointer         :: p          !! a JSON linked list
+    logical(LK),intent(out)          :: is_matrix  !! true if it is a valid matrix
+    integer(IK),intent(out),optional :: var_type   !! variable type (if all elements have the same type)
+    integer(IK),intent(out),optional :: n_sets     !! number of data sets (i.e., matrix rows if using row-major order)
+    integer(IK),intent(out),optional :: set_size   !! size of each data set (i.e., matrix cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    type(json_value),pointer :: p_row       !! for getting a set
+    type(json_value),pointer :: p_element   !! for getting an element in a set
+    integer(IK) :: vartype         !! json variable type of `p`
+    integer(IK) :: row_vartype     !! json variable type of a row
+    integer(IK) :: element_vartype !! json variable type of an element in a row
+    integer(IK) :: nr              !! number of children of `p`
+    integer(IK) :: nc              !! number of elements in first child of `p`
+    integer(IK) :: icount          !! number of elements in a set
+    integer     :: i               !! counter
+    integer     :: j               !! counter
+
+    !get info about the variable:
+    call json%info(p,vartype,nr,name)  !name is set here if present
+
+    is_matrix = (vartype==json_array)
+
+    if (is_matrix) then
+
+        main : do i=1,nr
+
+            call json%get_child(p,i,p_row)
+            call json%info(p_row,var_type=row_vartype,n_children=icount)
+
+            if (row_vartype==json_array) then
+                if (i==1) nc = icount  !number of columns in first row
+                if (icount==nc) then   !make sure each row has the same number of columns
+                    !see if all the variables in this row are the same type:
+                    do j=1,icount
+                        call json%get_child(p_row,j,p_element)
+                        call json%info(p_element,var_type=element_vartype)
+                        if (i==1 .and. j==1) vartype = element_vartype  !type of first element in the row
+                        if (vartype/=element_vartype) then
+                            !not all variables are the same time
+                            is_matrix = .false.
+                            exit main
+                        end if
+                    end do
+                else
+                    is_matrix = .false.
+                    exit main
+                end if
+            else
+                is_matrix = .false.
+                exit main
+            end if
+
+        end do main
+
+    end if
+
+    if (is_matrix) then
+        if (present(var_type)) var_type = vartype
+        if (present(n_sets))   n_sets   = nr
+        if (present(set_size)) set_size = nc
+    else
+        if (present(var_type)) var_type = json_unknown
+        if (present(n_sets))   n_sets   = 0
+        if (present(set_size)) set_size = 0
+    end if
+
+    nullify(p_row)
+    nullify(p_element)
+
+    end subroutine json_matrix_info
 !*****************************************************************************************
 
 !*****************************************************************************************
