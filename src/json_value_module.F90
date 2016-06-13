@@ -990,6 +990,10 @@
 !
 !### See also
 !  * [[json_info]]
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
 
     subroutine json_info_by_path(json,p,path,found,var_type,n_children,name)
 
@@ -1006,18 +1010,26 @@
     type(json_value),pointer :: p_var
     logical(LK) :: p_var_found
 
-    call json%get(p,path,p_var,found)
+    nullify(p_var)
+    call json%get(p,path,p_var,p_var_found)
 
     !check if it was found:
     if (present(found)) then
+        found = p_var_found
         if (.not. found) then
+            if (present(var_type))   var_type   = json_unknown
+            if (present(n_children)) n_children = 0
+            if (present(name))       name       = ''
+            call json%clear_exceptions()
+            return
+        end if
+    else
+        if (json%failed()) then
             if (present(var_type))   var_type   = json_unknown
             if (present(n_children)) n_children = 0
             if (present(name))       name       = ''
             return
         end if
-    else
-        if (json%failed()) return
     end if
 
     !get info:
