@@ -164,6 +164,6 @@ Miscellaneous
 * For more information about JSON, see: <http://www.json.org/>
 * [json-fortran on Travis CI](https://travis-ci.org/jacobwilliams/json-fortran)
 * [json-fortran on Waffle.IO](https://waffle.io/jacobwilliams/json-fortran)
-* [json-fortran on Codecov.IO](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
+* [json-fortran on Codecov.IO](https://codecov.io/gh/jacobwilliams/json-fortran)
 
 [top](#json-fortran)
