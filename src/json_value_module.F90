@@ -506,10 +506,16 @@
         procedure :: MAYBEWRAP(json_value_rename)
 
         !>
-        !  get info about a json_value
+        !  get info about a [[json_value]]
         generic,public :: info => json_info, MAYBEWRAP(json_info_by_path)
         procedure :: json_info
         procedure :: MAYBEWRAP(json_info_by_path)
+
+        !>
+        !  get matrix info about a [[json_value]]
+        generic,public :: matrix_info => json_matrix_info, MAYBEWRAP(json_matrix_info_by_path)
+        procedure :: json_matrix_info
+        procedure :: MAYBEWRAP(json_matrix_info_by_path)
 
         procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
@@ -1008,32 +1014,25 @@
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
     type(json_value),pointer :: p_var
-    logical(LK) :: p_var_found
+    logical(LK) :: ok
 
-    nullify(p_var)
-    call json%get(p,path,p_var,p_var_found)
+    call json%get(p,path,p_var,found)
 
     !check if it was found:
     if (present(found)) then
-        found = p_var_found
-        if (.not. found) then
-            if (present(var_type))   var_type   = json_unknown
-            if (present(n_children)) n_children = 0
-            if (present(name))       name       = ''
-            call json%clear_exceptions()
-            return
-        end if
+        ok = found
     else
-        if (json%failed()) then
-            if (present(var_type))   var_type   = json_unknown
-            if (present(n_children)) n_children = 0
-            if (present(name))       name       = ''
-            return
-        end if
+        ok = .not. json%failed()
     end if
 
-    !get info:
-    call json%info(p_var,var_type,n_children,name)
+    if (.not. ok) then
+        if (present(var_type))   var_type   = json_unknown
+        if (present(n_children)) n_children = 0
+        if (present(name))       name       = ''
+    else
+        !get info:
+        call json%info(p_var,var_type,n_children,name)
+    end if
 
     end subroutine json_info_by_path
 !*****************************************************************************************
@@ -1096,7 +1095,7 @@
     class(json_core),intent(inout)   :: json
     type(json_value),pointer         :: p          !! a JSON linked list
     logical(LK),intent(out)          :: is_matrix  !! true if it is a valid matrix
-    integer(IK),intent(out),optional :: var_type   !! variable type (if all elements have the same type)
+    integer(IK),intent(out),optional :: var_type   !! variable type of data in the matrix (if all elements have the same type)
     integer(IK),intent(out),optional :: n_sets     !! number of data sets (i.e., matrix rows if using row-major order)
     integer(IK),intent(out),optional :: set_size   !! size of each data set (i.e., matrix cols if using row-major order)
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
@@ -1121,7 +1120,14 @@
 
         main : do i=1,nr
 
+            nullify(p_row)
             call json%get_child(p,i,p_row)
+            if (.not. associated(p_row)) then
+                is_matrix = .false.
+                call json%throw_exception('Error in json_matrix_info: '//&
+                                          'Malformed JSON linked list')
+                exit main
+            end if
             call json%info(p_row,var_type=row_vartype,n_children=icount)
 
             if (row_vartype==json_array) then
@@ -1129,9 +1135,17 @@
                 if (icount==nc) then   !make sure each row has the same number of columns
                     !see if all the variables in this row are the same type:
                     do j=1,icount
+                        nullify(p_element)
                         call json%get_child(p_row,j,p_element)
+                        if (.not. associated(p_element)) then
+                            is_matrix = .false.
+                            call json%throw_exception('Error in json_matrix_info: '//&
+                                                      'Malformed JSON linked list')
+                            exit main
+                        end if
                         call json%info(p_element,var_type=element_vartype)
-                        if (i==1 .and. j==1) vartype = element_vartype  !type of first element in the row
+                        if (i==1 .and. j==1) vartype = element_vartype  !type of first element
+                                                                        !in the row
                         if (vartype/=element_vartype) then
                             !not all variables are the same time
                             is_matrix = .false.
@@ -1161,10 +1175,94 @@
         if (present(set_size)) set_size = 0
     end if
 
-    nullify(p_row)
-    nullify(p_element)
-
     end subroutine json_matrix_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns matrix information about a [[json_value]], given the path.
+!
+!### See also
+!  * [[json_matrix_info]]
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
+
+    subroutine json_matrix_info_by_path(json,p,path,is_matrix,found,&
+                                        var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p         !! a JSON linked list
+    character(kind=CK,len=*),intent(in) :: path      !! path to the variable
+    logical(LK),intent(out)             :: is_matrix !! true if it is a valid matrix
+    logical(LK),intent(out),optional    :: found     !! true if it was found
+    integer(IK),intent(out),optional    :: var_type  !! variable type of data in
+                                                     !! the matrix (if all elements have
+                                                     !! the same type)
+    integer(IK),intent(out),optional    :: n_sets    !! number of data sets (i.e., matrix
+                                                     !! rows if using row-major order)
+    integer(IK),intent(out),optional    :: set_size  !! size of each data set (i.e., matrix
+                                                     !! cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    type(json_value),pointer :: p_var
+    logical(LK) :: ok
+
+    call json%get(p,path,p_var,found)
+
+    !check if it was found:
+    if (present(found)) then
+        ok = found
+    else
+        ok = .not. json%failed()
+    end if
+
+    if (.not. ok) then
+        if (present(var_type)) var_type = json_unknown
+        if (present(n_sets))   n_sets   = 0
+        if (present(set_size)) set_size = 0
+        if (present(name))     name     = ''
+    else
+        !get info:
+        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name)
+        if (json%failed() .and. present(found)) then
+            found = .false.
+            call json%clear_exceptions()
+        end if
+    end if
+
+    end subroutine json_matrix_info_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_matrix_info_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_matrix_info_by_path(json,p,path,is_matrix,found,&
+                                             var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p          !! a JSON linked list
+    character(kind=CDK,len=*),intent(in) :: path       !! path to the variable
+    logical(LK),intent(out)              :: is_matrix  !! true if it is a valid matrix
+    logical(LK),intent(out),optional     :: found      !! true if it was found
+    integer(IK),intent(out),optional     :: var_type   !! variable type of data in
+                                                       !! the matrix (if all elements have
+                                                       !! the same type)
+    integer(IK),intent(out),optional     :: n_sets     !! number of data sets (i.e., matrix
+                                                       !! rows if using row-major order)
+    integer(IK),intent(out),optional     :: set_size   !! size of each data set (i.e., matrix
+                                                       !! cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    call json%matrix_info(p,to_unicode(path),is_matrix,found,var_type,n_sets,set_size,name)
+
+    end subroutine wrap_json_matrix_info_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
