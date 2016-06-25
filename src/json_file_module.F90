@@ -688,7 +688,7 @@
     integer(IK),intent(out),optional     :: n_children
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    call me%info(to_unicode(path),found,var_type,n_children)
+    call me%info(to_unicode(path),found,var_type,n_children,name)
 
     end subroutine wrap_json_file_variable_info
 !*****************************************************************************************
