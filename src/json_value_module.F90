@@ -1110,9 +1110,21 @@
     integer(IK) :: icount          !! number of elements in a set
     integer     :: i               !! counter
     integer     :: j               !! counter
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: p_name !! for getting the name
+#endif
 
     !get info about the variable:
-    call json%info(p,vartype,nr,name)  !name is set here if present
+#if defined __GFORTRAN__
+    ! [note: passing name directory to this routine seems
+    !        to have a bug on gfortran 6.1.0, so we use a
+    !        temp variable]
+    call json%info(p,vartype,nr,p_name)
+    if (present(name)) name = p_name
+    if (allocated(p_name)) deallocate(p_name)
+#else
+    call json%info(p,vartype,nr,name)
+#endif
 
     is_matrix = (vartype==json_array)
 
