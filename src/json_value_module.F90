@@ -1015,6 +1015,9 @@
 
     type(json_value),pointer :: p_var
     logical(LK) :: ok
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: p_name
+#endif
 
     call json%get(p,path,p_var,found)
 
@@ -1031,7 +1034,21 @@
         if (present(name))       name       = ''
     else
         !get info:
+
+#if defined __GFORTRAN__
+        call json%info(p_var,var_type,n_children)
+        if (present(name)) then !workaround for gfortran bug
+            if (allocated(p_var%name)) then
+                p_name = p_var%name
+                name = p_name
+            else
+                name = ''
+            end if
+        end if
+#else
         call json%info(p_var,var_type,n_children,name)
+#endif
+
     end if
 
     end subroutine json_info_by_path
@@ -1111,17 +1128,20 @@
     integer     :: i               !! counter
     integer     :: j               !! counter
 #if defined __GFORTRAN__
-    character(kind=CK,len=:),allocatable :: p_name !! for getting the name
+    character(kind=CK,len=:),allocatable :: p_name
 #endif
 
     !get info about the variable:
 #if defined __GFORTRAN__
-    ! [note: passing name directory to this routine seems
-    !        to have a bug on gfortran 6.1.0, so we use a
-    !        temp variable]
-    call json%info(p,vartype,nr,p_name)
-    if (present(name)) name = p_name
-    if (allocated(p_name)) deallocate(p_name)
+    call json%info(p,vartype,nr)
+    if (present(name)) then !workaround for gfortran bug
+        if (allocated(p%name)) then
+            p_name = p%name
+            name = p_name
+        else
+            name = ''
+        end if
+    end if
 #else
     call json%info(p,vartype,nr,name)
 #endif
@@ -1228,6 +1248,9 @@
 
     type(json_value),pointer :: p_var
     logical(LK) :: ok
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: p_name
+#endif
 
     call json%get(p,path,p_var,found)
 
@@ -1246,7 +1269,19 @@
     else
 
         !get info about the variable:
+#if defined __GFORTRAN__
+        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size)
+        if (present(name)) then !workaround for gfortran bug
+            if (allocated(p_var%name)) then
+                p_name = p_var%name
+                name = p_name
+            else
+                name = ''
+            end if
+        end if
+#else
         call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name)
+#endif
         if (json%failed() .and. present(found)) then
             found = .false.
             call json%clear_exceptions()
