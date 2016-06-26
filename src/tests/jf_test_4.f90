@@ -111,7 +111,10 @@ contains
     write(error_unit,'(A)') ''
     !get some info:
     call core%info(p,'INPUTS',found,var_type,n_children,name)
-    if (.not. found) then
+    if (found) then
+        !test again with CDK path (for unicode wrapper)
+        call core%info(p,json_cdk_'INPUTS',found,var_type,n_children,name)
+    else
         write(error_unit,'(A)') 'Error getting info on INPUT'
         error_cnt = error_cnt + 1
     end if

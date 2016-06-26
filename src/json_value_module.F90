@@ -1228,9 +1228,6 @@
 
     type(json_value),pointer :: p_var
     logical(LK) :: ok
-#if defined __GFORTRAN__
-    character(kind=CK,len=:),allocatable :: p_name !! for getting the name
-#endif
 
     call json%get(p,path,p_var,found)
 
@@ -1249,17 +1246,7 @@
     else
 
         !get info about the variable:
-!#if defined __GFORTRAN__
-!        ! [note: passing name directory to this routine seems
-!        !        to have a bug on older gfortran versions...
-!        ! ... it also seems to be failing with unicode build ...
-!        ! ... this doesn't seem to fix the problem ...
-!        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,p_name)
-!        if (present(name)) name = p_name
-!        if (allocated(p_name)) deallocate(p_name)
-!#else
         call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name)
-!#endif
         if (json%failed() .and. present(found)) then
             found = .false.
             call json%clear_exceptions()

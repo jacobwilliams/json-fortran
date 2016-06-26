@@ -6,7 +6,8 @@
 
 module jf_test_19_mod
 
-    use json_module, lk => json_lk, rk => json_rk, ik => json_ik, ck => json_ck
+    use json_module, lk => json_lk, rk => json_rk, ik => json_ik,&
+                     ck => json_ck, cdk => json_cdk
     use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
     implicit none
@@ -128,6 +129,13 @@ contains
                             set_size=set_size,name=name)
     if (found) then
         write(error_unit,'(A)') '...success'
+
+        !test again with CDK path (for unicode wrapper)
+        call json%matrix_info(p,CDK_'matrix',is_matrix,found=found,&
+                                var_type=var_type,n_sets=n_sets,&
+                                set_size=set_size,name=name)
+
+
     else
         write(error_unit,*) 'error calling json_matrix_info_by_path with found input'
         error_cnt = error_cnt + 1
