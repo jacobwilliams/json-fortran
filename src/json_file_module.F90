@@ -78,6 +78,7 @@
         procedure,public :: destroy => json_file_destroy
         procedure,public :: move    => json_file_move_pointer
         generic,public   :: info    => MAYBEWRAP(json_file_variable_info)
+        generic,public   :: matrix_info => MAYBEWRAP(json_file_variable_matrix_info)
 
         !error checking:
         procedure,public :: failed => json_file_failed
@@ -125,8 +126,9 @@
         procedure :: initialize_json_core_in_file
         procedure :: set_json_core_in_file
 
-        !git info:
+        !get info:
         procedure :: MAYBEWRAP(json_file_variable_info)
+        procedure :: MAYBEWRAP(json_file_variable_matrix_info)
 
         !get:
         procedure :: MAYBEWRAP(json_file_get_object)
@@ -691,6 +693,70 @@
     call me%info(to_unicode(path),found,var_type,n_children,name)
 
     end subroutine wrap_json_file_variable_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 6/26/2016
+!
+!  Returns matrix information about a variable in a [[json_file(type)]].
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
+
+    subroutine json_file_variable_matrix_info(me,path,is_matrix,found,&
+                                        var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path      !! path to the variable
+    logical(LK),intent(out)             :: is_matrix !! true if it is a valid matrix
+    logical(LK),intent(out),optional    :: found     !! true if it was found
+    integer(IK),intent(out),optional    :: var_type  !! variable type of data in
+                                                     !! the matrix (if all elements have
+                                                     !! the same type)
+    integer(IK),intent(out),optional    :: n_sets    !! number of data sets (i.e., matrix
+                                                     !! rows if using row-major order)
+    integer(IK),intent(out),optional    :: set_size  !! size of each data set (i.e., matrix
+                                                     !! cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size,name)
+
+    end subroutine json_file_variable_matrix_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_variable_matrix_info]], where "path" is kind=CDK.
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
+
+    subroutine wrap_json_file_variable_matrix_info(me,path,is_matrix,found,&
+                                                   var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path      !! path to the variable
+    logical(LK),intent(out)              :: is_matrix !! true if it is a valid matrix
+    logical(LK),intent(out),optional     :: found     !! true if it was found
+    integer(IK),intent(out),optional     :: var_type  !! variable type of data in
+                                                      !! the matrix (if all elements have
+                                                      !! the same type)
+    integer(IK),intent(out),optional     :: n_sets    !! number of data sets (i.e., matrix
+                                                      !! rows if using row-major order)
+    integer(IK),intent(out),optional     :: set_size  !! size of each data set (i.e., matrix
+                                                      !! cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    call me%matrix_info(to_unicode(path),is_matrix,found,var_type,n_sets,set_size,name)
+
+    end subroutine wrap_json_file_variable_matrix_info
 !*****************************************************************************************
 
 !*****************************************************************************************
