@@ -87,7 +87,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_variable_info...'
-    call f%info('blah',found,var_type,n_children)
+    call f%info('blah',found,var_type,n_children,name)
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
