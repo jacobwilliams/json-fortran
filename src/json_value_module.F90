@@ -1127,24 +1127,9 @@
     integer(IK) :: icount          !! number of elements in a set
     integer     :: i               !! counter
     integer     :: j               !! counter
-#if defined __GFORTRAN__
-    character(kind=CK,len=:),allocatable :: p_name
-#endif
 
     !get info about the variable:
-#if defined __GFORTRAN__
-    call json%info(p,vartype,nr)
-    if (present(name)) then !workaround for gfortran bug
-        if (allocated(p%name)) then
-            p_name = p%name
-            name = p_name
-        else
-            name = ''
-        end if
-    end if
-#else
     call json%info(p,vartype,nr,name)
-#endif
 
     is_matrix = (vartype==json_array)
 
@@ -1248,9 +1233,6 @@
 
     type(json_value),pointer :: p_var
     logical(LK) :: ok
-#if defined __GFORTRAN__
-    character(kind=CK,len=:),allocatable :: p_name
-#endif
 
     call json%get(p,path,p_var,found)
 
@@ -1269,19 +1251,7 @@
     else
 
         !get info about the variable:
-#if defined __GFORTRAN__
-        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size)
-        if (present(name)) then !workaround for gfortran bug
-            if (allocated(p_var%name)) then
-                p_name = p_var%name
-                name = p_name
-            else
-                name = ''
-            end if
-        end if
-#else
         call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name)
-#endif
         if (json%failed() .and. present(found)) then
             found = .false.
             call json%clear_exceptions()
