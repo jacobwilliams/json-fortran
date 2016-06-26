@@ -54,7 +54,7 @@ contains
     call json%print(p,error_unit)
 
     !get some info:
-    call json%get(p,'matrix',p_matrix)
+    call json%get(p,ck_'matrix',p_matrix)
     call json%matrix_info(p_matrix,is_matrix,var_type,n_sets,set_size,name)
 
     if (json%failed()) then
@@ -79,7 +79,7 @@ contains
     end if
 
     !now test with a variable that is NOT a matrix:
-    call json%get(p,'matrix(1)',p_matrix)
+    call json%get(p,ck_'matrix(1)',p_matrix)
     call json%matrix_info(p_matrix,is_matrix,var_type,n_sets,set_size,name)
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -88,7 +88,7 @@ contains
         if (.not. is_matrix) then
             write(error_unit,'(A)') '...success'
         else
-            write(error_unit,'(A)') 'Error: this should not be a matrix:'
+            write(error_unit,'(A)') 'Error: this should not be a matrix'
             error_cnt = error_cnt + 1
         end if
     end if
@@ -96,9 +96,9 @@ contains
     ! now, test by path:
 #if defined __GFORTRAN__
     !stupid workaround for gfortran bugs
-    name = 'Hello!'  ! just assign something before calling info routine
+    name = ck_'Hello!'  ! just assign something before calling info routine
 #endif
-    call json%matrix_info(p,'matrix',is_matrix,&
+    call json%matrix_info(p,ck_'matrix',is_matrix,&
                             var_type=var_type,n_sets=n_sets,&
                             set_size=set_size,name=name)
 
@@ -124,7 +124,7 @@ contains
     end if
 
     !also test with "found" input:
-    call json%matrix_info(p,'matrix',is_matrix,found=found,&
+    call json%matrix_info(p,ck_'matrix',is_matrix,found=found,&
                             var_type=var_type,n_sets=n_sets,&
                             set_size=set_size,name=name)
     if (found) then
@@ -142,7 +142,7 @@ contains
     end if
 
     !now test with a variable that is NOT a matrix:
-    call json%matrix_info(p,'matrix(1)',is_matrix,found=found,&
+    call json%matrix_info(p,ck_'matrix(1)',is_matrix,found=found,&
                             var_type=var_type,n_sets=n_sets,&
                             set_size=set_size,name=name)
     if (.not. is_matrix) then
