@@ -1200,6 +1200,12 @@
 !@note If `found` is present, no exceptions will be thrown if an
 !      error occurs. Otherwise, an exception will be thrown if the
 !      variable is not found.
+!
+!@warning There is a bug in gfortran-6.1.0 (and likely others) if using
+!         the `name` output and Unicode. The name will not be returned
+!         properly. It seems like setting an initial non-blank value
+!         before calling this routine can fix the issue in some cases.
+!         See `jf_test_19.F90`.
 
     subroutine json_matrix_info_by_path(json,p,path,is_matrix,found,&
                                         var_type,n_sets,set_size,name)
@@ -1241,18 +1247,19 @@
         if (present(set_size)) set_size = 0
         if (present(name))     name     = ''
     else
-        !get info:
 
         !get info about the variable:
-#if defined __GFORTRAN__
-        ! [note: passing name directory to this routine seems
-        !        to have a bug on older gfortran versions...
-        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,p_name)
-        if (present(name)) name = p_name
-        if (allocated(p_name)) deallocate(p_name)
-#else
+!#if defined __GFORTRAN__
+!        ! [note: passing name directory to this routine seems
+!        !        to have a bug on older gfortran versions...
+!        ! ... it also seems to be failing with unicode build ...
+!        ! ... this doesn't seem to fix the problem ...
+!        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,p_name)
+!        if (present(name)) name = p_name
+!        if (allocated(p_name)) deallocate(p_name)
+!#else
         call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name)
-#endif
+!#endif
         if (json%failed() .and. present(found)) then
             found = .false.
             call json%clear_exceptions()

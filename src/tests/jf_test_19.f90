@@ -93,6 +93,10 @@ contains
     end if
 
     ! now, test by path:
+#if defined __GFORTRAN__
+    !stupid workaround for gfortran bugs
+    name = 'Hello!'  ! just assign something before calling info routine
+#endif
     call json%matrix_info(p,'matrix',is_matrix,&
                             var_type=var_type,n_sets=n_sets,&
                             set_size=set_size,name=name)
