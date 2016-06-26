@@ -1220,12 +1220,6 @@
 !@note If `found` is present, no exceptions will be thrown if an
 !      error occurs. Otherwise, an exception will be thrown if the
 !      variable is not found.
-!
-!@warning There is a bug in gfortran-6.1.0 (and likely others) if using
-!         the `name` output and Unicode. The name will not be returned
-!         properly. It seems like setting an initial non-blank value
-!         before calling this routine can fix the issue in some cases.
-!         See `jf_test_19.F90`.
 
     subroutine json_matrix_info_by_path(json,p,path,is_matrix,found,&
                                         var_type,n_sets,set_size,name)
