@@ -1945,8 +1945,8 @@
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p
     logical(LK),intent(out)              :: is_valid  !! True if the structure is valid.
-    character(kind=CK,len=:),allocatable :: error_msg !! if not valid, this will contain
-                                                      !! a description of the problem
+    character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! if not valid, this will contain
+                                                                  !! a description of the problem
 
     if (associated(p)) then
         is_valid = .true.

@@ -133,6 +133,11 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+    call json%add(inp, 'null_variable')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
     nullify(inp)
 
     !trajectory variables:
