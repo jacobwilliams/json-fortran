@@ -3,8 +3,8 @@ title: Other Docs
 # Current Stable Release
 
 The latest stable release is
-[**{!__VERSION__!}**](
-http://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html).[^1]
+[**{!.VERSION!}**](
+http://jacobwilliams.github.io/json-fortran/{!.VERSION!}/index.html).[^1]
 
 # Past Releases
 
