@@ -227,6 +227,7 @@
         !>
         !  Add objects to a linked list of [[json_value]]s.
         generic,public :: add => json_value_add_member, &
+                                 MAYBEWRAP(json_value_add_null), &
                                  MAYBEWRAP(json_value_add_integer), &
                                  MAYBEWRAP(json_value_add_integer_vec), &
                                  MAYBEWRAP(json_value_add_double), &
@@ -244,6 +245,7 @@
 
     procedure,private :: json_value_add_member
     procedure,private :: MAYBEWRAP(json_value_add_integer)
+    procedure,private :: MAYBEWRAP(json_value_add_null)
     procedure,private :: MAYBEWRAP(json_value_add_integer_vec)
     procedure,private :: MAYBEWRAP(json_value_add_double)
     procedure,private :: MAYBEWRAP(json_value_add_double_vec)
@@ -1943,8 +1945,8 @@
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p
     logical(LK),intent(out)              :: is_valid  !! True if the structure is valid.
-    character(kind=CK,len=:),allocatable :: error_msg !! if not valid, this will contain
-                                                      !! a description of the problem
+    character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! if not valid, this will contain
+                                                                  !! a description of the problem
 
     if (associated(p)) then
         is_valid = .true.
@@ -2579,6 +2581,49 @@
     call json%add(p, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_double_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add a NULL value child to the [[json_value]] variable
+!
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
+
+    subroutine json_value_add_null(json, p, name)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p
+    character(kind=CK,len=*),intent(in) :: name
+
+    type(json_value),pointer :: var
+
+    !create the variable:
+    call json%create_null(var,name)
+
+    !add it:
+    call json%add(p, var)
+
+    end subroutine json_value_add_null
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_null]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_null(json, p, name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+
+    call json%add(p, to_unicode(name))
+
+    end subroutine wrap_json_value_add_null
 !*****************************************************************************************
 
 !*****************************************************************************************
