@@ -77,6 +77,21 @@ contains
         end if
     end if
 
+    !now test with a variable that is NOT a matrix:
+    call json%get(p,'matrix(1)',p_matrix)
+    call json%matrix_info(p_matrix,is_matrix,var_type,n_sets,set_size,name)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        if (.not. is_matrix) then
+            write(error_unit,'(A)') '...success'
+        else
+            write(error_unit,'(A)') 'Error: this should not be a matrix:'
+            error_cnt = error_cnt + 1
+        end if
+    end if
+
     ! now, test by path:
     call json%matrix_info(p,'matrix',is_matrix,&
                             var_type=var_type,n_sets=n_sets,&
@@ -111,6 +126,17 @@ contains
         write(error_unit,'(A)') '...success'
     else
         write(error_unit,*) 'error calling json_matrix_info_by_path with found input'
+        error_cnt = error_cnt + 1
+    end if
+
+    !now test with a variable that is NOT a matrix:
+    call json%matrix_info(p,'matrix(1)',is_matrix,found=found,&
+                            var_type=var_type,n_sets=n_sets,&
+                            set_size=set_size,name=name)
+    if (.not. is_matrix) then
+        write(error_unit,'(A)') '...success'
+    else
+        write(error_unit,'(A)') 'Error: this should not be a matrix:'
         error_cnt = error_cnt + 1
     end if
 
