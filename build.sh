@@ -347,7 +347,7 @@ if [[ $JF_SKIP_DOCS != [yY]* ]]; then
     if hash ford 2>/dev/null; then
     echo "Building documentation..."
     [[ $TRY_UNICODE = [yY]* ]] && MACRO_FLAG=("-m" "USE_UCS4")
-    echo "$FPP" > preprocessor-def.md # Override via include in project file, until FORD gets CLI for this
+    echo "$FPP" > .PREPROCESSOR # Override via include in project file, until FORD gets CLI for this
     ford --debug "${MACRO_FLAG[@]}" -p "$PAGESDIR" "$FORDMD"
     else
     echo "FORD not found! Install using: sudo pip install ford"

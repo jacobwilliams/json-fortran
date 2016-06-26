@@ -12,10 +12,10 @@ remain accurate.
         [Unreleased](|url|/page/releases/index.html#unreleased) are up
         to date and accurate.
 	     1. Look at the latest [changes committed to GitHub since the
-            last release](https://github.com/jacobwilliams/json-fortran/compare/{!__VERSION__!}...HEAD),
-            {!__VERSION__!}. This will only be accurate if you have
-            not yet updated `__VERSION__`. If you *have* updated
-            `__VERSION__` then edit the URL manually to view the
+            last release](https://github.com/jacobwilliams/json-fortran/compare/{!.VERSION!}...HEAD),
+            {!.VERSION!}. This will only be accurate if you have
+            not yet updated `.VERSION`. If you *have* updated
+            `.VERSION` then edit the URL manually to view the
             changes.
 		 1. Run the
             [`github_changelog_generator`](https://github.com/skywinder/github-changelog-generator)
@@ -51,9 +51,9 @@ remain accurate.
         string
 	 1. Add `pages/releases/index.md` to the git index: `git add pages/releases/index.md`
  1. Update the version string in remaining files requiring manual edits:
-     1. Edit the `__VERSION__` file
+     1. Edit the `.VERSION` file
      1. Edit the CMake example on line 123 of `README.md`
-	 1. Add both files to the git index: `git add __VERSION__
+	 1. Add both files to the git index: `git add .VERSION
      README.md`
  1. Commit the changes to the master branch: `git commit`
  1. Create the tag: `git tag <new version>`

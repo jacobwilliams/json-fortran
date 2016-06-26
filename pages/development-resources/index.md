@@ -40,4 +40,4 @@ deploying documentation and managing test coverage information.
 
 [This](|url|/page/development-resources/release-checklist.html) is a
 checklist of tasks to be performed when tagging a new release of
-JSON-Fortran. The current stable version is **{!__VERSION__!}**.
+JSON-Fortran. The current stable version is **{!.VERSION!}**.

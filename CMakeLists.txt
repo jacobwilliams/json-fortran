@@ -34,7 +34,7 @@ project ( jsonfortran NONE )
 # Get version (semantic versioning)
 # C.F. semver.org
 #----------------------------------
-file ( STRINGS "${CMAKE_SOURCE_DIR}/__VERSION__" VERSION )
+file ( STRINGS "${CMAKE_SOURCE_DIR}/.VERSION" VERSION )
 string( REPLACE "." ";" VERSION_LIST ${VERSION} )
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -169,7 +169,7 @@ if ( NOT SKIP_DOC_GEN )
     else ()
       set ( FPP "gfortran -E\n" ) # default to gfortran -E for gfortran and unsupported compilers
     endif ()
-    file ( WRITE "${CMAKE_BINARY_DIR}/preprocessor-def.md" "${FPP}" )
+    file ( WRITE "${CMAKE_BINARY_DIR}/.PREPROCESSOR" "${FPP}" )
     # Dynamically generate the FORD outputs list
     message ( STATUS "Dynamically computing FORD output information..." )
     if ( NOT (DEFINED FORD_OUTPUTS_CACHED) )
@@ -192,7 +192,7 @@ if ( NOT SKIP_DOC_GEN )
     message ( STATUS "Done dynamically computing FORD outputs." )
 
     foreach ( DOC_SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} ${CMAKE_SOURCE_DIR}/README.md
-	${CMAKE_SOURCE_DIR}/CHANGELOG.md ${CMAKE_SOURCE_DIR}/CONTRIBUTING.md
+	${CMAKE_SOURCE_DIR}/CHANGELOG.md ${CMAKE_SOURCE_DIR}/.github/CONTRIBUTING.md
 	${CMAKE_SOURCE_DIR}/LICENSE ${CMAKE_SOURCE_DIR}/json-fortran.md ${PAGES_FILES} )
       list ( APPEND FORD_DEPENDS "${DOC_SRC_FILE}" )
     endforeach ()

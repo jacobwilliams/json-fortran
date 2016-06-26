@@ -145,9 +145,9 @@ Some examples can also be found on the [wiki](https://github.com/jacobwilliams/j
 Contributing
 ------------
 
-[![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md)
+[![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/.github/CONTRIBUTING.md)
 
-Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo/)
+Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/.github/CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo/)
 
 [top](#json-fortran)
 

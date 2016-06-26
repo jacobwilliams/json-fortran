@@ -1,6 +1,6 @@
 ---
 project: JSON-Fortran
-preprocessor: {!preprocessor-def.md!}
+preprocessor: {!.PREPROCESSOR!}
 favicon: ./media/json-fortran-32x32.png
 project_dir: ./src
 output_dir: ./doc
@@ -51,11 +51,11 @@ file for more details.
 Official Releases
 -----------------
 
-The **current stable release** is **{!__VERSION__!}** and can be [downloaded
+The **current stable release** is **{!.VERSION!}** and can be [downloaded
 on GitHub](https://github.com/jacobwilliams/json-fortran/releases/latest)
 or installed with [Homebrew](http://brew.sh) on Mac OSX. The
-documentation for the current version, **{!__VERSION__!}**, can be
-found [here](http://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html)[^1], and a
+documentation for the current version, **{!.VERSION!}**, can be
+found [here](http://jacobwilliams.github.io/json-fortran/{!.VERSION!}/index.html)[^1], and a
 list of changes from the previous version are
 [here](http://jacobwilliams.github.io/json-fortran/page/releases/index.html#change-log).
 
@@ -70,8 +70,8 @@ Miscellaneous
 
 *[API]: Application Programming Interface: a set of routines, protocols, and tools for building software applications
 *[JSON]: JavaScript Object Notation: A human friendly syntax for storing and exchanging data
-*[current stable release]: {!__VERSION__!}
-*[latest stable release]: {!__VERSION__!}
+*[current stable release]: {!.VERSION!}
+*[latest stable release]: {!.VERSION!}
 
 [^1]:
     Documentation for a particular release does not contain links
