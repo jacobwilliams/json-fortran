@@ -213,6 +213,11 @@
         logical(LK) :: case_sensitive_keys = .true.    !! for name and path comparisons, are they
                                                        !! case sensitive.
 
+        logical(LK) :: no_whitespace = .false. !! when printing a JSON string, don't include
+                                               !! non-significant spaces or line breaks.
+                                               !! If true, the entire structure will be
+                                               !! printed on one line.
+
         contains
 
         private
@@ -635,7 +640,8 @@
                                   print_signs,real_format,spaces_per_tab,&
                                   strict_type_checking,&
                                   trailing_spaces_significant,&
-                                  case_sensitive_keys) result(json_core_object)
+                                  case_sensitive_keys,&
+                                  no_whitespace) result(json_core_object)
 
     implicit none
 
@@ -650,14 +656,20 @@
                                                             !! (default is false)
     logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
                                                                     !! space to be considered significant.
+                                                                    !! (default is false)
     logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
                                                             !! case sensitive.
+                                                            !! (default is true)
+    logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
+                                                      !! done without adding any non-significant
+                                                      !! spaces or linebreaks (default is false)
 
     call json_core_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
                                 strict_type_checking,&
                                 trailing_spaces_significant,&
-                                case_sensitive_keys)
+                                case_sensitive_keys,&
+                                no_whitespace)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -685,7 +697,8 @@
                                print_signs,real_format,spaces_per_tab,&
                                strict_type_checking,&
                                trailing_spaces_significant,&
-                               case_sensitive_keys)
+                               case_sensitive_keys,&
+                               no_whitespace)
 
     implicit none
 
@@ -700,8 +713,12 @@
                                                             !! (default is false)
     logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
                                                                     !! space to be considered significant.
+                                                                    !! (default is false)
     logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive.
+                                                            !! case sensitive. (default is true)
+    logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
+                                                      !! done without adding any non-significant
+                                                      !! spaces or linebreaks (default is false)
 
     character(kind=CDK,len=10) :: w,d,e
     character(kind=CDK,len=2)  :: sgn, rl_edit_desc
@@ -735,6 +752,8 @@
         json%trailing_spaces_significant = trailing_spaces_significant
     if (present(case_sensitive_keys)) &
         json%case_sensitive_keys = case_sensitive_keys
+    if (present(no_whitespace)) &
+        json%no_whitespace = no_whitespace
 
     !Set the format for real numbers:
     ! [if not changing it, then it remains the same]
@@ -3347,7 +3366,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p
-    integer(IK),intent(in)               :: iunit   !! the file unit (the file must already have been opened, can't be -1).
+    integer(IK),intent(in)               :: iunit   !! the file unit (the file must
+                                                    !! already have been opened, can't be -1).
 
     character(kind=CK,len=:),allocatable :: dummy
 
@@ -3372,7 +3392,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p
-    character(kind=CDK,len=*),intent(in) :: filename  !! the filename to print to (should not already be open)
+    character(kind=CDK,len=*),intent(in) :: filename  !! the filename to print to
+                                                      !! (should not already be open)
 
     integer(IK) :: iunit,istat
 
@@ -3438,7 +3459,7 @@
         end if
 
         !number of "tabs" to indent:
-        if (present(indent)) then
+        if (present(indent) .and. .not. json%no_whitespace) then
             tab = indent
         else
             tab = 0
@@ -3476,8 +3497,8 @@
 
                 !if an object is in an array, there is an extra tab:
                 if (is_array) then
-                     tab = tab+1
-                     spaces = tab*json%spaces_per_tab
+                    if ( .not. json%no_whitespace) tab = tab+1
+                    spaces = tab*json%spaces_per_tab
                 end if
 
                 nullify(element)
@@ -3492,9 +3513,16 @@
 
                     ! print the name
                     if (allocated(element%name)) then
-                        call write_it(repeat(space, spaces)//quotation_mark//&
-                                      element%name//quotation_mark//colon_char//space,&
-                                      advance=.false.)
+                        if (json%no_whitespace) then
+                            !compact printing - no extra space
+                            call write_it(repeat(space, spaces)//quotation_mark//&
+                                          element%name//quotation_mark//colon_char,&
+                                          advance=.false.)
+                        else
+                            call write_it(repeat(space, spaces)//quotation_mark//&
+                                          element%name//quotation_mark//colon_char//space,&
+                                          advance=.false.)
+                        end if
                     else
                         call json%throw_exception('Error in json_value_print:'//&
                                              ' element%name not allocated')
@@ -3619,8 +3647,9 @@
         logical(LK),intent(in),optional     :: advance  !! to add line break or not
         logical(LK),intent(in),optional     :: comma    !! print comma after the string
 
-        logical(LK) :: add_line_break, add_comma
-        character(kind=CK,len=:),allocatable :: s2
+        logical(LK) :: add_comma       !! if a delimiter is to be added after string
+        logical(LK) :: add_line_break  !! if a line break is to be added after string
+        character(kind=CK,len=:),allocatable :: s2  !! temporary string
 
         if (present(comma)) then
             add_comma = comma
@@ -3631,7 +3660,8 @@
         if (present(advance)) then
             add_line_break = advance
         else
-            add_line_break = .true. !default is to advance
+            add_line_break = .not. json%no_whitespace ! default is to advance if
+                                                      ! we are printing whitespace
         end if
 
         !string to print:
@@ -3757,7 +3787,7 @@
 
                 if (.not. associated(p)) then
                     call json%throw_exception('Error in json_get_by_path:'//&
-                                         ' Error getting child member.')
+                                              ' Error getting child member.')
                     exit
                 end if
 
@@ -3897,8 +3927,8 @@
         if (ierr/=0) then    !if there was an error
             ival = 0
             call json%throw_exception('Error in string_to_integer: '//&
-                                 'string cannot be converted to an integer: '//&
-                                 trim(str))
+                                      'string cannot be converted to an integer: '//&
+                                      trim(str))
         end if
 
     else

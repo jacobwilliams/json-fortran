@@ -271,7 +271,8 @@
                                             print_signs,real_format,spaces_per_tab,&
                                             strict_type_checking,&
                                             trailing_spaces_significant,&
-                                            case_sensitive_keys)
+                                            case_sensitive_keys,&
+                                            no_whitespace)
 
     implicit none
 
@@ -286,14 +287,19 @@
                                                             !! (default is false)
     logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
                                                                     !! space to be considered significant.
+                                                                    !! (default is false)
     logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive.
+                                                            !! case sensitive. (default is true)
+    logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
+                                                      !! done without adding any non-significant
+                                                      !! spaces or linebreaks (default is false)
 
     call me%core%initialize(verbose,compact_reals,&
                             print_signs,real_format,spaces_per_tab,&
                             strict_type_checking,&
                             trailing_spaces_significant,&
-                            case_sensitive_keys)
+                            case_sensitive_keys,&
+                            no_whitespace)
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
@@ -351,7 +357,8 @@
                                   print_signs,real_format,spaces_per_tab,&
                                   strict_type_checking,&
                                   trailing_spaces_significant,&
-                                  case_sensitive_keys) result(file_object)
+                                  case_sensitive_keys,&
+                                  no_whitespace) result(file_object)
 
     implicit none
 
@@ -368,14 +375,19 @@
                                                             !! (default is false)
     logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
                                                                     !! space to be considered significant.
+                                                                    !! (default is false)
     logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive.
+                                                            !! case sensitive. (default is true)
+    logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
+                                                      !! done without adding any non-significant
+                                                      !! spaces or linebreaks (default is false)
 
     call file_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
                                 strict_type_checking,&
                                 trailing_spaces_significant,&
-                                case_sensitive_keys)
+                                case_sensitive_keys,&
+                                no_whitespace)
 
     if (present(p)) file_object%p => p
 
