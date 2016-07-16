@@ -59,6 +59,14 @@
                                      operator(//),&
                                      operator(/=)
 #endif
+    use json_parameters, only: json_unknown,&
+                               json_null,   &
+                               json_object, &
+                               json_array,  &
+                               json_logical,&
+                               json_integer,&
+                               json_double, &
+                               json_string
     use json_value_module
     use json_file_module
 

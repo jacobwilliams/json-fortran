@@ -20,6 +20,23 @@
 
     character(kind=CDK,len=*),parameter :: json_ext = '.json'   !! JSON file extension
 
+    ! The types of JSON data.
+    integer(IK),parameter :: json_unknown   = 0  !! Unknown JSON data type
+                                                 !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter :: json_null      = 1  !! Null JSON data type
+                                                 !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter :: json_object    = 2  !! Object JSON data type
+                                                 !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter :: json_array     = 3  !! Array JSON data type
+                                                 !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter :: json_logical   = 4  !! Logical JSON data type
+                                                 !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter :: json_integer   = 5  !! Integer JSON data type
+                                                 !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter :: json_double    = 6  !! Double JSON data type
+                                                 !! (see [[json_file_variable_info]] and [[json_info]])
+    integer(IK),parameter :: json_string    = 7  !! String JSON data type
+
     !special JSON characters
     character(kind=CK,len=*),parameter :: space           = ' '
     character(kind=CK,len=*),parameter :: start_object    = '{'
@@ -42,11 +59,11 @@
     character(kind=CK,len=*),parameter :: slash           = achar(47)
     character(kind=CK,len=*),parameter :: backslash       = achar(92)
 
-    character(kind=CDK,len=*),parameter,public :: default_real_fmt = '(ss,E26.16E4)'
+    character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E26.16E4)'
         !! default real number format statement (for writing real values to strings and files).
         !! Note that this can be overridden by calling [[json_initialize]].
 
-    character(kind=CK,len=*),parameter,public :: star = '*' !! for invalid numbers and
+    character(kind=CK,len=*),parameter :: star = '*' !! for invalid numbers and
                                                             !! list-directed real output
 
 #if defined __GFORTRAN__
@@ -54,8 +71,8 @@
     character(kind=CK,len=26),protected :: upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' !! uppercase characters
     character(kind=CK,len=26),protected :: lower = 'abcdefghijklmnopqrstuvwxyz' !! lowercase characters
 #else
-    character(kind=CK,len=*),parameter,public :: upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' !! uppercase characters
-    character(kind=CK,len=*),parameter,public :: lower = 'abcdefghijklmnopqrstuvwxyz' !! lowercase characters
+    character(kind=CK,len=*),parameter :: upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' !! uppercase characters
+    character(kind=CK,len=*),parameter :: lower = 'abcdefghijklmnopqrstuvwxyz' !! lowercase characters
 #endif
 
 #if defined __GFORTRAN__
@@ -64,9 +81,9 @@
     character(kind=CK,len=4),protected :: true_str  = 'true'  !! JSON logical True string
     character(kind=CK,len=5),protected :: false_str = 'false' !! JSON logical False string
 #else
-    character(kind=CK,len=*),parameter,public :: null_str  = 'null'  !! JSON Null variable string
-    character(kind=CK,len=*),parameter,public :: true_str  = 'true'  !! JSON logical True string
-    character(kind=CK,len=*),parameter,public :: false_str = 'false' !! JSON logical False string
+    character(kind=CK,len=*),parameter :: null_str  = 'null'  !! JSON Null variable string
+    character(kind=CK,len=*),parameter :: true_str  = 'true'  !! JSON logical True string
+    character(kind=CK,len=*),parameter :: false_str = 'false' !! JSON logical False string
 #endif
 
     integer, private :: i_      !! just a counter for `control_chars` array
@@ -96,9 +113,9 @@
                                                !! output to strings rather than files.
                                                !! See 9.5.6.12 in the F2003/08 standard
 
-    integer(IK),parameter,public :: seq_chunk_size = 256_IK !! chunk size for reading sequential files
+    integer(IK),parameter :: seq_chunk_size = 256_IK !! chunk size for reading sequential files
 
-    integer(IK),parameter,public :: pushed_char_size = 10_IK !! magic number
+    integer(IK),parameter :: pushed_char_size = 10_IK !! magic number
 
     end module json_parameters
 !*****************************************************************************************
