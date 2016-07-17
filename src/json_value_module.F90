@@ -518,10 +518,12 @@
         procedure,public :: print_error_message => json_print_error_message !! simply routine to print error messages
         procedure,public :: swap                => json_value_swap          !! Swap two [[json_value]] pointers
                                                                             !! in a structure (or two different structures).
-        procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a child of another.
+        procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a descendant of another.
         procedure,public :: validate            => json_value_validate      !! Check that a [[json_value]] linked list is valid
                                                                             !! (i.e., is properly constructed). This may be
                                                                             !! useful if it has been constructed externally.
+        procedure,public :: insert_after        => json_value_insert_after  !! insert a new element after an existing one,
+                                                                            !! updating the JSON structure accordingly
 
         !other private routines:
         procedure :: name_equal
@@ -2375,7 +2377,7 @@
         case default
             found = .false.
             call json%throw_exception('Error in json_update_string: '//&
-                                 'the variable is not a scalar value')
+                                      'the variable is not a scalar value')
         end select
 
     else
@@ -2479,6 +2481,72 @@
     end if
 
     end subroutine json_value_add_member
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Inserts `new` after `p`, and updates the JSON structure accordingly.
+!
+!### Example
+!
+!````fortran
+!  program test
+!   use json_module
+!   implicit none
+!   logical(json_LK) :: found
+!   type(json_core) :: json
+!   type(json_value),pointer :: p,new,element
+!   call json%parse(file='myfile.json', p=p)
+!   call json%get(p,'x(3)',element,found) ! get pointer to an array element in the file
+!   call json%create_integer(new,1,'')    ! create a new element
+!   call json%insert_after(element,new)   ! insert new element after x(3)
+!   call json%print(p,'myfile2.json')     ! write it to a file
+!   call json%destroy(p)                  ! cleanup
+!  end program test
+!````
+!
+!@note This routine can be used to insert a new element
+!      into an array or object at a specific index.
+
+    subroutine json_value_insert_after(json,p,element)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p       !! a value from a JSON structure
+                                              !! (presumably, this is a child of
+                                              !! an object or array).
+    type(json_value),pointer       :: element !! the element to insert after `p`
+
+    type(json_value),pointer :: parent  !! the parent of `p`
+
+    if (.not. json%exception_thrown) then
+
+        parent => p%parent
+
+        if (associated(parent)) then
+            element%parent => parent
+            parent%n_children = parent%n_children + 1
+            ! if p is last in list have to update parent tail:
+            if (associated(parent%tail,p)) parent%tail => element
+        else
+            element%parent => null()
+        end if
+
+        !if are there any in the list after p:
+        if (associated(p%next)) then
+            element%next => p%next
+            element%next%previous => element
+        else
+            element%next => null()
+        end if
+
+        p%next => element
+        element%previous => p
+
+    end if
+
+    end subroutine json_value_insert_after
 !*****************************************************************************************
 
 !*****************************************************************************************
