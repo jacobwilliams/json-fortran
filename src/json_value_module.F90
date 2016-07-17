@@ -68,27 +68,6 @@
     !*********************************************************
 
     !*********************************************************
-    !
-    !  The types of JSON data.
-    !
-    integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_null      = 1  !! Null JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_object    = 2  !! Object JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_array     = 3  !! Array JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_integer   = 5  !! Integer JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_double    = 6  !! Double JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_string    = 7  !! String JSON data type
-    !*********************************************************
-
-    !*********************************************************
     !>
     !  Type used to construct the linked-list JSON structure.
     !  Normally, this should always be a pointer variable.
