@@ -148,7 +148,6 @@
     !     call json%print(p,'test.json')  !write it to a file
     !     call json%destroy(p)            !cleanup
     !    end program test
-    !    type,public :: json_core
     !````
     type,public :: json_core
 
@@ -503,6 +502,14 @@
         procedure :: json_matrix_info
         procedure :: MAYBEWRAP(json_matrix_info_by_path)
 
+        !>
+        !  insert a new element after an existing one,
+        !  updating the JSON structure accordingly
+        generic,public :: insert_after => json_value_insert_after, &
+                                          json_value_insert_after_child_by_index
+        procedure :: json_value_insert_after
+        procedure :: json_value_insert_after_child_by_index
+
         procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
@@ -522,8 +529,6 @@
         procedure,public :: validate            => json_value_validate      !! Check that a [[json_value]] linked list is valid
                                                                             !! (i.e., is properly constructed). This may be
                                                                             !! useful if it has been constructed externally.
-        procedure,public :: insert_after        => json_value_insert_after  !! insert a new element after an existing one,
-                                                                            !! updating the JSON structure accordingly
 
         !other private routines:
         procedure :: name_equal
@@ -2485,7 +2490,7 @@
 
 !*****************************************************************************************
 !>
-!  Inserts `new` after `p`, and updates the JSON structure accordingly.
+!  Inserts `element` after `p`, and updates the JSON structure accordingly.
 !
 !### Example
 !
@@ -2533,7 +2538,7 @@
             element%parent => null()
         end if
 
-        !if are there any in the list after p:
+        !if there are any in the list after p:
         if (associated(p%next)) then
             element%next => p%next
             element%next%previous => element
@@ -2547,6 +2552,37 @@
     end if
 
     end subroutine json_value_insert_after
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Inserts `element` after the `idx`-th child of `p`,
+!  and updates the JSON structure accordingly. It is just
+!  a wrapper for [[json_value_insert_after]].
+
+    subroutine json_value_insert_after_child_by_index(json,p,idx,element)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p       !! a JSON object or array.
+    integer(IK),intent(in)         :: idx     !! the index of the child of `p` to
+                                              !! insert the new element after
+    type(json_value),pointer       :: element !! the element to insert
+
+    type(json_value),pointer :: tmp  !! for getting the `idx`-th child of `p`
+
+    if (.not. json%exception_thrown) then
+
+        ! get the idx-th child of p:
+        call json%get_child(p,idx,tmp)
+
+        ! call json_value_insert_after:
+        if (.not. json%failed()) call json%insert_after(tmp,element)
+
+    end if
+
+    end subroutine json_value_insert_after_child_by_index
 !*****************************************************************************************
 
 !*****************************************************************************************

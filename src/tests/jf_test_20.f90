@@ -73,7 +73,7 @@ contains
             error_cnt = error_cnt + 1
         else
             call json%create_integer(new,44,'')   ! create a new element
-            call json%insert_after(element,new)   ! insert new element after x(3)
+            call json%insert_after(element,new)   ! insert new element after x(5)
             if (json%failed()) then
                 call json%print_error_message(error_unit)
                 error_cnt = error_cnt + 1
@@ -88,9 +88,38 @@ contains
             end if
         end if
 
+        !now, insert by index:
+        nullify(element)
+        call json%get(p,'x',element) ! get pointer to the array itself
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
+            error_cnt = error_cnt + 1
+        else
+            call json%create_integer(new,22,'')   ! create a new element
+            call json%insert_after(element,2,new) ! insert new element after x(2)
+            if (json%failed()) then
+                call json%print_error_message(error_unit)
+                error_cnt = error_cnt + 1
+            else
+                call json%get(p,'x',iarray)
+                if (.not. all(iarray==[1,2,22,3,33,4,44])) then
+                    write(error_unit,'(A,1x,*(I2,1X))') 'Error: unexpected output:',iarray
+                    error_cnt = error_cnt + 1
+                else
+                    write(error_unit,'(A,1x,*(I2,1X))') 'Success:',iarray
+                end if
+            end if
+        end if
+
         call json%validate(p,is_valid,error_msg)
         if (.not. is_valid) then
             write(error_unit,'(A)') trim(error_msg)
+            error_cnt = error_cnt + 1
+        end if
+
+        !just in case:
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
 
