@@ -128,6 +128,13 @@ contains
     ! cleanup:
     call json%destroy(p)
 
+    ! now, just a test of the edge case:
+    ! (where p doesn't have a parent)
+    call json%create_object(p,'root')
+    call json%create_object(new,'next')
+    call json%insert_after(p,new)
+    call json%destroy(p)
+
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
     write(error_unit,'(A)') ''
