@@ -3812,7 +3812,7 @@
                 call real32_to_string(p%real_value,json%real_fmt,json%compact_real,tmp)
             else
                 !use the default format (user has not called initialize() or specified one):
-                call real32_to_string(p%real_value,default_real_fmt,json%compact_real,tmp)
+                call real32_to_string(p%real_value,default_real32_fmt,json%compact_real,tmp)
             end if
 
             call write_it( s//trim(tmp), comma=print_comma )
