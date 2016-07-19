@@ -66,6 +66,10 @@
         !! default real number format statement (for writing real values to strings and files).
         !! Note that this can be overridden by calling [[json_initialize]].
 
+    character(kind=CDK,len=*),parameter :: default_real32_fmt = '(ss,E18.8E4)'
+        !! default real number format statement (for writing real3 values to strings and files).
+        !! Note that this can be overridden by calling [[json_initialize]].
+
     character(kind=CK,len=*),parameter :: star = '*' !! for invalid numbers and
                                                             !! list-directed real output
 
