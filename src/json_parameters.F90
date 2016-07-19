@@ -37,6 +37,9 @@
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter :: json_string    = 7  !! String JSON data type
 
+    integer(IK),parameter :: json_real      = 8  !! Real  JSON data type
+                                                 !! (see [[json_file_variable_info]] and [[json_info]])
+
     !special JSON characters
     character(kind=CK,len=*),parameter :: space           = ' '
     character(kind=CK,len=*),parameter :: start_object    = '{'
