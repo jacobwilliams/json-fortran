@@ -94,10 +94,12 @@
 
         generic,public :: get => MAYBEWRAP(json_file_get_object),      &
                                  MAYBEWRAP(json_file_get_integer),     &
+                                 MAYBEWRAP(json_file_get_real),      &
                                  MAYBEWRAP(json_file_get_double),      &
                                  MAYBEWRAP(json_file_get_logical),     &
                                  MAYBEWRAP(json_file_get_string),      &
                                  MAYBEWRAP(json_file_get_integer_vec), &
+                                 MAYBEWRAP(json_file_get_real_vec),  &
                                  MAYBEWRAP(json_file_get_double_vec),  &
                                  MAYBEWRAP(json_file_get_logical_vec), &
                                  MAYBEWRAP(json_file_get_string_vec),  &
@@ -106,6 +108,7 @@
         generic,public :: update =>  MAYBEWRAP(json_file_update_integer),  &
                                      MAYBEWRAP(json_file_update_logical),  &
                                      MAYBEWRAP(json_file_update_real),     &
+                                     MAYBEWRAP(json_file_update_double),     &
                                      MAYBEWRAP(json_file_update_string)
 #ifdef USE_UCS4
         generic,public :: update => json_file_update_string_name_ascii, &
@@ -133,10 +136,12 @@
         !get:
         procedure :: MAYBEWRAP(json_file_get_object)
         procedure :: MAYBEWRAP(json_file_get_integer)
+        procedure :: MAYBEWRAP(json_file_get_real)
         procedure :: MAYBEWRAP(json_file_get_double)
         procedure :: MAYBEWRAP(json_file_get_logical)
         procedure :: MAYBEWRAP(json_file_get_string)
         procedure :: MAYBEWRAP(json_file_get_integer_vec)
+        procedure :: MAYBEWRAP(json_file_get_real_vec)
         procedure :: MAYBEWRAP(json_file_get_double_vec)
         procedure :: MAYBEWRAP(json_file_get_logical_vec)
         procedure :: MAYBEWRAP(json_file_get_string_vec)
@@ -145,6 +150,7 @@
         !update:
         procedure :: MAYBEWRAP(json_file_update_integer)
         procedure :: MAYBEWRAP(json_file_update_logical)
+        procedure :: MAYBEWRAP(json_file_update_double)
         procedure :: MAYBEWRAP(json_file_update_real)
         procedure :: MAYBEWRAP(json_file_update_string)
 #ifdef USE_UCS4
@@ -282,7 +288,7 @@
     logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
     character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
     integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
+    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, real, double, or logical type
                                                             !! conversions are done for the `get` routines
                                                             !! (default is false)
     logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
@@ -979,6 +985,82 @@
     call me%get(to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_double_vec
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 12/9/2013
+!
+!  Get a real(RK32) variable value from a JSON file.
+
+    subroutine json_file_get_real (me, path, val, found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path
+    real(RK32),intent(out)                :: val
+    logical(LK),intent(out),optional    :: found
+
+    call me%core%get(me%p, path=path, value=val, found=found)
+
+    end subroutine json_file_get_real
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_get_real]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_get_real (me, path, val, found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path
+    real(RK32),intent(out)                 :: val
+    logical(LK),intent(out),optional     :: found
+
+    call me%get(to_unicode(path), val, found)
+
+    end subroutine wrap_json_file_get_real
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/19/2014
+!
+!  Get a real(RK32) vector from a JSON file.
+
+    subroutine json_file_get_real_vec(me, path, vec, found)
+
+    implicit none
+
+    class(json_file),intent(inout)                :: me
+    character(kind=CK,len=*),intent(in)           :: path
+    real(RK32),dimension(:),allocatable,intent(out) :: vec
+    logical(LK),intent(out),optional              :: found
+
+    call me%core%get(me%p, path, vec, found)
+
+    end subroutine json_file_get_real_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_get_real_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_get_real_vec(me, path, vec, found)
+
+    implicit none
+
+    class(json_file),intent(inout)                :: me
+    character(kind=CDK,len=*),intent(in)          :: path
+    real(RK32),dimension(:),allocatable,intent(out) :: vec
+    logical(LK),intent(out),optional              :: found
+
+    call me%get(to_unicode(path), vec, found)
+
+    end subroutine wrap_json_file_get_real_vec
+
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1231,13 +1313,55 @@
 !# See also
 !  * [[json_update_double]]
 
-    subroutine json_file_update_real(me,name,val,found)
+    subroutine json_file_update_double(me,name,val,found)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: name
     real(RK),intent(in)                 :: val
+    logical(LK),intent(out)             :: found
+
+    if (.not. me%core%failed()) call me%core%update(me%p,name,val,found)
+
+    end subroutine json_file_update_double
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_update_double]], where "name" is kind=CDK.
+
+    subroutine wrap_json_file_update_double(me,name,val,found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: name
+    real(RK),intent(in)                  :: val
+    logical(LK),intent(out)              :: found
+
+    call me%update(to_unicode(name),val,found)
+
+    end subroutine wrap_json_file_update_double
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/10/2015
+!
+!  Given the path string, if the variable is present in the file,
+!  and is a scalar, then update its value.
+!  If it is not present, then create it and set its value.
+!
+!# See also
+!  * [[json_update_double]]
+
+    subroutine json_file_update_real(me,name,val,found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: name
+    real(RK32),intent(in)                 :: val
     logical(LK),intent(out)             :: found
 
     if (.not. me%core%failed()) call me%core%update(me%p,name,val,found)
@@ -1255,7 +1379,7 @@
 
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: name
-    real(RK),intent(in)                  :: val
+    real(RK32),intent(in)                  :: val
     logical(LK),intent(out)              :: found
 
     call me%update(to_unicode(name),val,found)
