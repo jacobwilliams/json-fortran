@@ -930,6 +930,7 @@
         !  deferred-length characters in gfortran-4.9]
         if (allocated(from%name))      to%name = from%name
         if (allocated(from%dbl_value)) allocate(to%dbl_value,source=from%dbl_value)
+        if (allocated(from%real_value)) allocate(to%real_value,source=from%real_value)
         if (allocated(from%log_value)) allocate(to%log_value,source=from%log_value)
         if (allocated(from%str_value)) to%str_value = from%str_value
         if (allocated(from%int_value)) allocate(to%int_value,source=from%int_value)
@@ -984,6 +985,7 @@
     if (allocated(d%log_value)) deallocate(d%log_value)
     if (allocated(d%int_value)) deallocate(d%int_value)
     if (allocated(d%dbl_value)) deallocate(d%dbl_value)
+    if (allocated(d%real_value)) deallocate(d%real_value)
     if (allocated(d%str_value)) deallocate(d%str_value)
 
     end subroutine destroy_json_data
@@ -4674,7 +4676,7 @@
     if ( json%exception_thrown ) return
 
     if (me%var_type == json_real) then
-        value = me%dbl_value
+        value = me%real_value
     else
         if (json%strict_type_checking) then
             call json%throw_exception('Error in json_get_real:'//&
@@ -6458,7 +6460,7 @@
     !set type and value:
     call destroy_json_data(p)
     p%var_type = json_real
-    allocate(p%dbl_value)
+    allocate(p%real_value)
     if (present(val)) then
         p%real_value = val
     else
