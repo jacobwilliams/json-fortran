@@ -65,6 +65,7 @@
                                json_array,  &
                                json_logical,&
                                json_integer,&
+                               json_real, &
                                json_double, &
                                json_string
     use json_value_module
