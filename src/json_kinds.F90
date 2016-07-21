@@ -37,11 +37,13 @@
 
     module json_kinds
 
-    use,intrinsic :: iso_fortran_env, only: real64,int32,logical_kinds
+    use,intrinsic :: iso_fortran_env, only: real32,real64,int32,logical_kinds
 
     implicit none
 
     private
+
+    integer,parameter,public :: RK32 = real32  !! 4-byte real kind 
 
     integer,parameter,public :: RK = real64  !! Default real kind [8 bytes]
 
