@@ -21,7 +21,7 @@ contains
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
     type(json_core) :: json
-    type(json_value),pointer :: p,new,element
+    type(json_value),pointer :: p,new,element,elements,root
     logical(lk) :: found,is_valid
     integer(IK),dimension(:),allocatable :: iarray
     character(kind=CK,len=:),allocatable :: error_msg
@@ -109,6 +109,59 @@ contains
                     write(error_unit,'(A,1x,*(I2,1X))') 'Success:',iarray
                 end if
             end if
+        end if
+
+        ! extract a set of elements from one array
+        ! and insert them into another:
+        nullify(new)
+        call json%create_object(root,'')
+        call json%create_array(new,'array')
+        call json%add(root,new)
+        call json%add(new,'',100)
+        call json%add(new,'',101)
+        call json%add(new,'',102)
+
+        call json%get(root,'array',iarray)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
+            error_cnt = error_cnt + 1
+        end if
+
+        call json%get_child(new,2,elements)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
+            error_cnt = error_cnt + 1
+        else
+            call json%insert_after(element,7,elements) ! insert new element after x(7)
+            call json%get(p,'x',iarray)
+            if (.not. all(iarray==[1,2,22,3,33,4,44,101,102])) then
+                write(error_unit,'(A,1x,*(I3,1X))') 'Error: unexpected output:',iarray
+                error_cnt = error_cnt + 1
+            else
+                write(error_unit,'(A,1x,*(I3,1X))') 'Success:',iarray
+            end if
+
+            !also check original list, which should now have only 100
+            call json%validate(new,is_valid,error_msg)
+            if (.not. is_valid) then
+                write(error_unit,'(A)') trim(error_msg)
+                error_cnt = error_cnt + 1
+            else
+                !check contents:
+                call json%get(root,'array',iarray)
+                if (json%failed()) then
+                    call json%print_error_message(error_unit)
+                    error_cnt = error_cnt + 1
+                else
+                    if (.not. all(iarray==[100])) then
+                        write(error_unit,'(A,1x,*(I3,1X))') 'Error: unexpected output:',iarray
+                        error_cnt = error_cnt + 1
+                    else
+                        write(error_unit,'(A,1x,*(I3,1X))') 'Success:',iarray
+                    end if
+                end if
+            end if
+
         end if
 
         call json%validate(p,is_valid,error_msg)

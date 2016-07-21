@@ -2510,8 +2510,27 @@
 !  end program test
 !````
 !
-!@note This routine can be used to insert a new element
-!      into an array or object at a specific index.
+!### Details
+!
+!  * This routine can be used to insert a new element (or set of elements)
+!    into an array or object at a specific index.
+!    See [[json_value_insert_after_child_by_index]]
+!  * Children and subsequent elements of `element` are carried along.
+!  * If the inserted elements are part of an existing list, then
+!    they are removed from that list.
+!
+!````
+!              p
+!       [1] - [2] - [3] - [4]
+!                 |
+!                [5] - [6] - [7]        n=3 elements inserted
+!              element       last
+!
+!  Result is:
+!
+!       [1] - [2] - [5] - [6] - [7] - [3] - [4]
+!
+!````
 
     subroutine json_value_insert_after(json,p,element)
 
@@ -2524,30 +2543,66 @@
     type(json_value),pointer       :: element !! the element to insert after `p`
 
     type(json_value),pointer :: parent  !! the parent of `p`
+    type(json_value),pointer :: next  !! temp pointer for traversing structure
+    type(json_value),pointer :: last  !! the last of the items being inserted
+    integer :: n  !! number of items being inserted
 
     if (.not. json%exception_thrown) then
 
         parent => p%parent
 
+        ! set first parent of inserted list:
+        element%parent => parent
+
+        ! Count the number of inserted elements.
+        ! and set their parents.
+        n = 1 ! initialize counter
+        next => element%next
+        last => element
+        do
+            if (.not. associated(next)) exit
+            n = n + 1
+            next%parent => parent
+            last => next
+            next => next%next
+        end do
+
         if (associated(parent)) then
-            element%parent => parent
-            parent%n_children = parent%n_children + 1
-            ! if p is last in list have to update parent tail:
-            if (associated(parent%tail,p)) parent%tail => element
-        else
-            element%parent => null()
+            ! update parent's child counter:
+            parent%n_children = parent%n_children + n
+            ! if p is last of parents children then
+            ! also have to update parent tail pointer:
+            if (associated(parent%tail,p)) then
+                parent%tail => last
+            end if
         end if
 
-        !if there are any in the list after p:
-        if (associated(p%next)) then
-            element%next => p%next
-            element%next%previous => element
-        else
-            element%next => null()
+        if (associated(element%previous)) then
+            ! element is apparently part of an existing list,
+            ! so have to update that as well.
+            if (associated(element%previous%parent)) then
+                element%previous%parent%n_children = &
+                    element%previous%parent%n_children - n
+                element%previous%parent%tail => &
+                    element%previous ! now the last one in the list
+            else
+                ! this would be a memory leak if the previous entries
+                ! are not otherwise being pointed too
+                ! [throw an error in this case???]
+            end if
+            !remove element from the other list:
+            element%previous%next => null()
         end if
-
-        p%next => element
         element%previous => p
+
+        if (associated(p%next)) then
+            ! if there are any in the list after p:
+            last%next => p%next
+            last%next%previous => element
+        else
+            last%next => null()
+        end if
+        p%next => element
 
     end if
 
@@ -2557,7 +2612,7 @@
 !*****************************************************************************************
 !>
 !  Inserts `element` after the `idx`-th child of `p`,
-!  and updates the JSON structure accordingly. It is just
+!  and updates the JSON structure accordingly. This is just
 !  a wrapper for [[json_value_insert_after]].
 
     subroutine json_value_insert_after_child_by_index(json,p,idx,element)
