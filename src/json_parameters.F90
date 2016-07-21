@@ -37,6 +37,9 @@
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter :: json_string    = 7  !! String JSON data type
 
+    integer(IK),parameter :: json_real      = 8  !! Real  JSON data type
+                                                 !! (see [[json_file_variable_info]] and [[json_info]])
+
     !special JSON characters
     character(kind=CK,len=*),parameter :: space           = ' '
     character(kind=CK,len=*),parameter :: start_object    = '{'
@@ -61,6 +64,10 @@
 
     character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E26.16E4)'
         !! default real number format statement (for writing real values to strings and files).
+        !! Note that this can be overridden by calling [[json_initialize]].
+
+    character(kind=CDK,len=*),parameter :: default_real32_fmt = '(ss,E18.8E4)'
+        !! default real number format statement (for writing real3 values to strings and files).
         !! Note that this can be overridden by calling [[json_initialize]].
 
     character(kind=CK,len=*),parameter :: star = '*' !! for invalid numbers and
