@@ -148,7 +148,6 @@
     !     call json%print(p,'test.json')  !write it to a file
     !     call json%destroy(p)            !cleanup
     !    end program test
-    !    type,public :: json_core
     !````
     type,public :: json_core
 
@@ -503,6 +502,14 @@
         procedure :: json_matrix_info
         procedure :: MAYBEWRAP(json_matrix_info_by_path)
 
+        !>
+        !  insert a new element after an existing one,
+        !  updating the JSON structure accordingly
+        generic,public :: insert_after => json_value_insert_after, &
+                                          json_value_insert_after_child_by_index
+        procedure :: json_value_insert_after
+        procedure :: json_value_insert_after_child_by_index
+
         procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
@@ -518,7 +525,7 @@
         procedure,public :: print_error_message => json_print_error_message !! simply routine to print error messages
         procedure,public :: swap                => json_value_swap          !! Swap two [[json_value]] pointers
                                                                             !! in a structure (or two different structures).
-        procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a child of another.
+        procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a descendant of another.
         procedure,public :: validate            => json_value_validate      !! Check that a [[json_value]] linked list is valid
                                                                             !! (i.e., is properly constructed). This may be
                                                                             !! useful if it has been constructed externally.
@@ -2375,7 +2382,7 @@
         case default
             found = .false.
             call json%throw_exception('Error in json_update_string: '//&
-                                 'the variable is not a scalar value')
+                                      'the variable is not a scalar value')
         end select
 
     else
@@ -2479,6 +2486,158 @@
     end if
 
     end subroutine json_value_add_member
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Inserts `element` after `p`, and updates the JSON structure accordingly.
+!
+!### Example
+!
+!````fortran
+!  program test
+!   use json_module
+!   implicit none
+!   logical(json_LK) :: found
+!   type(json_core) :: json
+!   type(json_value),pointer :: p,new,element
+!   call json%parse(file='myfile.json', p=p)
+!   call json%get(p,'x(3)',element,found) ! get pointer to an array element in the file
+!   call json%create_integer(new,1,'')    ! create a new element
+!   call json%insert_after(element,new)   ! insert new element after x(3)
+!   call json%print(p,'myfile2.json')     ! write it to a file
+!   call json%destroy(p)                  ! cleanup
+!  end program test
+!````
+!
+!### Details
+!
+!  * This routine can be used to insert a new element (or set of elements)
+!    into an array or object at a specific index.
+!    See [[json_value_insert_after_child_by_index]]
+!  * Children and subsequent elements of `element` are carried along.
+!  * If the inserted elements are part of an existing list, then
+!    they are removed from that list.
+!
+!````
+!              p
+!       [1] - [2] - [3] - [4]
+!                 |
+!                [5] - [6] - [7]        n=3 elements inserted
+!              element       last
+!
+!  Result is:
+!
+!       [1] - [2] - [5] - [6] - [7] - [3] - [4]
+!
+!````
+
+    subroutine json_value_insert_after(json,p,element)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p       !! a value from a JSON structure
+                                              !! (presumably, this is a child of
+                                              !! an object or array).
+    type(json_value),pointer       :: element !! the element to insert after `p`
+
+    type(json_value),pointer :: parent  !! the parent of `p`
+    type(json_value),pointer :: next  !! temp pointer for traversing structure
+    type(json_value),pointer :: last  !! the last of the items being inserted
+    integer :: n  !! number of items being inserted
+
+    if (.not. json%exception_thrown) then
+
+        parent => p%parent
+
+        ! set first parent of inserted list:
+        element%parent => parent
+
+        ! Count the number of inserted elements.
+        ! and set their parents.
+        n = 1 ! initialize counter
+        next => element%next
+        last => element
+        do
+            if (.not. associated(next)) exit
+            n = n + 1
+            next%parent => parent
+            last => next
+            next => next%next
+        end do
+
+        if (associated(parent)) then
+            ! update parent's child counter:
+            parent%n_children = parent%n_children + n
+            ! if p is last of parents children then
+            ! also have to update parent tail pointer:
+            if (associated(parent%tail,p)) then
+                parent%tail => last
+            end if
+        end if
+
+        if (associated(element%previous)) then
+            ! element is apparently part of an existing list,
+            ! so have to update that as well.
+            if (associated(element%previous%parent)) then
+                element%previous%parent%n_children = &
+                    element%previous%parent%n_children - n
+                element%previous%parent%tail => &
+                    element%previous ! now the last one in the list
+            else
+                ! this would be a memory leak if the previous entries
+                ! are not otherwise being pointed too
+                ! [throw an error in this case???]
+            end if
+            !remove element from the other list:
+            element%previous%next => null()
+        end if
+        element%previous => p
+
+        if (associated(p%next)) then
+            ! if there are any in the list after p:
+            last%next => p%next
+            last%next%previous => element
+        else
+            last%next => null()
+        end if
+        p%next => element
+
+    end if
+
+    end subroutine json_value_insert_after
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Inserts `element` after the `idx`-th child of `p`,
+!  and updates the JSON structure accordingly. This is just
+!  a wrapper for [[json_value_insert_after]].
+
+    subroutine json_value_insert_after_child_by_index(json,p,idx,element)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p       !! a JSON object or array.
+    integer(IK),intent(in)         :: idx     !! the index of the child of `p` to
+                                              !! insert the new element after
+    type(json_value),pointer       :: element !! the element to insert
+
+    type(json_value),pointer :: tmp  !! for getting the `idx`-th child of `p`
+
+    if (.not. json%exception_thrown) then
+
+        ! get the idx-th child of p:
+        call json%get_child(p,idx,tmp)
+
+        ! call json_value_insert_after:
+        if (.not. json%failed()) call json%insert_after(tmp,element)
+
+    end if
+
+    end subroutine json_value_insert_after_child_by_index
 !*****************************************************************************************
 
 !*****************************************************************************************
