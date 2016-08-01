@@ -4239,9 +4239,13 @@
                                                                !! (default is '.')
 
     character(kind=CK,len=:),allocatable :: ck_path  !! path to the variable
+    character(kind=CK,len=1) :: sep
+
+    ! from unicode:
+    sep = path_sep
 
     ! call the main routine:
-    call json_get_path(json,p,ck_path,found,use_alt_array_tokens,path_sep)
+    call json_get_path(json,p,ck_path,found,use_alt_array_tokens,sep)
 
     ! from unicode:
     path = ck_path
