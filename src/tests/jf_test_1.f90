@@ -13,7 +13,8 @@ module jf_test_1_mod
     implicit none
 
     character(len=*),parameter :: dir = '../files/inputs/'    !! working directory
-    character(len=*),parameter :: filename1 = 'test1.json'
+    character(len=*),parameter :: filename1 = 'test1.json'    !! file to read
+    logical :: namelist_style !! for printing JSON variable paths
 
 contains
 
@@ -68,12 +69,25 @@ contains
         error_cnt = error_cnt + 1
       end if
 
+      ! -------------------------
       ! print each variable:
-      write(error_unit,'(A)') ''
-      write(error_unit,'(A)') 'printing each variable...'
+
       call core%initialize()
       call json%get(p) ! get root
-      call core%traverse(p,print_json_variable) ! print all the variables
+
+      namelist_style = .true.
+      write(error_unit,'(A)') ''
+      write(error_unit,'(A)') 'printing each variable [namelist style]'
+      write(error_unit,'(A)') ''
+      call core%traverse(p,print_json_variable)
+
+      namelist_style = .false.
+      write(error_unit,'(A)') ''
+      write(error_unit,'(A)') 'printing each variable [JSON style]'
+      write(error_unit,'(A)') ''
+      call core%traverse(p,print_json_variable)
+
+      ! -------------------------
 
       ! extract data from the parsed value
       write(error_unit,'(A)') ''
@@ -305,9 +319,13 @@ contains
 
     !only print the leafs:
     if (.not. associated(child)) then
-        call json%get_path(p,path,found,&
-                           use_alt_array_tokens=.true.,&
-                           path_sep=json_CK_'%')  ! fortran-style
+        if (namelist_style) then
+            call json%get_path(p,path,found,&
+                               use_alt_array_tokens=.true.,&
+                               path_sep=json_CK_'%')  ! fortran-style
+        else
+            call json%get_path(p,path,found)  ! JSON-style
+        end if
         if (found) then
 
             call json%info(p,var_type=var_type)
