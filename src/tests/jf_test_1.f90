@@ -68,6 +68,13 @@ contains
         error_cnt = error_cnt + 1
       end if
 
+      ! print each variable:
+      write(error_unit,'(A)') ''
+      write(error_unit,'(A)') 'printing each variable...'
+      call core%initialize()
+      call json%get(p) ! get root
+      call core%traverse(p,print_json_variable) ! print all the variables
+
       ! extract data from the parsed value
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'get some data from the file...'
@@ -275,6 +282,62 @@ contains
     end if
 
     end subroutine test_1
+
+    subroutine print_json_variable(json,p,finished)
+
+    !! A `traverse` routine for printing out all
+    !! the variables in a JSON structure.
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p
+    logical(json_LK),intent(out)        :: finished  !! set true to stop traversing
+
+    character(kind=json_CK,len=:),allocatable :: path !! path to the variable
+    logical(json_LK) :: found !! error flag
+    type(json_value),pointer :: child !! variable's first child
+    character(kind=json_CK,len=:),allocatable :: value !! variable value as a string
+    integer(json_IK) :: var_type !! JSON variable type
+
+    call json%get_child(p,child)
+    finished = .false.
+
+    !only print the leafs:
+    if (.not. associated(child)) then
+        call json%get_path(p,path,found,&
+                           use_alt_array_tokens=.true.,&
+                           path_sep=json_CK_'%')  ! fortran-style
+        if (found) then
+
+            call json%info(p,var_type=var_type)
+            select case (var_type)
+            case (json_array)
+                !an empty array
+                value = json_CK_'()'
+            case (json_object)
+                !an empty object
+                value = json_CK_'{}'
+            case default
+                ! get the value as a string
+                ! [assumes strict_type_checking=false]
+                ! note: strings are returned escaped without quotes
+                call json%get(p,value)
+            end select
+
+            !check for errors:
+            if (json%failed()) then
+                finished = .true.
+            else
+                write(output_unit,'(A)') path//json_CK_' = '//value
+            end if
+
+        else
+            finished = .true.
+        end if
+    end if
+
+    end subroutine print_json_variable
 
 end module jf_test_1_mod
 !*****************************************************************************************
