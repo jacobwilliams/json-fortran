@@ -108,6 +108,10 @@
         !! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
     character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !! minimum width format for integers
 
+    integer(IK),parameter :: max_integer_str_len = 256 !! maximum string length of an integer.
+                                                       !! This is totally arbitrary (any way
+                                                       !! to get the compiler to tell us this?)
+
     integer(IK),parameter :: chunk_size = 100_IK  !! for allocatable strings: allocate chunks of this size
     integer(IK),parameter :: unit2str = -1_IK  !! unit number to cause stuff to be
                                                !! output to strings rather than files.

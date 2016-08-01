@@ -510,6 +510,11 @@
         procedure :: json_value_insert_after
         procedure :: json_value_insert_after_child_by_index
 
+        !>
+        !  get the path to a JSON variable in a structure:
+        generic,public :: get_path => MAYBEWRAP(json_get_path)
+        procedure :: MAYBEWRAP(json_get_path)
+
         procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
@@ -4029,6 +4034,201 @@
     call json%get(me, to_unicode(path), p, found)
 
     end subroutine wrap_json_get_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns the path to a JSON object that is part
+!  of a linked list structure.
+!
+!  The path returned would be suitable for input to
+!  [[json_get_by_path]] and related routines.
+!
+!@note If an error occurs (which in this case means a malformed
+!      JSON structure) then an exception will be thrown, unless
+!      `found` is present, which will be set to `false`. `path`
+!      will be a blank string.
+
+    subroutine json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
+
+    implicit none
+
+    class(json_core),intent(inout)                   :: json
+    type(json_value),pointer,intent(in)              :: p     !! a JSON linked list object
+    character(kind=CK,len=:),allocatable,intent(out) :: path  !! path to the variable
+    logical(LK),intent(out),optional                 :: found !! true if there were no problems
+    logical(LK),intent(in),optional :: use_alt_array_tokens   !! if true, then '()' are used for array elements
+                                                              !! otherwise, '[]' are used [default]
+    character(kind=CK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
+                                                              !! (default is '.')
+
+    type(json_value),pointer                   :: tmp            !! for traversing the structure
+    type(json_value),pointer                   :: element        !! for traversing the structure
+    integer(IK)                                :: var_type       !! JSON variable type flag
+    character(kind=CK,len=:),allocatable       :: name           !! variable name
+    character(kind=CK,len=:),allocatable       :: parent_name    !! variable's parent name
+    character(kind=CK,len=max_integer_str_len) :: istr           !! for integer to string conversion (array indices)
+    integer(IK)                                :: i              !! counter
+    integer(IK)                                :: n_children     !! number of children for parent
+    logical(LK)                                :: use_brackets   !! to use '[]' characters for arrays
+    logical(LK)                                :: parent_is_root !! if the parent is the root
+
+    !initialize:
+    path = ''
+
+    !optional input:
+    if (present(use_alt_array_tokens)) then
+        use_brackets = .not. use_alt_array_tokens
+    else
+        use_brackets = .true.
+    end if
+
+    if (associated(p)) then
+
+        !traverse the structure via parents up to the root
+        tmp => p
+        do
+
+            if (.not. associated(tmp)) exit !finished
+
+            !get info about the current variable:
+            call json%info(tmp,name=name)
+
+            ! if tmp a child of an object, or an element of an array
+            if (associated(tmp%parent)) then
+
+                !get info about the parent:
+                call json%info(tmp%parent,var_type=var_type,&
+                               n_children=n_children,name=parent_name)
+
+                select case (var_type)
+                case (json_array)
+
+                    !get array index of this element:
+                    element => tmp%parent%children
+                    do i = 1, n_children
+                        if (.not. associated(element)) then
+                            call json%throw_exception('Error in json_get_path: '//&
+                                                      'malformed JSON structure. ')
+                            exit
+                        end if
+                        if (associated(element,tmp)) then
+                            exit
+                        else
+                            element => element%next
+                        end if
+                        if (i==n_children) then ! it wasn't found (should never happen)
+                            call json%throw_exception('Error in json_get_path: '//&
+                                                      'malformed JSON structure. ')
+                            exit
+                        end if
+                    end do
+                    call integer_to_string(i,int_fmt,istr)
+                    if (use_brackets) then
+                        call add_to_path(parent_name//start_array//&
+                                         trim(adjustl(istr))//end_array,path_sep)
+                    else
+                        call add_to_path(parent_name//start_array_alt//&
+                                         trim(adjustl(istr))//end_array_alt,path_sep)
+                    end if
+                    tmp => tmp%parent  ! already added parent name
+
+                case (json_object)
+
+                    !process parent on the next pass
+                    call add_to_path(name,path_sep)
+
+                case default
+
+                    call json%throw_exception('Error in json_get_path: '//&
+                                              'malformed JSON structure. '//&
+                                              'A variable that is not an object '//&
+                                              'or array should not have a child.')
+                    exit
+
+                end select
+
+            else
+                !the last one:
+                call add_to_path(name,path_sep)
+            end if
+
+            if (associated(tmp%parent)) then
+                !check if the parent is the root:
+                parent_is_root = (.not. associated(tmp%parent%parent))
+                if (parent_is_root) exit
+            end if
+
+            !go to parent:
+            tmp => tmp%parent
+
+        end do
+
+    else
+        call json%throw_exception('Error in json_get_path: '//&
+                                  'input pointer is not associated')
+    end if
+
+    !for errors, return blank string:
+    if (json%exception_thrown) path = ''
+
+    !optional output:
+    if (present(found)) then
+        if (json%exception_thrown) then
+            found = .false.
+            call json%clear_exceptions()
+        else
+            found = .true.
+        end if
+    end if
+
+    contains
+
+        subroutine add_to_path(str,dot)
+        !! prepend the string to the path
+        implicit none
+        character(kind=CK,len=*),intent(in) :: str  !! string to prepend to `path`
+        character(kind=CK,len=1),intent(in),optional :: dot  !! path separator (default is '.')
+        if (path=='') then
+            path = str
+        else
+            if (present(dot)) then
+                path = str//dot//path
+            else
+                path = str//child//path
+            end if
+        end if
+        end subroutine add_to_path
+
+    end subroutine json_get_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_get_path]] where "path" and "path_sep" are kind=CDK.
+
+    subroutine wrap_json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
+
+    implicit none
+
+    class(json_core),intent(inout)                    :: json
+    type(json_value),pointer,intent(in)               :: p     !! a JSON linked list object
+    character(kind=CDK,len=:),allocatable,intent(out) :: path  !! path to the variable
+    logical(LK),intent(out),optional                  :: found !! true if there were no problems
+    logical(LK),intent(in),optional :: use_alt_array_tokens    !! if true, then '()' are used for array elements
+                                                               !! otherwise, '[]' are used [default]
+    character(kind=CDK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
+                                                               !! (default is '.')
+
+    character(kind=CK,len=:),allocatable :: ck_path  !! path to the variable
+
+    ! call the main routine:
+    call json_get_path(json,p,ck_path,found,use_alt_array_tokens,path_sep)
+
+    ! from unicode:
+    path = ck_path
+
+    end subroutine wrap_json_get_path
 !*****************************************************************************************
 
 !*****************************************************************************************
