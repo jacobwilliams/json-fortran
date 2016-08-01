@@ -196,6 +196,11 @@
                                                !! If true, the entire structure will be
                                                !! printed on one line.
 
+        logical(LK) :: unescaped_strings = .true.  !! If false, then the raw escaped
+                                                   !! string is returned from [[json_get_string]]
+                                                   !! and similar routines. If true [default],
+                                                   !! then the string is returned unescaped.
+
         contains
 
         private
@@ -632,7 +637,8 @@
                                   strict_type_checking,&
                                   trailing_spaces_significant,&
                                   case_sensitive_keys,&
-                                  no_whitespace) result(json_core_object)
+                                  no_whitespace,&
+                                  unescape_strings) result(json_core_object)
 
     implicit none
 
@@ -654,13 +660,18 @@
     logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
                                                       !! done without adding any non-significant
                                                       !! spaces or linebreaks (default is false)
+    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
+                                                        !! string is returned from [[json_get_string]]
+                                                        !! and similar routines. If true [default],
+                                                        !! then the string is returned unescaped.
 
     call json_core_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
                                 strict_type_checking,&
                                 trailing_spaces_significant,&
                                 case_sensitive_keys,&
-                                no_whitespace)
+                                no_whitespace,&
+                                unescape_strings)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -689,7 +700,8 @@
                                strict_type_checking,&
                                trailing_spaces_significant,&
                                case_sensitive_keys,&
-                               no_whitespace)
+                               no_whitespace,&
+                               unescape_strings)
 
     implicit none
 
@@ -710,6 +722,10 @@
     logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
                                                       !! done without adding any non-significant
                                                       !! spaces or linebreaks (default is false)
+    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
+                                                        !! string is returned from [[json_get_string]]
+                                                        !! and similar routines. If true [default],
+                                                        !! then the string is returned unescaped.
 
     character(kind=CDK,len=10) :: w,d,e
     character(kind=CDK,len=2)  :: sgn, rl_edit_desc
@@ -745,6 +761,8 @@
         json%case_sensitive_keys = case_sensitive_keys
     if (present(no_whitespace)) &
         json%no_whitespace = no_whitespace
+    if (present(unescape_strings)) &
+        json%unescaped_strings = unescape_strings
 
     !Set the format for real numbers:
     ! [if not changing it, then it remains the same]
@@ -5001,31 +5019,83 @@
     value = ''
     if (.not. json%exception_thrown) then
 
-        select case (me%var_type)
-
-        case (json_string)
+        if (me%var_type == json_string) then
 
             if (allocated(me%str_value)) then
-                call unescape_string(me%str_value, value, error_message)
-                if (allocated(error_message)) then
-                    call json%throw_exception(error_message)
-                    deallocate(error_message)
-                    value = ''
+                if (json%unescaped_strings) then
+                    call unescape_string(me%str_value, value, error_message)
+                    if (allocated(error_message)) then
+                        call json%throw_exception(error_message)
+                        deallocate(error_message)
+                        value = ''
+                    end if
+                else
+                    value = me%str_value
                 end if
             else
                call json%throw_exception('Error in json_get_string: '//&
                                          'me%str_value not allocated')
             end if
 
-        case default
+        else
 
-            call json%throw_exception('Error in json_get_string: '//&
-                                      'Unable to resolve value to characters: '//&
-                                      me%name)
+            if (json%strict_type_checking) then
+                call json%throw_exception('Error in json_get_string:'//&
+                                          ' Unable to resolve value to string: '//me%name)
+            else
 
-            ! Note: for the other cases, we could do val to string conversions.
+                select case (me%var_type)
 
-        end select
+                case (json_integer)
+
+                    if (allocated(me%int_value)) then
+                        value = repeat(' ', max_integer_str_len)
+                        call integer_to_string(me%int_value,int_fmt,value)
+                        value = trim(value)
+                    else
+                        call json%throw_exception('Error in json_get_string: '//&
+                                                  'me%int_value not allocated')
+                    end if
+
+                case (json_double)
+
+                    if (allocated(me%dbl_value)) then
+                        value = repeat(' ', max_numeric_str_len)
+                        call real_to_string(me%dbl_value,json%real_fmt,&
+                                            json%compact_real,value)
+                        value = trim(value)
+                    else
+                        call json%throw_exception('Error in dbl_value: '//&
+                                                  'me%int_value not allocated')
+                    end if
+
+                case (json_logical)
+
+                    if (allocated(me%log_value)) then
+                        if (me%log_value) then
+                            value = true_str
+                        else
+                            value = false_str
+                        end if
+                    else
+                        call json%throw_exception('Error in json_get_string: '//&
+                                                  'me%log_value not allocated')
+                    end if
+
+                case (json_null)
+
+                    value = null_str
+
+                case default
+
+                    call json%throw_exception('Error in json_get_string: '//&
+                                              'Unable to resolve value to characters: '//&
+                                              me%name)
+
+                end select
+
+            end if
+        end if
 
     end if
 

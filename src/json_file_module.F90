@@ -272,7 +272,8 @@
                                             strict_type_checking,&
                                             trailing_spaces_significant,&
                                             case_sensitive_keys,&
-                                            no_whitespace)
+                                            no_whitespace,&
+                                            unescape_strings)
 
     implicit none
 
@@ -293,13 +294,18 @@
     logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
                                                       !! done without adding any non-significant
                                                       !! spaces or linebreaks (default is false)
+    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
+                                                        !! string is returned from [[json_get_string]]
+                                                        !! and similar routines. If true [default],
+                                                        !! then the string is returned unescaped.
 
     call me%core%initialize(verbose,compact_reals,&
                             print_signs,real_format,spaces_per_tab,&
                             strict_type_checking,&
                             trailing_spaces_significant,&
                             case_sensitive_keys,&
-                            no_whitespace)
+                            no_whitespace,&
+                            unescape_strings)
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
@@ -358,7 +364,8 @@
                                   strict_type_checking,&
                                   trailing_spaces_significant,&
                                   case_sensitive_keys,&
-                                  no_whitespace) result(file_object)
+                                  no_whitespace,&
+                                  unescape_strings) result(file_object)
 
     implicit none
 
@@ -381,13 +388,18 @@
     logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
                                                       !! done without adding any non-significant
                                                       !! spaces or linebreaks (default is false)
+    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
+                                                        !! string is returned from [[json_get_string]]
+                                                        !! and similar routines. If true [default],
+                                                        !! then the string is returned unescaped.
 
     call file_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
                                 strict_type_checking,&
                                 trailing_spaces_significant,&
                                 case_sensitive_keys,&
-                                no_whitespace)
+                                no_whitespace,&
+                                unescape_strings)
 
     if (present(p)) file_object%p => p
 
