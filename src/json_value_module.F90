@@ -196,6 +196,11 @@
                                                !! If true, the entire structure will be
                                                !! printed on one line.
 
+        logical(LK) :: unescaped_strings = .true.  !! If false, then the raw escaped
+                                                   !! string is returned from [[json_get_string]]
+                                                   !! and similar routines. If true [default],
+                                                   !! then the string is returned unescaped.
+
         contains
 
         private
@@ -510,6 +515,11 @@
         procedure :: json_value_insert_after
         procedure :: json_value_insert_after_child_by_index
 
+        !>
+        !  get the path to a JSON variable in a structure:
+        generic,public :: get_path => MAYBEWRAP(json_get_path)
+        procedure :: MAYBEWRAP(json_get_path)
+
         procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
@@ -627,7 +637,8 @@
                                   strict_type_checking,&
                                   trailing_spaces_significant,&
                                   case_sensitive_keys,&
-                                  no_whitespace) result(json_core_object)
+                                  no_whitespace,&
+                                  unescape_strings) result(json_core_object)
 
     implicit none
 
@@ -649,13 +660,18 @@
     logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
                                                       !! done without adding any non-significant
                                                       !! spaces or linebreaks (default is false)
+    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
+                                                        !! string is returned from [[json_get_string]]
+                                                        !! and similar routines. If true [default],
+                                                        !! then the string is returned unescaped.
 
     call json_core_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
                                 strict_type_checking,&
                                 trailing_spaces_significant,&
                                 case_sensitive_keys,&
-                                no_whitespace)
+                                no_whitespace,&
+                                unescape_strings)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -684,7 +700,8 @@
                                strict_type_checking,&
                                trailing_spaces_significant,&
                                case_sensitive_keys,&
-                               no_whitespace)
+                               no_whitespace,&
+                               unescape_strings)
 
     implicit none
 
@@ -705,6 +722,10 @@
     logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
                                                       !! done without adding any non-significant
                                                       !! spaces or linebreaks (default is false)
+    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
+                                                        !! string is returned from [[json_get_string]]
+                                                        !! and similar routines. If true [default],
+                                                        !! then the string is returned unescaped.
 
     character(kind=CDK,len=10) :: w,d,e
     character(kind=CDK,len=2)  :: sgn, rl_edit_desc
@@ -740,6 +761,8 @@
         json%case_sensitive_keys = case_sensitive_keys
     if (present(no_whitespace)) &
         json%no_whitespace = no_whitespace
+    if (present(unescape_strings)) &
+        json%unescaped_strings = unescape_strings
 
     !Set the format for real numbers:
     ! [if not changing it, then it remains the same]
@@ -4033,6 +4056,205 @@
 
 !*****************************************************************************************
 !>
+!  Returns the path to a JSON object that is part
+!  of a linked list structure.
+!
+!  The path returned would be suitable for input to
+!  [[json_get_by_path]] and related routines.
+!
+!@note If an error occurs (which in this case means a malformed
+!      JSON structure) then an exception will be thrown, unless
+!      `found` is present, which will be set to `false`. `path`
+!      will be a blank string.
+
+    subroutine json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
+
+    implicit none
+
+    class(json_core),intent(inout)                   :: json
+    type(json_value),pointer,intent(in)              :: p     !! a JSON linked list object
+    character(kind=CK,len=:),allocatable,intent(out) :: path  !! path to the variable
+    logical(LK),intent(out),optional                 :: found !! true if there were no problems
+    logical(LK),intent(in),optional :: use_alt_array_tokens   !! if true, then '()' are used for array elements
+                                                              !! otherwise, '[]' are used [default]
+    character(kind=CK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
+                                                              !! (default is '.')
+
+    type(json_value),pointer                   :: tmp            !! for traversing the structure
+    type(json_value),pointer                   :: element        !! for traversing the structure
+    integer(IK)                                :: var_type       !! JSON variable type flag
+    character(kind=CK,len=:),allocatable       :: name           !! variable name
+    character(kind=CK,len=:),allocatable       :: parent_name    !! variable's parent name
+    character(kind=CK,len=max_integer_str_len) :: istr           !! for integer to string conversion (array indices)
+    integer(IK)                                :: i              !! counter
+    integer(IK)                                :: n_children     !! number of children for parent
+    logical(LK)                                :: use_brackets   !! to use '[]' characters for arrays
+    logical(LK)                                :: parent_is_root !! if the parent is the root
+
+    !initialize:
+    path = ''
+
+    !optional input:
+    if (present(use_alt_array_tokens)) then
+        use_brackets = .not. use_alt_array_tokens
+    else
+        use_brackets = .true.
+    end if
+
+    if (associated(p)) then
+
+        !traverse the structure via parents up to the root
+        tmp => p
+        do
+
+            if (.not. associated(tmp)) exit !finished
+
+            !get info about the current variable:
+            call json%info(tmp,name=name)
+
+            ! if tmp a child of an object, or an element of an array
+            if (associated(tmp%parent)) then
+
+                !get info about the parent:
+                call json%info(tmp%parent,var_type=var_type,&
+                               n_children=n_children,name=parent_name)
+
+                select case (var_type)
+                case (json_array)
+
+                    !get array index of this element:
+                    element => tmp%parent%children
+                    do i = 1, n_children
+                        if (.not. associated(element)) then
+                            call json%throw_exception('Error in json_get_path: '//&
+                                                      'malformed JSON structure. ')
+                            exit
+                        end if
+                        if (associated(element,tmp)) then
+                            exit
+                        else
+                            element => element%next
+                        end if
+                        if (i==n_children) then ! it wasn't found (should never happen)
+                            call json%throw_exception('Error in json_get_path: '//&
+                                                      'malformed JSON structure. ')
+                            exit
+                        end if
+                    end do
+                    call integer_to_string(i,int_fmt,istr)
+                    if (use_brackets) then
+                        call add_to_path(parent_name//start_array//&
+                                         trim(adjustl(istr))//end_array,path_sep)
+                    else
+                        call add_to_path(parent_name//start_array_alt//&
+                                         trim(adjustl(istr))//end_array_alt,path_sep)
+                    end if
+                    tmp => tmp%parent  ! already added parent name
+
+                case (json_object)
+
+                    !process parent on the next pass
+                    call add_to_path(name,path_sep)
+
+                case default
+
+                    call json%throw_exception('Error in json_get_path: '//&
+                                              'malformed JSON structure. '//&
+                                              'A variable that is not an object '//&
+                                              'or array should not have a child.')
+                    exit
+
+                end select
+
+            else
+                !the last one:
+                call add_to_path(name,path_sep)
+            end if
+
+            if (associated(tmp%parent)) then
+                !check if the parent is the root:
+                parent_is_root = (.not. associated(tmp%parent%parent))
+                if (parent_is_root) exit
+            end if
+
+            !go to parent:
+            tmp => tmp%parent
+
+        end do
+
+    else
+        call json%throw_exception('Error in json_get_path: '//&
+                                  'input pointer is not associated')
+    end if
+
+    !for errors, return blank string:
+    if (json%exception_thrown) path = ''
+
+    !optional output:
+    if (present(found)) then
+        if (json%exception_thrown) then
+            found = .false.
+            call json%clear_exceptions()
+        else
+            found = .true.
+        end if
+    end if
+
+    contains
+
+        subroutine add_to_path(str,dot)
+        !! prepend the string to the path
+        implicit none
+        character(kind=CK,len=*),intent(in) :: str  !! string to prepend to `path`
+        character(kind=CK,len=1),intent(in),optional :: dot  !! path separator (default is '.')
+        if (path=='') then
+            path = str
+        else
+            if (present(dot)) then
+                path = str//dot//path
+            else
+                path = str//child//path
+            end if
+        end if
+        end subroutine add_to_path
+
+    end subroutine json_get_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_get_path]] where "path" and "path_sep" are kind=CDK.
+
+    subroutine wrap_json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
+
+    implicit none
+
+    class(json_core),intent(inout)                    :: json
+    type(json_value),pointer,intent(in)               :: p     !! a JSON linked list object
+    character(kind=CDK,len=:),allocatable,intent(out) :: path  !! path to the variable
+    logical(LK),intent(out),optional                  :: found !! true if there were no problems
+    logical(LK),intent(in),optional :: use_alt_array_tokens    !! if true, then '()' are used for array elements
+                                                               !! otherwise, '[]' are used [default]
+    character(kind=CDK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
+                                                               !! (default is '.')
+
+    character(kind=CK,len=:),allocatable :: ck_path  !! path to the variable
+    character(kind=CK,len=1) :: sep
+
+    ! from unicode:
+    sep = path_sep
+
+    ! call the main routine:
+    call json_get_path(json,p,ck_path,found,use_alt_array_tokens,sep)
+
+    ! from unicode:
+    path = ck_path
+
+    end subroutine wrap_json_get_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
 !  Convert a string into an integer.
 !
 !# History
@@ -4801,31 +5023,83 @@
     value = ''
     if (.not. json%exception_thrown) then
 
-        select case (me%var_type)
-
-        case (json_string)
+        if (me%var_type == json_string) then
 
             if (allocated(me%str_value)) then
-                call unescape_string(me%str_value, value, error_message)
-                if (allocated(error_message)) then
-                    call json%throw_exception(error_message)
-                    deallocate(error_message)
-                    value = ''
+                if (json%unescaped_strings) then
+                    call unescape_string(me%str_value, value, error_message)
+                    if (allocated(error_message)) then
+                        call json%throw_exception(error_message)
+                        deallocate(error_message)
+                        value = ''
+                    end if
+                else
+                    value = me%str_value
                 end if
             else
                call json%throw_exception('Error in json_get_string: '//&
                                          'me%str_value not allocated')
             end if
 
-        case default
+        else
 
-            call json%throw_exception('Error in json_get_string: '//&
-                                      'Unable to resolve value to characters: '//&
-                                      me%name)
+            if (json%strict_type_checking) then
+                call json%throw_exception('Error in json_get_string:'//&
+                                          ' Unable to resolve value to string: '//me%name)
+            else
 
-            ! Note: for the other cases, we could do val to string conversions.
+                select case (me%var_type)
 
-        end select
+                case (json_integer)
+
+                    if (allocated(me%int_value)) then
+                        value = repeat(' ', max_integer_str_len)
+                        call integer_to_string(me%int_value,int_fmt,value)
+                        value = trim(value)
+                    else
+                        call json%throw_exception('Error in json_get_string: '//&
+                                                  'me%int_value not allocated')
+                    end if
+
+                case (json_double)
+
+                    if (allocated(me%dbl_value)) then
+                        value = repeat(' ', max_numeric_str_len)
+                        call real_to_string(me%dbl_value,json%real_fmt,&
+                                            json%compact_real,value)
+                        value = trim(value)
+                    else
+                        call json%throw_exception('Error in dbl_value: '//&
+                                                  'me%int_value not allocated')
+                    end if
+
+                case (json_logical)
+
+                    if (allocated(me%log_value)) then
+                        if (me%log_value) then
+                            value = true_str
+                        else
+                            value = false_str
+                        end if
+                    else
+                        call json%throw_exception('Error in json_get_string: '//&
+                                                  'me%log_value not allocated')
+                    end if
+
+                case (json_null)
+
+                    value = null_str
+
+                case default
+
+                    call json%throw_exception('Error in json_get_string: '//&
+                                              'Unable to resolve value to characters: '//&
+                                              me%name)
+
+                end select
+
+            end if
+        end if
 
     end if
 
