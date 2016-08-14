@@ -1,17 +1,18 @@
 ---
 project: JSON-Fortran
-preprocessor: {!.PREPROCESSOR!}
-favicon: ./media/json-fortran-32x32.png
-project_dir: ./src
-output_dir: ./doc
-media_dir: ./media
-project_github: https://github.com/jacobwilliams/json-fortran
-project_download: https://github.com/jacobwilliams/json-fortran/releases/latest
 summary: JSON-Fortran -- A Fortran 2008 JSON API
 author: Jacob Williams
+src_dir: ./src
+output_dir: ./doc
+media_dir: ./media
+exclude_dir: ./src/tests
+favicon: ./media/json-fortran-32x32.png
+project_github: https://github.com/jacobwilliams/json-fortran
+project_download: https://github.com/jacobwilliams/json-fortran/releases/latest
 github: https://github.com/jacobwilliams
 website: http://degenerateconic.com
 twitter: https://twitter.com/degenerateconic
+preprocessor: {!.PREPROCESSOR!}
 predocmark_alt: >
 predocmark: <
 docmark_alt:
@@ -21,11 +22,13 @@ display: public
          private
 source: true
 graph: true
+sort: alpha
 coloured_edges: true
+extra_filetypes: .inc !
 print_creation_date: true
 creation_date: %Y-%m-%d %H:%M %z
-exclude_dir: tests
 extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
+            ifcore:https://software.intel.com/en-us/node/525900
 md_extensions: markdown.extensions.toc(anchorlink=False)
                markdown.extensions.smarty(smart_quotes=False)
 ---

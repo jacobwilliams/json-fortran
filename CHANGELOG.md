@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [5.1.0 (2016-08-14)](#510-2016-08-14)
     - [5.0.2 (2016-06-11)](#502-2016-06-11)
     - [5.0.1 (2016-06-11)](#501-2016-06-11)
     - [5.0.0 (2016-05-09)](#500-2016-05-09)
@@ -19,14 +20,38 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.2...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.1.0...HEAD)
+
+### [5.1.0](https://github.com/jacobwilliams/json-fortran/tree/5.1.0) (2016-08-14)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.2...5.1.0)
+or [Download v5.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/5.1.0)
+
+**Enhancements:**
+
+- Added a `traverse` routine to `json_file` [\#204](https://github.com/jacobwilliams/json-fortran/issues/204) [\#206](https://github.com/jacobwilliams/json-fortran/pull/206) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added added `get` and `set` routines for the `json_core` in a `json_file` [\#206](https://github.com/jacobwilliams/json-fortran/pull/206) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `get_path` routine [\#223](https://github.com/jacobwilliams/json-fortran/issues/223) [\#224](https://github.com/jacobwilliams/json-fortran/pull/224) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new option for returning strings in their escaped form. Also, when `strict_type_checking` is False, the `get` routines will now return integer, double, logical, and null values as strings. [\#224](https://github.com/jacobwilliams/json-fortran/pull/224) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `insert_after` routine [\#220](https://github.com/jacobwilliams/json-fortran/issues/220) [\#221](https://github.com/jacobwilliams/json-fortran/pull/221) ([jacobwilliams](https://github.com/jacobwilliams))
+- Move json type integer variables into the `json_parameters` module [\#218](https://github.com/jacobwilliams/json-fortran/issues/218) [\#219](https://github.com/jacobwilliams/json-fortran/pull/219) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new option to print JSON without extra whitespace [\#216](https://github.com/jacobwilliams/json-fortran/issues/216) [\#217](https://github.com/jacobwilliams/json-fortran/pull/217) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `info` routines (`json_info_by_path`, `json_matrix_info_by_path`, and `json_matrix_info`) [\#213](https://github.com/jacobwilliams/json-fortran/issues/213) [\#212](https://github.com/jacobwilliams/json-fortran/pull/212) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added an API for adding Null variables [\#210](https://github.com/jacobwilliams/json-fortran/issues/210) [\#214](https://github.com/jacobwilliams/json-fortran/pull/214) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fix doc deployment problems [\#201](https://github.com/jacobwilliams/json-fortran/issues/201) ([zbeekman](https://github.com/zbeekman))
+
 
 ### [5.0.2](https://github.com/jacobwilliams/json-fortran/tree/5.0.2) (2016-06-11)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.1...5.0.2)
 or [Download v5.0.2](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.2)
 
-Minor documentation fix.
+*Note: This release contains no changes to the library, only the documentation.*
+
+- Minor documentation fix.
 
 ### [5.0.1](https://github.com/jacobwilliams/json-fortran/tree/5.0.1) (2016-06-11)
 
