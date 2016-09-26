@@ -727,10 +727,13 @@
                                                         !! and similar routines. If true [default],
                                                         !! then the string is returned unescaped.
 
-    character(kind=CDK,len=10) :: w,d,e
-    character(kind=CDK,len=2)  :: sgn, rl_edit_desc
-    integer(IK) :: istat
-    logical(LK) :: sgn_prnt
+    character(kind=CDK,len=10) :: w  !! max string length
+    character(kind=CDK,len=10) :: d  !! real precision digits
+    character(kind=CDK,len=10) :: e  !! real exponent digits
+    character(kind=CDK,len=2)  :: sgn  !! sign flag: `ss` or `sp`
+    character(kind=CDK,len=2)  :: rl_edit_desc  !! `G`, `E`, `EN`, or `ES`
+    integer(IK)                :: istat  !! `iostat` flag for write statements
+    logical(LK)                :: sgn_prnt  !! print sign flag
 
     !reset exception to false:
     call json%clear_exceptions()
@@ -776,7 +779,13 @@
         ! [this overrides the other options]
         if (present(real_format)) then
             if (real_format==star) then
-                json%compact_real = .false.
+                if (present(compact_reals)) then
+                    ! we will also allow for compact reals with
+                    ! '*' format, if both arguments are present.
+                    json%compact_real = compact_reals
+                else
+                    json%compact_real = .false.
+                end if
                 json%real_fmt = star
                 return
             end if
@@ -1043,10 +1052,10 @@
     integer(IK),intent(out),optional     :: n_children !! number of children
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    type(json_value),pointer :: p_var
-    logical(LK) :: ok
+    type(json_value),pointer :: p_var  !! temporary pointer
+    logical(LK) :: ok  !! if the variable was found
 #if defined __GFORTRAN__
-    character(kind=CK,len=:),allocatable :: p_name
+    character(kind=CK,len=:),allocatable :: p_name  !! temporary variable for getting name
 #endif
 
     call json%get(p,path,p_var,found)
@@ -1158,7 +1167,7 @@
     integer     :: i               !! counter
     integer     :: j               !! counter
 #if defined __GFORTRAN__
-    character(kind=CK,len=:),allocatable :: p_name
+    character(kind=CK,len=:),allocatable :: p_name  !! temporary variable for getting name
 #endif
 
     !get info about the variable:
@@ -1273,7 +1282,7 @@
     type(json_value),pointer :: p_var
     logical(LK) :: ok
 #if defined __GFORTRAN__
-    character(kind=CK,len=:),allocatable :: p_name
+    character(kind=CK,len=:),allocatable :: p_name  !! temporary variable for getting name
 #endif
 
     call json%get(p,path,p_var,found)
