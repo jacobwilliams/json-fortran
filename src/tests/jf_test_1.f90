@@ -78,7 +78,7 @@ contains
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing each variable [namelist style]'
       write(error_unit,'(A)') ''
-      call core%initialize(unescape_strings=.false.)
+      call core%initialize(unescape_strings=.false.,compact_reals=.true.,real_format='*')
       call core%traverse(p,print_json_variable)
 
       namelist_style = .false.
