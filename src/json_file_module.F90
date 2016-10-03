@@ -71,6 +71,8 @@
 
         procedure,public :: get_core => get_json_core_in_file
 
+        procedure,public :: get_json_value => get_json_value_in_file
+
         procedure,public :: load_file => json_file_load
 
         generic,public :: load_from_string => MAYBEWRAP(json_file_load_from_string)
@@ -347,6 +349,22 @@
 
     end subroutine get_json_core_in_file
 !*****************************************************************************************
+
+
+!*****************************************************************************************
+!>
+!  Get a pointer of the [[json_value]] in this [[json_file]].
+
+    subroutine get_json_value_in_file(me,value)
+
+    implicit none
+
+    class(json_file), intent(in) :: me
+    type(json_value),pointer, intent(out) :: value
+
+    value => me%p
+
+    end subroutine get_json_value_in_file
 
 !*****************************************************************************************
 !> author: Izaak Beekman
