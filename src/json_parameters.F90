@@ -93,7 +93,7 @@
     !find out the precision of the floating point number system
     !and set safety factors
     integer(IK),parameter :: rp_safety_factor = 1_IK
-    integer(IK),parameter :: rp_addl_safety = 1_IK
+    integer(IK),parameter :: rp_addl_safety = 2_IK
     integer(IK),parameter :: real_precision = rp_safety_factor*precision(1.0_RK) + &
                                               rp_addl_safety
 
