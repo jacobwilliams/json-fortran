@@ -11,7 +11,8 @@
 #    build.sh [--compiler {intel|gnu|<other>}] [--cflags '<custom compiler flags here>']
 #             [--coverage [{yes|no}]] [--profile [{yes|no}]] [--skip-tests [{yes|no}]]
 #             [--skip-documentation [{yes|no}]] [--enable-unicode [{yes|no}]] [--help]
-#             [--clean]
+#             [--clean] [--real-kind [{REAL32\REAL64\REAL128}]]
+#             [--int-kind [{INT8\INT16\INT32\INT64}]]
 #
 #    By default, if invoked without any flags, this build script will build the
 #    JSON-Fortran library using gfortran,
@@ -22,6 +23,8 @@
 #        with :
 #            unit tests enabled
 #            documentation (if FORD is installed)
+#            real(REAL64) kinds
+#            integer(INT32) kinds
 #
 #     More recent (right-most) flags will override preceding flags
 #     flags:
@@ -146,6 +149,18 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
         # no good way to check that the user didn't do something questionable
         shift
         ;;
+    --real-kind)
+        REAL_KIND="-D$2"
+        # warning: not checking for valid input
+        # should be one of: REAL32, REAL64 [default], REAL128
+        shift
+        ;;
+    --int-kind)
+        INT_KIND="-D$2"
+        # warning: not checking for valid input
+        # should be one of: INT8, INT16, INT32 [default], INT64
+        shift
+        ;;
     --enable-unicode)
         case $2 in
         yes|Yes|YES)
@@ -178,7 +193,7 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
             ;;
         esac
         ;;
-    --profile) #nable profiling
+    --profile) #enable profiling
         case $2 in
         yes|Yes|YES)
             CODE_PROFILE="yes"
@@ -272,7 +287,7 @@ fi
 echo ""
 echo "Building library..."
 
-FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
+FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" -cflags "${FCOMPILERFLAGS} ${DEFINES} ${REAL_KIND} ${INT_KIND}" ${COVERAGE} ${PROFILING} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
 
 #build the unit tests (uses the above library):
 if [[ $JF_SKIP_TESTS != [yY]* ]]; then
