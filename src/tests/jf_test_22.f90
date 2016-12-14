@@ -4,7 +4,7 @@
 
 module jf_test_22_mod
 
-    use json_module
+    use json_module, CK => json_CK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
     implicit none
@@ -32,7 +32,7 @@ contains
     write(*,*) 'initialize...'
 
     error_cnt = 0
-    call json%initialize(comment_char='!')  ! fortran-style comments
+    call json%initialize(comment_char=CK_'!')  ! fortran-style comments
     if (json%failed()) then
       call json%print_error_message(error_unit)
       error_cnt = error_cnt + 1
