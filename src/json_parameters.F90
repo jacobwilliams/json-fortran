@@ -59,7 +59,7 @@
     character(kind=CK,len=*),parameter :: slash           = achar(47, kind=CK)
     character(kind=CK,len=*),parameter :: backslash       = achar(92, kind=CK)
 
-    character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E26.16E4)'
+    character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E27.17E4)'
         !! default real number format statement (for writing real values to strings and files).
         !! Note that this can be overridden by calling [[json_initialize]].
 
