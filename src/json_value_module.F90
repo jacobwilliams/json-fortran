@@ -847,7 +847,7 @@
                             trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
         else
             json%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // &
-                            '30.16E3)'  !just use this one (should never happen)
+                            '27.17E4)'  !just use this one (should never happen)
         end if
 
     end if
