@@ -246,7 +246,7 @@ if ( ENABLE_TESTS )
   # Validate input
   if ( JSONLINT )
     file ( GLOB JSON_INPUTS "${DATA_DIR}/inputs/*.json" )
-    file ( GLOB INVALID_JSON "${DATA_DIR}/inputs/*invalid*.json" )
+    file ( GLOB INVALID_JSON "${DATA_DIR}/inputs/*invalid*.json" "${DATA_DIR}/inputs/comments.json")
 
     list ( REMOVE_ITEM JSON_INPUTS ${INVALID_JSON} )
     list ( REMOVE_ITEM JSON_INPUTS "${DATA_DIR}/inputs/big.json" ) # This takes too long and is valid
