@@ -273,7 +273,8 @@
                                             trailing_spaces_significant,&
                                             case_sensitive_keys,&
                                             no_whitespace,&
-                                            unescape_strings)
+                                            unescape_strings,&
+                                            comment_char)
 
     implicit none
 
@@ -298,6 +299,10 @@
                                                         !! string is returned from [[json_get_string]]
                                                         !! and similar routines. If true [default],
                                                         !! then the string is returned unescaped.
+    character(kind=CK,len=1),intent(in),optional :: comment_char  !! If present, this character is used
+                                                                  !! to denote comments in the JSON file,
+                                                                  !! which will be ignored if present.
+                                                                  !! Example: `!` or `#`.
 
     call me%core%initialize(verbose,compact_reals,&
                             print_signs,real_format,spaces_per_tab,&
@@ -305,7 +310,8 @@
                             trailing_spaces_significant,&
                             case_sensitive_keys,&
                             no_whitespace,&
-                            unescape_strings)
+                            unescape_strings,&
+                            comment_char)
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
@@ -365,7 +371,8 @@
                                   trailing_spaces_significant,&
                                   case_sensitive_keys,&
                                   no_whitespace,&
-                                  unescape_strings) result(file_object)
+                                  unescape_strings,&
+                                  comment_char) result(file_object)
 
     implicit none
 
@@ -392,6 +399,10 @@
                                                         !! string is returned from [[json_get_string]]
                                                         !! and similar routines. If true [default],
                                                         !! then the string is returned unescaped.
+    character(kind=CK,len=1),intent(in),optional :: comment_char  !! If present, this character is used
+                                                                  !! to denote comments in the JSON file,
+                                                                  !! which will be ignored if present.
+                                                                  !! Example: `!` or `#`.
 
     call file_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
@@ -399,7 +410,8 @@
                                 trailing_spaces_significant,&
                                 case_sensitive_keys,&
                                 no_whitespace,&
-                                unescape_strings)
+                                unescape_strings,&
+                                comment_char)
 
     if (present(p)) file_object%p => p
 

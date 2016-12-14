@@ -201,6 +201,13 @@
                                                    !! and similar routines. If true [default],
                                                    !! then the string is returned unescaped.
 
+        logical(LK) :: allow_comments = .true.  !! if true, any comments will be ignored when
+                                                !! parsing a file. The comment token is defined
+                                                !! by the `comment_char` string.
+        character(kind=CK,len=1) :: comment_char = '!'  !! comment token when
+                                                       !! `allow_comments` is true.
+                                                       !! Examples: '`!`' or '`#`'.
+
         contains
 
         private
@@ -638,7 +645,8 @@
                                   trailing_spaces_significant,&
                                   case_sensitive_keys,&
                                   no_whitespace,&
-                                  unescape_strings) result(json_core_object)
+                                  unescape_strings,&
+                                  comment_char) result(json_core_object)
 
     implicit none
 
@@ -664,6 +672,10 @@
                                                         !! string is returned from [[json_get_string]]
                                                         !! and similar routines. If true [default],
                                                         !! then the string is returned unescaped.
+    character(kind=CK,len=1),intent(in),optional :: comment_char  !! If present, this character is used
+                                                                  !! to denote comments in the JSON file,
+                                                                  !! which will be ignored if present.
+                                                                  !! Example: `!` or `#`.
 
     call json_core_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
@@ -671,7 +683,8 @@
                                 trailing_spaces_significant,&
                                 case_sensitive_keys,&
                                 no_whitespace,&
-                                unescape_strings)
+                                unescape_strings,&
+                                comment_char)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -701,7 +714,8 @@
                                trailing_spaces_significant,&
                                case_sensitive_keys,&
                                no_whitespace,&
-                               unescape_strings)
+                               unescape_strings,&
+                               comment_char)
 
     implicit none
 
@@ -726,6 +740,10 @@
                                                         !! string is returned from [[json_get_string]]
                                                         !! and similar routines. If true [default],
                                                         !! then the string is returned unescaped.
+    character(kind=CK,len=1),intent(in),optional :: comment_char  !! If present, this character is used
+                                                                  !! to denote comments in the JSON file,
+                                                                  !! which will be ignored if present.
+                                                                  !! Example: `!` or `#`.
 
     character(kind=CDK,len=10) :: w  !! max string length
     character(kind=CDK,len=10) :: d  !! real precision digits
@@ -766,6 +784,12 @@
         json%no_whitespace = no_whitespace
     if (present(unescape_strings)) &
         json%unescaped_strings = unescape_strings
+
+    ! if we are allowing comments in the file:
+    if (present(comment_char)) then
+        json%allow_comments = .true.
+        json%comment_char = comment_char
+    end if
 
     !Set the format for real numbers:
     ! [if not changing it, then it remains the same]
@@ -5850,12 +5874,15 @@
         end if
 
         ! pop the next non whitespace character off the file
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
 
         if (eof) then
             return
         else
+
             select case (c)
+
             case (start_object)
 
                 ! start object
@@ -6484,7 +6511,8 @@
         nullify(pair)    !probably not necessary
 
         ! pair name
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
                                  ' Unexpected end of file while parsing start of object.')
@@ -6511,7 +6539,8 @@
         end if
 
         ! pair value
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
                                  ' Unexpected end of file while parsing object member.')
@@ -6532,7 +6561,8 @@
         end if
 
         ! another possible pair
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object: '//&
                                  'End of file encountered when parsing an object')
@@ -6587,7 +6617,8 @@
         if (associated(element)) call json%add(array, element)
 
         ! popped the next character
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
 
         if (eof) then
             ! The file ended before array was finished:
@@ -6649,7 +6680,7 @@
         do
 
             !get the next character from the file:
-            c = json%pop_char(unit, str=str, eof = eof, skip_ws = .false.)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., popped=c)
 
             if (eof) then
 
@@ -6722,6 +6753,8 @@
 !*****************************************************************************************
 !>
 !  Core parsing routine.
+!
+!  This is used to verify the strings `true`, `false`, and `null` during parsing.
 
     subroutine parse_for_chars(json, unit, str, chars)
 
@@ -6741,14 +6774,15 @@
         length = len_trim(chars)
 
         do i = 1, length
-            c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., popped=c)
             if (eof) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected end of file while parsing array.')
+                                     ' Unexpected end of file while parsing.')
                 return
             else if (c /= chars(i:i)) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected character.: "'//c//'" '//chars(i:i))
+                                     ' Unexpected character: "'//c//'" (expecting "'//&
+                                     chars(i:i)//'")')
                 return
             end if
         end do
@@ -6799,7 +6833,7 @@
         do
 
             !get the next character:
-            c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., popped=c)
 
             if (eof) then
                 call json%throw_exception('Error in parse_number:'//&
@@ -6874,22 +6908,31 @@
 !# See also
 !  * [[push_char]]
 !
-!@note This routine ignores non-printing ASCII characters (iachar<=31) that are in strings.
+!@note This routine ignores non-printing ASCII characters
+!      (iachar<=31) that are in strings.
 
-    recursive function pop_char(json, unit, str, eof, skip_ws) result(popped)
+    recursive subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,popped)
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    character(kind=CK,len=1)            :: popped  !! the popped character.
-    integer(IK),intent(in)              :: unit    !! file unit number (if parsing from a file)
-    character(kind=CK,len=*),intent(in) :: str     !! JSON string (if parsing from a string) -- only used if unit=0
-    logical(LK),intent(out)             :: eof     !! true if the end of the file has been reached.
-    logical(LK),intent(in),optional     :: skip_ws !! to ignore whitespace.
+    class(json_core),intent(inout)       :: json
+    integer(IK),intent(in)               :: unit          !! file unit number (if parsing
+                                                          !! from a file)
+    character(kind=CK,len=*),intent(in)  :: str           !! JSON string (if parsing from a
+                                                          !! string) -- only used if unit=0
+    logical(LK),intent(in),optional      :: skip_ws       !! to ignore whitespace [default False]
+    logical(LK),intent(in),optional      :: skip_comments !! to ignore comment lines [default False]
+    logical(LK),intent(out)              :: eof           !! true if the end of the file has
+                                                          !! been reached.
+    character(kind=CK,len=1),intent(out) :: popped        !! the popped character returned
 
-    integer(IK) :: ios,str_len
-    character(kind=CK,len=1) :: c
-    logical(LK) :: ignore
+    integer(IK)              :: ios             !! `iostat` flag
+    integer(IK)              :: str_len         !! length of `str`
+    character(kind=CK,len=1) :: c               !! a character read from the file (or string)
+    logical(LK)              :: ignore          !! if whitespace is to be ignored
+    logical(LK)              :: ignore_comments !! if comment lines are to be ignored
+    logical(LK)              :: parsing_comment !! if we are in the process
+                                                !! of parsing a comment line
 
     if (.not. json%exception_thrown) then
 
@@ -6898,6 +6941,12 @@
             ignore = .false.
         else
             ignore = skip_ws
+        end if
+        parsing_comment = .false.
+        if (.not. present(skip_comments)) then
+            ignore_comments = .false.
+        else
+            ignore_comments = skip_comments
         end if
 
         do
@@ -6943,31 +6992,42 @@
 
                 if (IS_IOSTAT_END(ios)) then  !end of file
 
+                    ! no character to return
                     json%char_count = 0
                     eof = .true.
+                    popped = space ! just to set a value
                     exit
 
                 else if (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
 
                     json%char_count = 0
                     json%line_count = json%line_count + 1
+                    if (ignore_comments) parsing_comment = .false. ! done parsing this comment line
                     cycle
 
                 end if
 
             end if
 
-            if (any(c == control_chars)) then
+            if (ignore_comments .and. (parsing_comment .or. c == json%comment_char) ) then
+
+                ! skipping the comment
+                parsing_comment = .true.
+                cycle
+
+            elseif (any(c == control_chars)) then
 
                 ! non printing ascii characters
                 cycle
 
             else if (ignore .and. c == space) then
 
+                ! ignoring whitespace
                 cycle
 
             else
 
+                ! return the character
                 popped = c
                 exit
 
@@ -6977,7 +7037,7 @@
 
     end if
 
-    end function pop_char
+    end subroutine pop_char
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -6995,9 +7055,9 @@
     implicit none
 
     class(json_core),intent(inout)      :: json
-    character(kind=CK,len=1),intent(in) :: c
+    character(kind=CK,len=1),intent(in) :: c     !! to character to push
 
-    character(kind=CK,len=max_numeric_str_len) :: istr
+    character(kind=CK,len=max_numeric_str_len) :: istr  !! for error printing
 
     if (.not. json%exception_thrown) then
 
