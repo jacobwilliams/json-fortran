@@ -11,6 +11,9 @@
 
 cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 
+set(PROJECT_DESCRIPTION "A Fortran 2008 JSON API")
+set(PROJECT_URL "https://github.com/jacobwilliams/json-fortran")
+
 # Set the type/configuration of build to perform
 set ( CMAKE_CONFIGURATION_TYPES "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
 set ( CMAKE_BUILD_TYPE "Release"
@@ -39,7 +42,8 @@ string( REPLACE "." ";" VERSION_LIST ${VERSION} )
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
 list(GET VERSION_LIST 2 VERSION_PATCH)
-message ( STATUS "CMake build configuration for JSON-Fortran ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
+set(PROJECT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+message ( STATUS "CMake build configuration for JSON-Fortran ${PROJECT_VERSION}" )
 
 #-------------------------------------
 # Collect source files for the library
@@ -397,3 +401,14 @@ set ( ENABLE_BUILD_TREE_EXPORT FALSE CACHE BOOL
 if ( ENABLE_BUILD_TREE_EXPORT )
   export ( PACKAGE ${PACKAGE_NAME} )
 endif ()
+
+# pkg-config stuff
+configure_file(
+   "${CMAKE_CURRENT_SOURCE_DIR}/json-fortran.pc.cmake.in"
+   "${CMAKE_CURRENT_BINARY_DIR}/json-fortran.pc"
+   @ONLY
+)
+install(FILES
+   "${CMAKE_CURRENT_BINARY_DIR}/json-fortran.pc"
+   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+)
