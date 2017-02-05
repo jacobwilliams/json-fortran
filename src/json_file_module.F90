@@ -30,7 +30,7 @@
     !  The `json_file` is the main public class that is
     !  used to open a file and get data from it.
     !
-    !  A `json_file` contains only two items: an instance of a [[json_core]],
+    !  A `json_file` contains only two items: an instance of a [[json_core(type)]],
     !  which use used for all data manipulation, and a [[json_value]],
     !  which is used to construct the linked-list data structure.
     !  Note that most methods in the `json_file` class are simply wrappers
@@ -61,7 +61,7 @@
 
         private
 
-        type(json_core) :: core !! The instance of the [[json_core]] factory used for this file.
+        type(json_core) :: core !! The instance of the [[json_core(type)]] factory used for this file.
         type(json_value),pointer :: p => null()  !! the JSON structure read from the file
 
     contains
@@ -165,8 +165,8 @@
     !  date: 07/23/2015
     !
     !  Structure constructor to initialize a [[json_file(type)]] object
-    !  with an existing [[json_value]] object, and either the [[json_core]]
-    !  settings or a [[json_core]] instance.
+    !  with an existing [[json_value]] object, and either the [[json_core(type)]]
+    !  settings or a [[json_core(type)]] instance.
     !
     !# Example
     !
@@ -258,7 +258,7 @@
 
 !*****************************************************************************************
 !>
-!  Initialize the [[json_core]] for this [[json_file]].
+!  Initialize the [[json_core(type)]] for this [[json_file]].
 !  This is just a wrapper for [[json_initialize]].
 !
 !@note: This does not destroy the data in the file.
@@ -274,35 +274,13 @@
                                             case_sensitive_keys,&
                                             no_whitespace,&
                                             unescape_strings,&
-                                            comment_char)
+                                            comment_char,&
+                                            use_rfc6901_paths)
 
     implicit none
 
     class(json_file),intent(inout) :: me
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
-                                                            !! conversions are done for the `get` routines
-                                                            !! (default is false)
-    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
-                                                                    !! space to be considered significant.
-                                                                    !! (default is false)
-    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive. (default is true)
-    logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
-                                                      !! done without adding any non-significant
-                                                      !! spaces or linebreaks (default is false)
-    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
-                                                        !! string is returned from [[json_get_string]]
-                                                        !! and similar routines. If true [default],
-                                                        !! then the string is returned unescaped.
-    character(kind=CK,len=1),intent(in),optional :: comment_char  !! If present, this character is used
-                                                                  !! to denote comments in the JSON file,
-                                                                  !! which will be ignored if present.
-                                                                  !! Example: `!` or `#`.
+#include "json_initialize_arguments.inc"
 
     call me%core%initialize(verbose,compact_reals,&
                             print_signs,real_format,spaces_per_tab,&
@@ -311,19 +289,20 @@
                             case_sensitive_keys,&
                             no_whitespace,&
                             unescape_strings,&
-                            comment_char)
+                            comment_char,&
+                            use_rfc6901_paths)
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Set the [[json_core]] for this [[json_file]].
+!  Set the [[json_core(type)]] for this [[json_file]].
 !
 !@note: This does not destroy the data in the file.
 !
 !@note: This one is used if you want to initialize the file with
-!       an already-existing [[json_core]] (presumably, this was already
+!       an already-existing [[json_core(type)]] (presumably, this was already
 !       initialized by a call to [[initialize_json_core]] or similar).
 
     subroutine set_json_core_in_file(me,core)
@@ -340,7 +319,7 @@
 
 !*****************************************************************************************
 !>
-!  Get a copy of the [[json_core]] in this [[json_file]].
+!  Get a copy of the [[json_core(type)]] in this [[json_file]].
 
     subroutine get_json_core_in_file(me,core)
 
@@ -372,37 +351,15 @@
                                   case_sensitive_keys,&
                                   no_whitespace,&
                                   unescape_strings,&
-                                  comment_char) result(file_object)
+                                  comment_char,&
+                                  use_rfc6901_paths) result(file_object)
 
     implicit none
 
     type(json_file) :: file_object
     type(json_value),pointer,optional,intent(in) :: p  !! `json_value` object to cast
                                                        !! as a `json_file` object
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
-                                                            !! conversions are done for the `get` routines
-                                                            !! (default is false)
-    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
-                                                                    !! space to be considered significant.
-                                                                    !! (default is false)
-    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive. (default is true)
-    logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
-                                                      !! done without adding any non-significant
-                                                      !! spaces or linebreaks (default is false)
-    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
-                                                        !! string is returned from [[json_get_string]]
-                                                        !! and similar routines. If true [default],
-                                                        !! then the string is returned unescaped.
-    character(kind=CK,len=1),intent(in),optional :: comment_char  !! If present, this character is used
-                                                                  !! to denote comments in the JSON file,
-                                                                  !! which will be ignored if present.
-                                                                  !! Example: `!` or `#`.
+#include "json_initialize_arguments.inc"
 
     call file_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
@@ -411,7 +368,8 @@
                                 case_sensitive_keys,&
                                 no_whitespace,&
                                 unescape_strings,&
-                                comment_char)
+                                comment_char,&
+                                use_rfc6901_paths)
 
     if (present(p)) file_object%p => p
 
@@ -422,7 +380,7 @@
 !> author: Jacob Williams
 !  date: 4/26/2016
 !
-!  Cast a [[json_value]] pointer and a [[json_core]] object
+!  Cast a [[json_value]] pointer and a [[json_core(type)]] object
 !  as a [[json_file(type)]] object.
 
     function initialize_json_file_v2(json_value_object, json_core_object) &
@@ -448,8 +406,8 @@
 !  or will be reused to open a different file.
 !  Otherwise a memory leak will occur.
 !
-!  Optionally, also destroy the [[json_core]] instance (this
-!  is not necessary to prevent memory leaks, since a [[json_core]]
+!  Optionally, also destroy the [[json_core(type)]] instance (this
+!  is not necessary to prevent memory leaks, since a [[json_core(type)]]
 !  does not use pointers).
 !
 !### History
@@ -461,7 +419,7 @@
     implicit none
 
     class(json_file),intent(inout) :: me
-    logical,intent(in),optional :: destroy_core  !! to also destroy the [[json_core]].
+    logical,intent(in),optional :: destroy_core  !! to also destroy the [[json_core(type)]].
                                                  !! default is to leave it as is.
 
     if (associated(me%p)) call me%core%destroy(me%p)
