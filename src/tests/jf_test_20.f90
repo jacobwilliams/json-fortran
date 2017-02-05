@@ -22,7 +22,7 @@ contains
 
     type(json_core) :: json
     type(json_value),pointer :: p,new,element,elements,root
-    logical(lk) :: found,is_valid
+    logical(lk) :: is_valid
     integer(IK),dimension(:),allocatable :: iarray
     character(kind=CK,len=:),allocatable :: error_msg
 
