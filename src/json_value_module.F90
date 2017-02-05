@@ -4236,7 +4236,7 @@
                             end if
                         end if
                         if (.not. status_ok) then
-                            call json%throw_exception('Error in json_get_by_path_rfc6901: '&
+                            call json%throw_exception('Error in json_get_by_path_rfc6901: '//&
                                                         'invalid path specification: '//trim(path))
                             exit
                         end if
@@ -4250,7 +4250,7 @@
                 end do
 
             else
-                call json%throw_exception('Error in json_get_by_path_rfc6901: '&
+                call json%throw_exception('Error in json_get_by_path_rfc6901: '//&
                                             'invalid path specification: '//trim(path))
             end if
         end if
