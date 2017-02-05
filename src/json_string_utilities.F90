@@ -333,7 +333,7 @@
         !trim the string if necessary:
         if (ipos<len(str_out)+1) then
             if (ipos==1) then
-                str_out = ''
+                str_out = CK_''
             else
 #if defined __GFORTRAN__
                 tmp = str_out(1:ipos-1)      !workaround for bug in gfortran 6.1
@@ -718,7 +718,7 @@
     integer :: i  !! counter
     integer :: n  !! length of input string
 
-    s_lower = ''
+    s_lower = CK_''
     n = len_trim(str)
 
     if (n>0) then
@@ -754,7 +754,7 @@
 
     if (len(str)>0) then
 
-        tmp = ''  ! initialize
+        tmp = CK_''  ! initialize
         ilen1 = len(s1)
 
         !     .
