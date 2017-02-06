@@ -68,6 +68,8 @@
 #    Jacob Williams : 12/27/2014
 #
 
+set -x
+set -v
 set -o errexit
 
 FORDMD='json-fortran.md'        # FORD options file for building documentation
