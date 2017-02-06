@@ -339,6 +339,9 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
                 mv ${SRCFILE}.gcov ${SRCFILE}-no-unicode.gcov
             fi
             if [ -f ${SRCFILE}-unicode.gcov ] && [ -f ${SRCFILE}-no-unicode.gcov ]; then
+                # ... test: print out result first:
+                ./pages/development-resources/gccr.pl -n -c ${SRCFILE}-no-unicode.gcov no-unicode \
+                ${SRCFILE}-unicode.gcov unicode
                 # merge them
                 ./pages/development-resources/gccr.pl -n -c ${SRCFILE}-no-unicode.gcov no-unicode \
                                   ${SRCFILE}-unicode.gcov unicode > ${SRCFILE}.gcov
