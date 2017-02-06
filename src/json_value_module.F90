@@ -7233,7 +7233,7 @@
                 parsing_comment = .true.
                 cycle
 
-            elseif (any(c == control_chars)) then
+            else if (any(c == control_chars)) then
 
                 ! non printing ascii characters
                 cycle
