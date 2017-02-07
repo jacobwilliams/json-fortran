@@ -3,7 +3,7 @@
 !  license: BSD
 !
 !  This module provides a low-level interface for manipulation of JSON data.
-!  The two public entities are [[json_value]], and [[json_core]].
+!  The two public entities are [[json_value]], and [[json_core(type)]].
 !  The [[json_file_module]] provides a higher-level interface to some
 !  of these routines.
 !
@@ -71,7 +71,7 @@
     !>
     !  Type used to construct the linked-list JSON structure.
     !  Normally, this should always be a pointer variable.
-    !  This type should only be used by an instance of [[json_core]].
+    !  This type should only be used by an instance of [[json_core(type)]].
     !
     !# Example
     !
@@ -175,8 +175,8 @@
         integer(IK) :: char_count = 0    !! character position in the current line
         integer(IK) :: line_count = 1    !! lines read counter
         integer(IK) :: pushed_index = 0  !! used when parsing lines in file
-        character(kind=CK,len=pushed_char_size) :: pushed_char = ''  !! used when parsing
-                                                                     !! lines in file
+        character(kind=CK,len=pushed_char_size) :: pushed_char = CK_''  !! used when parsing
+                                                                        !! lines in file
 
         integer(IK) :: ipos = 1  !! for allocatable strings: next character to read
 
@@ -207,6 +207,10 @@
         character(kind=CK,len=1) :: comment_char = '!'  !! comment token when
                                                        !! `allow_comments` is true.
                                                        !! Examples: '`!`' or '`#`'.
+
+        logical(LK) :: use_rfc6901_paths = .false. !! use the RFC 6901 standard for
+                                                   !! JSON paths. Otherwise, the original
+                                                   !! default method is used
 
         contains
 
@@ -320,6 +324,8 @@
         procedure,private :: MAYBEWRAP(json_get_string_with_path)
         procedure,private :: MAYBEWRAP(json_get_string_vec_with_path)
         procedure,private :: MAYBEWRAP(json_get_array_with_path)
+        procedure,private :: json_get_by_path_default
+        procedure,private :: json_get_by_path_rfc6901
 
         procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]] structure to an allocatable string
 
@@ -550,8 +556,8 @@
         !other private routines:
         procedure :: name_equal
         procedure :: json_value_print
-        procedure :: string_to_integer
-        procedure :: string_to_double
+        procedure :: string_to_int
+        procedure :: string_to_dble
         procedure :: parse_value
         procedure :: parse_number
         procedure :: parse_string
@@ -570,7 +576,7 @@
     !*********************************************************
     !>
     !  Structure constructor to initialize a
-    !  [[json_core]] object
+    !  [[json_core(type)]] object
     !
     !# Example
     !
@@ -617,7 +623,7 @@
 !> author: Jacob Williams
 !  date: 4/17/2016
 !
-!  Destructor for the [[json_core]] type.
+!  Destructor for the [[json_core(type)]] type.
 
     subroutine destroy_json_core(me)
 
@@ -632,7 +638,7 @@
 !> author: Jacob Williams
 !  date: 4/26/2016
 !
-!  Function constructor for a [[json_core]].
+!  Function constructor for a [[json_core(type)]].
 !  This is just a wrapper for [[json_initialize]].
 !
 !@note [[initialize_json_core]], [[json_initialize]],
@@ -646,36 +652,13 @@
                                   case_sensitive_keys,&
                                   no_whitespace,&
                                   unescape_strings,&
-                                  comment_char) result(json_core_object)
+                                  comment_char,&
+                                  use_rfc6901_paths) result(json_core_object)
 
     implicit none
 
     type(json_core) :: json_core_object
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
-                                                            !! conversions are done for the `get` routines
-                                                            !! (default is false)
-    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
-                                                                    !! space to be considered significant.
-                                                                    !! (default is false)
-    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive.
-                                                            !! (default is true)
-    logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
-                                                      !! done without adding any non-significant
-                                                      !! spaces or linebreaks (default is false)
-    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
-                                                        !! string is returned from [[json_get_string]]
-                                                        !! and similar routines. If true [default],
-                                                        !! then the string is returned unescaped.
-    character(kind=CK,len=1),intent(in),optional :: comment_char  !! If present, this character is used
-                                                                  !! to denote comments in the JSON file,
-                                                                  !! which will be ignored if present.
-                                                                  !! Example: `!` or `#`.
+#include "json_initialize_arguments.inc"
 
     call json_core_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
@@ -684,7 +667,8 @@
                                 case_sensitive_keys,&
                                 no_whitespace,&
                                 unescape_strings,&
-                                comment_char)
+                                comment_char,&
+                                use_rfc6901_paths)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -693,9 +677,9 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Initialize the [[json_core]] instance.
+!  Initialize the [[json_core(type)]] instance.
 !
-!  The routine may be called before any of the [[json_core]] methods are used in
+!  The routine may be called before any of the [[json_core(type)]] methods are used in
 !  order to specify certain parameters. If it is not called, then the defaults
 !  are used. This routine is also called internally by various routines.
 !  It can also be called to clear exceptions, or to reset some
@@ -715,35 +699,13 @@
                                case_sensitive_keys,&
                                no_whitespace,&
                                unescape_strings,&
-                               comment_char)
+                               comment_char,&
+                               use_rfc6901_paths)
 
     implicit none
 
     class(json_core),intent(inout)  :: json
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
-                                                            !! conversions are done for the `get` routines
-                                                            !! (default is false)
-    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
-                                                                    !! space to be considered significant.
-                                                                    !! (default is false)
-    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive. (default is true)
-    logical(LK),intent(in),optional :: no_whitespace  !! if true, printing the JSON structure is
-                                                      !! done without adding any non-significant
-                                                      !! spaces or linebreaks (default is false)
-    logical(LK),intent(in),optional :: unescape_strings !! If false, then the raw escaped
-                                                        !! string is returned from [[json_get_string]]
-                                                        !! and similar routines. If true [default],
-                                                        !! then the string is returned unescaped.
-    character(kind=CK,len=1),intent(in),optional :: comment_char  !! If present, this character is used
-                                                                  !! to denote comments in the JSON file,
-                                                                  !! which will be ignored if present.
-                                                                  !! Example: `!` or `#`.
+#include "json_initialize_arguments.inc"
 
     character(kind=CDK,len=10) :: w  !! max string length
     character(kind=CDK,len=10) :: d  !! real precision digits
@@ -758,7 +720,7 @@
 
     !Just in case, clear these global variables also:
     json%pushed_index = 0
-    json%pushed_char  = ''
+    json%pushed_char  = CK_''
     json%char_count   = 0
     json%line_count   = 1
     json%ipos         = 1
@@ -784,6 +746,8 @@
         json%no_whitespace = no_whitespace
     if (present(unescape_strings)) &
         json%unescaped_strings = unescape_strings
+    if (present(use_rfc6901_paths)) &
+        json%use_rfc6901_paths = use_rfc6901_paths
 
     ! if we are allowing comments in the file:
     if (present(comment_char)) then
@@ -888,7 +852,7 @@
         end if
 
     else
-        is_equal = name == '' ! check a blank name
+        is_equal = name == CK_'' ! check a blank name
     end if
 
     end function name_equal
@@ -1046,7 +1010,7 @@
         if (allocated(p%name)) then
             name = p%name
         else
-            name = ''
+            name = CK_''
         end if
     end if
 
@@ -1088,13 +1052,13 @@
     if (present(found)) then
         ok = found
     else
-        ok = .not. json%failed()
+        ok = .not. json%exception_thrown
     end if
 
     if (.not. ok) then
         if (present(var_type))   var_type   = json_unknown
         if (present(n_children)) n_children = 0
-        if (present(name))       name       = ''
+        if (present(name))       name       = CK_''
     else
         !get info:
 
@@ -1105,7 +1069,7 @@
                 p_name = p_var%name
                 name = p_name
             else
-                name = ''
+                name = CK_''
             end if
         end if
 #else
@@ -1202,7 +1166,7 @@
             p_name = p%name
             name = p_name
         else
-            name = ''
+            name = CK_''
         end if
     end if
 #else
@@ -1315,14 +1279,14 @@
     if (present(found)) then
         ok = found
     else
-        ok = .not. json%failed()
+        ok = .not. json%exception_thrown
     end if
 
     if (.not. ok) then
         if (present(var_type)) var_type = json_unknown
         if (present(n_sets))   n_sets   = 0
         if (present(set_size)) set_size = 0
-        if (present(name))     name     = ''
+        if (present(name))     name     = CK_''
     else
 
         !get info about the variable:
@@ -1333,13 +1297,13 @@
                 p_name = p_var%name
                 name = p_name
             else
-                name = ''
+                name = CK_''
             end if
         end if
 #else
         call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name)
 #endif
-        if (json%failed() .and. present(found)) then
+        if (json%exception_thrown .and. present(found)) then
             found = .false.
             call json%clear_exceptions()
         end if
@@ -1418,7 +1382,7 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Clear exceptions in the [[json_core]].
+!  Clear exceptions in the [[json_core(type)]].
 
     pure subroutine json_clear_exceptions(json)
 
@@ -1428,7 +1392,7 @@
 
     !clear the flag and message:
     json%exception_thrown = .false.
-    json%err_message = ''
+    json%err_message = CK_''
 
     end subroutine json_clear_exceptions
 !*****************************************************************************************
@@ -1437,7 +1401,7 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Throw an exception in the [[json_core]].
+!  Throw an exception in the [[json_core(type)]].
 !  This routine sets the error flag, and prevents any subsequent routine
 !  from doing anything, until [[json_clear_exceptions]] is called.
 !
@@ -1491,7 +1455,7 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Retrieve error code from the [[json_core]].
+!  Retrieve error code from the [[json_core(type)]].
 !  This should be called after `parse` to check for errors.
 !  If an error is thrown, before using the class again, [[json_initialize]]
 !  should be called to clean up before it is used again.
@@ -1531,7 +1495,7 @@
             error_msg = 'Unknown error.'
         end if
     else
-        error_msg = ''
+        error_msg = CK_''
     end if
 
     end subroutine json_check_for_errors
@@ -1541,7 +1505,7 @@
 !> author: Jacob Williams
 !  date: 12/5/2013
 !
-!  Logical function to indicate if an exception has been thrown in a [[json_core]].
+!  Logical function to indicate if an exception has been thrown in a [[json_core(type)]].
 !
 !# Example
 !
@@ -2689,7 +2653,7 @@
         call json%get_child(p,idx,tmp)
 
         ! call json_value_insert_after:
-        if (.not. json%failed()) call json%insert_after(tmp,element)
+        if (.not. json%exception_thrown) call json%insert_after(tmp,element)
 
     end if
 
@@ -2769,7 +2733,7 @@
 
     !populate the array:
     do i=1,size(val)
-        call json%add(var, '', val(i))
+        call json%add(var, CK_'', val(i))
     end do
 
     !add it:
@@ -2912,7 +2876,7 @@
 
     !populate the array:
     do i=1,size(val)
-        call json%add(var, '', val(i))
+        call json%add(var, CK_'', val(i))
     end do
 
     !add it:
@@ -3012,7 +2976,7 @@
 
     !populate the array:
     do i=1,size(val)
-        call json%add(var, '', val(i))
+        call json%add(var, CK_'', val(i))
     end do
 
     !add it:
@@ -3175,7 +3139,7 @@
         if (trim_string)    str = trim(str)
 
         !write it:
-        call json%add(var, '', str)
+        call json%add(var, CK_'', str)
 
         !cleanup
         deallocate(str)
@@ -3457,7 +3421,7 @@
 !  Returns a child in the object or array given the name string.
 !
 !  The name search can be case-sensitive or not, and can have significant trailing
-!  whitespace or not, depending on the settings in the [[json_core]] class.
+!  whitespace or not, depending on the settings in the [[json_core(type)]] class.
 !
 !@note The `name` input is not a path, and is not parsed like it is in [[json_get_by_path]].
 
@@ -3542,7 +3506,7 @@
     type(json_value),pointer,intent(in)              :: p
     character(kind=CK,len=:),intent(out),allocatable :: str  !! prints structure to this string
 
-    str = ''
+    str = CK_''
     call json%json_value_print(p, iunit=unit2str, str=str, indent=1, colon=.true.)
 
     end subroutine json_value_to_string
@@ -3670,7 +3634,7 @@
 
         !if the colon was the last thing written
         if (present(colon)) then
-            s = ''
+            s = CK_''
         else
             s = repeat(space, spaces)
         end if
@@ -3889,7 +3853,36 @@
 !>
 !  Returns the [[json_value]] pointer given the path string.
 !
-!# Example
+!  It uses either of two methods:
+!
+!  * The original JSON-Fortran defaults
+!  * RFC 6901
+
+    subroutine json_get_by_path(json, me, path, p, found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me     !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+                                                   !! specify by `path`
+    logical(LK),intent(out),optional     :: found  !! true if it was found
+
+    if (json%use_rfc6901_paths) then
+        call json%json_get_by_path_rfc6901(me, path, p, found)
+    else
+        call json%json_get_by_path_default(me, path, p, found)
+    end if
+
+    end subroutine json_get_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns the [[json_value]] pointer given the path string.
+!
+!### Example
 !
 !````fortran
 !    type(json_value),pointer :: dat,p
@@ -3898,7 +3891,7 @@
 !    call json%get(dat,'data(2).version',p,found)
 !````
 !
-!# Notes
+!### Notes
 !  The following special characters are used to denote paths:
 !
 !````
@@ -3911,15 +3904,20 @@
 !  Thus, if any of these characters are present in the name key,
 !  this routine cannot be used to get the value.
 !  In that case, the `get_child` methods would need to be used.
+!  Or, the alternate [[json_get_by_path_rfc6901]] could be used.
+!
+!### See also
+!  * [[json_get_by_path_rfc6901]] - alternate version with different path convention.
 
-    subroutine json_get_by_path(json, me, path, p, found)
+    subroutine json_get_by_path_default(json, me, path, p, found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: me     !! a JSON linked list
     character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
-    type(json_value),pointer,intent(out) :: p      !! pointer to the variable specify by `path`
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+                                                   !! specify by `path`
     logical(LK),intent(out),optional     :: found  !! true if it was found
 
     integer(IK)              :: i
@@ -4019,7 +4017,7 @@
                     exit
                 end if
                 array = .false.
-                child_i = json%string_to_integer(path(child_i:i-1))
+                child_i = json%string_to_int(path(child_i:i-1))
 
                 nullify(tmp)
                 call json%get_child(p, child_i, tmp)
@@ -4035,6 +4033,7 @@
         if (json%exception_thrown) then
 
             if (present(found)) then
+                nullify(p) ! just in case
                 found = .false.
                 call json%clear_exceptions()
             end if
@@ -4065,7 +4064,203 @@
         if (present(found)) found = .false.
     end if
 
-    end subroutine json_get_by_path
+    end subroutine json_get_by_path_default
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 2/4/2017
+!
+!  Returns the [[json_value]] pointer given the path string,
+!  using the "JSON Pointer" path specification defined by RFC 6901.
+!
+!  Note that trailing whitespace significance and case sensitivity
+!  are user-specified. To fully conform to the RFC 6901 standard,
+!  should probably set:
+!
+!  * trailing_spaces_significant = .true. [this is not the default setting]
+!  * case_sensitive_keys = .true.         [this is the default setting]
+!
+!### Example
+!
+!````fortran
+!    type(json_value),pointer :: dat,p
+!    logical :: found
+!    !...
+!    call json%get(dat,'/data/2/version',p,found)
+!````
+!
+!### See also
+!  * [[json_get_by_path_default]] - alternate version with different path convention.
+!
+!### Reference
+!  * [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
+!
+!@note Not doing anything special about the "-" character to index an array.
+!      This is considered a normal error.
+!
+!@warning Not checking if the member that is referenced is unique.
+!         (according to the standard, evaluation of non-unique references
+!         should fail). Like [[json_get_by_path_default]], this one will just return
+!         the first instance it encounters. This might be changed in the future.
+
+    subroutine json_get_by_path_rfc6901(json, me, path, p, found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me     !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
+                                                   !! (an RFC 6901 "JSON Pointer")
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+                                                   !! specify by `path`
+    logical(LK),intent(out),optional     :: found  !! true if it was found
+
+    character(kind=CK,len=:),allocatable :: token  !! a token in the path (between the `/` characters)
+    integer(IK)              :: i                  !! counter
+    character(kind=CK,len=1) :: c                  !! a character from the path
+    integer(IK)              :: islash_curr        !! location of current '/' character in the path
+    integer(IK)              :: islash_next        !! location of next '/' character in the path
+    integer(IK)              :: ilen               !! length of `path` string
+    type(json_value),pointer :: tmp                !! temporary variable for traversing the structure
+    integer(IK)              :: ival               !! integer array index value (0-based)
+    logical(LK)              :: status_ok          !! error flag
+
+    nullify(p)
+
+    if (.not. json%exception_thrown) then
+
+        p => me ! initialize
+
+        if (path/=CK_'') then
+
+            if (path(1:1)==slash) then  ! the first character must be a slash
+
+                islash_curr = 1   ! initialize current slash index
+
+                !keep trailing space or not:
+                if (json%trailing_spaces_significant) then
+                    ilen = len(path)
+                else
+                    ilen = len_trim(path)
+                end if
+
+                do
+
+                    ! get the next token by finding the slashes
+                    !
+                    !  1   2 3
+                    !  /abc/d/efg
+
+                    if (islash_curr==ilen) then
+                        !the last token is an empty string
+                        token = CK_''
+                        islash_next = 0  ! will signal to stop
+                    else
+
+                        !      .
+                        ! '/123/567/'
+
+                        ! index in remaining string:
+                        islash_next = index(path(islash_curr+1:ilen),slash)
+                        if (islash_next<=0) then
+                            !last token:
+                            token = path(islash_curr+1:ilen)
+                        else
+                            ! convert to actual index in path:
+                            islash_next = islash_curr + index(path(islash_curr+1:ilen),slash)
+                            if (islash_next>islash_curr+1) then
+                                token = path(islash_curr+1:islash_next-1)
+                            else
+                                !empty token:
+                                token = CK_''
+                            end if
+                        end if
+
+                    end if
+
+                    ! remove trailing spaces in the token here if necessary:
+                    if (.not. json%trailing_spaces_significant) &
+                        token = trim(token)
+
+                    ! decode the token:
+                    token = decode_rfc6901(token)
+
+                    ! now, parse the token:
+
+                    ! first see if there is a child with this name
+                    call json%get_child(p,token,tmp)
+                    if (associated(tmp)) then
+                        ! it was found
+                        p => tmp
+                    else
+                        ! No key with this name.
+                        ! Clear the exception thrown when
+                        ! the child was not found.
+                        if (json%exception_thrown) then
+                            call json%clear_exceptions()
+                        end if
+                        ! Is it an integer? If so,
+                        ! it might be an array index.
+                        status_ok = (len(token)>0)
+                        if (status_ok) then
+                            do i=1,len(token)
+                                ! It must only contain (0..9) characters
+                                ! (it must be unsigned)
+                                if (scan(token(i:i),CK_'0123456789')<1) then
+                                    status_ok = .false.
+                                    exit
+                                end if
+                            end do
+                            if (status_ok) then
+                                if (len(token)>1 .and. token(1:1)==CK_'0') then
+                                    ! leading zeros not allowed for some reason
+                                    status_ok = .false.
+                                end if
+                            end if
+                            if (status_ok) then
+                                ! if we make it this far, it should be
+                                ! convertable to an integer, so do it.
+                                call string_to_integer(token,ival,status_ok)
+                            end if
+                        end if
+                        if (status_ok) then
+                            ! ival is an array index (0-based)
+                            call json%get_child(p,ival+1,tmp)
+                            if (associated(tmp)) then
+                                p => tmp
+                            else
+                                ! not found
+                                call json%clear_exceptions()
+                                status_ok = .false.
+                            end if
+                        end if
+                        if (.not. status_ok) then
+                            call json%throw_exception('Error in json_get_by_path_rfc6901: '//&
+                                                        'invalid path specification: '//trim(path))
+                            exit
+                        end if
+                    end if
+
+                    if (islash_next<=0) exit ! finished
+
+                    ! set up for next token:
+                    islash_curr = islash_next
+
+                end do
+
+            else
+                call json%throw_exception('Error in json_get_by_path_rfc6901: '//&
+                                            'invalid path specification: '//trim(path))
+            end if
+        end if
+
+        if (json%exception_thrown) nullify(p)
+        nullify(tmp)
+
+    end if
+
+    end subroutine json_get_by_path_rfc6901
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -4099,6 +4294,9 @@
 !      JSON structure) then an exception will be thrown, unless
 !      `found` is present, which will be set to `false`. `path`
 !      will be a blank string.
+!
+!@note If `json%use_rfc6901_paths=.true.`, then the
+!      `use_alt_array_tokens` and `path_sep` inputs are ignored.
 
     subroutine json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
 
@@ -4125,7 +4323,7 @@
     logical(LK)                                :: parent_is_root !! if the parent is the root
 
     !initialize:
-    path = ''
+    path = CK_''
 
     !optional input:
     if (present(use_alt_array_tokens)) then
@@ -4174,13 +4372,18 @@
                             exit
                         end if
                     end do
-                    call integer_to_string(i,int_fmt,istr)
-                    if (use_brackets) then
-                        call add_to_path(parent_name//start_array//&
-                                         trim(adjustl(istr))//end_array,path_sep)
+                    if (json%use_rfc6901_paths) then
+                        call integer_to_string(i-1,int_fmt,istr) ! 0-based index
+                        call add_to_path(parent_name//slash//trim(adjustl(istr)))
                     else
-                        call add_to_path(parent_name//start_array_alt//&
-                                         trim(adjustl(istr))//end_array_alt,path_sep)
+                        call integer_to_string(i,int_fmt,istr)
+                        if (use_brackets) then
+                            call add_to_path(parent_name//start_array//&
+                                             trim(adjustl(istr))//end_array,path_sep)
+                        else
+                            call add_to_path(parent_name//start_array_alt//&
+                                             trim(adjustl(istr))//end_array_alt,path_sep)
+                        end if
                     end if
                     tmp => tmp%parent  ! already added parent name
 
@@ -4221,7 +4424,14 @@
     end if
 
     !for errors, return blank string:
-    if (json%exception_thrown) path = ''
+    if (json%exception_thrown) then
+        path = CK_''
+    else
+        if (json%use_rfc6901_paths) then
+            ! add the root slash:
+            path = slash//path
+        end if
+    end if
 
     !optional output:
     if (present(found)) then
@@ -4239,16 +4449,30 @@
         !! prepend the string to the path
         implicit none
         character(kind=CK,len=*),intent(in) :: str  !! string to prepend to `path`
-        character(kind=CK,len=1),intent(in),optional :: dot  !! path separator (default is '.')
-        if (path=='') then
-            path = str
-        else
-            if (present(dot)) then
-                path = str//dot//path
+        character(kind=CK,len=1),intent(in),optional :: dot
+            !! path separator (default is '.').
+            !! (ignored if `json%use_rfc6901_paths=.true.`)
+
+        if (json%use_rfc6901_paths) then
+            ! in this case, the options are ignored
+            if (path==CK_'') then
+                path = str
             else
-                path = str//child//path
+                path = str//slash//path
+            end if
+        else
+            ! default path format
+            if (path==CK_'') then
+                path = str
+            else
+                if (present(dot)) then
+                    path = str//dot//path
+                else
+                    path = str//child//path
+                end if
             end if
         end if
+
         end subroutine add_to_path
 
     end subroutine json_get_path
@@ -4290,13 +4514,9 @@
 !>
 !  Convert a string into an integer.
 !
-!# History
-!  * Jacob Williams : 12/10/2013 : Rewrote routine.  Added error checking.
-!  * Modified by Izaak Beekman
-!
-!@note Replacement for the parse_integer function in the original code.
+!@note Replacement for the `parse_integer` function in the original code.
 
-    function string_to_integer(json,str) result(ival)
+    function string_to_int(json,str) result(ival)
 
     implicit none
 
@@ -4304,22 +4524,16 @@
     character(kind=CK,len=*),intent(in) :: str
     integer(IK)                         :: ival
 
-    character(kind=CDK,len=:),allocatable :: digits
-    integer(IK) :: ndigits_digits,ndigits,ierr
+    logical(LK) :: status_ok !! error flag
 
     if (.not. json%exception_thrown) then
 
-        ! Compute how many digits we need to read
-        ndigits = 2*len_trim(str)
-        ndigits_digits = floor(log10(real(ndigits)))+1
-        allocate(character(kind=CDK,len=ndigits_digits) :: digits)
-        write(digits,'(I0)') ndigits !gfortran will have a runtime error with * edit descriptor here
-        ! gfortran bug: '*' edit descriptor for ISO_10646 strings does bad stuff.
-        read(str,'(I'//trim(digits)//')',iostat=ierr) ival   !string to integer
+        ! call the core routine:
+        call string_to_integer(str,ival,status_ok)
 
-        if (ierr/=0) then    !if there was an error
+        if (.not. status_ok) then
             ival = 0
-            call json%throw_exception('Error in string_to_integer: '//&
+            call json%throw_exception('Error in string_to_int: '//&
                                       'string cannot be converted to an integer: '//&
                                       trim(str))
         end if
@@ -4328,21 +4542,14 @@
         ival = 0
     end if
 
-    end function string_to_integer
+    end function string_to_int
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> author: Jacob Williams
-!  date: 1/19/2014
-!
+!>
 !  Convert a string into a double.
-!
-!# History
-!  * Jacob Williams, 10/27/2015 : Now using fmt=*, rather than
-!    fmt=real_fmt, since it doesn't work for some unusual cases
-!    (e.g., when str='1E-5').
 
-    function string_to_double(json,str) result(rval)
+    function string_to_dble(json,str) result(rval)
 
     implicit none
 
@@ -4350,16 +4557,15 @@
     character(kind=CK,len=*),intent(in) :: str
     real(RK)                            :: rval
 
-    integer(IK) :: ierr  !! read iostat error code
+    logical(LK) :: status_ok  !! error flag
 
     if (.not. json%exception_thrown) then
 
-        !string to double
-        read(str,fmt=*,iostat=ierr) rval
+        call string_to_real(str,rval,status_ok)
 
-        if (ierr/=0) then    !if there was an error
+        if (.not. status_ok) then    !if there was an error
             rval = 0.0_RK
-            call json%throw_exception('Error in string_to_double: '//&
+            call json%throw_exception('Error in string_to_dble: '//&
                                       'string cannot be converted to a double: '//&
                                       trim(str))
         end if
@@ -4368,7 +4574,7 @@
         rval = 0.0_RK
     end if
 
-    end function string_to_double
+    end function string_to_dble
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5053,7 +5259,7 @@
 
     character(kind=CK,len=:),allocatable :: error_message  !! for [[unescape_string]]
 
-    value = ''
+    value = CK_''
     if (.not. json%exception_thrown) then
 
         if (me%var_type == json_string) then
@@ -5064,7 +5270,7 @@
                     if (allocated(error_message)) then
                         call json%throw_exception(error_message)
                         deallocate(error_message)
-                        value = ''
+                        value = CK_''
                     end if
                 else
                     value = me%str_value
@@ -5155,7 +5361,7 @@
 
     type(json_value),pointer :: p
 
-    value = ''
+    value = CK_''
     if ( json%exception_thrown ) then
         if ( present(found) ) found = .false.
         return
@@ -5258,7 +5464,7 @@
             vec(i) = cval
             deallocate(cval)
         else
-            vec(i) = ''
+            vec(i) = CK_''
         end if
 
         end subroutine get_chars_from_array
@@ -5314,7 +5520,7 @@
             vec(i) = cval
             deallocate(cval)
         else
-            vec(i) = ''
+            vec(i) = CK_''
         end if
 
         end subroutine get_chars_from_array
@@ -5658,7 +5864,7 @@
 
     ! Note: the name of the root json_value doesn't really matter,
     !  but we'll allocate something here just in case.
-    p%name = ''
+    p%name = CK_''
 
     ! parse as a value
     call json%parse_value(unit=iunit, str=str, value=p)
@@ -5744,7 +5950,7 @@
 
         else
             !in this case, it was an empty line or file
-            line = ''
+            line = CK_''
         end if
 
         !create the error message:
@@ -5780,7 +5986,7 @@
     integer(IK) :: isize  !! number of characters read in read statement
 
     !initialize:
-    line = ''
+    line = CK_''
 
     !rewind to beginning of the current record:
     backspace(iunit, iostat=istat)
@@ -6405,7 +6611,7 @@
     if (present(val)) then
         p%str_value = val
     else
-        p%str_value = ''    !default value
+        p%str_value = CK_''    !default value
     end if
 
     !name:
@@ -6710,7 +6916,7 @@
                     if (i==4) then
                         if (valid_json_hex(hex)) then
                             i = 0
-                            hex = ''
+                            hex = CK_''
                             is_hex = .false.
                         else
                             call json%throw_exception('Error in parse_string:'//&
@@ -6739,7 +6945,7 @@
         !trim the string if necessary:
         if (ip<len(string)+1) then
             if (ip==1) then
-                string = ''
+                string = CK_''
             else
                 string = string(1:ip-1)
             end if
@@ -6877,10 +7083,10 @@
 
                     !string to value:
                     if (is_integer) then
-                        ival = json%string_to_integer(tmp)
+                        ival = json%string_to_int(tmp)
                         call to_integer(value,ival)
                     else
-                        rval = json%string_to_double(tmp)
+                        rval = json%string_to_dble(tmp)
                         call to_double(value,rval)
                     end if
 
@@ -7015,7 +7221,7 @@
                 parsing_comment = .true.
                 cycle
 
-            elseif (any(c == control_chars)) then
+            else if (any(c == control_chars)) then
 
                 ! non printing ascii characters
                 cycle

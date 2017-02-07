@@ -248,7 +248,7 @@ sub parse_execution_data($$)
 			if($save_raw) {
 				$data{'line'}[$file_line_num]{'raw'} = $raw;
 			}
-		}elsif($line =~ /^\s+(\d+):\s*(\d+):(.*)/) {
+		}elsif($line =~ /^\s*(\d+):\s*(\d+):(.*)/) {
 
 			# line was executed
 

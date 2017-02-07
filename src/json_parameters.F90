@@ -50,6 +50,7 @@
     character(kind=CK,len=*),parameter :: root            = CK_'$'  !! for [[json_get_by_path]]
     character(kind=CK,len=*),parameter :: this            = CK_'@'  !! for [[json_get_by_path]]
     character(kind=CK,len=*),parameter :: child           = CK_'.'  !! for [[json_get_by_path]]
+    character(kind=CK,len=*),parameter :: tilde           = CK_'~'
     character(kind=CK,len=*),parameter :: bspace          = achar(8,  kind=CK)
     character(kind=CK,len=*),parameter :: horizontal_tab  = achar(9,  kind=CK)
     character(kind=CK,len=*),parameter :: newline         = achar(10, kind=CK)
@@ -120,7 +121,7 @@
     integer(IK),parameter :: seq_chunk_size = 256_IK !! chunk size for reading sequential files
 
     integer(IK),parameter :: pushed_char_size = 10_IK !! size for `pushed_char`
-                                                      !! array in [[json_core]]
+                                                      !! array in [[json_core(type)]]
 
     end module json_parameters
 !*****************************************************************************************

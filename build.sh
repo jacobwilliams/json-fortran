@@ -68,6 +68,8 @@
 #    Jacob Williams : 12/27/2014
 #
 
+#set -x
+#set -v
 set -o errexit
 
 FORDMD='json-fortran.md'        # FORD options file for building documentation
@@ -314,13 +316,19 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
     # run next commands in subshell to avoid `cd -`
     (cd "$BINDIR"
     GLOBIGNORE='*.*'
-    #
-    for TEST in jf_test_*; do
+    # from: http://stackoverflow.com/questions/7992689/bash-how-to-loop-all-files-in-sorted-order
+    ls jf_test_* | sed 's/^\([^0-9]*\)\([0-9]*\)/\1 \2/' | sort -k2,2n | tr -d ' ' |
+    while read TEST; do
         # It would be nice to run json output printed to stdout through jsonlint, however,
         # some tests output more than one json structure and these need to be split
+        echo ""
+        echo "======================================================"
+        echo ""
         echo "Running ${TEST}"
         "./${TEST}"
     done)
+    echo ""
+    echo "======================================================"
     GLOBIGNORE="$OLD_IGNORES"
     if [[ $CODE_COVERAGE = [yY]* ]] ; then
         for SRCFILE in json_string_utilities.F90 json_value_module.F90 json_file_module.F90 ; do
@@ -337,6 +345,23 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
                 mv ${SRCFILE}.gcov ${SRCFILE}-no-unicode.gcov
             fi
             if [ -f ${SRCFILE}-unicode.gcov ] && [ -f ${SRCFILE}-no-unicode.gcov ]; then
+
+                ############## for debugging
+                #echo ""
+                #echo "-------------------"
+                #echo "no-unicode file"
+                #echo "-------------------"
+                #cat ${SRCFILE}-no-unicode.gcov
+                #echo ""
+                #echo "-------------------"
+                #echo "unicode file"
+                #echo "-------------------"
+                #cat ${SRCFILE}-unicode.gcov
+                #echo ""
+                #./pages/development-resources/gccr.pl -n -c ${SRCFILE}-no-unicode.gcov no-unicode \
+                #                  ${SRCFILE}-unicode.gcov unicode
+                ##############
+
                 # merge them
                 ./pages/development-resources/gccr.pl -n -c ${SRCFILE}-no-unicode.gcov no-unicode \
                                   ${SRCFILE}-unicode.gcov unicode > ${SRCFILE}.gcov
