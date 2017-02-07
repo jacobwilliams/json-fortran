@@ -557,7 +557,7 @@
         procedure :: name_equal
         procedure :: json_value_print
         procedure :: string_to_int
-        procedure :: string_to_double
+        procedure :: string_to_dble
         procedure :: parse_value
         procedure :: parse_number
         procedure :: parse_string
@@ -4514,10 +4514,6 @@
 !>
 !  Convert a string into an integer.
 !
-!# History
-!  * Jacob Williams : 12/10/2013 : Rewrote routine.  Added error checking.
-!  * Modified by Izaak Beekman
-!
 !@note Replacement for the `parse_integer` function in the original code.
 
     function string_to_int(json,str) result(ival)
@@ -4550,17 +4546,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> author: Jacob Williams
-!  date: 1/19/2014
-!
+!>
 !  Convert a string into a double.
-!
-!# History
-!  * Jacob Williams, 10/27/2015 : Now using `fmt=*`, rather than
-!    `fmt=real_fmt`, since it doesn't work for some unusual cases
-!    (e.g., when `str='1E-5'`).
 
-    function string_to_double(json,str) result(rval)
+    function string_to_dble(json,str) result(rval)
 
     implicit none
 
@@ -4568,16 +4557,15 @@
     character(kind=CK,len=*),intent(in) :: str
     real(RK)                            :: rval
 
-    integer(IK) :: ierr  !! read iostat error code
+    logical(LK) :: status_ok  !! error flag
 
     if (.not. json%exception_thrown) then
 
-        !string to double
-        read(str,fmt=*,iostat=ierr) rval
+        call string_to_real(str,rval,status_ok)
 
-        if (ierr/=0) then    !if there was an error
+        if (.not. status_ok) then    !if there was an error
             rval = 0.0_RK
-            call json%throw_exception('Error in string_to_double: '//&
+            call json%throw_exception('Error in string_to_dble: '//&
                                       'string cannot be converted to a double: '//&
                                       trim(str))
         end if
@@ -4586,7 +4574,7 @@
         rval = 0.0_RK
     end if
 
-    end function string_to_double
+    end function string_to_dble
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -7098,7 +7086,7 @@
                         ival = json%string_to_int(tmp)
                         call to_integer(value,ival)
                     else
-                        rval = json%string_to_double(tmp)
+                        rval = json%string_to_dble(tmp)
                         call to_double(value,rval)
                     end if
 

@@ -68,8 +68,8 @@
 #    Jacob Williams : 12/27/2014
 #
 
-set -x
-set -v
+#set -x
+#set -v
 set -o errexit
 
 FORDMD='json-fortran.md'        # FORD options file for building documentation
@@ -340,20 +340,20 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
             fi
             if [ -f ${SRCFILE}-unicode.gcov ] && [ -f ${SRCFILE}-no-unicode.gcov ]; then
 
-                ##############
-                echo ""
-                echo "-------------------"
-                echo "no-unicode file"
-                echo "-------------------"
-                cat ${SRCFILE}-no-unicode.gcov
-                echo ""
-                echo "-------------------"
-                echo "unicode file"
-                echo "-------------------"
-                cat ${SRCFILE}-unicode.gcov
-                echo ""
-                ./pages/development-resources/gccr.pl -n -c ${SRCFILE}-no-unicode.gcov no-unicode \
-                                  ${SRCFILE}-unicode.gcov unicode
+                ############## for debugging
+                #echo ""
+                #echo "-------------------"
+                #echo "no-unicode file"
+                #echo "-------------------"
+                #cat ${SRCFILE}-no-unicode.gcov
+                #echo ""
+                #echo "-------------------"
+                #echo "unicode file"
+                #echo "-------------------"
+                #cat ${SRCFILE}-unicode.gcov
+                #echo ""
+                #./pages/development-resources/gccr.pl -n -c ${SRCFILE}-no-unicode.gcov no-unicode \
+                #                  ${SRCFILE}-unicode.gcov unicode
                 ##############
 
                 # merge them
