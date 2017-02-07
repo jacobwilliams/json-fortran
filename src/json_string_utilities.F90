@@ -62,6 +62,7 @@
     public :: integer_to_string
     public :: real_to_string
     public :: string_to_integer
+    public :: string_to_real
     public :: valid_json_hex
     public :: to_unicode
     public :: escape_string
@@ -174,6 +175,35 @@
     end if
 
     end subroutine real_to_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/19/2014
+!
+!  Convert a string into a `real(RK)`.
+!
+!# History
+!  * Jacob Williams, 10/27/2015 : Now using `fmt=*`, rather than
+!    `fmt=real_fmt`, since it doesn't work for some unusual cases
+!    (e.g., when `str='1E-5'`).
+!  * Jacob Williams : 2/6/2017 : moved core logic to this routine.
+
+    subroutine string_to_real(str,rval,status_ok)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in) :: str
+    real(RK),intent(out)                :: rval
+    logical(LK),intent(out)             :: status_ok  !! true if there were no errors
+
+    integer(IK) :: ierr  !! read iostat error code
+
+    read(str,fmt=*,iostat=ierr) rval
+    status_ok = (ierr==0)
+    if (.not. status_ok) rval = 0.0_RK
+
+    end subroutine string_to_real
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -333,7 +363,7 @@
         !trim the string if necessary:
         if (ipos<len(str_out)+1) then
             if (ipos==1) then
-                str_out = ''
+                str_out = CK_''
             else
 #if defined __GFORTRAN__
                 tmp = str_out(1:ipos-1)      !workaround for bug in gfortran 6.1
@@ -718,7 +748,7 @@
     integer :: i  !! counter
     integer :: n  !! length of input string
 
-    s_lower = ''
+    s_lower = CK_''
     n = len_trim(str)
 
     if (n>0) then
@@ -754,7 +784,7 @@
 
     if (len(str)>0) then
 
-        tmp = ''  ! initialize
+        tmp = CK_''  ! initialize
         ilen1 = len(s1)
 
         !     .

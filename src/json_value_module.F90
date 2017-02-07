@@ -175,8 +175,8 @@
         integer(IK) :: char_count = 0    !! character position in the current line
         integer(IK) :: line_count = 1    !! lines read counter
         integer(IK) :: pushed_index = 0  !! used when parsing lines in file
-        character(kind=CK,len=pushed_char_size) :: pushed_char = ''  !! used when parsing
-                                                                     !! lines in file
+        character(kind=CK,len=pushed_char_size) :: pushed_char = CK_''  !! used when parsing
+                                                                        !! lines in file
 
         integer(IK) :: ipos = 1  !! for allocatable strings: next character to read
 
@@ -565,7 +565,7 @@
         procedure :: name_equal
         procedure :: json_value_print
         procedure :: string_to_int
-        procedure :: string_to_double
+        procedure :: string_to_dble
         procedure :: parse_value
         procedure :: parse_number
         procedure :: parse_string
@@ -728,7 +728,7 @@
 
     !Just in case, clear these global variables also:
     json%pushed_index = 0
-    json%pushed_char  = ''
+    json%pushed_char  = CK_''
     json%char_count   = 0
     json%line_count   = 1
     json%ipos         = 1
@@ -860,7 +860,7 @@
         end if
 
     else
-        is_equal = name == '' ! check a blank name
+        is_equal = name == CK_'' ! check a blank name
     end if
 
     end function name_equal
@@ -1018,7 +1018,7 @@
         if (allocated(p%name)) then
             name = p%name
         else
-            name = ''
+            name = CK_''
         end if
     end if
 
@@ -1222,7 +1222,7 @@
     if (.not. ok) then
         if (present(var_type))   var_type   = json_unknown
         if (present(n_children)) n_children = 0
-        if (present(name))       name       = ''
+        if (present(name))       name       = CK_''
     else
         !get info:
 
@@ -1233,7 +1233,7 @@
                 p_name = p_var%name
                 name = p_name
             else
-                name = ''
+                name = CK_''
             end if
         end if
 #else
@@ -1330,7 +1330,7 @@
             p_name = p%name
             name = p_name
         else
-            name = ''
+            name = CK_''
         end if
     end if
 #else
@@ -1450,7 +1450,7 @@
         if (present(var_type)) var_type = json_unknown
         if (present(n_sets))   n_sets   = 0
         if (present(set_size)) set_size = 0
-        if (present(name))     name     = ''
+        if (present(name))     name     = CK_''
     else
 
         !get info about the variable:
@@ -1461,7 +1461,7 @@
                 p_name = p_var%name
                 name = p_name
             else
-                name = ''
+                name = CK_''
             end if
         end if
 #else
@@ -1556,7 +1556,7 @@
 
     !clear the flag and message:
     json%exception_thrown = .false.
-    json%err_message = ''
+    json%err_message = CK_''
 
     end subroutine json_clear_exceptions
 !*****************************************************************************************
@@ -1659,7 +1659,7 @@
             error_msg = 'Unknown error.'
         end if
     else
-        error_msg = ''
+        error_msg = CK_''
     end if
 
     end subroutine json_check_for_errors
@@ -2897,7 +2897,7 @@
 
     !populate the array:
     do i=1,size(val)
-        call json%add(var, '', val(i))
+        call json%add(var, CK_'', val(i))
     end do
 
     !add it:
@@ -3040,7 +3040,7 @@
 
     !populate the array:
     do i=1,size(val)
-        call json%add(var, '', val(i))
+        call json%add(var, CK_'', val(i))
     end do
 
     !add it:
@@ -3140,7 +3140,7 @@
 
     !populate the array:
     do i=1,size(val)
-        call json%add(var, '', val(i))
+        call json%add(var, CK_'', val(i))
     end do
 
     !add it:
@@ -3303,7 +3303,7 @@
         if (trim_string)    str = trim(str)
 
         !write it:
-        call json%add(var, '', str)
+        call json%add(var, CK_'', str)
 
         !cleanup
         deallocate(str)
@@ -3670,7 +3670,7 @@
     type(json_value),pointer,intent(in)              :: p
     character(kind=CK,len=:),intent(out),allocatable :: str  !! prints structure to this string
 
-    str = ''
+    str = CK_''
     call json%json_value_print(p, iunit=unit2str, str=str, indent=1, colon=.true.)
 
     end subroutine json_value_to_string
@@ -3798,7 +3798,7 @@
 
         !if the colon was the last thing written
         if (present(colon)) then
-            s = ''
+            s = CK_''
         else
             s = repeat(space, spaces)
         end if
@@ -4318,7 +4318,7 @@
 
                     if (islash_curr==ilen) then
                         !the last token is an empty string
-                        token = ''
+                        token = CK_''
                         islash_next = 0  ! will signal to stop
                     else
 
@@ -4337,7 +4337,7 @@
                                 token = path(islash_curr+1:islash_next-1)
                             else
                                 !empty token:
-                                token = ''
+                                token = CK_''
                             end if
                         end if
 
@@ -4487,7 +4487,7 @@
     logical(LK)                                :: parent_is_root !! if the parent is the root
 
     !initialize:
-    path = ''
+    path = CK_''
 
     !optional input:
     if (present(use_alt_array_tokens)) then
@@ -4589,7 +4589,7 @@
 
     !for errors, return blank string:
     if (json%exception_thrown) then
-        path = ''
+        path = CK_''
     else
         if (json%use_rfc6901_paths) then
             ! add the root slash:
@@ -4619,14 +4619,14 @@
 
         if (json%use_rfc6901_paths) then
             ! in this case, the options are ignored
-            if (path=='') then
+            if (path==CK_'') then
                 path = str
             else
                 path = str//slash//path
             end if
         else
             ! default path format
-            if (path=='') then
+            if (path==CK_'') then
                 path = str
             else
                 if (present(dot)) then
@@ -4678,10 +4678,6 @@
 !>
 !  Convert a string into an integer.
 !
-!# History
-!  * Jacob Williams : 12/10/2013 : Rewrote routine.  Added error checking.
-!  * Modified by Izaak Beekman
-!
 !@note Replacement for the `parse_integer` function in the original code.
 
     function string_to_int(json,str) result(ival)
@@ -4714,17 +4710,10 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> author: Jacob Williams
-!  date: 1/19/2014
-!
+!>
 !  Convert a string into a double.
-!
-!# History
-!  * Jacob Williams, 10/27/2015 : Now using `fmt=*`, rather than
-!    `fmt=real_fmt`, since it doesn't work for some unusual cases
-!    (e.g., when `str='1E-5'`).
 
-    function string_to_double(json,str) result(rval)
+    function string_to_dble(json,str) result(rval)
 
     implicit none
 
@@ -4732,16 +4721,15 @@
     character(kind=CK,len=*),intent(in) :: str
     real(RK)                            :: rval
 
-    integer(IK) :: ierr  !! read iostat error code
+    logical(LK) :: status_ok  !! error flag
 
     if (.not. json%exception_thrown) then
 
-        !string to double
-        read(str,fmt=*,iostat=ierr) rval
+        call string_to_real(str,rval,status_ok)
 
-        if (ierr/=0) then    !if there was an error
+        if (.not. status_ok) then    !if there was an error
             rval = 0.0_RK
-            call json%throw_exception('Error in string_to_double: '//&
+            call json%throw_exception('Error in string_to_dble: '//&
                                       'string cannot be converted to a double: '//&
                                       trim(str))
         end if
@@ -4750,7 +4738,7 @@
         rval = 0.0_RK
     end if
 
-    end function string_to_double
+    end function string_to_dble
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5394,7 +5382,7 @@
 
     character(kind=CK,len=:),allocatable :: error_message  !! for [[unescape_string]]
 
-    value = ''
+    value = CK_''
     if (.not. json%exception_thrown) then
 
         if (me%var_type == json_string) then
@@ -5405,7 +5393,7 @@
                     if (allocated(error_message)) then
                         call json%throw_exception(error_message)
                         deallocate(error_message)
-                        value = ''
+                        value = CK_''
                     end if
                 else
                     value = me%str_value
@@ -5496,7 +5484,7 @@
 
     type(json_value),pointer :: p
 
-    value = ''
+    value = CK_''
     if ( json%exception_thrown ) then
         if ( present(found) ) found = .false.
         return
@@ -5599,7 +5587,7 @@
             vec(i) = cval
             deallocate(cval)
         else
-            vec(i) = ''
+            vec(i) = CK_''
         end if
 
         end subroutine get_chars_from_array
@@ -5725,7 +5713,7 @@
             ilen(i) = len(cval)  ! return the actual length
             deallocate(cval)
         else
-            vec(i)  = ''
+            vec(i)  = CK_''
             ilen(i) = 0
         end if
 
@@ -6120,7 +6108,7 @@
 
     ! Note: the name of the root json_value doesn't really matter,
     !  but we'll allocate something here just in case.
-    p%name = ''
+    p%name = CK_''
 
     ! parse as a value
     call json%parse_value(unit=iunit, str=str, value=p)
@@ -6206,7 +6194,7 @@
 
         else
             !in this case, it was an empty line or file
-            line = ''
+            line = CK_''
         end if
 
         !create the error message:
@@ -6242,7 +6230,7 @@
     integer(IK) :: isize  !! number of characters read in read statement
 
     !initialize:
-    line = ''
+    line = CK_''
 
     !rewind to beginning of the current record:
     backspace(iunit, iostat=istat)
@@ -6867,7 +6855,7 @@
     if (present(val)) then
         p%str_value = val
     else
-        p%str_value = ''    !default value
+        p%str_value = CK_''    !default value
     end if
 
     !name:
@@ -7172,7 +7160,7 @@
                     if (i==4) then
                         if (valid_json_hex(hex)) then
                             i = 0
-                            hex = ''
+                            hex = CK_''
                             is_hex = .false.
                         else
                             call json%throw_exception('Error in parse_string:'//&
@@ -7201,7 +7189,7 @@
         !trim the string if necessary:
         if (ip<len(string)+1) then
             if (ip==1) then
-                string = ''
+                string = CK_''
             else
                 string = string(1:ip-1)
             end if
@@ -7342,7 +7330,7 @@
                         ival = json%string_to_int(tmp)
                         call to_integer(value,ival)
                     else
-                        rval = json%string_to_double(tmp)
+                        rval = json%string_to_dble(tmp)
                         call to_double(value,rval)
                     end if
 
@@ -7477,7 +7465,7 @@
                 parsing_comment = .true.
                 cycle
 
-            elseif (any(c == control_chars)) then
+            else if (any(c == control_chars)) then
 
                 ! non printing ascii characters
                 cycle
