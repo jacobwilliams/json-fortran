@@ -49,8 +49,9 @@
     character(kind=CK,len=*),parameter :: end_array_alt   = CK_')'  !! for [[json_get_by_path]]
     character(kind=CK,len=*),parameter :: root            = CK_'$'  !! for [[json_get_by_path]]
     character(kind=CK,len=*),parameter :: this            = CK_'@'  !! for [[json_get_by_path]]
-    character(kind=CK,len=*),parameter :: child           = CK_'.'  !! for [[json_get_by_path]]
-    character(kind=CK,len=*),parameter :: tilde           = CK_'~'
+    character(kind=CK,len=*),parameter :: dot             = CK_'.'  !! for [[json_get_by_path]]
+    character(kind=CK,len=*),parameter :: tilde           = CK_'~'  !! RFC 6901 escape character
+    character(kind=CK,len=*),parameter :: percent         = CK_'%'  !! Fortran path separator
     character(kind=CK,len=*),parameter :: bspace          = achar(8,  kind=CK)
     character(kind=CK,len=*),parameter :: horizontal_tab  = achar(9,  kind=CK)
     character(kind=CK,len=*),parameter :: newline         = achar(10, kind=CK)
