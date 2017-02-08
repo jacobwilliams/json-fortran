@@ -796,8 +796,8 @@
             if (i>0) then
                 if (i>1) tmp = tmp//str(1:i-1)
                 tmp = tmp//s2 ! replace s1 with s2 in new string
-                n = i+ilen1+1 ! start of remainder of str to keep
-                if (n<ilen) then
+                n = i+ilen1   ! start of remainder of str to keep
+                if (n<=ilen) then
                     str = str(n:ilen)
                 else
                     ! done
