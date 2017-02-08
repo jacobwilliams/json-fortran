@@ -204,13 +204,20 @@
         logical(LK) :: allow_comments = .true.  !! if true, any comments will be ignored when
                                                 !! parsing a file. The comment token is defined
                                                 !! by the `comment_char` string.
-        character(kind=CK,len=1) :: comment_char = '!'  !! comment token when
-                                                       !! `allow_comments` is true.
-                                                       !! Examples: '`!`' or '`#`'.
+        character(kind=CK,len=1) :: comment_char = CK_'!'  !! comment token when
+                                                           !! `allow_comments` is true.
+                                                           !! Examples: '`!`' or '`#`'.
 
         logical(LK) :: use_rfc6901_paths = .false. !! use the RFC 6901 standard for
                                                    !! JSON paths. Otherwise, the original
                                                    !! default method is used
+
+        character(kind=CK,len=1) :: path_separator = dot !! The `path` separator to use
+                                                         !! in the "default" mode for
+                                                         !! the paths in the various
+                                                         !! `get_by_path` routines.
+                                                         !! Note: if `use_rfc6901_paths=true`
+                                                         !! then this is ignored.
 
         contains
 
@@ -653,7 +660,8 @@
                                   no_whitespace,&
                                   unescape_strings,&
                                   comment_char,&
-                                  use_rfc6901_paths) result(json_core_object)
+                                  use_rfc6901_paths,&
+                                  path_separator) result(json_core_object)
 
     implicit none
 
@@ -668,7 +676,8 @@
                                 no_whitespace,&
                                 unescape_strings,&
                                 comment_char,&
-                                use_rfc6901_paths)
+                                use_rfc6901_paths,&
+                                path_separator)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -700,7 +709,8 @@
                                no_whitespace,&
                                unescape_strings,&
                                comment_char,&
-                               use_rfc6901_paths)
+                               use_rfc6901_paths,&
+                               path_separator)
 
     implicit none
 
@@ -753,6 +763,11 @@
     if (present(comment_char)) then
         json%allow_comments = .true.
         json%comment_char = comment_char
+    end if
+
+    ! path separator:
+    if (present(path_separator)) then
+        json%path_separator = path_separator
     end if
 
     !Set the format for real numbers:
@@ -3894,12 +3909,10 @@
 !### Notes
 !  The following special characters are used to denote paths:
 !
-!````
-!  $         - root
-!  @         - this
-!  .         - child object member
-!  [] or ()  - child array element
-!````
+!  * `$`           - root
+!  * `@`           - this
+!  * `.`           - child object member (note this can be changed using `json%path_separator`)
+!  * `[]` or `()`  - child array element
 !
 !  Thus, if any of these characters are present in the name key,
 !  this routine cannot be used to get the value.
@@ -3964,27 +3977,6 @@
                 p => me
                 child_i = i + 1
 
-            case (child)
-
-                ! get child member from p
-                if (child_i < i) then
-                    nullify(tmp)
-                    call json%get_child(p, path(child_i:i-1), tmp)
-                    p => tmp
-                    nullify(tmp)
-                else
-                    child_i = i + 1
-                    cycle
-                end if
-
-                if (.not. associated(p)) then
-                    call json%throw_exception('Error in json_get_by_path:'//&
-                                              ' Error getting child member.')
-                    exit
-                end if
-
-                child_i = i+1
-
             case (start_array,start_array_alt)
 
                 !....Modified to allow for 'var[3]' style syntax
@@ -4025,6 +4017,31 @@
                 nullify(tmp)
 
                 child_i= i + 1
+
+            case default
+
+                if (c==json%path_separator) then
+
+                    ! get child member from p
+                    if (child_i < i) then
+                        nullify(tmp)
+                        call json%get_child(p, path(child_i:i-1), tmp)
+                        p => tmp
+                        nullify(tmp)
+                    else
+                        child_i = i + 1
+                        cycle
+                    end if
+
+                    if (.not. associated(p)) then
+                        call json%throw_exception('Error in json_get_by_path:'//&
+                                                  ' Error getting child member.')
+                        exit
+                    end if
+
+                    child_i = i+1
+
+                end if
 
             end select
 
@@ -4096,7 +4113,7 @@
 !### Reference
 !  * [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 !
-!@note Not doing anything special about the "-" character to index an array.
+!@note Not doing anything special about the `-` character to index an array.
 !      This is considered a normal error.
 !
 !@warning Not checking if the member that is referenced is unique.
@@ -4309,7 +4326,7 @@
     logical(LK),intent(in),optional :: use_alt_array_tokens   !! if true, then '()' are used for array elements
                                                               !! otherwise, '[]' are used [default]
     character(kind=CK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
-                                                              !! (default is '.')
+                                                              !! (otherwise use `json%path_separator`)
 
     type(json_value),pointer                   :: tmp            !! for traversing the structure
     type(json_value),pointer                   :: element        !! for traversing the structure
@@ -4445,11 +4462,11 @@
 
     contains
 
-        subroutine add_to_path(str,dot)
+        subroutine add_to_path(str,path_sep)
         !! prepend the string to the path
         implicit none
         character(kind=CK,len=*),intent(in) :: str  !! string to prepend to `path`
-        character(kind=CK,len=1),intent(in),optional :: dot
+        character(kind=CK,len=1),intent(in),optional :: path_sep
             !! path separator (default is '.').
             !! (ignored if `json%use_rfc6901_paths=.true.`)
 
@@ -4465,10 +4482,12 @@
             if (path==CK_'') then
                 path = str
             else
-                if (present(dot)) then
-                    path = str//dot//path
+                if (present(path_sep)) then
+                    ! use user specified:
+                    path = str//path_sep//path
                 else
-                    path = str//child//path
+                    ! use the default:
+                    path = str//json%path_separator//path
                 end if
             end if
         end if
