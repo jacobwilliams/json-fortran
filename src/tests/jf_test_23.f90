@@ -31,6 +31,7 @@ contains
     integer :: ival
     real(wp) :: rval
     logical :: found
+    character(kind=json_CK,len=10),dimension(:),allocatable :: cval_array
 
     error_cnt = 0
     call json%initialize(   trailing_spaces_significant=.true.,&
@@ -76,82 +77,114 @@ contains
       write(error_unit,'(A)') ''
       key = '/version/svn'
       call json%get(key, ival)
-      if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-      else
-        write(error_unit,'(A,I5)') key//' = ',ival
-      end if
+      call check_i()
 
       write(error_unit,'(A)') ''
       key = '/data/0/array/1'
       call json%get(key, cval)
-      if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-      else
-        write(error_unit,'(A)') key//' = '//trim(cval)
-      end if
+      call check_c()
 
       write(error_unit,'(A)') ''
       key = '/files/0'
       call json%get(key, cval)
-      if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-      else
-        write(error_unit,'(A)') key//' = '//trim(cval)
-      end if
+      call check_c()
 
       write(error_unit,'(A)') ''
       key = '/files/1'
       call json%get(key, cval)
-      if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-      else
-        write(error_unit,'(A)') key//' = '//trim(cval)
-      end if
+      call check_c()
 
       write(error_unit,'(A)') ''
       key = '/files/2'
       call json%get(key, cval)
-      if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-      else
-        write(error_unit,'(A)') key//' = '//trim(cval)
-      end if
+      call check_c()
 
       write(error_unit,'(A)') ''
       key = '/data/1/real'
       call json%get(key, rval)
-      if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-      else
-        write(error_unit,'(A,E30.16)') key//' = ',rval
-      end if
+      call check_i()
 
       write(error_unit,'(A)') ''
       key = '/files/3'
       call json%get(key, cval)      !has hex characters
-      if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-      else
-        write(error_unit,'(A)') key//' = '//trim(cval)
-      end if
+      call check_c()
 
       write(error_unit,'(A)') ''
       key = '/files/4'
       call json%get(key, cval)      !string with spaces and no escape characters
+      call check_c()
+
+      ! Test the examples in the RFC 6901 spec:
+
+      write(error_unit,'(A)') ''
+      key = ""
+      call json%get(key, p) ! the whole document
       if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-      else
-        write(error_unit,'(A)') key//' = '//trim(cval)
+          write(error_unit,'(A)') 'Error: could not find '//key
+          error_cnt = error_cnt + 1
       end if
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/foo"
+      call json%get(key, cval_array) ! ["bar", "baz"]
+      if (json%failed()) then
+          write(error_unit,'(A)') 'Error: could not find '//key
+          error_cnt = error_cnt + 1
+      else
+          write(error_unit,'(A)') key//' = ',cval_array
+      end if
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/foo/0"
+      call json%get(key, cval)       ! "bar"
+      call check_c()   ! "bar"
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/  "
+      call json%get(key, ival)
+      call check_i()   ! 0
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/a~1b"
+      call json%get(key, ival)
+      call check_i()   ! 1
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/c%d"
+      call json%get(key, ival)
+      call check_i()   ! 2
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/e^f"
+      call json%get(key, ival)
+      call check_i()   ! 3
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/g|h"
+      call json%get(key, ival)
+      call check_i()   ! 4
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/i\\j"
+      call json%get(key, ival)
+      call check_i()   ! 5
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/k\""l"
+      call json%get(key, ival)
+      call check_i()   ! 6
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/ "
+      call json%get(key, ival)
+      call check_i()   ! 7
+
+      write(error_unit,'(A)') ''
+      key = "/rfc6901 tests/m~0n"
+      call json%get(key, ival)
+      call check_i()   ! 8
+
+
 
       !
       ! Test of values that aren't there:
@@ -210,6 +243,38 @@ contains
       call json%print_error_message(error_unit)
       error_cnt = error_cnt + 1
     end if
+
+    contains
+
+        subroutine check_c()
+
+        !! check results of a character test
+
+        implicit none
+
+        if (json%failed()) then
+          call json%print_error_message(error_unit)
+          error_cnt = error_cnt + 1
+        else
+          write(error_unit,'(A)') key//' = '//cval
+        end if
+
+        end subroutine check_c
+
+        subroutine check_i()
+
+        !! check results of an integer test
+
+        implicit none
+
+        if (json%failed()) then
+          call json%print_error_message(error_unit)
+          error_cnt = error_cnt + 1
+        else
+          write(error_unit,'(A,I5)') key//' = ',ival
+        end if
+
+        end subroutine check_i
 
     end subroutine test_23
 

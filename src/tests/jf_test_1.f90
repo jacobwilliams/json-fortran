@@ -94,6 +94,18 @@ contains
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'get some data from the file...'
 
+      call json%initialize(path_separator=json_CK_'%')  ! use fortran-style paths
+
+      call json%get('version%svn', ival)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A,I5)') 'version%svn = ',ival
+      end if
+
+      call json%initialize(path_separator=json_CK_'.')  ! reset to normal paths
+
       write(error_unit,'(A)') ''
       call json%get('version.svn', ival)
       if (json%failed()) then

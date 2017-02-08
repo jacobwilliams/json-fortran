@@ -26,3 +26,10 @@
                                                           !! `get_by_path` routines are interpreted
                                                           !! as RFC 6901 "JSON Pointer" paths.
                                                           !! By default, this is False.
+    character(kind=CK,len=1),intent(in),optional :: path_separator !! The `path` separator to use
+                                                                   !! in the "default" mode for
+                                                                   !! the paths in the various
+                                                                   !! `get_by_path` routines.
+                                                                   !! Example: `.` [default] or `%`.
+                                                                   !! Note: if `use_rfc6901_paths=true`
+                                                                   !! then this is ignored.
