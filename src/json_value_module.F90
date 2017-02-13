@@ -208,15 +208,18 @@
                                                            !! `allow_comments` is true.
                                                            !! Examples: '`!`' or '`#`'.
 
-        logical(LK) :: use_rfc6901_paths = .false. !! use the RFC 6901 standard for
-                                                   !! JSON paths. Otherwise, the original
-                                                   !! default method is used
+        integer(IK) :: path_mode = 1_IK  !! How the path strings are interpreted in the
+                                         !! `get_by_path` routines:
+                                         !!
+                                         !! * 1 -- Default mode (see [[json_get_by_path_default]])
+                                         !! * 2 -- as RFC 6901 "JSON Pointer" paths
+                                         !!   (see [[json_get_by_path_rfc6901]])
 
         character(kind=CK,len=1) :: path_separator = dot !! The `path` separator to use
                                                          !! in the "default" mode for
                                                          !! the paths in the various
                                                          !! `get_by_path` routines.
-                                                         !! Note: if `use_rfc6901_paths=true`
+                                                         !! Note: if `path_mode/=1`
                                                          !! then this is ignored.
 
         contains
@@ -660,7 +663,7 @@
                                   no_whitespace,&
                                   unescape_strings,&
                                   comment_char,&
-                                  use_rfc6901_paths,&
+                                  path_mode,&
                                   path_separator) result(json_core_object)
 
     implicit none
@@ -676,7 +679,7 @@
                                 no_whitespace,&
                                 unescape_strings,&
                                 comment_char,&
-                                use_rfc6901_paths,&
+                                path_mode,&
                                 path_separator)
 
     end function initialize_json_core
@@ -709,7 +712,7 @@
                                no_whitespace,&
                                unescape_strings,&
                                comment_char,&
-                               use_rfc6901_paths,&
+                               path_mode,&
                                path_separator)
 
     implicit none
@@ -756,8 +759,14 @@
         json%no_whitespace = no_whitespace
     if (present(unescape_strings)) &
         json%unescaped_strings = unescape_strings
-    if (present(use_rfc6901_paths)) &
-        json%use_rfc6901_paths = use_rfc6901_paths
+    if (present(path_mode)) then
+        if (path_mode==1_IK .or. path_mode==2_IK) then
+            json%path_mode = path_mode
+        else
+            json%path_mode = 1_IK  ! just to have a valid value
+            call json%throw_exception('Invalid path_mode.')
+        end if
+    end if
 
     ! if we are allowing comments in the file:
     if (present(comment_char)) then
@@ -3884,11 +3893,13 @@
                                                    !! specify by `path`
     logical(LK),intent(out),optional     :: found  !! true if it was found
 
-    if (json%use_rfc6901_paths) then
-        call json%json_get_by_path_rfc6901(me, path, p, found)
-    else
+    ! note: it can only be 1 or 2 (which was checked in initialize)
+    select case (json%path_mode)
+    case(1_IK)
         call json%json_get_by_path_default(me, path, p, found)
-    end if
+    case(2_IK)
+        call json%json_get_by_path_rfc6901(me, path, p, found)
+    end select
 
     end subroutine json_get_by_path
 !*****************************************************************************************
@@ -3912,7 +3923,7 @@
 !  * `$`           - root
 !  * `@`           - this
 !  * `.`           - child object member (note this can be changed using `json%path_separator`)
-!  * `[]` or `()`  - child array element
+!  * `[]` or `()`  - child array element (note that indices are 1-based)
 !
 !  Thus, if any of these characters are present in the name key,
 !  this routine cannot be used to get the value.
@@ -4312,8 +4323,8 @@
 !      `found` is present, which will be set to `false`. `path`
 !      will be a blank string.
 !
-!@note If `json%use_rfc6901_paths=.true.`, then the
-!      `use_alt_array_tokens` and `path_sep` inputs are ignored.
+!@note If `json%path_mode/=1`, then the `use_alt_array_tokens`
+!      and `path_sep` inputs are ignored if present.
 
     subroutine json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
 
@@ -4389,10 +4400,11 @@
                             exit
                         end if
                     end do
-                    if (json%use_rfc6901_paths) then
+                    select case(json%path_mode)
+                    case(2)
                         call integer_to_string(i-1,int_fmt,istr) ! 0-based index
                         call add_to_path(parent_name//slash//trim(adjustl(istr)))
-                    else
+                    case(1)
                         call integer_to_string(i,int_fmt,istr)
                         if (use_brackets) then
                             call add_to_path(parent_name//start_array//&
@@ -4401,7 +4413,7 @@
                             call add_to_path(parent_name//start_array_alt//&
                                              trim(adjustl(istr))//end_array_alt,path_sep)
                         end if
-                    end if
+                    end select
                     tmp => tmp%parent  ! already added parent name
 
                 case (json_object)
@@ -4444,7 +4456,7 @@
     if (json%exception_thrown) then
         path = CK_''
     else
-        if (json%use_rfc6901_paths) then
+        if (json%path_mode==2) then
             ! add the root slash:
             path = slash//path
         end if
@@ -4468,16 +4480,17 @@
         character(kind=CK,len=*),intent(in) :: str  !! string to prepend to `path`
         character(kind=CK,len=1),intent(in),optional :: path_sep
             !! path separator (default is '.').
-            !! (ignored if `json%use_rfc6901_paths=.true.`)
+            !! (ignored if `json%path_mode/=1`)
 
-        if (json%use_rfc6901_paths) then
+        select case (json%path_mode)
+        case(2)
             ! in this case, the options are ignored
             if (path==CK_'') then
                 path = str
             else
                 path = str//slash//path
             end if
-        else
+        case(1)
             ! default path format
             if (path==CK_'') then
                 path = str
@@ -4490,7 +4503,7 @@
                     path = str//json%path_separator//path
                 end if
             end if
-        end if
+        end select
 
         end subroutine add_to_path
 
