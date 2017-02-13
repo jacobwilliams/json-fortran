@@ -769,8 +769,9 @@
     end if
 
     ! if we are allowing comments in the file:
+    ! [an empty string disables comments]
     if (present(comment_char)) then
-        json%allow_comments = .true.
+        json%allow_comments = comment_char/=CK_''
         json%comment_char = comment_char
     end if
 
