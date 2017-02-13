@@ -21,7 +21,9 @@
     character(kind=CK,len=1),intent(in),optional :: comment_char  !! If present, this character is used
                                                                   !! to denote comments in the JSON file,
                                                                   !! which will be ignored if present.
-                                                                  !! Example: `!` or `#`.
+                                                                  !! Example: `!` or `#`. Setting this
+                                                                  !! to a blank string disables the
+                                                                  !! ignoring of comments. (Default is `!`).
     integer(IK),intent(in),optional :: path_mode  !! How the path strings are interpreted in the
                                                   !! `get_by_path` routines:
                                                   !!
