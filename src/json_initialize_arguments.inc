@@ -22,14 +22,17 @@
                                                                   !! to denote comments in the JSON file,
                                                                   !! which will be ignored if present.
                                                                   !! Example: `!` or `#`.
-    logical(LK),intent(in),optional :: use_rfc6901_paths  !! If true, then path values in the
-                                                          !! `get_by_path` routines are interpreted
-                                                          !! as RFC 6901 "JSON Pointer" paths.
-                                                          !! By default, this is False.
+    integer(IK),intent(in),optional :: path_mode  !! How the path strings are interpreted in the
+                                                  !! `get_by_path` routines:
+                                                  !!
+                                                  !! * 1 -- Default way (see [[json_get_by_path_default]])
+                                                  !!   [Default]
+                                                  !! * 2 -- as RFC 6901 "JSON Pointer" paths
+                                                  !!   (see [[json_get_by_path_rfc6901]])
     character(kind=CK,len=1),intent(in),optional :: path_separator !! The `path` separator to use
                                                                    !! in the "default" mode for
                                                                    !! the paths in the various
                                                                    !! `get_by_path` routines.
                                                                    !! Example: `.` [default] or `%`.
-                                                                   !! Note: if `use_rfc6901_paths=true`
+                                                                   !! Note: if `path_mode/=1`
                                                                    !! then this is ignored.

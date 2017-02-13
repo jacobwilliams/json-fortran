@@ -275,7 +275,7 @@
                                             no_whitespace,&
                                             unescape_strings,&
                                             comment_char,&
-                                            use_rfc6901_paths,&
+                                            path_mode,&
                                             path_separator)
 
     implicit none
@@ -291,7 +291,7 @@
                             no_whitespace,&
                             unescape_strings,&
                             comment_char,&
-                            use_rfc6901_paths,&
+                            path_mode,&
                             path_separator)
 
     end subroutine initialize_json_core_in_file
@@ -354,7 +354,7 @@
                                   no_whitespace,&
                                   unescape_strings,&
                                   comment_char,&
-                                  use_rfc6901_paths,&
+                                  path_mode,&
                                   path_separator) result(file_object)
 
     implicit none
@@ -372,7 +372,7 @@
                                 no_whitespace,&
                                 unescape_strings,&
                                 comment_char,&
-                                use_rfc6901_paths,&
+                                path_mode,&
                                 path_separator)
 
     if (present(p)) file_object%p => p

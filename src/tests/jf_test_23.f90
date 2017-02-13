@@ -36,7 +36,7 @@ contains
     error_cnt = 0
     call json%initialize(   trailing_spaces_significant=.true.,&
                             case_sensitive_keys=.true.,&
-                            use_rfc6901_paths=.true.)
+                            path_mode=2) ! RFC6901 paths
     if (json%failed()) then
       call json%print_error_message(error_unit)
       error_cnt = error_cnt + 1
@@ -217,7 +217,7 @@ contains
 
     call core%initialize(   trailing_spaces_significant=.true.,&
                             case_sensitive_keys=.true.,&
-                            use_rfc6901_paths=.true.)
+                            path_mode=2) ! RFC6901 paths
 
     write(error_unit,'(A)') ''
     key = '/data/1/real'
