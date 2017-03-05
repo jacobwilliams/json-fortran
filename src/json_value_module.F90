@@ -297,6 +297,12 @@
 #endif
 
         !>
+        !  Create a [[json_value]] linked list using the
+        !  path to the variables
+        generic,public :: create => MAYBEWRAP(json_create_by_path)  ! this will create a null ...
+        procedure :: MAYBEWRAP(json_create_by_path)
+
+        !>
         !  Get data from a [[json_value]] linked list.
         !
         !@note There are two versions (e.g. [[json_get_integer]] and [[json_get_integer_with_path]]).
@@ -544,6 +550,7 @@
         procedure :: MAYBEWRAP(json_get_path)
 
         procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
+        procedure,public :: replace             => json_value_replace       !! Replace a [[json_value]] in a linked-list structure.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
         procedure,public :: count               => json_count               !! count the number of children
@@ -1776,6 +1783,40 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!>
+!  Replace `p1` with `p2` in a JSON structure.
+!
+!@note The replacement is done using an insert and remove
+!      See [[json_value_insert_after]] and [[json_value_remove]]
+!      for details.
+
+    subroutine json_value_replace(json,p1,p2,destroy)
+
+    implicit none
+
+    class(json_core),intent(inout)  :: json
+    type(json_value),pointer        :: p1       !! the item to replace
+    type(json_value),pointer        :: p2       !! item to take the place of `p1`
+    logical(LK),intent(in),optional :: destroy  !! Should `p1` also be destroyed
+                                                !! (default is True). Normally,
+                                                !! this should be true to avoid
+                                                !! a memory leak.
+
+    logical(LK) :: destroy_p1 !! if `p1` is to be destroyed
+
+    if (present(destroy)) then
+        destroy_p1 = destroy
+    else
+        destroy_p1 = .true.  ! default
+    end if
+
+    call json%insert_after(p1,p2)
+    call json%remove(p1,destroy_p1)
+
+    end subroutine json_value_replace
+!*****************************************************************************************
+
+!*****************************************************************************************
 !> author: Jacob Williams
 !  date: 4/26/2016
 !
@@ -2685,6 +2726,66 @@
     end subroutine json_value_insert_after_child_by_index
 !*****************************************************************************************
 
+! ... to do .... add the full set of these ...
+
+!*****************************************************************************************
+!>
+!  Add a double value to a [[json_value]], given the path.
+!
+!@warning Using this routine to change the type of an existing object or array to
+!         a scalar may result in a memory leak. It should only be used
+!         to add a new variable (or set an existing one).
+
+    subroutine json_add_double_with_path(json,me,path,value,found)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me
+    character(kind=CK,len=*),intent(in) :: path
+    real(RK),intent(in)                 :: value
+    logical(LK),intent(out),optional    :: found
+
+    type(json_value),pointer :: p
+
+    if ( .not. json%exception_thrown ) then
+
+        nullify(p)
+
+        ! return a pointer to the path (possibly creating it)
+        call json%create(me,path,p,found)
+
+        if (.not. associated(p)) then
+
+            call json%throw_exception('Error in json_add_double_with_path:'//&
+                                      ' Unable to resolve path: '//trim(path))
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+
+        else
+            ! set the value (may need to change type,
+            ! since if it had to be created, it is
+            ! a null variable)
+            if (p%var_type==json_double) then
+                p%dbl_value = value
+            else
+                call to_double(p,value)
+            end if
+
+        end if
+
+    else
+        if ( present(found) ) found = .false.
+    end if
+
+    end subroutine json_add_double_with_path
+!*****************************************************************************************
+
+
+
+
 !*****************************************************************************************
 !> author: Jacob Williams
 !  date: 1/19/2014
@@ -3373,7 +3474,7 @@
 !>
 !  Returns a child in the object or array given the index.
 
-    subroutine json_value_get_by_index(json, p, idx, child)
+    subroutine json_value_get_by_index(json, p, idx, child, found)
 
     implicit none
 
@@ -3381,8 +3482,14 @@
     type(json_value),pointer,intent(in) :: p      !! object or array JSON data
     integer(IK),intent(in)              :: idx    !! index of the child
     type(json_value),pointer            :: child  !! pointer to the child
+    logical(LK),intent(out),optional    :: found  !! true if the value was found
+                                                  !! (if not present, an exception
+                                                  !! will be thrown if it was not
+                                                  !! found.  If present and not
+                                                  !! found, no exception will be
+                                                  !! thrown).
 
-    integer(IK) :: i
+    integer(IK) :: i  !! counter
 
     nullify(child)
 
@@ -3400,7 +3507,7 @@
                     call json%throw_exception('Error in json_value_get_by_index:'//&
                                               ' child%next is not associated.')
                     nullify(child)
-                    return
+                    exit
                 end if
 
             end do
@@ -3412,6 +3519,18 @@
 
         end if
 
+        ! found output:
+        if (json%exception_thrown) then
+            if (present(found)) then
+                call json%clear_exceptions()
+                found = .false.
+            end if
+        else
+            if (present(found)) found = .true.
+        end if
+
+    else
+        if (present(found)) found = .false.
     end if
 
     end subroutine json_value_get_by_index
@@ -3450,16 +3569,23 @@
 !
 !@note The `name` input is not a path, and is not parsed like it is in [[json_get_by_path]].
 
-    subroutine json_value_get_by_name_chars(json, p, name, child)
+    subroutine json_value_get_by_name_chars(json, p, name, child, found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: p
-    character(kind=CK,len=*),intent(in) :: name      !! the name of a child of `p`
-    type(json_value),pointer            :: child     !! pointer to the child
+    character(kind=CK,len=*),intent(in) :: name   !! the name of a child of `p`
+    type(json_value),pointer            :: child  !! pointer to the child
+    logical(LK),intent(out),optional    :: found  !! true if the value was found
+                                                  !! (if not present, an exception
+                                                  !! will be thrown if it was not
+                                                  !! found.  If present and not
+                                                  !! found, no exception will be
+                                                  !! thrown).
 
     integer(IK) :: i,n_children
+    logical :: error
 
     nullify(child)
 
@@ -3467,6 +3593,7 @@
 
         if (associated(p)) then
 
+            error = .true.   ! will be false if it is found
             if (p%var_type==json_object) then
                 n_children = json%count(p)
                 child => p%children    !start with first one
@@ -3474,26 +3601,43 @@
                     if (.not. associated(child)) then
                         call json%throw_exception('Error in json_value_get_by_name_chars: '//&
                                                   'Malformed JSON linked list')
-                        return
+                        exit
                     end if
                     if (allocated(child%name)) then
                         !name string matching routine:
-                        if (json%name_equal(child,name)) return
+                        if (json%name_equal(child,name)) then
+                            error = .false.
+                            exit
+                        end if
                     end if
                     child => child%next
                 end do
             end if
 
-            !did not find anything:
-            call json%throw_exception('Error in json_value_get_by_name_chars: '//&
-                                 'child variable '//trim(name)//' was not found.')
-            nullify(child)
+            if (error) then
+                !did not find anything:
+                call json%throw_exception('Error in json_value_get_by_name_chars: '//&
+                                     'child variable '//trim(name)//' was not found.')
+                nullify(child)
+            end if
 
         else
             call json%throw_exception('Error in json_value_get_by_name_chars: '//&
                                  'pointer is not associated.')
         end if
 
+        ! found output:
+        if (json%exception_thrown) then
+            if (present(found)) then
+                call json%clear_exceptions()
+                found = .false.
+            end if
+        else
+            if (present(found)) found = .true.
+        end if
+
+    else
+        if (present(found)) found = .false.
     end if
 
     end subroutine json_value_get_by_name_chars
@@ -3503,7 +3647,7 @@
 !>
 !  Alternate version of [[json_value_get_by_name_chars]] where `name` is kind=CDK.
 
-    subroutine wrap_json_value_get_by_name_chars(json, p, name, child)
+    subroutine wrap_json_value_get_by_name_chars(json, p, name, child, found)
 
     implicit none
 
@@ -3511,8 +3655,9 @@
     type(json_value),pointer,intent(in)  :: p
     character(kind=CDK,len=*),intent(in) :: name
     type(json_value),pointer             :: child
+    logical(LK),intent(out),optional     :: found
 
-    call json%get(p,to_unicode(name),child)
+    call json%get(p,to_unicode(name),child,found)
 
     end subroutine wrap_json_value_get_by_name_chars
 !*****************************************************************************************
@@ -3907,6 +4052,65 @@
 
 !*****************************************************************************************
 !>
+!  Returns the [[json_value]] pointer given the path string,
+!  If necessary, by creating the variables as needed.
+!
+!  By default, the leaf node and any empty array elements
+!  are created as `json_null` values.
+!
+!  It only works for the default path mode. An error will be
+!  thrown if RFC 6901 mode is enabled.
+!
+!### See also
+!  * [[json_get_by_path]]
+
+    subroutine json_create_by_path(json, me, path, p, found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me     !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+                                                   !! specify by `path`
+    logical(LK),intent(out),optional     :: found  !! true if it was found
+        !! ...TODO found should indicate if the variable was already there.
+        !!         another logical output should indicate success.
+
+    ! note: it can only be 1 or 2 (which was checked in initialize)
+    select case (json%path_mode)
+    case(1_IK)
+        call json%json_get_by_path_default(me, path, p, found, create_it=.true.)
+    case(2_IK)
+        ! the problem here is there isn't really a way to disambiguate
+        ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
+        call json%throw_exception('Create by path not suppored in RFC 6901 path mode.')
+    end select
+
+    end subroutine json_create_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_create_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_create_by_path(json, me, path, p, found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me
+    character(kind=CDK,len=*),intent(in) :: path
+    type(json_value),pointer,intent(out) :: p
+    logical(LK),intent(out),optional     :: found
+
+    call json%get(me, to_unicode(path), p, found)
+
+    end subroutine wrap_json_create_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
 !  Returns the [[json_value]] pointer given the path string.
 !
 !### Example
@@ -3933,35 +4137,58 @@
 !
 !### See also
 !  * [[json_get_by_path_rfc6901]] - alternate version with different path convention.
+!
+!@note JSON `null` values are used here for unknown variables when `create_it` is True.
+!      So, it is possible that an existing null variable can be converted to another
+!      type (object or array) if a child is specified in the path. Doing it this way
+!      to avoid having to use another type (say `json_unknown`) that would have to be
+!      converted to null once all the variables have been created (user would have
+!      had to do this).
 
-    subroutine json_get_by_path_default(json, me, path, p, found)
+    subroutine json_get_by_path_default(json, me, path, p, found, create_it)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
-    type(json_value),pointer,intent(in)  :: me     !! a JSON linked list
-    character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
-    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
-                                                   !! specify by `path`
-    logical(LK),intent(out),optional     :: found  !! true if it was found
+    type(json_value),pointer,intent(in)  :: me        !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path      !! path to the variable
+    type(json_value),pointer,intent(out) :: p         !! pointer to the variable
+                                                      !! specify by `path`
+    logical(LK),intent(out),optional     :: found     !! true if it was found
+    logical(LK),intent(in),optional      :: create_it !! if a variable is not present
+                                                      !! in the path, then it is created.
+                                                      !! the leaf node is returned as
+                                                      !! a `null` json type and can be
+                                                      !! changed by the caller.
 
-    integer(IK)              :: i
-    integer(IK)              :: length
-    integer(IK)              :: child_i
-    character(kind=CK,len=1) :: c
-    logical(LK)              :: array
-    type(json_value),pointer :: tmp
+    integer(IK)              :: i            !! counter of characters in `path`
+    integer(IK)              :: length       !! significant length of `path`
+    integer(IK)              :: child_i      !! index for getting children
+    character(kind=CK,len=1) :: c            !! a character in the `path`
+    logical(LK)              :: array        !! flag when searching for array index in `path`
+    type(json_value),pointer :: tmp          !! temp variables for getting child objects
+    logical(LK)              :: child_found  !! if the child value was found
+    logical(LK)              :: create       !! if the object is to be created
+    logical(LK)              :: created      !! if `create` is true, then this will be
+                                             !! true if the leaf object had to be created
+    integer(IK)              :: j            !! counter of children when creating object
 
     nullify(p)
 
     if (.not. json%exception_thrown) then
 
-        ! default to assuming relative to this
+        if (present(create_it)) then
+            create = create_it
+        else
+            create = .false.
+        end if
+
+        ! default to assuming relative to me
         p => me
 
         child_i = 1
-
         array = .false.
+        created = .false.
 
         !keep trailing space or not:
         if (json%trailing_spaces_significant) then
@@ -3982,17 +4209,16 @@
                     p => p%parent
                 end do
                 child_i = i + 1
+                if (create) created = .false. ! should always exist
 
             case (this)
 
                 ! this
                 p => me
                 child_i = i + 1
+                if (create) created = .false. ! should always exist
 
             case (start_array,start_array_alt)
-
-                !....Modified to allow for 'var[3]' style syntax
-                !Note: jmozmoz/fson has a slightly different version of this...
 
                 ! start looking for the array element index
                 array = .true.
@@ -4000,15 +4226,47 @@
                 ! get child member from p
                 if (child_i < i) then
                     nullify(tmp)
-                    call json%get_child(p, path(child_i:i-1), tmp)
+                    if (create) then
+
+                        !
+                        ! Example:
+                        !    'aaa.bbb(1)'
+                        !     -> and aaa is a null, need to make it an object
+                        !
+                        !  What about the case: aaa.bbb(1)(3) ?
+                        !  Is that already handled?
+                        !
+                        if (p%var_type==json_null) then
+                            ! if p was also created, then we need to
+                            ! convert it into an object here:
+                            p%var_type = json_object
+                        end if
+
+                        ! don't want to throw exceptions in this case
+                        call json%get_child(p, path(child_i:i-1), tmp, child_found)
+                        if (.not. child_found) then
+                            ! have to create this child
+                            ! [make it an array]
+                            call json_value_create(tmp)
+                            call to_array(tmp,path(child_i:i-1))
+                            call json%add(p,tmp)
+                            created = .true.
+                            !write(*,*) 'creating: '//path(child_i:i-1)
+                        else
+                            created = .false.
+                        end if
+                    else
+                        ! call the normal way
+                        call json%get_child(p, path(child_i:i-1), tmp)
+                    end if
                     p => tmp
-                    nullify(tmp)
                 else
-                    child_i = i + 1
+                    child_i = i + 1     ! what is this for? ... it never happens
+                                        ! in the test cases. '@(' maybe?
                     cycle
                 end if
                 if (.not. associated(p)) then
-                    call json%throw_exception('Error in json_get_by_path:'//&
+                    call json%throw_exception('Error in json_get_by_path_default:'//&
                                          ' Error getting array element')
                     exit
                 end if
@@ -4016,19 +4274,53 @@
 
             case (end_array,end_array_alt)
 
-                if (.not.array) then
-                    call json%throw_exception('Error in json_get_by_path: Unexpected ]')
+                if (.not. array) then
+                    call json%throw_exception('Error in json_get_by_path_default: Unexpected '//c)
                     exit
                 end if
                 array = .false.
                 child_i = json%string_to_int(path(child_i:i-1))
 
                 nullify(tmp)
-                call json%get_child(p, child_i, tmp)
-                p => tmp
-                nullify(tmp)
+                if (create) then
+                    ! don't want to throw exceptions in this case
+                    call json%get_child(p, child_i, tmp, child_found)
+                    if (.not. child_found) then
 
-                child_i= i + 1
+                        if (p%var_type==json_null) then
+                            ! if p was also created, then we need to
+                            ! convert it into an array here:
+                            p%var_type = json_array
+                        end if
+
+                        ! have to create this element
+                        ! [make it a null]
+                        ! (and any missing ones before it)
+                        do j = 1, child_i
+                            nullify(tmp)
+                            call json%get_child(p, j, tmp, child_found)
+                            if (.not. child_found) then
+                                call json_value_create(tmp)
+                                call to_null(tmp)  ! array element doesn't need a name
+                                call json%add(p,tmp)
+                                if (j==child_i) created = .true.
+                            else
+                                if (j==child_i) created = .false.
+                            end if
+                        end do
+
+                    else
+                        created = .false.
+                    end if
+
+                else
+                    ! call the normal way:
+                    call json%get_child(p, child_i, tmp)
+                end if
+
+                p => tmp
+
+                child_i = i + 1
 
             case default
 
@@ -4037,21 +4329,49 @@
                     ! get child member from p
                     if (child_i < i) then
                         nullify(tmp)
-                        call json%get_child(p, path(child_i:i-1), tmp)
+                        if (create) then
+                            if (p%var_type==json_null) then
+                                ! if p was also created, then we need to
+                                ! convert it into an object here:
+                                p%var_type = json_object
+                            end if
+                            ! don't want to throw exceptions in this case
+                            !write(*,*) 'calling get_child...'
+                            call json%get_child(p, path(child_i:i-1), tmp, child_found)
+                            !if (child_found) then
+                            !    write(*,*) path(child_i:i-1)//' found'
+                            !else
+                            !    write(*,*) path(child_i:i-1)//' not found'
+                            !end if
+
+                            if (.not. child_found) then
+                                ! have to create this child
+                                ! [make it an object]
+                                call json_value_create(tmp)
+                                call to_object(tmp,path(child_i:i-1))
+                                call json%add(p,tmp)
+                                created = .true.
+                                !write(*,*) 'creating: '//path(child_i:i-1)
+                            else
+                                created = .false.
+                            end if
+                        else
+                            ! call the normal way
+                            call json%get_child(p, path(child_i:i-1), tmp)
+                        end if
                         p => tmp
-                        nullify(tmp)
                     else
-                        child_i = i + 1
+                        child_i = i + 1     ! say '$.', '@.', or ').'
                         cycle
                     end if
 
                     if (.not. associated(p)) then
-                        call json%throw_exception('Error in json_get_by_path:'//&
+                        call json%throw_exception('Error in json_get_by_path_default:'//&
                                                   ' Error getting child member.')
                         exit
                     end if
 
-                    child_i = i+1
+                    child_i = i + 1
 
                 end if
 
@@ -4072,14 +4392,47 @@
             ! grab the last child if present in the path
             if (child_i <= length) then
                 nullify(tmp)
-                call json%get_child(p, path(child_i:i-1), tmp)
+                if (create) then
+                    if (p%var_type==json_null) then
+                        ! if p was also created, then we need to
+                        ! convert it into an object here:
+                        p%var_type = json_object
+                    end if
+                    !write(*,*) 'grab the last child: '//path(child_i:i-1)
+                    call json%get_child(p, path(child_i:i-1), tmp, child_found)
+                    if (.not. child_found) then
+                        !write(*,*) 'not found.'
+                        !write(*,*) 'creating: '//path(child_i:i-1)
+                        ! have to create this child
+                        ! (make it a null since it is the leaf)
+                        call json_value_create(tmp)
+                        call to_null(tmp,path(child_i:i-1))
+                        call json%add(p,tmp)
+                        created = .true.
+                    else
+                        !write(*,*) 'found.'
+                        created = .false.
+                    end if
+                else
+                    ! call the normal way
+                    call json%get_child(p, path(child_i:i-1), tmp)
+                end if
+                !if (.not. associated(tmp)) write(*,*) '!!! tmp not associated !!!'
                 p => tmp
-                nullify(tmp)
+            else
+                ! we already have p
+                if (create .and. created) then
+                    ! make leaf p a null, but only
+                    ! if it wasn't there
+                    call to_null(p)
+                end if
             end if
+
+            ! error checking
             if (associated(p)) then
                 if (present(found)) found = .true.    !everything seems to be ok
             else
-                call json%throw_exception('Error in json_get_by_path:'//&
+                call json%throw_exception('Error in json_get_by_path_default:'//&
                                           ' variable not found: '//trim(path))
                 if (present(found)) then
                     found = .false.
@@ -4147,13 +4500,13 @@
 
     character(kind=CK,len=:),allocatable :: token  !! a token in the path (between the `/` characters)
     integer(IK)              :: i                  !! counter
-    character(kind=CK,len=1) :: c                  !! a character from the path
     integer(IK)              :: islash_curr        !! location of current '/' character in the path
     integer(IK)              :: islash_next        !! location of next '/' character in the path
     integer(IK)              :: ilen               !! length of `path` string
     type(json_value),pointer :: tmp                !! temporary variable for traversing the structure
     integer(IK)              :: ival               !! integer array index value (0-based)
     logical(LK)              :: status_ok          !! error flag
+    logical(LK)              :: child_found        !! for getting child values
 
     nullify(p)
 
@@ -4218,17 +4571,12 @@
                     ! now, parse the token:
 
                     ! first see if there is a child with this name
-                    call json%get_child(p,token,tmp)
-                    if (associated(tmp)) then
+                    call json%get_child(p,token,tmp,child_found)
+                    if (child_found) then
                         ! it was found
                         p => tmp
                     else
                         ! No key with this name.
-                        ! Clear the exception thrown when
-                        ! the child was not found.
-                        if (json%exception_thrown) then
-                            call json%clear_exceptions()
-                        end if
                         ! Is it an integer? If so,
                         ! it might be an array index.
                         status_ok = (len(token)>0)
@@ -4255,12 +4603,11 @@
                         end if
                         if (status_ok) then
                             ! ival is an array index (0-based)
-                            call json%get_child(p,ival+1,tmp)
-                            if (associated(tmp)) then
+                            call json%get_child(p,ival+1,tmp,child_found)
+                            if (child_found) then
                                 p => tmp
                             else
                                 ! not found
-                                call json%clear_exceptions()
                                 status_ok = .false.
                             end if
                         end if
@@ -4284,9 +4631,18 @@
             end if
         end if
 
-        if (json%exception_thrown) nullify(p)
-        nullify(tmp)
+        if (json%exception_thrown) then
+            nullify(p)
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+        else
+            if (present(found)) found = .true.
+        end if
 
+    else
+        if (present(found)) found = .false.
     end if
 
     end subroutine json_get_by_path_rfc6901
