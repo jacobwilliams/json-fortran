@@ -43,17 +43,19 @@ contains
     write(error_unit,'(A)') 'creating...'
 
     call json%create_object(p,'root')
-    call json%create(p,'a'           ,tmp)
-    call json%create(p,'b'           ,tmp)
-    call json%create(p,'c'           ,tmp)
-    call json%create(p,'b.bb'        ,tmp)
-    call json%create(p,'c.ccc'       ,tmp)
-    call json%create(p,'a.aa.aaa(1)' ,tmp)
-    call json%create(p,'a.aa.aaaa(3)',tmp)
-    call json%create(p,'a.array'     ,tmp)
-    call json%create(p,'a.array(1)'  ,tmp)
-    call json%create(p,'a.array(2)'  ,tmp)
-    call json%create(p,'a.array(2).scalar'  ,tmp)
+
+    call json%create(p,'a'          )
+    call json%create(p,'b'          )
+    call json%create(p,'c'          )
+    call json%create(p,'a.array'    )
+    call json%create(p,'a.array(2)' )
+    call json%add_with_path(p,'b.bb'              , 1.0_rk , found)
+    call json%add_with_path(p,'c.ccc'             , 2      , found)
+    call json%add_with_path(p,'a.aa.aaa(1)'       , '3.0'  , found)
+    call json%add_with_path(p,'a.aa.aaaa(3)'      , 4.0_rk , found)
+    call json%add_with_path(p,'a.array(1)'        , 5      , found)
+    call json%add_with_path(p,'a.array(2).scalar' , '6'    , found)
+    call json%add_with_path(p,'a.array(2).logical', .true. , found)
 
     write(error_unit,'(A)') 'validating...'
     call json%validate(p,is_valid,error_msg)

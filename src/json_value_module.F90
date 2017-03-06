@@ -296,10 +296,13 @@
         procedure,private :: json_update_string_val_ascii
 #endif
 
+        procedure,public :: add_with_path => json_add_scalar_with_path
+
         !>
         !  Create a [[json_value]] linked list using the
-        !  path to the variables
-        generic,public :: create => MAYBEWRAP(json_create_by_path)  ! this will create a null ...
+        !  path to the variables.
+        !  (This will create a `null` variable)
+        generic,public :: create => MAYBEWRAP(json_create_by_path)
         procedure :: MAYBEWRAP(json_create_by_path)
 
         !>
@@ -2726,25 +2729,83 @@
     end subroutine json_value_insert_after_child_by_index
 !*****************************************************************************************
 
-! ... to do .... add the full set of these ...
+
+! !*****************************************************************************************
+! !>
+! !  Add a double value to a [[json_value]], given the path.
+! !
+! !@warning Using this routine to change the type of an existing object or array to
+! !         a scalar may result in a memory leak. It should only be used
+! !         to add a new variable (or set an existing one).
+!
+!     subroutine json_add_double_with_path(json,me,path,value,found)
+!
+!     implicit none
+!
+!     class(json_core),intent(inout)      :: json
+!     type(json_value),pointer            :: me
+!     character(kind=CK,len=*),intent(in) :: path
+!     real(RK),intent(in)                 :: value
+!     logical(LK),intent(out),optional    :: found
+!
+!     type(json_value),pointer :: p
+!
+!     if ( .not. json%exception_thrown ) then
+!
+!         nullify(p)
+!
+!         ! return a pointer to the path (possibly creating it)
+!         call json%create(me,path,p,found)
+!
+!         if (.not. associated(p)) then
+!
+!             call json%throw_exception('Error in json_add_double_with_path:'//&
+!                                       ' Unable to resolve path: '//trim(path))
+!             if (present(found)) then
+!                 found = .false.
+!                 call json%clear_exceptions()
+!             end if
+!
+!         else
+!             ! set the value (may need to change type,
+!             ! since if it had to be created, it is
+!             ! a null variable)
+!             if (p%var_type==json_double) then
+!                 p%dbl_value = value
+!             else
+!                 call to_double(p,value)
+!             end if
+!
+!         end if
+!
+!     else
+!         if ( present(found) ) found = .false.
+!     end if
+!
+!     end subroutine json_add_double_with_path
+! !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Add a double value to a [[json_value]], given the path.
+!  Add a scalar value to a [[json_value]], given the path.
 !
 !@warning Using this routine to change the type of an existing object or array to
 !         a scalar may result in a memory leak. It should only be used
 !         to add a new variable (or set an existing one).
+!
+!@note This is different from the other routines, since we are using
+!      an unlimited polymorphic input instead of having separate routines.
 
-    subroutine json_add_double_with_path(json,me,path,value,found)
+    subroutine json_add_scalar_with_path(json,me,path,value,found,was_created)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: me
     character(kind=CK,len=*),intent(in) :: path
-    real(RK),intent(in)                 :: value
+    class(*),intent(in)                 :: value
     logical(LK),intent(out),optional    :: found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
 
     type(json_value),pointer :: p
 
@@ -2753,11 +2814,11 @@
         nullify(p)
 
         ! return a pointer to the path (possibly creating it)
-        call json%create(me,path,p,found)
+        call json%create(me,path,p,found,was_created)
 
         if (.not. associated(p)) then
 
-            call json%throw_exception('Error in json_add_double_with_path:'//&
+            call json%throw_exception('Error in json_add_scalar_with_path:'//&
                                       ' Unable to resolve path: '//trim(path))
             if (present(found)) then
                 found = .false.
@@ -2765,24 +2826,62 @@
             end if
 
         else
+
             ! set the value (may need to change type,
             ! since if it had to be created, it is
             ! a null variable)
-            if (p%var_type==json_double) then
-                p%dbl_value = value
-            else
-                call to_double(p,value)
-            end if
+            select type (value)
+            type is (real(RK))
+                if (p%var_type==json_double) then
+                    p%dbl_value = value
+                else
+                    call to_double(p,value)
+                end if
+            type is (integer(IK))
+                if (p%var_type==json_integer) then
+                    p%int_value = value
+                else
+                    call to_integer(p,value)
+                end if
+            type is (character(kind=CK,len=*))
+                if (p%var_type==json_string) then
+                    p%str_value = value
+                else
+                    call to_string(p,value)
+                end if
+#if defined __GFORTRAN__ && defined USE_UCS4
+            type is (character(kind=CDK,len=*))
+                ! only if using unicode
+                if (p%var_type==json_string) then
+                    p%str_value = to_unicode(value)
+                else
+                    call to_string(p,to_unicode(value))
+                end if
+#endif
+            type is (logical(kind=LK))
+                if (p%var_type==json_logical) then
+                    p%log_value = value
+                else
+                    call to_logical(p,value)
+                end if
+            class default
+                call json%throw_exception('Error in json_add_scalar_with_path:'//&
+                                          ' Invalid input type')
+                if (present(found)) then
+                    found = .false.
+                    call json%clear_exceptions()
+                end if
+            end select
 
         end if
 
     else
-        if ( present(found) ) found = .false.
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
     end if
 
-    end subroutine json_add_double_with_path
+    end subroutine json_add_scalar_with_path
 !*****************************************************************************************
-
 
 
 
@@ -4064,27 +4163,37 @@
 !### See also
 !  * [[json_get_by_path]]
 
-    subroutine json_create_by_path(json, me, path, p, found)
+    subroutine json_create_by_path(json,me,path,p,found,was_created)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
-    type(json_value),pointer,intent(in)  :: me     !! a JSON linked list
-    character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
-    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
-                                                   !! specify by `path`
-    logical(LK),intent(out),optional     :: found  !! true if it was found
-        !! ...TODO found should indicate if the variable was already there.
-        !!         another logical output should indicate success.
+    type(json_value),pointer,intent(in)  :: me           !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path         !! path to the variable
+    type(json_value),pointer,intent(out),optional :: p   !! pointer to the variable
+                                                         !! specify by `path`
+    logical(LK),intent(out),optional     :: found        !! true if there were no errors
+                                                         !! (variable found or created)
+    logical(LK),intent(out),optional     :: was_created  !! true if it was actually created
+                                                         !! (as opposed to already being there)
 
-    ! note: it can only be 1 or 2 (which was checked in initialize)
+    type(json_value),pointer :: tmp
+
+    if (present(p)) nullify(p)
+
+    ! note: path_mode can only be 1 or 2 (which was checked in initialize)
     select case (json%path_mode)
     case(1_IK)
-        call json%json_get_by_path_default(me, path, p, found, create_it=.true.)
+        call json%json_get_by_path_default(me,path,tmp,found,&
+                                            create_it=.true.,&
+                                            was_created=was_created)
+        if (present(p)) p => tmp
     case(2_IK)
         ! the problem here is there isn't really a way to disambiguate
         ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
-        call json%throw_exception('Create by path not suppored in RFC 6901 path mode.')
+        call json%throw_exception('Create by path not supported in RFC 6901 path mode.')
+        if (present(found)) found = .false.
+        if (present(was_created)) was_created = .false.
     end select
 
     end subroutine json_create_by_path
@@ -4094,7 +4203,7 @@
 !>
 !  Alternate version of [[json_create_by_path]] where "path" is kind=CDK.
 
-    subroutine wrap_json_create_by_path(json, me, path, p, found)
+    subroutine wrap_json_create_by_path(json,me,path,p,found,was_created)
 
     implicit none
 
@@ -4103,8 +4212,9 @@
     character(kind=CDK,len=*),intent(in) :: path
     type(json_value),pointer,intent(out) :: p
     logical(LK),intent(out),optional     :: found
+    logical(LK),intent(out),optional     :: was_created
 
-    call json%get(me, to_unicode(path), p, found)
+    call json%create(me,to_unicode(path),p,found,was_created)
 
     end subroutine wrap_json_create_by_path
 !*****************************************************************************************
@@ -4145,21 +4255,25 @@
 !      converted to null once all the variables have been created (user would have
 !      had to do this).
 
-    subroutine json_get_by_path_default(json, me, path, p, found, create_it)
+    subroutine json_get_by_path_default(json,me,path,p,found,create_it,was_created)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
-    type(json_value),pointer,intent(in)  :: me        !! a JSON linked list
-    character(kind=CK,len=*),intent(in)  :: path      !! path to the variable
-    type(json_value),pointer,intent(out) :: p         !! pointer to the variable
-                                                      !! specify by `path`
-    logical(LK),intent(out),optional     :: found     !! true if it was found
-    logical(LK),intent(in),optional      :: create_it !! if a variable is not present
-                                                      !! in the path, then it is created.
-                                                      !! the leaf node is returned as
-                                                      !! a `null` json type and can be
-                                                      !! changed by the caller.
+    type(json_value),pointer,intent(in)  :: me          !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path        !! path to the variable
+    type(json_value),pointer,intent(out) :: p           !! pointer to the variable
+                                                        !! specify by `path`
+    logical(LK),intent(out),optional     :: found       !! true if it was found
+    logical(LK),intent(in),optional      :: create_it   !! if a variable is not present
+                                                        !! in the path, then it is created.
+                                                        !! the leaf node is returned as
+                                                        !! a `null` json type and can be
+                                                        !! changed by the caller.
+    logical(LK),intent(out),optional     :: was_created !! if `create_it` is true, this
+                                                        !! will be true if the variable
+                                                        !! was actually created. Otherwise
+                                                        !! it will be false.
 
     integer(IK)              :: i            !! counter of characters in `path`
     integer(IK)              :: length       !! significant length of `path`
@@ -4228,14 +4342,13 @@
                     nullify(tmp)
                     if (create) then
 
-                        !
                         ! Example:
                         !    'aaa.bbb(1)'
                         !     -> and aaa is a null, need to make it an object
                         !
                         !  What about the case: aaa.bbb(1)(3) ?
                         !  Is that already handled?
-                        !
+
                         if (p%var_type==json_null) then
                             ! if p was also created, then we need to
                             ! convert it into an object here:
@@ -4251,7 +4364,6 @@
                             call to_array(tmp,path(child_i:i-1))
                             call json%add(p,tmp)
                             created = .true.
-                            !write(*,*) 'creating: '//path(child_i:i-1)
                         else
                             created = .false.
                         end if
@@ -4336,14 +4448,7 @@
                                 p%var_type = json_object
                             end if
                             ! don't want to throw exceptions in this case
-                            !write(*,*) 'calling get_child...'
                             call json%get_child(p, path(child_i:i-1), tmp, child_found)
-                            !if (child_found) then
-                            !    write(*,*) path(child_i:i-1)//' found'
-                            !else
-                            !    write(*,*) path(child_i:i-1)//' not found'
-                            !end if
-
                             if (.not. child_found) then
                                 ! have to create this child
                                 ! [make it an object]
@@ -4351,7 +4456,6 @@
                                 call to_object(tmp,path(child_i:i-1))
                                 call json%add(p,tmp)
                                 created = .true.
-                                !write(*,*) 'creating: '//path(child_i:i-1)
                             else
                                 created = .false.
                             end if
@@ -4398,11 +4502,8 @@
                         ! convert it into an object here:
                         p%var_type = json_object
                     end if
-                    !write(*,*) 'grab the last child: '//path(child_i:i-1)
                     call json%get_child(p, path(child_i:i-1), tmp, child_found)
                     if (.not. child_found) then
-                        !write(*,*) 'not found.'
-                        !write(*,*) 'creating: '//path(child_i:i-1)
                         ! have to create this child
                         ! (make it a null since it is the leaf)
                         call json_value_create(tmp)
@@ -4410,14 +4511,12 @@
                         call json%add(p,tmp)
                         created = .true.
                     else
-                        !write(*,*) 'found.'
                         created = .false.
                     end if
                 else
                     ! call the normal way
                     call json%get_child(p, path(child_i:i-1), tmp)
                 end if
-                !if (.not. associated(tmp)) write(*,*) '!!! tmp not associated !!!'
                 p => tmp
             else
                 ! we already have p
@@ -4442,8 +4541,12 @@
 
         end if
 
+        ! if it had to be created:
+        if (present(was_created)) was_created = created
+
     else
         if (present(found)) found = .false.
+        if (present(was_created)) was_created = .false.
     end if
 
     end subroutine json_get_by_path_default
