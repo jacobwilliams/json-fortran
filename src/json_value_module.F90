@@ -226,15 +226,17 @@
 
         private
 
-        generic,public :: get_child => json_value_get_by_index, &
+        generic,public :: get_child => json_value_get_child_by_index, &
                                        json_value_get_child,&
-                                       MAYBEWRAP(json_value_get_by_name_chars)
-        procedure,private :: json_value_get_by_index
-        procedure,private :: MAYBEWRAP(json_value_get_by_name_chars)
+                                       MAYBEWRAP(json_value_get_child_by_name)
+        procedure,private :: json_value_get_child_by_index
+        procedure,private :: MAYBEWRAP(json_value_get_child_by_name)
         procedure,private :: json_value_get_child
 
         !>
         !  Add objects to a linked list of [[json_value]]s.
+        !
+        !@note It might make more sense to call this `add_child`.
         generic,public :: add => json_value_add_member, &
                                  MAYBEWRAP(json_value_add_null), &
                                  MAYBEWRAP(json_value_add_integer), &
@@ -270,14 +272,18 @@
 #endif
 
         !>
-        !  These are like the `add` methods, except if a child with the
-        !  same name is already present, then its value is simply updated.
+        !  These are like the `add` methods, except if a variable with the
+        !  same path is already present, then its value is simply updated.
         !  Note that currently, these only work for scalar variables.
         !  These routines can also change the variable's type (but an error will be
         !  thrown if the existing variable is not a scalar).
         !
-        !@note It should not be used to change the type of a variable in an array,
-        !      or it may result in an invalid JSON file.
+        !### See also
+        !  * [[json_add_scalar_by_path]] - this one can be used to change
+        !    arrays and objects to scalars if so desired.
+        !
+        !@note Unlike some routines, the `found` output is not optional,
+        !      so it doesn't present exceptions from being thrown.
 
         generic,public :: update => MAYBEWRAP(json_update_logical),&
                                     MAYBEWRAP(json_update_double),&
@@ -296,34 +302,67 @@
         procedure,private :: json_update_string_val_ascii
 #endif
 
-        procedure,public :: add_with_path => json_add_scalar_with_path
+        !>
+        !  Add variables to a [[json_value]] linked list
+        !  by specifying their paths.
+        !
+        !### Example
+        !
+        !````fortran
+        !    use, intrinsic :: iso_fortran_env, only: output_unit, wp=>real64
+        !    use json_module
+        !    type(json_core) :: json
+        !    type(json_value) :: p
+        !    call json%create_object(p,'root') ! create the root
+        !    ! now add some variables using the paths:
+        !    call json%add_by_path(p,'inputs.t',    0.0_wp  )
+        !    call json%add_by_path(p,'inputs.x(1)', 100.0_wp)
+        !    call json%add_by_path(p,'inputs.x(2)', 200.0_wp)
+        !    call json%print(p,output_unit)  ! now print to console
+        !````
+        !
+        !### Notes
+        !  * This uses [[json_create_by_path]]
+        !
+        !### See also
+        !  * The `json_core%update` methods.
+        !  * [[json_create_by_path]]
+
+        generic,public :: add_by_path => MAYBEWRAP(json_add_scalar_by_path)
+        procedure :: MAYBEWRAP(json_add_scalar_by_path)
 
         !>
         !  Create a [[json_value]] linked list using the
-        !  path to the variables.
+        !  path to the variables. Optionally return a
+        !  pointer to the variable.
+        !
         !  (This will create a `null` variable)
+        !
+        !### See also
+        !  * [[json_add_scalar_by_path]]
+
         generic,public :: create => MAYBEWRAP(json_create_by_path)
         procedure :: MAYBEWRAP(json_create_by_path)
 
         !>
         !  Get data from a [[json_value]] linked list.
         !
-        !@note There are two versions (e.g. [[json_get_integer]] and [[json_get_integer_with_path]]).
+        !@note There are two versions (e.g. [[json_get_integer]] and [[json_get_integer_by_path]]).
         !      The first one gets the value from the [[json_value]] passed into the routine,
         !      while the second one gets the value from the [[json_value]] found by parsing the
         !      path.  The path version is split up into unicode and non-unicode versions.
 
         generic,public :: get => &
                                   MAYBEWRAP(json_get_by_path),               &
-            json_get_integer,     MAYBEWRAP(json_get_integer_with_path),     &
-            json_get_integer_vec, MAYBEWRAP(json_get_integer_vec_with_path), &
-            json_get_double,      MAYBEWRAP(json_get_double_with_path),      &
-            json_get_double_vec,  MAYBEWRAP(json_get_double_vec_with_path),  &
-            json_get_logical,     MAYBEWRAP(json_get_logical_with_path),     &
-            json_get_logical_vec, MAYBEWRAP(json_get_logical_vec_with_path), &
-            json_get_string,      MAYBEWRAP(json_get_string_with_path),      &
-            json_get_string_vec,  MAYBEWRAP(json_get_string_vec_with_path),  &
-            json_get_array,       MAYBEWRAP(json_get_array_with_path)
+            json_get_integer,     MAYBEWRAP(json_get_integer_by_path),     &
+            json_get_integer_vec, MAYBEWRAP(json_get_integer_vec_by_path), &
+            json_get_double,      MAYBEWRAP(json_get_double_by_path),      &
+            json_get_double_vec,  MAYBEWRAP(json_get_double_vec_by_path),  &
+            json_get_logical,     MAYBEWRAP(json_get_logical_by_path),     &
+            json_get_logical_vec, MAYBEWRAP(json_get_logical_vec_by_path), &
+            json_get_string,      MAYBEWRAP(json_get_string_by_path),      &
+            json_get_string_vec,  MAYBEWRAP(json_get_string_vec_by_path),  &
+            json_get_array,       MAYBEWRAP(json_get_array_by_path)
         procedure,private :: json_get_integer
         procedure,private :: json_get_integer_vec
         procedure,private :: json_get_double
@@ -334,19 +373,21 @@
         procedure,private :: json_get_string_vec
         procedure,private :: json_get_array
         procedure,private :: MAYBEWRAP(json_get_by_path)
-        procedure,private :: MAYBEWRAP(json_get_integer_with_path)
-        procedure,private :: MAYBEWRAP(json_get_integer_vec_with_path)
-        procedure,private :: MAYBEWRAP(json_get_double_with_path)
-        procedure,private :: MAYBEWRAP(json_get_double_vec_with_path)
-        procedure,private :: MAYBEWRAP(json_get_logical_with_path)
-        procedure,private :: MAYBEWRAP(json_get_logical_vec_with_path)
-        procedure,private :: MAYBEWRAP(json_get_string_with_path)
-        procedure,private :: MAYBEWRAP(json_get_string_vec_with_path)
-        procedure,private :: MAYBEWRAP(json_get_array_with_path)
+        procedure,private :: MAYBEWRAP(json_get_integer_by_path)
+        procedure,private :: MAYBEWRAP(json_get_integer_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_double_by_path)
+        procedure,private :: MAYBEWRAP(json_get_double_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_logical_by_path)
+        procedure,private :: MAYBEWRAP(json_get_logical_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_string_by_path)
+        procedure,private :: MAYBEWRAP(json_get_string_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_array_by_path)
         procedure,private :: json_get_by_path_default
         procedure,private :: json_get_by_path_rfc6901
 
-        procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]] structure to an allocatable string
+        procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]]
+                                                                    !! structure to an allocatable
+                                                                    !! string
 
         !>
         !  Print the [[json_value]] to a file.
@@ -2268,20 +2309,20 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 
-    subroutine json_update_logical(json,p,name,val,found)
+    subroutine json_update_logical(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     logical(LK),intent(in)              :: val
     logical(LK),intent(out)             :: found
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) then
 
         call json%info(p_var,var_type)
@@ -2295,7 +2336,7 @@
         end select
 
     else
-        call json%add(p,name,val)   !add the new element
+        call json%add_by_path(p,path,val)   !add the new element
     end if
 
     end subroutine json_update_logical
@@ -2303,19 +2344,19 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_logical]], where `name` is kind=CDK.
+!  Alternate version of [[json_update_logical]], where `path` is kind=CDK.
 
-    subroutine wrap_json_update_logical(json,p,name,val,found)
+    subroutine wrap_json_update_logical(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     logical(LK),intent(in)               :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),val,found)
+    call json%update(p,to_unicode(path),val,found)
 
     end subroutine wrap_json_update_logical
 !*****************************************************************************************
@@ -2328,20 +2369,20 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 
-    subroutine json_update_double(json,p,name,val,found)
+    subroutine json_update_double(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     real(RK),intent(in)                 :: val
     logical(LK),intent(out)             :: found
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) then
 
         call json%info(p_var,var_type)
@@ -2355,7 +2396,7 @@
         end select
 
     else
-        call json%add(p,name,val)   !add the new element
+        call json%add_by_path(p,path,val)   !add the new element
     end if
 
     end subroutine json_update_double
@@ -2363,19 +2404,19 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_double]], where `name` is kind=CDK.
+!  Alternate version of [[json_update_double]], where `path` is kind=CDK.
 
-    subroutine wrap_json_update_double(json,p,name,val,found)
+    subroutine wrap_json_update_double(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     real(RK),intent(in)                  :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),val,found)
+    call json%update(p,to_unicode(path),val,found)
 
     end subroutine wrap_json_update_double
 !*****************************************************************************************
@@ -2388,20 +2429,20 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 
-    subroutine json_update_integer(json,p,name,val,found)
+    subroutine json_update_integer(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     integer(IK),intent(in)              :: val
     logical(LK),intent(out)             :: found
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) then
 
         call json%info(p_var,var_type)
@@ -2415,7 +2456,7 @@
         end select
 
     else
-        call json%add(p,name,val)   !add the new element
+        call json%add_by_path(p,path,val)   !add the new element
     end if
 
     end subroutine json_update_integer
@@ -2423,19 +2464,19 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_integer]], where `name` is kind=CDK.
+!  Alternate version of [[json_update_integer]], where `path` is kind=CDK.
 
-    subroutine wrap_json_update_integer(json,p,name,val,found)
+    subroutine wrap_json_update_integer(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     integer(IK),intent(in)               :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),val,found)
+    call json%update(p,to_unicode(path),val,found)
 
     end subroutine wrap_json_update_integer
 !*****************************************************************************************
@@ -2448,20 +2489,20 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 
-    subroutine json_update_string(json,p,name,val,found)
+    subroutine json_update_string(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     character(kind=CK,len=*),intent(in) :: val
     logical(LK),intent(out)             :: found
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) then
 
         call json%info(p_var,var_type)
@@ -2475,7 +2516,7 @@
         end select
 
     else
-        call json%add(p,name,val)   !add the new element
+        call json%add_by_path(p,path,val)   !add the new element
     end if
 
     end subroutine json_update_string
@@ -2483,38 +2524,38 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_string]], where `name` and `value` are kind=CDK.
+!  Alternate version of [[json_update_string]], where `path` and `value` are kind=CDK.
 
-    subroutine wrap_json_update_string(json,p,name,val,found)
+    subroutine wrap_json_update_string(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),to_unicode(val),found)
+    call json%update(p,to_unicode(path),to_unicode(val),found)
 
     end subroutine wrap_json_update_string
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_string]], where `name` is kind=CDK.
+!  Alternate version of [[json_update_string]], where `path` is kind=CDK.
 
-    subroutine json_update_string_name_ascii(json,p,name,val,found)
+    subroutine json_update_string_name_ascii(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     character(kind=CK, len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),val,found)
+    call json%update(p,to_unicode(path),val,found)
 
     end subroutine json_update_string_name_ascii
 !*****************************************************************************************
@@ -2523,17 +2564,17 @@
 !>
 !  Alternate version of [[json_update_string]], where `val` is kind=CDK.
 
-    subroutine json_update_string_val_ascii(json,p,name,val,found)
+    subroutine json_update_string_val_ascii(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CK, len=*),intent(in) :: name
+    character(kind=CK, len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,name,to_unicode(val),found)
+    call json%update(p,path,to_unicode(val),found)
 
     end subroutine json_update_string_val_ascii
 !*****************************************************************************************
@@ -2548,7 +2589,8 @@
 
     class(json_core),intent(inout) :: json
     type(json_value),pointer       :: p
-    type(json_value),pointer       :: member  !! the child member to add
+    type(json_value),pointer       :: member  !! the child member
+                                              !! to add to `p`
 
     if (.not. json%exception_thrown) then
 
@@ -2729,96 +2771,45 @@
     end subroutine json_value_insert_after_child_by_index
 !*****************************************************************************************
 
-
-! !*****************************************************************************************
-! !>
-! !  Add a double value to a [[json_value]], given the path.
-! !
-! !@warning Using this routine to change the type of an existing object or array to
-! !         a scalar may result in a memory leak. It should only be used
-! !         to add a new variable (or set an existing one).
-!
-!     subroutine json_add_double_with_path(json,me,path,value,found)
-!
-!     implicit none
-!
-!     class(json_core),intent(inout)      :: json
-!     type(json_value),pointer            :: me
-!     character(kind=CK,len=*),intent(in) :: path
-!     real(RK),intent(in)                 :: value
-!     logical(LK),intent(out),optional    :: found
-!
-!     type(json_value),pointer :: p
-!
-!     if ( .not. json%exception_thrown ) then
-!
-!         nullify(p)
-!
-!         ! return a pointer to the path (possibly creating it)
-!         call json%create(me,path,p,found)
-!
-!         if (.not. associated(p)) then
-!
-!             call json%throw_exception('Error in json_add_double_with_path:'//&
-!                                       ' Unable to resolve path: '//trim(path))
-!             if (present(found)) then
-!                 found = .false.
-!                 call json%clear_exceptions()
-!             end if
-!
-!         else
-!             ! set the value (may need to change type,
-!             ! since if it had to be created, it is
-!             ! a null variable)
-!             if (p%var_type==json_double) then
-!                 p%dbl_value = value
-!             else
-!                 call to_double(p,value)
-!             end if
-!
-!         end if
-!
-!     else
-!         if ( present(found) ) found = .false.
-!     end if
-!
-!     end subroutine json_add_double_with_path
-! !*****************************************************************************************
-
 !*****************************************************************************************
 !>
 !  Add a scalar value to a [[json_value]], given the path.
 !
-!@warning Using this routine to change the type of an existing object or array to
-!         a scalar may result in a memory leak. It should only be used
-!         to add a new variable (or set an existing one).
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
 !
 !@note This is different from the other routines, since we are using
 !      an unlimited polymorphic input instead of having separate routines.
 
-    subroutine json_add_scalar_with_path(json,me,path,value,found,was_created)
+    subroutine json_add_scalar_by_path(json,me,path,value,found,was_created)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
-    type(json_value),pointer            :: me
-    character(kind=CK,len=*),intent(in) :: path
-    class(*),intent(in)                 :: value
-    logical(LK),intent(out),optional    :: found
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    class(*),intent(in)                 :: value        !! the value to add (can be
+                                                        !! integer, real, logical, or
+                                                        !! character)
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
     logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
 
     type(json_value),pointer :: p
+    type(json_value),pointer :: tmp
 
     if ( .not. json%exception_thrown ) then
 
         nullify(p)
 
         ! return a pointer to the path (possibly creating it)
+        ! If the variable had to be created, then
+        ! it will be a json_null variable.
         call json%create(me,path,p,found,was_created)
 
         if (.not. associated(p)) then
 
-            call json%throw_exception('Error in json_add_scalar_with_path:'//&
+            call json%throw_exception('Error in json_add_scalar_by_path:'//&
                                       ' Unable to resolve path: '//trim(path))
             if (present(found)) then
                 found = .false.
@@ -2827,27 +2818,33 @@
 
         else
 
-            ! set the value (may need to change type,
-            ! since if it had to be created, it is
-            ! a null variable)
+            !NOTE: a new object is created, and the old one
+            !      is replaced and destroyed. This is to
+            !      prevent memory leaks if the type is
+            !      being changed (for example, if an array
+            !      is being replaced with a scalar).
+
             select type (value)
             type is (real(RK))
                 if (p%var_type==json_double) then
                     p%dbl_value = value
                 else
-                    call to_double(p,value)
+                    call json%create_double(tmp,value,p%name) ! keep name
+                    call json%replace(p,tmp,destroy=.true.)
                 end if
             type is (integer(IK))
                 if (p%var_type==json_integer) then
                     p%int_value = value
                 else
-                    call to_integer(p,value)
+                    call json%create_integer(tmp,value,p%name) ! keep name
+                    call json%replace(p,tmp,destroy=.true.)
                 end if
             type is (character(kind=CK,len=*))
                 if (p%var_type==json_string) then
                     p%str_value = value
                 else
-                    call to_string(p,value)
+                    call json%create_string(tmp,value,p%name) ! keep name
+                    call json%replace(p,tmp,destroy=.true.)
                 end if
 #if defined __GFORTRAN__ && defined USE_UCS4
             type is (character(kind=CDK,len=*))
@@ -2855,17 +2852,19 @@
                 if (p%var_type==json_string) then
                     p%str_value = to_unicode(value)
                 else
-                    call to_string(p,to_unicode(value))
+                    call json%create_string(tmp,to_unicode(value),p%name) ! keep name
+                    call json%replace(p,tmp,destroy=.true.)
                 end if
 #endif
             type is (logical(kind=LK))
                 if (p%var_type==json_logical) then
                     p%log_value = value
                 else
-                    call to_logical(p,value)
+                    call json%create_logical(tmp,value,p%name) ! keep name
+                    call json%replace(p,tmp,destroy=.true.)
                 end if
             class default
-                call json%throw_exception('Error in json_add_scalar_with_path:'//&
+                call json%throw_exception('Error in json_add_scalar_by_path:'//&
                                           ' Invalid input type')
                 if (present(found)) then
                     found = .false.
@@ -2880,10 +2879,30 @@
         if ( present(was_created) ) was_created = .false.
     end if
 
-    end subroutine json_add_scalar_with_path
+    end subroutine json_add_scalar_by_path
 !*****************************************************************************************
 
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_scalar_by_path]] where "path" is kind=CDK.
 
+    subroutine wrap_json_add_scalar_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    class(*),intent(in)                  :: value       !! the value to add (can be
+                                                        !! integer, real, logical, or
+                                                        !! character)
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%json_add_scalar_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_scalar_by_path
+!*****************************************************************************************
 
 !*****************************************************************************************
 !> author: Jacob Williams
@@ -3573,7 +3592,7 @@
 !>
 !  Returns a child in the object or array given the index.
 
-    subroutine json_value_get_by_index(json, p, idx, child, found)
+    subroutine json_value_get_child_by_index(json, p, idx, child, found)
 
     implicit none
 
@@ -3603,7 +3622,7 @@
                 if (associated(child%next)) then
                     child => child%next
                 else
-                    call json%throw_exception('Error in json_value_get_by_index:'//&
+                    call json%throw_exception('Error in json_value_get_child_by_index:'//&
                                               ' child%next is not associated.')
                     nullify(child)
                     exit
@@ -3613,7 +3632,7 @@
 
         else
 
-            call json%throw_exception('Error in json_value_get_by_index:'//&
+            call json%throw_exception('Error in json_value_get_child_by_index:'//&
                                       ' p%children is not associated.')
 
         end if
@@ -3632,13 +3651,13 @@
         if (present(found)) found = .false.
     end if
 
-    end subroutine json_value_get_by_index
+    end subroutine json_value_get_child_by_index
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
 !  Returns pointer to the first child of the object
-!  (or null() if it is not associated).
+!  (or `null()` if it is not associated).
 
     subroutine json_value_get_child(json, p, child)
 
@@ -3668,7 +3687,7 @@
 !
 !@note The `name` input is not a path, and is not parsed like it is in [[json_get_by_path]].
 
-    subroutine json_value_get_by_name_chars(json, p, name, child, found)
+    subroutine json_value_get_child_by_name(json, p, name, child, found)
 
     implicit none
 
@@ -3698,7 +3717,7 @@
                 child => p%children    !start with first one
                 do i=1, n_children
                     if (.not. associated(child)) then
-                        call json%throw_exception('Error in json_value_get_by_name_chars: '//&
+                        call json%throw_exception('Error in json_value_get_child_by_name: '//&
                                                   'Malformed JSON linked list')
                         exit
                     end if
@@ -3715,13 +3734,13 @@
 
             if (error) then
                 !did not find anything:
-                call json%throw_exception('Error in json_value_get_by_name_chars: '//&
+                call json%throw_exception('Error in json_value_get_child_by_name: '//&
                                      'child variable '//trim(name)//' was not found.')
                 nullify(child)
             end if
 
         else
-            call json%throw_exception('Error in json_value_get_by_name_chars: '//&
+            call json%throw_exception('Error in json_value_get_child_by_name: '//&
                                  'pointer is not associated.')
         end if
 
@@ -3739,14 +3758,14 @@
         if (present(found)) found = .false.
     end if
 
-    end subroutine json_value_get_by_name_chars
+    end subroutine json_value_get_child_by_name
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_get_by_name_chars]] where `name` is kind=CDK.
+!  Alternate version of [[json_value_get_child_by_name]] where `name` is kind=CDK.
 
-    subroutine wrap_json_value_get_by_name_chars(json, p, name, child, found)
+    subroutine wrap_json_value_get_child_by_name(json, p, name, child, found)
 
     implicit none
 
@@ -3758,7 +3777,7 @@
 
     call json%get(p,to_unicode(name),child,found)
 
-    end subroutine wrap_json_value_get_by_name_chars
+    end subroutine wrap_json_value_get_child_by_name
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -4192,7 +4211,10 @@
         ! the problem here is there isn't really a way to disambiguate
         ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
         call json%throw_exception('Create by path not supported in RFC 6901 path mode.')
-        if (present(found)) found = .false.
+        if (present(found)) then
+            call json%clear_exceptions()
+            found = .false.
+        end if
         if (present(was_created)) was_created = .false.
     end select
 
@@ -4208,11 +4230,14 @@
     implicit none
 
     class(json_core),intent(inout)       :: json
-    type(json_value),pointer,intent(in)  :: me
-    character(kind=CDK,len=*),intent(in) :: path
-    type(json_value),pointer,intent(out) :: p
-    logical(LK),intent(out),optional     :: found
-    logical(LK),intent(out),optional     :: was_created
+    type(json_value),pointer,intent(in)  :: me           !! a JSON linked list
+    character(kind=CDK,len=*),intent(in) :: path         !! path to the variable
+    type(json_value),pointer,intent(out),optional :: p   !! pointer to the variable
+                                                         !! specify by `path`
+    logical(LK),intent(out),optional     :: found        !! true if there were no errors
+                                                         !! (variable found or created)
+    logical(LK),intent(out),optional     :: was_created  !! true if it was actually created
+                                                         !! (as opposed to already being there)
 
     call json%create(me,to_unicode(path),p,found,was_created)
 
@@ -5115,7 +5140,7 @@
 !>
 !  Get an integer value from a [[json_value]], given the path string.
 
-    subroutine json_get_integer_with_path(json, me, path, value, found)
+    subroutine json_get_integer_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -5153,14 +5178,14 @@
         if ( present(found) ) found = .true.
     end if
 
-    end subroutine json_get_integer_with_path
+    end subroutine json_get_integer_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_integer_with_path]], where "path" is kind=CDK.
+!  Alternate version of [[json_get_integer_by_path]], where "path" is kind=CDK.
 
-    subroutine wrap_json_get_integer_with_path(json, me, path, value, found)
+    subroutine wrap_json_get_integer_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -5172,7 +5197,7 @@
 
     call json%get(me, to_unicode(path), value, found)
 
-    end subroutine wrap_json_get_integer_with_path
+    end subroutine wrap_json_get_integer_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5227,7 +5252,7 @@
 !>
 !  Get an integer vector from a [[json_value]], given the path string.
 
-    subroutine json_get_integer_vec_with_path(json, me, path, vec, found)
+    subroutine json_get_integer_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -5268,14 +5293,14 @@
 
         end subroutine get_int_from_array
 
-    end subroutine json_get_integer_vec_with_path
+    end subroutine json_get_integer_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_integer_vec_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_integer_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_integer_vec_with_path(json, me, path, vec, found)
+    subroutine wrap_json_get_integer_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -5287,7 +5312,7 @@
 
     call json%get(me,path=to_unicode(path),vec=vec,found=found)
 
-    end subroutine wrap_json_get_integer_vec_with_path
+    end subroutine wrap_json_get_integer_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5336,7 +5361,7 @@
 !>
 !  Get a double value from a [[json_value]], given the path.
 
-    subroutine json_get_double_with_path(json, me, path, value, found)
+    subroutine json_get_double_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -5379,14 +5404,14 @@
         if (present(found)) found = .true.
     end if
 
-    end subroutine json_get_double_with_path
+    end subroutine json_get_double_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_double_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_double_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_double_with_path(json, me, path, value, found)
+    subroutine wrap_json_get_double_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -5398,7 +5423,7 @@
 
     call json%get(me,to_unicode(path),value,found)
 
-    end subroutine wrap_json_get_double_with_path
+    end subroutine wrap_json_get_double_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5453,7 +5478,7 @@
 !>
 !  Get a double vector from a [[json_value]], given the path.
 
-    subroutine json_get_double_vec_with_path(json, me, path, vec, found)
+    subroutine json_get_double_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -5493,14 +5518,14 @@
 
         end subroutine get_double_from_array
 
-    end subroutine json_get_double_vec_with_path
+    end subroutine json_get_double_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_double_vec_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_double_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_double_vec_with_path(json, me, path, vec, found)
+    subroutine wrap_json_get_double_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -5512,7 +5537,7 @@
 
     call json%get(me, to_unicode(path), vec, found)
 
-    end subroutine wrap_json_get_double_vec_with_path
+    end subroutine wrap_json_get_double_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5557,7 +5582,7 @@
 !>
 !  Get a logical value from a [[json_value]], given the path.
 
-    subroutine json_get_logical_with_path(json, me, path, value, found)
+    subroutine json_get_logical_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -5600,14 +5625,14 @@
         if (present(found)) found = .true.
     end if
 
-    end subroutine json_get_logical_with_path
+    end subroutine json_get_logical_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_logical_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_logical_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_logical_with_path(json, me, path, value, found)
+    subroutine wrap_json_get_logical_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -5619,7 +5644,7 @@
 
     call json%get(me,to_unicode(path),value,found)
 
-    end subroutine wrap_json_get_logical_with_path
+    end subroutine wrap_json_get_logical_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5674,7 +5699,7 @@
 !>
 !  Get a logical vector from a [[json_value]], given the path.
 
-    subroutine json_get_logical_vec_with_path(json, me, path, vec, found)
+    subroutine json_get_logical_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -5715,14 +5740,14 @@
 
         end subroutine get_logical_from_array
 
-    end subroutine json_get_logical_vec_with_path
+    end subroutine json_get_logical_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_logical_vec_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_logical_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_logical_vec_with_path(json, me, path, vec, found)
+    subroutine wrap_json_get_logical_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -5734,7 +5759,7 @@
 
     call json%get(me,to_unicode(path),vec,found)
 
-    end subroutine wrap_json_get_logical_vec_with_path
+    end subroutine wrap_json_get_logical_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5841,7 +5866,7 @@
 !>
 !  Get a character string from a [[json_value]], given the path.
 
-    subroutine json_get_string_with_path(json, me, path, value, found)
+    subroutine json_get_string_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -5864,7 +5889,7 @@
     call json%get(me=me, path=path, p=p)
 
     if (.not. associated(p)) then
-        call json%throw_exception('Error in json_get_string_with_path:'//&
+        call json%throw_exception('Error in json_get_string_by_path:'//&
                                   ' Unable to resolve path: '//trim(path))
 
     else
@@ -5886,14 +5911,14 @@
     !cleanup:
     if (associated(p)) nullify(p)
 
-    end subroutine json_get_string_with_path
+    end subroutine json_get_string_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_string_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_string_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_string_with_path(json, me, path, value, found)
+    subroutine wrap_json_get_string_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -5905,7 +5930,7 @@
 
     call json%get(me,to_unicode(path),value,found)
 
-    end subroutine wrap_json_get_string_with_path
+    end subroutine wrap_json_get_string_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5968,7 +5993,7 @@
 !>
 !  Get a string vector from a [[json_value(type)]], given the path.
 
-    subroutine json_get_string_vec_with_path(json, me, path, vec, found)
+    subroutine json_get_string_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -6017,14 +6042,14 @@
 
         end subroutine get_chars_from_array
 
-    end subroutine json_get_string_vec_with_path
+    end subroutine json_get_string_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_string_vec_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_string_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_string_vec_with_path(json, me, path, vec, found)
+    subroutine wrap_json_get_string_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -6036,7 +6061,7 @@
 
     call json%get(me,to_unicode(path),vec,found)
 
-    end subroutine wrap_json_get_string_vec_with_path
+    end subroutine wrap_json_get_string_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -6160,7 +6185,7 @@
 !  This routine calls the user-supplied array_callback subroutine
 !  for each element in the array (specified by the path).
 
-    subroutine json_get_array_with_path(json, me, path, array_callback, found)
+    subroutine json_get_array_by_path(json, me, path, array_callback, found)
 
     implicit none
 
@@ -6198,14 +6223,14 @@
         if ( present(found) ) found = .true.
     end if
 
-    end subroutine json_get_array_with_path
+    end subroutine json_get_array_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_array_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_array_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_array_with_path(json, me, path, array_callback, found)
+    subroutine wrap_json_get_array_by_path(json, me, path, array_callback, found)
 
     implicit none
 
@@ -6217,7 +6242,7 @@
 
     call json%get(me, to_unicode(path), array_callback, found)
 
-    end subroutine wrap_json_get_array_with_path
+    end subroutine wrap_json_get_array_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
