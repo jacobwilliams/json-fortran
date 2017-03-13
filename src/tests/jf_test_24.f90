@@ -20,9 +20,9 @@ contains
     integer,intent(out) :: error_cnt
 
     type(json_value),pointer :: p
-    type(json_value),pointer :: tmp
     type(json_core) :: json
     logical(lk) :: found
+    logical(lk) :: was_created
     logical(lk) :: is_valid
     character(kind=CK,len=:),allocatable :: error_msg
 
@@ -55,7 +55,23 @@ contains
     call json%add_by_path(p,'a.aa.aaaa(3)'      , 4.0_rk , found)
     call json%add_by_path(p,'a.array(1)'        , 5      , found)
     call json%add_by_path(p,'a.array(2).scalar' , '6'    , found)
-    call json%add_by_path(p,'a.array(2).logical', .true. , found)
+    call json%add_by_path(p,'a.array(2).logical', .true. , found, was_created)
+
+    if (.not. was_created) then
+        write(error_unit,'(A)') 'Error: variable should have been created.'
+        error_cnt = error_cnt + 1
+    end if
+
+    ! now for variables that are already present:
+    call json%add_by_path(p,'a.aa.aaaa(3)'      , 40.0_rk , found)
+    call json%add_by_path(p,'a.array(1)'        , 50      , found)
+    call json%add_by_path(p,'a.array(2).scalar' , '60'    , found)
+    call json%add_by_path(p,'a.array(2).logical', .false. , found, was_created)
+
+    if (was_created) then
+        write(error_unit,'(A)') 'Error: variable should already have been present.'
+        error_cnt = error_cnt + 1
+    end if
 
     write(error_unit,'(A)') 'validating...'
     call json%validate(p,is_valid,error_msg)
