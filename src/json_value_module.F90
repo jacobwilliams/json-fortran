@@ -4413,13 +4413,12 @@
                     end if
                     p => tmp
                 else
-                    child_i = i + 1     ! what is this for? ... it never happens
-                                        ! in the test cases. '@(' maybe?
+                    child_i = i + 1     ! say, '@('
                     cycle
                 end if
                 if (.not. associated(p)) then
                     call json%throw_exception('Error in json_get_by_path_default:'//&
-                                         ' Error getting array element')
+                                              ' Error getting array element')
                     exit
                 end if
                 child_i = i + 1
