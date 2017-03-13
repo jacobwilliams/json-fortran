@@ -134,6 +134,15 @@ contains
       end if
 
       write(error_unit,'(A)') ''
+      call json%get('@(1)(1)', cval)    ! this is version.major = 2
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A)') '@(1)(1) = '//trim(cval)
+      end if
+
+      write(error_unit,'(A)') ''
       call json%get('files(2)', cval)
       if (json%failed()) then
         call json%print_error_message(error_unit)

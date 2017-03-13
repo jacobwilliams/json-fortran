@@ -4157,13 +4157,21 @@
                                                    !! specify by `path`
     logical(LK),intent(out),optional     :: found  !! true if it was found
 
-    ! note: it can only be 1 or 2 (which was checked in initialize)
-    select case (json%path_mode)
-    case(1_IK)
-        call json%json_get_by_path_default(me, path, p, found)
-    case(2_IK)
-        call json%json_get_by_path_rfc6901(me, path, p, found)
-    end select
+    nullify(p)
+
+    if (.not. json%exception_thrown) then
+
+        ! note: it can only be 1 or 2 (which was checked in initialize)
+        select case (json%path_mode)
+        case(1_IK)
+            call json%json_get_by_path_default(me, path, p, found)
+        case(2_IK)
+            call json%json_get_by_path_rfc6901(me, path, p, found)
+        end select
+
+    else
+        if (present(found)) found = .false.
+    end if
 
     end subroutine json_get_by_path
 !*****************************************************************************************
@@ -4200,23 +4208,30 @@
 
     if (present(p)) nullify(p)
 
-    ! note: path_mode can only be 1 or 2 (which was checked in initialize)
-    select case (json%path_mode)
-    case(1_IK)
-        call json%json_get_by_path_default(me,path,tmp,found,&
-                                            create_it=.true.,&
-                                            was_created=was_created)
-        if (present(p)) p => tmp
-    case(2_IK)
-        ! the problem here is there isn't really a way to disambiguate
-        ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
-        call json%throw_exception('Create by path not supported in RFC 6901 path mode.')
-        if (present(found)) then
-            call json%clear_exceptions()
-            found = .false.
-        end if
+    if (.not. json%exception_thrown) then
+
+        ! note: path_mode can only be 1 or 2 (which was checked in initialize)
+        select case (json%path_mode)
+        case(1_IK)
+            call json%json_get_by_path_default(me,path,tmp,found,&
+                                                create_it=.true.,&
+                                                was_created=was_created)
+            if (present(p)) p => tmp
+        case(2_IK)
+            ! the problem here is there isn't really a way to disambiguate
+            ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
+            call json%throw_exception('Create by path not supported in RFC 6901 path mode.')
+            if (present(found)) then
+                call json%clear_exceptions()
+                found = .false.
+            end if
+            if (present(was_created)) was_created = .false.
+        end select
+
+    else
         if (present(was_created)) was_created = .false.
-    end select
+        if (present(found)) found = .false.
+    end if
 
     end subroutine json_create_by_path
 !*****************************************************************************************
