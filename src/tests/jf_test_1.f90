@@ -32,6 +32,7 @@ contains
     character(kind=json_CK,len=:),allocatable :: cval
     real(wp) :: rval
     logical :: found
+    logical :: lval
 
     error_cnt = 0
     call json%initialize()
@@ -106,6 +107,7 @@ contains
 
       call json%initialize(path_separator=json_CK_'.')  ! reset to normal paths
 
+      ! get an integer value:
       write(error_unit,'(A)') ''
       call json%get('version.svn', ival)
       if (json%failed()) then
@@ -114,7 +116,20 @@ contains
       else
         write(error_unit,'(A,I5)') 'version.svn = ',ival
       end if
+      ! integer to double conversion:
+      call json%get('version.svn', rval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      end if
+      ! integer to logical conversion:
+      call json%get('version.svn', lval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      end if
 
+      ! get a character value:
       write(error_unit,'(A)') ''
       call json%get('data(1).array(2)', cval)
       if (json%failed()) then
@@ -122,6 +137,21 @@ contains
         error_cnt = error_cnt + 1
       else
         write(error_unit,'(A)') 'data(1).array(2) = '//trim(cval)
+      end if
+
+      ! get a logical value:
+      call json%get('data(1).tf1', lval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A)') 'data(1).tf1 = ', lval
+      end if
+      ! logical to double:
+      call json%get('data(1).tf1', rval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
       end if
 
       write(error_unit,'(A)') ''
