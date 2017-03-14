@@ -226,6 +226,8 @@
 
         private
 
+        !>
+        !  Return a child of a [[json_value]] structure.
         generic,public :: get_child => json_value_get_child_by_index, &
                                        json_value_get_child,&
                                        MAYBEWRAP(json_value_get_child_by_name)
@@ -279,12 +281,15 @@
         !  thrown if the existing variable is not a scalar).
         !
         !### See also
-        !  * [[json_add_scalar_by_path]] - this one can be used to change
+        !  * [[add_by_path]] - this one can be used to change
         !    arrays and objects to scalars if so desired.
         !
         !@note Unlike some routines, the `found` output is not optional,
         !      so it doesn't present exceptions from being thrown.
-
+        !
+        !@note These have been mostly supplanted by the [[add_by_path]]
+        !      methods, which do a similar thing (and can be used for
+        !      scalars and vectors, etc.)
         generic,public :: update => MAYBEWRAP(json_update_logical),&
                                     MAYBEWRAP(json_update_double),&
                                     MAYBEWRAP(json_update_integer),&
@@ -328,8 +333,26 @@
         !  * The `json_core%update` methods.
         !  * [[json_create_by_path]]
 
-        generic,public :: add_by_path => MAYBEWRAP(json_add_scalar_by_path)
-        procedure :: MAYBEWRAP(json_add_scalar_by_path)
+        generic,public :: add_by_path => MAYBEWRAP(json_add_member_by_path),&
+                                         MAYBEWRAP(json_add_integer_by_path),&
+                                         MAYBEWRAP(json_add_double_by_path),&
+                                         MAYBEWRAP(json_add_logical_by_path),&
+                                         MAYBEWRAP(json_add_string_by_path)
+                                         !MAYBEWRAP(json_add_vector_by_path)
+#ifdef USE_UCS4
+        generic,public :: add_by_path => json_add_string_by_path_value_ascii,&
+                                         json_add_string_by_path_path_ascii
+#endif
+        procedure :: MAYBEWRAP(json_add_member_by_path)
+        procedure :: MAYBEWRAP(json_add_integer_by_path)
+        procedure :: MAYBEWRAP(json_add_double_by_path)
+        procedure :: MAYBEWRAP(json_add_logical_by_path)
+        procedure :: MAYBEWRAP(json_add_string_by_path)
+#ifdef USE_UCS4
+        procedure :: json_add_string_by_path_value_ascii
+        procedure :: json_add_string_by_path_path_ascii
+#endif
+        !procedure :: MAYBEWRAP(json_add_vector_by_path)
 
         !>
         !  Create a [[json_value]] linked list using the
@@ -339,7 +362,7 @@
         !  (This will create a `null` variable)
         !
         !### See also
-        !  * [[json_add_scalar_by_path]]
+        !  * [[add_by_path]]
 
         generic,public :: create => MAYBEWRAP(json_create_by_path)
         procedure :: MAYBEWRAP(json_create_by_path)
@@ -2773,30 +2796,112 @@
 
 !*****************************************************************************************
 !>
-!  Add a scalar value to a [[json_value]], given the path.
+!  Add a new member (`json_value` pointer) to a JSON structure, given the path.
 !
 !@warning If the path points to an existing variable in the structure,
 !         then this routine will destroy it and replace it with the
 !         new value.
-!
-!@note This is different from the other routines, since we are using
-!      an unlimited polymorphic input instead of having separate routines.
 
-    subroutine json_add_scalar_by_path(json,me,path,value,found,was_created)
+    subroutine json_add_member_by_path(json,me,path,p,found,was_created)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: me           !! the JSON structure
     character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
-    class(*),intent(in)                 :: value        !! the value to add (can be
-                                                        !! integer, real, logical, or
-                                                        !! character)
+    type(json_value),pointer,intent(in) :: p            !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! name of the variable
+
+    if ( .not. json%exception_thrown ) then
+
+        if (.not. associated(p)) then
+            call json%throw_exception('Error in json_add_member_by_path:'//&
+                                      ' Input pointer p is not associated.')
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+            if ( present(was_created) ) was_created = .false.
+        else
+
+            ! return a pointer to the path (possibly creating it)
+            call json%create(me,path,tmp,found,was_created)
+
+            if (.not. associated(tmp)) then
+
+                call json%throw_exception('Error in json_add_member_by_path:'//&
+                                          ' Unable to resolve path: '//trim(path))
+                if (present(found)) then
+                    found = .false.
+                    call json%clear_exceptions()
+                end if
+
+            else
+
+                call json%info(tmp,name=name)
+
+                ! replace it with the new one:
+                call json%replace(tmp,p,destroy=.true.)
+                call json%rename(p,name)
+
+            end if
+
+        end if
+
+    else
+        if ( present(found) ) found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_member_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_member_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_member_by_path(json,me,path,p,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    type(json_value),pointer,intent(in)  :: p            !! the value to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_member_by_path(me,to_unicode(path),p,found,was_created)
+
+    end subroutine wrap_json_add_member_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add an integer value to a [[json_value]], given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_integer_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),intent(in)              :: value        !! the value to add
     logical(LK),intent(out),optional    :: found        !! if the variable was found
     logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
 
     type(json_value),pointer :: p
     type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! variable name
 
     if ( .not. json%exception_thrown ) then
 
@@ -2809,7 +2914,7 @@
 
         if (.not. associated(p)) then
 
-            call json%throw_exception('Error in json_add_scalar_by_path:'//&
+            call json%throw_exception('Error in json_add_integer_by_path:'//&
                                       ' Unable to resolve path: '//trim(path))
             if (present(found)) then
                 found = .false.
@@ -2824,53 +2929,13 @@
             !      being changed (for example, if an array
             !      is being replaced with a scalar).
 
-            select type (value)
-            type is (real(RK))
-                if (p%var_type==json_double) then
-                    p%dbl_value = value
-                else
-                    call json%create_double(tmp,value,p%name) ! keep name
-                    call json%replace(p,tmp,destroy=.true.)
-                end if
-            type is (integer(IK))
-                if (p%var_type==json_integer) then
-                    p%int_value = value
-                else
-                    call json%create_integer(tmp,value,p%name) ! keep name
-                    call json%replace(p,tmp,destroy=.true.)
-                end if
-            type is (character(kind=CK,len=*))
-                if (p%var_type==json_string) then
-                    p%str_value = value
-                else
-                    call json%create_string(tmp,value,p%name) ! keep name
-                    call json%replace(p,tmp,destroy=.true.)
-                end if
-#if defined __GFORTRAN__ && defined USE_UCS4
-            type is (character(kind=CDK,len=*))
-                ! only if using unicode
-                if (p%var_type==json_string) then
-                    p%str_value = to_unicode(value)
-                else
-                    call json%create_string(tmp,to_unicode(value),p%name) ! keep name
-                    call json%replace(p,tmp,destroy=.true.)
-                end if
-#endif
-            type is (logical(kind=LK))
-                if (p%var_type==json_logical) then
-                    p%log_value = value
-                else
-                    call json%create_logical(tmp,value,p%name) ! keep name
-                    call json%replace(p,tmp,destroy=.true.)
-                end if
-            class default
-                call json%throw_exception('Error in json_add_scalar_by_path:'//&
-                                          ' Invalid input type')
-                if (present(found)) then
-                    found = .false.
-                    call json%clear_exceptions()
-                end if
-            end select
+            if (p%var_type==json_integer) then
+                p%int_value = value
+            else
+                call json%info(p,name=name)
+                call json%create_integer(tmp,value,name)
+                call json%replace(p,tmp,destroy=.true.)
+            end if
 
         end if
 
@@ -2879,30 +2944,421 @@
         if ( present(was_created) ) was_created = .false.
     end if
 
-    end subroutine json_add_scalar_by_path
+    end subroutine json_add_integer_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Wrapper to [[json_add_scalar_by_path]] where "path" is kind=CDK.
+!  Wrapper to [[json_add_integer_by_path]] where "path" is kind=CDK.
 
-    subroutine wrap_json_add_scalar_by_path(json,me,path,value,found,was_created)
+    subroutine wrap_json_add_integer_by_path(json,me,path,value,found,was_created)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: me          !! the JSON structure
     character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
-    class(*),intent(in)                  :: value       !! the value to add (can be
-                                                        !! integer, real, logical, or
-                                                        !! character)
+    integer(IK),intent(in)               :: value       !! the value to add
     logical(LK),intent(out),optional     :: found       !! if the variable was found
     logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
 
-    call json%json_add_scalar_by_path(me,to_unicode(path),value,found,was_created)
+    call json%json_add_integer_by_path(me,to_unicode(path),value,found,was_created)
 
-    end subroutine wrap_json_add_scalar_by_path
+    end subroutine wrap_json_add_integer_by_path
 !*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add an double value to a [[json_value]], given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_double_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    real(RK),intent(in)                 :: value        !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! variable name
+
+    if ( .not. json%exception_thrown ) then
+
+        nullify(p)
+
+        ! return a pointer to the path (possibly creating it)
+        ! If the variable had to be created, then
+        ! it will be a json_null variable.
+        call json%create(me,path,p,found,was_created)
+
+        if (.not. associated(p)) then
+
+            call json%throw_exception('Error in json_add_double_by_path:'//&
+                                      ' Unable to resolve path: '//trim(path))
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+
+        else
+
+            !NOTE: a new object is created, and the old one
+            !      is replaced and destroyed. This is to
+            !      prevent memory leaks if the type is
+            !      being changed (for example, if an array
+            !      is being replaced with a scalar).
+
+            if (p%var_type==json_double) then
+                p%dbl_value = value
+            else
+                call json%info(p,name=name)
+                call json%create_double(tmp,value,name)
+                call json%replace(p,tmp,destroy=.true.)
+            end if
+
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_double_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_double_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_double_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    real(RK),intent(in)                  :: value       !! the value to add
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%json_add_double_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_double_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add an logical value to a [[json_value]], given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_logical_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    logical(LK),intent(in)              :: value        !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! variable name
+
+    if ( .not. json%exception_thrown ) then
+
+        nullify(p)
+
+        ! return a pointer to the path (possibly creating it)
+        ! If the variable had to be created, then
+        ! it will be a json_null variable.
+        call json%create(me,path,p,found,was_created)
+
+        if (.not. associated(p)) then
+
+            call json%throw_exception('Error in json_add_logical_by_path:'//&
+                                      ' Unable to resolve path: '//trim(path))
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+
+        else
+
+            !NOTE: a new object is created, and the old one
+            !      is replaced and destroyed. This is to
+            !      prevent memory leaks if the type is
+            !      being changed (for example, if an array
+            !      is being replaced with a scalar).
+
+            if (p%var_type==json_logical) then
+                p%log_value = value
+            else
+                call json%info(p,name=name)
+                call json%create_logical(tmp,value,name)
+                call json%replace(p,tmp,destroy=.true.)
+            end if
+
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_logical_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_logical_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_logical_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    logical(LK),intent(in)               :: value       !! the value to add
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%json_add_logical_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_logical_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add a string value to a [[json_value]], given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_string_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    character(kind=CK,len=*),intent(in) :: value        !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! variable name
+
+    if ( .not. json%exception_thrown ) then
+
+        nullify(p)
+
+        ! return a pointer to the path (possibly creating it)
+        ! If the variable had to be created, then
+        ! it will be a json_null variable.
+        call json%create(me,path,p,found,was_created)
+
+        if (.not. associated(p)) then
+
+            call json%throw_exception('Error in json_add_string_by_path:'//&
+                                      ' Unable to resolve path: '//trim(path))
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+
+        else
+
+            !NOTE: a new object is created, and the old one
+            !      is replaced and destroyed. This is to
+            !      prevent memory leaks if the type is
+            !      being changed (for example, if an array
+            !      is being replaced with a scalar).
+
+            if (p%var_type==json_string) then
+                p%str_value = value
+            else
+                call json%info(p,name=name)
+                call json%create_string(tmp,value,name)
+                call json%replace(p,tmp,destroy=.true.)
+            end if
+
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_string_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_string_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_string_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    character(kind=CDK,len=*),intent(in) :: value       !! the value to add
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%json_add_string_by_path(me,to_unicode(path),to_unicode(value),found,was_created)
+
+    end subroutine wrap_json_add_string_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_string_by_path]] where "path" is kind=CDK.
+
+    subroutine json_add_string_by_path_path_ascii(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    character(kind=CK,len=*),intent(in)  :: value        !! the value to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_string_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine json_add_string_by_path_path_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_string_by_path]] where "value" is kind=CDK.
+
+    subroutine json_add_string_by_path_value_ascii(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    character(kind=CDK,len=*),intent(in) :: value        !! the value to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_string_by_path(me,path,to_unicode(value),found,was_created)
+
+    end subroutine json_add_string_by_path_value_ascii
+!*****************************************************************************************
+
+! !*****************************************************************************************
+! !>
+! !  Add a vector value to a JSON structure, given the path.
+! !
+! !@warning If the path points to an existing variable in the structure,
+! !         then this routine will destroy it and replace it with the
+! !         new value.
+! !
+! !@note This is different from the other routines, since we are using
+! !      an unlimited polymorphic input instead of having separate routines.
+!
+!     subroutine json_add_vector_by_path(json,me,path,value,found,was_created)
+!
+!     implicit none
+!
+!     class(json_core),intent(inout)      :: json
+!     type(json_value),pointer            :: me           !! the JSON structure
+!     character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+!     class(*),dimension(:),intent(in)    :: value        !! the value to add (can be
+!                                                         !! integer, real, logical, or
+!                                                         !! character)
+!     logical(LK),intent(out),optional    :: found        !! if the variable was found
+!     logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+!
+!     type(json_value),pointer :: p
+!     type(json_value),pointer :: var
+!     integer(IK) :: i    !! counter
+!     character(kind=CK,len=:),allocatable :: name !! the variable name
+!
+!     !get a pointer to the variable
+!     !(creating it if necessary)
+!     call json%create(me,path,p,found,was_created)
+!     call json%info(p,name=name)
+!
+!     !create a new array variable:
+!     call json%create_array(var,name) ! keep name
+!
+!     ! replace p with this array (destroy p)
+!     call json%replace(p,var,destroy=.true.)
+!
+!     !populate each element of the array:
+!     do i=1,size(value)
+!         select type (value)
+!         type is (real(RK))
+!             call json%add(var, CK_'', value(i))
+!         type is (integer(IK))
+!             call json%add(var, CK_'', value(i))
+!         type is (character(kind=CK,len=*))
+!             call json%add(var, CK_'', value(i))
+! #if defined __GFORTRAN__ && defined USE_UCS4
+!         type is (character(kind=CDK,len=*))
+!             call json%add(var, CK_'', to_unicode(value(i)))
+! #endif
+!         type is (logical(kind=LK))
+!             call json%add(var, CK_'', value(i))
+!         class default
+!             call json%throw_exception('Error in json_add_vector_by_path:'//&
+!                                       ' Invalid input type')
+!             if (present(found)) then
+!                 found = .false.
+!                 call json%clear_exceptions()
+!             end if
+!             exit
+!         end select
+!
+!     end do
+!
+!     end subroutine json_add_vector_by_path
+! !*****************************************************************************************
+!
+! !*****************************************************************************************
+! !>
+! !  Wrapper for [[json_add_vector_by_path]] where "path" is kind=CDK.
+!
+!     subroutine wrap_json_add_vector_by_path(json,me,path,value,found,was_created)
+!
+!     implicit none
+!
+!     class(json_core),intent(inout)       :: json
+!     type(json_value),pointer             :: me          !! the JSON structure
+!     character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+!     class(*),dimension(:),intent(in)     :: value       !! the value to add (can be
+!                                                         !! integer, real, logical, or
+!                                                         !! character)
+!     logical(LK),intent(out),optional     :: found       !! if the variable was found
+!     logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+!
+!     call json%json_add_vector_by_path(me,path,value,found,was_created)
+!
+!     end subroutine wrap_json_add_vector_by_path
+! !*****************************************************************************************
 
 !*****************************************************************************************
 !> author: Jacob Williams
