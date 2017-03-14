@@ -145,7 +145,11 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
       else
-        write(error_unit,'(A)') 'data(1).tf1 = ', lval
+        if (lval) then
+            write(error_unit,'(A)') 'data(1).tf1 = True'
+        else
+            write(error_unit,'(A)') 'data(1).tf1 = False'
+        end if
       end if
       ! logical to double:
       call json%get('data(1).tf1', rval)
