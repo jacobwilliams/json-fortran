@@ -79,6 +79,13 @@ contains
     call json%add_by_path(p,    CK_'a.unicode_test.cvec.ck_ck' ,  [CK_'1',CK_'2',CK_'3'],   found)
     call json%add_by_path(p,    CK_'a.unicode_test.cvec.ck_cdk' , [CDK_'1',CDK_'2',CDK_'3'],found)
     call json%add_by_path(p,   CDK_'a.unicode_test.cvec.cdk_cdk' ,[CDK_'1',CDK_'2',CDK_'3'],found)
+
+    ! also test the unicode operators:
+    if (ck_'1' == cdk_'1' .and. &
+        ck_'1' /= cdk_'2' .and. &
+        cdk_'1' /= ck_'2' ) then
+        write(error_unit,'(A)') 'Unicode operator tests passed'
+    end if
 #endif
 
     if (.not. was_created) then
