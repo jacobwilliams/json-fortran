@@ -5577,9 +5577,6 @@
     logical(LK)                                :: use_brackets   !! to use '[]' characters for arrays
     logical(LK)                                :: parent_is_root !! if the parent is the root
 
-    !initialize:
-    path = CK_''
-
     !optional input:
     if (present(use_alt_array_tokens)) then
         use_brackets = .not. use_alt_array_tokens
@@ -5597,6 +5594,9 @@
 
             !get info about the current variable:
             call json%info(tmp,name=name)
+            if (json%path_mode==2) then
+                name = encode_rfc6901(name)
+            end if
 
             ! if tmp a child of an object, or an element of an array
             if (associated(tmp%parent)) then
@@ -5604,6 +5604,9 @@
                 !get info about the parent:
                 call json%info(tmp%parent,var_type=var_type,&
                                n_children=n_children,name=parent_name)
+                if (json%path_mode==2) then
+                    parent_name = encode_rfc6901(parent_name)
+                end if
 
                 select case (var_type)
                 case (json_array)
@@ -5680,7 +5683,7 @@
     end if
 
     !for errors, return blank string:
-    if (json%exception_thrown) then
+    if (json%exception_thrown .or. .not. allocated(path)) then
         path = CK_''
     else
         if (json%path_mode==2) then
@@ -5712,14 +5715,14 @@
         select case (json%path_mode)
         case(2)
             ! in this case, the options are ignored
-            if (path==CK_'') then
+            if (.not. allocated(path)) then
                 path = str
             else
                 path = str//slash//path
             end if
         case(1)
             ! default path format
-            if (path==CK_'') then
+            if (.not. allocated(path)) then
                 path = str
             else
                 if (present(path_sep)) then
