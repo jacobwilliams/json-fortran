@@ -60,6 +60,13 @@ contains
     call json%add_by_path(p,'a.aa.aaaa(3)'      , 4.0_rk , found)
     call json%add_by_path(p,'a.array(1)'        , 5      , found)
     call json%add_by_path(p,'a.array(2).scalar' , '6'    , found)
+
+    call json%add_by_path(p,'a.array(2).ivec' , [1,2,3], found)
+    call json%add_by_path(p,'a.array(2).rvec' , [1.0_rk,2.0_rk,3.0_rk], found)
+    call json%add_by_path(p,'a.array(2).lvec' , [.true.,.false.,.true.], found)
+    call json%add_by_path(p,'a.array(2).cvec' , ['1 ','2 ','3 '], found)
+    call json%add_by_path(p,'a.array(2).cvec_trim' , ['1 ','2 ','3 '], found, ilen=[1,1,1])
+
     call json%add_by_path(p,'a.array(2).logical', .true. , found, was_created)
 
 #ifdef USE_UCS4
@@ -68,6 +75,10 @@ contains
     call json%add_by_path(p,    CK_'a.unicode_test.ck_ck',   CK_'ck'   , found)
     call json%add_by_path(p,    CK_'a.unicode_test.ck_cdk',  CDK_'cdk' , found)
     call json%add_by_path(p,   CDK_'a.unicode_test.cdk_cdk', CDK_'cdk' , found)
+    call json%add_by_path(p,   CDK_'a.unicode_test.cvec.cdk_ck' , [CK_'1',CK_'2',CK_'3'],   found)
+    call json%add_by_path(p,    CK_'a.unicode_test.cvec.ck_ck' ,  [CK_'1',CK_'2',CK_'3'],   found)
+    call json%add_by_path(p,    CK_'a.unicode_test.cvec.ck_cdk' , [CDK_'1',CDK_'2',CDK_'3'],found)
+    call json%add_by_path(p,   CDK_'a.unicode_test.cvec.cdk_cdk' ,[CDK_'1',CDK_'2',CDK_'3'],found)
 #endif
 
     if (.not. was_created) then
