@@ -1139,7 +1139,7 @@
 !> author: Jacob Williams
 !  date: 12/18/2016
 !
-!  Returns information about characters strings returned from a [[json_value]].
+!  Returns information about character strings returned from a [[json_value]].
 
     subroutine json_string_info(json,p,ilen,max_str_len,found)
 
@@ -1167,7 +1167,6 @@
     logical(LK) :: initialized !! if the output array has been sized
     logical(LK) :: get_max_len !! if we are returning the `max_str_len`
     logical(LK) :: get_ilen    !! if we are returning the `ilen` array
-    logical(LK) :: is_array    !! if the variable is an array
     integer(IK) :: var_type    !! variable type
 
     get_max_len = present(max_str_len)
@@ -1175,7 +1174,7 @@
 
     if (.not. json%exception_thrown) then
 
-        found       = .true.
+        if (present(found)) found = .true.
         initialized = .false.
 
         if (get_max_len) max_str_len = 0
@@ -6433,7 +6432,7 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
-    logical(LK)                         :: value
+    logical(LK),intent(out)             :: value
 
     value = .false.
     if ( json%exception_thrown ) return
@@ -6472,7 +6471,7 @@
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
     character(kind=CK,len=*),intent(in) :: path
-    logical(LK)                         :: value
+    logical(LK),intent(out)             :: value
     logical(LK),intent(out),optional    :: found
 
     type(json_value),pointer :: p
@@ -6522,7 +6521,7 @@
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: me
     character(kind=CDK,len=*),intent(in) :: path
-    logical(LK)                          :: value
+    logical(LK),intent(out)              :: value
     logical(LK),intent(out),optional     :: found
 
     call json%get(me,to_unicode(path),value,found)
@@ -6928,8 +6927,8 @@
 
     implicit none
 
-    class(json_core),intent(inout)                                :: json
-    type(json_value),pointer,intent(in)                           :: me
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me
     character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec
     integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
                                                              !! of each character
@@ -6965,7 +6964,7 @@
         if (.not. initialized) then
             ! string length long enough to hold the longest one
             allocate( character(kind=CK,len=max_len) :: vec(count) )
-            allocate( ilen(count) )
+            !allocate( ilen(count) )
             initialized = .true.
         end if
 
