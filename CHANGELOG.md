@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [5.2.0 (2017-03-05)](#520-2017-03-05)
     - [5.1.0 (2016-08-14)](#510-2016-08-14)
     - [5.0.2 (2016-06-11)](#502-2016-06-11)
     - [5.0.1 (2016-06-11)](#501-2016-06-11)
@@ -20,7 +21,35 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.1.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.2.0...HEAD)
+
+### [5.2.0](https://github.com/jacobwilliams/json-fortran/tree/5.2.0) (2017-03-05)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.1.0...5.2.0)
+or [Download v5.2.0](https://github.com/jacobwilliams/json-fortran/releases/tag/5.2.0)
+
+**Enhancements:**
+
+- Added support for comments in JSON files. [\#256](https://github.com/jacobwilliams/json-fortran/issues/256)
+[\#234](https://github.com/jacobwilliams/json-fortran/issues/234)
+[\#259](https://github.com/jacobwilliams/json-fortran/pull/259) ([jacobwilliams](https://github.com/jacobwilliams))
+[\#240](https://github.com/jacobwilliams/json-fortran/pull/240) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added support for RFC 6901 paths. [\#249](https://github.com/jacobwilliams/json-fortran/issues/249) [\#253](https://github.com/jacobwilliams/json-fortran/issues/253) [\#255](https://github.com/jacobwilliams/json-fortran/issues/255)
+[\#258](https://github.com/jacobwilliams/json-fortran/pull/258) ([jacobwilliams](https://github.com/jacobwilliams))
+[\#252](https://github.com/jacobwilliams/json-fortran/pull/252) ([jacobwilliams](https://github.com/jacobwilliams))
+[\#251](https://github.com/jacobwilliams/json-fortran/pull/251) ([jacobwilliams](https://github.com/jacobwilliams))
+- Can now specify default real and integer kinds using compiler directives. [\#236](https://github.com/jacobwilliams/json-fortran/issues/236) [\#238](https://github.com/jacobwilliams/json-fortran/issues/238)
+[\#239](https://github.com/jacobwilliams/json-fortran/pull/239) ([jacobwilliams](https://github.com/jacobwilliams))
+- `compact_reals` and `real_format='*'` can now be used at the same time. [\#226](https://github.com/jacobwilliams/json-fortran/issues/226)
+[\#227](https://github.com/jacobwilliams/json-fortran/pull/227) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added option to change default path separator character. [\#254](https://github.com/jacobwilliams/json-fortran/pull/254) ([jacobwilliams](https://github.com/jacobwilliams))
+- Add pkg-config file [\#242](https://github.com/jacobwilliams/json-fortran/pull/242) ([wesbarnett](https://github.com/wesbarnett))
+
+**Fixed issues:**
+
+- Real numbers now written with 17 digits of precision (previously it was using 16 which doesn't accurately represent all values to full precision) [\#230](https://github.com/jacobwilliams/json-fortran/issues/230)
+[\#241](https://github.com/jacobwilliams/json-fortran/pull/241) ([jacobwilliams](https://github.com/jacobwilliams))
+[\#232](https://github.com/jacobwilliams/json-fortran/pull/232) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [5.1.0](https://github.com/jacobwilliams/json-fortran/tree/5.1.0) (2016-08-14)
 

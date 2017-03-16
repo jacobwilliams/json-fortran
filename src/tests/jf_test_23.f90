@@ -32,11 +32,12 @@ contains
     real(wp) :: rval
     logical :: found
     character(kind=json_CK,len=10),dimension(:),allocatable :: cval_array
+    integer :: i !! counter
 
     error_cnt = 0
     call json%initialize(   trailing_spaces_significant=.true.,&
                             case_sensitive_keys=.true.,&
-                            use_rfc6901_paths=.true.)
+                            path_mode=2) ! RFC6901 paths
     if (json%failed()) then
       call json%print_error_message(error_unit)
       error_cnt = error_cnt + 1
@@ -217,23 +218,30 @@ contains
 
     call core%initialize(   trailing_spaces_significant=.true.,&
                             case_sensitive_keys=.true.,&
-                            use_rfc6901_paths=.true.)
+                            path_mode=2) ! RFC6901 paths
 
     write(error_unit,'(A)') ''
-    key = '/data/1/real'
-    call json%get(key,p)
-    call core%get_path(p, path, found)
-    if (found) then
-        if (key==path) then
-            write(error_unit,'(A)') 'get_path test passed: '//path
+    do i = 1, 4
+        select case (i)
+            case(1); key = '/data/1/real'
+            case(2); key = '/rfc6901 tests/  '
+            case(3); key = '/rfc6901 tests/m~0n'
+            case(4); key = '/rfc6901 tests/a~1b'
+        end select
+        call json%get(key,p)
+        call core%get_path(p, path, found)
+        if (found) then
+            if (key==path) then
+                write(error_unit,'(A)') 'get_path test passed: '//path
+            else
+                write(error_unit,'(A)') 'Error: path does not match: '//path//' '//key
+                error_cnt = error_cnt + 1
+            end if
         else
-            write(error_unit,'(A)') 'Error: path does not match: '//path//' '//key
+            write(error_unit,'(A)') 'Error: could not find '//key
             error_cnt = error_cnt + 1
         end if
-    else
-        write(error_unit,'(A)') 'Error: could not find '//key
-        error_cnt = error_cnt + 1
-    end if
+    end do
 
     ! clean up
     write(error_unit,'(A)') ''
