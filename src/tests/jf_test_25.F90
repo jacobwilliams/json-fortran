@@ -21,6 +21,7 @@ contains
 
     type(json_value),pointer :: p, tmp
     type(json_core) :: json
+    type(json_file) :: f
     logical(lk) :: found
     character(kind=CK,len=:),dimension(:),allocatable :: vec  !! array of strings from JSON
     integer(ik),dimension(:),allocatable :: ilen  !! array of string lengths
@@ -99,6 +100,35 @@ contains
     if (json%failed()) then
       call json%print_error_message(error_unit)
       error_cnt = error_cnt + 1
+    end if
+#endif
+
+    ! test json_file interface
+    f = json_file(p)
+    call f%get('str_array', vec, ilen, found)
+    if (f%failed()) then
+      call f%print_error_message(error_unit)
+      error_cnt = error_cnt + 1
+    end if
+    if (all(ilen==[1,2,3,5])) then
+        write(error_unit,'(A)') 'json_file success!'
+    else
+        write(error_unit,'(A,1X,*(I5,1X))') 'json_file failed: ', ilen
+        error_cnt = error_cnt + 1
+    end if
+#ifdef USE_UCS4
+    ! unicode test
+    f = json_file(p)
+    call f%get(CDK_'str_array', vec, ilen, found)
+    if (f%failed()) then
+      call f%print_error_message(error_unit)
+      error_cnt = error_cnt + 1
+    end if
+    if (all(ilen==[1,2,3,5])) then
+        write(error_unit,'(A)') 'json_file success!'
+    else
+        write(error_unit,'(A,1X,*(I5,1X))') 'json_file failed: ', ilen
+        error_cnt = error_cnt + 1
     end if
 #endif
 
