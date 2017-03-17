@@ -101,6 +101,7 @@
                                  MAYBEWRAP(json_file_get_double_vec),  &
                                  MAYBEWRAP(json_file_get_logical_vec), &
                                  MAYBEWRAP(json_file_get_string_vec),  &
+                                 MAYBEWRAP(json_file_get_alloc_string_vec),  &
                                  json_file_get_root
 
         generic,public :: update =>  MAYBEWRAP(json_file_update_integer),  &
@@ -140,6 +141,7 @@
         procedure :: MAYBEWRAP(json_file_get_double_vec)
         procedure :: MAYBEWRAP(json_file_get_logical_vec)
         procedure :: MAYBEWRAP(json_file_get_string_vec)
+        procedure :: MAYBEWRAP(json_file_get_alloc_string_vec)
         procedure :: json_file_get_root
 
         !update:
@@ -1118,6 +1120,52 @@
     call me%get(to_unicode(path), vec, found)
 
     end subroutine wrap_json_file_get_string_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 12/17/2016
+!
+!  Get an (allocatable length) string vector from a JSON file.
+!  This is just a wrapper for [[json_get_alloc_string_vec_with_path]].
+
+    subroutine json_file_get_alloc_string_vec(me, path, vec, ilen, found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+    logical(LK),intent(out),optional :: found
+
+    call me%core%get(me%p, path, vec, ilen, found)
+
+    end subroutine json_file_get_alloc_string_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_get_alloc_string_vec]], where "path" is kind=CDK.
+!  This is just a wrapper for [[wrap_json_get_alloc_string_vec_with_path]].
+
+    subroutine wrap_json_file_get_alloc_string_vec(me, path, vec, ilen, found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+    logical(LK),intent(out),optional :: found
+
+    call me%get(to_unicode(path), vec, ilen, found)
+
+    end subroutine wrap_json_file_get_alloc_string_vec
 !*****************************************************************************************
 
 !*****************************************************************************************

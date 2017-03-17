@@ -386,7 +386,7 @@
         !      path.  The path version is split up into unicode and non-unicode versions.
 
         generic,public :: get => &
-                                  MAYBEWRAP(json_get_by_path),               &
+                                  MAYBEWRAP(json_get_by_path),             &
             json_get_integer,     MAYBEWRAP(json_get_integer_by_path),     &
             json_get_integer_vec, MAYBEWRAP(json_get_integer_vec_by_path), &
             json_get_double,      MAYBEWRAP(json_get_double_by_path),      &
@@ -395,7 +395,9 @@
             json_get_logical_vec, MAYBEWRAP(json_get_logical_vec_by_path), &
             json_get_string,      MAYBEWRAP(json_get_string_by_path),      &
             json_get_string_vec,  MAYBEWRAP(json_get_string_vec_by_path),  &
+            json_get_alloc_string_vec,MAYBEWRAP(json_get_alloc_string_vec_by_path),&
             json_get_array,       MAYBEWRAP(json_get_array_by_path)
+
         procedure,private :: json_get_integer
         procedure,private :: json_get_integer_vec
         procedure,private :: json_get_double
@@ -404,6 +406,7 @@
         procedure,private :: json_get_logical_vec
         procedure,private :: json_get_string
         procedure,private :: json_get_string_vec
+        procedure,private :: json_get_alloc_string_vec
         procedure,private :: json_get_array
         procedure,private :: MAYBEWRAP(json_get_by_path)
         procedure,private :: MAYBEWRAP(json_get_integer_by_path)
@@ -415,6 +418,7 @@
         procedure,private :: MAYBEWRAP(json_get_string_by_path)
         procedure,private :: MAYBEWRAP(json_get_string_vec_by_path)
         procedure,private :: MAYBEWRAP(json_get_array_by_path)
+        procedure,private :: MAYBEWRAP(json_get_alloc_string_vec_by_path)
         procedure,private :: json_get_by_path_default
         procedure,private :: json_get_by_path_rfc6901
 
@@ -606,6 +610,11 @@
         generic,public :: info => json_info, MAYBEWRAP(json_info_by_path)
         procedure :: json_info
         procedure :: MAYBEWRAP(json_info_by_path)
+
+        !>
+        !  get string info about a [[json_value]]
+        generic,public :: string_info => json_string_info
+        procedure :: json_string_info
 
         !>
         !  get matrix info about a [[json_value]]
@@ -1124,6 +1133,161 @@
     end if
 
     end subroutine json_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 12/18/2016
+!
+!  Returns information about character strings returned from a [[json_value]].
+
+    subroutine json_string_info(json,p,ilen,max_str_len,found)
+
+    implicit none
+
+    class(json_core),intent(inout)   :: json
+    type(json_value),pointer         :: p
+    integer(IK),dimension(:),allocatable,intent(out),optional :: ilen !! if `p` is an array, this
+                                                                      !! is the actual length
+                                                                      !! of each character
+                                                                      !! string in the array.
+                                                                      !! if not an array, this
+                                                                      !! is returned unallocated.
+    integer(IK),intent(out),optional :: max_str_len !! The maximum length required to
+                                                    !! hold the string representation returned
+                                                    !! by a call to a `get` routine. If a scalar,
+                                                    !! this is just the length of the scalar. If
+                                                    !! a vector, this is the maximum length of
+                                                    !! any element.
+    logical(LK),intent(out),optional :: found   !! true if there were no errors.
+                                                !! if not present, an error will
+                                                !! throw an exception
+
+    character(kind=CK,len=:),allocatable :: cval !! for getting values as strings.
+    logical(LK) :: initialized !! if the output array has been sized
+    logical(LK) :: get_max_len !! if we are returning the `max_str_len`
+    logical(LK) :: get_ilen    !! if we are returning the `ilen` array
+    integer(IK) :: var_type    !! variable type
+
+    get_max_len = present(max_str_len)
+    get_ilen    = present(ilen)
+
+    if (.not. json%exception_thrown) then
+
+        if (present(found)) found = .true.
+        initialized = .false.
+
+        if (get_max_len) max_str_len = 0
+
+        select case (p%var_type)
+
+        case (json_array) ! it's an array
+
+            ! call routine for each element
+            call json%get(p, array_callback=get_string_lengths)
+
+        case default ! not an array
+
+            if (json%strict_type_checking) then
+                ! only allowing strings to be returned
+                ! as strings, so we can check size directly
+                call json%info(p,var_type=var_type)
+                if (var_type==json_string) then
+                    if (allocated(p%str_value) .and. get_max_len) &
+                        max_str_len = len(p%str_value)
+                else
+                    ! it isn't a string, so there is no length
+                    call json%throw_exception('Error in json_string_info: '//&
+                                              'When strict_type_checking is true '//&
+                                              'the variable must be a character string.')
+                end if
+            else
+                ! in this case, we have to get the value
+                ! as a string to know what size it is.
+                call json%get(p, value=cval)
+                if (.not. json%exception_thrown) then
+                    if (allocated(cval) .and. get_max_len) &
+                        max_str_len = len(cval)
+                end if
+            end if
+
+        end select
+
+    end if
+
+    if (json%exception_thrown) then
+        if (present(found)) then
+            call json%clear_exceptions()
+            found = .false.
+        end if
+        if (get_max_len) max_str_len = 0
+        if (get_ilen) then
+            if (allocated(ilen)) deallocate(ilen)
+        end if
+    end if
+
+    contains
+
+        subroutine get_string_lengths(json, element, i, count)
+
+        !! callback function to call for each element in the array.
+
+        implicit none
+
+        class(json_core),intent(inout)      :: json
+        type(json_value),pointer,intent(in) :: element
+        integer(IK),intent(in)              :: i        !! index
+        integer(IK),intent(in)              :: count    !! size of array
+
+        character(kind=CK,len=:),allocatable :: cval
+        integer(IK) :: var_type
+
+        if (json%exception_thrown) return
+
+        if (.not. initialized) then
+            if (get_ilen) allocate(ilen(count))
+            initialized = .true.
+        end if
+
+        if (json%strict_type_checking) then
+            ! only allowing strings to be returned
+            ! as strings, so we can check size directly
+            call json%info(element,var_type=var_type)
+            if (var_type==json_string) then
+                if (allocated(element%str_value)) then
+                    if (get_max_len) then
+                        if (len(element%str_value)>max_str_len) &
+                                max_str_len = len(element%str_value)
+                    end if
+                    if (get_ilen) ilen(i) = len(element%str_value)
+                else
+                    if (get_ilen) ilen(i) = 0
+                end if
+            else
+                ! it isn't a string, so there is no length
+                call json%throw_exception('Error in json_string_info: '//&
+                                            'When strict_type_checking is true '//&
+                                            'the array must contain only '//&
+                                            'character strings.')
+            end if
+        else
+            ! in this case, we have to get the value
+            ! as a string to know what size it is.
+            call json%get(element, value=cval)
+            if (json%exception_thrown) return
+            if (allocated(cval)) then
+                if (get_max_len) then
+                    if (len(cval)>max_str_len) max_str_len = len(cval)
+                end if
+                if (get_ilen) ilen(i) = len(cval)
+            else
+                if (get_ilen) ilen(i) = 0
+            end if
+        end if
+
+        end subroutine get_string_lengths
+
+    end subroutine json_string_info
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -6002,41 +6166,27 @@
     implicit none
 
     class(json_core),intent(inout)                   :: json
-    type(json_value),pointer                         :: me
+    type(json_value),pointer,intent(in)              :: me
     character(kind=CK,len=*),intent(in)              :: path
     integer(IK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
 
-    logical(LK) :: initialized
+    type(json_value),pointer :: p
 
-    initialized = .false.
+    call json%get(me, path, p, found)
 
-    call json%get(me, path=path, array_callback=get_int_from_array, found=found)
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
 
-    ! need to duplicate callback function, no other way
-    contains
+    call json%get(p, vec)
 
-        subroutine get_int_from_array(json, element, i, count)
-
-        !! callback function for integer
-
-        implicit none
-
-        class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: element
-        integer(IK),intent(in)              :: i        !! index
-        integer(IK),intent(in)              :: count    !! size of array
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json%get(element, value=vec(i))
-
-        end subroutine get_int_from_array
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
 
     end subroutine json_get_integer_vec_by_path
 !*****************************************************************************************
@@ -6228,40 +6378,27 @@
     implicit none
 
     class(json_core),intent(inout)                :: json
-    type(json_value),pointer                      :: me
+    type(json_value),pointer,intent(in)           :: me
     character(kind=CK,len=*),intent(in)           :: path
     real(RK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional              :: found
 
-    logical(LK) :: initialized
+    type(json_value),pointer :: p
 
-    initialized = .false.
+    call json%get(me, path, p, found)
 
-    !the callback function is called for each element of the array:
-    call json%get(me, path=path, array_callback=get_double_from_array, found=found)
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
 
-    contains
+    call json%get(p, vec)
 
-        subroutine get_double_from_array(json, element, i, count)
-        !! callback function for double
-
-        implicit none
-
-        class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: element
-        integer(IK),intent(in)              :: i        !! index
-        integer(IK),intent(in)              :: count    !! size of array
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json%get(element, value=vec(i))
-
-        end subroutine get_double_from_array
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
 
     end subroutine json_get_double_vec_by_path
 !*****************************************************************************************
@@ -6295,7 +6432,7 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
-    logical(LK)                         :: value
+    logical(LK),intent(out)             :: value
 
     value = .false.
     if ( json%exception_thrown ) return
@@ -6334,7 +6471,7 @@
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
     character(kind=CK,len=*),intent(in) :: path
-    logical(LK)                         :: value
+    logical(LK),intent(out)             :: value
     logical(LK),intent(out),optional    :: found
 
     type(json_value),pointer :: p
@@ -6384,7 +6521,7 @@
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: me
     character(kind=CDK,len=*),intent(in) :: path
-    logical(LK)                          :: value
+    logical(LK),intent(out)              :: value
     logical(LK),intent(out),optional     :: found
 
     call json%get(me,to_unicode(path),value,found)
@@ -6454,36 +6591,22 @@
     logical(LK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
 
-    logical(LK) :: initialized
+    type(json_value),pointer :: p
 
-    initialized = .false.
+    call json%get(me, path, p, found)
 
-    !the callback function is called for each element of the array:
-    call json%get(me, path=path, array_callback=get_logical_from_array, found=found)
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
 
-    contains
+    call json%get(p, vec)
 
-        subroutine get_logical_from_array(json, element, i, count)
-
-        !! callback function for logical
-
-        implicit none
-
-        class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: element
-        integer(IK),intent(in)              :: i        !! index
-        integer(IK),intent(in)              :: count    !! size of array
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json%get(element, value=vec(i))
-
-        end subroutine get_logical_from_array
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
 
     end subroutine json_get_logical_vec_by_path
 !*****************************************************************************************
@@ -6748,44 +6871,22 @@
     character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                              :: found
 
-    logical(LK) :: initialized
+    type(json_value),pointer :: p
 
-    initialized = .false.
+    call json%get(me, path, p, found)
 
-    !the callback function is called for each element of the array:
-    call json%get(me, path=path, array_callback=get_chars_from_array, found=found)
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
 
-    contains
+    call json%get(p, vec)
 
-        subroutine get_chars_from_array(json, element, i, count)
-
-        !! callback function for chars
-
-        implicit none
-
-        class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: element
-        integer(IK),intent(in)              :: i        !! index
-        integer(IK),intent(in)              :: count    !! size of array
-
-        character(kind=CK,len=:),allocatable :: cval
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json%get(element, value=cval)
-        if (allocated(cval)) then
-            vec(i) = cval
-            deallocate(cval)
-        else
-            vec(i) = CK_''
-        end if
-
-        end subroutine get_chars_from_array
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
 
     end subroutine json_get_string_vec_by_path
 !*****************************************************************************************
@@ -6810,9 +6911,155 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!> author: Jacob Williams
+!  date: 12/16/2016
+!
+!  Get a string vector from a [[json_value(type)]]. This is an alternate
+!  version of [[json_get_string_vec]]. This one returns an allocatable
+!  length character (where the string length is the maximum length of
+!  any element in the array). It also returns an integer array of the
+!  actual sizes of the strings in the JSON structure.
+!
+!@note This is somewhat inefficient since it does
+!      cycle through the array twice.
+!
+!@warning The allocation of `vec` doesn't work with
+!         gfortran 4.9 or 5 due to compiler bugs
+
+    subroutine json_get_alloc_string_vec(json, me, vec, ilen)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+
+    logical(LK) :: initialized !! if the output array has been sized
+    integer(IK) :: max_len     !! the length of the longest string in the array
+
+    initialized = .false.
+
+    call json%string_info(me,ilen=ilen,max_str_len=max_len)
+    if (.not. json%exception_thrown) then
+        ! now get each string using the callback function:
+        call json%get(me, array_callback=get_chars_from_array)
+    end if
+
+    contains
+
+        subroutine get_chars_from_array(json, element, i, count)
+
+        !! callback function for chars
+
+        implicit none
+
+        class(json_core),intent(inout)      :: json
+        type(json_value),pointer,intent(in) :: element
+        integer(IK),intent(in)              :: i        !! index
+        integer(IK),intent(in)              :: count    !! size of array
+
+        character(kind=CK,len=:),allocatable :: cval  !! for getting string
+
+        !size the output array:
+        if (.not. initialized) then
+            ! string length long enough to hold the longest one
+            ! Note that this doesn't work with gfortran 4.9 or 5.
+            allocate( character(kind=CK,len=max_len) :: vec(count) )
+            initialized = .true.
+        end if
+
+        !populate the elements:
+        call json%get(element, value=cval)
+        if (allocated(cval)) then
+            vec(i)  = cval
+            ilen(i) = len(cval)  ! return the actual length
+            deallocate(cval)
+        else
+            vec(i)  = CK_''
+            ilen(i) = 0
+        end if
+
+        end subroutine get_chars_from_array
+
+    end subroutine json_get_alloc_string_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
 !>
-!  This routine calls the user-supplied [[json_array_callback_func]] subroutine
-!      for each element in the array.
+!  Alternate version of [[json_get_alloc_string_vec]] where input is the path.
+!
+!  This is an alternate version of [[json_get_string_vec_by_path]].
+!  This one returns an allocatable length character (where the string
+!  length is the maximum length of any element in the array). It also
+!  returns an integer array of the actual sizes of the strings in the
+!  JSON structure.
+!
+!@note An alternative to using this routine is to use [[json_get_array]] with
+!      a callback function that gets the string from each element and populates
+!      a user-defined string type.
+
+    subroutine json_get_alloc_string_vec_by_path(json, me, path, vec, ilen, found)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: me
+    character(kind=CK,len=*),intent(in) :: path
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+    logical(LK),intent(out),optional :: found
+
+    type(json_value),pointer :: p
+
+    call json%get(me, path, p, found)
+
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
+
+    call json%get(p, vec, ilen)
+
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
+
+    end subroutine json_get_alloc_string_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_alloc_string_vec_by_path]], where "path" is kind=CDK
+
+    subroutine wrap_json_get_alloc_string_vec_by_path(json,me,path,vec,ilen,found)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer,intent(in)   :: me
+    character(kind=CDK,len=*),intent(in)  :: path
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+    logical(LK),intent(out),optional :: found
+
+    call json%get(me,to_unicode(path),vec,ilen,found)
+
+    end subroutine wrap_json_get_alloc_string_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  This routine calls the user-supplied [[json_array_callback_func]]
+!  subroutine for each element in the array.
 !
 !@note For integer, double, logical, and character arrays,
 !      higher-level routines are provided (see `get` methods), so
