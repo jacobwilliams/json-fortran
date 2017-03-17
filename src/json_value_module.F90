@@ -6963,17 +6963,17 @@
         !size the output array:
         if (.not. initialized) then
             ! string length long enough to hold the longest one
-#if defined __GFORTRAN__
-            ! this is a work-around for a bug
-            ! in the gfortran 4.9 compiler.
-            call allocate_vec(max_len,count)
-            !block
-            !    character(kind=CK,len=max_len),dimension(count) :: tmp_array
-            !    vec = tmp_array
-            !end block
-#else
+!#if defined __GFORTRAN__
+!            ! this is a work-around for a bug
+!            ! in the gfortran 4.9 compiler.
+!            call allocate_vec(max_len,count)
+!            !block
+!            !    character(kind=CK,len=max_len),dimension(count) :: tmp_array
+!            !    vec = tmp_array
+!            !end block
+!#else
             allocate( character(kind=CK,len=max_len) :: vec(count) )
-#endif
+!#endif
             initialized = .true.
         end if
 
@@ -6990,20 +6990,20 @@
 
         end subroutine get_chars_from_array
 
-        subroutine allocate_vec(max_len,count)
-
-        !! try to allocate on assignment to avoid gfortran bug.
-
-        implicit none
-
-        integer(IK),intent(in) :: max_len
-        integer(IK),intent(in) :: count
-
-        character(kind=CK,len=max_len),dimension(count) :: tmp_array
-
-        vec = tmp_array
-
-        end subroutine allocate_vec
+        !subroutine allocate_vec(max_len,count)
+!
+        !!! try to allocate on assignment to avoid gfortran bug.
+!
+        !implicit none
+!
+        !integer(IK),intent(in) :: max_len
+        !integer(IK),intent(in) :: count
+!
+        !character(kind=CK,len=max_len),dimension(count) :: tmp_array
+!
+        !vec = tmp_array
+!
+        !end subroutine allocate_vec
 
     end subroutine json_get_alloc_string_vec
 !*****************************************************************************************
