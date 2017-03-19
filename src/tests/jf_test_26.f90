@@ -14,7 +14,7 @@ contains
     integer,intent(out) :: error_cnt
 
     type(json_core) :: json
-    type(json_value),pointer :: p
+    type(json_value),pointer :: p,tmp
     type(json_file) :: f
     logical(lk) :: is_valid
     character(kind=CK,len=:),allocatable :: error_msg
@@ -39,6 +39,12 @@ contains
     call f%add(ck_'test.vector.unicode(2)',  [cdk_'ck, cdk'])
     call f%add(cdk_'test.vector.unicode(3)', [ck_'cdk, ck'])
     call f%add(cdk_'test.vector.unicode(4)', [cdk_'cdk, cdk'])
+
+    !add a json_value pointer:
+    call json%create_integer(tmp,999,'') ! note that the name will be replaced
+                                         ! with the name given in the path
+                                         ! when it is added.
+    call f%add('inputs.pointer',tmp)
 
     write(error_unit,'(A)') 'validating...'
     call f%get(p)
