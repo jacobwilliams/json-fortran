@@ -570,7 +570,7 @@
         !````fortran
         !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json%create_integer(p,'value',42)
+        !    call json%create_integer(p,42,'value')
         !````
         generic,public :: create_integer => MAYBEWRAP(json_value_create_integer)
         procedure :: MAYBEWRAP(json_value_create_integer)
@@ -7690,8 +7690,8 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name  !! variable name
     logical(LK),intent(in)              :: val   !! variable value
+    character(kind=CK,len=*),intent(in) :: name  !! variable name
 
     call json_value_create(p)
     call to_logical(p,val,name)
@@ -7711,8 +7711,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
     logical(LK),intent(in)               :: val
+    character(kind=CDK,len=*),intent(in) :: name
 
     call json%create_logical(p,val,to_unicode(name))
 
@@ -7738,8 +7738,8 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
     integer(IK),intent(in)              :: val
+    character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
     call to_integer(p,val,name)
@@ -7760,8 +7760,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
     integer(IK),intent(in)               :: val
+    character(kind=CDK,len=*),intent(in) :: name
 
     call json%create_integer(p,val,to_unicode(name))
 
@@ -7787,8 +7787,8 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
     real(RK),intent(in)                 :: val
+    character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
     call to_double(p,val,name)
@@ -7809,8 +7809,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
     real(RK),intent(in)                  :: val
+    character(kind=CDK,len=*),intent(in) :: name
 
     call json%create_double(p,val,to_unicode(name))
 
@@ -7836,8 +7836,8 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
     character(kind=CK,len=*),intent(in) :: val
+    character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
     call to_string(p,val,name)
@@ -7858,8 +7858,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
     character(kind=CDK,len=*),intent(in) :: val
+    character(kind=CDK,len=*),intent(in) :: name
 
     call json%create_string(p,to_unicode(val),to_unicode(name))
 
