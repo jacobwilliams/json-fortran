@@ -4894,7 +4894,13 @@
 
             else
 
-                call write_it( start_array )
+                call write_it( s//start_array )
+
+                !if an array is in an array, there is an extra tab:
+                if (is_array) then
+                    if ( .not. json%no_whitespace) tab = tab+1
+                    spaces = tab*json%spaces_per_tab
+                end if
 
                 nullify(element)
                 element => p%children
