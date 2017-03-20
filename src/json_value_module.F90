@@ -4354,8 +4354,8 @@
 !
 !# History
 !  * JW : 1/4/2014 : Original routine removed.
-!    Now using n_children variable.
-!    Renamed from json_value_count.
+!    Now using `n_children` variable.
+!    Renamed from `json_value_count`.
 
     function json_count(json,p) result(count)
 
@@ -4380,7 +4380,7 @@
 !  date: 10/16/2015
 !
 !  Returns a pointer to the parent of a [[json_value]].
-!  If there is no parent, then a null() pointer is returned.
+!  If there is no parent, then a `null()` pointer is returned.
 
     subroutine json_get_parent(json,p,parent)
 
@@ -4388,7 +4388,7 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p        !! JSON object
-    type(json_value),pointer,intent(out) :: parent   !! pointer to parent
+    type(json_value),pointer,intent(out) :: parent   !! pointer to `parent`
 
     if (associated(p)) then
         parent => p%parent
@@ -4406,7 +4406,7 @@
 !  date: 10/31/2015
 !
 !  Returns a pointer to the next of a [[json_value]].
-!  If there is no next, then a null() pointer is returned.
+!  If there is no next, then a `null()` pointer is returned.
 
     subroutine json_get_next(json,p,next)
 
@@ -4414,7 +4414,7 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p       !! JSON object
-    type(json_value),pointer,intent(out) :: next    !! pointer to next
+    type(json_value),pointer,intent(out) :: next    !! pointer to `next`
 
     if (associated(p)) then
         next => p%next
@@ -4432,7 +4432,7 @@
 !  date: 10/31/2015
 !
 !  Returns a pointer to the previous of a [[json_value]].
-!  If there is no previous, then a null() pointer is returned.
+!  If there is no previous, then a `null()` pointer is returned.
 
     subroutine json_get_previous(json,p,previous)
 
@@ -4440,7 +4440,7 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p        !! JSON object
-    type(json_value),pointer,intent(out) :: previous !! pointer to previous
+    type(json_value),pointer,intent(out) :: previous !! pointer to `previous`
 
     if (associated(p)) then
         previous => p%previous
@@ -4459,7 +4459,7 @@
 !
 !  Returns a pointer to the tail of a [[json_value]]
 !  (the last child of an array of object).
-!  If there is no tail, then a null() pointer is returned.
+!  If there is no tail, then a `null()` pointer is returned.
 
     subroutine json_get_tail(json,p,tail)
 
@@ -4467,7 +4467,7 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p        !! JSON object
-    type(json_value),pointer,intent(out) :: tail     !! pointer to tail
+    type(json_value),pointer,intent(out) :: tail     !! pointer to `tail`
 
     if (associated(p)) then
         tail => p%tail
@@ -4491,6 +4491,8 @@
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: p      !! object or array JSON data
     integer(IK),intent(in)              :: idx    !! index of the child
+                                                  !! (this is a 1-based Fortran
+                                                  !! style array index).
     type(json_value),pointer            :: child  !! pointer to the child
     logical(LK),intent(out),optional    :: found  !! true if the value was found
                                                   !! (if not present, an exception
@@ -4753,7 +4755,7 @@
 !
 !# Notes
 !  * This is an internal routine called by the various wrapper routines.
-!  * The reason the str argument is non-optional is because of a
+!  * The reason the `str` argument is non-optional is because of a
 !    bug in v4.9 of the gfortran compiler.
 
     recursive subroutine json_value_print(json,p,iunit,str,indent,&
@@ -5042,7 +5044,7 @@
 !  It uses either of two methods:
 !
 !  * The original JSON-Fortran defaults
-!  * RFC 6901
+!  * [RFC 6901](https://tools.ietf.org/html/rfc6901)
 
     subroutine json_get_by_path(json, me, path, p, found)
 
@@ -5498,10 +5500,10 @@
 !
 !  Note that trailing whitespace significance and case sensitivity
 !  are user-specified. To fully conform to the RFC 6901 standard,
-!  should probably set:
+!  should probably set (via `initialize`):
 !
-!  * trailing_spaces_significant = .true. [this is not the default setting]
-!  * case_sensitive_keys = .true.         [this is the default setting]
+!  * `trailing_spaces_significant` = .true. [this is not the default setting]
+!  * `case_sensitive_keys` = .true.         [this is the default setting]
 !
 !### Example
 !
@@ -5520,6 +5522,9 @@
 !
 !@note Not doing anything special about the `-` character to index an array.
 !      This is considered a normal error.
+!
+!@note Unlike in the default path mode, the array indices here are 0-based
+!      (in accordance with the RFC 6901 standard)
 !
 !@warning Not checking if the member that is referenced is unique.
 !         (according to the standard, evaluation of non-unique references
