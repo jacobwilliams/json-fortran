@@ -38,3 +38,9 @@
                                                                    !! Example: `.` [default] or `%`.
                                                                    !! Note: if `path_mode/=1`
                                                                    !! then this is ignored.
+   logical(LK),intent(in),optional :: compress_vectors  !! If true, then arrays of integers,
+                                                        !! nulls, doubles, and logicals are
+                                                        !! printed all on one line.
+                                                        !! [Note: `no_whitespace` will
+                                                        !! override this option if necessary].
+                                                        !! (Default is False).

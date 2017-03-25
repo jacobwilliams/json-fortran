@@ -222,6 +222,12 @@
                                                          !! Note: if `path_mode/=1`
                                                          !! then this is ignored.
 
+        logical(LK) :: compress_vectors = .false. !! If true, then arrays of integers,
+                                                  !! nulls, doubles, & logicals are
+                                                  !! printed all on one line.
+                                                  !! [Note: `no_whitespace` will
+                                                  !! override this option if necessary]
+
         contains
 
         private
@@ -757,7 +763,8 @@
                                   unescape_strings,&
                                   comment_char,&
                                   path_mode,&
-                                  path_separator) result(json_core_object)
+                                  path_separator,&
+                                  compress_vectors) result(json_core_object)
 
     implicit none
 
@@ -773,7 +780,8 @@
                                 unescape_strings,&
                                 comment_char,&
                                 path_mode,&
-                                path_separator)
+                                path_separator,&
+                                compress_vectors)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -806,7 +814,8 @@
                                unescape_strings,&
                                comment_char,&
                                path_mode,&
-                               path_separator)
+                               path_separator,&
+                               compress_vectors)
 
     implicit none
 
@@ -871,6 +880,11 @@
     ! path separator:
     if (present(path_separator)) then
         json%path_separator = path_separator
+    end if
+
+    ! printing vectors in compressed form:
+    if (present(compress_vectors)) then
+        json%compress_vectors = compress_vectors
     end if
 
     !Set the format for real numbers:
@@ -4759,7 +4773,8 @@
 !    bug in v4.9 of the gfortran compiler.
 
     recursive subroutine json_value_print(json,p,iunit,str,indent,&
-                                          need_comma,colon,is_array_element)
+                                          need_comma,colon,is_array_element,&
+                                          is_compressed_vector)
 
     implicit none
 
@@ -4775,16 +4790,28 @@
                                                       !! printed to this string rather than
                                                       !! a file. This mode is used by
                                                       !! [[json_value_to_string]].
+    logical(LK),intent(in),optional :: is_compressed_vector  !! if True, this is an element
+                                                             !! from an array being printed
+                                                             !! on one line [default is False]
 
-    character(kind=CK,len=max_numeric_str_len) :: tmp !for val to string conversions
+    character(kind=CK,len=max_numeric_str_len) :: tmp !! for val to string conversions
     character(kind=CK,len=:),allocatable :: s
     type(json_value),pointer :: element
     integer(IK) :: tab, i, count, spaces
     logical(LK) :: print_comma
     logical(LK) :: write_file, write_string
     logical(LK) :: is_array
+    integer(IK) :: var_type,var_type_prev
+    logical(LK) :: is_vector !! if all elements of a vector
+                             !! are scalars of the same type
 
     if (.not. json%exception_thrown) then
+
+        if (present(is_compressed_vector)) then
+            is_vector = is_compressed_vector
+        else
+            is_vector = .false.
+        end if
 
         !whether to write a string or a file (one or the other):
         write_string = (iunit==unit2str)
@@ -4890,13 +4917,42 @@
 
             count = json%count(p)
 
+            if (json%compress_vectors) then
+                ! check to see if every child is the same type,
+                ! and a scalar:
+                is_vector = .true.
+                var_type_prev = -1   ! an invalid value
+                nullify(element)
+                element => p%children
+                do i = 1, count
+                    if (.not. associated(element)) then
+                        call json%throw_exception('Error in json_value_print: '//&
+                                                  'Malformed JSON linked list')
+                        return
+                    end if
+                    ! check variable type of all the children.
+                    ! They must all be the same, and a scalar.
+                    call json%info(element,var_type=var_type)
+                    if (i>1 .and. (var_type/=var_type_prev .or. &
+                        any(var_type==[json_object,json_array]))) then
+                        is_vector = .false.
+                        exit
+                    end if
+                    var_type_prev = var_type
+                    ! get the next child the list:
+                    element => element%next
+                end do
+            else
+                is_vector = .false.
+            end if
+
             if (count==0) then    !special case for empty array
 
                 call write_it( s//start_array//end_array, comma=print_comma )
 
             else
 
-                call write_it( s//start_array )
+                call write_it( s//start_array, advance=(.not. is_vector) )
 
                 !if an array is in an array, there is an extra tab:
                 if (is_array) then
@@ -4915,30 +4971,44 @@
                     end if
 
                     ! recursive print of the element
-                    call json%json_value_print(element, iunit=iunit, indent=tab,&
-                                    need_comma=i<count, is_array_element=.true., str=str)
-
+                    if (is_vector) then
+                        call json%json_value_print(element, iunit=iunit, indent=0,&
+                                        need_comma=i<count, is_array_element=.false., str=str,&
+                                        is_compressed_vector = .true.)
+                    else
+                        call json%json_value_print(element, iunit=iunit, indent=tab,&
+                                        need_comma=i<count, is_array_element=.true., str=str)
+                    end if
                     ! get the next child the list:
                     element => element%next
 
                 end do
 
                 !indent the closing array character:
-                call write_it( repeat(space, max(0,spaces-json%spaces_per_tab))//end_array,&
-                               comma=print_comma )
+                if (is_vector) then
+                    call write_it( end_array,comma=print_comma )
+                else
+                    call write_it( repeat(space, max(0,spaces-json%spaces_per_tab))//end_array,&
+                                   comma=print_comma )
+                end if
                 nullify(element)
 
             end if
 
         case (json_null)
 
-            call write_it( s//null_str, comma=print_comma )
+            call write_it( s//null_str, comma=print_comma, &
+                            advance=(.not. is_vector),&
+                            space_after_comma=is_vector )
 
         case (json_string)
 
             if (allocated(p%str_value)) then
                 call write_it( s//quotation_mark// &
-                               p%str_value//quotation_mark, comma=print_comma )
+                               p%str_value//quotation_mark, &
+                               comma=print_comma, &
+                               advance=(.not. is_vector),&
+                               space_after_comma=is_vector )
             else
                 call json%throw_exception('Error in json_value_print:'//&
                                           ' p%value_string not allocated')
@@ -4948,16 +5018,22 @@
         case (json_logical)
 
             if (p%log_value) then
-                call write_it( s//true_str, comma=print_comma )
+                call write_it( s//true_str, comma=print_comma, &
+                                advance=(.not. is_vector),&
+                                space_after_comma=is_vector )
             else
-                call write_it( s//false_str, comma=print_comma )
+                call write_it( s//false_str, comma=print_comma, &
+                                advance=(.not. is_vector),&
+                                space_after_comma=is_vector )
             end if
 
         case (json_integer)
 
             call integer_to_string(p%int_value,int_fmt,tmp)
 
-            call write_it( s//trim(tmp), comma=print_comma )
+            call write_it( s//trim(tmp), comma=print_comma, &
+                            advance=(.not. is_vector),&
+                            space_after_comma=is_vector )
 
         case (json_double)
 
@@ -4968,7 +5044,9 @@
                 call real_to_string(p%dbl_value,default_real_fmt,json%compact_real,tmp)
             end if
 
-            call write_it( s//trim(tmp), comma=print_comma )
+            call write_it( s//trim(tmp), comma=print_comma, &
+                            advance=(.not. is_vector),&
+                            space_after_comma=is_vector )
 
         case default
 
@@ -4983,18 +5061,20 @@
 
     contains
 
-        subroutine write_it(s,advance,comma)
+        subroutine write_it(s,advance,comma,space_after_comma)
 
         !! write the string to the file (or the output string)
 
         implicit none
 
-        character(kind=CK,len=*),intent(in) :: s        !! string to print
-        logical(LK),intent(in),optional     :: advance  !! to add line break or not
-        logical(LK),intent(in),optional     :: comma    !! print comma after the string
+        character(kind=CK,len=*),intent(in) :: s  !! string to print
+        logical(LK),intent(in),optional :: advance           !! to add line break or not
+        logical(LK),intent(in),optional :: comma             !! print comma after the string
+        logical(LK),intent(in),optional :: space_after_comma !! print a space after the comma
 
         logical(LK) :: add_comma       !! if a delimiter is to be added after string
         logical(LK) :: add_line_break  !! if a line break is to be added after string
+        logical(LK) :: add_space       !! if a space is to be added after the comma
         character(kind=CK,len=:),allocatable :: s2  !! temporary string
 
         if (present(comma)) then
@@ -5002,7 +5082,15 @@
         else
             add_comma = .false. !default is not to add comma
         end if
-
+        if (json%no_whitespace) then
+            add_space = .false.
+        else
+            if (present(space_after_comma)) then
+                add_space = space_after_comma
+            else
+                add_space = .false. !default is not to add space
+            end if
+        end if
         if (present(advance)) then
             add_line_break = advance
         else
@@ -5012,7 +5100,10 @@
 
         !string to print:
         s2 = s
-        if (add_comma) s2 = s2 // delimiter
+        if (add_comma) then
+            s2 = s2 // delimiter
+            if (add_space) s2 = s2 // space
+        end if
 
         if (write_file) then
 
