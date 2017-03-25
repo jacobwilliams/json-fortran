@@ -4933,8 +4933,9 @@
                     ! check variable type of all the children.
                     ! They must all be the same, and a scalar.
                     call json%info(element,var_type=var_type)
-                    if (i>1 .and. (var_type/=var_type_prev .or. &
-                        any(var_type==[json_object,json_array]))) then
+                    if (var_type==json_object .or. &
+                        var_type==json_array .or. &
+                        (i>1 .and. var_type/=var_type_prev)) then
                         is_vector = .false.
                         exit
                     end if
