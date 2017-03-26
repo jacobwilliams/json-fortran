@@ -337,7 +337,8 @@
                                             unescape_strings,&
                                             comment_char,&
                                             path_mode,&
-                                            path_separator)
+                                            path_separator,&
+                                            compress_vectors)
 
     implicit none
 
@@ -353,7 +354,8 @@
                             unescape_strings,&
                             comment_char,&
                             path_mode,&
-                            path_separator)
+                            path_separator,&
+                            compress_vectors)
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
@@ -416,7 +418,8 @@
                                   unescape_strings,&
                                   comment_char,&
                                   path_mode,&
-                                  path_separator) result(file_object)
+                                  path_separator,&
+                                  compress_vectors) result(file_object)
 
     implicit none
 
@@ -434,7 +437,8 @@
                                 unescape_strings,&
                                 comment_char,&
                                 path_mode,&
-                                path_separator)
+                                path_separator,&
+                                compress_vectors)
 
     if (present(p)) file_object%p => p
 
