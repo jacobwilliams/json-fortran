@@ -8899,6 +8899,9 @@
 
         end if
 
+        !character count in the current line
+        json%char_count = json%char_count - 1
+
     end if
 
     end subroutine push_char
