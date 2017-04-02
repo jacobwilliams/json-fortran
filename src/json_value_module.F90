@@ -2965,6 +2965,8 @@
     type(json_value),pointer       :: p       !! a JSON object or array.
     integer(IK),intent(in)         :: idx     !! the index of the child of `p` to
                                               !! insert the new element after
+                                              !! (this is a 1-based Fortran
+                                              !! style array index)
     type(json_value),pointer       :: element !! the element to insert
 
     type(json_value),pointer :: tmp  !! for getting the `idx`-th child of `p`
@@ -6228,6 +6230,15 @@
 
     logical(LK) :: initialized
 
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(vec(0))
+            return
+        end if
+    end select
+
     initialized = .false.
 
     !the callback function is called for each element of the array:
@@ -6440,6 +6451,15 @@
 
     logical(LK) :: initialized
 
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(vec(0))
+            return
+        end if
+    end select
+
     initialized = .false.
 
     !the callback function is called for each element of the array:
@@ -6647,6 +6667,15 @@
     logical(LK),dimension(:),allocatable,intent(out) :: vec
 
     logical(LK) :: initialized
+
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(vec(0))
+            return
+        end if
+    end select
 
     initialized = .false.
 
@@ -6920,6 +6949,15 @@
 
     logical(LK) :: initialized
 
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(vec(0))
+            return
+        end if
+    end select
+
     initialized = .false.
 
     !the callback function is called for each element of the array:
@@ -7042,6 +7080,16 @@
 
     logical(LK) :: initialized !! if the output array has been sized
     integer(IK) :: max_len     !! the length of the longest string in the array
+
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(character(kind=CK,len=0) :: vec(0))
+            allocate(ilen(0))
+            return
+        end if
+    end select
 
     initialized = .false.
 

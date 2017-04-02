@@ -33,6 +33,12 @@ contains
     real(wp) :: rval
     logical :: found
     logical :: lval
+    integer,dimension(:),allocatable :: ivec
+    integer,dimension(:),allocatable :: ilen
+    real(wp),dimension(:),allocatable :: rvec
+    character(kind=json_CK,len=1),dimension(:),allocatable :: cvec
+    character(kind=json_CK,len=:),dimension(:),allocatable :: acvec
+    logical,dimension(:),allocatable :: lvec
 
     error_cnt = 0
     call json%initialize()
@@ -219,6 +225,20 @@ contains
         error_cnt = error_cnt + 1
       else
         write(error_unit,'(A)') 'files[5] = '//trim(cval)
+      end if
+
+      ! test empty array (each type):
+      write(error_unit,'(A)') ''
+                               call json%get('empty_array', ivec  )
+      if (.not. json%failed()) call json%get('empty_array', rvec  )
+      if (.not. json%failed()) call json%get('empty_array', cvec  )
+      if (.not. json%failed()) call json%get('empty_array', acvec, ilen )
+      if (.not. json%failed()) call json%get('empty_array', lvec  )
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A)') 'empty_array = ',ivec
       end if
 
       !
