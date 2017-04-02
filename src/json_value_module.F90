@@ -73,7 +73,7 @@
     !  Normally, this should always be a pointer variable.
     !  This type should only be used by an instance of [[json_core(type)]].
     !
-    !# Example
+    !### Example
     !
     !  The following test program:
     !
@@ -435,7 +435,7 @@
         !>
         !  Print the [[json_value]] to a file.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -452,7 +452,7 @@
         !  This must be called explicitly if it is no longer needed,
         !  before it goes out of scope.  Otherwise, a memory leak will result.
         !
-        !# Example
+        !### Example
         !
         !  Destroy the [[json_value]] pointer before the variable goes out of scope:
         !````fortran
@@ -498,7 +498,7 @@
         !  Allocate a [[json_value]] pointer and make it a double variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -512,7 +512,7 @@
         !  Allocate a [[json_value]] pointer and make it an array variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -526,7 +526,7 @@
         !  Allocate a [[json_value]] pointer and make it an object variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -543,7 +543,7 @@
         !  Allocate a json_value pointer and make it a null variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -557,7 +557,7 @@
         !  Allocate a json_value pointer and make it a string variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -571,7 +571,7 @@
         !  Allocate a json_value pointer and make it an integer variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -585,7 +585,7 @@
         !  Allocate a json_value pointer and make it a logical variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -687,7 +687,7 @@
     !  Structure constructor to initialize a
     !  [[json_core(type)]] object
     !
-    !# Example
+    !### Example
     !
     !```fortran
     ! type(json_file)  :: json_core
@@ -798,14 +798,14 @@
 !  It can also be called to clear exceptions, or to reset some
 !  of the variables (note that only the arguments present are changed).
 !
-!# Modified
+!### Modified
 !  * Izaak Beekman : 02/24/2015
 !
 !@note [[initialize_json_core]], [[json_initialize]],
 !      [[initialize_json_core_in_file]], and [[initialize_json_file]]
 !      all have a similar interface.
 
-    subroutine json_initialize(json,verbose,compact_reals,&
+    subroutine json_initialize(me,verbose,compact_reals,&
                                print_signs,real_format,spaces_per_tab,&
                                strict_type_checking,&
                                trailing_spaces_significant,&
@@ -819,26 +819,26 @@
 
     implicit none
 
-    class(json_core),intent(inout)  :: json
+    class(json_core),intent(inout)  :: me
 #include "json_initialize_arguments.inc"
 
-    character(kind=CDK,len=10) :: w  !! max string length
-    character(kind=CDK,len=10) :: d  !! real precision digits
-    character(kind=CDK,len=10) :: e  !! real exponent digits
-    character(kind=CDK,len=2)  :: sgn  !! sign flag: `ss` or `sp`
-    character(kind=CDK,len=2)  :: rl_edit_desc  !! `G`, `E`, `EN`, or `ES`
-    integer(IK)                :: istat  !! `iostat` flag for write statements
-    logical(LK)                :: sgn_prnt  !! print sign flag
+    character(kind=CDK,len=10) :: w            !! max string length
+    character(kind=CDK,len=10) :: d            !! real precision digits
+    character(kind=CDK,len=10) :: e            !! real exponent digits
+    character(kind=CDK,len=2)  :: sgn          !! sign flag: `ss` or `sp`
+    character(kind=CDK,len=2)  :: rl_edit_desc !! `G`, `E`, `EN`, or `ES`
+    integer(IK)                :: istat        !! `iostat` flag for write statements
+    logical(LK)                :: sgn_prnt     !! print sign flag
 
     !reset exception to false:
-    call json%clear_exceptions()
+    call me%clear_exceptions()
 
     !Just in case, clear these global variables also:
-    json%pushed_index = 0
-    json%pushed_char  = CK_''
-    json%char_count   = 0
-    json%line_count   = 1
-    json%ipos         = 1
+    me%pushed_index = 0
+    me%pushed_char  = CK_''
+    me%char_count   = 0
+    me%line_count   = 1
+    me%ipos         = 1
 
 #ifdef USE_UCS4
     ! reopen stdout and stderr with utf-8 encoding
@@ -848,49 +848,49 @@
 
     !various optional inputs:
     if (present(spaces_per_tab)) &
-        json%spaces_per_tab = spaces_per_tab
+        me%spaces_per_tab = spaces_per_tab
     if (present(verbose)) &
-        json%is_verbose = verbose
+        me%is_verbose = verbose
     if (present(strict_type_checking)) &
-        json%strict_type_checking = strict_type_checking
+        me%strict_type_checking = strict_type_checking
     if (present(trailing_spaces_significant)) &
-        json%trailing_spaces_significant = trailing_spaces_significant
+        me%trailing_spaces_significant = trailing_spaces_significant
     if (present(case_sensitive_keys)) &
-        json%case_sensitive_keys = case_sensitive_keys
+        me%case_sensitive_keys = case_sensitive_keys
     if (present(no_whitespace)) &
-        json%no_whitespace = no_whitespace
+        me%no_whitespace = no_whitespace
     if (present(unescape_strings)) &
-        json%unescaped_strings = unescape_strings
+        me%unescaped_strings = unescape_strings
     if (present(path_mode)) then
         if (path_mode==1_IK .or. path_mode==2_IK) then
-            json%path_mode = path_mode
+            me%path_mode = path_mode
         else
-            json%path_mode = 1_IK  ! just to have a valid value
-            call json%throw_exception('Invalid path_mode.')
+            me%path_mode = 1_IK  ! just to have a valid value
+            call me%throw_exception('Invalid path_mode.')
         end if
     end if
 
     ! if we are allowing comments in the file:
     ! [an empty string disables comments]
     if (present(comment_char)) then
-        json%allow_comments = comment_char/=CK_''
-        json%comment_char = comment_char
+        me%allow_comments = comment_char/=CK_''
+        me%comment_char = comment_char
     end if
 
     ! path separator:
     if (present(path_separator)) then
-        json%path_separator = path_separator
+        me%path_separator = path_separator
     end if
 
     ! printing vectors in compressed form:
     if (present(compress_vectors)) then
-        json%compress_vectors = compress_vectors
+        me%compress_vectors = compress_vectors
     end if
 
     !Set the format for real numbers:
     ! [if not changing it, then it remains the same]
 
-    if ( (.not. allocated(json%real_fmt)) .or. &  ! if this hasn't been done yet
+    if ( (.not. allocated(me%real_fmt)) .or. &  ! if this hasn't been done yet
           present(compact_reals) .or. &
           present(print_signs)   .or. &
           present(real_format) ) then
@@ -902,16 +902,16 @@
                 if (present(compact_reals)) then
                     ! we will also allow for compact reals with
                     ! '*' format, if both arguments are present.
-                    json%compact_real = compact_reals
+                    me%compact_real = compact_reals
                 else
-                    json%compact_real = .false.
+                    me%compact_real = .false.
                 end if
-                json%real_fmt = star
+                me%real_fmt = star
                 return
             end if
         end if
 
-        if (present(compact_reals)) json%compact_real = compact_reals
+        if (present(compact_reals)) me%compact_real = compact_reals
 
         !set defaults
         sgn_prnt = .false.
@@ -928,7 +928,7 @@
            case ('g','G','e','E','en','EN','es','ES')
               rl_edit_desc = real_format
            case default
-              call json%throw_exception('Invalid real format, "' // &
+              call me%throw_exception('Invalid real format, "' // &
                         trim(real_format) // '", passed to json_initialize.'// &
                         new_line('a') // 'Acceptable formats are: "G", "E", "EN", and "ES".' )
            end select
@@ -939,10 +939,10 @@
         if (istat==0) write(d,'(ss,I0)',iostat=istat) real_precision
         if (istat==0) write(e,'(ss,I0)',iostat=istat) real_exponent_digits
         if (istat==0) then
-            json%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) //&
+            me%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) //&
                             trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
         else
-            json%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // &
+            me%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // &
                             '27.17E4)'  !just use this one (should never happen)
         end if
 
@@ -996,7 +996,7 @@
 !
 !  Create a deep copy of a [[json_value]] linked-list structure.
 !
-!# Example
+!### Example
 !
 !````fortran
 !    program test
@@ -1405,7 +1405,7 @@
 !  The idea here is that if it is a valid matrix, it can be interoperable with
 !  a Fortran rank 2 array of the same type.
 !
-!# Example
+!### Example
 !
 !  The following example is an array with `var_type=json_integer`, `n_sets=3`, and `set_size=4`
 !
@@ -1747,7 +1747,7 @@
 !  If an error is thrown, before using the class again, [[json_initialize]]
 !  should be called to clean up before it is used again.
 !
-!# Example
+!### Example
 !
 !````fortran
 !     type(json_file) :: json
@@ -1762,7 +1762,7 @@
 !     end if
 !````
 !
-!# See also
+!### See also
 !  * [[json_failed]]
 
     subroutine json_check_for_errors(json,status_ok,error_msg)
@@ -1794,7 +1794,7 @@
 !
 !  Logical function to indicate if an exception has been thrown in a [[json_core(type)]].
 !
-!# Example
+!### Example
 !
 !````fortran
 !    type(json_core) :: json
@@ -1824,7 +1824,7 @@
 !    end if
 !````
 !
-!# See also
+!### See also
 !  * [[json_check_for_errors]]
 
     pure function json_failed(json) result(failed)
@@ -1845,7 +1845,7 @@
 !  Allocate a [[json_value]] pointer variable.
 !  This should be called before adding data to it.
 !
-!# Example
+!### Example
 !
 !````fortran
 !    type(json_value),pointer :: var
@@ -1853,7 +1853,7 @@
 !    call to_double(var,1.0_RK)
 !````
 !
-!# Notes
+!### Notes
 !  1. This routine does not check for exceptions.
 !  2. The pointer should not already be allocated, or a memory leak will occur.
 
@@ -1941,7 +1941,7 @@
 !  Remove a [[json_value]] (and all its children)
 !  from a linked-list structure, preserving the rest of the structure.
 !
-!# Examples
+!### Examples
 !
 !  To extract an object from one JSON structure, and add it to another:
 !````fortran
@@ -1964,7 +1964,7 @@
 !     call json%remove(p)                  ! remove and destroy it
 !````
 !
-!# History
+!### History
 !  * Jacob Williams : 12/28/2014 : added destroy optional argument.
 
     subroutine json_value_remove(json,p,destroy)
@@ -4368,7 +4368,7 @@
 !>
 !  Count the number of children.
 !
-!# History
+!### History
 !  * JW : 1/4/2014 : Original routine removed.
 !    Now using `n_children` variable.
 !    Renamed from `json_value_count`.
@@ -4705,7 +4705,7 @@
     character(kind=CK,len=:),intent(out),allocatable :: str  !! prints structure to this string
 
     str = CK_''
-    call json%json_value_print(p, iunit=unit2str, str=str, indent=1, colon=.true.)
+    call json%json_value_print(p, iunit=unit2str, str=str, indent=1_IK, colon=.true.)
 
     end subroutine json_value_to_string
 !*****************************************************************************************
@@ -4728,7 +4728,7 @@
     character(kind=CK,len=:),allocatable :: dummy
 
     if (iunit/=unit2str) then
-        call json%json_value_print(p,iunit,str=dummy, indent=1, colon=.true.)
+        call json%json_value_print(p,iunit,str=dummy, indent=1_IK, colon=.true.)
     else
         call json%throw_exception('Error in json_print_1: iunit must not be -1.')
     end if
@@ -4769,7 +4769,7 @@
 !>
 !  Print the JSON structure to a string or a file.
 !
-!# Notes
+!### Notes
 !  * This is an internal routine called by the various wrapper routines.
 !  * The reason the `str` argument is non-optional is because of a
 !    bug in v4.9 of the gfortran compiler.
@@ -7392,7 +7392,7 @@
 !>
 !  Parse the JSON file and populate the [[json_value]] tree.
 !
-!# Inputs
+!### Inputs
 !
 !  The inputs can be:
 !
@@ -7400,7 +7400,7 @@
 !                      [note if unit is already open, then the filename is ignored]
 !  * `file`          : JSON is read from file using internal unit number
 !
-!# Example
+!### Example
 !
 !````fortran
 !    type(json_core) :: json
@@ -7408,7 +7408,7 @@
 !    call json%parse(file='myfile.json', p=p)
 !````
 !
-!# History
+!### History
 !  * Jacob Williams : 01/13/2015 : added read from string option.
 !  * Izaak Beekman  : 03/08/2015 : moved read from string to separate
 !    subroutine, and error annotation to separate subroutine.
@@ -7503,7 +7503,7 @@
 !>
 !  Parse the JSON string and populate the [[json_value]] tree.
 !
-!# See also
+!### See also
 !  * [[json_parse_file]]
 
     subroutine json_parse_string(json, p, str)
@@ -7828,7 +7828,7 @@
 !  Allocate a [[json_value]] pointer and make it a logical(LK) variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -7876,7 +7876,7 @@
 !  Allocate a [[json_value]] pointer and make it an integer(IK) variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -7925,7 +7925,7 @@
 !  Allocate a [[json_value]] pointer and make it a real(RK) variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -7974,7 +7974,7 @@
 !  Allocate a json_value pointer and make it a string variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -8023,7 +8023,7 @@
 !  Allocate a json_value pointer and make it a null variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -8070,7 +8070,7 @@
 !  Allocate a [[json_value]] pointer and make it an object variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -8120,7 +8120,7 @@
 !  Allocate a [[json_value]] pointer and make it an array variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -8253,16 +8253,16 @@
 !
 !  Change the [[json_value]] variable to a string.
 !
-!# Modified
+!### Modified
 !  * Izaak Beekman : 02/24/2015
-!
 
     subroutine to_string(p,val,name)
 
     implicit none
 
     type(json_value),intent(inout)               :: p
-    character(kind=CK,len=*),intent(in),optional :: val   !! if the value is also to be set (if not present, then '' is used).
+    character(kind=CK,len=*),intent(in),optional :: val   !! if the value is also to be set
+                                                          !! (if not present, then '' is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -8512,7 +8512,7 @@
 !>
 !  Parses a string while reading a JSON file.
 !
-!# History
+!### History
 !  * Jacob Williams : 6/16/2014 : Added hex validation.
 !  * Jacob Williams : 12/3/2015 : Fixed some bugs.
 
@@ -8771,7 +8771,7 @@
 !>
 !  Get the next character from the file (or string).
 !
-!# See also
+!### See also
 !  * [[push_char]]
 !
 !@note This routine ignores non-printing ASCII characters
@@ -8910,10 +8910,10 @@
 !>
 !  Core routine.
 !
-!# See also
+!### See also
 !  * [[pop_char]]
 !
-!# History
+!### History
 !  * Jacob Williams : 5/3/2015 : replaced original version of this routine.
 
     subroutine push_char(json,c)

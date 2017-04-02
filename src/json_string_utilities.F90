@@ -144,7 +144,7 @@
 !
 !  Convert a real value to a string.
 !
-!# Modified
+!### Modified
 !  * Izaak Beekman : 02/24/2015 : added the compact option.
 !  * Jacob Williams : 10/27/2015 : added the star option.
 
