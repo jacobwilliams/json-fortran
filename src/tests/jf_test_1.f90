@@ -36,8 +36,8 @@ contains
     integer,dimension(:),allocatable :: ivec
     integer,dimension(:),allocatable :: ilen
     real(wp),dimension(:),allocatable :: rvec
-    character(len=1),dimension(:),allocatable :: cvec
-    character(len=:),dimension(:),allocatable :: acvec
+    character(kind=json_CK,len=1),dimension(:),allocatable :: cvec
+    character(kind=json_CK,len=:),dimension(:),allocatable :: acvec
     logical,dimension(:),allocatable :: lvec
 
     error_cnt = 0

@@ -7085,7 +7085,7 @@
     select case (me%var_type)
     case (json_array)
         if (json%count(me)==0) then
-            allocate(character(len=0) :: vec(0))
+            allocate(character(kind=CK,len=0) :: vec(0))
             allocate(ilen(0))
             return
         end if
