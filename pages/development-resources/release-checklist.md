@@ -52,7 +52,7 @@ remain accurate.
 	 1. Add `pages/releases/index.md` to the git index: `git add pages/releases/index.md`
  1. Update the version string in remaining files requiring manual edits:
      1. Edit the `.VERSION` file
-     1. Edit the CMake example on line 123 of `README.md`
+     1. Edit the CMake example on line 117 of `README.md`
 	 1. Add both files to the git index: `git add .VERSION
      README.md`
  1. Commit the changes to the master branch: `git commit`

@@ -25,6 +25,9 @@ documentation from the documentation for official releases other than
 using the browser's back button. Feel free to bookmark this page, or
 the [main project page](|url|/index.html) for convenient navigation.
 
+* [5.3.0](http://jacobwilliams.github.io/json-fortran/5.3.0/index.html)
+   ([FORD](https://github.com/cmacmackin/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/5.3.0)
 * [5.2.0](http://jacobwilliams.github.io/json-fortran/5.2.0/index.html)
    ([FORD](https://github.com/cmacmackin/ford) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/5.2.0)

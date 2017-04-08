@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [5.3.0 (2017-04-07)](#530-2017-04-07)
     - [5.2.0 (2017-03-05)](#520-2017-03-05)
     - [5.1.0 (2016-08-14)](#510-2016-08-14)
     - [5.0.2 (2016-06-11)](#502-2016-06-11)
@@ -21,7 +22,29 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.2.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.3.0...HEAD)
+
+### [5.3.0](https://github.com/jacobwilliams/json-fortran/tree/5.3.0) (2017-04-07)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.2.0...5.3.0)
+or [Download v5.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/5.3.0)
+
+**Enhancements:**
+
+- It is now possible to build a JSON structure by specifying the paths to the variables. The `update` routines also now use this new feature so if the variable is not present, it will be added using the path (formerly, it added it as a name, which was inconsistent). Renamed the argument to the `update` routines from `name` to `path`.
+ [\#257](https://github.com/jacobwilliams/json-fortran/issues/257) [\#261](https://github.com/jacobwilliams/json-fortran/pull/261) [\#268](https://github.com/jacobwilliams/json-fortran/issues/268) [\#270](https://github.com/jacobwilliams/json-fortran/pull/270)  ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `get` routine to return an allocatable string array [\#245](https://github.com/jacobwilliams/json-fortran/issues/245) [\#265](https://github.com/jacobwilliams/json-fortran/pull/265) ([jacobwilliams](https://github.com/jacobwilliams))
+- Arrays of scalar values can now optionally be printed on a single line [\#228](https://github.com/jacobwilliams/json-fortran/issues/228) [\#273](https://github.com/jacobwilliams/json-fortran/pull/273) ([jacobwilliams](https://github.com/jacobwilliams))
+- When reading an empty JSON array it is now returned as an allocated array with zero length (rather than an unallocated array).
+ [\#276](https://github.com/jacobwilliams/json-fortran/issues/276) [\#277](https://github.com/jacobwilliams/json-fortran/pull/277) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fixed an issue where the `char_count` wasn’t always correct, which caused the error message for invalid JSON to be wrong.
+ [\#272](https://github.com/jacobwilliams/json-fortran/issues/272) [\#274](https://github.com/jacobwilliams/json-fortran/pull/274) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed an issue where values with significant trailing whitespace were being trimmed when printed. [\#263](https://github.com/jacobwilliams/json-fortran/issues/263) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed two bugs in `json_get_path` for RFC 6091 path mode. Special characters weren’t being encoded properly, and it didn't work if the final key was all whitespace. [\#262](https://github.com/jacobwilliams/json-fortran/issues/262) [\#264](https://github.com/jacobwilliams/json-fortran/pull/264) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed an issue with indenting of arrays within arrays. [\#269](https://github.com/jacobwilliams/json-fortran/issues/269) [\#271](https://github.com/jacobwilliams/json-fortran/pull/271) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [5.2.0](https://github.com/jacobwilliams/json-fortran/tree/5.2.0) (2017-03-05)
 
