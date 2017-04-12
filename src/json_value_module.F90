@@ -643,6 +643,7 @@
 
         procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
         procedure,public :: replace             => json_value_replace       !! Replace a [[json_value]] in a linked-list structure.
+        procedure,public :: reverse             => json_value_reverse       !! Reverse the order of the children of an array of object.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
         procedure,public :: count               => json_count               !! count the number of children
@@ -2069,6 +2070,54 @@
     call json%remove(p1,destroy_p1)
 
     end subroutine json_value_replace
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/11/2017
+!
+!  Reverse the order of the children of an array or object.
+
+    subroutine json_value_reverse(json,p)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p
+
+    type(json_value),pointer :: tmp       !! temp variable for traversing the list
+    type(json_value),pointer :: current   !! temp variable for traversing the list
+    integer(IK)              :: var_type  !! for getting the variable type
+
+    if (associated(p)) then
+
+        call json%info(p,var_type=var_type)
+
+        ! can only reverse objects or arrays
+        if (var_type==json_object .or. var_type==json_array) then
+
+            nullify(tmp)
+            current => p%children
+            p%tail => current
+
+            ! Swap next and previous for all nodes:
+            do
+                if (.not. associated(current)) exit
+                tmp              => current%previous
+                current%previous => current%next
+                current%next     => tmp
+                current          => current%previous
+            end do
+
+            if (associated(tmp)) then
+                p%children => tmp%previous
+            end if
+
+        end if
+
+    end if
+
+    end subroutine json_value_reverse
 !*****************************************************************************************
 
 !*****************************************************************************************
