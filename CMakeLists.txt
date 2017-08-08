@@ -410,5 +410,5 @@ configure_file(
 )
 install(FILES
    "${CMAKE_CURRENT_BINARY_DIR}/json-fortran.pc"
-   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+   DESTINATION "${INSTALL_LIB_DIR}/pkgconfig"
 )
