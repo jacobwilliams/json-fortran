@@ -288,13 +288,13 @@
         !  thrown if the existing variable is not a scalar).
         !
         !### See also
-        !  * [[add_by_path]] - this one can be used to change
+        !  * [[json_core(type):add_by_path]] - this one can be used to change
         !    arrays and objects to scalars if so desired.
         !
         !@note Unlike some routines, the `found` output is not optional,
         !      so it doesn't present exceptions from being thrown.
         !
-        !@note These have been mostly supplanted by the [[add_by_path]]
+        !@note These have been mostly supplanted by the [[json_core(type):add_by_path]]
         !      methods, which do a similar thing (and can be used for
         !      scalars and vectors, etc.)
         generic,public :: update => MAYBEWRAP(json_update_logical),&
@@ -379,7 +379,7 @@
         !  (This will create a `null` variable)
         !
         !### See also
-        !  * [[add_by_path]]
+        !  * [[json_core(type):add_by_path]]
 
         generic,public :: create => MAYBEWRAP(json_create_by_path)
         procedure :: MAYBEWRAP(json_create_by_path)
@@ -8579,6 +8579,7 @@
 !### History
 !  * Jacob Williams : 6/16/2014 : Added hex validation.
 !  * Jacob Williams : 12/3/2015 : Fixed some bugs.
+!  * Jacob Williams : 8/23/2015 : `string` is now returned unescaped.
 
     subroutine parse_string(json, unit, str, string)
 
