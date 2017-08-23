@@ -115,11 +115,12 @@
         type(json_value),pointer :: children => null()  !! first child item of this
         type(json_value),pointer :: tail     => null()  !! last child item of this
 
-        character(kind=CK,len=:),allocatable :: name  !! variable name
+        character(kind=CK,len=:),allocatable :: name  !! variable name (unescaped)
 
         real(RK),allocatable                 :: dbl_value  !! real data for this variable
         logical(LK),allocatable              :: log_value  !! logical data for this variable
         character(kind=CK,len=:),allocatable :: str_value  !! string data for this variable
+                                                           !! (unescaped)
         integer(IK),allocatable              :: int_value  !! integer data for this variable
 
         integer(IK) :: var_type = json_unknown  !! variable type
@@ -641,9 +642,12 @@
         generic,public :: get_path => MAYBEWRAP(json_get_path)
         procedure :: MAYBEWRAP(json_get_path)
 
-        procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
-        procedure,public :: replace             => json_value_replace       !! Replace a [[json_value]] in a linked-list structure.
-        procedure,public :: reverse             => json_value_reverse       !! Reverse the order of the children of an array of object.
+        procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a
+                                                                            !! linked-list structure.
+        procedure,public :: replace             => json_value_replace       !! Replace a [[json_value]] in a
+                                                                            !! linked-list structure.
+        procedure,public :: reverse             => json_value_reverse       !! Reverse the order of the children
+                                                                            !! of an array of object.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
         procedure,public :: count               => json_count               !! count the number of children
@@ -654,14 +658,19 @@
         procedure,public :: get_previous        => json_get_previous        !! get pointer to json_value previous
         procedure,public :: get_tail            => json_get_tail            !! get pointer to json_value tail
         procedure,public :: initialize          => json_initialize          !! to initialize some parsing parameters
-        procedure,public :: traverse            => json_traverse            !! to traverse all elements of a JSON structure
-        procedure,public :: print_error_message => json_print_error_message !! simply routine to print error messages
+        procedure,public :: traverse            => json_traverse            !! to traverse all elements of a JSON
+                                                                            !! structure
+        procedure,public :: print_error_message => json_print_error_message !! simply routine to print error
+                                                                            !! messages
         procedure,public :: swap                => json_value_swap          !! Swap two [[json_value]] pointers
-                                                                            !! in a structure (or two different structures).
-        procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a descendant of another.
-        procedure,public :: validate            => json_value_validate      !! Check that a [[json_value]] linked list is valid
-                                                                            !! (i.e., is properly constructed). This may be
-                                                                            !! useful if it has been constructed externally.
+                                                                            !! in a structure (or two different
+                                                                            !! structures).
+        procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a
+                                                                            !! descendant of another.
+        procedure,public :: validate            => json_value_validate      !! Check that a [[json_value]] linked
+                                                                            !! list is valid (i.e., is properly
+                                                                            !! constructed). This may be useful
+                                                                            !! if it has been constructed externally.
 
         !other private routines:
         procedure :: name_equal
@@ -4223,13 +4232,9 @@
     character(kind=CK,len=*),intent(in) :: val   !! value
 
     type(json_value),pointer :: var
-    character(kind=CK,len=:),allocatable :: str
-
-    !add escape characters if necessary:
-    call escape_string(val, str)
 
     !create the variable:
-    call json%create_string(var,str,name)
+    call json%create_string(var,val,name)
 
     !add it:
     call json%add(p, var)
@@ -4855,6 +4860,8 @@
     integer(IK) :: var_type,var_type_prev
     logical(LK) :: is_vector !! if all elements of a vector
                              !! are scalars of the same type
+    character(kind=CK,len=:),allocatable :: str_escaped !! escaped version of
+                                                        !! `name` or `str_value`
 
     if (.not. json%exception_thrown) then
 
@@ -4931,19 +4938,20 @@
 
                     ! print the name
                     if (allocated(element%name)) then
+                        call escape_string(element%name,str_escaped)
                         if (json%no_whitespace) then
                             !compact printing - no extra space
                             call write_it(repeat(space, spaces)//quotation_mark//&
-                                          element%name//quotation_mark//colon_char,&
+                                          str_escaped//quotation_mark//colon_char,&
                                           advance=.false.)
                         else
                             call write_it(repeat(space, spaces)//quotation_mark//&
-                                          element%name//quotation_mark//colon_char//space,&
+                                          str_escaped//quotation_mark//colon_char//space,&
                                           advance=.false.)
                         end if
                     else
                         call json%throw_exception('Error in json_value_print:'//&
-                                             ' element%name not allocated')
+                                                  ' element%name not allocated')
                         nullify(element)
                         return
                     end if
@@ -5056,8 +5064,10 @@
         case (json_string)
 
             if (allocated(p%str_value)) then
+                ! have to escape the string for printing:
+                call escape_string(p%str_value,str_escaped)
                 call write_it( s//quotation_mark// &
-                               p%str_value//quotation_mark, &
+                               str_escaped//quotation_mark, &
                                comma=print_comma, &
                                advance=(.not. is_vector),&
                                space_after_comma=is_vector )
@@ -5148,7 +5158,7 @@
                 ! overrides input value:
                 add_line_break = .false.
             else
-            add_line_break = advance
+                add_line_break = advance
             end if
         else
             add_line_break = .not. json%no_whitespace ! default is to advance if
@@ -6828,8 +6838,6 @@
     type(json_value),pointer,intent(in)              :: me
     character(kind=CK,len=:),allocatable,intent(out) :: value
 
-    character(kind=CK,len=:),allocatable :: error_message  !! for [[unescape_string]]
-
     value = CK_''
     if (.not. json%exception_thrown) then
 
@@ -6837,14 +6845,11 @@
 
             if (allocated(me%str_value)) then
                 if (json%unescaped_strings) then
-                    call unescape_string(me%str_value, value, error_message)
-                    if (allocated(error_message)) then
-                        call json%throw_exception(error_message)
-                        deallocate(error_message)
-                        value = CK_''
-                    end if
-                else
+                    ! default: it is stored already unescaped:
                     value = me%str_value
+                else
+                    ! return the escaped version:
+                    call escape_string(me%str_value, value)
                 end if
             else
                call json%throw_exception('Error in json_get_string: '//&
@@ -7829,11 +7834,13 @@
                 select case (value%var_type)
                 case (json_string)
 #if defined __GFORTRAN__
-                    call json%parse_string(unit,str,tmp)  ! write to a tmp variable because of
-                    value%str_value = tmp                 ! a bug in 4.9 gfortran compiler.
-                    deallocate(tmp)                       !
+                    ! write to a tmp variable because of
+                    ! a bug in 4.9 gfortran compiler.
+                    call json%parse_string(unit,str,tmp)
+                    value%str_value = tmp
+                    if (allocated(tmp))  deallocate(tmp)
 #else
-                    call json%parse_string(unit, str, value%str_value)
+                    call json%parse_string(unit,tmp,value%str_value)
 #endif
                 end select
 
@@ -8225,7 +8232,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: p
-    logical(LK),intent(in),optional              :: val   !! if the value is also to be set (if not present, then .false. is used).
+    logical(LK),intent(in),optional              :: val   !! if the value is also to be set
+                                                          !! (if not present, then .false. is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -8254,7 +8262,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: p
-    integer(IK),intent(in),optional              :: val   !! if the value is also to be set (if not present, then 0 is used).
+    integer(IK),intent(in),optional              :: val   !! if the value is also to be set
+                                                          !! (if not present, then 0 is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -8283,7 +8292,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: p
-    real(RK),intent(in),optional                 :: val   !! if the value is also to be set (if not present, then 0.0_rk is used).
+    real(RK),intent(in),optional                 :: val   !! if the value is also to be set
+                                                          !! (if not present, then 0.0_rk is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -8577,7 +8587,7 @@
     class(json_core),intent(inout)                   :: json
     integer(IK),intent(in)                           :: unit  !! file unit number (if parsing from a file)
     character(kind=CK,len=*),intent(in)              :: str   !! JSON string (if parsing from a string)
-    character(kind=CK,len=:),allocatable,intent(out) :: string
+    character(kind=CK,len=:),allocatable,intent(out) :: string !! the string (unescaped if necessary)
 
     logical(LK) :: eof, is_hex, escape
     character(kind=CK,len=1) :: c
@@ -8585,6 +8595,8 @@
     integer(IK) :: i
     integer(IK) :: ip !! index to put next character,
                       !! to speed up by reducing the number of character string reallocations.
+    character(kind=CK,len=:),allocatable :: string_unescaped !! temp variable
+    character(kind=CK,len=:),allocatable :: error_message !! for string unescaping
 
     !at least return a blank string if there is a problem:
     string = repeat(space, chunk_size)
@@ -8664,6 +8676,18 @@
                 string = string(1:ip-1)
             end if
         end if
+
+        !string is returned unescaped:
+        call unescape_string(string,string_unescaped,error_message)
+        if (allocated(error_message)) then
+            call json%throw_exception(error_message)
+        else
+            string = string_unescaped
+        end if
+
+        !cleanup:
+        if (allocated(error_message))    deallocate(error_message)
+        if (allocated(string_unescaped)) deallocate(string_unescaped)
 
     end if
 
