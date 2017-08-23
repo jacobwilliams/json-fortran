@@ -5144,7 +5144,12 @@
             end if
         end if
         if (present(advance)) then
+            if (json%no_whitespace) then
+                ! overrides input value:
+                add_line_break = .false.
+            else
             add_line_break = advance
+            end if
         else
             add_line_break = .not. json%no_whitespace ! default is to advance if
                                                       ! we are printing whitespace
