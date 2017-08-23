@@ -7840,7 +7840,7 @@
                     value%str_value = tmp
                     if (allocated(tmp))  deallocate(tmp)
 #else
-                    call json%parse_string(unit,tmp,value%str_value)
+                    call json%parse_string(unit,str,value%str_value)
 #endif
                 end select
 
