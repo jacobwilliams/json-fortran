@@ -1190,7 +1190,7 @@
 !  date: 12/17/2016
 !
 !  Get an (allocatable length) string vector from a JSON file.
-!  This is just a wrapper for [[json_get_alloc_string_vec_with_path]].
+!  This is just a wrapper for [[json_get_alloc_string_vec_by_path]].
 
     subroutine json_file_get_alloc_string_vec(me, path, vec, ilen, found)
 
@@ -1212,7 +1212,7 @@
 !*****************************************************************************************
 !>
 !  Alternate version of [[json_file_get_alloc_string_vec]], where "path" is kind=CDK.
-!  This is just a wrapper for [[wrap_json_get_alloc_string_vec_with_path]].
+!  This is just a wrapper for [[wrap_json_get_alloc_string_vec_by_path]].
 
     subroutine wrap_json_file_get_alloc_string_vec(me, path, vec, ilen, found)
 

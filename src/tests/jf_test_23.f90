@@ -166,12 +166,12 @@ contains
       call check_i()   ! 4
 
       write(error_unit,'(A)') ''
-      key = "/rfc6901 tests/i\\j"
+      key = "/rfc6901 tests/i\j"
       call json%get(key, ival)
       call check_i()   ! 5
 
       write(error_unit,'(A)') ''
-      key = "/rfc6901 tests/k\""l"
+      key = "/rfc6901 tests/k""l"
       call json%get(key, ival)
       call check_i()   ! 6
 

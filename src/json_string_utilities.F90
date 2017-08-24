@@ -335,7 +335,23 @@
             if (ipos+3>len(str_out)) str_out = str_out // repeat(space, chunk_size)
 
             select case(c)
-            case(quotation_mark,backslash,slash)
+            case(backslash)
+
+                !test for unicode sequence: '\uXXXX'
+                ![don't add an extra '\' for those]
+                if (i+5<=len(str_in)) then
+                    if (str_in(i+1:i+1)==CK_'u' .and. &
+                        valid_json_hex(str_in(i+2:i+5))) then
+                        str_out(ipos:ipos) = c
+                        ipos = ipos + 1
+                        cycle
+                    end if
+                end if
+
+                str_out(ipos:ipos+1) = backslash//c
+                ipos = ipos + 2
+
+            case(quotation_mark,slash)
                 str_out(ipos:ipos+1) = backslash//c
                 ipos = ipos + 2
             case(bspace)
@@ -387,18 +403,17 @@
 !>
 !  Remove the escape characters from a JSON string and return it.
 !
-!  The escaped characters are denoted by the '\' character:
-!````
-!    '\"'        quotation mark
-!    '\\'        reverse solidus
-!    '\/'        solidus
-!    '\b'        backspace
-!    '\f'        formfeed
-!    '\n'        newline (LF)
-!    '\r'        carriage return (CR)
-!    '\t'        horizontal tab
-!    '\uXXXX'    4 hexadecimal digits
-!````
+!  The escaped characters are denoted by the `\` character:
+!
+!  * `\"`        - quotation mark
+!  * `\\`        - reverse solidus
+!  * `\/`        - solidus
+!  * `\b`        - backspace
+!  * `\f`        - formfeed
+!  * `\n`        - newline (LF)
+!  * `\r`        - carriage return (CR)
+!  * `\t`        - horizontal tab
+!  * `\uXXXX`    - 4 hexadecimal digits
 
     subroutine unescape_string(str_in, str_out, error_message)
 
