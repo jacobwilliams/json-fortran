@@ -149,6 +149,32 @@ contains
         error_cnt = error_cnt + 1
     end if
 
+    call json%add(inp, 'bspace', achar(8,kind=json_CK))
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%add(inp, 'horizontal_tab', achar(9,kind=json_CK))
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%add(inp, 'newline', achar(10,kind=json_CK))
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%add(inp, 'formfeed', achar(12,kind=json_CK))
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%add(inp, 'carriage_return', achar(13,kind=json_CK))
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+
     nullify(inp)
 
     !trajectory variables:
