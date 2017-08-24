@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.0.0 (2017-08-24)](#600-2017-08-24)
     - [5.3.0 (2017-04-07)](#530-2017-04-07)
     - [5.2.0 (2017-03-05)](#520-2017-03-05)
     - [5.1.0 (2016-08-14)](#510-2016-08-14)
@@ -22,7 +23,21 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.3.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.0.0...HEAD)
+
+### [6.0.0](https://github.com/jacobwilliams/json-fortran/tree/6.0.0) (2017-08-24)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.3.0...6.0.0)
+or [Download v6.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.0.0)
+
+**Enhancements:**
+
+- Added a routine to reverse an array or object [\#280](https://github.com/jacobwilliams/json-fortran/issues/280) [\#281](https://github.com/jacobwilliams/json-fortran/pull/281) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fixed a bug where using `no_whitespace` mode could still print line breaks in some cases [\#288](https://github.com/jacobwilliams/json-fortran/issues/288) ([jacobwilliams](https://github.com/jacobwilliams))
+- Strings (name key and value) were not being properly escaped/unescaped in some contexts. This change introduces a small backward incompatibility (formerly, if keys contained escape characters, the user would have to include them when getting their value). Now, the string variables in all user-facing API calls are unescaped (i.e., the user does not have to manually escape the keys to get their associated value). All strings are also now properly returned unescaped, no matter how the JSON structure was constructed. Escaping is now done in all cases if necessary when the JSON is printed to a string, file or the console. [\#287](https://github.com/jacobwilliams/json-fortran/issues/287) [\#289](https://github.com/jacobwilliams/json-fortran/pull/289) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [5.3.0](https://github.com/jacobwilliams/json-fortran/tree/5.3.0) (2017-04-07)
 
