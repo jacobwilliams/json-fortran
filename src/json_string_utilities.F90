@@ -403,18 +403,17 @@
 !>
 !  Remove the escape characters from a JSON string and return it.
 !
-!  The escaped characters are denoted by the '\' character:
-!````
-!    '\"'        quotation mark
-!    '\\'        reverse solidus
-!    '\/'        solidus
-!    '\b'        backspace
-!    '\f'        formfeed
-!    '\n'        newline (LF)
-!    '\r'        carriage return (CR)
-!    '\t'        horizontal tab
-!    '\uXXXX'    4 hexadecimal digits
-!````
+!  The escaped characters are denoted by the `\` character:
+!
+!  * `\"`        - quotation mark
+!  * `\\`        - reverse solidus
+!  * `\/`        - solidus
+!  * `\b`        - backspace
+!  * `\f`        - formfeed
+!  * `\n`        - newline (LF)
+!  * `\r`        - carriage return (CR)
+!  * `\t`        - horizontal tab
+!  * `\uXXXX`    - 4 hexadecimal digits
 
     subroutine unescape_string(str_in, str_out, error_message)
 
