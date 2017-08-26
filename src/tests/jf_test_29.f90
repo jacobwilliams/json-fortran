@@ -19,17 +19,7 @@ contains
 
     integer,intent(out) :: error_cnt
 
-    type(json_value),pointer :: p
-    type(json_core) :: json
-    logical(LK) :: has_duplicate
-    character(kind=CK,len=:),allocatable :: name
-    character(kind=CK,len=:),allocatable :: path
-
-    character(kind=CK,len=*),parameter :: json_str = &
-            '{"vars": {"a":1, "b":2, "a":3, "a":4, "c":5} }'
-
     error_cnt = 0
-    call json%initialize()
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -37,40 +27,80 @@ contains
     write(error_unit,'(A)') '================================='
     write(error_unit,'(A)') ''
 
-    write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'JSON string: '//json_str
+    call test(CK_'{"vars":{"a":1,"b":2,"a":3,"a":4,"c":5}}',.true.,CK_'a',CK_'vars.a')
+    call test(CK_'{"vars":{"a":1,"a":3}}',.true.,CK_'a',CK_'vars.a')
+    call test(CK_'{"vars":{"aaa":1,"b":2,"aaa":3,"a":4,"c":5}}',.true.,CK_'aaa',CK_'vars.aaa')
+    call test(CK_'{"vars":{"aaaa":1,"aaaa":3}}',.true.,CK_'aaaa',CK_'vars.aaaa')
+    call test(CK_'{"a":1,"b":2,"a":3,"a":4,"c":5}',.true.,CK_'a',CK_'a')
+    call test(CK_'{"c":5}',.false.,CK_'',CK_'')
+    call test(CK_'{"vars":{"c":5},"array":[1,2]}',.false.,CK_'',CK_'')
+    call test(CK_'{}',.false.,CK_'',CK_'')
 
-    call json%parse(p,json_str)
-    if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-    else
+    contains
+
+        subroutine test(json_str,correct_has_duplicate,correct_name,correct_path)
+
+        implicit none
+
+        character(kind=CK,len=*),intent(in) :: json_str !! JSON string to check
+        logical(LK),intent(in)              :: correct_has_duplicate !! expected result
+        character(kind=CK,len=*),intent(in) :: correct_name !! expected result
+        character(kind=CK,len=*),intent(in) :: correct_path !! expected result
+
+        type(json_value),pointer :: p
+        type(json_core) :: json
+        logical(LK) :: has_duplicate
+        character(kind=CK,len=:),allocatable :: name
+        character(kind=CK,len=:),allocatable :: path
+
+        call json%initialize(no_whitespace=.true.)
 
         write(error_unit,'(A)') ''
-        call json%check_for_duplicate_keys(p,has_duplicate,name,path)
+        write(error_unit,'(A)') 'JSON string: '//json_str
+
+        call json%parse(p,json_str)
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
-            if (has_duplicate) then
-                write(output_unit,'(A)') 'Duplicate key found:'
-                write(output_unit,'(A)') '  name: '//trim(name)
-                write(output_unit,'(A)') '  path: '//trim(path)
-                if (name /= CK_'a' .or. path /= CK_'vars.a') then
-                    write(error_unit,'(A)') 'Error: incorrect duplicate key name or path'
+
+            write(error_unit,'(A)') ''
+
+            ! just test all options:
+            call json%check_for_duplicate_keys(p,has_duplicate,name=name)
+            call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+            call json%check_for_duplicate_keys(p,has_duplicate)
+            call json%check_for_duplicate_keys(p,has_duplicate,name=name,path=path)
+            if (json%failed()) then
+                call json%print_error_message(error_unit)
+                error_cnt = error_cnt + 1
+            else
+                if (correct_has_duplicate .neqv. has_duplicate) then
+                    write(error_unit,'(A)') '   Test failed.'
                     error_cnt = error_cnt + 1
                 else
-                    write(output_unit,'(A)') 'Test passed'
+                    if (has_duplicate) then
+                        write(output_unit,'(A)') '   Duplicate key found:'
+                        write(output_unit,'(A)') '    name: '//trim(name)
+                        write(output_unit,'(A)') '    path: '//trim(path)
+                        if (name/=correct_name .or. path/=correct_path) then
+                            write(error_unit,'(A)') '   Error: incorrect duplicate key name or path'
+                            error_cnt = error_cnt + 1
+                        else
+                            write(output_unit,'(A)') '   Test passed: correct duplicate found'
+                        end if
+                    else
+                        write(output_unit,'(A)') '   Test passed: no duplicates present'
+                    end if
                 end if
-            else
-                write(error_unit,'(A)') 'Test failed. Duplicate keys not found'
-                error_cnt = error_cnt + 1
             end if
+
         end if
 
-    end if
+        call json%destroy(p)
+        call json%destroy()
 
-    call json%destroy(p)
+        end subroutine test
 
     end subroutine test_29
 

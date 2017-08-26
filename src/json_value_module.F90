@@ -4933,10 +4933,20 @@
 
 #if defined __GFORTRAN__
 
-        character(kind=CK,len=:),allocatable :: tmp_name !! workaround for gfortran bugs
-        character(kind=CK,len=:),allocatable :: tmp_path !! workaround for gfortran bugs
+        ! this is a workaround for a gfortran bug (6 and 7),
 
-        call json%check_children_for_duplicate_keys(p,has_duplicate,tmp_name,tmp_path)
+        character(kind=CK,len=:),allocatable :: tmp_name !! temp variable for `name` string
+        character(kind=CK,len=:),allocatable :: tmp_path !! temp variable for `path` string
+
+        if (present(name) .and. present(path)) then
+            call json%check_children_for_duplicate_keys(p,has_duplicate,name=tmp_name,path=tmp_path)
+        else if (present(name) .and. .not. present(path)) then
+            call json%check_children_for_duplicate_keys(p,has_duplicate,name=tmp_name)
+        else if (.not. present(name) .and. present(path)) then
+            call json%check_children_for_duplicate_keys(p,has_duplicate,path=tmp_path)
+        else
+            call json%check_children_for_duplicate_keys(p,has_duplicate)
+        end if
 
         if (has_duplicate) then
             if (present(name)) name = tmp_name
