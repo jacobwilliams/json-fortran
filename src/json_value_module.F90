@@ -671,9 +671,16 @@
                                                                             !! list is valid (i.e., is properly
                                                                             !! constructed). This may be useful
                                                                             !! if it has been constructed externally.
+        procedure,public :: check_for_duplicate_keys &
+                                => json_check_all_for_duplicate_keys  !! Check entire JSON structure
+                                                                      !! for duplicate keys (recursively)
+        procedure,public :: check_children_for_duplicate_keys &
+                                => json_check_children_for_duplicate_keys  !! Check a `json_value` object's
+                                                                           !! children for duplicate keys
 
         !other private routines:
         procedure :: name_equal
+        procedure :: name_strings_equal
         procedure :: json_value_print
         procedure :: string_to_int
         procedure :: string_to_dble
@@ -963,10 +970,13 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date: 4/30/2016
 !
 !  Returns true if `name` is equal to `p%name`, using the specified
 !  settings for case sensitivity and trailing whitespace.
+!
+!### History
+!  * 4/30/2016 : original version
+!  * 8/25/2017 : now just a wrapper for [[name_strings_equal]]
 
     function name_equal(json,p,name) result(is_equal)
 
@@ -975,29 +985,51 @@
     class(json_core),intent(inout)      :: json
     type(json_value),intent(in)         :: p        !! the json object
     character(kind=CK,len=*),intent(in) :: name     !! the name to check for
-    logical(LK)                         :: is_equal !! true if the string are lexically equal
+    logical(LK)                         :: is_equal !! true if the string are
+                                                    !! lexically equal
 
     if (allocated(p%name)) then
-
-        !must be the same length if we are treating
-        !trailing spaces as significant, so do a
-        !quick test of this first:
-        if (json%trailing_spaces_significant) then
-            is_equal = len(p%name) == len(name)
-            if (.not. is_equal) return
-        end if
-
-        if (json%case_sensitive_keys) then
-            is_equal = p%name == name
-        else
-            is_equal = lowercase_string(p%name) == lowercase_string(name)
-        end if
-
+        ! call the low-level routines for the name strings:
+        is_equal = json%name_strings_equal(p%name,name)
     else
         is_equal = name == CK_'' ! check a blank name
     end if
 
     end function name_equal
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 8/25/2017
+!
+!  Returns true if the name strings `name1` is equal to `name2`, using
+!  the specified settings for case sensitivity and trailing whitespace.
+
+    function name_strings_equal(json,name1,name2) result(is_equal)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    character(kind=CK,len=*),intent(in) :: name1     !! the name to check
+    character(kind=CK,len=*),intent(in) :: name2     !! the name to check
+    logical(LK)                         :: is_equal  !! true if the string are
+                                                     !! lexically equal
+
+    !must be the same length if we are treating
+    !trailing spaces as significant, so do a
+    !quick test of this first:
+    if (json%trailing_spaces_significant) then
+        is_equal = len(name1) == len(name2)
+        if (.not. is_equal) return
+    end if
+
+    if (json%case_sensitive_keys) then
+        is_equal = name1 == name2
+    else
+        is_equal = lowercase_string(name1) == lowercase_string(name2)
+    end if
+
+    end function name_strings_equal
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -4681,8 +4713,9 @@
                 child => p%children    !start with first one
                 do i=1, n_children
                     if (.not. associated(child)) then
-                        call json%throw_exception('Error in json_value_get_child_by_name: '//&
-                                                  'Malformed JSON linked list')
+                        call json%throw_exception(&
+                            'Error in json_value_get_child_by_name: '//&
+                            'Malformed JSON linked list')
                         exit
                     end if
                     if (allocated(child%name)) then
@@ -4698,14 +4731,16 @@
 
             if (error) then
                 !did not find anything:
-                call json%throw_exception('Error in json_value_get_child_by_name: '//&
-                                     'child variable '//trim(name)//' was not found.')
+                call json%throw_exception(&
+                    'Error in json_value_get_child_by_name: '//&
+                    'child variable '//trim(name)//' was not found.')
                 nullify(child)
             end if
 
         else
-            call json%throw_exception('Error in json_value_get_child_by_name: '//&
-                                 'pointer is not associated.')
+            call json%throw_exception(&
+                'Error in json_value_get_child_by_name: '//&
+                'pointer is not associated.')
         end if
 
         ! found output:
@@ -4723,6 +4758,186 @@
     end if
 
     end subroutine json_value_get_child_by_name
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 8/25/2017
+!
+!  Checks a JSON object for duplicate child names.
+!
+!  It uses the specified settings for name matching (see [[name_strings_equal]]).
+!
+!@note This will only check for one duplicate,
+!      it will return the first one that it finds.
+
+    subroutine json_check_children_for_duplicate_keys(json,p,has_duplicate,name,path)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer,intent(in) :: p  !! the object to search. If `p` is
+                                              !! not a `json_object`, then `has_duplicate`
+                                              !! will be false.
+    logical(LK),intent(out) :: has_duplicate  !! true if there is at least
+                                              !! two children have duplicate
+                                              !! `name` values.
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! the duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicate was found)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: path !! the full path to the
+                                                                      !! duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicate was found)
+
+    integer(IK)              :: i           !! counter
+    integer(IK)              :: j           !! counter
+    type(json_value),pointer :: child       !! pointer to a child of `p`
+    integer(IK)              :: n_children  !! number of children of `p`
+    logical(LK)              :: found       !! flag for `get_child`
+
+    type :: alloc_str
+        !! so we can have an array of allocatable strings
+        character(kind=CK,len=:),allocatable :: str  !! name string
+    end type alloc_str
+    type(alloc_str),dimension(:),allocatable :: names !! array of all the
+                                                      !! child name strings
+
+    ! initialize:
+    has_duplicate =.false.
+
+    if (.not. json%exception_thrown) then
+
+        if (associated(p)) then
+
+            if (p%var_type==json_object) then
+
+                ! number of items to check:
+                n_children = json%count(p)
+                allocate(names(n_children))
+
+                ! first get a list of all the name keys:
+                do i=1, n_children
+                    call json%get_child(p,i,child,found) ! get by index
+                    if (.not. found) then
+                        call json%throw_exception(&
+                            'Error in json_check_children_for_duplicate_keys: '//&
+                            'Malformed JSON linked list')
+                        exit
+                    end if
+                    if (allocated(child%name)) then
+                        names(i)%str = child%name
+                    else
+                        call json%throw_exception(&
+                            'Error in json_check_children_for_duplicate_keys: '//&
+                            'Object child name is not allocated')
+                        exit
+                    end if
+                end do
+
+                if (.not. json%exception_thrown) then
+                    ! now check the list for duplicates:
+                    main: do i=1,n_children
+                        do j=1,i-1
+                            if (json%name_strings_equal(names(i)%str,names(j)%str)) then
+                                has_duplicate = .true.
+                                if (present(name)) then
+                                    name = names(i)%str
+                                end if
+                                if (present(path)) then
+                                    call json%get_child(p,names(i)%str,child,found) ! get by name
+                                    if (found) then
+                                        call json%get_path(child,path,found)
+                                        if (.not. found) then
+                                            ! should never happen since we know it is there
+                                            call json%throw_exception(&
+                                                    'Error in json_check_children_for_duplicate_keys: '//&
+                                                    'Could not get path')
+                                        end if
+                                    else
+                                        ! should never happen since we know it is there
+                                        call json%throw_exception(&
+                                            'Error in json_check_children_for_duplicate_keys: '//&
+                                            'Could not get child: '//trim(names(i)%str))
+                                    end if
+                                end if
+                                exit main
+                            end if
+                        end do
+                    end do main
+                end if
+
+                ! cleanup
+                do i=1,n_children
+                    if (allocated(names(i)%str)) deallocate(names(i)%str)
+                end do
+                if (allocated(names)) deallocate(names)
+
+            end if
+
+        end if
+
+    end if
+
+    end subroutine json_check_children_for_duplicate_keys
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 8/25/2017
+!
+!  Checks a JSON structure for duplicate child names.
+!  This one recursively traverses the entire structure
+!  (calling [[json_check_children_for_duplicate_keys]]
+!  recursively for each element).
+!
+!@note This will only check for one duplicate,
+!      it will return the first one that it finds.
+
+    subroutine json_check_all_for_duplicate_keys(json,p,has_duplicate,name,path)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer,intent(in) :: p  !! the object to search. If `p` is
+                                              !! not a `json_object`, then `has_duplicate`
+                                              !! will be false.
+    logical(LK),intent(out) :: has_duplicate  !! true if there is at least
+                                              !! one duplicate `name` key anywhere
+                                              !! in the structure.
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! the duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicates were found)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: path !! the full path to the
+                                                                      !! duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicate was found)
+
+    has_duplicate = .false.
+    if (.not. json%exception_thrown) then
+        call json%traverse(p,duplicate_key_func)
+    end if
+
+    contains
+
+        subroutine duplicate_key_func(json,p,finished)
+
+        !! Callback function to check each element
+        !! for duplicate child names.
+
+        implicit none
+
+        class(json_core),intent(inout)      :: json
+        type(json_value),pointer,intent(in) :: p
+        logical(LK),intent(out)             :: finished
+
+        call json%check_children_for_duplicate_keys(p,has_duplicate,name,path)
+
+        finished = has_duplicate .or. json%exception_thrown
+
+        end subroutine duplicate_key_func
+
+    end subroutine json_check_all_for_duplicate_keys
 !*****************************************************************************************
 
 !*****************************************************************************************
