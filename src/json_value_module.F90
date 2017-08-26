@@ -229,6 +229,12 @@
                                                   !! [Note: `no_whitespace` will
                                                   !! override this option if necessary]
 
+        logical(LK) :: allow_duplicate_keys = .true. !! If False, then after parsing, if any
+                                                     !! duplicate keys are found, an error is
+                                                     !! thrown. A call to [[json_value_validate]]
+                                                     !! will also check for duplicates. If True
+                                                     !! [default] then no special checks are done
+
         contains
 
         private
@@ -781,7 +787,8 @@
                                   comment_char,&
                                   path_mode,&
                                   path_separator,&
-                                  compress_vectors) result(json_core_object)
+                                  compress_vectors,&
+                                  allow_duplicate_keys) result(json_core_object)
 
     implicit none
 
@@ -798,7 +805,8 @@
                                 comment_char,&
                                 path_mode,&
                                 path_separator,&
-                                compress_vectors)
+                                compress_vectors,&
+                                allow_duplicate_keys)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -832,7 +840,8 @@
                                comment_char,&
                                path_mode,&
                                path_separator,&
-                               compress_vectors)
+                               compress_vectors,&
+                               allow_duplicate_keys)
 
     implicit none
 
@@ -902,6 +911,11 @@
     ! printing vectors in compressed form:
     if (present(compress_vectors)) then
         me%compress_vectors = compress_vectors
+    end if
+
+    ! checking for duplicate keys:
+    if (present(allow_duplicate_keys)) then
+        me%allow_duplicate_keys = allow_duplicate_keys
     end if
 
     !Set the format for real numbers:
@@ -2372,21 +2386,77 @@
 !
 !  It recursively traverses the entire structure and checks every element.
 !
+!### History
+!  * Jacob Williams, 8/26/2017 : added duplicate key check.
+!
+!@note It will return on the first error it encounters.
+!
 !@note This routine does not check or throw any exceptions.
+!      If `json` is currently in a state of exception, it will
+!      remain so after calling this routine.
 
     subroutine json_value_validate(json,p,is_valid,error_msg)
 
     implicit none
 
-    class(json_core),intent(inout)       :: json
-    type(json_value),pointer,intent(in)  :: p
-    logical(LK),intent(out)              :: is_valid  !! True if the structure is valid.
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p
+    logical(LK),intent(out)             :: is_valid  !! True if the structure is valid.
     character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! if not valid, this will contain
                                                                   !! a description of the problem
 
+    logical(LK) :: has_duplicate !! to check for duplicate keys
+    character(kind=CK,len=:),allocatable :: path  !! path to duplicate key
+    logical(LK) :: status_ok !! to check for existing exception
+    logical(LK) :: status_ok2 !! to check for a new exception
+    character(kind=CK,len=:),allocatable :: exception_msg  !! error message for an existing exception
+    character(kind=CK,len=:),allocatable :: exception_msg2  !! error message for a new exception
+
     if (associated(p)) then
+
         is_valid = .true.
         call check_if_valid(p,require_parent=associated(p%parent))
+
+        if (is_valid .and. .not. json%allow_duplicate_keys) then
+            ! if no errors so far, also check the
+            ! entire structure for duplicate keys:
+
+            ! note: check_for_duplicate_keys does call routines
+            ! that check and throw exceptions, so let's clear any
+            ! first. (save message for later)
+            call json%check_for_errors(status_ok, exception_msg)
+            call json%clear_exceptions()
+
+            call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+            if (json%failed()) then
+                ! if an exception was thrown during this call,
+                ! then clear it but make that the error message
+                ! returned by this routine. Normally this should
+                ! never actually occur since we have already
+                ! validated the structure.
+                call json%check_for_errors(is_valid, exception_msg2)
+                error_msg = exception_msg2
+                call json%clear_exceptions()
+                is_valid = .false.
+            else
+                if (has_duplicate) then
+                    error_msg = 'duplicate key found: '//path
+                    is_valid  = .false.
+                end if
+            end if
+
+            if (.not. status_ok) then
+                ! restore any existing exception if necessary
+                call json%throw_exception(exception_msg)
+            end if
+
+            ! cleanup:
+            if (allocated(path))           deallocate(path)
+            if (allocated(exception_msg))  deallocate(exception_msg)
+            if (allocated(exception_msg2)) deallocate(exception_msg2)
+
+        end if
+
     else
         error_msg = 'The pointer is not associated'
         is_valid = .false.
@@ -7726,6 +7796,8 @@
     integer(IK) :: iunit   !! file unit actually used
     integer(IK) :: istat   !! iostat flag
     logical(LK) :: is_open !! if the file is already open
+    logical(LK) :: has_duplicate  !! if checking for duplicate keys
+    character(kind=CDK,len=:),allocatable :: path !! path to any duplicate key
 
     !clear any exceptions and initialize:
     call json%initialize()
@@ -7782,10 +7854,24 @@
 
         ! parse as a value
         call json%parse_value(unit=iunit, str=CK_'', value=p)
-        if (json%exception_thrown) call json%annotate_invalid_json(iunit,CK_'')
 
         ! close the file if necessary
         close(unit=iunit, iostat=istat)
+
+        ! check for errors:
+        if (json%exception_thrown) then
+            call json%annotate_invalid_json(iunit,CK_'')
+        else
+            if (.not. json%allow_duplicate_keys) then
+                call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+                if (.not. json%exception_thrown) then
+                    if (has_duplicate) then
+                        call json%throw_exception('Error in json_parse_file: '//&
+                                                  'Duplicate key found: '//path)
+                    end if
+                end if
+            end if
+        end if
 
     else
 
@@ -7814,6 +7900,9 @@
 
     integer(IK),parameter :: iunit = 0 !! indicates that json data will be read from buffer
 
+    logical(LK) :: has_duplicate  !! if checking for duplicate keys
+    character(kind=CDK,len=:),allocatable :: path !! path to any duplicate key
+
     !clear any exceptions and initialize:
     call json%initialize()
 
@@ -7827,7 +7916,19 @@
     ! parse as a value
     call json%parse_value(unit=iunit, str=str, value=p)
 
-    if (json%exception_thrown) call json%annotate_invalid_json(iunit,str)
+    if (json%exception_thrown) then
+        call json%annotate_invalid_json(iunit,str)
+    else
+        if (.not. json%allow_duplicate_keys) then
+            call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+            if (.not. json%exception_thrown) then
+                if (has_duplicate) then
+                    call json%throw_exception('Error in json_parse_string: '//&
+                                              'Duplicate key found: '//path)
+                end if
+            end if
+        end if
+    end if
 
     end subroutine json_parse_string
 !*****************************************************************************************

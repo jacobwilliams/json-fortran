@@ -52,6 +52,8 @@ contains
         logical(LK) :: has_duplicate
         character(kind=CK,len=:),allocatable :: name
         character(kind=CK,len=:),allocatable :: path
+        logical(LK) :: is_valid
+        character(kind=CK,len=:),allocatable :: error_msg
 
         call json%initialize(no_whitespace=.true.)
 
@@ -96,9 +98,39 @@ contains
             end if
 
         end if
-
         call json%destroy(p)
         call json%destroy()
+
+        ! also check using two other methods:
+        if (error_cnt==0) then
+
+            ! check when the string is parsed:
+            call json%initialize(allow_duplicate_keys=.false.)
+            call json%parse(p,json_str)
+            if (json%failed() .eqv. correct_has_duplicate) then
+                write(output_unit,'(A)') '   Test passed: parse'
+            else
+                write(output_unit,'(A)') '   Test failed: parse'
+                error_cnt = error_cnt + 1
+            end if
+            call json%destroy(p)
+            call json%destroy()
+
+            ! check by explicit call to validate:
+            call json%initialize()  ! don't throw an exception when parsing
+            call json%parse(p,json_str)
+            call json%initialize(allow_duplicate_keys=.false.)
+            call json%validate(p,is_valid,error_msg)
+            if (is_valid .eqv. (.not. correct_has_duplicate)) then
+                write(output_unit,'(A)') '   Test passed: validate'
+            else
+                write(output_unit,'(A)') '   Test failed: validate'
+                error_cnt = error_cnt + 1
+            end if
+            call json%destroy(p)
+            call json%destroy()
+
+        end if
 
         end subroutine test
 
