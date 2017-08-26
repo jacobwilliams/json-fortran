@@ -4931,7 +4931,21 @@
         type(json_value),pointer,intent(in) :: p
         logical(LK),intent(out)             :: finished
 
+#if defined __GFORTRAN__
+
+        character(kind=CK,len=:),allocatable :: tmp_name !! workaround for gfortran bugs
+        character(kind=CK,len=:),allocatable :: tmp_path !! workaround for gfortran bugs
+
+        call json%check_children_for_duplicate_keys(p,has_duplicate,tmp_name,tmp_path)
+
+        if (has_duplicate) then
+            if (present(name)) name = tmp_name
+            if (present(path)) path = tmp_path
+        end if
+
+#else
         call json%check_children_for_duplicate_keys(p,has_duplicate,name,path)
+#endif
 
         finished = has_duplicate .or. json%exception_thrown
 
