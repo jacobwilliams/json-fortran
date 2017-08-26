@@ -7797,7 +7797,7 @@
     integer(IK) :: istat   !! iostat flag
     logical(LK) :: is_open !! if the file is already open
     logical(LK) :: has_duplicate  !! if checking for duplicate keys
-    character(kind=CDK,len=:),allocatable :: path !! path to any duplicate key
+    character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
 
     !clear any exceptions and initialize:
     call json%initialize()
@@ -7901,7 +7901,7 @@
     integer(IK),parameter :: iunit = 0 !! indicates that json data will be read from buffer
 
     logical(LK) :: has_duplicate  !! if checking for duplicate keys
-    character(kind=CDK,len=:),allocatable :: path !! path to any duplicate key
+    character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
 
     !clear any exceptions and initialize:
     call json%initialize()
