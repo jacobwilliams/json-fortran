@@ -1,7 +1,7 @@
 language: python
 
 python:
-  - 2.7
+  - 3.5
 
 sudo: false
 
@@ -18,7 +18,7 @@ addons:
       - kalakris-cmake
       - ubuntu-toolchain-r-test
     packages:
-      - gfortran-4.9
+      - gfortran-6
       - binutils
       - cmake
       - python-pip
@@ -53,10 +53,11 @@ install:
       mkdir "$HOME/.local/bin"
     fi
   - export PATH="$HOME/.local/bin:$PATH"
-  - export FC=/usr/bin/gfortran-4.9
-  - ln -fs /usr/bin/gfortran-4.9 "$HOME/.local/bin/gfortran" && gfortran --version
-  - ls -l /usr/bin/gfortran-4.9
-  - ln -fs /usr/bin/gcov-4.9 "$HOME/.local/bin/gcov" && gcov --version
+  - export FC=/usr/bin/gfortran-6
+  - ln -fs /usr/bin/gfortran-6 "$HOME/.local/bin/gfortran" && gfortran --version
+  - ls -l /usr/bin/gfortran-6
+  - ln -fs /usr/bin/gcov-6 "$HOME/.local/bin/gcov" && gcov --version
+  - perl --version
   - |
     if ! which f90split; then
       wget http://people.sc.fsu.edu/~jburkardt/f_src/f90split/f90split.f90 && \
@@ -80,8 +81,8 @@ before_script:
     fi
   - |
     if [ "$TRAVIS_TAG" ]; then
-      if [[ "v$TRAVIS_TAG" != "v$(cat __VERSION__)" ]]; then
-        echo "ERROR: You are trying to tag a new release but have a version missmatch in \`__VERSION__\`"
+      if [[ "v$TRAVIS_TAG" != "v$(cat .VERSION)" ]]; then
+        echo "ERROR: You are trying to tag a new release but have a version missmatch in \`.VERSION\`"
         false # throw an error
       fi
     fi

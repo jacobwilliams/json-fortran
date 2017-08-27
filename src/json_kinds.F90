@@ -4,7 +4,7 @@
 !
 !  JSON-Fortran kind definitions.
 !
-!## License
+!### License
 !  * JSON-Fortran is released under a BSD-style license.
 !    See the [LICENSE](https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE)
 !    file for details.
@@ -34,24 +34,66 @@
 !      character arguments of the default (```CDK```) kind. If you find a procedure which does
 !      not accept an ```intent(in)``` literal string argument of default kind, please
 !      [file an issue](https://github.com/jacobwilliams/json-fortran/issues/new) on GitHub.
+!
+!@note The default real kind (`RK`) and the default integer kind (`IK`) can be
+!      changed using optional preprocessor flags. This library was built with kinds:
+#ifdef REAL32
+!      real(kind=real32) [4 bytes]
+#elif REAL64
+!      real(kind=real64) [8 bytes]
+#elif REAL128
+!      real(kind=real128) [16 bytes]
+#else
+!      real(kind=real64) [8 bytes]
+#endif
+!      and
+#ifdef INT8
+!      integer(kind=int8) [1 byte]
+#elif INT16
+!      integer(kind=int16) [2 bytes]
+#elif INT32
+!      integer(kind=int32) [4 bytes]
+#elif INT64
+!      integer(kind=int64) [8 bytes]
+#else
+!      integer(kind=int32) [4 bytes]
+#endif
+!      .
 
     module json_kinds
 
-    use,intrinsic :: iso_fortran_env, only: real64,int32,logical_kinds
+    use,intrinsic :: iso_fortran_env
 
     implicit none
 
     private
 
-    integer,parameter,public :: RK = real64  !! Default real kind [8 bytes]
+#ifdef REAL32
+    integer,parameter,public :: RK = real32   !! Default real kind [4 bytes]
+#elif REAL64
+    integer,parameter,public :: RK = real64   !! Default real kind [8 bytes]
+#elif REAL128
+    integer,parameter,public :: RK = real128  !! Default real kind [16 bytes]
+#else
+    integer,parameter,public :: RK = real64   !! Default real kind if not specified [8 bytes]
+#endif
 
-    integer,parameter,public :: IK = int32   !! Default integer kind [4 bytes].
+#ifdef INT8
+    integer,parameter,public :: IK = int8     !! Default integer kind [1 byte]
+#elif INT16
+    integer,parameter,public :: IK = int16    !! Default integer kind [2 bytes]
+#elif INT32
+    integer,parameter,public :: IK = int32    !! Default integer kind [4 bytes]
+#elif INT64
+    integer,parameter,public :: IK = int64    !! Default integer kind [8 bytes]
+#else
+    integer,parameter,public :: IK = int32    !! Default integer kind if not specified [4 bytes]
+#endif
 
     !*********************************************************
     !>
     !  Processor dependendant 'DEFAULT' character kind.
     !  This is 1 byte for the Intel and Gfortran compilers.
-
     integer,parameter,public :: CDK = selected_char_kind('DEFAULT')
     !*********************************************************
 
@@ -62,14 +104,12 @@
     !  (and perhaps others).
     !  The declaration ensures a valid kind
     !  if the compiler doesn't have a logical_kinds(3).
-    !
     integer,parameter,public :: LK = logical_kinds(min(3,size(logical_kinds)))
     !*********************************************************
 
     !*********************************************************
     !>
     !  String kind preprocessor macro.
-    !
 #if defined __GFORTRAN__ && defined USE_UCS4
     ! gfortran compiler AND UCS4 support requested:
     character(kind=CDK,len=*),parameter :: json_fortran_string_kind = 'ISO_10646'

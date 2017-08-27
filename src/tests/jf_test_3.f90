@@ -31,6 +31,7 @@ contains
     integer :: i
     character(kind=json_CK,len=10) :: str
     real(wp),dimension(:),allocatable :: rvec
+    type(json_core) :: core
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -39,7 +40,7 @@ contains
     write(error_unit,'(A)') ''
 
     error_cnt = 0
-    call json%initialize()
+    call json%initialize(allow_duplicate_keys=.false.)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -116,6 +117,19 @@ contains
     call json%destroy()
     if (json%failed()) then
         call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'json_core tests...'
+    ! test json_core manipulation:
+    call core%initialize(trailing_spaces_significant=.true.,&
+                         case_sensitive_keys=.true.)
+    call json%initialize(core)  ! send it to the file
+    call core%destroy()
+    call json%get_core(core)    ! get it back
+    if (core%failed()) then
+        call core%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
 

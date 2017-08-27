@@ -82,12 +82,12 @@ The code requires a Fortran compiler that supports
 various Fortran 2003 and Fortran 2008 features such as: allocatable
 strings, `newunit`, `generic`, `class`, and `abstract interface`.
 It has been successfully compiled with the [Intel Fortran compiler
-13.1.0](https://software.intel.com/en-us/articles/non-commercial-software-development) (and greater) and the recent [4.9 release of the GNU gfortran
-compiler](http://gcc.gnu.org/wiki/GFortran/News#GCC4.9). It has also
+13.1.0](https://software.intel.com/en-us/articles/non-commercial-software-development) (and greater) and the [GNU gfortran
+compiler](http://gcc.gnu.org/wiki/GFortran) [4.9 and greater]. It has also
 been reported that the library can be built (using the CMake build
 script) with the [NAG Fortran compiler 6.0](http://www.nag.com/nagware/NP/NP_desc.asp)
 
-Currently, several ways are provided to build the jsonfortran library
+Currently, several ways are provided to build the JSON-fortran library
 (libjsonfortran).
 
 * A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the JSON-Fortran library and the unit tests.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
@@ -114,7 +114,7 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.3.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 6.0.0 REQUIRED )
 include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
@@ -122,7 +122,7 @@ foreach ( UNIT_TEST ${JF_TEST_SRCS} )
   get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
   add_executable ( ${TEST} ${UNIT_TEST} )
   target_link_libraries ( ${TEST} jsonfortran-static )
-  # or for linking against the dynamic/shareed library:
+  # or for linking against the dynamic/shared library:
   # target_link_libraries ( ${TEST} jsonfortran ) # instead
 endforeach()
 ```
@@ -145,9 +145,9 @@ Some examples can also be found on the [wiki](https://github.com/jacobwilliams/j
 Contributing
 ------------
 
-[![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md)
+[![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/.github/CONTRIBUTING.md)
 
-Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo/)
+Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/.github/CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo/)
 
 [top](#json-fortran)
 
@@ -164,6 +164,6 @@ Miscellaneous
 * For more information about JSON, see: <http://www.json.org/>
 * [json-fortran on Travis CI](https://travis-ci.org/jacobwilliams/json-fortran)
 * [json-fortran on Waffle.IO](https://waffle.io/jacobwilliams/json-fortran)
-* [json-fortran on Codecov.IO](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
+* [json-fortran on Codecov.IO](https://codecov.io/gh/jacobwilliams/json-fortran)
 
 [top](#json-fortran)

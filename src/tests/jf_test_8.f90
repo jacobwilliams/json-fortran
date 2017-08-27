@@ -38,7 +38,7 @@ contains
     character(len=*),parameter :: str_invalid = '{ "label": "foo",'//newline//' "value : "bar" }'
 
     error_cnt = 0
-    call json%initialize()
+    call json%initialize(allow_duplicate_keys=.false.)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

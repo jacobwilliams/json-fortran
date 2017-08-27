@@ -61,11 +61,16 @@
 
     public :: integer_to_string
     public :: real_to_string
+    public :: string_to_integer
+    public :: string_to_real
     public :: valid_json_hex
     public :: to_unicode
     public :: escape_string
     public :: unescape_string
     public :: lowercase_string
+    public :: replace_string
+    public :: decode_rfc6901
+    public :: encode_rfc6901
 
     contains
 !*****************************************************************************************
@@ -98,12 +103,48 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!>
+!  Convert a string into an integer.
+!
+!# History
+!  * Jacob Williams : 12/10/2013 : Rewrote original `parse_integer` routine.
+!    Added error checking.
+!  * Modified by Izaak Beekman
+!  * Jacob Williams : 2/4/2017 : moved core logic to this routine.
+
+    subroutine string_to_integer(str,ival,status_ok)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in) :: str        !! the string to conver to an integer
+    integer(IK),intent(out)             :: ival       !! the integer value
+    logical(LK),intent(out)             :: status_ok  !! true if there were no errors
+
+    character(kind=CDK,len=:),allocatable :: digits
+    integer(IK) :: ndigits_digits,ndigits,ierr
+
+    ! Compute how many digits we need to read
+    ndigits = 2*len_trim(str)
+    ndigits_digits = floor(log10(real(ndigits)))+1
+    allocate(character(kind=CDK,len=ndigits_digits) :: digits)
+    write(digits,'(I0)') ndigits !gfortran will have a runtime error with * edit descriptor here
+    ! gfortran bug: '*' edit descriptor for ISO_10646 strings does bad stuff.
+    read(str,'(I'//trim(digits)//')',iostat=ierr) ival   !string to integer
+
+    ! error check:
+    status_ok = (ierr==0)
+    if (.not. status_ok) ival = 0_IK
+
+    end subroutine string_to_integer
+!*****************************************************************************************
+
+!*****************************************************************************************
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
 !  Convert a real value to a string.
 !
-!# Modified
+!### Modified
 !  * Izaak Beekman : 02/24/2015 : added the compact option.
 !  * Jacob Williams : 10/27/2015 : added the star option.
 
@@ -134,6 +175,35 @@
     end if
 
     end subroutine real_to_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/19/2014
+!
+!  Convert a string into a `real(RK)`.
+!
+!# History
+!  * Jacob Williams, 10/27/2015 : Now using `fmt=*`, rather than
+!    `fmt=real_fmt`, since it doesn't work for some unusual cases
+!    (e.g., when `str='1E-5'`).
+!  * Jacob Williams : 2/6/2017 : moved core logic to this routine.
+
+    subroutine string_to_real(str,rval,status_ok)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in) :: str
+    real(RK),intent(out)                :: rval
+    logical(LK),intent(out)             :: status_ok  !! true if there were no errors
+
+    integer(IK) :: ierr  !! read iostat error code
+
+    read(str,fmt=*,iostat=ierr) rval
+    status_ok = (ierr==0)
+    if (.not. status_ok) rval = 0.0_RK
+
+    end subroutine string_to_real
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -265,7 +335,23 @@
             if (ipos+3>len(str_out)) str_out = str_out // repeat(space, chunk_size)
 
             select case(c)
-            case(quotation_mark,backslash,slash)
+            case(backslash)
+
+                !test for unicode sequence: '\uXXXX'
+                ![don't add an extra '\' for those]
+                if (i+5<=len(str_in)) then
+                    if (str_in(i+1:i+1)==CK_'u' .and. &
+                        valid_json_hex(str_in(i+2:i+5))) then
+                        str_out(ipos:ipos) = c
+                        ipos = ipos + 1
+                        cycle
+                    end if
+                end if
+
+                str_out(ipos:ipos+1) = backslash//c
+                ipos = ipos + 2
+
+            case(quotation_mark,slash)
                 str_out(ipos:ipos+1) = backslash//c
                 ipos = ipos + 2
             case(bspace)
@@ -293,7 +379,7 @@
         !trim the string if necessary:
         if (ipos<len(str_out)+1) then
             if (ipos==1) then
-                str_out = ''
+                str_out = CK_''
             else
 #if defined __GFORTRAN__
                 tmp = str_out(1:ipos-1)      !workaround for bug in gfortran 6.1
@@ -317,18 +403,17 @@
 !>
 !  Remove the escape characters from a JSON string and return it.
 !
-!  The escaped characters are denoted by the '\' character:
-!````
-!    '\"'        quotation mark
-!    '\\'        reverse solidus
-!    '\/'        solidus
-!    '\b'        backspace
-!    '\f'        formfeed
-!    '\n'        newline (LF)
-!    '\r'        carriage return (CR)
-!    '\t'        horizontal tab
-!    '\uXXXX'    4 hexadecimal digits
-!````
+!  The escaped characters are denoted by the `\` character:
+!
+!  * `\"`        - quotation mark
+!  * `\\`        - reverse solidus
+!  * `\/`        - solidus
+!  * `\b`        - backspace
+!  * `\f`        - formfeed
+!  * `\n`        - newline (LF)
+!  * `\r`        - carriage return (CR)
+!  * `\t`        - horizontal tab
+!  * `\uXXXX`    - 4 hexadecimal digits
 
     subroutine unescape_string(str_in, str_out, error_message)
 
@@ -342,6 +427,10 @@
     integer :: n   !! length of str_in
     integer :: m   !! length of str_out
     character(kind=CK,len=1) :: c  !! for scanning each character in string
+
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: tmp  !! for GFortran bug workaround
+#endif
 
     if (scan(str_in,backslash)>0) then
 
@@ -434,7 +523,13 @@
         end do
 
         !trim trailing space:
+#if defined __GFORTRAN__
+        ! workaround for Gfortran 6.1.0 bug
+        tmp = str_out(1:m)
+        str_out = tmp
+#else
         str_out = str_out(1:m)
+#endif
 
     else
         !there are no escape characters, so return as is:
@@ -668,7 +763,7 @@
     integer :: i  !! counter
     integer :: n  !! length of input string
 
-    s_lower = ''
+    s_lower = CK_''
     n = len_trim(str)
 
     if (n>0) then
@@ -678,6 +773,105 @@
     end if
 
     end function lowercase_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Replace all occurances of `s1` in `str` with `s2`.
+!
+!  A case-sensitive match is used.
+!
+!@note `str` must be allocated.
+
+    pure subroutine replace_string(str,s1,s2)
+
+    implicit none
+
+    character(kind=CK,len=:),allocatable,intent(inout) :: str
+    character(kind=CK,len=*),intent(in) :: s1
+    character(kind=CK,len=*),intent(in) :: s2
+
+    character(kind=CK,len=:),allocatable :: tmp  !! temporary string for accumulating result
+    integer(IK) :: i      !! counter
+    integer(IK) :: n      !! for accumulating the string
+    integer(IK) :: ilen   !! length of `str` string
+    integer(IK) :: ilen1  !! length of `s1` string
+
+    if (len(str)>0) then
+
+        tmp = CK_''  ! initialize
+        ilen1 = len(s1)
+
+        !     .
+        ! '123ab789'
+
+        do
+            ilen = len(str)
+            i = index(str,s1)
+            if (i>0) then
+                if (i>1) tmp = tmp//str(1:i-1)
+                tmp = tmp//s2 ! replace s1 with s2 in new string
+                n = i+ilen1   ! start of remainder of str to keep
+                if (n<=ilen) then
+                    str = str(n:ilen)
+                else
+                    ! done
+                    exit
+                end if
+            else
+                ! done: get remainder of string
+                tmp = tmp//str
+                exit
+            end if
+        end do
+
+        str = tmp
+
+    end if
+
+    end subroutine replace_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Decode a string from the "JSON Pointer" RFC 6901 format.
+!
+!  It replaces `~1` with `/` and `~0` with `~`.
+
+    pure function decode_rfc6901(str) result(str_out)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in) :: str
+    character(kind=CK,len=:),allocatable :: str_out
+
+    str_out = str
+
+    call replace_string(str_out,tilde//CK_'1',slash)
+    call replace_string(str_out,tilde//CK_'0',tilde)
+
+    end function decode_rfc6901
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Encode a string into the "JSON Pointer" RFC 6901 format.
+!
+!  It replaces `~` with `~0` and `/` with `~1`.
+
+    pure function encode_rfc6901(str) result(str_out)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in) :: str
+    character(kind=CK,len=:),allocatable :: str_out
+
+    str_out = str
+
+    call replace_string(str_out,tilde,tilde//CK_'0')
+    call replace_string(str_out,slash,tilde//CK_'1')
+
+    end function encode_rfc6901
 !*****************************************************************************************
 
     end module json_string_utilities

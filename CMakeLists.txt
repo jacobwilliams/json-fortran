@@ -11,6 +11,9 @@
 
 cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 
+set(PROJECT_DESCRIPTION "A Fortran 2008 JSON API")
+set(PROJECT_URL "https://github.com/jacobwilliams/json-fortran")
+
 # Set the type/configuration of build to perform
 set ( CMAKE_CONFIGURATION_TYPES "Debug" "Release" "MinSizeRel" "RelWithDebInfo" )
 set ( CMAKE_BUILD_TYPE "Release"
@@ -34,12 +37,13 @@ project ( jsonfortran NONE )
 # Get version (semantic versioning)
 # C.F. semver.org
 #----------------------------------
-file ( STRINGS "${CMAKE_SOURCE_DIR}/__VERSION__" VERSION )
+file ( STRINGS "${CMAKE_SOURCE_DIR}/.VERSION" VERSION )
 string( REPLACE "." ";" VERSION_LIST ${VERSION} )
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
 list(GET VERSION_LIST 2 VERSION_PATCH)
-message ( STATUS "CMake build configuration for JSON-Fortran ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
+set(PROJECT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+message ( STATUS "CMake build configuration for JSON-Fortran ${PROJECT_VERSION}" )
 
 #-------------------------------------
 # Collect source files for the library
@@ -163,13 +167,20 @@ if ( NOT SKIP_DOC_GEN )
     else ()
       set ( MACRO_FLAG "" )
     endif ()
+    # Pick the preprocessor to use based on the Fortran compiler
+    if ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel" )
+      set ( FPP "fpp\n" )
+    else ()
+      set ( FPP "gfortran -E\n" ) # default to gfortran -E for gfortran and unsupported compilers
+    endif ()
+    file ( WRITE "${CMAKE_BINARY_DIR}/.PREPROCESSOR" "${FPP}" )
     # Dynamically generate the FORD outputs list
     message ( STATUS "Dynamically computing FORD output information..." )
     if ( NOT (DEFINED FORD_OUTPUTS_CACHED) )
       message ( STATUS "Running FORD to dynamically compute documentation outputs, this could take a while..." )
       execute_process ( COMMAND ${CMAKE_COMMAND} -E remove_directory ${DOC_DIR}
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${DOC_DIR}
-	COMMAND "${FORD}" -q ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${PAGE_DIR}" "${FORD_PROJECT_FILE}" OUTPUT_QUIET )
+	COMMAND "${FORD}" --debug -q ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${PAGE_DIR}" "${FORD_PROJECT_FILE}" OUTPUT_QUIET )
     else ()
       message ( STATUS "Re-using cached FORD outputs, rather than regenerating them" )
     endif ()
@@ -185,12 +196,12 @@ if ( NOT SKIP_DOC_GEN )
     message ( STATUS "Done dynamically computing FORD outputs." )
 
     foreach ( DOC_SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} ${CMAKE_SOURCE_DIR}/README.md
-	${CMAKE_SOURCE_DIR}/CHANGELOG.md ${CMAKE_SOURCE_DIR}/CONTRIBUTING.md
+	${CMAKE_SOURCE_DIR}/CHANGELOG.md ${CMAKE_SOURCE_DIR}/.github/CONTRIBUTING.md
 	${CMAKE_SOURCE_DIR}/LICENSE ${CMAKE_SOURCE_DIR}/json-fortran.md ${PAGES_FILES} )
       list ( APPEND FORD_DEPENDS "${DOC_SRC_FILE}" )
     endforeach ()
     add_custom_command ( OUTPUT ${FORD_OUTPUTS_CACHED}
-      COMMAND "${FORD}" ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${CMAKE_SOURCE_DIR}/pages" "${FORD_PROJECT_FILE}"
+      COMMAND "${FORD}" --debug ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${CMAKE_SOURCE_DIR}/pages" "${FORD_PROJECT_FILE}"
       MAIN_DEPENDENCY "${FORD_PROJECT_FILE}"
       DEPENDS ${FORD_DEPENDS}
       COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using FORD" )
@@ -239,7 +250,7 @@ if ( ENABLE_TESTS )
   # Validate input
   if ( JSONLINT )
     file ( GLOB JSON_INPUTS "${DATA_DIR}/inputs/*.json" )
-    file ( GLOB INVALID_JSON "${DATA_DIR}/inputs/*invalid*.json" )
+    file ( GLOB INVALID_JSON "${DATA_DIR}/inputs/*invalid*.json" "${DATA_DIR}/inputs/comments.json")
 
     list ( REMOVE_ITEM JSON_INPUTS ${INVALID_JSON} )
     list ( REMOVE_ITEM JSON_INPUTS "${DATA_DIR}/inputs/big.json" ) # This takes too long and is valid
@@ -390,3 +401,14 @@ set ( ENABLE_BUILD_TREE_EXPORT FALSE CACHE BOOL
 if ( ENABLE_BUILD_TREE_EXPORT )
   export ( PACKAGE ${PACKAGE_NAME} )
 endif ()
+
+# pkg-config stuff
+configure_file(
+   "${CMAKE_CURRENT_SOURCE_DIR}/json-fortran.pc.cmake.in"
+   "${CMAKE_CURRENT_BINARY_DIR}/json-fortran.pc"
+   @ONLY
+)
+install(FILES
+   "${CMAKE_CURRENT_BINARY_DIR}/json-fortran.pc"
+   DESTINATION "${INSTALL_LIB_DIR}/pkgconfig"
+)

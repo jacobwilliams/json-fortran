@@ -31,6 +31,7 @@ contains
     character(kind=json_CK,len=:),allocatable :: str,name
     logical :: found,lval
     integer :: var_type,n_children
+    integer(json_ik) :: ival
 
     character(kind=json_CDK,len=*),parameter :: json_str = '{ "blah": 123 }'
 
@@ -87,7 +88,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_variable_info...'
-    call f%info('blah',found,var_type,n_children)
+    call f%info('blah',found,var_type,n_children,name)
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -111,7 +112,22 @@ contains
         if (found .and. lval) then
             write(error_unit,'(A)') '...success'
         else
-            write(error_unit,'(A)') 'Error: incorrect result.'
+            write(error_unit,'(A)') 'Error: incorrect result: ', lval
+            error_cnt = error_cnt + 1
+        end if
+    end if
+
+    write(error_unit,'(A)') 'json_file_get_integer...'
+    call f2%get('a.b',ival,found)
+    if (f2%failed()) then
+        call f2%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        !also make sure the values are correct:
+        if (found .and. ival==1_JSON_IK) then
+            write(error_unit,'(A)') '...success'
+        else
+            write(error_unit,'(A,1X,I5)') 'Error: incorrect result: ', ival
             error_cnt = error_cnt + 1
         end if
     end if

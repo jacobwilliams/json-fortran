@@ -4,7 +4,7 @@
 !
 !  Higher-level [[json_file]] interface for the [[json_value]] type.
 !
-!## License
+!### License
 !  * JSON-Fortran is released under a BSD-style license.
 !    See the [LICENSE](https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE)
 !    file for details.
@@ -30,13 +30,13 @@
     !  The `json_file` is the main public class that is
     !  used to open a file and get data from it.
     !
-    !  A `json_file` contains only two items: an instance of a [[json_core]],
+    !  A `json_file` contains only two items: an instance of a [[json_core(type)]],
     !  which use used for all data manipulation, and a [[json_value]],
     !  which is used to construct the linked-list data structure.
     !  Note that most methods in the `json_file` class are simply wrappers
     !  to the lower-level routines in the [[json_value_module]].
     !
-    !# Example
+    !### Example
     !
     !```fortran
     !    program test
@@ -61,15 +61,17 @@
 
         private
 
-        type(json_core) :: json !! the instance of the [[json_core]] factory used for this file
-
+        type(json_core) :: core !! The instance of the [[json_core(type)]] factory used for this file.
         type(json_value),pointer :: p => null()  !! the JSON structure read from the file
 
         logical :: finalize = .true. !! if true, the finalizer will destroy the data
                                      !! in the class (both `p` and `json`).
     contains
 
-        procedure,public :: initialize => initialize_json_core_in_file
+        generic,public :: initialize => initialize_json_core_in_file,&
+                                        set_json_core_in_file
+
+        procedure,public :: get_core => get_json_core_in_file
 
         procedure,public :: load_file => json_file_load
 
@@ -78,6 +80,7 @@
         procedure,public :: destroy => json_file_destroy
         procedure,public :: move    => json_file_move_pointer
         generic,public   :: info    => MAYBEWRAP(json_file_variable_info)
+        generic,public   :: matrix_info => MAYBEWRAP(json_file_variable_matrix_info)
 
         !error checking:
         procedure,public :: failed => json_file_failed
@@ -91,6 +94,8 @@
                                         json_file_print_1, &
                                         json_file_print_2
 
+        !>
+        !  Get a variable from a [[json_file(type)]], by specifying the path.
         generic,public :: get => MAYBEWRAP(json_file_get_object),      &
                                  MAYBEWRAP(json_file_get_integer),     &
                                  MAYBEWRAP(json_file_get_double),      &
@@ -100,8 +105,49 @@
                                  MAYBEWRAP(json_file_get_double_vec),  &
                                  MAYBEWRAP(json_file_get_logical_vec), &
                                  MAYBEWRAP(json_file_get_string_vec),  &
+                                 MAYBEWRAP(json_file_get_alloc_string_vec),  &
                                  json_file_get_root
 
+        !>
+        !  Add a variable to a [[json_file(type)]], by specifying the path.
+        !
+        !### Example
+        !
+        !```fortran
+        !  program test
+        !  use json_module, rk=>json_rk, ik=>json_ik
+        !  implicit none
+        !  type(json_file) :: f
+        !  call f%initialize()  ! specify whatever init options you want.
+        !  call f%add('inputs.t', 0.0_rk)
+        !  call f%add('inputs.x', [1.0_rk,2.0_rk,3.0_rk])
+        !  call f%add('inputs.flag', .true.)
+        !  call f%print_file()
+        !  end program test
+        !```
+        generic,public :: add => MAYBEWRAP(json_file_add_object),      &
+                                 MAYBEWRAP(json_file_add_integer),     &
+                                 MAYBEWRAP(json_file_add_double),      &
+                                 MAYBEWRAP(json_file_add_logical),     &
+                                 MAYBEWRAP(json_file_add_string),      &
+                                 MAYBEWRAP(json_file_add_integer_vec), &
+                                 MAYBEWRAP(json_file_add_double_vec),  &
+                                 MAYBEWRAP(json_file_add_logical_vec), &
+                                 MAYBEWRAP(json_file_add_string_vec)
+#ifdef USE_UCS4
+        generic,public :: add => json_file_add_string_path_ascii, &
+                                 json_file_add_string_value_ascii,&
+                                 json_file_add_string_vec_path_ascii,&
+                                 json_file_add_string_vec_vec_ascii
+#endif
+
+        !>
+        !  Update a scalar variable in a [[json_file(type)]],
+        !  by specifying the path.
+        !
+        !@note These have been mostly supplanted by the `add`
+        !      methods, which do a similar thing (and can be used for
+        !      scalars and vectors, etc.)
         generic,public :: update =>  MAYBEWRAP(json_file_update_integer),  &
                                      MAYBEWRAP(json_file_update_logical),  &
                                      MAYBEWRAP(json_file_update_real),     &
@@ -111,11 +157,23 @@
                                     json_file_update_string_val_ascii
 #endif
 
+        !traverse
+        procedure,public :: traverse => json_file_traverse
+
+        ! ***************************************************
+        ! private routines
+        ! ***************************************************
+
         !load from string:
         procedure :: MAYBEWRAP(json_file_load_from_string)
 
-        !git info:
+        !initialize
+        procedure :: initialize_json_core_in_file
+        procedure :: set_json_core_in_file
+
+        !get info:
         procedure :: MAYBEWRAP(json_file_variable_info)
+        procedure :: MAYBEWRAP(json_file_variable_matrix_info)
 
         !get:
         procedure :: MAYBEWRAP(json_file_get_object)
@@ -127,7 +185,25 @@
         procedure :: MAYBEWRAP(json_file_get_double_vec)
         procedure :: MAYBEWRAP(json_file_get_logical_vec)
         procedure :: MAYBEWRAP(json_file_get_string_vec)
+        procedure :: MAYBEWRAP(json_file_get_alloc_string_vec)
         procedure :: json_file_get_root
+
+        !add:
+        procedure :: MAYBEWRAP(json_file_add_object)
+        procedure :: MAYBEWRAP(json_file_add_integer)
+        procedure :: MAYBEWRAP(json_file_add_double)
+        procedure :: MAYBEWRAP(json_file_add_logical)
+        procedure :: MAYBEWRAP(json_file_add_string)
+        procedure :: MAYBEWRAP(json_file_add_integer_vec)
+        procedure :: MAYBEWRAP(json_file_add_double_vec)
+        procedure :: MAYBEWRAP(json_file_add_logical_vec)
+        procedure :: MAYBEWRAP(json_file_add_string_vec)
+#ifdef USE_UCS4
+        procedure :: json_file_add_string_path_ascii
+        procedure :: json_file_add_string_value_ascii
+        procedure :: json_file_add_string_vec_path_ascii
+        procedure :: json_file_add_string_vec_vec_ascii
+#endif
 
         !update:
         procedure :: MAYBEWRAP(json_file_update_integer)
@@ -154,10 +230,10 @@
     !  date: 07/23/2015
     !
     !  Structure constructor to initialize a [[json_file(type)]] object
-    !  with an existing [[json_value]] object, and either the [[json_core]]
-    !  settings or a [[json_core]] instance.
+    !  with an existing [[json_value]] object, and either the [[json_core(type)]]
+    !  settings or a [[json_core(type)]] instance.
     !
-    !# Example
+    !### Example
     !
     !```fortran
     ! ...
@@ -210,7 +286,7 @@
     class(json_file),intent(in) :: me
     logical(LK)                 :: failed  !! will be true if there has been an error.
 
-    failed = me%json%failed()
+    failed = me%core%failed()
 
     end function json_file_failed
 !*****************************************************************************************
@@ -227,7 +303,7 @@
     logical(LK),intent(out) :: status_ok !! true if there were no errors
     character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! the error message (if there were errors)
 
-    call me%json%check_for_errors(status_ok,error_msg)
+    call me%core%check_for_errors(status_ok,error_msg)
 
     end subroutine json_file_check_for_errors
 !*****************************************************************************************
@@ -242,7 +318,7 @@
 
     class(json_file),intent(inout) :: me
 
-    call me%json%clear_exceptions()
+    call me%core%clear_exceptions()
 
     end subroutine json_file_clear_exceptions
 !*****************************************************************************************
@@ -258,14 +334,14 @@
     class(json_file),intent(inout) :: me
     integer, intent(in), optional  :: io_unit
 
-    call me%json%print_error_message(io_unit)
+    call me%core%print_error_message(io_unit)
 
     end subroutine json_file_print_error_message
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Initialize the [[json_core]] for this [[json_file]].
+!  Initialize the [[json_core(type)]] for this [[json_file]].
 !  This is just a wrapper for [[json_initialize]].
 !
 !@note: This does not destroy the data in the file.
@@ -279,36 +355,77 @@
                                             strict_type_checking,&
                                             trailing_spaces_significant,&
                                             case_sensitive_keys,&
+                                            no_whitespace,&
+                                            unescape_strings,&
+                                            comment_char,&
+                                            path_mode,&
+                                            path_separator,&
+                                            compress_vectors,&
+                                            allow_duplicate_keys,&
                                             finalize)
 
     implicit none
 
     class(json_file),intent(inout) :: me
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
-                                                            !! conversions are done for the `get` routines
-                                                            !! (default is false)
-    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
-                                                                    !! space to be considered significant.
-    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive.
-    logical(LK),intent(in),optional :: finalize             !! if true, the JSON data in the file will
-                                                            !! be destroyed when the variable goes out
-                                                            !! of scope [the default is true].
+#include "json_initialize_arguments.inc"
+    logical(LK),intent(in),optional :: finalize  !! if true, the JSON data in the file will
+                                                 !! be destroyed when the variable goes out
+                                                 !! of scope [the default is true].
 
-    call me%json%initialize(verbose,compact_reals,&
+    call me%core%initialize(verbose,compact_reals,&
                             print_signs,real_format,spaces_per_tab,&
                             strict_type_checking,&
                             trailing_spaces_significant,&
-                            case_sensitive_keys)
+                            case_sensitive_keys,&
+                            no_whitespace,&
+                            unescape_strings,&
+                            comment_char,&
+                            path_mode,&
+                            path_separator,&
+                            compress_vectors,&
+                            allow_duplicate_keys)
 
     if (present(finalize)) me%finalize = finalize
 
     end subroutine initialize_json_core_in_file
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Set the [[json_core(type)]] for this [[json_file]].
+!
+!@note: This does not destroy the data in the file.
+!
+!@note: This one is used if you want to initialize the file with
+!       an already-existing [[json_core(type)]] (presumably, this was already
+!       initialized by a call to [[initialize_json_core]] or similar).
+
+    subroutine set_json_core_in_file(me,core)
+
+    implicit none
+
+    class(json_file),intent(inout) :: me
+    type(json_core),intent(in)     :: core
+
+    me%core = core
+
+    end subroutine set_json_core_in_file
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Get a copy of the [[json_core(type)]] in this [[json_file]].
+
+    subroutine get_json_core_in_file(me,core)
+
+    implicit none
+
+    class(json_file),intent(in) :: me
+    type(json_core),intent(out) :: core
+
+    core = me%core
+
+    end subroutine get_json_core_in_file
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -326,34 +443,39 @@
                                   print_signs,real_format,spaces_per_tab,&
                                   strict_type_checking,&
                                   trailing_spaces_significant,&
-                                  case_sensitive_keys,finalize) result(file_object)
+                                  case_sensitive_keys,&
+                                  no_whitespace,&
+                                  unescape_strings,&
+                                  comment_char,&
+                                  path_mode,&
+                                  path_separator,&
+                                  compress_vectors,&
+                                  allow_duplicate_keys,&
+                                  finalize) result(file_object)
 
     implicit none
 
     type(json_file) :: file_object
     type(json_value),pointer,optional,intent(in) :: p  !! `json_value` object to cast
                                                        !! as a `json_file` object
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
-                                                            !! conversions are done for the `get` routines
-                                                            !! (default is false)
-    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
-                                                                    !! space to be considered significant.
-    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive.
-    logical(LK),intent(in),optional :: finalize             !! if true, the JSON data in the file will
-                                                            !! be destroyed when the variable goes out
-                                                            !! of scope [the default is true].
+#include "json_initialize_arguments.inc"
+    logical(LK),intent(in),optional :: finalize        !! if true, the JSON data in the file will
+                                                       !! be destroyed when the variable goes out
+                                                       !! of scope [the default is true].
 
     call file_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
                                 strict_type_checking,&
                                 trailing_spaces_significant,&
-                                case_sensitive_keys)
+                                case_sensitive_keys,&
+                                no_whitespace,&
+                                unescape_strings,&
+                                comment_char,&
+                                path_mode,&
+                                path_separator,&
+                                compress_vectors,&
+                                allow_duplicate_keys,&
+                                finalize)
 
     if (present(p)) file_object%p => p
     if (present(finalize)) file_object%finalize = finalize
@@ -365,7 +487,7 @@
 !> author: Jacob Williams
 !  date: 4/26/2016
 !
-!  Cast a [[json_value]] pointer and a [[json_core]] object
+!  Cast a [[json_value]] pointer and a [[json_core(type)]] object
 !  as a [[json_file(type)]] object.
 
     function initialize_json_file_v2(json_value_object,json_core_object,&
@@ -382,7 +504,7 @@
                                                      !! of scope [the default is true].
 
     file_object%p    => json_value_object
-    file_object%json = json_core_object
+    file_object%core = json_core_object
     if (present(finalize)) file_object%finalize = finalize
 
     end function initialize_json_file_v2
@@ -396,8 +518,8 @@
 !  or will be reused to open a different file.
 !  Otherwise a memory leak will occur.
 !
-!  Optionally, also destroy the [[json_core]] instance (this
-!  is not necessary to prevent memory leaks, since a [[json_core]]
+!  Optionally, also destroy the [[json_core(type)]] instance (this
+!  is not necessary to prevent memory leaks, since a [[json_core(type)]]
 !  does not use pointers).
 !
 !### History
@@ -412,13 +534,13 @@
     implicit none
 
     class(json_file),intent(inout) :: me
-    logical,intent(in),optional :: destroy_core  !! to also destroy the [[json_core]].
-                                                 !! [default is to leave it as is].
+    logical,intent(in),optional :: destroy_core  !! to also destroy the [[json_core(type)]].
+                                                 !! default is to leave it as is.
 
-    if (associated(me%p)) call me%json%destroy(me%p)
+    if (associated(me%p)) call me%core%destroy(me%p)
 
     if (present(destroy_core)) then
-        if (destroy_core) call me%json%destroy()
+        if (destroy_core) call me%core%destroy()
     end if
 
     end subroutine json_file_destroy
@@ -445,7 +567,7 @@
         if (from%failed()) then
             !Don't get the data if the FROM file has an
             !active exception, since it may not be valid.
-            call to%json%throw_exception('Error in json_file_move_pointer: '//&
+            call to%core%throw_exception('Error in json_file_move_pointer: '//&
                                          'error exception in FROM file.')
         else
             call to%initialize()  !initialize and clear any exceptions that may be present
@@ -454,7 +576,7 @@
         end if
 
     else
-        call to%json%throw_exception('Error in json_file_move_pointer: '//&
+        call to%core%throw_exception('Error in json_file_move_pointer: '//&
                                      'pointer is not associated.')
     end if
 
@@ -467,7 +589,7 @@
 !
 !  Load the JSON data from a file.
 !
-!# Example
+!### Example
 !
 !```fortran
 !     program main
@@ -488,7 +610,7 @@
     character(kind=CDK,len=*),intent(in) :: filename  !! the filename to open
     integer(IK),intent(in),optional      :: unit      !! the unit number to use (if not present, a newunit is used)
 
-    call me%json%parse(file=filename, p=me%p, unit=unit)
+    call me%core%parse(file=filename, p=me%p, unit=unit)
 
     end subroutine json_file_load
 !*****************************************************************************************
@@ -499,7 +621,7 @@
 !
 !  Load the JSON data from a string.
 !
-!# Example
+!### Example
 !
 !  Load JSON from a string:
 !```fortran
@@ -514,7 +636,7 @@
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
 
-    call me%json%parse(str=str, p=me%p)
+    call me%core%parse(str=str, p=me%p)
 
     end subroutine json_file_load_from_string
 !*****************************************************************************************
@@ -547,7 +669,7 @@
 
     class(json_file),intent(inout)  :: me
 
-    call me%json%print(me%p,iunit=output_unit)
+    call me%core%print(me%p,iunit=output_unit)
 
     end subroutine json_file_print_to_console
 !*****************************************************************************************
@@ -566,9 +688,9 @@
     integer(IK),intent(in)          :: iunit  !! file unit number (must not be -1)
 
     if (iunit/=unit2str) then
-        call me%json%print(me%p,iunit=iunit)
+        call me%core%print(me%p,iunit=iunit)
     else
-        call me%json%throw_exception('Error in json_file_print_1: iunit must not be -1.')
+        call me%core%throw_exception('Error in json_file_print_1: iunit must not be -1.')
     end if
 
     end subroutine json_file_print_1
@@ -581,7 +703,7 @@
 !  Print the JSON structure to the specified filename.
 !  The file is opened, printed, and then closed.
 !
-!# Example
+!### Example
 !  Example loading a JSON file, changing a value, and then printing
 !  result to a new file:
 !```fortran
@@ -599,7 +721,7 @@
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: filename  !! filename to print to
 
-    call me%json%print(me%p,filename)
+    call me%core%print(me%p,filename)
 
     end subroutine json_file_print_2
 !*****************************************************************************************
@@ -610,7 +732,7 @@
 !
 !  Print the JSON file to a string.
 !
-!# Example
+!### Example
 !
 !  Open a JSON file, and then print the contents to a string:
 !```fortran
@@ -627,7 +749,7 @@
     class(json_file),intent(inout)                   :: me
     character(kind=CK,len=:),allocatable,intent(out) :: str  !! string to print JSON data to
 
-    call me%json%print_to_string(me%p,str)
+    call me%core%print_to_string(me%p,str)
 
     end subroutine json_file_print_to_string
 !*****************************************************************************************
@@ -637,40 +759,23 @@
 !  date: 2/3/2014
 !
 !  Returns information about a variable in a [[json_file(type)]].
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
 
-    subroutine json_file_variable_info(me,path,found,var_type,n_children)
+    subroutine json_file_variable_info(me,path,found,var_type,n_children,name)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: path       !! path to the variable
-    logical(LK),intent(out)             :: found      !! the variable exists in the structure
-    integer(IK),intent(out)             :: var_type   !! variable type
-    integer(IK),intent(out)             :: n_children !! number of children
+    logical(LK),intent(out),optional    :: found      !! the variable exists in the structure
+    integer(IK),intent(out),optional    :: var_type   !! variable type
+    integer(IK),intent(out),optional    :: n_children !! number of children
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    type(json_value),pointer :: p
-
-    !initialize:
-    nullify(p)
-
-    !get a pointer to the variable (if it is there):
-    call me%get(path,p,found)
-
-    if (found) then
-
-        !get info:
-        call me%json%info(p,var_type,n_children)
-
-    else
-
-        !set to dummy values:
-        var_type = json_unknown
-        n_children = 0
-
-    end if
-
-    !cleanup:
-    nullify(p)
+    call me%core%info(me%p,path,found,var_type,n_children,name)
 
     end subroutine json_file_variable_info
 !*****************************************************************************************
@@ -678,20 +783,89 @@
 !*****************************************************************************************
 !>
 !  Alternate version of [[json_file_variable_info]], where "path" is kind=CDK.
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
 
-    subroutine wrap_json_file_variable_info(me,path,found,var_type,n_children)
+    subroutine wrap_json_file_variable_info(me,path,found,var_type,n_children,name)
 
     implicit none
 
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: path
-    logical(LK),intent(out)              :: found
-    integer(IK),intent(out)              :: var_type
-    integer(IK),intent(out)              :: n_children
+    logical(LK),intent(out),optional     :: found
+    integer(IK),intent(out),optional     :: var_type
+    integer(IK),intent(out),optional     :: n_children
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    call me%info(to_unicode(path),found,var_type,n_children)
+    call me%info(to_unicode(path),found,var_type,n_children,name)
 
     end subroutine wrap_json_file_variable_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 6/26/2016
+!
+!  Returns matrix information about a variable in a [[json_file(type)]].
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
+
+    subroutine json_file_variable_matrix_info(me,path,is_matrix,found,&
+                                        var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path      !! path to the variable
+    logical(LK),intent(out)             :: is_matrix !! true if it is a valid matrix
+    logical(LK),intent(out),optional    :: found     !! true if it was found
+    integer(IK),intent(out),optional    :: var_type  !! variable type of data in
+                                                     !! the matrix (if all elements have
+                                                     !! the same type)
+    integer(IK),intent(out),optional    :: n_sets    !! number of data sets (i.e., matrix
+                                                     !! rows if using row-major order)
+    integer(IK),intent(out),optional    :: set_size  !! size of each data set (i.e., matrix
+                                                     !! cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size,name)
+
+    end subroutine json_file_variable_matrix_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_variable_matrix_info]], where "path" is kind=CDK.
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
+
+    subroutine wrap_json_file_variable_matrix_info(me,path,is_matrix,found,&
+                                                   var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path      !! path to the variable
+    logical(LK),intent(out)              :: is_matrix !! true if it is a valid matrix
+    logical(LK),intent(out),optional     :: found     !! true if it was found
+    integer(IK),intent(out),optional     :: var_type  !! variable type of data in
+                                                      !! the matrix (if all elements have
+                                                      !! the same type)
+    integer(IK),intent(out),optional     :: n_sets    !! number of data sets (i.e., matrix
+                                                      !! rows if using row-major order)
+    integer(IK),intent(out),optional     :: set_size  !! size of each data set (i.e., matrix
+                                                      !! cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    call me%matrix_info(to_unicode(path),is_matrix,found,var_type,n_sets,set_size,name)
+
+    end subroutine wrap_json_file_variable_matrix_info
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -729,7 +903,7 @@
     type(json_value),pointer,intent(out) :: p      !! pointer to the variable
     logical(LK),intent(out),optional     :: found  !! if it was really found
 
-    call me%json%get(me%p, path=path, p=p, found=found)
+    call me%core%get(me%p, path=path, p=p, found=found)
 
     end subroutine json_file_get_object
 !*****************************************************************************************
@@ -743,9 +917,9 @@
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: path
-    type(json_value),pointer,intent(out) :: p
-    logical(LK),intent(out),optional     :: found
+    character(kind=CDK,len=*),intent(in) :: path    !! the path to the variable
+    type(json_value),pointer,intent(out) :: p       !! pointer to the variable
+    logical(LK),intent(out),optional     :: found   !! if it was really found
 
     call me%get(to_unicode(path), p, found)
 
@@ -767,7 +941,7 @@
     integer(IK),intent(out)             :: val    !! value
     logical(LK),intent(out),optional    :: found  !! if it was really found
 
-    call me%json%get(me%p, path=path, value=val, found=found)
+    call me%core%get(me%p, path=path, value=val, found=found)
 
     end subroutine json_file_get_integer
 !*****************************************************************************************
@@ -781,9 +955,9 @@
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: path
-    integer(IK),intent(out)              :: val
-    logical(LK),intent(out),optional     :: found
+    character(kind=CDK,len=*),intent(in) :: path   !! the path to the variable
+    integer(IK),intent(out)              :: val    !! value
+    logical(LK),intent(out),optional     :: found  !! if it was really found
 
     call me%get(to_unicode(path), val, found)
 
@@ -805,7 +979,7 @@
     integer(IK),dimension(:),allocatable,intent(out) :: vec    !! the value vector
     logical(LK),intent(out),optional                 :: found  !! if it was really found
 
-    call me%json%get(me%p, path, vec, found)
+    call me%core%get(me%p, path, vec, found)
 
     end subroutine json_file_get_integer_vec
 !*****************************************************************************************
@@ -819,9 +993,9 @@
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CDK,len=*),intent(in)             :: path
-    integer(IK),dimension(:),allocatable,intent(out) :: vec
-    logical(LK),intent(out),optional                 :: found
+    character(kind=CDK,len=*),intent(in)             :: path  !! the path to the variable
+    integer(IK),dimension(:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional                 :: found !! if it was really found
 
     call me%get(to_unicode(path), vec, found)
 
@@ -839,11 +1013,11 @@
     implicit none
 
     class(json_file),intent(inout)      :: me
-    character(kind=CK,len=*),intent(in) :: path
-    real(RK),intent(out)                :: val
-    logical(LK),intent(out),optional    :: found
+    character(kind=CK,len=*),intent(in) :: path  !! the path to the variable
+    real(RK),intent(out)                :: val   !! value
+    logical(LK),intent(out),optional    :: found !! if it was really found
 
-    call me%json%get(me%p, path=path, value=val, found=found)
+    call me%core%get(me%p, path=path, value=val, found=found)
 
     end subroutine json_file_get_double
 !*****************************************************************************************
@@ -857,9 +1031,9 @@
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: path
-    real(RK),intent(out)                 :: val
-    logical(LK),intent(out),optional     :: found
+    character(kind=CDK,len=*),intent(in) :: path  !! the path to the variable
+    real(RK),intent(out)                 :: val   !! value
+    logical(LK),intent(out),optional     :: found !! if it was really found
 
     call me%get(to_unicode(path), val, found)
 
@@ -877,11 +1051,11 @@
     implicit none
 
     class(json_file),intent(inout)                :: me
-    character(kind=CK,len=*),intent(in)           :: path
-    real(RK),dimension(:),allocatable,intent(out) :: vec
-    logical(LK),intent(out),optional              :: found
+    character(kind=CK,len=*),intent(in)           :: path  !! the path to the variable
+    real(RK),dimension(:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional              :: found !! if it was really found
 
-    call me%json%get(me%p, path, vec, found)
+    call me%core%get(me%p, path, vec, found)
 
     end subroutine json_file_get_double_vec
 !*****************************************************************************************
@@ -895,9 +1069,9 @@
     implicit none
 
     class(json_file),intent(inout)                :: me
-    character(kind=CDK,len=*),intent(in)          :: path
-    real(RK),dimension(:),allocatable,intent(out) :: vec
-    logical(LK),intent(out),optional              :: found
+    character(kind=CDK,len=*),intent(in)          :: path  !! the path to the variable
+    real(RK),dimension(:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional              :: found !! if it was really found
 
     call me%get(to_unicode(path), vec, found)
 
@@ -915,11 +1089,11 @@
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CK,len=*),intent(in)  :: path
-    logical(LK),intent(out)              :: val
-    logical(LK),intent(out),optional     :: found
+    character(kind=CK,len=*),intent(in)  :: path   !! the path to the variable
+    logical(LK),intent(out)              :: val    !! value
+    logical(LK),intent(out),optional     :: found  !! if it was really found
 
-    call me%json%get(me%p, path=path, value=val, found=found)
+    call me%core%get(me%p, path=path, value=val, found=found)
 
     end subroutine json_file_get_logical
 !*****************************************************************************************
@@ -933,9 +1107,9 @@
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: path
-    logical(LK),intent(out)              :: val
-    logical(LK),intent(out),optional     :: found
+    character(kind=CDK,len=*),intent(in) :: path   !! the path to the variable
+    logical(LK),intent(out)              :: val    !! value
+    logical(LK),intent(out),optional     :: found  !! if it was really found
 
     call me%get(to_unicode(path), val, found)
 
@@ -953,11 +1127,11 @@
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CK,len=*),intent(in)              :: path
-    logical(LK),dimension(:),allocatable,intent(out) :: vec
-    logical(LK),intent(out),optional                 :: found
+    character(kind=CK,len=*),intent(in)              :: path  !! the path to the variable
+    logical(LK),dimension(:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional                 :: found !! if it was really found
 
-    call me%json%get(me%p, path, vec, found)
+    call me%core%get(me%p, path, vec, found)
 
     end subroutine json_file_get_logical_vec
 !*****************************************************************************************
@@ -971,9 +1145,9 @@
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CDK,len=*),intent(in)             :: path
-    logical(LK),dimension(:),allocatable,intent(out) :: vec
-    logical(LK),intent(out),optional                 :: found
+    character(kind=CDK,len=*),intent(in)             :: path  !! the path to the variable
+    logical(LK),dimension(:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional                 :: found !! if it was really found
 
     call me%get(to_unicode(path), vec, found)
 
@@ -992,11 +1166,11 @@
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CK,len=*),intent(in)              :: path
-    character(kind=CK,len=:),allocatable,intent(out) :: val
-    logical(LK),intent(out),optional                 :: found
+    character(kind=CK,len=*),intent(in)              :: path  !! the path to the variable
+    character(kind=CK,len=:),allocatable,intent(out) :: val   !! value
+    logical(LK),intent(out),optional                 :: found !! if it was really found
 
-    call me%json%get(me%p, path=path, value=val, found=found)
+    call me%core%get(me%p, path=path, value=val, found=found)
 
     end subroutine json_file_get_string
 !*****************************************************************************************
@@ -1010,9 +1184,9 @@
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CDK,len=*),intent(in)             :: path
-    character(kind=CK,len=:),allocatable,intent(out) :: val
-    logical(LK),intent(out),optional                 :: found
+    character(kind=CDK,len=*),intent(in)             :: path  !! the path to the variable
+    character(kind=CK,len=:),allocatable,intent(out) :: val   !! value
+    logical(LK),intent(out),optional                 :: found !! if it was really found
 
     call me%get(to_unicode(path), val, found)
 
@@ -1030,11 +1204,11 @@
     implicit none
 
     class(json_file),intent(inout)                                :: me
-    character(kind=CK,len=*),intent(in)                           :: path
-    character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
-    logical(LK),intent(out),optional                              :: found
+    character(kind=CK,len=*),intent(in)                           :: path  !! the path to the variable
+    character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec   !! value vector
+    logical(LK),intent(out),optional                              :: found !! if it was really found
 
-    call me%json%get(me%p, path, vec, found)
+    call me%core%get(me%p, path, vec, found)
 
     end subroutine json_file_get_string_vec
 !*****************************************************************************************
@@ -1048,9 +1222,9 @@
     implicit none
 
     class(json_file),intent(inout)                                :: me
-    character(kind=CDK,len=*),intent(in)                          :: path
-    character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
-    logical(LK),intent(out),optional                              :: found
+    character(kind=CDK,len=*),intent(in)                          :: path  !! the path to the variable
+    character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec   !! value vector
+    logical(LK),intent(out),optional                              :: found !! if it was really found
 
     call me%get(to_unicode(path), vec, found)
 
@@ -1059,43 +1233,567 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date:1/10/2015
+!  date: 12/17/2016
+!
+!  Get an (allocatable length) string vector from a JSON file.
+!  This is just a wrapper for [[json_get_alloc_string_vec_by_path]].
+
+    subroutine json_file_get_alloc_string_vec(me, path, vec, ilen, found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path !! the path to the variable
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec !! value vector
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+    logical(LK),intent(out),optional :: found
+
+    call me%core%get(me%p, path, vec, ilen, found)
+
+    end subroutine json_file_get_alloc_string_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_get_alloc_string_vec]], where "path" is kind=CDK.
+!  This is just a wrapper for [[wrap_json_get_alloc_string_vec_by_path]].
+
+    subroutine wrap_json_file_get_alloc_string_vec(me, path, vec, ilen, found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path !! the path to the variable
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec  !! value vector
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+    logical(LK),intent(out),optional :: found
+
+    call me%get(to_unicode(path), vec, ilen, found)
+
+    end subroutine wrap_json_file_get_alloc_string_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a [[json_value]] pointer to an object to a JSON file.
+
+    subroutine json_file_add_object(me,path,p,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    type(json_value),pointer,intent(in)  :: p            !! pointer to the variable to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_by_path(me%p,path,p,found,was_created)
+
+    end subroutine json_file_add_object
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_object]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_object(me,path,p,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    type(json_value),pointer,intent(in)  :: p            !! pointer to the variable to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_object(to_unicode(path),p,found,was_created)
+
+    end subroutine wrap_json_file_add_object
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add an integer value to a JSON file.
+
+    subroutine json_file_add_integer(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),intent(in)              :: val          !! value
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_by_path(me%p,path,val,found,was_created)
+
+    end subroutine json_file_add_integer
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_integer]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_integer(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),intent(in)               :: val          !! value
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_integer(to_unicode(path),val,found,was_created)
+
+    end subroutine wrap_json_file_add_integer
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add an integer vector to a JSON file.
+
+    subroutine json_file_add_integer_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    integer(IK),dimension(:),intent(in)  :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_by_path(me%p,path,vec,found,was_created)
+
+    end subroutine json_file_add_integer_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_integer_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_integer_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),dimension(:),intent(in)  :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_integer_vec(to_unicode(path),vec,found,was_created)
+
+    end subroutine wrap_json_file_add_integer_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a real(RK) variable value to a JSON file.
+
+    subroutine json_file_add_double(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    real(RK),intent(in)                 :: val          !! value
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_by_path(me%p,path,val,found,was_created)
+
+    end subroutine json_file_add_double
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_double]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_double(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(RK),intent(in)                  :: val          !! value
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_double(to_unicode(path),val,found,was_created)
+
+    end subroutine wrap_json_file_add_double
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a real(RK) vector to a JSON file.
+
+    subroutine json_file_add_double_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    real(RK),dimension(:),intent(in)     :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_by_path(me%p,path,vec,found,was_created)
+
+    end subroutine json_file_add_double_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_double_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_double_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(RK),dimension(:),intent(in)     :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_double_vec(to_unicode(path),vec,found,was_created)
+
+    end subroutine wrap_json_file_add_double_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a logical(LK) value to a JSON file.
+
+    subroutine json_file_add_logical(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    logical(LK),intent(in)               :: val          !! value
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_by_path(me%p,path,val,found,was_created)
+
+    end subroutine json_file_add_logical
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_logical]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_logical(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    logical(LK),intent(in)               :: val          !! value
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_logical(to_unicode(path),val,found,was_created)
+
+    end subroutine wrap_json_file_add_logical
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a logical(LK) vector to a JSON file.
+
+    subroutine json_file_add_logical_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    logical(LK),dimension(:),intent(in)  :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_by_path(me%p,path,vec,found,was_created)
+
+    end subroutine json_file_add_logical_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_logical_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_logical_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    logical(LK),dimension(:),intent(in)  :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_logical_vec(to_unicode(path),vec,found,was_created)
+
+    end subroutine wrap_json_file_add_logical_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a character string to a json file.
+
+    subroutine json_file_add_string(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    character(kind=CK,len=*),intent(in) :: val          !! value
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_by_path(me%p,path,val,found,was_created)
+
+    end subroutine json_file_add_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_string]], where "path" and "val" are kind=CDK.
+
+    subroutine wrap_json_file_add_string(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    character(kind=CDK,len=*),intent(in) :: val          !! value
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_string(to_unicode(path),to_unicode(val),found,was_created)
+
+    end subroutine wrap_json_file_add_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Wrapper for [[json_file_add_string]] where "path" is kind=CDK).
+
+    subroutine json_file_add_string_path_ascii(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    character(kind=CK,len=*),intent(in)  :: val          !! value
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%json_file_add_string(to_unicode(path),val,found,was_created)
+
+    end subroutine json_file_add_string_path_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Wrapper for [[json_file_add_string]] where "val" is kind=CDK).
+
+    subroutine json_file_add_string_value_ascii(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    character(kind=CDK,len=*),intent(in) :: val          !! value
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%json_file_add_string(path,to_unicode(val),found,was_created)
+
+end subroutine json_file_add_string_value_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a string vector to a JSON file.
+
+    subroutine json_file_add_string_vec(me,path,vec,found,was_created,ilen)
+
+    implicit none
+
+    class(json_file),intent(inout)                   :: me
+    character(kind=CK,len=*),intent(in)              :: path  !! the path to the variable
+    character(kind=CK,len=*),dimension(:),intent(in) :: vec   !! the value vector
+    logical(LK),intent(out),optional                 :: found        !! if the variable was found
+    logical(LK),intent(out),optional                 :: was_created  !! if the variable had to be created
+    integer(IK),dimension(:),intent(in),optional     :: ilen   !! the string lengths of each
+                                                               !! element in `value`. If not present,
+                                                               !! the full `len(value)` string is added
+                                                               !! for each element.
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_by_path(me%p,path,vec,found,was_created,ilen)
+
+    end subroutine json_file_add_string_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_string_vec]], where "path" and "vec" are kind=CDK.
+
+    subroutine wrap_json_file_add_string_vec(me,path,vec,found,was_created,ilen)
+
+    implicit none
+
+    class(json_file),intent(inout)                   :: me
+    character(kind=CDK,len=*),intent(in)             :: path  !! the path to the variable
+    character(kind=CDK,len=*),dimension(:),intent(in):: vec   !! the value vector
+    logical(LK),intent(out),optional                 :: found        !! if the variable was found
+    logical(LK),intent(out),optional                 :: was_created  !! if the variable had to be created
+    integer(IK),dimension(:),intent(in),optional     :: ilen   !! the string lengths of each
+                                                               !! element in `value`. If not present,
+                                                               !! the full `len(value)` string is added
+                                                               !! for each element.
+
+    call me%json_file_add_string_vec(to_unicode(path),to_unicode(vec),found,was_created,ilen)
+
+    end subroutine wrap_json_file_add_string_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_string_vec]], where "path" is kind=CDK.
+
+    subroutine json_file_add_string_vec_path_ascii(me,path,vec,found,was_created,ilen)
+
+    implicit none
+
+    class(json_file),intent(inout)                   :: me
+    character(kind=CDK,len=*),intent(in)             :: path  !! the path to the variable
+    character(kind=CK,len=*),dimension(:),intent(in) :: vec   !! the value vector
+    logical(LK),intent(out),optional                 :: found        !! if the variable was found
+    logical(LK),intent(out),optional                 :: was_created  !! if the variable had to be created
+    integer(IK),dimension(:),intent(in),optional     :: ilen   !! the string lengths of each
+                                                               !! element in `value`. If not present,
+                                                               !! the full `len(value)` string is added
+                                                               !! for each element.
+
+    call me%json_file_add_string_vec(to_unicode(path),vec,found,was_created,ilen)
+
+    end subroutine json_file_add_string_vec_path_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_string_vec]], where "vec" is kind=CDK.
+
+    subroutine json_file_add_string_vec_vec_ascii(me,path,vec,found,was_created,ilen)
+
+    implicit none
+
+    class(json_file),intent(inout)                    :: me
+    character(kind=CK,len=*),intent(in)               :: path  !! the path to the variable
+    character(kind=CDK,len=*),dimension(:),intent(in) :: vec   !! the value vector
+    logical(LK),intent(out),optional                  :: found        !! if the variable was found
+    logical(LK),intent(out),optional                  :: was_created  !! if the variable had to be created
+    integer(IK),dimension(:),intent(in),optional      :: ilen   !! the string lengths of each
+                                                                !! element in `value`. If not present,
+                                                                !! the full `len(value)` string is added
+                                                                !! for each element.
+
+    call me%json_file_add_string_vec(path,to_unicode(vec),found,was_created,ilen)
+
+    end subroutine json_file_add_string_vec_vec_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/10/2015
 !
 !  Given the path string, if the variable is present in the file,
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 !
-!# See also
+!### See also
 !  * [[json_update_integer]]
 
-    subroutine json_file_update_integer(me,name,val,found)
+    subroutine json_file_update_integer(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     integer(IK),intent(in)              :: val
     logical(LK),intent(out)             :: found
 
-    if (.not. me%json%failed()) call me%json%update(me%p,name,val,found)
+    if (.not. me%core%failed()) call me%core%update(me%p,path,val,found)
 
     end subroutine json_file_update_integer
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_file_update_integer]], where "name" is kind=CDK.
+!  Alternate version of [[json_file_update_integer]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_update_integer(me,name,val,found)
+    subroutine wrap_json_file_update_integer(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     integer(IK),intent(in)               :: val
     logical(LK),intent(out)              :: found
 
-    call me%update(to_unicode(name),val,found)
+    call me%update(to_unicode(path),val,found)
 
     end subroutine wrap_json_file_update_integer
 !*****************************************************************************************
@@ -1108,37 +1806,37 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 !
-!# See also
+!### See also
 !  * [[json_update_logical]]
 
-    subroutine json_file_update_logical(me,name,val,found)
+    subroutine json_file_update_logical(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     logical(LK),intent(in)              :: val
     logical(LK),intent(out)             :: found
 
-    if (.not. me%json%failed()) call me%json%update(me%p,name,val,found)
+    if (.not. me%core%failed()) call me%core%update(me%p,path,val,found)
 
     end subroutine json_file_update_logical
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_file_update_logical]], where "name" is kind=CDK.
+!  Alternate version of [[json_file_update_logical]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_update_logical(me,name,val,found)
+    subroutine wrap_json_file_update_logical(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     logical(LK),intent(in)               :: val
     logical(LK),intent(out)              :: found
 
-    call me%update(to_unicode(name),val,found)
+    call me%update(to_unicode(path),val,found)
 
     end subroutine wrap_json_file_update_logical
 !*****************************************************************************************
@@ -1151,37 +1849,37 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 !
-!# See also
+!### See also
 !  * [[json_update_double]]
 
-    subroutine json_file_update_real(me,name,val,found)
+    subroutine json_file_update_real(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     real(RK),intent(in)                 :: val
     logical(LK),intent(out)             :: found
 
-    if (.not. me%json%failed()) call me%json%update(me%p,name,val,found)
+    if (.not. me%core%failed()) call me%core%update(me%p,path,val,found)
 
     end subroutine json_file_update_real
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_file_update_real]], where "name" is kind=CDK.
+!  Alternate version of [[json_file_update_real]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_update_real(me,name,val,found)
+    subroutine wrap_json_file_update_real(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     real(RK),intent(in)                  :: val
     logical(LK),intent(out)              :: found
 
-    call me%update(to_unicode(name),val,found)
+    call me%update(to_unicode(path),val,found)
 
     end subroutine wrap_json_file_update_real
 !*****************************************************************************************
@@ -1194,55 +1892,55 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 !
-!# See also
+!### See also
 !  * [[json_update_string]]
 
-    subroutine json_file_update_string(me,name,val,found)
+    subroutine json_file_update_string(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     character(kind=CK,len=*),intent(in) :: val
     logical(LK),intent(out)             :: found
 
-    if (.not. me%json%failed()) call me%json%update(me%p,name,val,found)
+    if (.not. me%core%failed()) call me%core%update(me%p,path,val,found)
 
     end subroutine json_file_update_string
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_file_update_string]], where "name" and "val" are kind=CDK.
+!  Alternate version of [[json_file_update_string]], where "path" and "val" are kind=CDK.
 
-    subroutine wrap_json_file_update_string(me,name,val,found)
+    subroutine wrap_json_file_update_string(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call me%update(to_unicode(name),to_unicode(val),found)
+    call me%update(to_unicode(path),to_unicode(val),found)
 
     end subroutine wrap_json_file_update_string
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_file_update_string]], where "name" is kind=CDK.
+!  Alternate version of [[json_file_update_string]], where "path" is kind=CDK.
 
-    subroutine json_file_update_string_name_ascii(me,name,val,found)
+    subroutine json_file_update_string_name_ascii(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     character(kind=CK, len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call me%update(to_unicode(name),val,found)
+    call me%update(to_unicode(path),val,found)
 
     end subroutine json_file_update_string_name_ascii
 !*****************************************************************************************
@@ -1251,18 +1949,38 @@
 !>
 !  Alternate version of [[json_file_update_string]], where "val" is kind=CDK.
 
-    subroutine json_file_update_string_val_ascii(me,name,val,found)
+    subroutine json_file_update_string_val_ascii(me,path,val,found)
 
     implicit none
 
     class(json_file),intent(inout)       :: me
-    character(kind=CK, len=*),intent(in) :: name
+    character(kind=CK, len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call me%update(name,to_unicode(val),found)
+    call me%update(path,to_unicode(val),found)
 
     end subroutine json_file_update_string_val_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 6/11/2016
+!
+!  Traverse the JSON structure in the file.
+!  This routine calls the user-specified [[json_traverse_callback_func]]
+!  for each element of the structure.
+
+    subroutine json_file_traverse(me,traverse_callback)
+
+    implicit none
+
+    class(json_file),intent(inout)         :: me
+    procedure(json_traverse_callback_func) :: traverse_callback
+
+    call me%core%traverse(me%p,traverse_callback)
+
+    end subroutine json_file_traverse
 !*****************************************************************************************
 
 !*****************************************************************************************

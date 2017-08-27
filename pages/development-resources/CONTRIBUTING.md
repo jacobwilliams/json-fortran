@@ -1,3 +1,3 @@
 title: Contributing Guidelines
 
-{!CONTRIBUTING.md!}
+{!.github/CONTRIBUTING.md!}

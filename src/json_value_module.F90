@@ -3,7 +3,7 @@
 !  license: BSD
 !
 !  This module provides a low-level interface for manipulation of JSON data.
-!  The two public entities are [[json_value]], and [[json_core]].
+!  The two public entities are [[json_value]], and [[json_core(type)]].
 !  The [[json_file_module]] provides a higher-level interface to some
 !  of these routines.
 !
@@ -68,33 +68,12 @@
     !*********************************************************
 
     !*********************************************************
-    !
-    !  The types of JSON data.
-    !
-    integer(IK),parameter,public :: json_unknown   = 0  !! Unknown JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_null      = 1  !! Null JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_object    = 2  !! Object JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_array     = 3  !! Array JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_logical   = 4  !! Logical JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_integer   = 5  !! Integer JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_double    = 6  !! Double JSON data type
-                                                        !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter,public :: json_string    = 7  !! String JSON data type
-    !*********************************************************
-
-    !*********************************************************
     !>
     !  Type used to construct the linked-list JSON structure.
     !  Normally, this should always be a pointer variable.
-    !  This type should only be used by an instance of [[json_core]].
+    !  This type should only be used by an instance of [[json_core(type)]].
     !
-    !# Example
+    !### Example
     !
     !  The following test program:
     !
@@ -136,11 +115,12 @@
         type(json_value),pointer :: children => null()  !! first child item of this
         type(json_value),pointer :: tail     => null()  !! last child item of this
 
-        character(kind=CK,len=:),allocatable :: name  !! variable name
+        character(kind=CK,len=:),allocatable :: name  !! variable name (unescaped)
 
         real(RK),allocatable                 :: dbl_value  !! real data for this variable
         logical(LK),allocatable              :: log_value  !! logical data for this variable
         character(kind=CK,len=:),allocatable :: str_value  !! string data for this variable
+                                                           !! (unescaped)
         integer(IK),allocatable              :: int_value  !! integer data for this variable
 
         integer(IK) :: var_type = json_unknown  !! variable type
@@ -169,7 +149,6 @@
     !     call json%print(p,'test.json')  !write it to a file
     !     call json%destroy(p)            !cleanup
     !    end program test
-    !    type,public :: json_core
     !````
     type,public :: json_core
 
@@ -197,8 +176,8 @@
         integer(IK) :: char_count = 0    !! character position in the current line
         integer(IK) :: line_count = 1    !! lines read counter
         integer(IK) :: pushed_index = 0  !! used when parsing lines in file
-        character(kind=CK,len=pushed_char_size) :: pushed_char = ''  !! used when parsing
-                                                                     !! lines in file
+        character(kind=CK,len=pushed_char_size) :: pushed_char = CK_''  !! used when parsing
+                                                                        !! lines in file
 
         integer(IK) :: ipos = 1  !! for allocatable strings: next character to read
 
@@ -213,18 +192,68 @@
         logical(LK) :: case_sensitive_keys = .true.    !! for name and path comparisons, are they
                                                        !! case sensitive.
 
+        logical(LK) :: no_whitespace = .false. !! when printing a JSON string, don't include
+                                               !! non-significant spaces or line breaks.
+                                               !! If true, the entire structure will be
+                                               !! printed on one line.
+
+        logical(LK) :: unescaped_strings = .true.  !! If false, then the raw escaped
+                                                   !! string is returned from [[json_get_string]]
+                                                   !! and similar routines. If true [default],
+                                                   !! then the string is returned unescaped.
+
+        logical(LK) :: allow_comments = .true.  !! if true, any comments will be ignored when
+                                                !! parsing a file. The comment token is defined
+                                                !! by the `comment_char` string.
+        character(kind=CK,len=1) :: comment_char = CK_'!'  !! comment token when
+                                                           !! `allow_comments` is true.
+                                                           !! Examples: '`!`' or '`#`'.
+
+        integer(IK) :: path_mode = 1_IK  !! How the path strings are interpreted in the
+                                         !! `get_by_path` routines:
+                                         !!
+                                         !! * 1 -- Default mode (see [[json_get_by_path_default]])
+                                         !! * 2 -- as RFC 6901 "JSON Pointer" paths
+                                         !!   (see [[json_get_by_path_rfc6901]])
+
+        character(kind=CK,len=1) :: path_separator = dot !! The `path` separator to use
+                                                         !! in the "default" mode for
+                                                         !! the paths in the various
+                                                         !! `get_by_path` routines.
+                                                         !! Note: if `path_mode/=1`
+                                                         !! then this is ignored.
+
+        logical(LK) :: compress_vectors = .false. !! If true, then arrays of integers,
+                                                  !! nulls, doubles, & logicals are
+                                                  !! printed all on one line.
+                                                  !! [Note: `no_whitespace` will
+                                                  !! override this option if necessary]
+
+        logical(LK) :: allow_duplicate_keys = .true. !! If False, then after parsing, if any
+                                                     !! duplicate keys are found, an error is
+                                                     !! thrown. A call to [[json_value_validate]]
+                                                     !! will also check for duplicates. If True
+                                                     !! [default] then no special checks are done
+
         contains
 
         private
 
-        generic,public :: get_child => json_value_get_by_index, &
-                                       MAYBEWRAP(json_value_get_by_name_chars)
-        procedure,private :: json_value_get_by_index
-        procedure,private :: MAYBEWRAP(json_value_get_by_name_chars)
+        !>
+        !  Return a child of a [[json_value]] structure.
+        generic,public :: get_child => json_value_get_child_by_index, &
+                                       json_value_get_child,&
+                                       MAYBEWRAP(json_value_get_child_by_name)
+        procedure,private :: json_value_get_child_by_index
+        procedure,private :: MAYBEWRAP(json_value_get_child_by_name)
+        procedure,private :: json_value_get_child
 
         !>
         !  Add objects to a linked list of [[json_value]]s.
+        !
+        !@note It might make more sense to call this `add_child`.
         generic,public :: add => json_value_add_member, &
+                                 MAYBEWRAP(json_value_add_null), &
                                  MAYBEWRAP(json_value_add_integer), &
                                  MAYBEWRAP(json_value_add_integer_vec), &
                                  MAYBEWRAP(json_value_add_double), &
@@ -242,6 +271,7 @@
 
     procedure,private :: json_value_add_member
     procedure,private :: MAYBEWRAP(json_value_add_integer)
+    procedure,private :: MAYBEWRAP(json_value_add_null)
     procedure,private :: MAYBEWRAP(json_value_add_integer_vec)
     procedure,private :: MAYBEWRAP(json_value_add_double)
     procedure,private :: MAYBEWRAP(json_value_add_double_vec)
@@ -257,15 +287,22 @@
 #endif
 
         !>
-        !  These are like the `add` methods, except if a child with the
-        !  same name is already present, then its value is simply updated.
+        !  These are like the `add` methods, except if a variable with the
+        !  same path is already present, then its value is simply updated.
         !  Note that currently, these only work for scalar variables.
         !  These routines can also change the variable's type (but an error will be
         !  thrown if the existing variable is not a scalar).
         !
-        !@note It should not be used to change the type of a variable in an array,
-        !      or it may result in an invalid JSON file.
-
+        !### See also
+        !  * [[json_core(type):add_by_path]] - this one can be used to change
+        !    arrays and objects to scalars if so desired.
+        !
+        !@note Unlike some routines, the `found` output is not optional,
+        !      so it doesn't present exceptions from being thrown.
+        !
+        !@note These have been mostly supplanted by the [[json_core(type):add_by_path]]
+        !      methods, which do a similar thing (and can be used for
+        !      scalars and vectors, etc.)
         generic,public :: update => MAYBEWRAP(json_update_logical),&
                                     MAYBEWRAP(json_update_double),&
                                     MAYBEWRAP(json_update_integer),&
@@ -284,24 +321,96 @@
 #endif
 
         !>
+        !  Add variables to a [[json_value]] linked list
+        !  by specifying their paths.
+        !
+        !### Example
+        !
+        !````fortran
+        !    use, intrinsic :: iso_fortran_env, only: output_unit, wp=>real64
+        !    use json_module
+        !    type(json_core) :: json
+        !    type(json_value) :: p
+        !    call json%create_object(p,'root') ! create the root
+        !    ! now add some variables using the paths:
+        !    call json%add_by_path(p,'inputs.t',    0.0_wp  )
+        !    call json%add_by_path(p,'inputs.x(1)', 100.0_wp)
+        !    call json%add_by_path(p,'inputs.x(2)', 200.0_wp)
+        !    call json%print(p,output_unit)  ! now print to console
+        !````
+        !
+        !### Notes
+        !  * This uses [[json_create_by_path]]
+        !
+        !### See also
+        !  * The `json_core%update` methods.
+        !  * [[json_create_by_path]]
+
+        generic,public :: add_by_path => MAYBEWRAP(json_add_member_by_path),&
+                                         MAYBEWRAP(json_add_integer_by_path),&
+                                         MAYBEWRAP(json_add_double_by_path),&
+                                         MAYBEWRAP(json_add_logical_by_path),&
+                                         MAYBEWRAP(json_add_string_by_path),&
+                                         MAYBEWRAP(json_add_integer_vec_by_path),&
+                                         MAYBEWRAP(json_add_double_vec_by_path),&
+                                         MAYBEWRAP(json_add_logical_vec_by_path),&
+                                         MAYBEWRAP(json_add_string_vec_by_path)
+#ifdef USE_UCS4
+        generic,public :: add_by_path => json_add_string_by_path_value_ascii,&
+                                         json_add_string_by_path_path_ascii,&
+                                         json_add_string_vec_by_path_value_ascii,&
+                                         json_add_string_vec_by_path_path_ascii
+#endif
+        procedure :: MAYBEWRAP(json_add_member_by_path)
+        procedure :: MAYBEWRAP(json_add_integer_by_path)
+        procedure :: MAYBEWRAP(json_add_double_by_path)
+        procedure :: MAYBEWRAP(json_add_logical_by_path)
+        procedure :: MAYBEWRAP(json_add_string_by_path)
+        procedure :: MAYBEWRAP(json_add_integer_vec_by_path)
+        procedure :: MAYBEWRAP(json_add_double_vec_by_path)
+        procedure :: MAYBEWRAP(json_add_logical_vec_by_path)
+        procedure :: MAYBEWRAP(json_add_string_vec_by_path)
+#ifdef USE_UCS4
+        procedure :: json_add_string_by_path_value_ascii
+        procedure :: json_add_string_by_path_path_ascii
+        procedure :: json_add_string_vec_by_path_value_ascii
+        procedure :: json_add_string_vec_by_path_path_ascii
+#endif
+
+        !>
+        !  Create a [[json_value]] linked list using the
+        !  path to the variables. Optionally return a
+        !  pointer to the variable.
+        !
+        !  (This will create a `null` variable)
+        !
+        !### See also
+        !  * [[json_core(type):add_by_path]]
+
+        generic,public :: create => MAYBEWRAP(json_create_by_path)
+        procedure :: MAYBEWRAP(json_create_by_path)
+
+        !>
         !  Get data from a [[json_value]] linked list.
         !
-        !@note There are two versions (e.g. [[json_get_integer]] and [[json_get_integer_with_path]]).
+        !@note There are two versions (e.g. [[json_get_integer]] and [[json_get_integer_by_path]]).
         !      The first one gets the value from the [[json_value]] passed into the routine,
         !      while the second one gets the value from the [[json_value]] found by parsing the
         !      path.  The path version is split up into unicode and non-unicode versions.
 
         generic,public :: get => &
-                                  MAYBEWRAP(json_get_by_path),               &
-            json_get_integer,     MAYBEWRAP(json_get_integer_with_path),     &
-            json_get_integer_vec, MAYBEWRAP(json_get_integer_vec_with_path), &
-            json_get_double,      MAYBEWRAP(json_get_double_with_path),      &
-            json_get_double_vec,  MAYBEWRAP(json_get_double_vec_with_path),  &
-            json_get_logical,     MAYBEWRAP(json_get_logical_with_path),     &
-            json_get_logical_vec, MAYBEWRAP(json_get_logical_vec_with_path), &
-            json_get_string,      MAYBEWRAP(json_get_string_with_path),      &
-            json_get_string_vec,  MAYBEWRAP(json_get_string_vec_with_path),  &
-            json_get_array,       MAYBEWRAP(json_get_array_with_path)
+                                  MAYBEWRAP(json_get_by_path),             &
+            json_get_integer,     MAYBEWRAP(json_get_integer_by_path),     &
+            json_get_integer_vec, MAYBEWRAP(json_get_integer_vec_by_path), &
+            json_get_double,      MAYBEWRAP(json_get_double_by_path),      &
+            json_get_double_vec,  MAYBEWRAP(json_get_double_vec_by_path),  &
+            json_get_logical,     MAYBEWRAP(json_get_logical_by_path),     &
+            json_get_logical_vec, MAYBEWRAP(json_get_logical_vec_by_path), &
+            json_get_string,      MAYBEWRAP(json_get_string_by_path),      &
+            json_get_string_vec,  MAYBEWRAP(json_get_string_vec_by_path),  &
+            json_get_alloc_string_vec,MAYBEWRAP(json_get_alloc_string_vec_by_path),&
+            json_get_array,       MAYBEWRAP(json_get_array_by_path)
+
         procedure,private :: json_get_integer
         procedure,private :: json_get_integer_vec
         procedure,private :: json_get_double
@@ -310,24 +419,30 @@
         procedure,private :: json_get_logical_vec
         procedure,private :: json_get_string
         procedure,private :: json_get_string_vec
+        procedure,private :: json_get_alloc_string_vec
         procedure,private :: json_get_array
         procedure,private :: MAYBEWRAP(json_get_by_path)
-        procedure,private :: MAYBEWRAP(json_get_integer_with_path)
-        procedure,private :: MAYBEWRAP(json_get_integer_vec_with_path)
-        procedure,private :: MAYBEWRAP(json_get_double_with_path)
-        procedure,private :: MAYBEWRAP(json_get_double_vec_with_path)
-        procedure,private :: MAYBEWRAP(json_get_logical_with_path)
-        procedure,private :: MAYBEWRAP(json_get_logical_vec_with_path)
-        procedure,private :: MAYBEWRAP(json_get_string_with_path)
-        procedure,private :: MAYBEWRAP(json_get_string_vec_with_path)
-        procedure,private :: MAYBEWRAP(json_get_array_with_path)
+        procedure,private :: MAYBEWRAP(json_get_integer_by_path)
+        procedure,private :: MAYBEWRAP(json_get_integer_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_double_by_path)
+        procedure,private :: MAYBEWRAP(json_get_double_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_logical_by_path)
+        procedure,private :: MAYBEWRAP(json_get_logical_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_string_by_path)
+        procedure,private :: MAYBEWRAP(json_get_string_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_array_by_path)
+        procedure,private :: MAYBEWRAP(json_get_alloc_string_vec_by_path)
+        procedure,private :: json_get_by_path_default
+        procedure,private :: json_get_by_path_rfc6901
 
-        procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]] structure to an allocatable string
+        procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]]
+                                                                    !! structure to an allocatable
+                                                                    !! string
 
         !>
         !  Print the [[json_value]] to a file.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -344,7 +459,7 @@
         !  This must be called explicitly if it is no longer needed,
         !  before it goes out of scope.  Otherwise, a memory leak will result.
         !
-        !# Example
+        !### Example
         !
         !  Destroy the [[json_value]] pointer before the variable goes out of scope:
         !````fortran
@@ -390,7 +505,7 @@
         !  Allocate a [[json_value]] pointer and make it a double variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -404,7 +519,7 @@
         !  Allocate a [[json_value]] pointer and make it an array variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -418,7 +533,7 @@
         !  Allocate a [[json_value]] pointer and make it an object variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -435,7 +550,7 @@
         !  Allocate a json_value pointer and make it a null variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -449,7 +564,7 @@
         !  Allocate a json_value pointer and make it a string variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -463,12 +578,12 @@
         !  Allocate a json_value pointer and make it an integer variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
         !    type(json_value),pointer :: p
-        !    call json%create_integer(p,'value',42)
+        !    call json%create_integer(p,42,'value')
         !````
         generic,public :: create_integer => MAYBEWRAP(json_value_create_integer)
         procedure :: MAYBEWRAP(json_value_create_integer)
@@ -477,7 +592,7 @@
         !  Allocate a json_value pointer and make it a logical variable.
         !  The pointer should not already be allocated.
         !
-        !# Example
+        !### Example
         !
         !````fortran
         !    type(json_core) :: json
@@ -503,7 +618,42 @@
         generic,public :: rename => MAYBEWRAP(json_value_rename)
         procedure :: MAYBEWRAP(json_value_rename)
 
-        procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a linked-list structure.
+        !>
+        !  get info about a [[json_value]]
+        generic,public :: info => json_info, MAYBEWRAP(json_info_by_path)
+        procedure :: json_info
+        procedure :: MAYBEWRAP(json_info_by_path)
+
+        !>
+        !  get string info about a [[json_value]]
+        generic,public :: string_info => json_string_info
+        procedure :: json_string_info
+
+        !>
+        !  get matrix info about a [[json_value]]
+        generic,public :: matrix_info => json_matrix_info, MAYBEWRAP(json_matrix_info_by_path)
+        procedure :: json_matrix_info
+        procedure :: MAYBEWRAP(json_matrix_info_by_path)
+
+        !>
+        !  insert a new element after an existing one,
+        !  updating the JSON structure accordingly
+        generic,public :: insert_after => json_value_insert_after, &
+                                          json_value_insert_after_child_by_index
+        procedure :: json_value_insert_after
+        procedure :: json_value_insert_after_child_by_index
+
+        !>
+        !  get the path to a JSON variable in a structure:
+        generic,public :: get_path => MAYBEWRAP(json_get_path)
+        procedure :: MAYBEWRAP(json_get_path)
+
+        procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a
+                                                                            !! linked-list structure.
+        procedure,public :: replace             => json_value_replace       !! Replace a [[json_value]] in a
+                                                                            !! linked-list structure.
+        procedure,public :: reverse             => json_value_reverse       !! Reverse the order of the children
+                                                                            !! of an array of object.
         procedure,public :: check_for_errors    => json_check_for_errors    !! check for error and get error message
         procedure,public :: clear_exceptions    => json_clear_exceptions    !! clear exceptions
         procedure,public :: count               => json_count               !! count the number of children
@@ -513,22 +663,33 @@
         procedure,public :: get_next            => json_get_next            !! get pointer to json_value next
         procedure,public :: get_previous        => json_get_previous        !! get pointer to json_value previous
         procedure,public :: get_tail            => json_get_tail            !! get pointer to json_value tail
-        procedure,public :: info                => json_info                !! get info about a json_value
         procedure,public :: initialize          => json_initialize          !! to initialize some parsing parameters
-        procedure,public :: traverse            => json_traverse            !! to traverse all elements of a JSON structure
-        procedure,public :: print_error_message => json_print_error_message !! simply routine to print error messages
+        procedure,public :: traverse            => json_traverse            !! to traverse all elements of a JSON
+                                                                            !! structure
+        procedure,public :: print_error_message => json_print_error_message !! simply routine to print error
+                                                                            !! messages
         procedure,public :: swap                => json_value_swap          !! Swap two [[json_value]] pointers
-                                                                            !! in a structure (or two different structures).
-        procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a child of another.
-        procedure,public :: validate            => json_value_validate      !! Check that a [[json_value]] linked list is valid
-                                                                            !! (i.e., is properly constructed). This may be
-                                                                            !! useful if it has been constructed externally.
+                                                                            !! in a structure (or two different
+                                                                            !! structures).
+        procedure,public :: is_child_of         => json_value_is_child_of   !! Check if a [[json_value]] is a
+                                                                            !! descendant of another.
+        procedure,public :: validate            => json_value_validate      !! Check that a [[json_value]] linked
+                                                                            !! list is valid (i.e., is properly
+                                                                            !! constructed). This may be useful
+                                                                            !! if it has been constructed externally.
+        procedure,public :: check_for_duplicate_keys &
+                                => json_check_all_for_duplicate_keys  !! Check entire JSON structure
+                                                                      !! for duplicate keys (recursively)
+        procedure,public :: check_children_for_duplicate_keys &
+                                => json_check_children_for_duplicate_keys  !! Check a `json_value` object's
+                                                                           !! children for duplicate keys
 
         !other private routines:
         procedure :: name_equal
+        procedure :: name_strings_equal
         procedure :: json_value_print
-        procedure :: string_to_integer
-        procedure :: string_to_double
+        procedure :: string_to_int
+        procedure :: string_to_dble
         procedure :: parse_value
         procedure :: parse_number
         procedure :: parse_string
@@ -547,9 +708,9 @@
     !*********************************************************
     !>
     !  Structure constructor to initialize a
-    !  [[json_core]] object
+    !  [[json_core(type)]] object
     !
-    !# Example
+    !### Example
     !
     !```fortran
     ! type(json_file)  :: json_core
@@ -563,7 +724,7 @@
     !*************************************************************************************
     abstract interface
 
-        subroutine array_callback_func(json, element, i, count)
+        subroutine json_array_callback_func(json, element, i, count)
             !! Array element callback function.  Used by [[json_get_array]]
             import :: json_value,json_core,IK
             implicit none
@@ -571,18 +732,20 @@
             type(json_value),pointer,intent(in)  :: element
             integer(IK),intent(in)               :: i        !! index
             integer(IK),intent(in)               :: count    !! size of array
-        end subroutine array_callback_func
+        end subroutine json_array_callback_func
 
-        subroutine traverse_callback_func(json,p,finished)
+        subroutine json_traverse_callback_func(json,p,finished)
             !! Callback function used by [[json_traverse]]
             import :: json_value,json_core,LK
             implicit none
             class(json_core),intent(inout)      :: json
             type(json_value),pointer,intent(in) :: p
             logical(LK),intent(out)             :: finished  !! set true to stop traversing
-        end subroutine traverse_callback_func
+        end subroutine json_traverse_callback_func
 
     end interface
+    public :: json_array_callback_func
+    public :: json_traverse_callback_func
     !*************************************************************************************
 
     contains
@@ -592,7 +755,7 @@
 !> author: Jacob Williams
 !  date: 4/17/2016
 !
-!  Destructor for the [[json_core]] type.
+!  Destructor for the [[json_core(type)]] type.
 
     subroutine destroy_json_core(me)
 
@@ -607,7 +770,7 @@
 !> author: Jacob Williams
 !  date: 4/26/2016
 !
-!  Function constructor for a [[json_core]].
+!  Function constructor for a [[json_core(type)]].
 !  This is just a wrapper for [[json_initialize]].
 !
 !@note [[initialize_json_core]], [[json_initialize]],
@@ -618,29 +781,32 @@
                                   print_signs,real_format,spaces_per_tab,&
                                   strict_type_checking,&
                                   trailing_spaces_significant,&
-                                  case_sensitive_keys) result(json_core_object)
+                                  case_sensitive_keys,&
+                                  no_whitespace,&
+                                  unescape_strings,&
+                                  comment_char,&
+                                  path_mode,&
+                                  path_separator,&
+                                  compress_vectors,&
+                                  allow_duplicate_keys) result(json_core_object)
 
     implicit none
 
     type(json_core) :: json_core_object
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
-                                                            !! conversions are done for the `get` routines
-                                                            !! (default is false)
-    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
-                                                                    !! space to be considered significant.
-    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive.
+#include "json_initialize_arguments.inc"
 
     call json_core_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
                                 strict_type_checking,&
                                 trailing_spaces_significant,&
-                                case_sensitive_keys)
+                                case_sensitive_keys,&
+                                no_whitespace,&
+                                unescape_strings,&
+                                comment_char,&
+                                path_mode,&
+                                path_separator,&
+                                compress_vectors,&
+                                allow_duplicate_keys)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -649,57 +815,56 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Initialize the [[json_core]] instance.
+!  Initialize the [[json_core(type)]] instance.
 !
-!  The routine may be called before any of the [[json_core]] methods are used in
+!  The routine may be called before any of the [[json_core(type)]] methods are used in
 !  order to specify certain parameters. If it is not called, then the defaults
 !  are used. This routine is also called internally by various routines.
 !  It can also be called to clear exceptions, or to reset some
 !  of the variables (note that only the arguments present are changed).
 !
-!# Modified
+!### Modified
 !  * Izaak Beekman : 02/24/2015
 !
 !@note [[initialize_json_core]], [[json_initialize]],
 !      [[initialize_json_core_in_file]], and [[initialize_json_file]]
 !      all have a similar interface.
 
-    subroutine json_initialize(json,verbose,compact_reals,&
+    subroutine json_initialize(me,verbose,compact_reals,&
                                print_signs,real_format,spaces_per_tab,&
                                strict_type_checking,&
                                trailing_spaces_significant,&
-                               case_sensitive_keys)
+                               case_sensitive_keys,&
+                               no_whitespace,&
+                               unescape_strings,&
+                               comment_char,&
+                               path_mode,&
+                               path_separator,&
+                               compress_vectors,&
+                               allow_duplicate_keys)
 
     implicit none
 
-    class(json_core),intent(inout)  :: json
-    logical(LK),intent(in),optional :: verbose       !! mainly useful for debugging (default is false)
-    logical(LK),intent(in),optional :: compact_reals !! to compact the real number strings for output (default is true)
-    logical(LK),intent(in),optional :: print_signs   !! always print numeric sign (default is false)
-    character(kind=CDK,len=*),intent(in),optional :: real_format !! Real number format: 'E' [default], '*', 'G', 'EN', or 'ES'
-    integer(IK),intent(in),optional :: spaces_per_tab !! number of spaces per tab for indenting (default is 2)
-    logical(LK),intent(in),optional :: strict_type_checking !! if true, no integer, double, or logical type
-                                                            !! conversions are done for the `get` routines
-                                                            !! (default is false)
-    logical(LK),intent(in),optional :: trailing_spaces_significant  !! for name and path comparisons, is trailing
-                                                                    !! space to be considered significant.
-    logical(LK),intent(in),optional :: case_sensitive_keys  !! for name and path comparisons, are they
-                                                            !! case sensitive.
+    class(json_core),intent(inout)  :: me
+#include "json_initialize_arguments.inc"
 
-    character(kind=CDK,len=10) :: w,d,e
-    character(kind=CDK,len=2)  :: sgn, rl_edit_desc
-    integer(IK) :: istat
-    logical(LK) :: sgn_prnt
+    character(kind=CDK,len=10) :: w            !! max string length
+    character(kind=CDK,len=10) :: d            !! real precision digits
+    character(kind=CDK,len=10) :: e            !! real exponent digits
+    character(kind=CDK,len=2)  :: sgn          !! sign flag: `ss` or `sp`
+    character(kind=CDK,len=2)  :: rl_edit_desc !! `G`, `E`, `EN`, or `ES`
+    integer(IK)                :: istat        !! `iostat` flag for write statements
+    logical(LK)                :: sgn_prnt     !! print sign flag
 
     !reset exception to false:
-    call json%clear_exceptions()
+    call me%clear_exceptions()
 
     !Just in case, clear these global variables also:
-    json%pushed_index = 0
-    json%pushed_char  = ''
-    json%char_count   = 0
-    json%line_count   = 1
-    json%ipos         = 1
+    me%pushed_index = 0
+    me%pushed_char  = CK_''
+    me%char_count   = 0
+    me%line_count   = 1
+    me%ipos         = 1
 
 #ifdef USE_UCS4
     ! reopen stdout and stderr with utf-8 encoding
@@ -709,20 +874,54 @@
 
     !various optional inputs:
     if (present(spaces_per_tab)) &
-        json%spaces_per_tab = spaces_per_tab
+        me%spaces_per_tab = spaces_per_tab
     if (present(verbose)) &
-        json%is_verbose = verbose
+        me%is_verbose = verbose
     if (present(strict_type_checking)) &
-        json%strict_type_checking = strict_type_checking
+        me%strict_type_checking = strict_type_checking
     if (present(trailing_spaces_significant)) &
-        json%trailing_spaces_significant = trailing_spaces_significant
+        me%trailing_spaces_significant = trailing_spaces_significant
     if (present(case_sensitive_keys)) &
-        json%case_sensitive_keys = case_sensitive_keys
+        me%case_sensitive_keys = case_sensitive_keys
+    if (present(no_whitespace)) &
+        me%no_whitespace = no_whitespace
+    if (present(unescape_strings)) &
+        me%unescaped_strings = unescape_strings
+    if (present(path_mode)) then
+        if (path_mode==1_IK .or. path_mode==2_IK) then
+            me%path_mode = path_mode
+        else
+            me%path_mode = 1_IK  ! just to have a valid value
+            call me%throw_exception('Invalid path_mode.')
+        end if
+    end if
+
+    ! if we are allowing comments in the file:
+    ! [an empty string disables comments]
+    if (present(comment_char)) then
+        me%allow_comments = comment_char/=CK_''
+        me%comment_char = comment_char
+    end if
+
+    ! path separator:
+    if (present(path_separator)) then
+        me%path_separator = path_separator
+    end if
+
+    ! printing vectors in compressed form:
+    if (present(compress_vectors)) then
+        me%compress_vectors = compress_vectors
+    end if
+
+    ! checking for duplicate keys:
+    if (present(allow_duplicate_keys)) then
+        me%allow_duplicate_keys = allow_duplicate_keys
+    end if
 
     !Set the format for real numbers:
     ! [if not changing it, then it remains the same]
 
-    if ( (.not. allocated(json%real_fmt)) .or. &  ! if this hasn't been done yet
+    if ( (.not. allocated(me%real_fmt)) .or. &  ! if this hasn't been done yet
           present(compact_reals) .or. &
           present(print_signs)   .or. &
           present(real_format) ) then
@@ -731,13 +930,19 @@
         ! [this overrides the other options]
         if (present(real_format)) then
             if (real_format==star) then
-                json%compact_real = .false.
-                json%real_fmt = star
+                if (present(compact_reals)) then
+                    ! we will also allow for compact reals with
+                    ! '*' format, if both arguments are present.
+                    me%compact_real = compact_reals
+                else
+                    me%compact_real = .false.
+                end if
+                me%real_fmt = star
                 return
             end if
         end if
 
-        if (present(compact_reals)) json%compact_real = compact_reals
+        if (present(compact_reals)) me%compact_real = compact_reals
 
         !set defaults
         sgn_prnt = .false.
@@ -754,7 +959,7 @@
            case ('g','G','e','E','en','EN','es','ES')
               rl_edit_desc = real_format
            case default
-              call json%throw_exception('Invalid real format, "' // &
+              call me%throw_exception('Invalid real format, "' // &
                         trim(real_format) // '", passed to json_initialize.'// &
                         new_line('a') // 'Acceptable formats are: "G", "E", "EN", and "ES".' )
            end select
@@ -765,11 +970,11 @@
         if (istat==0) write(d,'(ss,I0)',iostat=istat) real_precision
         if (istat==0) write(e,'(ss,I0)',iostat=istat) real_exponent_digits
         if (istat==0) then
-            json%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) //&
+            me%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) //&
                             trim(w) // '.' // trim(d) // 'E' // trim(e) // ')'
         else
-            json%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // &
-                            '30.16E3)'  !just use this one (should never happen)
+            me%real_fmt = '(' // sgn // ',' // trim(rl_edit_desc) // &
+                            '27.17E4)'  !just use this one (should never happen)
         end if
 
     end if
@@ -779,10 +984,13 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date: 4/30/2016
 !
 !  Returns true if `name` is equal to `p%name`, using the specified
 !  settings for case sensitivity and trailing whitespace.
+!
+!### History
+!  * 4/30/2016 : original version
+!  * 8/25/2017 : now just a wrapper for [[name_strings_equal]]
 
     function name_equal(json,p,name) result(is_equal)
 
@@ -791,29 +999,51 @@
     class(json_core),intent(inout)      :: json
     type(json_value),intent(in)         :: p        !! the json object
     character(kind=CK,len=*),intent(in) :: name     !! the name to check for
-    logical(LK)                         :: is_equal !! true if the string are lexically equal
+    logical(LK)                         :: is_equal !! true if the string are
+                                                    !! lexically equal
 
     if (allocated(p%name)) then
-
-        !must be the same length if we are treating
-        !trailing spaces as significant, so do a
-        !quick test of this first:
-        if (json%trailing_spaces_significant) then
-            is_equal = len(p%name) == len(name)
-            if (.not. is_equal) return
-        end if
-
-        if (json%case_sensitive_keys) then
-            is_equal = p%name == name
-        else
-            is_equal = lowercase_string(p%name) == lowercase_string(name)
-        end if
-
+        ! call the low-level routines for the name strings:
+        is_equal = json%name_strings_equal(p%name,name)
     else
-        is_equal = name == '' ! check a blank name
+        is_equal = name == CK_'' ! check a blank name
     end if
 
     end function name_equal
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 8/25/2017
+!
+!  Returns true if the name strings `name1` is equal to `name2`, using
+!  the specified settings for case sensitivity and trailing whitespace.
+
+    function name_strings_equal(json,name1,name2) result(is_equal)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    character(kind=CK,len=*),intent(in) :: name1     !! the name to check
+    character(kind=CK,len=*),intent(in) :: name2     !! the name to check
+    logical(LK)                         :: is_equal  !! true if the string are
+                                                     !! lexically equal
+
+    !must be the same length if we are treating
+    !trailing spaces as significant, so do a
+    !quick test of this first:
+    if (json%trailing_spaces_significant) then
+        is_equal = len(name1) == len(name2)
+        if (.not. is_equal) return
+    end if
+
+    if (json%case_sensitive_keys) then
+        is_equal = name1 == name2
+    else
+        is_equal = lowercase_string(name1) == lowercase_string(name2)
+    end if
+
+    end function name_strings_equal
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -822,7 +1052,7 @@
 !
 !  Create a deep copy of a [[json_value]] linked-list structure.
 !
-!# Example
+!### Example
 !
 !````fortran
 !    program test
@@ -968,11 +1198,489 @@
         if (allocated(p%name)) then
             name = p%name
         else
-            name = ''
+            name = CK_''
         end if
     end if
 
     end subroutine json_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 12/18/2016
+!
+!  Returns information about character strings returned from a [[json_value]].
+
+    subroutine json_string_info(json,p,ilen,max_str_len,found)
+
+    implicit none
+
+    class(json_core),intent(inout)   :: json
+    type(json_value),pointer         :: p
+    integer(IK),dimension(:),allocatable,intent(out),optional :: ilen !! if `p` is an array, this
+                                                                      !! is the actual length
+                                                                      !! of each character
+                                                                      !! string in the array.
+                                                                      !! if not an array, this
+                                                                      !! is returned unallocated.
+    integer(IK),intent(out),optional :: max_str_len !! The maximum length required to
+                                                    !! hold the string representation returned
+                                                    !! by a call to a `get` routine. If a scalar,
+                                                    !! this is just the length of the scalar. If
+                                                    !! a vector, this is the maximum length of
+                                                    !! any element.
+    logical(LK),intent(out),optional :: found   !! true if there were no errors.
+                                                !! if not present, an error will
+                                                !! throw an exception
+
+    character(kind=CK,len=:),allocatable :: cval !! for getting values as strings.
+    logical(LK) :: initialized !! if the output array has been sized
+    logical(LK) :: get_max_len !! if we are returning the `max_str_len`
+    logical(LK) :: get_ilen    !! if we are returning the `ilen` array
+    integer(IK) :: var_type    !! variable type
+
+    get_max_len = present(max_str_len)
+    get_ilen    = present(ilen)
+
+    if (.not. json%exception_thrown) then
+
+        if (present(found)) found = .true.
+        initialized = .false.
+
+        if (get_max_len) max_str_len = 0
+
+        select case (p%var_type)
+
+        case (json_array) ! it's an array
+
+            ! call routine for each element
+            call json%get(p, array_callback=get_string_lengths)
+
+        case default ! not an array
+
+            if (json%strict_type_checking) then
+                ! only allowing strings to be returned
+                ! as strings, so we can check size directly
+                call json%info(p,var_type=var_type)
+                if (var_type==json_string) then
+                    if (allocated(p%str_value) .and. get_max_len) &
+                        max_str_len = len(p%str_value)
+                else
+                    ! it isn't a string, so there is no length
+                    call json%throw_exception('Error in json_string_info: '//&
+                                              'When strict_type_checking is true '//&
+                                              'the variable must be a character string.')
+                end if
+            else
+                ! in this case, we have to get the value
+                ! as a string to know what size it is.
+                call json%get(p, value=cval)
+                if (.not. json%exception_thrown) then
+                    if (allocated(cval) .and. get_max_len) &
+                        max_str_len = len(cval)
+                end if
+            end if
+
+        end select
+
+    end if
+
+    if (json%exception_thrown) then
+        if (present(found)) then
+            call json%clear_exceptions()
+            found = .false.
+        end if
+        if (get_max_len) max_str_len = 0
+        if (get_ilen) then
+            if (allocated(ilen)) deallocate(ilen)
+        end if
+    end if
+
+    contains
+
+        subroutine get_string_lengths(json, element, i, count)
+
+        !! callback function to call for each element in the array.
+
+        implicit none
+
+        class(json_core),intent(inout)      :: json
+        type(json_value),pointer,intent(in) :: element
+        integer(IK),intent(in)              :: i        !! index
+        integer(IK),intent(in)              :: count    !! size of array
+
+        character(kind=CK,len=:),allocatable :: cval
+        integer(IK) :: var_type
+
+        if (json%exception_thrown) return
+
+        if (.not. initialized) then
+            if (get_ilen) allocate(ilen(count))
+            initialized = .true.
+        end if
+
+        if (json%strict_type_checking) then
+            ! only allowing strings to be returned
+            ! as strings, so we can check size directly
+            call json%info(element,var_type=var_type)
+            if (var_type==json_string) then
+                if (allocated(element%str_value)) then
+                    if (get_max_len) then
+                        if (len(element%str_value)>max_str_len) &
+                                max_str_len = len(element%str_value)
+                    end if
+                    if (get_ilen) ilen(i) = len(element%str_value)
+                else
+                    if (get_ilen) ilen(i) = 0
+                end if
+            else
+                ! it isn't a string, so there is no length
+                call json%throw_exception('Error in json_string_info: '//&
+                                            'When strict_type_checking is true '//&
+                                            'the array must contain only '//&
+                                            'character strings.')
+            end if
+        else
+            ! in this case, we have to get the value
+            ! as a string to know what size it is.
+            call json%get(element, value=cval)
+            if (json%exception_thrown) return
+            if (allocated(cval)) then
+                if (get_max_len) then
+                    if (len(cval)>max_str_len) max_str_len = len(cval)
+                end if
+                if (get_ilen) ilen(i) = len(cval)
+            else
+                if (get_ilen) ilen(i) = 0
+            end if
+        end if
+
+        end subroutine get_string_lengths
+
+    end subroutine json_string_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!
+!  Returns information about a [[json_value]], given the path.
+!
+!### See also
+!  * [[json_info]]
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
+
+    subroutine json_info_by_path(json,p,path,found,var_type,n_children,name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p          !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path       !! path to the variable
+    logical(LK),intent(out),optional     :: found      !! true if it was found
+    integer(IK),intent(out),optional     :: var_type   !! variable type
+    integer(IK),intent(out),optional     :: n_children !! number of children
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    type(json_value),pointer :: p_var  !! temporary pointer
+    logical(LK) :: ok  !! if the variable was found
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: p_name  !! temporary variable for getting name
+#endif
+
+    call json%get(p,path,p_var,found)
+
+    !check if it was found:
+    if (present(found)) then
+        ok = found
+    else
+        ok = .not. json%exception_thrown
+    end if
+
+    if (.not. ok) then
+        if (present(var_type))   var_type   = json_unknown
+        if (present(n_children)) n_children = 0
+        if (present(name))       name       = CK_''
+    else
+        !get info:
+
+#if defined __GFORTRAN__
+        call json%info(p_var,var_type,n_children)
+        if (present(name)) then !workaround for gfortran bug
+            if (allocated(p_var%name)) then
+                p_name = p_var%name
+                name = p_name
+            else
+                name = CK_''
+            end if
+        end if
+#else
+        call json%info(p_var,var_type,n_children,name)
+#endif
+
+    end if
+
+    end subroutine json_info_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_info_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_info_by_path(json,p,path,found,var_type,n_children,name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p          !! a JSON linked list
+    character(kind=CDK,len=*),intent(in) :: path       !! path to the variable
+    logical(LK),intent(out),optional     :: found      !! true if it was found
+    integer(IK),intent(out),optional     :: var_type   !! variable type
+    integer(IK),intent(out),optional     :: n_children !! number of children
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    call json%info(p,to_unicode(path),found,var_type,n_children,name)
+
+    end subroutine wrap_json_info_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 10/16/2015
+!
+!  Alternate version of [[json_info]] that returns matrix
+!  information about a [[json_value]].
+!
+!  A [[json_value]] is a valid rank 2 matrix if all of the following are true:
+!
+!  * The var_type is *json_array*
+!  * Each child is also a *json_array*, each of which has the same number of elements
+!  * Each individual element has the same variable type (integer, logical, etc.)
+!
+!  The idea here is that if it is a valid matrix, it can be interoperable with
+!  a Fortran rank 2 array of the same type.
+!
+!### Example
+!
+!  The following example is an array with `var_type=json_integer`, `n_sets=3`, and `set_size=4`
+!
+!```json
+!    {
+!        "matrix": [
+!            [1,2,3,4],
+!            [5,6,7,8],
+!            [9,10,11,12]
+!        ]
+!    }
+!```
+
+    subroutine json_matrix_info(json,p,is_matrix,var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_core),intent(inout)   :: json
+    type(json_value),pointer         :: p          !! a JSON linked list
+    logical(LK),intent(out)          :: is_matrix  !! true if it is a valid matrix
+    integer(IK),intent(out),optional :: var_type   !! variable type of data in the matrix (if all elements have the same type)
+    integer(IK),intent(out),optional :: n_sets     !! number of data sets (i.e., matrix rows if using row-major order)
+    integer(IK),intent(out),optional :: set_size   !! size of each data set (i.e., matrix cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    type(json_value),pointer :: p_row       !! for getting a set
+    type(json_value),pointer :: p_element   !! for getting an element in a set
+    integer(IK) :: vartype         !! json variable type of `p`
+    integer(IK) :: row_vartype     !! json variable type of a row
+    integer(IK) :: element_vartype !! json variable type of an element in a row
+    integer(IK) :: nr              !! number of children of `p`
+    integer(IK) :: nc              !! number of elements in first child of `p`
+    integer(IK) :: icount          !! number of elements in a set
+    integer     :: i               !! counter
+    integer     :: j               !! counter
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: p_name  !! temporary variable for getting name
+#endif
+
+    !get info about the variable:
+#if defined __GFORTRAN__
+    call json%info(p,vartype,nr)
+    if (present(name)) then !workaround for gfortran bug
+        if (allocated(p%name)) then
+            p_name = p%name
+            name = p_name
+        else
+            name = CK_''
+        end if
+    end if
+#else
+    call json%info(p,vartype,nr,name)
+#endif
+
+    is_matrix = (vartype==json_array)
+
+    if (is_matrix) then
+
+        main : do i=1,nr
+
+            nullify(p_row)
+            call json%get_child(p,i,p_row)
+            if (.not. associated(p_row)) then
+                is_matrix = .false.
+                call json%throw_exception('Error in json_matrix_info: '//&
+                                          'Malformed JSON linked list')
+                exit main
+            end if
+            call json%info(p_row,var_type=row_vartype,n_children=icount)
+
+            if (row_vartype==json_array) then
+                if (i==1) nc = icount  !number of columns in first row
+                if (icount==nc) then   !make sure each row has the same number of columns
+                    !see if all the variables in this row are the same type:
+                    do j=1,icount
+                        nullify(p_element)
+                        call json%get_child(p_row,j,p_element)
+                        if (.not. associated(p_element)) then
+                            is_matrix = .false.
+                            call json%throw_exception('Error in json_matrix_info: '//&
+                                                      'Malformed JSON linked list')
+                            exit main
+                        end if
+                        call json%info(p_element,var_type=element_vartype)
+                        if (i==1 .and. j==1) vartype = element_vartype  !type of first element
+                                                                        !in the row
+                        if (vartype/=element_vartype) then
+                            !not all variables are the same time
+                            is_matrix = .false.
+                            exit main
+                        end if
+                    end do
+                else
+                    is_matrix = .false.
+                    exit main
+                end if
+            else
+                is_matrix = .false.
+                exit main
+            end if
+
+        end do main
+
+    end if
+
+    if (is_matrix) then
+        if (present(var_type)) var_type = vartype
+        if (present(n_sets))   n_sets   = nr
+        if (present(set_size)) set_size = nc
+    else
+        if (present(var_type)) var_type = json_unknown
+        if (present(n_sets))   n_sets   = 0
+        if (present(set_size)) set_size = 0
+    end if
+
+    end subroutine json_matrix_info
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns matrix information about a [[json_value]], given the path.
+!
+!### See also
+!  * [[json_matrix_info]]
+!
+!@note If `found` is present, no exceptions will be thrown if an
+!      error occurs. Otherwise, an exception will be thrown if the
+!      variable is not found.
+
+    subroutine json_matrix_info_by_path(json,p,path,is_matrix,found,&
+                                        var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p         !! a JSON linked list
+    character(kind=CK,len=*),intent(in) :: path      !! path to the variable
+    logical(LK),intent(out)             :: is_matrix !! true if it is a valid matrix
+    logical(LK),intent(out),optional    :: found     !! true if it was found
+    integer(IK),intent(out),optional    :: var_type  !! variable type of data in
+                                                     !! the matrix (if all elements have
+                                                     !! the same type)
+    integer(IK),intent(out),optional    :: n_sets    !! number of data sets (i.e., matrix
+                                                     !! rows if using row-major order)
+    integer(IK),intent(out),optional    :: set_size  !! size of each data set (i.e., matrix
+                                                     !! cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    type(json_value),pointer :: p_var
+    logical(LK) :: ok
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: p_name  !! temporary variable for getting name
+#endif
+
+    call json%get(p,path,p_var,found)
+
+    !check if it was found:
+    if (present(found)) then
+        ok = found
+    else
+        ok = .not. json%exception_thrown
+    end if
+
+    if (.not. ok) then
+        if (present(var_type)) var_type = json_unknown
+        if (present(n_sets))   n_sets   = 0
+        if (present(set_size)) set_size = 0
+        if (present(name))     name     = CK_''
+    else
+
+        !get info about the variable:
+#if defined __GFORTRAN__
+        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size)
+        if (present(name)) then !workaround for gfortran bug
+            if (allocated(p_var%name)) then
+                p_name = p_var%name
+                name = p_name
+            else
+                name = CK_''
+            end if
+        end if
+#else
+        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name)
+#endif
+        if (json%exception_thrown .and. present(found)) then
+            found = .false.
+            call json%clear_exceptions()
+        end if
+    end if
+
+    end subroutine json_matrix_info_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_matrix_info_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_matrix_info_by_path(json,p,path,is_matrix,found,&
+                                             var_type,n_sets,set_size,name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p          !! a JSON linked list
+    character(kind=CDK,len=*),intent(in) :: path       !! path to the variable
+    logical(LK),intent(out)              :: is_matrix  !! true if it is a valid matrix
+    logical(LK),intent(out),optional     :: found      !! true if it was found
+    integer(IK),intent(out),optional     :: var_type   !! variable type of data in
+                                                       !! the matrix (if all elements have
+                                                       !! the same type)
+    integer(IK),intent(out),optional     :: n_sets     !! number of data sets (i.e., matrix
+                                                       !! rows if using row-major order)
+    integer(IK),intent(out),optional     :: set_size   !! size of each data set (i.e., matrix
+                                                       !! cols if using row-major order)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+
+    call json%matrix_info(p,to_unicode(path),is_matrix,found,var_type,n_sets,set_size,name)
+
+    end subroutine wrap_json_matrix_info_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1017,7 +1725,7 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Clear exceptions in the [[json_core]].
+!  Clear exceptions in the [[json_core(type)]].
 
     pure subroutine json_clear_exceptions(json)
 
@@ -1027,7 +1735,7 @@
 
     !clear the flag and message:
     json%exception_thrown = .false.
-    json%err_message = ''
+    json%err_message = CK_''
 
     end subroutine json_clear_exceptions
 !*****************************************************************************************
@@ -1036,7 +1744,7 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Throw an exception in the [[json_core]].
+!  Throw an exception in the [[json_core(type)]].
 !  This routine sets the error flag, and prevents any subsequent routine
 !  from doing anything, until [[json_clear_exceptions]] is called.
 !
@@ -1090,12 +1798,12 @@
 !> author: Jacob Williams
 !  date: 12/4/2013
 !
-!  Retrieve error code from the [[json_core]].
+!  Retrieve error code from the [[json_core(type)]].
 !  This should be called after `parse` to check for errors.
 !  If an error is thrown, before using the class again, [[json_initialize]]
 !  should be called to clean up before it is used again.
 !
-!# Example
+!### Example
 !
 !````fortran
 !     type(json_file) :: json
@@ -1110,7 +1818,7 @@
 !     end if
 !````
 !
-!# See also
+!### See also
 !  * [[json_failed]]
 
     subroutine json_check_for_errors(json,status_ok,error_msg)
@@ -1130,7 +1838,7 @@
             error_msg = 'Unknown error.'
         end if
     else
-        error_msg = ''
+        error_msg = CK_''
     end if
 
     end subroutine json_check_for_errors
@@ -1140,9 +1848,9 @@
 !> author: Jacob Williams
 !  date: 12/5/2013
 !
-!  Logical function to indicate if an exception has been thrown in a [[json_core]].
+!  Logical function to indicate if an exception has been thrown in a [[json_core(type)]].
 !
-!# Example
+!### Example
 !
 !````fortran
 !    type(json_core) :: json
@@ -1172,7 +1880,7 @@
 !    end if
 !````
 !
-!# See also
+!### See also
 !  * [[json_check_for_errors]]
 
     pure function json_failed(json) result(failed)
@@ -1180,7 +1888,8 @@
     implicit none
 
     class(json_core),intent(in) :: json
-    logical(LK) :: failed
+    logical(LK)                 :: failed  !! will be true if an exception
+                                           !! has been thrown.
 
     failed = json%exception_thrown
 
@@ -1192,7 +1901,7 @@
 !  Allocate a [[json_value]] pointer variable.
 !  This should be called before adding data to it.
 !
-!# Example
+!### Example
 !
 !````fortran
 !    type(json_value),pointer :: var
@@ -1200,7 +1909,7 @@
 !    call to_double(var,1.0_RK)
 !````
 !
-!# Notes
+!### Notes
 !  1. This routine does not check for exceptions.
 !  2. The pointer should not already be allocated, or a memory leak will occur.
 
@@ -1288,7 +1997,7 @@
 !  Remove a [[json_value]] (and all its children)
 !  from a linked-list structure, preserving the rest of the structure.
 !
-!# Examples
+!### Examples
 !
 !  To extract an object from one JSON structure, and add it to another:
 !````fortran
@@ -1311,7 +2020,7 @@
 !     call json%remove(p)                  ! remove and destroy it
 !````
 !
-!# History
+!### History
 !  * Jacob Williams : 12/28/2014 : added destroy optional argument.
 
     subroutine json_value_remove(json,p,destroy)
@@ -1382,6 +2091,88 @@
     end if
 
     end subroutine json_value_remove
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Replace `p1` with `p2` in a JSON structure.
+!
+!@note The replacement is done using an insert and remove
+!      See [[json_value_insert_after]] and [[json_value_remove]]
+!      for details.
+
+    subroutine json_value_replace(json,p1,p2,destroy)
+
+    implicit none
+
+    class(json_core),intent(inout)  :: json
+    type(json_value),pointer        :: p1       !! the item to replace
+    type(json_value),pointer        :: p2       !! item to take the place of `p1`
+    logical(LK),intent(in),optional :: destroy  !! Should `p1` also be destroyed
+                                                !! (default is True). Normally,
+                                                !! this should be true to avoid
+                                                !! a memory leak.
+
+    logical(LK) :: destroy_p1 !! if `p1` is to be destroyed
+
+    if (present(destroy)) then
+        destroy_p1 = destroy
+    else
+        destroy_p1 = .true.  ! default
+    end if
+
+    call json%insert_after(p1,p2)
+    call json%remove(p1,destroy_p1)
+
+    end subroutine json_value_replace
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 4/11/2017
+!
+!  Reverse the order of the children of an array or object.
+
+    subroutine json_value_reverse(json,p)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p
+
+    type(json_value),pointer :: tmp       !! temp variable for traversing the list
+    type(json_value),pointer :: current   !! temp variable for traversing the list
+    integer(IK)              :: var_type  !! for getting the variable type
+
+    if (associated(p)) then
+
+        call json%info(p,var_type=var_type)
+
+        ! can only reverse objects or arrays
+        if (var_type==json_object .or. var_type==json_array) then
+
+            nullify(tmp)
+            current => p%children
+            p%tail => current
+
+            ! Swap next and previous for all nodes:
+            do
+                if (.not. associated(current)) exit
+                tmp              => current%previous
+                current%previous => current%next
+                current%next     => tmp
+                current          => current%previous
+            end do
+
+            if (associated(tmp)) then
+                p%children => tmp%previous
+            end if
+
+        end if
+
+    end if
+
+    end subroutine json_value_reverse
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1595,21 +2386,77 @@
 !
 !  It recursively traverses the entire structure and checks every element.
 !
+!### History
+!  * Jacob Williams, 8/26/2017 : added duplicate key check.
+!
+!@note It will return on the first error it encounters.
+!
 !@note This routine does not check or throw any exceptions.
+!      If `json` is currently in a state of exception, it will
+!      remain so after calling this routine.
 
     subroutine json_value_validate(json,p,is_valid,error_msg)
 
     implicit none
 
-    class(json_core),intent(inout)       :: json
-    type(json_value),pointer,intent(in)  :: p
-    logical(LK),intent(out)              :: is_valid  !! True if the structure is valid.
-    character(kind=CK,len=:),allocatable :: error_msg !! if not valid, this will contain
-                                                      !! a description of the problem
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p
+    logical(LK),intent(out)             :: is_valid  !! True if the structure is valid.
+    character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! if not valid, this will contain
+                                                                  !! a description of the problem
+
+    logical(LK) :: has_duplicate !! to check for duplicate keys
+    character(kind=CK,len=:),allocatable :: path  !! path to duplicate key
+    logical(LK) :: status_ok !! to check for existing exception
+    logical(LK) :: status_ok2 !! to check for a new exception
+    character(kind=CK,len=:),allocatable :: exception_msg  !! error message for an existing exception
+    character(kind=CK,len=:),allocatable :: exception_msg2  !! error message for a new exception
 
     if (associated(p)) then
+
         is_valid = .true.
         call check_if_valid(p,require_parent=associated(p%parent))
+
+        if (is_valid .and. .not. json%allow_duplicate_keys) then
+            ! if no errors so far, also check the
+            ! entire structure for duplicate keys:
+
+            ! note: check_for_duplicate_keys does call routines
+            ! that check and throw exceptions, so let's clear any
+            ! first. (save message for later)
+            call json%check_for_errors(status_ok, exception_msg)
+            call json%clear_exceptions()
+
+            call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+            if (json%failed()) then
+                ! if an exception was thrown during this call,
+                ! then clear it but make that the error message
+                ! returned by this routine. Normally this should
+                ! never actually occur since we have already
+                ! validated the structure.
+                call json%check_for_errors(is_valid, exception_msg2)
+                error_msg = exception_msg2
+                call json%clear_exceptions()
+                is_valid = .false.
+            else
+                if (has_duplicate) then
+                    error_msg = 'duplicate key found: '//path
+                    is_valid  = .false.
+                end if
+            end if
+
+            if (.not. status_ok) then
+                ! restore any existing exception if necessary
+                call json%throw_exception(exception_msg)
+            end if
+
+            ! cleanup:
+            if (allocated(path))           deallocate(path)
+            if (allocated(exception_msg))  deallocate(exception_msg)
+            if (allocated(exception_msg2)) deallocate(exception_msg2)
+
+        end if
+
     else
         error_msg = 'The pointer is not associated'
         is_valid = .false.
@@ -1833,20 +2680,20 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 
-    subroutine json_update_logical(json,p,name,val,found)
+    subroutine json_update_logical(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     logical(LK),intent(in)              :: val
     logical(LK),intent(out)             :: found
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) then
 
         call json%info(p_var,var_type)
@@ -1860,7 +2707,7 @@
         end select
 
     else
-        call json%add(p,name,val)   !add the new element
+        call json%add_by_path(p,path,val)   !add the new element
     end if
 
     end subroutine json_update_logical
@@ -1868,19 +2715,19 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_logical]], where `name` is kind=CDK.
+!  Alternate version of [[json_update_logical]], where `path` is kind=CDK.
 
-    subroutine wrap_json_update_logical(json,p,name,val,found)
+    subroutine wrap_json_update_logical(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     logical(LK),intent(in)               :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),val,found)
+    call json%update(p,to_unicode(path),val,found)
 
     end subroutine wrap_json_update_logical
 !*****************************************************************************************
@@ -1893,20 +2740,20 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 
-    subroutine json_update_double(json,p,name,val,found)
+    subroutine json_update_double(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     real(RK),intent(in)                 :: val
     logical(LK),intent(out)             :: found
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) then
 
         call json%info(p_var,var_type)
@@ -1920,7 +2767,7 @@
         end select
 
     else
-        call json%add(p,name,val)   !add the new element
+        call json%add_by_path(p,path,val)   !add the new element
     end if
 
     end subroutine json_update_double
@@ -1928,19 +2775,19 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_double]], where `name` is kind=CDK.
+!  Alternate version of [[json_update_double]], where `path` is kind=CDK.
 
-    subroutine wrap_json_update_double(json,p,name,val,found)
+    subroutine wrap_json_update_double(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     real(RK),intent(in)                  :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),val,found)
+    call json%update(p,to_unicode(path),val,found)
 
     end subroutine wrap_json_update_double
 !*****************************************************************************************
@@ -1953,20 +2800,20 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 
-    subroutine json_update_integer(json,p,name,val,found)
+    subroutine json_update_integer(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     integer(IK),intent(in)              :: val
     logical(LK),intent(out)             :: found
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) then
 
         call json%info(p_var,var_type)
@@ -1980,7 +2827,7 @@
         end select
 
     else
-        call json%add(p,name,val)   !add the new element
+        call json%add_by_path(p,path,val)   !add the new element
     end if
 
     end subroutine json_update_integer
@@ -1988,19 +2835,19 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_integer]], where `name` is kind=CDK.
+!  Alternate version of [[json_update_integer]], where `path` is kind=CDK.
 
-    subroutine wrap_json_update_integer(json,p,name,val,found)
+    subroutine wrap_json_update_integer(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     integer(IK),intent(in)               :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),val,found)
+    call json%update(p,to_unicode(path),val,found)
 
     end subroutine wrap_json_update_integer
 !*****************************************************************************************
@@ -2013,20 +2860,20 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 
-    subroutine json_update_string(json,p,name,val,found)
+    subroutine json_update_string(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path
     character(kind=CK,len=*),intent(in) :: val
     logical(LK),intent(out)             :: found
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) then
 
         call json%info(p_var,var_type)
@@ -2036,11 +2883,11 @@
         case default
             found = .false.
             call json%throw_exception('Error in json_update_string: '//&
-                                 'the variable is not a scalar value')
+                                      'the variable is not a scalar value')
         end select
 
     else
-        call json%add(p,name,val)   !add the new element
+        call json%add_by_path(p,path,val)   !add the new element
     end if
 
     end subroutine json_update_string
@@ -2048,38 +2895,38 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_string]], where `name` and `value` are kind=CDK.
+!  Alternate version of [[json_update_string]], where `path` and `value` are kind=CDK.
 
-    subroutine wrap_json_update_string(json,p,name,val,found)
+    subroutine wrap_json_update_string(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),to_unicode(val),found)
+    call json%update(p,to_unicode(path),to_unicode(val),found)
 
     end subroutine wrap_json_update_string
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_update_string]], where `name` is kind=CDK.
+!  Alternate version of [[json_update_string]], where `path` is kind=CDK.
 
-    subroutine json_update_string_name_ascii(json,p,name,val,found)
+    subroutine json_update_string_name_ascii(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
     character(kind=CK, len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,to_unicode(name),val,found)
+    call json%update(p,to_unicode(path),val,found)
 
     end subroutine json_update_string_name_ascii
 !*****************************************************************************************
@@ -2088,17 +2935,17 @@
 !>
 !  Alternate version of [[json_update_string]], where `val` is kind=CDK.
 
-    subroutine json_update_string_val_ascii(json,p,name,val,found)
+    subroutine json_update_string_val_ascii(json,p,path,val,found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CK, len=*),intent(in) :: name
+    character(kind=CK, len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
 
-    call json%update(p,name,to_unicode(val),found)
+    call json%update(p,path,to_unicode(val),found)
 
     end subroutine json_update_string_val_ascii
 !*****************************************************************************************
@@ -2113,7 +2960,8 @@
 
     class(json_core),intent(inout) :: json
     type(json_value),pointer       :: p
-    type(json_value),pointer       :: member  !! the child member to add
+    type(json_value),pointer       :: member  !! the child member
+                                              !! to add to `p`
 
     if (.not. json%exception_thrown) then
 
@@ -2140,6 +2988,988 @@
     end if
 
     end subroutine json_value_add_member
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Inserts `element` after `p`, and updates the JSON structure accordingly.
+!
+!### Example
+!
+!````fortran
+!  program test
+!   use json_module
+!   implicit none
+!   logical(json_LK) :: found
+!   type(json_core) :: json
+!   type(json_value),pointer :: p,new,element
+!   call json%parse(file='myfile.json', p=p)
+!   call json%get(p,'x(3)',element,found) ! get pointer to an array element in the file
+!   call json%create_integer(new,1,'')    ! create a new element
+!   call json%insert_after(element,new)   ! insert new element after x(3)
+!   call json%print(p,'myfile2.json')     ! write it to a file
+!   call json%destroy(p)                  ! cleanup
+!  end program test
+!````
+!
+!### Details
+!
+!  * This routine can be used to insert a new element (or set of elements)
+!    into an array or object at a specific index.
+!    See [[json_value_insert_after_child_by_index]]
+!  * Children and subsequent elements of `element` are carried along.
+!  * If the inserted elements are part of an existing list, then
+!    they are removed from that list.
+!
+!````
+!              p
+!       [1] - [2] - [3] - [4]
+!                 |
+!                [5] - [6] - [7]        n=3 elements inserted
+!              element       last
+!
+!  Result is:
+!
+!       [1] - [2] - [5] - [6] - [7] - [3] - [4]
+!
+!````
+
+    subroutine json_value_insert_after(json,p,element)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p       !! a value from a JSON structure
+                                              !! (presumably, this is a child of
+                                              !! an object or array).
+    type(json_value),pointer       :: element !! the element to insert after `p`
+
+    type(json_value),pointer :: parent  !! the parent of `p`
+    type(json_value),pointer :: next  !! temp pointer for traversing structure
+    type(json_value),pointer :: last  !! the last of the items being inserted
+    integer :: n  !! number of items being inserted
+
+    if (.not. json%exception_thrown) then
+
+        parent => p%parent
+
+        ! set first parent of inserted list:
+        element%parent => parent
+
+        ! Count the number of inserted elements.
+        ! and set their parents.
+        n = 1 ! initialize counter
+        next => element%next
+        last => element
+        do
+            if (.not. associated(next)) exit
+            n = n + 1
+            next%parent => parent
+            last => next
+            next => next%next
+        end do
+
+        if (associated(parent)) then
+            ! update parent's child counter:
+            parent%n_children = parent%n_children + n
+            ! if p is last of parents children then
+            ! also have to update parent tail pointer:
+            if (associated(parent%tail,p)) then
+                parent%tail => last
+            end if
+        end if
+
+        if (associated(element%previous)) then
+            ! element is apparently part of an existing list,
+            ! so have to update that as well.
+            if (associated(element%previous%parent)) then
+                element%previous%parent%n_children = &
+                    element%previous%parent%n_children - n
+                element%previous%parent%tail => &
+                    element%previous ! now the last one in the list
+            else
+                ! this would be a memory leak if the previous entries
+                ! are not otherwise being pointed too
+                ! [throw an error in this case???]
+            end if
+            !remove element from the other list:
+            element%previous%next => null()
+        end if
+        element%previous => p
+
+        if (associated(p%next)) then
+            ! if there are any in the list after p:
+            last%next => p%next
+            last%next%previous => element
+        else
+            last%next => null()
+        end if
+        p%next => element
+
+    end if
+
+    end subroutine json_value_insert_after
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Inserts `element` after the `idx`-th child of `p`,
+!  and updates the JSON structure accordingly. This is just
+!  a wrapper for [[json_value_insert_after]].
+
+    subroutine json_value_insert_after_child_by_index(json,p,idx,element)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p       !! a JSON object or array.
+    integer(IK),intent(in)         :: idx     !! the index of the child of `p` to
+                                              !! insert the new element after
+                                              !! (this is a 1-based Fortran
+                                              !! style array index)
+    type(json_value),pointer       :: element !! the element to insert
+
+    type(json_value),pointer :: tmp  !! for getting the `idx`-th child of `p`
+
+    if (.not. json%exception_thrown) then
+
+        ! get the idx-th child of p:
+        call json%get_child(p,idx,tmp)
+
+        ! call json_value_insert_after:
+        if (.not. json%exception_thrown) call json%insert_after(tmp,element)
+
+    end if
+
+    end subroutine json_value_insert_after_child_by_index
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add a new member (`json_value` pointer) to a JSON structure, given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_member_by_path(json,me,path,p,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    type(json_value),pointer,intent(in) :: p            !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! name of the variable
+
+    if ( .not. json%exception_thrown ) then
+
+        if (.not. associated(p)) then
+            call json%throw_exception('Error in json_add_member_by_path:'//&
+                                      ' Input pointer p is not associated.')
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+            if ( present(was_created) ) was_created = .false.
+        else
+
+            ! return a pointer to the path (possibly creating it)
+            call json%create(me,path,tmp,found,was_created)
+
+            if (.not. associated(tmp)) then
+
+                call json%throw_exception('Error in json_add_member_by_path:'//&
+                                          ' Unable to resolve path: '//trim(path))
+                if (present(found)) then
+                    found = .false.
+                    call json%clear_exceptions()
+                end if
+
+            else
+
+                call json%info(tmp,name=name)
+
+                ! replace it with the new one:
+                call json%replace(tmp,p,destroy=.true.)
+                call json%rename(p,name)
+
+            end if
+
+        end if
+
+    else
+        if ( present(found) ) found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_member_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_member_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_member_by_path(json,me,path,p,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    type(json_value),pointer,intent(in)  :: p            !! the value to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_member_by_path(me,to_unicode(path),p,found,was_created)
+
+    end subroutine wrap_json_add_member_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add an integer value to a [[json_value]], given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_integer_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),intent(in)              :: value        !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! variable name
+
+    if ( .not. json%exception_thrown ) then
+
+        nullify(p)
+
+        ! return a pointer to the path (possibly creating it)
+        ! If the variable had to be created, then
+        ! it will be a json_null variable.
+        call json%create(me,path,p,found,was_created)
+
+        if (.not. associated(p)) then
+
+            call json%throw_exception('Error in json_add_integer_by_path:'//&
+                                      ' Unable to resolve path: '//trim(path))
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+
+        else
+
+            !NOTE: a new object is created, and the old one
+            !      is replaced and destroyed. This is to
+            !      prevent memory leaks if the type is
+            !      being changed (for example, if an array
+            !      is being replaced with a scalar).
+
+            if (p%var_type==json_integer) then
+                p%int_value = value
+            else
+                call json%info(p,name=name)
+                call json%create_integer(tmp,value,name)
+                call json%replace(p,tmp,destroy=.true.)
+            end if
+
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_integer_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_integer_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_integer_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    integer(IK),intent(in)               :: value       !! the value to add
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%json_add_integer_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_integer_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add an double value to a [[json_value]], given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_double_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    real(RK),intent(in)                 :: value        !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! variable name
+
+    if ( .not. json%exception_thrown ) then
+
+        nullify(p)
+
+        ! return a pointer to the path (possibly creating it)
+        ! If the variable had to be created, then
+        ! it will be a json_null variable.
+        call json%create(me,path,p,found,was_created)
+
+        if (.not. associated(p)) then
+
+            call json%throw_exception('Error in json_add_double_by_path:'//&
+                                      ' Unable to resolve path: '//trim(path))
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+
+        else
+
+            !NOTE: a new object is created, and the old one
+            !      is replaced and destroyed. This is to
+            !      prevent memory leaks if the type is
+            !      being changed (for example, if an array
+            !      is being replaced with a scalar).
+
+            if (p%var_type==json_double) then
+                p%dbl_value = value
+            else
+                call json%info(p,name=name)
+                call json%create_double(tmp,value,name)
+                call json%replace(p,tmp,destroy=.true.)
+            end if
+
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_double_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_double_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_double_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    real(RK),intent(in)                  :: value       !! the value to add
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%json_add_double_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_double_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add a logical value to a [[json_value]], given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_logical_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    logical(LK),intent(in)              :: value        !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! variable name
+
+    if ( .not. json%exception_thrown ) then
+
+        nullify(p)
+
+        ! return a pointer to the path (possibly creating it)
+        ! If the variable had to be created, then
+        ! it will be a json_null variable.
+        call json%create(me,path,p,found,was_created)
+
+        if (.not. associated(p)) then
+
+            call json%throw_exception('Error in json_add_logical_by_path:'//&
+                                      ' Unable to resolve path: '//trim(path))
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+
+        else
+
+            !NOTE: a new object is created, and the old one
+            !      is replaced and destroyed. This is to
+            !      prevent memory leaks if the type is
+            !      being changed (for example, if an array
+            !      is being replaced with a scalar).
+
+            if (p%var_type==json_logical) then
+                p%log_value = value
+            else
+                call json%info(p,name=name)
+                call json%create_logical(tmp,value,name)
+                call json%replace(p,tmp,destroy=.true.)
+            end if
+
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_logical_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_logical_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_logical_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    logical(LK),intent(in)               :: value       !! the value to add
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%json_add_logical_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_logical_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add a string value to a [[json_value]], given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_string_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    character(kind=CK,len=*),intent(in) :: value        !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! variable name
+
+    if ( .not. json%exception_thrown ) then
+
+        nullify(p)
+
+        ! return a pointer to the path (possibly creating it)
+        ! If the variable had to be created, then
+        ! it will be a json_null variable.
+        call json%create(me,path,p,found,was_created)
+
+        if (.not. associated(p)) then
+
+            call json%throw_exception('Error in json_add_string_by_path:'//&
+                                      ' Unable to resolve path: '//trim(path))
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+
+        else
+
+            !NOTE: a new object is created, and the old one
+            !      is replaced and destroyed. This is to
+            !      prevent memory leaks if the type is
+            !      being changed (for example, if an array
+            !      is being replaced with a scalar).
+
+            if (p%var_type==json_string) then
+                p%str_value = value
+            else
+                call json%info(p,name=name)
+                call json%create_string(tmp,value,name)
+                call json%replace(p,tmp,destroy=.true.)
+            end if
+
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_string_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_string_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_string_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    character(kind=CDK,len=*),intent(in) :: value       !! the value to add
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%json_add_string_by_path(me,to_unicode(path),to_unicode(value),found,was_created)
+
+    end subroutine wrap_json_add_string_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_string_by_path]] where "path" is kind=CDK.
+
+    subroutine json_add_string_by_path_path_ascii(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    character(kind=CK,len=*),intent(in)  :: value        !! the value to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_string_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine json_add_string_by_path_path_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_string_by_path]] where "value" is kind=CDK.
+
+    subroutine json_add_string_by_path_value_ascii(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    character(kind=CDK,len=*),intent(in) :: value        !! the value to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_string_by_path(me,path,to_unicode(value),found,was_created)
+
+    end subroutine json_add_string_by_path_value_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_integer_by_path]] for adding an integer vector by path.
+
+    subroutine json_add_integer_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),dimension(:),intent(in) :: value        !! the vector to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p   !! pointer to path (which may exist)
+    type(json_value),pointer :: var !! new variable that is created
+    integer(IK) :: i    !! counter
+    character(kind=CK,len=:),allocatable :: name !! the variable name
+    logical(LK) :: p_found  !! if the path was successfully found (or created)
+
+    if ( .not. json%exception_thrown ) then
+
+        !get a pointer to the variable
+        !(creating it if necessary)
+        call json%create(me,path,p,found=p_found)
+        if (p_found) then
+            call json%info(p,name=name)             ! want to keep the existing name
+            call json%create_array(var,name)        ! create a new array variable
+            call json%replace(p,var,destroy=.true.) ! replace p with this array (destroy p)
+            !populate each element of the array:
+            do i=1,size(value)
+                call json%add(var, CK_'', value(i))
+            end do
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_integer_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_integer_vec_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_integer_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),dimension(:),intent(in)  :: value        !! the vector to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_integer_vec_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_integer_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_logical_by_path]] for adding a logical vector by path.
+
+    subroutine json_add_logical_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    logical(LK),dimension(:),intent(in) :: value        !! the vector to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p   !! pointer to path (which may exist)
+    type(json_value),pointer :: var !! new variable that is created
+    integer(IK) :: i    !! counter
+    character(kind=CK,len=:),allocatable :: name !! the variable name
+    logical(LK) :: p_found  !! if the path was successfully found (or created)
+
+    if ( .not. json%exception_thrown ) then
+
+        !get a pointer to the variable
+        !(creating it if necessary)
+        call json%create(me,path,p,found=p_found)
+        if (p_found) then
+            call json%info(p,name=name)             ! want to keep the existing name
+            call json%create_array(var,name)        ! create a new array variable
+            call json%replace(p,var,destroy=.true.) ! replace p with this array (destroy p)
+            !populate each element of the array:
+            do i=1,size(value)
+                call json%add(var, CK_'', value(i))
+            end do
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_logical_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_logical_vec_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_logical_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    logical(LK),dimension(:),intent(in)  :: value        !! the vector to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_logical_vec_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_logical_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_double_by_path]] for adding a double vector by path.
+
+    subroutine json_add_double_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    real(RK),dimension(:),intent(in)     :: value        !! the vector to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p   !! pointer to path (which may exist)
+    type(json_value),pointer :: var !! new variable that is created
+    integer(IK) :: i    !! counter
+    character(kind=CK,len=:),allocatable :: name !! the variable name
+    logical(LK) :: p_found  !! if the path was successfully found (or created)
+
+    if ( .not. json%exception_thrown ) then
+
+        !get a pointer to the variable
+        !(creating it if necessary)
+        call json%create(me,path,p,found=p_found)
+        if (p_found) then
+            call json%info(p,name=name)             ! want to keep the existing name
+            call json%create_array(var,name)        ! create a new array variable
+            call json%replace(p,var,destroy=.true.) ! replace p with this array (destroy p)
+            !populate each element of the array:
+            do i=1,size(value)
+                call json%add(var, CK_'', value(i))
+            end do
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_double_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_double_vec_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_double_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(RK),dimension(:),intent(in)     :: value        !! the vector to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_double_vec_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_double_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_string_by_path]] for adding a string vector by path.
+!
+!@note The `ilen` input can be used to specify the actual lengths of the
+!      the strings in the array. They must all be `<= len(value)`.
+
+    subroutine json_add_string_vec_by_path(json,me,path,value,found,was_created,ilen)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    character(kind=CK,len=*),dimension(:),intent(in) :: value !! the vector to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+    integer(IK),dimension(:),intent(in),optional :: ilen !! the string lengths of each
+                                                         !! element in `value`. If not present,
+                                                         !! the full `len(value)` string is added
+                                                         !! for each element.
+
+    type(json_value),pointer :: p   !! pointer to path (which may exist)
+    type(json_value),pointer :: var !! new variable that is created
+    integer(IK) :: i    !! counter
+    character(kind=CK,len=:),allocatable :: name !! the variable name
+    logical(LK) :: p_found  !! if the path was successfully found (or created)
+
+    if ( .not. json%exception_thrown ) then
+
+        ! validate ilen array if present:
+        if (present(ilen)) then
+            if (size(ilen)/=size(value)) then
+                call json%throw_exception('Error in json_add_string_vec_by_path: '//&
+                                          'Invalid size of ilen input vector.')
+                if (present(found)) then
+                    found = .false.
+                    call json%clear_exceptions()
+                end if
+                if (present(was_created)) was_created = .false.
+                return
+            else
+                ! also have to validate the specified lengths.
+                ! (must not be greater than input string length)
+                do i = 1, size(value)
+                    if (ilen(i)>len(value)) then
+                        call json%throw_exception('Error in json_add_string_vec_by_path: '//&
+                                                  'Invalid ilen element.')
+                        if (present(found)) then
+                            found = .false.
+                            call json%clear_exceptions()
+                        end if
+                        if (present(was_created)) was_created = .false.
+                        return
+                    end if
+                end do
+            end if
+        end if
+
+        !get a pointer to the variable
+        !(creating it if necessary)
+        call json%create(me,path,p,found=p_found)
+        if (p_found) then
+            call json%info(p,name=name)             ! want to keep the existing name
+            call json%create_array(var,name)        ! create a new array variable
+            call json%replace(p,var,destroy=.true.) ! replace p with this array (destroy p)
+            !populate each element of the array:
+            do i=1,size(value)
+                if (present(ilen)) then
+                    call json%add(var, CK_'', value(i)(1:ilen(i)))
+                else
+                    call json%add(var, CK_'', value(i))
+                end if
+            end do
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_string_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_string_vec_by_path]] where "path" and "value" are kind=CDK).
+
+    subroutine wrap_json_add_string_vec_by_path(json,me,path,value,&
+                                                found,was_created,ilen)
+
+    implicit none
+
+    class(json_core),intent(inout)                   :: json
+    type(json_value),pointer                         :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in)             :: path         !! the path to the variable
+    character(kind=CDK,len=*),dimension(:),intent(in):: value        !! the vector to add
+    logical(LK),intent(out),optional                 :: found        !! if the variable was found
+    logical(LK),intent(out),optional                 :: was_created  !! if the variable had to be created
+    integer(IK),dimension(:),intent(in),optional :: ilen !! the string lengths of each
+                                                         !! element in `value`. If not present,
+                                                         !! the full `len(value)` string is added
+                                                         !! for each element.
+
+    call json%json_add_string_vec_by_path(me,to_unicode(path),to_unicode(value),&
+                                            found,was_created,ilen)
+
+    end subroutine wrap_json_add_string_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_string_vec_by_path]] where "value" is kind=CDK).
+
+    subroutine json_add_string_vec_by_path_value_ascii(json,me,path,value,&
+                                                        found,was_created,ilen)
+
+    implicit none
+
+    class(json_core),intent(inout)                   :: json
+    type(json_value),pointer                         :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in)              :: path         !! the path to the variable
+    character(kind=CDK,len=*),dimension(:),intent(in):: value        !! the vector to add
+    logical(LK),intent(out),optional                 :: found        !! if the variable was found
+    logical(LK),intent(out),optional                 :: was_created  !! if the variable had to be created
+    integer(IK),dimension(:),intent(in),optional :: ilen !! the string lengths of each
+                                                         !! element in `value`. If not present,
+                                                         !! the full `len(value)` string is added
+                                                         !! for each element.
+
+    call json%json_add_string_vec_by_path(me,path,to_unicode(value),&
+                                            found,was_created,ilen)
+
+    end subroutine json_add_string_vec_by_path_value_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_string_vec_by_path]] where "path" is kind=CDK).
+
+    subroutine json_add_string_vec_by_path_path_ascii(json,me,path,value,&
+                                                        found,was_created,ilen)
+
+    implicit none
+
+    class(json_core),intent(inout)                   :: json
+    type(json_value),pointer                         :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in)             :: path         !! the path to the variable
+    character(kind=CK,len=*),dimension(:),intent(in) :: value        !! the vector to add
+    logical(LK),intent(out),optional                 :: found        !! if the variable was found
+    logical(LK),intent(out),optional                 :: was_created  !! if the variable had to be created
+    integer(IK),dimension(:),intent(in),optional :: ilen !! the string lengths of each
+                                                         !! element in `value`. If not present,
+                                                         !! the full `len(value)` string is added
+                                                         !! for each element.
+
+    call json%json_add_string_vec_by_path(me,to_unicode(path),value,&
+                                            found,was_created,ilen)
+
+    end subroutine json_add_string_vec_by_path_path_ascii
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2215,7 +4045,7 @@
 
     !populate the array:
     do i=1,size(val)
-        call json%add(var, '', val(i))
+        call json%add(var, CK_'', val(i))
     end do
 
     !add it:
@@ -2240,6 +4070,49 @@
     call json%add(p, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_double_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Add a NULL value child to the [[json_value]] variable
+!
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
+
+    subroutine json_value_add_null(json, p, name)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p
+    character(kind=CK,len=*),intent(in) :: name
+
+    type(json_value),pointer :: var
+
+    !create the variable:
+    call json%create_null(var,name)
+
+    !add it:
+    call json%add(p, var)
+
+    end subroutine json_value_add_null
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_null]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_null(json, p, name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
+
+    call json%add(p, to_unicode(name))
+
+    end subroutine wrap_json_value_add_null
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2315,7 +4188,7 @@
 
     !populate the array:
     do i=1,size(val)
-        call json%add(var, '', val(i))
+        call json%add(var, CK_'', val(i))
     end do
 
     !add it:
@@ -2415,7 +4288,7 @@
 
     !populate the array:
     do i=1,size(val)
-        call json%add(var, '', val(i))
+        call json%add(var, CK_'', val(i))
     end do
 
     !add it:
@@ -2461,13 +4334,9 @@
     character(kind=CK,len=*),intent(in) :: val   !! value
 
     type(json_value),pointer :: var
-    character(kind=CK,len=:),allocatable :: str
-
-    !add escape characters if necessary:
-    call escape_string(val, str)
 
     !create the variable:
-    call json%create_string(var,str,name)
+    call json%create_string(var,val,name)
 
     !add it:
     call json%add(p, var)
@@ -2578,7 +4447,7 @@
         if (trim_string)    str = trim(str)
 
         !write it:
-        call json%add(var, '', str)
+        call json%add(var, CK_'', str)
 
         !cleanup
         deallocate(str)
@@ -2655,20 +4524,25 @@
 !>
 !  Count the number of children.
 !
-!# History
+!### History
 !  * JW : 1/4/2014 : Original routine removed.
-!    Now using n_children variable.
-!    Renamed from json_value_count.
+!    Now using `n_children` variable.
+!    Renamed from `json_value_count`.
 
-    pure function json_count(json,p) result(count)
+    function json_count(json,p) result(count)
 
     implicit none
 
-    class(json_core),intent(in)         :: json
+    class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: p
     integer(IK)                         :: count  !! number of children
 
-    count = p%n_children
+    if (associated(p)) then
+        count = p%n_children
+    else
+        call json%throw_exception('Error in json_count: '//&
+                                  'pointer is not associated.')
+    end if
 
     end function json_count
 !*****************************************************************************************
@@ -2678,17 +4552,23 @@
 !  date: 10/16/2015
 !
 !  Returns a pointer to the parent of a [[json_value]].
-!  If there is no parent, then a null() pointer is returned.
+!  If there is no parent, then a `null()` pointer is returned.
 
     subroutine json_get_parent(json,p,parent)
 
     implicit none
 
-    class(json_core),intent(in)          :: json
+    class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p        !! JSON object
-    type(json_value),pointer,intent(out) :: parent   !! pointer to parent
+    type(json_value),pointer,intent(out) :: parent   !! pointer to `parent`
 
-    parent => p%parent
+    if (associated(p)) then
+        parent => p%parent
+    else
+        nullify(parent)
+        call json%throw_exception('Error in json_get_parent: '//&
+                                  'pointer is not associated.')
+    end if
 
     end subroutine json_get_parent
 !*****************************************************************************************
@@ -2698,17 +4578,23 @@
 !  date: 10/31/2015
 !
 !  Returns a pointer to the next of a [[json_value]].
-!  If there is no next, then a null() pointer is returned.
+!  If there is no next, then a `null()` pointer is returned.
 
     subroutine json_get_next(json,p,next)
 
     implicit none
 
-    class(json_core),intent(in)          :: json
-    type(json_value),pointer,intent(in)  :: p      !! JSON object
-    type(json_value),pointer,intent(out) :: next    !! pointer to next
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p       !! JSON object
+    type(json_value),pointer,intent(out) :: next    !! pointer to `next`
 
-    next => p%next
+    if (associated(p)) then
+        next => p%next
+    else
+        nullify(next)
+        call json%throw_exception('Error in json_get_next: '//&
+                                  'pointer is not associated.')
+    end if
 
     end subroutine json_get_next
 !*****************************************************************************************
@@ -2718,17 +4604,23 @@
 !  date: 10/31/2015
 !
 !  Returns a pointer to the previous of a [[json_value]].
-!  If there is no previous, then a null() pointer is returned.
+!  If there is no previous, then a `null()` pointer is returned.
 
     subroutine json_get_previous(json,p,previous)
 
     implicit none
 
-    class(json_core),intent(in)          :: json
+    class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p        !! JSON object
-    type(json_value),pointer,intent(out) :: previous !! pointer to previous
+    type(json_value),pointer,intent(out) :: previous !! pointer to `previous`
 
-    previous => p%previous
+    if (associated(p)) then
+        previous => p%previous
+    else
+        nullify(previous)
+        call json%throw_exception('Error in json_get_previous: '//&
+                                  'pointer is not associated.')
+    end if
 
     end subroutine json_get_previous
 !*****************************************************************************************
@@ -2739,17 +4631,23 @@
 !
 !  Returns a pointer to the tail of a [[json_value]]
 !  (the last child of an array of object).
-!  If there is no tail, then a null() pointer is returned.
+!  If there is no tail, then a `null()` pointer is returned.
 
     subroutine json_get_tail(json,p,tail)
 
     implicit none
 
-    class(json_core),intent(in)          :: json
+    class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p        !! JSON object
-    type(json_value),pointer,intent(out) :: tail     !! pointer to tail
+    type(json_value),pointer,intent(out) :: tail     !! pointer to `tail`
 
-    tail => p%tail
+    if (associated(p)) then
+        tail => p%tail
+    else
+        nullify(tail)
+        call json%throw_exception('Error in json_get_tail: '//&
+                                  'pointer is not associated.')
+    end if
 
     end subroutine json_get_tail
 !*****************************************************************************************
@@ -2758,16 +4656,24 @@
 !>
 !  Returns a child in the object or array given the index.
 
-    subroutine json_value_get_by_index(json, p, idx, child)
+    subroutine json_value_get_child_by_index(json, p, idx, child, found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: p      !! object or array JSON data
     integer(IK),intent(in)              :: idx    !! index of the child
+                                                  !! (this is a 1-based Fortran
+                                                  !! style array index).
     type(json_value),pointer            :: child  !! pointer to the child
+    logical(LK),intent(out),optional    :: found  !! true if the value was found
+                                                  !! (if not present, an exception
+                                                  !! will be thrown if it was not
+                                                  !! found.  If present and not
+                                                  !! found, no exception will be
+                                                  !! thrown).
 
-    integer(IK) :: i
+    integer(IK) :: i  !! counter
 
     nullify(child)
 
@@ -2782,24 +4688,60 @@
                 if (associated(child%next)) then
                     child => child%next
                 else
-                    call json%throw_exception('Error in json_value_get_by_index:'//&
+                    call json%throw_exception('Error in json_value_get_child_by_index:'//&
                                               ' child%next is not associated.')
                     nullify(child)
-                    return
+                    exit
                 end if
 
             end do
 
         else
 
-            call json%throw_exception('Error in json_value_get_by_index:'//&
+            call json%throw_exception('Error in json_value_get_child_by_index:'//&
                                       ' p%children is not associated.')
 
         end if
 
+        ! found output:
+        if (json%exception_thrown) then
+            if (present(found)) then
+                call json%clear_exceptions()
+                found = .false.
+            end if
+        else
+            if (present(found)) found = .true.
+        end if
+
+    else
+        if (present(found)) found = .false.
     end if
 
-    end subroutine json_value_get_by_index
+    end subroutine json_value_get_child_by_index
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns pointer to the first child of the object
+!  (or `null()` if it is not associated).
+
+    subroutine json_value_get_child(json, p, child)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p      !! object or array JSON data
+    type(json_value),pointer            :: child  !! pointer to the child
+
+    if (associated(p)) then
+        child => p%children
+    else
+        nullify(child)
+        call json%throw_exception('Error in json_value_get_child: '//&
+                                  'pointer is not associated.')
+    end if
+
+    end subroutine json_value_get_child
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2807,20 +4749,27 @@
 !  Returns a child in the object or array given the name string.
 !
 !  The name search can be case-sensitive or not, and can have significant trailing
-!  whitespace or not, depending on the settings in the [[json_core]] class.
+!  whitespace or not, depending on the settings in the [[json_core(type)]] class.
 !
 !@note The `name` input is not a path, and is not parsed like it is in [[json_get_by_path]].
 
-    subroutine json_value_get_by_name_chars(json, p, name, child)
+    subroutine json_value_get_child_by_name(json, p, name, child, found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: p
-    character(kind=CK,len=*),intent(in) :: name      !! the name of a child of `p`
-    type(json_value),pointer            :: child     !! pointer to the child
+    character(kind=CK,len=*),intent(in) :: name   !! the name of a child of `p`
+    type(json_value),pointer            :: child  !! pointer to the child
+    logical(LK),intent(out),optional    :: found  !! true if the value was found
+                                                  !! (if not present, an exception
+                                                  !! will be thrown if it was not
+                                                  !! found.  If present and not
+                                                  !! found, no exception will be
+                                                  !! thrown).
 
     integer(IK) :: i,n_children
+    logical :: error
 
     nullify(child)
 
@@ -2828,43 +4777,268 @@
 
         if (associated(p)) then
 
+            error = .true.   ! will be false if it is found
             if (p%var_type==json_object) then
                 n_children = json%count(p)
                 child => p%children    !start with first one
                 do i=1, n_children
                     if (.not. associated(child)) then
-                        call json%throw_exception('Error in json_value_get_by_name_chars: '//&
-                                                  'Malformed JSON linked list')
-                        return
+                        call json%throw_exception(&
+                            'Error in json_value_get_child_by_name: '//&
+                            'Malformed JSON linked list')
+                        exit
                     end if
                     if (allocated(child%name)) then
                         !name string matching routine:
-                        if (json%name_equal(child,name)) return
+                        if (json%name_equal(child,name)) then
+                            error = .false.
+                            exit
+                        end if
                     end if
                     child => child%next
                 end do
             end if
 
-            !did not find anything:
-            call json%throw_exception('Error in json_value_get_by_name_chars: '//&
-                                 'child variable '//trim(name)//' was not found.')
-            nullify(child)
+            if (error) then
+                !did not find anything:
+                call json%throw_exception(&
+                    'Error in json_value_get_child_by_name: '//&
+                    'child variable '//trim(name)//' was not found.')
+                nullify(child)
+            end if
 
         else
-            call json%throw_exception('Error in json_value_get_by_name_chars: '//&
-                                 'pointer is not associated.')
+            call json%throw_exception(&
+                'Error in json_value_get_child_by_name: '//&
+                'pointer is not associated.')
+        end if
+
+        ! found output:
+        if (json%exception_thrown) then
+            if (present(found)) then
+                call json%clear_exceptions()
+                found = .false.
+            end if
+        else
+            if (present(found)) found = .true.
+        end if
+
+    else
+        if (present(found)) found = .false.
+    end if
+
+    end subroutine json_value_get_child_by_name
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 8/25/2017
+!
+!  Checks a JSON object for duplicate child names.
+!
+!  It uses the specified settings for name matching (see [[name_strings_equal]]).
+!
+!@note This will only check for one duplicate,
+!      it will return the first one that it finds.
+
+    subroutine json_check_children_for_duplicate_keys(json,p,has_duplicate,name,path)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer,intent(in) :: p  !! the object to search. If `p` is
+                                              !! not a `json_object`, then `has_duplicate`
+                                              !! will be false.
+    logical(LK),intent(out) :: has_duplicate  !! true if there is at least
+                                              !! two children have duplicate
+                                              !! `name` values.
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! the duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicate was found)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: path !! the full path to the
+                                                                      !! duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicate was found)
+
+    integer(IK)              :: i           !! counter
+    integer(IK)              :: j           !! counter
+    type(json_value),pointer :: child       !! pointer to a child of `p`
+    integer(IK)              :: n_children  !! number of children of `p`
+    logical(LK)              :: found       !! flag for `get_child`
+
+    type :: alloc_str
+        !! so we can have an array of allocatable strings
+        character(kind=CK,len=:),allocatable :: str  !! name string
+    end type alloc_str
+    type(alloc_str),dimension(:),allocatable :: names !! array of all the
+                                                      !! child name strings
+
+    ! initialize:
+    has_duplicate =.false.
+
+    if (.not. json%exception_thrown) then
+
+        if (associated(p)) then
+
+            if (p%var_type==json_object) then
+
+                ! number of items to check:
+                n_children = json%count(p)
+                allocate(names(n_children))
+
+                ! first get a list of all the name keys:
+                do i=1, n_children
+                    call json%get_child(p,i,child,found) ! get by index
+                    if (.not. found) then
+                        call json%throw_exception(&
+                            'Error in json_check_children_for_duplicate_keys: '//&
+                            'Malformed JSON linked list')
+                        exit
+                    end if
+                    if (allocated(child%name)) then
+                        names(i)%str = child%name
+                    else
+                        call json%throw_exception(&
+                            'Error in json_check_children_for_duplicate_keys: '//&
+                            'Object child name is not allocated')
+                        exit
+                    end if
+                end do
+
+                if (.not. json%exception_thrown) then
+                    ! now check the list for duplicates:
+                    main: do i=1,n_children
+                        do j=1,i-1
+                            if (json%name_strings_equal(names(i)%str,names(j)%str)) then
+                                has_duplicate = .true.
+                                if (present(name)) then
+                                    name = names(i)%str
+                                end if
+                                if (present(path)) then
+                                    call json%get_child(p,names(i)%str,child,found) ! get by name
+                                    if (found) then
+                                        call json%get_path(child,path,found)
+                                        if (.not. found) then
+                                            ! should never happen since we know it is there
+                                            call json%throw_exception(&
+                                                    'Error in json_check_children_for_duplicate_keys: '//&
+                                                    'Could not get path')
+                                        end if
+                                    else
+                                        ! should never happen since we know it is there
+                                        call json%throw_exception(&
+                                            'Error in json_check_children_for_duplicate_keys: '//&
+                                            'Could not get child: '//trim(names(i)%str))
+                                    end if
+                                end if
+                                exit main
+                            end if
+                        end do
+                    end do main
+                end if
+
+                ! cleanup
+                do i=1,n_children
+                    if (allocated(names(i)%str)) deallocate(names(i)%str)
+                end do
+                if (allocated(names)) deallocate(names)
+
+            end if
+
         end if
 
     end if
 
-    end subroutine json_value_get_by_name_chars
+    end subroutine json_check_children_for_duplicate_keys
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 8/25/2017
+!
+!  Checks a JSON structure for duplicate child names.
+!  This one recursively traverses the entire structure
+!  (calling [[json_check_children_for_duplicate_keys]]
+!  recursively for each element).
+!
+!@note This will only check for one duplicate,
+!      it will return the first one that it finds.
+
+    subroutine json_check_all_for_duplicate_keys(json,p,has_duplicate,name,path)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer,intent(in) :: p  !! the object to search. If `p` is
+                                              !! not a `json_object`, then `has_duplicate`
+                                              !! will be false.
+    logical(LK),intent(out) :: has_duplicate  !! true if there is at least
+                                              !! one duplicate `name` key anywhere
+                                              !! in the structure.
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! the duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicates were found)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: path !! the full path to the
+                                                                      !! duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicate was found)
+
+    has_duplicate = .false.
+    if (.not. json%exception_thrown) then
+        call json%traverse(p,duplicate_key_func)
+    end if
+
+    contains
+
+        subroutine duplicate_key_func(json,p,finished)
+
+        !! Callback function to check each element
+        !! for duplicate child names.
+
+        implicit none
+
+        class(json_core),intent(inout)      :: json
+        type(json_value),pointer,intent(in) :: p
+        logical(LK),intent(out)             :: finished
+
+#if defined __GFORTRAN__
+
+        ! this is a workaround for a gfortran bug (6 and 7),
+
+        character(kind=CK,len=:),allocatable :: tmp_name !! temp variable for `name` string
+        character(kind=CK,len=:),allocatable :: tmp_path !! temp variable for `path` string
+
+        if (present(name) .and. present(path)) then
+            call json%check_children_for_duplicate_keys(p,has_duplicate,name=tmp_name,path=tmp_path)
+        else if (present(name) .and. .not. present(path)) then
+            call json%check_children_for_duplicate_keys(p,has_duplicate,name=tmp_name)
+        else if (.not. present(name) .and. present(path)) then
+            call json%check_children_for_duplicate_keys(p,has_duplicate,path=tmp_path)
+        else
+            call json%check_children_for_duplicate_keys(p,has_duplicate)
+        end if
+
+        if (has_duplicate) then
+            if (present(name)) name = tmp_name
+            if (present(path)) path = tmp_path
+        end if
+
+#else
+        call json%check_children_for_duplicate_keys(p,has_duplicate,name,path)
+#endif
+
+        finished = has_duplicate .or. json%exception_thrown
+
+        end subroutine duplicate_key_func
+
+    end subroutine json_check_all_for_duplicate_keys
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_get_by_name_chars]] where `name` is kind=CDK.
+!  Alternate version of [[json_value_get_child_by_name]] where `name` is kind=CDK.
 
-    subroutine wrap_json_value_get_by_name_chars(json, p, name, child)
+    subroutine wrap_json_value_get_child_by_name(json, p, name, child, found)
 
     implicit none
 
@@ -2872,10 +5046,11 @@
     type(json_value),pointer,intent(in)  :: p
     character(kind=CDK,len=*),intent(in) :: name
     type(json_value),pointer             :: child
+    logical(LK),intent(out),optional     :: found
 
-    call json%get(p,to_unicode(name),child)
+    call json%get(p,to_unicode(name),child,found)
 
-    end subroutine wrap_json_value_get_by_name_chars
+    end subroutine wrap_json_value_get_child_by_name
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2892,8 +5067,8 @@
     type(json_value),pointer,intent(in)              :: p
     character(kind=CK,len=:),intent(out),allocatable :: str  !! prints structure to this string
 
-    str = ''
-    call json%json_value_print(p, iunit=unit2str, str=str, indent=1, colon=.true.)
+    str = CK_''
+    call json%json_value_print(p, iunit=unit2str, str=str, indent=1_IK, colon=.true.)
 
     end subroutine json_value_to_string
 !*****************************************************************************************
@@ -2910,12 +5085,13 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p
-    integer(IK),intent(in)               :: iunit   !! the file unit (the file must already have been opened, can't be -1).
+    integer(IK),intent(in)               :: iunit   !! the file unit (the file must
+                                                    !! already have been opened, can't be -1).
 
     character(kind=CK,len=:),allocatable :: dummy
 
     if (iunit/=unit2str) then
-        call json%json_value_print(p,iunit,str=dummy, indent=1, colon=.true.)
+        call json%json_value_print(p,iunit,str=dummy, indent=1_IK, colon=.true.)
     else
         call json%throw_exception('Error in json_print_1: iunit must not be -1.')
     end if
@@ -2935,7 +5111,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p
-    character(kind=CDK,len=*),intent(in) :: filename  !! the filename to print to (should not already be open)
+    character(kind=CDK,len=*),intent(in) :: filename  !! the filename to print to
+                                                      !! (should not already be open)
 
     integer(IK) :: iunit,istat
 
@@ -2955,13 +5132,14 @@
 !>
 !  Print the JSON structure to a string or a file.
 !
-!# Notes
+!### Notes
 !  * This is an internal routine called by the various wrapper routines.
-!  * The reason the str argument is non-optional is because of a
+!  * The reason the `str` argument is non-optional is because of a
 !    bug in v4.9 of the gfortran compiler.
 
     recursive subroutine json_value_print(json,p,iunit,str,indent,&
-                                          need_comma,colon,is_array_element)
+                                          need_comma,colon,is_array_element,&
+                                          is_compressed_vector)
 
     implicit none
 
@@ -2977,16 +5155,30 @@
                                                       !! printed to this string rather than
                                                       !! a file. This mode is used by
                                                       !! [[json_value_to_string]].
+    logical(LK),intent(in),optional :: is_compressed_vector  !! if True, this is an element
+                                                             !! from an array being printed
+                                                             !! on one line [default is False]
 
-    character(kind=CK,len=max_numeric_str_len) :: tmp !for val to string conversions
+    character(kind=CK,len=max_numeric_str_len) :: tmp !! for val to string conversions
     character(kind=CK,len=:),allocatable :: s
     type(json_value),pointer :: element
     integer(IK) :: tab, i, count, spaces
     logical(LK) :: print_comma
     logical(LK) :: write_file, write_string
     logical(LK) :: is_array
+    integer(IK) :: var_type,var_type_prev
+    logical(LK) :: is_vector !! if all elements of a vector
+                             !! are scalars of the same type
+    character(kind=CK,len=:),allocatable :: str_escaped !! escaped version of
+                                                        !! `name` or `str_value`
 
     if (.not. json%exception_thrown) then
+
+        if (present(is_compressed_vector)) then
+            is_vector = is_compressed_vector
+        else
+            is_vector = .false.
+        end if
 
         !whether to write a string or a file (one or the other):
         write_string = (iunit==unit2str)
@@ -3001,7 +5193,7 @@
         end if
 
         !number of "tabs" to indent:
-        if (present(indent)) then
+        if (present(indent) .and. .not. json%no_whitespace) then
             tab = indent
         else
             tab = 0
@@ -3018,7 +5210,7 @@
 
         !if the colon was the last thing written
         if (present(colon)) then
-            s = ''
+            s = CK_''
         else
             s = repeat(space, spaces)
         end if
@@ -3039,8 +5231,8 @@
 
                 !if an object is in an array, there is an extra tab:
                 if (is_array) then
-                     tab = tab+1
-                     spaces = tab*json%spaces_per_tab
+                    if ( .not. json%no_whitespace) tab = tab+1
+                    spaces = tab*json%spaces_per_tab
                 end if
 
                 nullify(element)
@@ -3055,12 +5247,20 @@
 
                     ! print the name
                     if (allocated(element%name)) then
-                        call write_it(repeat(space, spaces)//quotation_mark//&
-                                      element%name//quotation_mark//colon_char//space,&
-                                      advance=.false.)
+                        call escape_string(element%name,str_escaped)
+                        if (json%no_whitespace) then
+                            !compact printing - no extra space
+                            call write_it(repeat(space, spaces)//quotation_mark//&
+                                          str_escaped//quotation_mark//colon_char,&
+                                          advance=.false.)
+                        else
+                            call write_it(repeat(space, spaces)//quotation_mark//&
+                                          str_escaped//quotation_mark//colon_char//space,&
+                                          advance=.false.)
+                        end if
                     else
                         call json%throw_exception('Error in json_value_print:'//&
-                                             ' element%name not allocated')
+                                                  ' element%name not allocated')
                         nullify(element)
                         return
                     end if
@@ -3085,13 +5285,49 @@
 
             count = json%count(p)
 
+            if (json%compress_vectors) then
+                ! check to see if every child is the same type,
+                ! and a scalar:
+                is_vector = .true.
+                var_type_prev = -1   ! an invalid value
+                nullify(element)
+                element => p%children
+                do i = 1, count
+                    if (.not. associated(element)) then
+                        call json%throw_exception('Error in json_value_print: '//&
+                                                  'Malformed JSON linked list')
+                        return
+                    end if
+                    ! check variable type of all the children.
+                    ! They must all be the same, and a scalar.
+                    call json%info(element,var_type=var_type)
+                    if (var_type==json_object .or. &
+                        var_type==json_array .or. &
+                        (i>1 .and. var_type/=var_type_prev)) then
+                        is_vector = .false.
+                        exit
+                    end if
+                    var_type_prev = var_type
+                    ! get the next child the list:
+                    element => element%next
+                end do
+            else
+                is_vector = .false.
+            end if
+
             if (count==0) then    !special case for empty array
 
                 call write_it( s//start_array//end_array, comma=print_comma )
 
             else
 
-                call write_it( start_array )
+                call write_it( s//start_array, advance=(.not. is_vector) )
+
+                !if an array is in an array, there is an extra tab:
+                if (is_array) then
+                    if ( .not. json%no_whitespace) tab = tab+1
+                    spaces = tab*json%spaces_per_tab
+                end if
 
                 nullify(element)
                 element => p%children
@@ -3104,30 +5340,46 @@
                     end if
 
                     ! recursive print of the element
-                    call json%json_value_print(element, iunit=iunit, indent=tab,&
-                                    need_comma=i<count, is_array_element=.true., str=str)
-
+                    if (is_vector) then
+                        call json%json_value_print(element, iunit=iunit, indent=0,&
+                                        need_comma=i<count, is_array_element=.false., str=str,&
+                                        is_compressed_vector = .true.)
+                    else
+                        call json%json_value_print(element, iunit=iunit, indent=tab,&
+                                        need_comma=i<count, is_array_element=.true., str=str)
+                    end if
                     ! get the next child the list:
                     element => element%next
 
                 end do
 
                 !indent the closing array character:
-                call write_it( repeat(space, max(0,spaces-json%spaces_per_tab))//end_array,&
-                               comma=print_comma )
+                if (is_vector) then
+                    call write_it( end_array,comma=print_comma )
+                else
+                    call write_it( repeat(space, max(0,spaces-json%spaces_per_tab))//end_array,&
+                                   comma=print_comma )
+                end if
                 nullify(element)
 
             end if
 
         case (json_null)
 
-            call write_it( s//null_str, comma=print_comma )
+            call write_it( s//null_str, comma=print_comma, &
+                            advance=(.not. is_vector),&
+                            space_after_comma=is_vector )
 
         case (json_string)
 
             if (allocated(p%str_value)) then
+                ! have to escape the string for printing:
+                call escape_string(p%str_value,str_escaped)
                 call write_it( s//quotation_mark// &
-                               trim(p%str_value)//quotation_mark, comma=print_comma )
+                               str_escaped//quotation_mark, &
+                               comma=print_comma, &
+                               advance=(.not. is_vector),&
+                               space_after_comma=is_vector )
             else
                 call json%throw_exception('Error in json_value_print:'//&
                                           ' p%value_string not allocated')
@@ -3137,16 +5389,22 @@
         case (json_logical)
 
             if (p%log_value) then
-                call write_it( s//true_str, comma=print_comma )
+                call write_it( s//true_str, comma=print_comma, &
+                                advance=(.not. is_vector),&
+                                space_after_comma=is_vector )
             else
-                call write_it( s//false_str, comma=print_comma )
+                call write_it( s//false_str, comma=print_comma, &
+                                advance=(.not. is_vector),&
+                                space_after_comma=is_vector )
             end if
 
         case (json_integer)
 
             call integer_to_string(p%int_value,int_fmt,tmp)
 
-            call write_it( s//trim(tmp), comma=print_comma )
+            call write_it( s//trim(tmp), comma=print_comma, &
+                            advance=(.not. is_vector),&
+                            space_after_comma=is_vector )
 
         case (json_double)
 
@@ -3157,7 +5415,9 @@
                 call real_to_string(p%dbl_value,default_real_fmt,json%compact_real,tmp)
             end if
 
-            call write_it( s//trim(tmp), comma=print_comma )
+            call write_it( s//trim(tmp), comma=print_comma, &
+                            advance=(.not. is_vector),&
+                            space_after_comma=is_vector )
 
         case default
 
@@ -3172,34 +5432,54 @@
 
     contains
 
-        subroutine write_it(s,advance,comma)
+        subroutine write_it(s,advance,comma,space_after_comma)
 
         !! write the string to the file (or the output string)
 
         implicit none
 
-        character(kind=CK,len=*),intent(in) :: s        !! string to print
-        logical(LK),intent(in),optional     :: advance  !! to add line break or not
-        logical(LK),intent(in),optional     :: comma    !! print comma after the string
+        character(kind=CK,len=*),intent(in) :: s  !! string to print
+        logical(LK),intent(in),optional :: advance           !! to add line break or not
+        logical(LK),intent(in),optional :: comma             !! print comma after the string
+        logical(LK),intent(in),optional :: space_after_comma !! print a space after the comma
 
-        logical(LK) :: add_line_break, add_comma
-        character(kind=CK,len=:),allocatable :: s2
+        logical(LK) :: add_comma       !! if a delimiter is to be added after string
+        logical(LK) :: add_line_break  !! if a line break is to be added after string
+        logical(LK) :: add_space       !! if a space is to be added after the comma
+        character(kind=CK,len=:),allocatable :: s2  !! temporary string
 
         if (present(comma)) then
             add_comma = comma
         else
             add_comma = .false. !default is not to add comma
         end if
-
-        if (present(advance)) then
-            add_line_break = advance
+        if (json%no_whitespace) then
+            add_space = .false.
         else
-            add_line_break = .true. !default is to advance
+            if (present(space_after_comma)) then
+                add_space = space_after_comma
+            else
+                add_space = .false. !default is not to add space
+            end if
+        end if
+        if (present(advance)) then
+            if (json%no_whitespace) then
+                ! overrides input value:
+                add_line_break = .false.
+            else
+                add_line_break = advance
+            end if
+        else
+            add_line_break = .not. json%no_whitespace ! default is to advance if
+                                                      ! we are printing whitespace
         end if
 
         !string to print:
         s2 = s
-        if (add_comma) s2 = s2 // delimiter
+        if (add_comma) then
+            s2 = s2 // delimiter
+            if (add_space) s2 = s2 // space
+        end if
 
         if (write_file) then
 
@@ -3228,28 +5508,10 @@
 !>
 !  Returns the [[json_value]] pointer given the path string.
 !
-!# Example
+!  It uses either of two methods:
 !
-!````fortran
-!    type(json_value),pointer :: dat,p
-!    logical :: found
-!    !...
-!    call json%get(dat,'data(2).version',p,found)
-!````
-!
-!# Notes
-!  The following special characters are used to denote paths:
-!
-!````
-!  $         - root
-!  @         - this
-!  .         - child object member
-!  [] or ()  - child array element
-!````
-!
-!  Thus, if any of these characters are present in the name key,
-!  this routine cannot be used to get the value.
-!  In that case, the `get_child` methods would need to be used.
+!  * The original JSON-Fortran defaults
+!  * [RFC 6901](https://tools.ietf.org/html/rfc6901)
 
     subroutine json_get_by_path(json, me, path, p, found)
 
@@ -3258,26 +5520,196 @@
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: me     !! a JSON linked list
     character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
-    type(json_value),pointer,intent(out) :: p      !! pointer to the variable specify by `path`
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+                                                   !! specify by `path`
     logical(LK),intent(out),optional     :: found  !! true if it was found
-
-    integer(IK)              :: i
-    integer(IK)              :: length
-    integer(IK)              :: child_i
-    character(kind=CK,len=1) :: c
-    logical(LK)              :: array
-    type(json_value),pointer :: tmp
 
     nullify(p)
 
     if (.not. json%exception_thrown) then
 
-        ! default to assuming relative to this
+        ! note: it can only be 1 or 2 (which was checked in initialize)
+        select case (json%path_mode)
+        case(1_IK)
+            call json%json_get_by_path_default(me, path, p, found)
+        case(2_IK)
+            call json%json_get_by_path_rfc6901(me, path, p, found)
+        end select
+
+    else
+        if (present(found)) found = .false.
+    end if
+
+    end subroutine json_get_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns the [[json_value]] pointer given the path string,
+!  If necessary, by creating the variables as needed.
+!
+!  By default, the leaf node and any empty array elements
+!  are created as `json_null` values.
+!
+!  It only works for the default path mode. An error will be
+!  thrown if RFC 6901 mode is enabled.
+!
+!### See also
+!  * [[json_get_by_path]]
+
+    subroutine json_create_by_path(json,me,path,p,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me           !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path         !! path to the variable
+    type(json_value),pointer,intent(out),optional :: p   !! pointer to the variable
+                                                         !! specify by `path`
+    logical(LK),intent(out),optional     :: found        !! true if there were no errors
+                                                         !! (variable found or created)
+    logical(LK),intent(out),optional     :: was_created  !! true if it was actually created
+                                                         !! (as opposed to already being there)
+
+    type(json_value),pointer :: tmp
+
+    if (present(p)) nullify(p)
+
+    if (.not. json%exception_thrown) then
+
+        ! note: path_mode can only be 1 or 2 (which was checked in initialize)
+        select case (json%path_mode)
+        case(1_IK)
+            call json%json_get_by_path_default(me,path,tmp,found,&
+                                                create_it=.true.,&
+                                                was_created=was_created)
+            if (present(p)) p => tmp
+        case(2_IK)
+            ! the problem here is there isn't really a way to disambiguate
+            ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
+            call json%throw_exception('Create by path not supported in RFC 6901 path mode.')
+            if (present(found)) then
+                call json%clear_exceptions()
+                found = .false.
+            end if
+            if (present(was_created)) was_created = .false.
+        end select
+
+    else
+        if (present(was_created)) was_created = .false.
+        if (present(found)) found = .false.
+    end if
+
+    end subroutine json_create_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_create_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_create_by_path(json,me,path,p,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me           !! a JSON linked list
+    character(kind=CDK,len=*),intent(in) :: path         !! path to the variable
+    type(json_value),pointer,intent(out),optional :: p   !! pointer to the variable
+                                                         !! specify by `path`
+    logical(LK),intent(out),optional     :: found        !! true if there were no errors
+                                                         !! (variable found or created)
+    logical(LK),intent(out),optional     :: was_created  !! true if it was actually created
+                                                         !! (as opposed to already being there)
+
+    call json%create(me,to_unicode(path),p,found,was_created)
+
+    end subroutine wrap_json_create_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns the [[json_value]] pointer given the path string.
+!
+!### Example
+!
+!````fortran
+!    type(json_value),pointer :: dat,p
+!    logical :: found
+!    !...
+!    call json%get(dat,'data(2).version',p,found)
+!````
+!
+!### Notes
+!  The following special characters are used to denote paths:
+!
+!  * `$`           - root
+!  * `@`           - this
+!  * `.`           - child object member (note this can be changed using `json%path_separator`)
+!  * `[]` or `()`  - child array element (note that indices are 1-based)
+!
+!  Thus, if any of these characters are present in the name key,
+!  this routine cannot be used to get the value.
+!  In that case, the `get_child` methods would need to be used.
+!  Or, the alternate [[json_get_by_path_rfc6901]] could be used.
+!
+!### See also
+!  * [[json_get_by_path_rfc6901]] - alternate version with different path convention.
+!
+!@note JSON `null` values are used here for unknown variables when `create_it` is True.
+!      So, it is possible that an existing null variable can be converted to another
+!      type (object or array) if a child is specified in the path. Doing it this way
+!      to avoid having to use another type (say `json_unknown`) that would have to be
+!      converted to null once all the variables have been created (user would have
+!      had to do this).
+
+    subroutine json_get_by_path_default(json,me,path,p,found,create_it,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me          !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path        !! path to the variable
+    type(json_value),pointer,intent(out) :: p           !! pointer to the variable
+                                                        !! specify by `path`
+    logical(LK),intent(out),optional     :: found       !! true if it was found
+    logical(LK),intent(in),optional      :: create_it   !! if a variable is not present
+                                                        !! in the path, then it is created.
+                                                        !! the leaf node is returned as
+                                                        !! a `null` json type and can be
+                                                        !! changed by the caller.
+    logical(LK),intent(out),optional     :: was_created !! if `create_it` is true, this
+                                                        !! will be true if the variable
+                                                        !! was actually created. Otherwise
+                                                        !! it will be false.
+
+    integer(IK)              :: i            !! counter of characters in `path`
+    integer(IK)              :: length       !! significant length of `path`
+    integer(IK)              :: child_i      !! index for getting children
+    character(kind=CK,len=1) :: c            !! a character in the `path`
+    logical(LK)              :: array        !! flag when searching for array index in `path`
+    type(json_value),pointer :: tmp          !! temp variables for getting child objects
+    logical(LK)              :: child_found  !! if the child value was found
+    logical(LK)              :: create       !! if the object is to be created
+    logical(LK)              :: created      !! if `create` is true, then this will be
+                                             !! true if the leaf object had to be created
+    integer(IK)              :: j            !! counter of children when creating object
+
+    nullify(p)
+
+    if (.not. json%exception_thrown) then
+
+        if (present(create_it)) then
+            create = create_it
+        else
+            create = .false.
+        end if
+
+        ! default to assuming relative to me
         p => me
 
         child_i = 1
-
         array = .false.
+        created = .false.
 
         !keep trailing space or not:
         if (json%trailing_spaces_significant) then
@@ -3298,38 +5730,16 @@
                     p => p%parent
                 end do
                 child_i = i + 1
+                if (create) created = .false. ! should always exist
 
             case (this)
 
                 ! this
                 p => me
                 child_i = i + 1
-
-            case (child)
-
-                ! get child member from p
-                if (child_i < i) then
-                    nullify(tmp)
-                    call json%get_child(p, path(child_i:i-1), tmp)
-                    p => tmp
-                    nullify(tmp)
-                else
-                    child_i = i + 1
-                    cycle
-                end if
-
-                if (.not. associated(p)) then
-                    call json%throw_exception('Error in json_get_by_path:'//&
-                                         ' Error getting child member.')
-                    exit
-                end if
-
-                child_i = i+1
+                if (create) created = .false. ! should always exist
 
             case (start_array,start_array_alt)
-
-                !....Modified to allow for 'var[3]' style syntax
-                !Note: jmozmoz/fson has a slightly different version of this...
 
                 ! start looking for the array element index
                 array = .true.
@@ -3337,35 +5747,143 @@
                 ! get child member from p
                 if (child_i < i) then
                     nullify(tmp)
-                    call json%get_child(p, path(child_i:i-1), tmp)
+                    if (create) then
+
+                        ! Example:
+                        !    'aaa.bbb(1)'
+                        !     -> and aaa is a null, need to make it an object
+                        !
+                        !  What about the case: aaa.bbb(1)(3) ?
+                        !  Is that already handled?
+
+                        if (p%var_type==json_null) then
+                            ! if p was also created, then we need to
+                            ! convert it into an object here:
+                            p%var_type = json_object
+                        end if
+
+                        ! don't want to throw exceptions in this case
+                        call json%get_child(p, path(child_i:i-1), tmp, child_found)
+                        if (.not. child_found) then
+                            ! have to create this child
+                            ! [make it an array]
+                            call json_value_create(tmp)
+                            call to_array(tmp,path(child_i:i-1))
+                            call json%add(p,tmp)
+                            created = .true.
+                        else
+                            created = .false.
+                        end if
+                    else
+                        ! call the normal way
+                        call json%get_child(p, path(child_i:i-1), tmp)
+                    end if
                     p => tmp
-                    nullify(tmp)
                 else
-                    child_i = i + 1
+                    child_i = i + 1     ! say, '@('
                     cycle
                 end if
                 if (.not. associated(p)) then
-                    call json%throw_exception('Error in json_get_by_path:'//&
-                                         ' Error getting array element')
+                    call json%throw_exception('Error in json_get_by_path_default:'//&
+                                              ' Error getting array element')
                     exit
                 end if
                 child_i = i + 1
 
             case (end_array,end_array_alt)
 
-                if (.not.array) then
-                    call json%throw_exception('Error in json_get_by_path: Unexpected ]')
+                if (.not. array) then
+                    call json%throw_exception('Error in json_get_by_path_default: Unexpected '//c)
                     exit
                 end if
                 array = .false.
-                child_i = json%string_to_integer(path(child_i:i-1))
+                child_i = json%string_to_int(path(child_i:i-1))
 
                 nullify(tmp)
-                call json%get_child(p, child_i, tmp)
+                if (create) then
+                    ! don't want to throw exceptions in this case
+                    call json%get_child(p, child_i, tmp, child_found)
+                    if (.not. child_found) then
+
+                        if (p%var_type==json_null) then
+                            ! if p was also created, then we need to
+                            ! convert it into an array here:
+                            p%var_type = json_array
+                        end if
+
+                        ! have to create this element
+                        ! [make it a null]
+                        ! (and any missing ones before it)
+                        do j = 1, child_i
+                            nullify(tmp)
+                            call json%get_child(p, j, tmp, child_found)
+                            if (.not. child_found) then
+                                call json_value_create(tmp)
+                                call to_null(tmp)  ! array element doesn't need a name
+                                call json%add(p,tmp)
+                                if (j==child_i) created = .true.
+                            else
+                                if (j==child_i) created = .false.
+                            end if
+                        end do
+
+                    else
+                        created = .false.
+                    end if
+
+                else
+                    ! call the normal way:
+                    call json%get_child(p, child_i, tmp)
+                end if
+
                 p => tmp
-                nullify(tmp)
 
-                child_i= i + 1
+                child_i = i + 1
+
+            case default
+
+                if (c==json%path_separator) then
+
+                    ! get child member from p
+                    if (child_i < i) then
+                        nullify(tmp)
+                        if (create) then
+                            if (p%var_type==json_null) then
+                                ! if p was also created, then we need to
+                                ! convert it into an object here:
+                                p%var_type = json_object
+                            end if
+                            ! don't want to throw exceptions in this case
+                            call json%get_child(p, path(child_i:i-1), tmp, child_found)
+                            if (.not. child_found) then
+                                ! have to create this child
+                                ! [make it an object]
+                                call json_value_create(tmp)
+                                call to_object(tmp,path(child_i:i-1))
+                                call json%add(p,tmp)
+                                created = .true.
+                            else
+                                created = .false.
+                            end if
+                        else
+                            ! call the normal way
+                            call json%get_child(p, path(child_i:i-1), tmp)
+                        end if
+                        p => tmp
+                    else
+                        child_i = i + 1     ! say '$.', '@.', or ').'
+                        cycle
+                    end if
+
+                    if (.not. associated(p)) then
+                        call json%throw_exception('Error in json_get_by_path_default:'//&
+                                                  ' Error getting child member.')
+                        exit
+                    end if
+
+                    child_i = i + 1
+
+                end if
 
             end select
 
@@ -3374,6 +5892,7 @@
         if (json%exception_thrown) then
 
             if (present(found)) then
+                nullify(p) ! just in case
                 found = .false.
                 call json%clear_exceptions()
             end if
@@ -3383,14 +5902,42 @@
             ! grab the last child if present in the path
             if (child_i <= length) then
                 nullify(tmp)
-                call json%get_child(p, path(child_i:i-1), tmp)
+                if (create) then
+                    if (p%var_type==json_null) then
+                        ! if p was also created, then we need to
+                        ! convert it into an object here:
+                        p%var_type = json_object
+                    end if
+                    call json%get_child(p, path(child_i:i-1), tmp, child_found)
+                    if (.not. child_found) then
+                        ! have to create this child
+                        ! (make it a null since it is the leaf)
+                        call json_value_create(tmp)
+                        call to_null(tmp,path(child_i:i-1))
+                        call json%add(p,tmp)
+                        created = .true.
+                    else
+                        created = .false.
+                    end if
+                else
+                    ! call the normal way
+                    call json%get_child(p, path(child_i:i-1), tmp)
+                end if
                 p => tmp
-                nullify(tmp)
+            else
+                ! we already have p
+                if (create .and. created) then
+                    ! make leaf p a null, but only
+                    ! if it wasn't there
+                    call to_null(p)
+                end if
             end if
+
+            ! error checking
             if (associated(p)) then
                 if (present(found)) found = .true.    !everything seems to be ok
             else
-                call json%throw_exception('Error in json_get_by_path:'//&
+                call json%throw_exception('Error in json_get_by_path_default:'//&
                                           ' variable not found: '//trim(path))
                 if (present(found)) then
                     found = .false.
@@ -3400,11 +5947,217 @@
 
         end if
 
+        ! if it had to be created:
+        if (present(was_created)) was_created = created
+
+    else
+        if (present(found)) found = .false.
+        if (present(was_created)) was_created = .false.
+    end if
+
+    end subroutine json_get_by_path_default
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 2/4/2017
+!
+!  Returns the [[json_value]] pointer given the path string,
+!  using the "JSON Pointer" path specification defined by RFC 6901.
+!
+!  Note that trailing whitespace significance and case sensitivity
+!  are user-specified. To fully conform to the RFC 6901 standard,
+!  should probably set (via `initialize`):
+!
+!  * `trailing_spaces_significant` = .true. [this is not the default setting]
+!  * `case_sensitive_keys` = .true.         [this is the default setting]
+!
+!### Example
+!
+!````fortran
+!    type(json_value),pointer :: dat,p
+!    logical :: found
+!    !...
+!    call json%get(dat,'/data/2/version',p,found)
+!````
+!
+!### See also
+!  * [[json_get_by_path_default]] - alternate version with different path convention.
+!
+!### Reference
+!  * [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
+!
+!@note Not doing anything special about the `-` character to index an array.
+!      This is considered a normal error.
+!
+!@note Unlike in the default path mode, the array indices here are 0-based
+!      (in accordance with the RFC 6901 standard)
+!
+!@warning Not checking if the member that is referenced is unique.
+!         (according to the standard, evaluation of non-unique references
+!         should fail). Like [[json_get_by_path_default]], this one will just return
+!         the first instance it encounters. This might be changed in the future.
+
+    subroutine json_get_by_path_rfc6901(json, me, path, p, found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me     !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
+                                                   !! (an RFC 6901 "JSON Pointer")
+    type(json_value),pointer,intent(out) :: p      !! pointer to the variable
+                                                   !! specify by `path`
+    logical(LK),intent(out),optional     :: found  !! true if it was found
+
+    character(kind=CK,len=:),allocatable :: token  !! a token in the path (between the `/` characters)
+    integer(IK)              :: i                  !! counter
+    integer(IK)              :: islash_curr        !! location of current '/' character in the path
+    integer(IK)              :: islash_next        !! location of next '/' character in the path
+    integer(IK)              :: ilen               !! length of `path` string
+    type(json_value),pointer :: tmp                !! temporary variable for traversing the structure
+    integer(IK)              :: ival               !! integer array index value (0-based)
+    logical(LK)              :: status_ok          !! error flag
+    logical(LK)              :: child_found        !! for getting child values
+
+    nullify(p)
+
+    if (.not. json%exception_thrown) then
+
+        p => me ! initialize
+
+        if (path/=CK_'') then
+
+            if (path(1:1)==slash) then  ! the first character must be a slash
+
+                islash_curr = 1   ! initialize current slash index
+
+                !keep trailing space or not:
+                if (json%trailing_spaces_significant) then
+                    ilen = len(path)
+                else
+                    ilen = len_trim(path)
+                end if
+
+                do
+
+                    ! get the next token by finding the slashes
+                    !
+                    !  1   2 3
+                    !  /abc/d/efg
+
+                    if (islash_curr==ilen) then
+                        !the last token is an empty string
+                        token = CK_''
+                        islash_next = 0  ! will signal to stop
+                    else
+
+                        !      .
+                        ! '/123/567/'
+
+                        ! index in remaining string:
+                        islash_next = index(path(islash_curr+1:ilen),slash)
+                        if (islash_next<=0) then
+                            !last token:
+                            token = path(islash_curr+1:ilen)
+                        else
+                            ! convert to actual index in path:
+                            islash_next = islash_curr + index(path(islash_curr+1:ilen),slash)
+                            if (islash_next>islash_curr+1) then
+                                token = path(islash_curr+1:islash_next-1)
+                            else
+                                !empty token:
+                                token = CK_''
+                            end if
+                        end if
+
+                    end if
+
+                    ! remove trailing spaces in the token here if necessary:
+                    if (.not. json%trailing_spaces_significant) &
+                        token = trim(token)
+
+                    ! decode the token:
+                    token = decode_rfc6901(token)
+
+                    ! now, parse the token:
+
+                    ! first see if there is a child with this name
+                    call json%get_child(p,token,tmp,child_found)
+                    if (child_found) then
+                        ! it was found
+                        p => tmp
+                    else
+                        ! No key with this name.
+                        ! Is it an integer? If so,
+                        ! it might be an array index.
+                        status_ok = (len(token)>0)
+                        if (status_ok) then
+                            do i=1,len(token)
+                                ! It must only contain (0..9) characters
+                                ! (it must be unsigned)
+                                if (scan(token(i:i),CK_'0123456789')<1) then
+                                    status_ok = .false.
+                                    exit
+                                end if
+                            end do
+                            if (status_ok) then
+                                if (len(token)>1 .and. token(1:1)==CK_'0') then
+                                    ! leading zeros not allowed for some reason
+                                    status_ok = .false.
+                                end if
+                            end if
+                            if (status_ok) then
+                                ! if we make it this far, it should be
+                                ! convertable to an integer, so do it.
+                                call string_to_integer(token,ival,status_ok)
+                            end if
+                        end if
+                        if (status_ok) then
+                            ! ival is an array index (0-based)
+                            call json%get_child(p,ival+1,tmp,child_found)
+                            if (child_found) then
+                                p => tmp
+                            else
+                                ! not found
+                                status_ok = .false.
+                            end if
+                        end if
+                        if (.not. status_ok) then
+                            call json%throw_exception('Error in json_get_by_path_rfc6901: '//&
+                                                        'invalid path specification: '//trim(path))
+                            exit
+                        end if
+                    end if
+
+                    if (islash_next<=0) exit ! finished
+
+                    ! set up for next token:
+                    islash_curr = islash_next
+
+                end do
+
+            else
+                call json%throw_exception('Error in json_get_by_path_rfc6901: '//&
+                                            'invalid path specification: '//trim(path))
+            end if
+        end if
+
+        if (json%exception_thrown) then
+            nullify(p)
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+        else
+            if (present(found)) found = .true.
+        end if
+
     else
         if (present(found)) found = .false.
     end if
 
-    end subroutine json_get_by_path
+    end subroutine json_get_by_path_rfc6901
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3428,15 +6181,246 @@
 
 !*****************************************************************************************
 !>
+!  Returns the path to a JSON object that is part
+!  of a linked list structure.
+!
+!  The path returned would be suitable for input to
+!  [[json_get_by_path]] and related routines.
+!
+!@note If an error occurs (which in this case means a malformed
+!      JSON structure) then an exception will be thrown, unless
+!      `found` is present, which will be set to `false`. `path`
+!      will be a blank string.
+!
+!@note If `json%path_mode/=1`, then the `use_alt_array_tokens`
+!      and `path_sep` inputs are ignored if present.
+
+    subroutine json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
+
+    implicit none
+
+    class(json_core),intent(inout)                   :: json
+    type(json_value),pointer,intent(in)              :: p     !! a JSON linked list object
+    character(kind=CK,len=:),allocatable,intent(out) :: path  !! path to the variable
+    logical(LK),intent(out),optional                 :: found !! true if there were no problems
+    logical(LK),intent(in),optional :: use_alt_array_tokens   !! if true, then '()' are used for array elements
+                                                              !! otherwise, '[]' are used [default]
+    character(kind=CK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
+                                                              !! (otherwise use `json%path_separator`)
+
+    type(json_value),pointer                   :: tmp            !! for traversing the structure
+    type(json_value),pointer                   :: element        !! for traversing the structure
+    integer(IK)                                :: var_type       !! JSON variable type flag
+    character(kind=CK,len=:),allocatable       :: name           !! variable name
+    character(kind=CK,len=:),allocatable       :: parent_name    !! variable's parent name
+    character(kind=CK,len=max_integer_str_len) :: istr           !! for integer to string conversion (array indices)
+    integer(IK)                                :: i              !! counter
+    integer(IK)                                :: n_children     !! number of children for parent
+    logical(LK)                                :: use_brackets   !! to use '[]' characters for arrays
+    logical(LK)                                :: parent_is_root !! if the parent is the root
+
+    !optional input:
+    if (present(use_alt_array_tokens)) then
+        use_brackets = .not. use_alt_array_tokens
+    else
+        use_brackets = .true.
+    end if
+
+    if (associated(p)) then
+
+        !traverse the structure via parents up to the root
+        tmp => p
+        do
+
+            if (.not. associated(tmp)) exit !finished
+
+            !get info about the current variable:
+            call json%info(tmp,name=name)
+            if (json%path_mode==2) then
+                name = encode_rfc6901(name)
+            end if
+
+            ! if tmp a child of an object, or an element of an array
+            if (associated(tmp%parent)) then
+
+                !get info about the parent:
+                call json%info(tmp%parent,var_type=var_type,&
+                               n_children=n_children,name=parent_name)
+                if (json%path_mode==2) then
+                    parent_name = encode_rfc6901(parent_name)
+                end if
+
+                select case (var_type)
+                case (json_array)
+
+                    !get array index of this element:
+                    element => tmp%parent%children
+                    do i = 1, n_children
+                        if (.not. associated(element)) then
+                            call json%throw_exception('Error in json_get_path: '//&
+                                                      'malformed JSON structure. ')
+                            exit
+                        end if
+                        if (associated(element,tmp)) then
+                            exit
+                        else
+                            element => element%next
+                        end if
+                        if (i==n_children) then ! it wasn't found (should never happen)
+                            call json%throw_exception('Error in json_get_path: '//&
+                                                      'malformed JSON structure. ')
+                            exit
+                        end if
+                    end do
+                    select case(json%path_mode)
+                    case(2)
+                        call integer_to_string(i-1,int_fmt,istr) ! 0-based index
+                        call add_to_path(parent_name//slash//trim(adjustl(istr)))
+                    case(1)
+                        call integer_to_string(i,int_fmt,istr)
+                        if (use_brackets) then
+                            call add_to_path(parent_name//start_array//&
+                                             trim(adjustl(istr))//end_array,path_sep)
+                        else
+                            call add_to_path(parent_name//start_array_alt//&
+                                             trim(adjustl(istr))//end_array_alt,path_sep)
+                        end if
+                    end select
+                    tmp => tmp%parent  ! already added parent name
+
+                case (json_object)
+
+                    !process parent on the next pass
+                    call add_to_path(name,path_sep)
+
+                case default
+
+                    call json%throw_exception('Error in json_get_path: '//&
+                                              'malformed JSON structure. '//&
+                                              'A variable that is not an object '//&
+                                              'or array should not have a child.')
+                    exit
+
+                end select
+
+            else
+                !the last one:
+                call add_to_path(name,path_sep)
+            end if
+
+            if (associated(tmp%parent)) then
+                !check if the parent is the root:
+                parent_is_root = (.not. associated(tmp%parent%parent))
+                if (parent_is_root) exit
+            end if
+
+            !go to parent:
+            tmp => tmp%parent
+
+        end do
+
+    else
+        call json%throw_exception('Error in json_get_path: '//&
+                                  'input pointer is not associated')
+    end if
+
+    !for errors, return blank string:
+    if (json%exception_thrown .or. .not. allocated(path)) then
+        path = CK_''
+    else
+        if (json%path_mode==2) then
+            ! add the root slash:
+            path = slash//path
+        end if
+    end if
+
+    !optional output:
+    if (present(found)) then
+        if (json%exception_thrown) then
+            found = .false.
+            call json%clear_exceptions()
+        else
+            found = .true.
+        end if
+    end if
+
+    contains
+
+        subroutine add_to_path(str,path_sep)
+        !! prepend the string to the path
+        implicit none
+        character(kind=CK,len=*),intent(in) :: str  !! string to prepend to `path`
+        character(kind=CK,len=1),intent(in),optional :: path_sep
+            !! path separator (default is '.').
+            !! (ignored if `json%path_mode/=1`)
+
+        select case (json%path_mode)
+        case(2)
+            ! in this case, the options are ignored
+            if (.not. allocated(path)) then
+                path = str
+            else
+                path = str//slash//path
+            end if
+        case(1)
+            ! default path format
+            if (.not. allocated(path)) then
+                path = str
+            else
+                if (present(path_sep)) then
+                    ! use user specified:
+                    path = str//path_sep//path
+                else
+                    ! use the default:
+                    path = str//json%path_separator//path
+                end if
+            end if
+        end select
+
+        end subroutine add_to_path
+
+    end subroutine json_get_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_get_path]] where "path" and "path_sep" are kind=CDK.
+
+    subroutine wrap_json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
+
+    implicit none
+
+    class(json_core),intent(inout)                    :: json
+    type(json_value),pointer,intent(in)               :: p     !! a JSON linked list object
+    character(kind=CDK,len=:),allocatable,intent(out) :: path  !! path to the variable
+    logical(LK),intent(out),optional                  :: found !! true if there were no problems
+    logical(LK),intent(in),optional :: use_alt_array_tokens    !! if true, then '()' are used for array elements
+                                                               !! otherwise, '[]' are used [default]
+    character(kind=CDK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
+                                                               !! (default is '.')
+
+    character(kind=CK,len=:),allocatable :: ck_path  !! path to the variable
+    character(kind=CK,len=1) :: sep
+
+    ! from unicode:
+    sep = path_sep
+
+    ! call the main routine:
+    call json_get_path(json,p,ck_path,found,use_alt_array_tokens,sep)
+
+    ! from unicode:
+    path = ck_path
+
+    end subroutine wrap_json_get_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
 !  Convert a string into an integer.
 !
-!# History
-!  * Jacob Williams : 12/10/2013 : Rewrote routine.  Added error checking.
-!  * Modified by Izaak Beekman
-!
-!@note Replacement for the parse_integer function in the original code.
+!@note Replacement for the `parse_integer` function in the original code.
 
-    function string_to_integer(json,str) result(ival)
+    function string_to_int(json,str) result(ival)
 
     implicit none
 
@@ -3444,45 +6428,32 @@
     character(kind=CK,len=*),intent(in) :: str
     integer(IK)                         :: ival
 
-    character(kind=CDK,len=:),allocatable :: digits
-    integer(IK) :: ndigits_digits,ndigits,ierr
+    logical(LK) :: status_ok !! error flag
 
     if (.not. json%exception_thrown) then
 
-        ! Compute how many digits we need to read
-        ndigits = 2*len_trim(str)
-        ndigits_digits = floor(log10(real(ndigits)))+1
-        allocate(character(kind=CDK,len=ndigits_digits) :: digits)
-        write(digits,'(I0)') ndigits !gfortran will have a runtime error with * edit descriptor here
-        ! gfortran bug: '*' edit descriptor for ISO_10646 strings does bad stuff.
-        read(str,'(I'//trim(digits)//')',iostat=ierr) ival   !string to integer
+        ! call the core routine:
+        call string_to_integer(str,ival,status_ok)
 
-        if (ierr/=0) then    !if there was an error
+        if (.not. status_ok) then
             ival = 0
-            call json%throw_exception('Error in string_to_integer: '//&
-                                 'string cannot be converted to an integer: '//&
-                                 trim(str))
+            call json%throw_exception('Error in string_to_int: '//&
+                                      'string cannot be converted to an integer: '//&
+                                      trim(str))
         end if
 
     else
         ival = 0
     end if
 
-    end function string_to_integer
+    end function string_to_int
 !*****************************************************************************************
 
 !*****************************************************************************************
-!> author: Jacob Williams
-!  date: 1/19/2014
-!
+!>
 !  Convert a string into a double.
-!
-!# History
-!  * Jacob Williams, 10/27/2015 : Now using fmt=*, rather than
-!    fmt=real_fmt, since it doesn't work for some unusual cases
-!    (e.g., when str='1E-5').
 
-    function string_to_double(json,str) result(rval)
+    function string_to_dble(json,str) result(rval)
 
     implicit none
 
@@ -3490,16 +6461,15 @@
     character(kind=CK,len=*),intent(in) :: str
     real(RK)                            :: rval
 
-    integer(IK) :: ierr  !! read iostat error code
+    logical(LK) :: status_ok  !! error flag
 
     if (.not. json%exception_thrown) then
 
-        !string to double
-        read(str,fmt=*,iostat=ierr) rval
+        call string_to_real(str,rval,status_ok)
 
-        if (ierr/=0) then    !if there was an error
+        if (.not. status_ok) then    !if there was an error
             rval = 0.0_RK
-            call json%throw_exception('Error in string_to_double: '//&
+            call json%throw_exception('Error in string_to_dble: '//&
                                       'string cannot be converted to a double: '//&
                                       trim(str))
         end if
@@ -3508,7 +6478,7 @@
         rval = 0.0_RK
     end if
 
-    end function string_to_double
+    end function string_to_dble
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3557,7 +6527,7 @@
 !>
 !  Get an integer value from a [[json_value]], given the path string.
 
-    subroutine json_get_integer_with_path(json, me, path, value, found)
+    subroutine json_get_integer_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -3595,14 +6565,14 @@
         if ( present(found) ) found = .true.
     end if
 
-    end subroutine json_get_integer_with_path
+    end subroutine json_get_integer_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_integer_with_path]], where "path" is kind=CDK.
+!  Alternate version of [[json_get_integer_by_path]], where "path" is kind=CDK.
 
-    subroutine wrap_json_get_integer_with_path(json, me, path, value, found)
+    subroutine wrap_json_get_integer_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -3614,7 +6584,7 @@
 
     call json%get(me, to_unicode(path), value, found)
 
-    end subroutine wrap_json_get_integer_with_path
+    end subroutine wrap_json_get_integer_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3632,6 +6602,15 @@
     integer(IK),dimension(:),allocatable,intent(out) :: vec
 
     logical(LK) :: initialized
+
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(vec(0))
+            return
+        end if
+    end select
 
     initialized = .false.
 
@@ -3669,55 +6648,41 @@
 !>
 !  Get an integer vector from a [[json_value]], given the path string.
 
-    subroutine json_get_integer_vec_with_path(json, me, path, vec, found)
+    subroutine json_get_integer_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
     class(json_core),intent(inout)                   :: json
-    type(json_value),pointer                         :: me
+    type(json_value),pointer,intent(in)              :: me
     character(kind=CK,len=*),intent(in)              :: path
     integer(IK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
 
-    logical(LK) :: initialized
+    type(json_value),pointer :: p
 
-    initialized = .false.
+    call json%get(me, path, p, found)
 
-    call json%get(me, path=path, array_callback=get_int_from_array, found=found)
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
 
-    ! need to duplicate callback function, no other way
-    contains
+    call json%get(p, vec)
 
-        subroutine get_int_from_array(json, element, i, count)
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
 
-        !! callback function for integer
-
-        implicit none
-
-        class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: element
-        integer(IK),intent(in)              :: i        !! index
-        integer(IK),intent(in)              :: count    !! size of array
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json%get(element, value=vec(i))
-
-        end subroutine get_int_from_array
-
-    end subroutine json_get_integer_vec_with_path
+    end subroutine json_get_integer_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_integer_vec_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_integer_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_integer_vec_with_path(json, me, path, vec, found)
+    subroutine wrap_json_get_integer_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -3729,7 +6694,7 @@
 
     call json%get(me,path=to_unicode(path),vec=vec,found=found)
 
-    end subroutine wrap_json_get_integer_vec_with_path
+    end subroutine wrap_json_get_integer_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3778,7 +6743,7 @@
 !>
 !  Get a double value from a [[json_value]], given the path.
 
-    subroutine json_get_double_with_path(json, me, path, value, found)
+    subroutine json_get_double_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -3821,14 +6786,14 @@
         if (present(found)) found = .true.
     end if
 
-    end subroutine json_get_double_with_path
+    end subroutine json_get_double_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_double_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_double_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_double_with_path(json, me, path, value, found)
+    subroutine wrap_json_get_double_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -3840,7 +6805,7 @@
 
     call json%get(me,to_unicode(path),value,found)
 
-    end subroutine wrap_json_get_double_with_path
+    end subroutine wrap_json_get_double_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3858,6 +6823,15 @@
     real(RK),dimension(:),allocatable,intent(out) :: vec
 
     logical(LK) :: initialized
+
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(vec(0))
+            return
+        end if
+    end select
 
     initialized = .false.
 
@@ -3895,54 +6869,41 @@
 !>
 !  Get a double vector from a [[json_value]], given the path.
 
-    subroutine json_get_double_vec_with_path(json, me, path, vec, found)
+    subroutine json_get_double_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
     class(json_core),intent(inout)                :: json
-    type(json_value),pointer                      :: me
+    type(json_value),pointer,intent(in)           :: me
     character(kind=CK,len=*),intent(in)           :: path
     real(RK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional              :: found
 
-    logical(LK) :: initialized
+    type(json_value),pointer :: p
 
-    initialized = .false.
+    call json%get(me, path, p, found)
 
-    !the callback function is called for each element of the array:
-    call json%get(me, path=path, array_callback=get_double_from_array, found=found)
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
 
-    contains
+    call json%get(p, vec)
 
-        subroutine get_double_from_array(json, element, i, count)
-        !! callback function for double
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
 
-        implicit none
-
-        class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: element
-        integer(IK),intent(in)              :: i        !! index
-        integer(IK),intent(in)              :: count    !! size of array
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json%get(element, value=vec(i))
-
-        end subroutine get_double_from_array
-
-    end subroutine json_get_double_vec_with_path
+    end subroutine json_get_double_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_double_vec_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_double_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_double_vec_with_path(json, me, path, vec, found)
+    subroutine wrap_json_get_double_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -3954,7 +6915,7 @@
 
     call json%get(me, to_unicode(path), vec, found)
 
-    end subroutine wrap_json_get_double_vec_with_path
+    end subroutine wrap_json_get_double_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -3967,7 +6928,7 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
-    logical(LK)                         :: value
+    logical(LK),intent(out)             :: value
 
     value = .false.
     if ( json%exception_thrown ) return
@@ -3999,14 +6960,14 @@
 !>
 !  Get a logical value from a [[json_value]], given the path.
 
-    subroutine json_get_logical_with_path(json, me, path, value, found)
+    subroutine json_get_logical_by_path(json, me, path, value, found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
     character(kind=CK,len=*),intent(in) :: path
-    logical(LK)                         :: value
+    logical(LK),intent(out)             :: value
     logical(LK),intent(out),optional    :: found
 
     type(json_value),pointer :: p
@@ -4042,26 +7003,26 @@
         if (present(found)) found = .true.
     end if
 
-    end subroutine json_get_logical_with_path
+    end subroutine json_get_logical_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_logical_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_logical_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_logical_with_path(json, me, path, value, found)
+    subroutine wrap_json_get_logical_by_path(json, me, path, value, found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: me
     character(kind=CDK,len=*),intent(in) :: path
-    logical(LK)                          :: value
+    logical(LK),intent(out)              :: value
     logical(LK),intent(out),optional     :: found
 
     call json%get(me,to_unicode(path),value,found)
 
-    end subroutine wrap_json_get_logical_with_path
+    end subroutine wrap_json_get_logical_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -4079,6 +7040,15 @@
     logical(LK),dimension(:),allocatable,intent(out) :: vec
 
     logical(LK) :: initialized
+
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(vec(0))
+            return
+        end if
+    end select
 
     initialized = .false.
 
@@ -4116,7 +7086,7 @@
 !>
 !  Get a logical vector from a [[json_value]], given the path.
 
-    subroutine json_get_logical_vec_with_path(json, me, path, vec, found)
+    subroutine json_get_logical_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -4126,45 +7096,31 @@
     logical(LK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
 
-    logical(LK) :: initialized
+    type(json_value),pointer :: p
 
-    initialized = .false.
+    call json%get(me, path, p, found)
 
-    !the callback function is called for each element of the array:
-    call json%get(me, path=path, array_callback=get_logical_from_array, found=found)
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
 
-    contains
+    call json%get(p, vec)
 
-        subroutine get_logical_from_array(json, element, i, count)
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
 
-        !! callback function for logical
-
-        implicit none
-
-        class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: element
-        integer(IK),intent(in)              :: i        !! index
-        integer(IK),intent(in)              :: count    !! size of array
-
-        !size the output array:
-        if (.not. initialized) then
-            allocate(vec(count))
-            initialized = .true.
-        end if
-
-        !populate the elements:
-        call json%get(element, value=vec(i))
-
-        end subroutine get_logical_from_array
-
-    end subroutine json_get_logical_vec_with_path
+    end subroutine json_get_logical_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_logical_vec_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_logical_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_logical_vec_with_path(json, me, path, vec, found)
+    subroutine wrap_json_get_logical_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -4176,7 +7132,7 @@
 
     call json%get(me,to_unicode(path),vec,found)
 
-    end subroutine wrap_json_get_logical_vec_with_path
+    end subroutine wrap_json_get_logical_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -4191,36 +7147,83 @@
     type(json_value),pointer,intent(in)              :: me
     character(kind=CK,len=:),allocatable,intent(out) :: value
 
-    character(kind=CK,len=:),allocatable :: error_message  !! for [[unescape_string]]
-
-    value = ''
+    value = CK_''
     if (.not. json%exception_thrown) then
 
-        select case (me%var_type)
-
-        case (json_string)
+        if (me%var_type == json_string) then
 
             if (allocated(me%str_value)) then
-                call unescape_string(me%str_value, value, error_message)
-                if (allocated(error_message)) then
-                    call json%throw_exception(error_message)
-                    deallocate(error_message)
-                    value = ''
+                if (json%unescaped_strings) then
+                    ! default: it is stored already unescaped:
+                    value = me%str_value
+                else
+                    ! return the escaped version:
+                    call escape_string(me%str_value, value)
                 end if
             else
                call json%throw_exception('Error in json_get_string: '//&
                                          'me%str_value not allocated')
             end if
 
-        case default
+        else
 
-            call json%throw_exception('Error in json_get_string: '//&
-                                      'Unable to resolve value to characters: '//&
-                                      me%name)
+            if (json%strict_type_checking) then
+                call json%throw_exception('Error in json_get_string:'//&
+                                          ' Unable to resolve value to string: '//me%name)
+            else
 
-            ! Note: for the other cases, we could do val to string conversions.
+                select case (me%var_type)
 
-        end select
+                case (json_integer)
+
+                    if (allocated(me%int_value)) then
+                        value = repeat(' ', max_integer_str_len)
+                        call integer_to_string(me%int_value,int_fmt,value)
+                        value = trim(value)
+                    else
+                        call json%throw_exception('Error in json_get_string: '//&
+                                                  'me%int_value not allocated')
+                    end if
+
+                case (json_double)
+
+                    if (allocated(me%dbl_value)) then
+                        value = repeat(' ', max_numeric_str_len)
+                        call real_to_string(me%dbl_value,json%real_fmt,&
+                                            json%compact_real,value)
+                        value = trim(value)
+                    else
+                        call json%throw_exception('Error in dbl_value: '//&
+                                                  'me%int_value not allocated')
+                    end if
+
+                case (json_logical)
+
+                    if (allocated(me%log_value)) then
+                        if (me%log_value) then
+                            value = true_str
+                        else
+                            value = false_str
+                        end if
+                    else
+                        call json%throw_exception('Error in json_get_string: '//&
+                                                  'me%log_value not allocated')
+                    end if
+
+                case (json_null)
+
+                    value = null_str
+
+                case default
+
+                    call json%throw_exception('Error in json_get_string: '//&
+                                              'Unable to resolve value to characters: '//&
+                                              me%name)
+
+                end select
+
+            end if
+        end if
 
     end if
 
@@ -4231,7 +7234,7 @@
 !>
 !  Get a character string from a [[json_value]], given the path.
 
-    subroutine json_get_string_with_path(json, me, path, value, found)
+    subroutine json_get_string_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -4243,7 +7246,7 @@
 
     type(json_value),pointer :: p
 
-    value = ''
+    value = CK_''
     if ( json%exception_thrown ) then
         if ( present(found) ) found = .false.
         return
@@ -4254,7 +7257,7 @@
     call json%get(me=me, path=path, p=p)
 
     if (.not. associated(p)) then
-        call json%throw_exception('Error in json_get_string_with_path:'//&
+        call json%throw_exception('Error in json_get_string_by_path:'//&
                                   ' Unable to resolve path: '//trim(path))
 
     else
@@ -4276,14 +7279,14 @@
     !cleanup:
     if (associated(p)) nullify(p)
 
-    end subroutine json_get_string_with_path
+    end subroutine json_get_string_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_string_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_string_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_string_with_path(json, me, path, value, found)
+    subroutine wrap_json_get_string_by_path(json, me, path, value, found)
 
     implicit none
 
@@ -4295,7 +7298,7 @@
 
     call json%get(me,to_unicode(path),value,found)
 
-    end subroutine wrap_json_get_string_with_path
+    end subroutine wrap_json_get_string_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -4313,6 +7316,15 @@
     character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
 
     logical(LK) :: initialized
+
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(vec(0))
+            return
+        end if
+    end select
 
     initialized = .false.
 
@@ -4346,7 +7358,7 @@
             vec(i) = cval
             deallocate(cval)
         else
-            vec(i) = ''
+            vec(i) = CK_''
         end if
 
         end subroutine get_chars_from_array
@@ -4358,7 +7370,7 @@
 !>
 !  Get a string vector from a [[json_value(type)]], given the path.
 
-    subroutine json_get_string_vec_with_path(json, me, path, vec, found)
+    subroutine json_get_string_vec_by_path(json, me, path, vec, found)
 
     implicit none
 
@@ -4368,12 +7380,92 @@
     character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                              :: found
 
-    logical(LK) :: initialized
+    type(json_value),pointer :: p
+
+    call json%get(me, path, p, found)
+
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
+
+    call json%get(p, vec)
+
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
+
+    end subroutine json_get_string_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_string_vec_by_path]], where "path" is kind=CDK
+
+    subroutine wrap_json_get_string_vec_by_path(json, me, path, vec, found)
+
+    implicit none
+
+    class(json_core),intent(inout)                                :: json
+    type(json_value),pointer,intent(in)                           :: me
+    character(kind=CDK,len=*),intent(in)                          :: path
+    character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
+    logical(LK),intent(out),optional                              :: found
+
+    call json%get(me,to_unicode(path),vec,found)
+
+    end subroutine wrap_json_get_string_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 12/16/2016
+!
+!  Get a string vector from a [[json_value(type)]]. This is an alternate
+!  version of [[json_get_string_vec]]. This one returns an allocatable
+!  length character (where the string length is the maximum length of
+!  any element in the array). It also returns an integer array of the
+!  actual sizes of the strings in the JSON structure.
+!
+!@note This is somewhat inefficient since it does
+!      cycle through the array twice.
+!
+!@warning The allocation of `vec` doesn't work with
+!         gfortran 4.9 or 5 due to compiler bugs
+
+    subroutine json_get_alloc_string_vec(json, me, vec, ilen)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+
+    logical(LK) :: initialized !! if the output array has been sized
+    integer(IK) :: max_len     !! the length of the longest string in the array
+
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(character(kind=CK,len=0) :: vec(0))
+            allocate(ilen(0))
+            return
+        end if
+    end select
 
     initialized = .false.
 
-    !the callback function is called for each element of the array:
-    call json%get(me, path=path, array_callback=get_chars_from_array, found=found)
+    call json%string_info(me,ilen=ilen,max_str_len=max_len)
+    if (.not. json%exception_thrown) then
+        ! now get each string using the callback function:
+        call json%get(me, array_callback=get_chars_from_array)
+    end if
 
     contains
 
@@ -4388,51 +7480,105 @@
         integer(IK),intent(in)              :: i        !! index
         integer(IK),intent(in)              :: count    !! size of array
 
-        character(kind=CK,len=:),allocatable :: cval
+        character(kind=CK,len=:),allocatable :: cval  !! for getting string
 
         !size the output array:
         if (.not. initialized) then
-            allocate(vec(count))
+            ! string length long enough to hold the longest one
+            ! Note that this doesn't work with gfortran 4.9 or 5.
+            allocate( character(kind=CK,len=max_len) :: vec(count) )
             initialized = .true.
         end if
 
         !populate the elements:
         call json%get(element, value=cval)
         if (allocated(cval)) then
-            vec(i) = cval
+            vec(i)  = cval
+            ilen(i) = len(cval)  ! return the actual length
             deallocate(cval)
         else
-            vec(i) = ''
+            vec(i)  = CK_''
+            ilen(i) = 0
         end if
 
         end subroutine get_chars_from_array
 
-    end subroutine json_get_string_vec_with_path
+    end subroutine json_get_alloc_string_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_string_vec_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_alloc_string_vec]] where input is the path.
+!
+!  This is an alternate version of [[json_get_string_vec_by_path]].
+!  This one returns an allocatable length character (where the string
+!  length is the maximum length of any element in the array). It also
+!  returns an integer array of the actual sizes of the strings in the
+!  JSON structure.
+!
+!@note An alternative to using this routine is to use [[json_get_array]] with
+!      a callback function that gets the string from each element and populates
+!      a user-defined string type.
 
-    subroutine wrap_json_get_string_vec_with_path(json, me, path, vec, found)
+    subroutine json_get_alloc_string_vec_by_path(json, me, path, vec, ilen, found)
 
     implicit none
 
-    class(json_core),intent(inout)                                :: json
-    type(json_value),pointer,intent(in)                           :: me
-    character(kind=CDK,len=*),intent(in)                          :: path
-    character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
-    logical(LK),intent(out),optional                              :: found
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: me
+    character(kind=CK,len=*),intent(in) :: path
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+    logical(LK),intent(out),optional :: found
 
-    call json%get(me,to_unicode(path),vec,found)
+    type(json_value),pointer :: p
 
-    end subroutine wrap_json_get_string_vec_with_path
+    call json%get(me, path, p, found)
+
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
+
+    call json%get(p, vec, ilen)
+
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
+
+    end subroutine json_get_alloc_string_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  This routine calls the user-supplied [[array_callback_func]] subroutine
-!      for each element in the array.
+!  Alternate version of [[json_get_alloc_string_vec_by_path]], where "path" is kind=CDK
+
+    subroutine wrap_json_get_alloc_string_vec_by_path(json,me,path,vec,ilen,found)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer,intent(in)   :: me
+    character(kind=CDK,len=*),intent(in)  :: path
+    character(kind=CK,len=:),dimension(:),allocatable,intent(out) :: vec
+    integer(IK),dimension(:),allocatable,intent(out) :: ilen !! the actual length
+                                                             !! of each character
+                                                             !! string in the array
+    logical(LK),intent(out),optional :: found
+
+    call json%get(me,to_unicode(path),vec,ilen,found)
+
+    end subroutine wrap_json_get_alloc_string_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  This routine calls the user-supplied [[json_array_callback_func]]
+!  subroutine for each element in the array.
 !
 !@note For integer, double, logical, and character arrays,
 !      higher-level routines are provided (see `get` methods), so
@@ -4444,7 +7590,7 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
-    procedure(array_callback_func)      :: array_callback
+    procedure(json_array_callback_func) :: array_callback
 
     type(json_value),pointer :: element !! temp variable for getting elements
     integer(IK) :: i      !! counter
@@ -4486,16 +7632,16 @@
 !  date: 4/28/2016
 !
 !  Traverse a JSON structure.
-!  This routine calls the user-specified [[traverse_callback_func]]
+!  This routine calls the user-specified [[json_traverse_callback_func]]
 !  for each element of the structure.
 
     subroutine json_traverse(json,p,traverse_callback)
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer,intent(in) :: p
-    procedure(traverse_callback_func)   :: traverse_callback
+    class(json_core),intent(inout)         :: json
+    type(json_value),pointer,intent(in)    :: p
+    procedure(json_traverse_callback_func) :: traverse_callback
 
     logical(LK) :: finished !! can be used to stop the process
 
@@ -4550,14 +7696,14 @@
 !  This routine calls the user-supplied array_callback subroutine
 !  for each element in the array (specified by the path).
 
-    subroutine json_get_array_with_path(json, me, path, array_callback, found)
+    subroutine json_get_array_by_path(json, me, path, array_callback, found)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
     character(kind=CK,len=*),intent(in) :: path
-    procedure(array_callback_func)      :: array_callback
+    procedure(json_array_callback_func) :: array_callback
     logical(LK),intent(out),optional    :: found
 
     type(json_value),pointer :: p
@@ -4588,33 +7734,33 @@
         if ( present(found) ) found = .true.
     end if
 
-    end subroutine json_get_array_with_path
+    end subroutine json_get_array_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_get_array_with_path]], where "path" is kind=CDK
+!  Alternate version of [[json_get_array_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_array_with_path(json, me, path, array_callback, found)
+    subroutine wrap_json_get_array_by_path(json, me, path, array_callback, found)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: me
     character(kind=CDK,len=*),intent(in) :: path
-    procedure(array_callback_func)       :: array_callback
+    procedure(json_array_callback_func)  :: array_callback
     logical(LK),intent(out),optional     :: found
 
     call json%get(me, to_unicode(path), array_callback, found)
 
-    end subroutine wrap_json_get_array_with_path
+    end subroutine wrap_json_get_array_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
 !  Parse the JSON file and populate the [[json_value]] tree.
 !
-!# Inputs
+!### Inputs
 !
 !  The inputs can be:
 !
@@ -4622,7 +7768,7 @@
 !                      [note if unit is already open, then the filename is ignored]
 !  * `file`          : JSON is read from file using internal unit number
 !
-!# Example
+!### Example
 !
 !````fortran
 !    type(json_core) :: json
@@ -4630,7 +7776,7 @@
 !    call json%parse(file='myfile.json', p=p)
 !````
 !
-!# History
+!### History
 !  * Jacob Williams : 01/13/2015 : added read from string option.
 !  * Izaak Beekman  : 03/08/2015 : moved read from string to separate
 !    subroutine, and error annotation to separate subroutine.
@@ -4650,6 +7796,8 @@
     integer(IK) :: iunit   !! file unit actually used
     integer(IK) :: istat   !! iostat flag
     logical(LK) :: is_open !! if the file is already open
+    logical(LK) :: has_duplicate  !! if checking for duplicate keys
+    character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
 
     !clear any exceptions and initialize:
     call json%initialize()
@@ -4706,10 +7854,24 @@
 
         ! parse as a value
         call json%parse_value(unit=iunit, str=CK_'', value=p)
-        if (json%exception_thrown) call json%annotate_invalid_json(iunit,CK_'')
 
         ! close the file if necessary
         close(unit=iunit, iostat=istat)
+
+        ! check for errors:
+        if (json%exception_thrown) then
+            call json%annotate_invalid_json(iunit,CK_'')
+        else
+            if (.not. json%allow_duplicate_keys) then
+                call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+                if (.not. json%exception_thrown) then
+                    if (has_duplicate) then
+                        call json%throw_exception('Error in json_parse_file: '//&
+                                                  'Duplicate key found: '//path)
+                    end if
+                end if
+            end if
+        end if
 
     else
 
@@ -4725,7 +7887,7 @@
 !>
 !  Parse the JSON string and populate the [[json_value]] tree.
 !
-!# See also
+!### See also
 !  * [[json_parse_file]]
 
     subroutine json_parse_string(json, p, str)
@@ -4738,6 +7900,9 @@
 
     integer(IK),parameter :: iunit = 0 !! indicates that json data will be read from buffer
 
+    logical(LK) :: has_duplicate  !! if checking for duplicate keys
+    character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
+
     !clear any exceptions and initialize:
     call json%initialize()
 
@@ -4746,12 +7911,24 @@
 
     ! Note: the name of the root json_value doesn't really matter,
     !  but we'll allocate something here just in case.
-    p%name = ''
+    p%name = CK_''
 
     ! parse as a value
     call json%parse_value(unit=iunit, str=str, value=p)
 
-    if (json%exception_thrown) call json%annotate_invalid_json(iunit,str)
+    if (json%exception_thrown) then
+        call json%annotate_invalid_json(iunit,str)
+    else
+        if (.not. json%allow_duplicate_keys) then
+            call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+            if (.not. json%exception_thrown) then
+                if (has_duplicate) then
+                    call json%throw_exception('Error in json_parse_string: '//&
+                                              'Duplicate key found: '//path)
+                end if
+            end if
+        end if
+    end if
 
     end subroutine json_parse_string
 !*****************************************************************************************
@@ -4832,7 +8009,7 @@
 
         else
             !in this case, it was an empty line or file
-            line = ''
+            line = CK_''
         end if
 
         !create the error message:
@@ -4868,7 +8045,7 @@
     integer(IK) :: isize  !! number of characters read in read statement
 
     !initialize:
-    line = ''
+    line = CK_''
 
     !rewind to beginning of the current record:
     backspace(iunit, iostat=istat)
@@ -4962,12 +8139,15 @@
         end if
 
         ! pop the next non whitespace character off the file
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
 
         if (eof) then
             return
         else
+
             select case (c)
+
             case (start_object)
 
                 ! start object
@@ -4994,11 +8174,13 @@
                 select case (value%var_type)
                 case (json_string)
 #if defined __GFORTRAN__
-                    call json%parse_string(unit,str,tmp)  ! write to a tmp variable because of
-                    value%str_value = tmp                 ! a bug in 4.9 gfortran compiler.
-                    deallocate(tmp)                       !
+                    ! write to a tmp variable because of
+                    ! a bug in 4.9 gfortran compiler.
+                    call json%parse_string(unit,str,tmp)
+                    value%str_value = tmp
+                    if (allocated(tmp))  deallocate(tmp)
 #else
-                    call json%parse_string(unit, str, value%str_value)
+                    call json%parse_string(unit,str,value%str_value)
 #endif
                 end select
 
@@ -5047,7 +8229,7 @@
 !  Allocate a [[json_value]] pointer and make it a logical(LK) variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -5060,8 +8242,8 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name  !! variable name
     logical(LK),intent(in)              :: val   !! variable value
+    character(kind=CK,len=*),intent(in) :: name  !! variable name
 
     call json_value_create(p)
     call to_logical(p,val,name)
@@ -5081,8 +8263,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
     logical(LK),intent(in)               :: val
+    character(kind=CDK,len=*),intent(in) :: name
 
     call json%create_logical(p,val,to_unicode(name))
 
@@ -5095,7 +8277,7 @@
 !  Allocate a [[json_value]] pointer and make it an integer(IK) variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -5108,8 +8290,8 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
     integer(IK),intent(in)              :: val
+    character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
     call to_integer(p,val,name)
@@ -5130,8 +8312,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
     integer(IK),intent(in)               :: val
+    character(kind=CDK,len=*),intent(in) :: name
 
     call json%create_integer(p,val,to_unicode(name))
 
@@ -5144,7 +8326,7 @@
 !  Allocate a [[json_value]] pointer and make it a real(RK) variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -5157,8 +8339,8 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
     real(RK),intent(in)                 :: val
+    character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
     call to_double(p,val,name)
@@ -5179,8 +8361,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
     real(RK),intent(in)                  :: val
+    character(kind=CDK,len=*),intent(in) :: name
 
     call json%create_double(p,val,to_unicode(name))
 
@@ -5193,7 +8375,7 @@
 !  Allocate a json_value pointer and make it a string variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -5206,8 +8388,8 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
     character(kind=CK,len=*),intent(in) :: val
+    character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
     call to_string(p,val,name)
@@ -5228,8 +8410,8 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
     character(kind=CDK,len=*),intent(in) :: val
+    character(kind=CDK,len=*),intent(in) :: name
 
     call json%create_string(p,to_unicode(val),to_unicode(name))
 
@@ -5242,7 +8424,7 @@
 !  Allocate a json_value pointer and make it a null variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -5289,7 +8471,7 @@
 !  Allocate a [[json_value]] pointer and make it an object variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -5339,7 +8521,7 @@
 !  Allocate a [[json_value]] pointer and make it an array variable.
 !  The pointer should not already be allocated.
 !
-!# Example
+!### Example
 !````fortran
 !     type(json_value),pointer :: p
 !     type(json_core) :: json
@@ -5390,7 +8572,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: p
-    logical(LK),intent(in),optional              :: val   !! if the value is also to be set (if not present, then .false. is used).
+    logical(LK),intent(in),optional              :: val   !! if the value is also to be set
+                                                          !! (if not present, then .false. is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -5419,7 +8602,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: p
-    integer(IK),intent(in),optional              :: val   !! if the value is also to be set (if not present, then 0 is used).
+    integer(IK),intent(in),optional              :: val   !! if the value is also to be set
+                                                          !! (if not present, then 0 is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -5448,7 +8632,8 @@
     implicit none
 
     type(json_value),intent(inout)               :: p
-    real(RK),intent(in),optional                 :: val   !! if the value is also to be set (if not present, then 0.0_rk is used).
+    real(RK),intent(in),optional                 :: val   !! if the value is also to be set
+                                                          !! (if not present, then 0.0_rk is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -5472,16 +8657,16 @@
 !
 !  Change the [[json_value]] variable to a string.
 !
-!# Modified
+!### Modified
 !  * Izaak Beekman : 02/24/2015
-!
 
     subroutine to_string(p,val,name)
 
     implicit none
 
     type(json_value),intent(inout)               :: p
-    character(kind=CK,len=*),intent(in),optional :: val   !! if the value is also to be set (if not present, then '' is used).
+    character(kind=CK,len=*),intent(in),optional :: val   !! if the value is also to be set
+                                                          !! (if not present, then '' is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -5490,7 +8675,7 @@
     if (present(val)) then
         p%str_value = val
     else
-        p%str_value = ''    !default value
+        p%str_value = CK_''    !default value
     end if
 
     !name:
@@ -5596,7 +8781,8 @@
         nullify(pair)    !probably not necessary
 
         ! pair name
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
                                  ' Unexpected end of file while parsing start of object.')
@@ -5623,7 +8809,8 @@
         end if
 
         ! pair value
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
                                  ' Unexpected end of file while parsing object member.')
@@ -5644,7 +8831,8 @@
         end if
 
         ! another possible pair
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object: '//&
                                  'End of file encountered when parsing an object')
@@ -5699,7 +8887,8 @@
         if (associated(element)) call json%add(array, element)
 
         ! popped the next character
-        c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+        call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                            skip_comments=json%allow_comments, popped=c)
 
         if (eof) then
             ! The file ended before array was finished:
@@ -5727,9 +8916,10 @@
 !>
 !  Parses a string while reading a JSON file.
 !
-!# History
+!### History
 !  * Jacob Williams : 6/16/2014 : Added hex validation.
 !  * Jacob Williams : 12/3/2015 : Fixed some bugs.
+!  * Jacob Williams : 8/23/2015 : `string` is now returned unescaped.
 
     subroutine parse_string(json, unit, str, string)
 
@@ -5738,7 +8928,7 @@
     class(json_core),intent(inout)                   :: json
     integer(IK),intent(in)                           :: unit  !! file unit number (if parsing from a file)
     character(kind=CK,len=*),intent(in)              :: str   !! JSON string (if parsing from a string)
-    character(kind=CK,len=:),allocatable,intent(out) :: string
+    character(kind=CK,len=:),allocatable,intent(out) :: string !! the string (unescaped if necessary)
 
     logical(LK) :: eof, is_hex, escape
     character(kind=CK,len=1) :: c
@@ -5746,6 +8936,8 @@
     integer(IK) :: i
     integer(IK) :: ip !! index to put next character,
                       !! to speed up by reducing the number of character string reallocations.
+    character(kind=CK,len=:),allocatable :: string_unescaped !! temp variable
+    character(kind=CK,len=:),allocatable :: error_message !! for string unescaping
 
     !at least return a blank string if there is a problem:
     string = repeat(space, chunk_size)
@@ -5761,7 +8953,7 @@
         do
 
             !get the next character from the file:
-            c = json%pop_char(unit, str=str, eof = eof, skip_ws = .false.)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., popped=c)
 
             if (eof) then
 
@@ -5791,7 +8983,7 @@
                     if (i==4) then
                         if (valid_json_hex(hex)) then
                             i = 0
-                            hex = ''
+                            hex = CK_''
                             is_hex = .false.
                         else
                             call json%throw_exception('Error in parse_string:'//&
@@ -5820,11 +9012,23 @@
         !trim the string if necessary:
         if (ip<len(string)+1) then
             if (ip==1) then
-                string = ''
+                string = CK_''
             else
                 string = string(1:ip-1)
             end if
         end if
+
+        !string is returned unescaped:
+        call unescape_string(string,string_unescaped,error_message)
+        if (allocated(error_message)) then
+            call json%throw_exception(error_message)
+        else
+            string = string_unescaped
+        end if
+
+        !cleanup:
+        if (allocated(error_message))    deallocate(error_message)
+        if (allocated(string_unescaped)) deallocate(string_unescaped)
 
     end if
 
@@ -5834,6 +9038,8 @@
 !*****************************************************************************************
 !>
 !  Core parsing routine.
+!
+!  This is used to verify the strings `true`, `false`, and `null` during parsing.
 
     subroutine parse_for_chars(json, unit, str, chars)
 
@@ -5853,14 +9059,15 @@
         length = len_trim(chars)
 
         do i = 1, length
-            c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., popped=c)
             if (eof) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected end of file while parsing array.')
+                                     ' Unexpected end of file while parsing.')
                 return
             else if (c /= chars(i:i)) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected character.: "'//c//'" '//chars(i:i))
+                                     ' Unexpected character: "'//c//'" (expecting "'//&
+                                     chars(i:i)//'")')
                 return
             end if
         end do
@@ -5911,7 +9118,7 @@
         do
 
             !get the next character:
-            c = json%pop_char(unit, str=str, eof = eof, skip_ws = .true.)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., popped=c)
 
             if (eof) then
                 call json%throw_exception('Error in parse_number:'//&
@@ -5955,10 +9162,10 @@
 
                     !string to value:
                     if (is_integer) then
-                        ival = json%string_to_integer(tmp)
+                        ival = json%string_to_int(tmp)
                         call to_integer(value,ival)
                     else
-                        rval = json%string_to_double(tmp)
+                        rval = json%string_to_dble(tmp)
                         call to_double(value,rval)
                     end if
 
@@ -5983,25 +9190,34 @@
 !>
 !  Get the next character from the file (or string).
 !
-!# See also
+!### See also
 !  * [[push_char]]
 !
-!@note This routine ignores non-printing ASCII characters (iachar<=31) that are in strings.
+!@note This routine ignores non-printing ASCII characters
+!      (iachar<=31) that are in strings.
 
-    recursive function pop_char(json, unit, str, eof, skip_ws) result(popped)
+    recursive subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,popped)
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    character(kind=CK,len=1)            :: popped  !! the popped character.
-    integer(IK),intent(in)              :: unit    !! file unit number (if parsing from a file)
-    character(kind=CK,len=*),intent(in) :: str     !! JSON string (if parsing from a string) -- only used if unit=0
-    logical(LK),intent(out)             :: eof     !! true if the end of the file has been reached.
-    logical(LK),intent(in),optional     :: skip_ws !! to ignore whitespace.
+    class(json_core),intent(inout)       :: json
+    integer(IK),intent(in)               :: unit          !! file unit number (if parsing
+                                                          !! from a file)
+    character(kind=CK,len=*),intent(in)  :: str           !! JSON string (if parsing from a
+                                                          !! string) -- only used if unit=0
+    logical(LK),intent(in),optional      :: skip_ws       !! to ignore whitespace [default False]
+    logical(LK),intent(in),optional      :: skip_comments !! to ignore comment lines [default False]
+    logical(LK),intent(out)              :: eof           !! true if the end of the file has
+                                                          !! been reached.
+    character(kind=CK,len=1),intent(out) :: popped        !! the popped character returned
 
-    integer(IK) :: ios,str_len
-    character(kind=CK,len=1) :: c
-    logical(LK) :: ignore
+    integer(IK)              :: ios             !! `iostat` flag
+    integer(IK)              :: str_len         !! length of `str`
+    character(kind=CK,len=1) :: c               !! a character read from the file (or string)
+    logical(LK)              :: ignore          !! if whitespace is to be ignored
+    logical(LK)              :: ignore_comments !! if comment lines are to be ignored
+    logical(LK)              :: parsing_comment !! if we are in the process
+                                                !! of parsing a comment line
 
     if (.not. json%exception_thrown) then
 
@@ -6010,6 +9226,12 @@
             ignore = .false.
         else
             ignore = skip_ws
+        end if
+        parsing_comment = .false.
+        if (.not. present(skip_comments)) then
+            ignore_comments = .false.
+        else
+            ignore_comments = skip_comments
         end if
 
         do
@@ -6055,31 +9277,42 @@
 
                 if (IS_IOSTAT_END(ios)) then  !end of file
 
+                    ! no character to return
                     json%char_count = 0
                     eof = .true.
+                    popped = space ! just to set a value
                     exit
 
                 else if (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
 
                     json%char_count = 0
                     json%line_count = json%line_count + 1
+                    if (ignore_comments) parsing_comment = .false. ! done parsing this comment line
                     cycle
 
                 end if
 
             end if
 
-            if (any(c == control_chars)) then
+            if (ignore_comments .and. (parsing_comment .or. c == json%comment_char) ) then
+
+                ! skipping the comment
+                parsing_comment = .true.
+                cycle
+
+            else if (any(c == control_chars)) then
 
                 ! non printing ascii characters
                 cycle
 
             else if (ignore .and. c == space) then
 
+                ! ignoring whitespace
                 cycle
 
             else
 
+                ! return the character
                 popped = c
                 exit
 
@@ -6089,17 +9322,17 @@
 
     end if
 
-    end function pop_char
+    end subroutine pop_char
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
 !  Core routine.
 !
-!# See also
+!### See also
 !  * [[pop_char]]
 !
-!# History
+!### History
 !  * Jacob Williams : 5/3/2015 : replaced original version of this routine.
 
     subroutine push_char(json,c)
@@ -6107,9 +9340,9 @@
     implicit none
 
     class(json_core),intent(inout)      :: json
-    character(kind=CK,len=1),intent(in) :: c
+    character(kind=CK,len=1),intent(in) :: c     !! to character to push
 
-    character(kind=CK,len=max_numeric_str_len) :: istr
+    character(kind=CK,len=max_numeric_str_len) :: istr  !! for error printing
 
     if (.not. json%exception_thrown) then
 
@@ -6132,6 +9365,9 @@
             end if
 
         end if
+
+        !character count in the current line
+        json%char_count = json%char_count - 1
 
     end if
 

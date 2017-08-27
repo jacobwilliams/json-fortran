@@ -4,6 +4,13 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.0.0 (2017-08-24)](#600-2017-08-24)
+    - [5.3.0 (2017-04-07)](#530-2017-04-07)
+    - [5.2.0 (2017-03-05)](#520-2017-03-05)
+    - [5.1.0 (2016-08-14)](#510-2016-08-14)
+    - [5.0.2 (2016-06-11)](#502-2016-06-11)
+    - [5.0.1 (2016-06-11)](#501-2016-06-11)
+    - [5.0.0 (2016-05-09)](#500-2016-05-09)
     - [4.3.0 (2015-12-05)](#430-2015-12-05)
     - [4.2.0 (2015-08-03)](#420-2015-08-03)
     - [4.1.1 (2015-05-27)](#411-2015-05-27)
@@ -16,7 +23,152 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.3.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.0.0...HEAD)
+
+### [6.0.0](https://github.com/jacobwilliams/json-fortran/tree/6.0.0) (2017-08-24)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.3.0...6.0.0)
+or [Download v6.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.0.0)
+
+**Enhancements:**
+
+- Added a routine to reverse an array or object [\#280](https://github.com/jacobwilliams/json-fortran/issues/280) [\#281](https://github.com/jacobwilliams/json-fortran/pull/281) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fixed a bug where using `no_whitespace` mode could still print line breaks in some cases [\#288](https://github.com/jacobwilliams/json-fortran/issues/288) ([jacobwilliams](https://github.com/jacobwilliams))
+- Strings (name key and value) were not being properly escaped/unescaped in some contexts. This change introduces a small backward incompatibility (formerly, if keys contained escape characters, the user would have to include them when getting their value). Now, the string variables in all user-facing API calls are unescaped (i.e., the user does not have to manually escape the keys to get their associated value). All strings are also now properly returned unescaped, no matter how the JSON structure was constructed. Escaping is now done in all cases if necessary when the JSON is printed to a string, file or the console. [\#287](https://github.com/jacobwilliams/json-fortran/issues/287) [\#289](https://github.com/jacobwilliams/json-fortran/pull/289) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [5.3.0](https://github.com/jacobwilliams/json-fortran/tree/5.3.0) (2017-04-07)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.2.0...5.3.0)
+or [Download v5.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/5.3.0)
+
+**Enhancements:**
+
+- It is now possible to build a JSON structure by specifying the paths to the variables. The `update` routines also now use this new feature so if the variable is not present, it will be added using the path (formerly, it added it as a name, which was inconsistent). Renamed the argument to the `update` routines from `name` to `path`.
+ [\#257](https://github.com/jacobwilliams/json-fortran/issues/257) [\#261](https://github.com/jacobwilliams/json-fortran/pull/261) [\#268](https://github.com/jacobwilliams/json-fortran/issues/268) [\#270](https://github.com/jacobwilliams/json-fortran/pull/270)  ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `get` routine to return an allocatable string array [\#245](https://github.com/jacobwilliams/json-fortran/issues/245) [\#265](https://github.com/jacobwilliams/json-fortran/pull/265) ([jacobwilliams](https://github.com/jacobwilliams))
+- Arrays of scalar values can now optionally be printed on a single line [\#228](https://github.com/jacobwilliams/json-fortran/issues/228) [\#273](https://github.com/jacobwilliams/json-fortran/pull/273) ([jacobwilliams](https://github.com/jacobwilliams))
+- When reading an empty JSON array it is now returned as an allocated array with zero length (rather than an unallocated array).
+ [\#276](https://github.com/jacobwilliams/json-fortran/issues/276) [\#277](https://github.com/jacobwilliams/json-fortran/pull/277) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fixed an issue where the `char_count` wasn’t always correct, which caused the error message for invalid JSON to be wrong.
+ [\#272](https://github.com/jacobwilliams/json-fortran/issues/272) [\#274](https://github.com/jacobwilliams/json-fortran/pull/274) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed an issue where values with significant trailing whitespace were being trimmed when printed. [\#263](https://github.com/jacobwilliams/json-fortran/issues/263) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed two bugs in `json_get_path` for RFC 6091 path mode. Special characters weren’t being encoded properly, and it didn't work if the final key was all whitespace. [\#262](https://github.com/jacobwilliams/json-fortran/issues/262) [\#264](https://github.com/jacobwilliams/json-fortran/pull/264) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed an issue with indenting of arrays within arrays. [\#269](https://github.com/jacobwilliams/json-fortran/issues/269) [\#271](https://github.com/jacobwilliams/json-fortran/pull/271) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [5.2.0](https://github.com/jacobwilliams/json-fortran/tree/5.2.0) (2017-03-05)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.1.0...5.2.0)
+or [Download v5.2.0](https://github.com/jacobwilliams/json-fortran/releases/tag/5.2.0)
+
+**Enhancements:**
+
+- Added support for comments in JSON files. [\#256](https://github.com/jacobwilliams/json-fortran/issues/256)
+[\#234](https://github.com/jacobwilliams/json-fortran/issues/234)
+[\#259](https://github.com/jacobwilliams/json-fortran/pull/259) ([jacobwilliams](https://github.com/jacobwilliams))
+[\#240](https://github.com/jacobwilliams/json-fortran/pull/240) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added support for RFC 6901 paths. [\#249](https://github.com/jacobwilliams/json-fortran/issues/249) [\#253](https://github.com/jacobwilliams/json-fortran/issues/253) [\#255](https://github.com/jacobwilliams/json-fortran/issues/255)
+[\#258](https://github.com/jacobwilliams/json-fortran/pull/258) ([jacobwilliams](https://github.com/jacobwilliams))
+[\#252](https://github.com/jacobwilliams/json-fortran/pull/252) ([jacobwilliams](https://github.com/jacobwilliams))
+[\#251](https://github.com/jacobwilliams/json-fortran/pull/251) ([jacobwilliams](https://github.com/jacobwilliams))
+- Can now specify default real and integer kinds using compiler directives. [\#236](https://github.com/jacobwilliams/json-fortran/issues/236) [\#238](https://github.com/jacobwilliams/json-fortran/issues/238)
+[\#239](https://github.com/jacobwilliams/json-fortran/pull/239) ([jacobwilliams](https://github.com/jacobwilliams))
+- `compact_reals` and `real_format='*'` can now be used at the same time. [\#226](https://github.com/jacobwilliams/json-fortran/issues/226)
+[\#227](https://github.com/jacobwilliams/json-fortran/pull/227) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added option to change default path separator character. [\#254](https://github.com/jacobwilliams/json-fortran/pull/254) ([jacobwilliams](https://github.com/jacobwilliams))
+- Add pkg-config file [\#242](https://github.com/jacobwilliams/json-fortran/pull/242) ([wesbarnett](https://github.com/wesbarnett))
+
+**Fixed issues:**
+
+- Real numbers now written with 17 digits of precision (previously it was using 16 which doesn't accurately represent all values to full precision) [\#230](https://github.com/jacobwilliams/json-fortran/issues/230)
+[\#241](https://github.com/jacobwilliams/json-fortran/pull/241) ([jacobwilliams](https://github.com/jacobwilliams))
+[\#232](https://github.com/jacobwilliams/json-fortran/pull/232) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [5.1.0](https://github.com/jacobwilliams/json-fortran/tree/5.1.0) (2016-08-14)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.2...5.1.0)
+or [Download v5.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/5.1.0)
+
+**Enhancements:**
+
+- Added a `traverse` routine to `json_file` [\#204](https://github.com/jacobwilliams/json-fortran/issues/204) [\#206](https://github.com/jacobwilliams/json-fortran/pull/206) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added added `get` and `set` routines for the `json_core` in a `json_file` [\#206](https://github.com/jacobwilliams/json-fortran/pull/206) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `get_path` routine [\#223](https://github.com/jacobwilliams/json-fortran/issues/223) [\#224](https://github.com/jacobwilliams/json-fortran/pull/224) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new option for returning strings in their escaped form. Also, when `strict_type_checking` is False, the `get` routines will now return integer, double, logical, and null values as strings. [\#224](https://github.com/jacobwilliams/json-fortran/pull/224) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `insert_after` routine [\#220](https://github.com/jacobwilliams/json-fortran/issues/220) [\#221](https://github.com/jacobwilliams/json-fortran/pull/221) ([jacobwilliams](https://github.com/jacobwilliams))
+- Move json type integer variables into the `json_parameters` module [\#218](https://github.com/jacobwilliams/json-fortran/issues/218) [\#219](https://github.com/jacobwilliams/json-fortran/pull/219) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new option to print JSON without extra whitespace [\#216](https://github.com/jacobwilliams/json-fortran/issues/216) [\#217](https://github.com/jacobwilliams/json-fortran/pull/217) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `info` routines (`json_info_by_path`, `json_matrix_info_by_path`, and `json_matrix_info`) [\#213](https://github.com/jacobwilliams/json-fortran/issues/213) [\#212](https://github.com/jacobwilliams/json-fortran/pull/212) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added an API for adding Null variables [\#210](https://github.com/jacobwilliams/json-fortran/issues/210) [\#214](https://github.com/jacobwilliams/json-fortran/pull/214) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fix doc deployment problems [\#201](https://github.com/jacobwilliams/json-fortran/issues/201) ([zbeekman](https://github.com/zbeekman))
+
+
+### [5.0.2](https://github.com/jacobwilliams/json-fortran/tree/5.0.2) (2016-06-11)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.1...5.0.2)
+or [Download v5.0.2](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.2)
+
+*Note: This release contains no changes to the library, only the documentation.*
+
+- Minor documentation fix.
+
+### [5.0.1](https://github.com/jacobwilliams/json-fortran/tree/5.0.1) (2016-06-11)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/5.0.0...5.0.1)
+or [Download v5.0.1](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.1)
+
+*Note: This release contains no changes to the library, only the build system and documentation.*
+
+**Fixed issues:**
+
+- FORD now uses the Intel preprocessor when library is built with the Intel compiler [\#205](https://github.com/jacobwilliams/json-fortran/issues/205)
+- ShellCheck script files [\#181](https://github.com/jacobwilliams/json-fortran/issues/181)
+
+**Merged pull requests:**
+
+- De-lint shell scripts with ShellCheck, debug FORD upgrade, and various updates to documentation and build system.  [\#201](https://github.com/jacobwilliams/json-fortran/pull/201) ([zbeekman](https://github.com/zbeekman))
+
+### [5.0.0](https://github.com/jacobwilliams/json-fortran/tree/5.0.0) (2016-05-09)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/4.3.0...5.0.0)
+or [Download v5.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.0)
+
+See also [this Wiki page](https://github.com/jacobwilliams/json-fortran/wiki/5.0-Changes) on how to update your code to be compatible with this release.
+
+**Enhancements:**
+
+- Split `json_module` into multiple files. [\#168](https://github.com/jacobwilliams/json-fortran/issues/168) [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- The library is now thread safe [\#36](https://github.com/jacobwilliams/json-fortran/issues/36) [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new `initialize()`, `failed()`, `print_error_message()`, `check_to_errors()`, and `clear_exceptions()` to the `json_file` class. [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- The number of spaces for indenting can now be user specified. [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- Updates for Visual Studio project [\#170](https://github.com/jacobwilliams/json-fortran/pull/170) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a `validate()` method for validating JSON linked lists [\#196](https://github.com/jacobwilliams/json-fortran/issues/196) [\#197](https://github.com/jacobwilliams/json-fortran/pull/197) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added some additional error checks for malformed JSON linked lists [\#182](https://github.com/jacobwilliams/json-fortran/pull/182) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a new routine `is_child_of` to check if one `json_value` is a descendant of another [\#182](https://github.com/jacobwilliams/json-fortran/pull/182) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new options for case-insensitive searching of names/paths, as well as the option to consider trailing space significant [\#185](https://github.com/jacobwilliams/json-fortran/issues/185) [\#192](https://github.com/jacobwilliams/json-fortran/pull/192) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a routine to enable swapping of elements in a `json_value` linked list [\#177](https://github.com/jacobwilliams/json-fortran/issues/177) [\#182](https://github.com/jacobwilliams/json-fortran/pull/182) ([jacobwilliams](https://github.com/jacobwilliams))
+- Rename parameters `RK`, `IK`, `LK`, `CK`, and `CDK` using less generic names (`json_RK`, `json_IK`, `json_LK`, `json_CK`, and `json_CDK`) [\#172](https://github.com/jacobwilliams/json-fortran/issues/172) ([jacobwilliams](https://github.com/jacobwilliams))
+- Calling the `initialize()` method (which is now in `json_core` and    `json_file`) is no longer mandatory [\#171](https://github.com/jacobwilliams/json-fortran/issues/171) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a `rename()` method for renaming a `json_value` variable [\#184](https://github.com/jacobwilliams/json-fortran/issues/184) [\#187](https://github.com/jacobwilliams/json-fortran/pull/187) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added some compiler directives so that workarounds for Gfortran bugs are not used for other compilers [\#190](https://github.com/jacobwilliams/json-fortran/issues/190) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added option for strict typing for `get` routines [\#173](https://github.com/jacobwilliams/json-fortran/issues/173) ([jacobwilliams](https://github.com/jacobwilliams))
+- Various cosmetic changes and renaming of some of the dummy arguments in some procedures. [\#198](https://github.com/jacobwilliams/json-fortran/pull/198) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added checks to avoid unnecessary looping when traversing arrays if an exception is thrown [\#183](https://github.com/jacobwilliams/json-fortran/pull/183) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a new `get_child` method to get the first child. [9d4f736] ([jacobwilliams](https://github.com/jacobwilliams))
+- Added some additional error checks for unassociated pointers [9d4f736] ([jacobwilliams](https://github.com/jacobwilliams))
+- Ensure null pointers are returned for some error cases [838f476] ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed Issues**
+
+- Fixed a bug in the `traverse()` routine, where the `finished` output flag was not being correctly checked [\#182](https://github.com/jacobwilliams/json-fortran/pull/182) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [4.3.0](https://github.com/jacobwilliams/json-fortran/tree/4.3.0) (2015-12-05)
 
@@ -84,7 +236,7 @@ via [PR \#144](https://github.com/jacobwilliams/json-fortran/pull/144) from  ([j
   [PR \#124](https://github.com/jacobwilliams/json-fortran/pull/124)
   from [zbeekman](https://github.com/zbeekman)
 - Migrate to
-  [Codecov.io](https://codecov.io/github/jacobwilliams/json-fortran?branch=master)
+  [Codecov.io](https://codecov.io/gh/jacobwilliams/json-fortran)
   [\#106](https://github.com/jacobwilliams/json-fortran/issues/106)
   via [PR \#107](https://github.com/jacobwilliams/json-fortran/pull/107)
   from [zbeekman](https://github.com/zbeekman)

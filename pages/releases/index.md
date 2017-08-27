@@ -12,8 +12,8 @@ of the `master` branch, please head back to the
 ## Latest Stable Release
 
 **Documentation:**
-[{!__VERSION__!}](
-http://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html)
+[{!.VERSION!}](
+http://jacobwilliams.github.io/json-fortran/{!.VERSION!}/index.html)
 
 **Download:**
 <https://github.com/jacobwilliams/json-fortran/releases/latest>
@@ -25,6 +25,27 @@ documentation from the documentation for official releases other than
 using the browser's back button. Feel free to bookmark this page, or
 the [main project page](|url|/index.html) for convenient navigation.
 
+* [6.0.0](http://jacobwilliams.github.io/json-fortran/6.0.0/index.html)
+   ([FORD](https://github.com/cmacmackin/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/6.0.0)
+* [5.3.0](http://jacobwilliams.github.io/json-fortran/5.3.0/index.html)
+   ([FORD](https://github.com/cmacmackin/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/5.3.0)
+* [5.2.0](http://jacobwilliams.github.io/json-fortran/5.2.0/index.html)
+   ([FORD](https://github.com/cmacmackin/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/5.2.0)
+* [5.1.0](http://jacobwilliams.github.io/json-fortran/5.1.0/index.html)
+   ([FORD](https://github.com/cmacmackin/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/5.1.0)
+* [5.0.2](http://jacobwilliams.github.io/json-fortran/5.0.2/index.html)
+   ([FORD](https://github.com/cmacmackin/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.2)
+* [5.0.1](http://jacobwilliams.github.io/json-fortran/5.0.1/index.html)
+   ([FORD](https://github.com/cmacmackin/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.1)
+* [5.0.0](http://jacobwilliams.github.io/json-fortran/5.0.0/index.html)
+   ([FORD](https://github.com/cmacmackin/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/5.0.0)
 * [4.3.0](http://jacobwilliams.github.io/json-fortran/4.3.0/index.html)
    ([FORD](https://github.com/cmacmackin/ford) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/4.3.0)
@@ -56,7 +77,7 @@ the [main project page](|url|/index.html) for convenient navigation.
 # Development Version
 
 Documentation for the latest development version may be found at
-<https://jacobwilliams.github.io/json-fortran/{!__VERSION__!}/index.html>
+<https://jacobwilliams.github.io/json-fortran/{!.VERSION!}/index.html>
 or generated locally using the
 [build.sh](|url|/page/development-resources/build.sh.html) build
 script.

@@ -34,7 +34,9 @@ contains
 
     integer :: i
     character(kind=json_CK,len=10) :: istr
-    character(kind=json_CK,len=:),allocatable :: string
+    character(kind=json_CK,len=:),allocatable :: string,name
+    logical(json_LK) :: found
+    integer(json_IK) :: var_type,n_children
 
     error_cnt = 0
     call core%initialize()
@@ -103,6 +105,31 @@ contains
     end if
     write(output_unit,'(A)') string
     deallocate(string)  !cleanup
+
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'json_info_by_path'
+    write(error_unit,'(A)') ''
+    !get some info:
+    call core%info(p,'INPUTS',found,var_type,n_children,name)
+    if (found) then
+        !test again with CDK path (for unicode wrapper)
+        call core%info(p,json_cdk_'INPUTS',found,var_type,n_children,name)
+    else
+        write(error_unit,'(A)') 'Error getting info on INPUT'
+        error_cnt = error_cnt + 1
+    end if
+    !test without found:
+    call core%info(p,'INPUTS',var_type=var_type,n_children=n_children,name=name)
+    if (core%failed()) then
+        call core%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    !get with a variable that we know if not present:
+    call core%info(p,'BLAHBLAH',found,var_type,n_children,name)
+    if (found) then !should not be found
+        write(error_unit,'(A)') 'Error: BLAHBLAH should not be there'
+        error_cnt = error_cnt + 1
+    end if
 
     !cleanup:
     call core%destroy(p)
