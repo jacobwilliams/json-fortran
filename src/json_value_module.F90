@@ -229,6 +229,12 @@
                                                   !! [Note: `no_whitespace` will
                                                   !! override this option if necessary]
 
+        logical(LK) :: allow_duplicate_keys = .true. !! If False, then after parsing, if any
+                                                     !! duplicate keys are found, an error is
+                                                     !! thrown. A call to [[json_value_validate]]
+                                                     !! will also check for duplicates. If True
+                                                     !! [default] then no special checks are done
+
         contains
 
         private
@@ -671,9 +677,16 @@
                                                                             !! list is valid (i.e., is properly
                                                                             !! constructed). This may be useful
                                                                             !! if it has been constructed externally.
+        procedure,public :: check_for_duplicate_keys &
+                                => json_check_all_for_duplicate_keys  !! Check entire JSON structure
+                                                                      !! for duplicate keys (recursively)
+        procedure,public :: check_children_for_duplicate_keys &
+                                => json_check_children_for_duplicate_keys  !! Check a `json_value` object's
+                                                                           !! children for duplicate keys
 
         !other private routines:
         procedure :: name_equal
+        procedure :: name_strings_equal
         procedure :: json_value_print
         procedure :: string_to_int
         procedure :: string_to_dble
@@ -774,7 +787,8 @@
                                   comment_char,&
                                   path_mode,&
                                   path_separator,&
-                                  compress_vectors) result(json_core_object)
+                                  compress_vectors,&
+                                  allow_duplicate_keys) result(json_core_object)
 
     implicit none
 
@@ -791,7 +805,8 @@
                                 comment_char,&
                                 path_mode,&
                                 path_separator,&
-                                compress_vectors)
+                                compress_vectors,&
+                                allow_duplicate_keys)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -825,7 +840,8 @@
                                comment_char,&
                                path_mode,&
                                path_separator,&
-                               compress_vectors)
+                               compress_vectors,&
+                               allow_duplicate_keys)
 
     implicit none
 
@@ -897,6 +913,11 @@
         me%compress_vectors = compress_vectors
     end if
 
+    ! checking for duplicate keys:
+    if (present(allow_duplicate_keys)) then
+        me%allow_duplicate_keys = allow_duplicate_keys
+    end if
+
     !Set the format for real numbers:
     ! [if not changing it, then it remains the same]
 
@@ -963,10 +984,13 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date: 4/30/2016
 !
 !  Returns true if `name` is equal to `p%name`, using the specified
 !  settings for case sensitivity and trailing whitespace.
+!
+!### History
+!  * 4/30/2016 : original version
+!  * 8/25/2017 : now just a wrapper for [[name_strings_equal]]
 
     function name_equal(json,p,name) result(is_equal)
 
@@ -975,29 +999,51 @@
     class(json_core),intent(inout)      :: json
     type(json_value),intent(in)         :: p        !! the json object
     character(kind=CK,len=*),intent(in) :: name     !! the name to check for
-    logical(LK)                         :: is_equal !! true if the string are lexically equal
+    logical(LK)                         :: is_equal !! true if the string are
+                                                    !! lexically equal
 
     if (allocated(p%name)) then
-
-        !must be the same length if we are treating
-        !trailing spaces as significant, so do a
-        !quick test of this first:
-        if (json%trailing_spaces_significant) then
-            is_equal = len(p%name) == len(name)
-            if (.not. is_equal) return
-        end if
-
-        if (json%case_sensitive_keys) then
-            is_equal = p%name == name
-        else
-            is_equal = lowercase_string(p%name) == lowercase_string(name)
-        end if
-
+        ! call the low-level routines for the name strings:
+        is_equal = json%name_strings_equal(p%name,name)
     else
         is_equal = name == CK_'' ! check a blank name
     end if
 
     end function name_equal
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 8/25/2017
+!
+!  Returns true if the name strings `name1` is equal to `name2`, using
+!  the specified settings for case sensitivity and trailing whitespace.
+
+    function name_strings_equal(json,name1,name2) result(is_equal)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    character(kind=CK,len=*),intent(in) :: name1     !! the name to check
+    character(kind=CK,len=*),intent(in) :: name2     !! the name to check
+    logical(LK)                         :: is_equal  !! true if the string are
+                                                     !! lexically equal
+
+    !must be the same length if we are treating
+    !trailing spaces as significant, so do a
+    !quick test of this first:
+    if (json%trailing_spaces_significant) then
+        is_equal = len(name1) == len(name2)
+        if (.not. is_equal) return
+    end if
+
+    if (json%case_sensitive_keys) then
+        is_equal = name1 == name2
+    else
+        is_equal = lowercase_string(name1) == lowercase_string(name2)
+    end if
+
+    end function name_strings_equal
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2340,21 +2386,77 @@
 !
 !  It recursively traverses the entire structure and checks every element.
 !
+!### History
+!  * Jacob Williams, 8/26/2017 : added duplicate key check.
+!
+!@note It will return on the first error it encounters.
+!
 !@note This routine does not check or throw any exceptions.
+!      If `json` is currently in a state of exception, it will
+!      remain so after calling this routine.
 
     subroutine json_value_validate(json,p,is_valid,error_msg)
 
     implicit none
 
-    class(json_core),intent(inout)       :: json
-    type(json_value),pointer,intent(in)  :: p
-    logical(LK),intent(out)              :: is_valid  !! True if the structure is valid.
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p
+    logical(LK),intent(out)             :: is_valid  !! True if the structure is valid.
     character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! if not valid, this will contain
                                                                   !! a description of the problem
 
+    logical(LK) :: has_duplicate !! to check for duplicate keys
+    character(kind=CK,len=:),allocatable :: path  !! path to duplicate key
+    logical(LK) :: status_ok !! to check for existing exception
+    logical(LK) :: status_ok2 !! to check for a new exception
+    character(kind=CK,len=:),allocatable :: exception_msg  !! error message for an existing exception
+    character(kind=CK,len=:),allocatable :: exception_msg2  !! error message for a new exception
+
     if (associated(p)) then
+
         is_valid = .true.
         call check_if_valid(p,require_parent=associated(p%parent))
+
+        if (is_valid .and. .not. json%allow_duplicate_keys) then
+            ! if no errors so far, also check the
+            ! entire structure for duplicate keys:
+
+            ! note: check_for_duplicate_keys does call routines
+            ! that check and throw exceptions, so let's clear any
+            ! first. (save message for later)
+            call json%check_for_errors(status_ok, exception_msg)
+            call json%clear_exceptions()
+
+            call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+            if (json%failed()) then
+                ! if an exception was thrown during this call,
+                ! then clear it but make that the error message
+                ! returned by this routine. Normally this should
+                ! never actually occur since we have already
+                ! validated the structure.
+                call json%check_for_errors(is_valid, exception_msg2)
+                error_msg = exception_msg2
+                call json%clear_exceptions()
+                is_valid = .false.
+            else
+                if (has_duplicate) then
+                    error_msg = 'duplicate key found: '//path
+                    is_valid  = .false.
+                end if
+            end if
+
+            if (.not. status_ok) then
+                ! restore any existing exception if necessary
+                call json%throw_exception(exception_msg)
+            end if
+
+            ! cleanup:
+            if (allocated(path))           deallocate(path)
+            if (allocated(exception_msg))  deallocate(exception_msg)
+            if (allocated(exception_msg2)) deallocate(exception_msg2)
+
+        end if
+
     else
         error_msg = 'The pointer is not associated'
         is_valid = .false.
@@ -4681,8 +4783,9 @@
                 child => p%children    !start with first one
                 do i=1, n_children
                     if (.not. associated(child)) then
-                        call json%throw_exception('Error in json_value_get_child_by_name: '//&
-                                                  'Malformed JSON linked list')
+                        call json%throw_exception(&
+                            'Error in json_value_get_child_by_name: '//&
+                            'Malformed JSON linked list')
                         exit
                     end if
                     if (allocated(child%name)) then
@@ -4698,14 +4801,16 @@
 
             if (error) then
                 !did not find anything:
-                call json%throw_exception('Error in json_value_get_child_by_name: '//&
-                                     'child variable '//trim(name)//' was not found.')
+                call json%throw_exception(&
+                    'Error in json_value_get_child_by_name: '//&
+                    'child variable '//trim(name)//' was not found.')
                 nullify(child)
             end if
 
         else
-            call json%throw_exception('Error in json_value_get_child_by_name: '//&
-                                 'pointer is not associated.')
+            call json%throw_exception(&
+                'Error in json_value_get_child_by_name: '//&
+                'pointer is not associated.')
         end if
 
         ! found output:
@@ -4723,6 +4828,210 @@
     end if
 
     end subroutine json_value_get_child_by_name
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 8/25/2017
+!
+!  Checks a JSON object for duplicate child names.
+!
+!  It uses the specified settings for name matching (see [[name_strings_equal]]).
+!
+!@note This will only check for one duplicate,
+!      it will return the first one that it finds.
+
+    subroutine json_check_children_for_duplicate_keys(json,p,has_duplicate,name,path)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer,intent(in) :: p  !! the object to search. If `p` is
+                                              !! not a `json_object`, then `has_duplicate`
+                                              !! will be false.
+    logical(LK),intent(out) :: has_duplicate  !! true if there is at least
+                                              !! two children have duplicate
+                                              !! `name` values.
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! the duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicate was found)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: path !! the full path to the
+                                                                      !! duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicate was found)
+
+    integer(IK)              :: i           !! counter
+    integer(IK)              :: j           !! counter
+    type(json_value),pointer :: child       !! pointer to a child of `p`
+    integer(IK)              :: n_children  !! number of children of `p`
+    logical(LK)              :: found       !! flag for `get_child`
+
+    type :: alloc_str
+        !! so we can have an array of allocatable strings
+        character(kind=CK,len=:),allocatable :: str  !! name string
+    end type alloc_str
+    type(alloc_str),dimension(:),allocatable :: names !! array of all the
+                                                      !! child name strings
+
+    ! initialize:
+    has_duplicate =.false.
+
+    if (.not. json%exception_thrown) then
+
+        if (associated(p)) then
+
+            if (p%var_type==json_object) then
+
+                ! number of items to check:
+                n_children = json%count(p)
+                allocate(names(n_children))
+
+                ! first get a list of all the name keys:
+                do i=1, n_children
+                    call json%get_child(p,i,child,found) ! get by index
+                    if (.not. found) then
+                        call json%throw_exception(&
+                            'Error in json_check_children_for_duplicate_keys: '//&
+                            'Malformed JSON linked list')
+                        exit
+                    end if
+                    if (allocated(child%name)) then
+                        names(i)%str = child%name
+                    else
+                        call json%throw_exception(&
+                            'Error in json_check_children_for_duplicate_keys: '//&
+                            'Object child name is not allocated')
+                        exit
+                    end if
+                end do
+
+                if (.not. json%exception_thrown) then
+                    ! now check the list for duplicates:
+                    main: do i=1,n_children
+                        do j=1,i-1
+                            if (json%name_strings_equal(names(i)%str,names(j)%str)) then
+                                has_duplicate = .true.
+                                if (present(name)) then
+                                    name = names(i)%str
+                                end if
+                                if (present(path)) then
+                                    call json%get_child(p,names(i)%str,child,found) ! get by name
+                                    if (found) then
+                                        call json%get_path(child,path,found)
+                                        if (.not. found) then
+                                            ! should never happen since we know it is there
+                                            call json%throw_exception(&
+                                                    'Error in json_check_children_for_duplicate_keys: '//&
+                                                    'Could not get path')
+                                        end if
+                                    else
+                                        ! should never happen since we know it is there
+                                        call json%throw_exception(&
+                                            'Error in json_check_children_for_duplicate_keys: '//&
+                                            'Could not get child: '//trim(names(i)%str))
+                                    end if
+                                end if
+                                exit main
+                            end if
+                        end do
+                    end do main
+                end if
+
+                ! cleanup
+                do i=1,n_children
+                    if (allocated(names(i)%str)) deallocate(names(i)%str)
+                end do
+                if (allocated(names)) deallocate(names)
+
+            end if
+
+        end if
+
+    end if
+
+    end subroutine json_check_children_for_duplicate_keys
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 8/25/2017
+!
+!  Checks a JSON structure for duplicate child names.
+!  This one recursively traverses the entire structure
+!  (calling [[json_check_children_for_duplicate_keys]]
+!  recursively for each element).
+!
+!@note This will only check for one duplicate,
+!      it will return the first one that it finds.
+
+    subroutine json_check_all_for_duplicate_keys(json,p,has_duplicate,name,path)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer,intent(in) :: p  !! the object to search. If `p` is
+                                              !! not a `json_object`, then `has_duplicate`
+                                              !! will be false.
+    logical(LK),intent(out) :: has_duplicate  !! true if there is at least
+                                              !! one duplicate `name` key anywhere
+                                              !! in the structure.
+    character(kind=CK,len=:),allocatable,intent(out),optional :: name !! the duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicates were found)
+    character(kind=CK,len=:),allocatable,intent(out),optional :: path !! the full path to the
+                                                                      !! duplicate name
+                                                                      !! (unallocated if no
+                                                                      !! duplicate was found)
+
+    has_duplicate = .false.
+    if (.not. json%exception_thrown) then
+        call json%traverse(p,duplicate_key_func)
+    end if
+
+    contains
+
+        subroutine duplicate_key_func(json,p,finished)
+
+        !! Callback function to check each element
+        !! for duplicate child names.
+
+        implicit none
+
+        class(json_core),intent(inout)      :: json
+        type(json_value),pointer,intent(in) :: p
+        logical(LK),intent(out)             :: finished
+
+#if defined __GFORTRAN__
+
+        ! this is a workaround for a gfortran bug (6 and 7),
+
+        character(kind=CK,len=:),allocatable :: tmp_name !! temp variable for `name` string
+        character(kind=CK,len=:),allocatable :: tmp_path !! temp variable for `path` string
+
+        if (present(name) .and. present(path)) then
+            call json%check_children_for_duplicate_keys(p,has_duplicate,name=tmp_name,path=tmp_path)
+        else if (present(name) .and. .not. present(path)) then
+            call json%check_children_for_duplicate_keys(p,has_duplicate,name=tmp_name)
+        else if (.not. present(name) .and. present(path)) then
+            call json%check_children_for_duplicate_keys(p,has_duplicate,path=tmp_path)
+        else
+            call json%check_children_for_duplicate_keys(p,has_duplicate)
+        end if
+
+        if (has_duplicate) then
+            if (present(name)) name = tmp_name
+            if (present(path)) path = tmp_path
+        end if
+
+#else
+        call json%check_children_for_duplicate_keys(p,has_duplicate,name,path)
+#endif
+
+        finished = has_duplicate .or. json%exception_thrown
+
+        end subroutine duplicate_key_func
+
+    end subroutine json_check_all_for_duplicate_keys
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -7487,6 +7796,8 @@
     integer(IK) :: iunit   !! file unit actually used
     integer(IK) :: istat   !! iostat flag
     logical(LK) :: is_open !! if the file is already open
+    logical(LK) :: has_duplicate  !! if checking for duplicate keys
+    character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
 
     !clear any exceptions and initialize:
     call json%initialize()
@@ -7543,10 +7854,24 @@
 
         ! parse as a value
         call json%parse_value(unit=iunit, str=CK_'', value=p)
-        if (json%exception_thrown) call json%annotate_invalid_json(iunit,CK_'')
 
         ! close the file if necessary
         close(unit=iunit, iostat=istat)
+
+        ! check for errors:
+        if (json%exception_thrown) then
+            call json%annotate_invalid_json(iunit,CK_'')
+        else
+            if (.not. json%allow_duplicate_keys) then
+                call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+                if (.not. json%exception_thrown) then
+                    if (has_duplicate) then
+                        call json%throw_exception('Error in json_parse_file: '//&
+                                                  'Duplicate key found: '//path)
+                    end if
+                end if
+            end if
+        end if
 
     else
 
@@ -7575,6 +7900,9 @@
 
     integer(IK),parameter :: iunit = 0 !! indicates that json data will be read from buffer
 
+    logical(LK) :: has_duplicate  !! if checking for duplicate keys
+    character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
+
     !clear any exceptions and initialize:
     call json%initialize()
 
@@ -7588,7 +7916,19 @@
     ! parse as a value
     call json%parse_value(unit=iunit, str=str, value=p)
 
-    if (json%exception_thrown) call json%annotate_invalid_json(iunit,str)
+    if (json%exception_thrown) then
+        call json%annotate_invalid_json(iunit,str)
+    else
+        if (.not. json%allow_duplicate_keys) then
+            call json%check_for_duplicate_keys(p,has_duplicate,path=path)
+            if (.not. json%exception_thrown) then
+                if (has_duplicate) then
+                    call json%throw_exception('Error in json_parse_string: '//&
+                                              'Duplicate key found: '//path)
+                end if
+            end if
+        end if
+    end if
 
     end subroutine json_parse_string
 !*****************************************************************************************
