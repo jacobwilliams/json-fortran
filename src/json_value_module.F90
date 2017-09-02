@@ -186,25 +186,25 @@
                                                       !! type is different from the return type (for
                                                       !! example, integer to double).
 
-        logical(LK) :: trailing_spaces_significant = .false.    !! for name and path comparisons, is trailing
-                                                                !! space to be considered significant.
+        logical(LK) :: trailing_spaces_significant = .false.    !! for name and path comparisons, if trailing
+                                                                !! space is to be considered significant.
 
-        logical(LK) :: case_sensitive_keys = .true.    !! for name and path comparisons, are they
-                                                       !! case sensitive.
+        logical(LK) :: case_sensitive_keys = .true.    !! if name and path comparisons
+                                                       !! are case sensitive.
 
         logical(LK) :: no_whitespace = .false. !! when printing a JSON string, don't include
                                                !! non-significant spaces or line breaks.
                                                !! If true, the entire structure will be
                                                !! printed on one line.
 
-        logical(LK) :: unescaped_strings = .true.  !! If false, then the raw escaped
+        logical(LK) :: unescaped_strings = .true.  !! If false, then the escaped
                                                    !! string is returned from [[json_get_string]]
                                                    !! and similar routines. If true [default],
                                                    !! then the string is returned unescaped.
 
         logical(LK) :: allow_comments = .true.  !! if true, any comments will be ignored when
                                                 !! parsing a file. The comment token is defined
-                                                !! by the `comment_char` string.
+                                                !! by the `comment_char` character variable.
         character(kind=CK,len=1) :: comment_char = CK_'!'  !! comment token when
                                                            !! `allow_comments` is true.
                                                            !! Examples: '`!`' or '`#`'.
@@ -215,6 +215,8 @@
                                          !! * 1 -- Default mode (see [[json_get_by_path_default]])
                                          !! * 2 -- as RFC 6901 "JSON Pointer" paths
                                          !!   (see [[json_get_by_path_rfc6901]])
+                                         !! * 3 -- JSONPath "bracket-notation" (currently only
+                                         !!   used in [[json_get_path]])
 
         character(kind=CK,len=1) :: path_separator = dot !! The `path` separator to use
                                                          !! in the "default" mode for
@@ -888,7 +890,7 @@
     if (present(unescape_strings)) &
         me%unescaped_strings = unescape_strings
     if (present(path_mode)) then
-        if (path_mode==1_IK .or. path_mode==2_IK) then
+        if (path_mode==1_IK .or. path_mode==2_IK .or. path_mode==3_IK) then
             me%path_mode = path_mode
         else
             me%path_mode = 1_IK  ! just to have a valid value
@@ -5512,6 +5514,9 @@
 !
 !  * The original JSON-Fortran defaults
 !  * [RFC 6901](https://tools.ietf.org/html/rfc6901)
+!
+!@warning if `found` is present, we should clear any exceptions that are thrown
+!         to be consistent with other routines. This is not currently being done.
 
     subroutine json_get_by_path(json, me, path, p, found)
 
@@ -5524,16 +5529,24 @@
                                                    !! specify by `path`
     logical(LK),intent(out),optional     :: found  !! true if it was found
 
+    character(kind=CK,len=max_integer_str_len),allocatable :: path_mode_str !! string version
+                                                                           !! of `json%path_mode`
+
     nullify(p)
 
     if (.not. json%exception_thrown) then
 
-        ! note: it can only be 1 or 2 (which was checked in initialize)
+        ! note: it can only be 1 or 2 (3 not currently enabled)
         select case (json%path_mode)
         case(1_IK)
             call json%json_get_by_path_default(me, path, p, found)
         case(2_IK)
             call json%json_get_by_path_rfc6901(me, path, p, found)
+        case default
+            call integer_to_string(json%path_mode,int_fmt,path_mode_str)
+            call json%throw_exception('Error in json_get_by_path: Unsupported path_mode: '//&
+                                        trim(path_mode_str))
+            if (present(found)) found = .false.
         end select
 
     else
@@ -5572,6 +5585,8 @@
                                                          !! (as opposed to already being there)
 
     type(json_value),pointer :: tmp
+    character(kind=CK,len=max_integer_str_len),allocatable :: path_mode_str !! string version
+                                                                           !! of `json%path_mode`
 
     if (present(p)) nullify(p)
 
@@ -5587,7 +5602,17 @@
         case(2_IK)
             ! the problem here is there isn't really a way to disambiguate
             ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
-            call json%throw_exception('Create by path not supported in RFC 6901 path mode.')
+            call json%throw_exception('Error in json_create_by_path: '//&
+                                      'Create by path not supported in RFC 6901 path mode.')
+            if (present(found)) then
+                call json%clear_exceptions()
+                found = .false.
+            end if
+            if (present(was_created)) was_created = .false.
+        case default
+            call integer_to_string(json%path_mode,int_fmt,path_mode_str)
+            call json%throw_exception('Error in json_create_by_path: Unsupported path_mode: '//&
+                                        trim(path_mode_str))
             if (present(found)) then
                 call json%clear_exceptions()
                 found = .false.
@@ -5640,6 +5665,8 @@
 !````
 !
 !### Notes
+!  The syntax used here is a subset of the
+!  [http://goessner.net/articles/JsonPath/](JSONPath) "dot–notation".
 !  The following special characters are used to denote paths:
 !
 !  * `$`           - root
@@ -5997,6 +6024,9 @@
 !         (according to the standard, evaluation of non-unique references
 !         should fail). Like [[json_get_by_path_default]], this one will just return
 !         the first instance it encounters. This might be changed in the future.
+!
+!@warning I think the standard indicates that the input paths should use
+!         escaped JSON strings (currently we are assuming they are not escaped).
 
     subroutine json_get_by_path_rfc6901(json, me, path, p, found)
 
@@ -6194,6 +6224,12 @@
 !
 !@note If `json%path_mode/=1`, then the `use_alt_array_tokens`
 !      and `path_sep` inputs are ignored if present.
+!
+!@note [http://goessner.net/articles/JsonPath/](JSONPath) (`path_mode=3`)
+!      does not specify whether or not the keys should be escaped (this routine
+!      assumes not, as does http://jsonpath.com).
+!      Also, we are using Fortran-style 1-based array indices,
+!      not 0-based, to agree with the assumption in `path_mode=1`
 
     subroutine json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
 
@@ -6205,15 +6241,18 @@
     logical(LK),intent(out),optional                 :: found !! true if there were no problems
     logical(LK),intent(in),optional :: use_alt_array_tokens   !! if true, then '()' are used for array elements
                                                               !! otherwise, '[]' are used [default]
+                                                              !! (only used if `path_mode=1`)
     character(kind=CK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
                                                               !! (otherwise use `json%path_separator`)
+                                                              !! (only used if `path_mode=1`)
 
     type(json_value),pointer                   :: tmp            !! for traversing the structure
     type(json_value),pointer                   :: element        !! for traversing the structure
     integer(IK)                                :: var_type       !! JSON variable type flag
     character(kind=CK,len=:),allocatable       :: name           !! variable name
     character(kind=CK,len=:),allocatable       :: parent_name    !! variable's parent name
-    character(kind=CK,len=max_integer_str_len) :: istr           !! for integer to string conversion (array indices)
+    character(kind=CK,len=max_integer_str_len) :: istr           !! for integer to string conversion
+                                                                 !! (array indices)
     integer(IK)                                :: i              !! counter
     integer(IK)                                :: n_children     !! number of children for parent
     logical(LK)                                :: use_brackets   !! to use '[]' characters for arrays
@@ -6273,10 +6312,20 @@
                         end if
                     end do
                     select case(json%path_mode)
+                    case(3)
+                        ! JSONPath "bracket-notation"
+                        ! example: `$['key'][1]`
+                        ! [note: this uses 1-based indices]
+                        call integer_to_string(i,int_fmt,istr)
+                        call add_to_path(start_array//single_quote//parent_name//&
+                                         single_quote//end_array//&
+                                         start_array//trim(adjustl(istr))//end_array,CK_'')
                     case(2)
+                        ! rfc6901
                         call integer_to_string(i-1,int_fmt,istr) ! 0-based index
                         call add_to_path(parent_name//slash//trim(adjustl(istr)))
                     case(1)
+                        ! default
                         call integer_to_string(i,int_fmt,istr)
                         if (use_brackets) then
                             call add_to_path(parent_name//start_array//&
@@ -6291,7 +6340,13 @@
                 case (json_object)
 
                     !process parent on the next pass
-                    call add_to_path(name,path_sep)
+                    select case(json%path_mode)
+                    case(3)
+                        call add_to_path(start_array//single_quote//name//&
+                                         single_quote//end_array,CK_'')
+                    case default
+                        call add_to_path(name,path_sep)
+                    end select
 
                 case default
 
@@ -6305,7 +6360,13 @@
 
             else
                 !the last one:
-                call add_to_path(name,path_sep)
+                select case(json%path_mode)
+                case(3)
+                    call add_to_path(start_array//single_quote//name//&
+                                     single_quote//end_array,CK_'')
+                case default
+                    call add_to_path(name,path_sep)
+                end select
             end if
 
             if (associated(tmp%parent)) then
@@ -6328,10 +6389,14 @@
     if (json%exception_thrown .or. .not. allocated(path)) then
         path = CK_''
     else
-        if (json%path_mode==2) then
+        select case (json%path_mode)
+        case(3)
+            ! add the outer level object identifier:
+            path = root//path
+        case(2)
             ! add the root slash:
             path = slash//path
-        end if
+        end select
     end if
 
     !optional output:
@@ -6355,6 +6420,13 @@
             !! (ignored if `json%path_mode/=1`)
 
         select case (json%path_mode)
+        case(3)
+            ! in this case, the options are ignored
+            if (.not. allocated(path)) then
+                path = str
+            else
+                path = str//path
+            end if
         case(2)
             ! in this case, the options are ignored
             if (.not. allocated(path)) then

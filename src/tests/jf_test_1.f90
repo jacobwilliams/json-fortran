@@ -95,6 +95,13 @@ contains
       call core%initialize(unescape_strings=.true.)
       call core%traverse(p,print_json_variable)
 
+      namelist_style = .false.
+      write(error_unit,'(A)') ''
+      write(error_unit,'(A)') 'printing each variable [JSONPath style]'
+      write(error_unit,'(A)') ''
+      call core%initialize(path_mode=3)
+      call core%traverse(p,print_json_variable)
+
       ! -------------------------
 
       ! extract data from the parsed value
