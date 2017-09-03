@@ -704,6 +704,7 @@
         procedure :: push_char
         procedure :: get_current_line_from_file_stream
         procedure :: get_current_line_from_file_sequential
+        procedure :: convert
 
     end type json_core
     !*********************************************************
@@ -5567,8 +5568,8 @@
 !  By default, the leaf node and any empty array elements
 !  are created as `json_null` values.
 !
-!  It only works for the default path mode. An error will be
-!  thrown if RFC 6901 mode is enabled.
+!  It only works for `path_mode=1` or `path_mode=3`.
+!  An error will be thrown for `path_mode=2` (RFC 6901).
 !
 !### See also
 !  * [[json_get_by_path]]
@@ -5601,25 +5602,24 @@
                                                 create_it=.true.,&
                                                 was_created=was_created)
             if (present(p)) p => tmp
-        case(2_IK)
-            ! the problem here is there isn't really a way to disambiguate
-            ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
-            call json%throw_exception('Error in json_create_by_path: '//&
-                                      'Create by path not supported in RFC 6901 path mode.')
-            if (present(found)) then
-                call json%clear_exceptions()
-                found = .false.
-            end if
-            if (present(was_created)) was_created = .false.
-        !case(3_IK)
-        !    call json%json_get_by_path_jsonpath_bracket(me,path,tmp,found,&
-        !                                                create_it=.true.,&
-        !                                                was_created=was_created)
-        !    if (present(p)) p => tmp
+        case(3_IK)
+           call json%json_get_by_path_jsonpath_bracket(me,path,tmp,found,&
+                                                       create_it=.true.,&
+                                                       was_created=was_created)
+           if (present(p)) p => tmp
+
         case default
-            call integer_to_string(json%path_mode,int_fmt,path_mode_str)
-            call json%throw_exception('Error in json_create_by_path: Unsupported path_mode: '//&
-                                        trim(path_mode_str))
+
+            if (json%path_mode==2_IK) then
+                ! the problem here is there isn't really a way to disambiguate
+                ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
+                call json%throw_exception('Error in json_create_by_path: '//&
+                                          'Create by path not supported in RFC 6901 path mode.')
+            else
+                call integer_to_string(json%path_mode,int_fmt,path_mode_str)
+                call json%throw_exception('Error in json_create_by_path: Unsupported path_mode: '//&
+                                            trim(path_mode_str))
+            end if
             if (present(found)) then
                 call json%clear_exceptions()
                 found = .false.
@@ -5669,6 +5669,7 @@
 !    type(json_value),pointer :: dat,p
 !    logical :: found
 !    !...
+!    call json%initialize(path_mode=1) ! this is the default so not strictly necessary.
 !    call json%get(dat,'data(2).version',p,found)
 !````
 !
@@ -5688,7 +5689,12 @@
 !  Or, the alternate [[json_get_by_path_rfc6901]] could be used.
 !
 !### See also
-!  * [[json_get_by_path_rfc6901]] - alternate version with different path convention.
+!  * [[json_get_by_path_rfc6901]]
+!  * [[json_get_by_path_jsonpath_bracket]]
+!
+!@note The syntax is inherited from FSON, and is basically a subset
+!      of JSONPath "dot-notation", with the addition allowance of () for
+!      array elements.
 !
 !@note JSON `null` values are used here for unknown variables when `create_it` is True.
 !      So, it is possible that an existing null variable can be converted to another
@@ -5696,6 +5702,9 @@
 !      to avoid having to use another type (say `json_unknown`) that would have to be
 !      converted to null once all the variables have been created (user would have
 !      had to do this).
+!
+!@warning See (**) in code. I think we need to protect for memory leaks when
+!         changing the type of a variable that already exists.
 
     subroutine json_get_by_path_default(json,me,path,p,found,create_it,was_created)
 
@@ -5791,7 +5800,7 @@
                         !  What about the case: aaa.bbb(1)(3) ?
                         !  Is that already handled?
 
-                        if (p%var_type==json_null) then
+                        if (p%var_type==json_null) then             ! (**)
                             ! if p was also created, then we need to
                             ! convert it into an object here:
                             p%var_type = json_object
@@ -5840,7 +5849,7 @@
                     call json%get_child(p, child_i, tmp, child_found)
                     if (.not. child_found) then
 
-                        if (p%var_type==json_null) then
+                        if (p%var_type==json_null) then            ! (**)
                             ! if p was also created, then we need to
                             ! convert it into an array here:
                             p%var_type = json_array
@@ -5883,11 +5892,12 @@
                     if (child_i < i) then
                         nullify(tmp)
                         if (create) then
-                            if (p%var_type==json_null) then
+                            if (p%var_type==json_null) then            ! (**)
                                 ! if p was also created, then we need to
                                 ! convert it into an object here:
                                 p%var_type = json_object
                             end if
+
                             ! don't want to throw exceptions in this case
                             call json%get_child(p, path(child_i:i-1), tmp, child_found)
                             if (.not. child_found) then
@@ -5938,11 +5948,12 @@
             if (child_i <= length) then
                 nullify(tmp)
                 if (create) then
-                    if (p%var_type==json_null) then
+                    if (p%var_type==json_null) then            ! (**)
                         ! if p was also created, then we need to
                         ! convert it into an object here:
                         p%var_type = json_object
                     end if
+
                     call json%get_child(p, path(child_i:i-1), tmp, child_found)
                     if (.not. child_found) then
                         ! have to create this child
@@ -6010,14 +6021,17 @@
 !### Example
 !
 !````fortran
+!    type(json_core) :: json
 !    type(json_value),pointer :: dat,p
 !    logical :: found
 !    !...
+!    call json%initialize(path_mode=2)
 !    call json%get(dat,'/data/2/version',p,found)
 !````
 !
 !### See also
-!  * [[json_get_by_path_default]] - alternate version with different path convention.
+!  * [[json_get_by_path_default]]
+!  * [[json_get_by_path_jsonpath_bracket]]
 !
 !### Reference
 !  * [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
@@ -6206,6 +6220,12 @@
 !  using the "JSON Pointer" path specification defined by the
 !  JSONPath "bracket-notation".
 !
+!  The first character `$` is optional, and signifies the root
+!  of the structure. If it is not present, then the first key
+!  is taken to be in the `me` object.
+!
+!  Single or double quotes may be used
+!
 !### Example
 !
 !````fortran
@@ -6214,19 +6234,12 @@
 !    logical :: found
 !    !...
 !    call json%initialize(path_mode=3)
-
 !    call json%get(dat,"$['store']['book'][1]['title']",p,found)
 !````
 !
-!  The first character `$` is optional, and signifies the root
-!  of the structure. If it is not present, then the first key
-!  is taken to be in the `me` object.
-!
-!  Single or double quotes may be used
-!
 !### See also
-!  * [[json_get_by_path_default]] - subset of JSONPath "dot-notation"
-!  * [[json_get_by_path_rfc6901]] - RFC6901 "JSON pointer"
+!  * [[json_get_by_path_default]]
+!  * [[json_get_by_path_rfc6901]]
 !
 !### Reference
 !  * [JSONPath](http://goessner.net/articles/JsonPath/)
@@ -6234,12 +6247,19 @@
 !@note Uses 1-based array indices (same as [[json_get_by_path_default]],
 !      but unlike [[json_get_by_path_rfc6901]] which uses 0-based indices).
 !
+!@note When `create_it=True`, if the variable already exists and is a type
+!      that is not compatible with the usage in the `path`, then it is
+!      destroyed and replaced with what is specified in the `path`. Note that
+!      this applies the all variables in the path as it is created. Currently,
+!      this behavior is different from [[json_get_by_path_default]].
+!
+!@note JSON `null` values are used here for unknown variables
+!      when `create_it` is True.
+!
 !@warning Note that if using single quotes, this routine cannot parse
 !         a key containing `']`. If using double quotes, this routine
 !         cannot parse a key containing `"]`. If the key contains both
 !         `']` and `"]`, there is no way to parse it using this routine.
-!
-!@warning The `create` logic hasn't been added yet !
 
     subroutine json_get_by_path_jsonpath_bracket(json,me,path,p,found,create_it,was_created)
 
@@ -6278,7 +6298,6 @@
     integer(IK)              :: ilen               !! length of `path` string
     logical(LK)              :: double_quotes      !! if the keys are enclosed in `"`,
                                                    !! rather than `'` tokens.
-
     logical(LK)              :: create             !! if the object is to be created
     logical(LK)              :: created            !! if `create` is true, then this will be
                                                    !! true if the leaf object had to be created
@@ -6319,6 +6338,7 @@
                     do while (associated (p%parent))
                         p => p%parent
                     end do
+                    if (create) created = .false. ! should always exist
                 end if
 
                 !keep trailing space or not:
@@ -6372,9 +6392,9 @@
                                 end if
                                 if (iend>istart) then
 
-                                    ! istart  iend
-                                    !   |       |
-                                    !  ['abcdefg']
+                                    !     istart  iend
+                                    !       |       |
+                                    ! ['p']['abcdefg']
 
                                     if (iend>istart+1) then
                                         token = path(istart+1:iend-1)
@@ -6385,8 +6405,35 @@
                                     ! the token here if necessary:
                                     if (.not. json%trailing_spaces_significant) &
                                         token = trim(token)
-                                    ! have a token, see if it is valid:
-                                    call json%get_child(p,token,tmp,status_ok)
+
+                                    if (create) then
+                                        ! have a token, create it if necessary
+
+                                        ! we need to convert it into an object here
+                                        ! (e.g., if p was also just created)
+                                        ! and destroy its data to prevent a memory leak
+                                        call json%convert(p,json_object)
+
+                                        ! don't want to throw exceptions in this case
+                                        call json%get_child(p,token,tmp,status_ok)
+                                        if (.not. status_ok) then
+                                            ! have to create this child
+                                            ! [make it a null since we don't
+                                            ! know what it is yet]
+                                            call json_value_create(tmp)
+                                            call to_null(tmp,token)
+                                            call json%add(p,tmp)
+                                            status_ok = .true.
+                                            created = .true.
+                                        else
+                                            ! it was already there.
+                                            created = .false.
+                                        end if
+                                    else
+                                        ! have a token, see if it is valid:
+                                        call json%get_child(p,token,tmp,status_ok)
+                                    end if
+
                                     if (status_ok) then
                                         ! it was found
                                         p => tmp
@@ -6429,10 +6476,45 @@
                                         call string_to_integer(token,ival,status_ok)
                                         if (status_ok) status_ok = ival>0  ! assuming 1-based array indices
                                     end if
+
                                     if (status_ok) then
-                                        ! have a valid integer to use as an index, so
+
+                                        ! have a valid integer to use as an index
                                         ! see if this element is really there:
                                         call json%get_child(p,ival,tmp,status_ok)
+
+                                        if (create .and. .not. status_ok) then
+
+                                            ! have to create it:
+
+                                            if (.not.(p%var_type==json_object .or. p%var_type==json_array)) then
+                                                ! we need to convert it into an array here
+                                                ! (e.g., if p was also just created)
+                                                ! and destroy its data to prevent a memory leak
+                                                call json%convert(p,json_array)
+                                            end if
+
+                                            ! have to create this element
+                                            ! [make it a null]
+                                            ! (and any missing ones before it)
+                                            do j = 1, ival
+                                                nullify(tmp)
+                                                call json%get_child(p, j, tmp, status_ok)
+                                                if (.not. status_ok) then
+                                                    call json_value_create(tmp)
+                                                    call to_null(tmp)  ! array element doesn't need a name
+                                                    call json%add(p,tmp)
+                                                    if (j==ival) created = .true.
+                                                else
+                                                    if (j==ival) created = .false.
+                                                end if
+                                            end do
+                                            status_ok = .true.
+
+                                        else
+                                            created = .false.
+                                        end if
+
                                         if (status_ok) then
                                             ! found it
                                             p => tmp
@@ -6494,11 +6576,64 @@
             if (present(found)) found = .true.
         end if
 
+        ! if it had to be created:
+        if (present(was_created)) was_created = created
+
     else
         if (present(found)) found = .false.
+        if (present(was_created)) was_created = .false.
     end if
 
     end subroutine json_get_by_path_jsonpath_bracket
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Convert an existing JSON variable `p` to a different variable type.
+!  The existing variable (and its children) is destroyed. It is replaced
+!  in the structure by a new variable of type `var_type`
+!  (which can be a `json_null`, `json_object` or `json_array`).
+!
+!@note This is an internal routine used when creating variables by path.
+
+    subroutine convert(json,p,var_type)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer :: p  !! the variable to convert
+    integer(IK),intent(in) :: var_type !! the variable type to convert `p` to
+
+    type(json_value),pointer :: tmp  !! temporary variable
+    character(kind=CK,len=:),allocatable :: name !! the name of a JSON variable
+
+    logical :: convert_it  !! if `p` needs to be converted
+
+    convert_it = p%var_type /= var_type
+
+    if (convert_it) then
+
+        call json%info(p,name=name) ! get existing name
+
+        select case (var_type)
+        case(json_object)
+            call json%create_object(tmp,name)
+        case(json_array)
+            call json%create_array(tmp,name)
+        case(json_null)
+            call json%create_null(tmp,name)
+        case default
+            call json%throw_exception('Error in convert: invalid var_type value.')
+            return
+        end select
+
+        call json%replace(p,tmp,destroy=.true.)
+        p => tmp
+        nullify(tmp)
+
+    end if
+
+    end subroutine convert
 !*****************************************************************************************
 
 !*****************************************************************************************
