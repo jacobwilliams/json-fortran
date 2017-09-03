@@ -5585,7 +5585,7 @@
                                                          !! (as opposed to already being there)
 
     type(json_value),pointer :: tmp
-    character(kind=CK,len=max_integer_str_len),allocatable :: path_mode_str !! string version
+    character(kind=CK,len=max_integer_str_len) :: path_mode_str !! string version
                                                                            !! of `json%path_mode`
 
     if (present(p)) nullify(p)
