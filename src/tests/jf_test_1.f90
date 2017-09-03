@@ -99,8 +99,10 @@ contains
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing each variable [JSONPath style]'
       write(error_unit,'(A)') ''
-      call core%initialize(path_mode=3)
+      call core%initialize(path_mode=3,unescape_strings=.false.)
       call core%traverse(p,print_json_variable)
+
+      call core%destroy()
 
       ! -------------------------
 
@@ -108,7 +110,7 @@ contains
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'get some data from the file...'
 
-      call json%initialize(path_separator=json_CK_'%')  ! use fortran-style paths
+      call json%initialize(path_mode=1,path_separator=json_CK_'%')  ! use fortran-style paths
 
       call json%get('version%svn', ival)
       if (json%failed()) then
@@ -362,6 +364,31 @@ contains
       if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
+      end if
+
+      write(error_unit,'(A)') ''
+      write(error_unit,'(A)') ''
+      write(error_unit,'(A)') 'get some data from the file (bracket notation)...'
+
+      call json%initialize(path_mode=3)
+
+      ! get an integer value:
+      write(error_unit,'(A)') ''
+      call json%get("$['version']['svn']", ival)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A,I5)') "$['version']['svn'] = ",ival
+      end if
+      ! get a character value:
+      write(error_unit,'(A)') ''
+      call json%get("$['data'][1]['name']", cval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A)') "['data'][1]['array'][2] = "//trim(cval)
       end if
 
     end if
