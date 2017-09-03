@@ -388,7 +388,20 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
       else
-        write(error_unit,'(A)') "['data'][1]['array'][2] = "//trim(cval)
+        write(error_unit,'(A)') "$['data'][1]['array'][2] = "//trim(cval)
+      end if
+      ! get a logical value (use double quotes):
+      write(error_unit,'(A)') ''
+      call json%get('$["data"][1]["tf1"]', lval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        if (lval) then
+            write(error_unit,'(A)') '$["data"][1]["tf1"] = True'
+        else
+            write(error_unit,'(A)') '$["data"][1]["tf1"] = False'
+        end if
       end if
 
     end if

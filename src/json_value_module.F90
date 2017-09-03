@@ -6213,12 +6213,16 @@
 !    type(json_value),pointer :: dat,p
 !    logical :: found
 !    !...
+!    call json%initialize(path_mode=3)
+
 !    call json%get(dat,"$['store']['book'][1]['title']",p,found)
 !````
 !
 !  The first character `$` is optional, and signifies the root
-!  of the structure. If it is not present, the the first key is
-!  taken to be in the `me` object.
+!  of the structure. If it is not present, then the first key
+!  is taken to be in the `me` object.
+!
+!  Single or double quotes may be used
 !
 !### See also
 !  * [[json_get_by_path_default]] - subset of JSONPath "dot-notation"
@@ -6230,7 +6234,12 @@
 !@note Uses 1-based array indices (same as [[json_get_by_path_default]],
 !      but unlike [[json_get_by_path_rfc6901]] which uses 0-based indices).
 !
-!@warning The `create` logic hasn't been added yet !!!
+!@warning Note that if using single quotes, this routine cannot parse
+!         a key containing `']`. If using double quotes, this routine
+!         cannot parse a key containing `"]`. If the key contains both
+!         `']` and `"]`, there is no way to parse it using this routine.
+!
+!@warning The `create` logic hasn't been added yet !
 
     subroutine json_get_by_path_jsonpath_bracket(json,me,path,p,found,create_it,was_created)
 
@@ -6267,6 +6276,9 @@
                                                    !! traversing the structure
     integer(IK)              :: i                  !! counter
     integer(IK)              :: ilen               !! length of `path` string
+    logical(LK)              :: double_quotes      !! if the keys are enclosed in `"`,
+                                                   !! rather than `'` tokens.
+
     logical(LK)              :: create             !! if the object is to be created
     logical(LK)              :: created            !! if `create` is true, then this will be
                                                    !! true if the leaf object had to be created
@@ -6335,26 +6347,35 @@
 
                         ! get the next token by checking:
                         !
-                        ! * is the token after istart a quote?
-                        !   if so, then search for the next `']`
-                        !   ['']
+                        ! * [''] -- is the token after istart a quote?
+                        !           if so, then search for the next `']`
                         !
-                        ! * if not, then maybe it is a number,
-                        !   so search for the next `]`
-                        !   [1]
-                        !
-                        ! istart  iend
-                        !  |       |
-                        !  [abcdefg][h][ijk]
+                        ! * [1] -- if not, then maybe it is a number,
+                        !          so search for the next `]`
 
                         ! verify length of remaining string
                         if (istart+2<=ilen) then
-                            if (path(istart+1:istart+1) == single_quote) then  ! ['
-                                istart = istart + 1 ! move to ' index
-                                ! it should be a key value
-                                iend = istart + index(path(istart+1:ilen),&
-                                       single_quote//end_array)  ! ']
+
+                            double_quotes = path(istart+1:istart+1) == quotation_mark   ! ["
+
+                            if (double_quotes .or. path(istart+1:istart+1)==single_quote) then  ! ['
+
+                                ! it might be a key value: ['abc']
+
+                                istart = istart + 1 ! move counter to ' index
+                                if (double_quotes) then
+                                    iend = istart + index(path(istart+1:ilen),&
+                                           quotation_mark//end_array)  ! "]
+                                else
+                                    iend = istart + index(path(istart+1:ilen),&
+                                           single_quote//end_array)  ! ']
+                                end if
                                 if (iend>istart) then
+
+                                    ! istart  iend
+                                    !   |       |
+                                    !  ['abcdefg']
+
                                     if (iend>istart+1) then
                                         token = path(istart+1:iend-1)
                                     else
@@ -6376,15 +6397,18 @@
                                                 '" in path: '//trim(path))
                                         exit
                                     end if
-                                    iend = iend + 1 ! move to ]
+                                    iend = iend + 1 ! move counter to ] index
                                 else
                                     call json%throw_exception(&
                                             'Error in json_get_by_path_jsonpath_bracket: '//&
                                             'invalid path: '//trim(path))
                                     exit
                                 end if
+
                             else
-                                ! it might be an integer value
+
+                                ! it might be an integer value: [123]
+
                                 iend = istart + index(path(istart+1:ilen),end_array)   ! ]
                                 if (iend>istart+1) then
 
@@ -6434,7 +6458,9 @@
                                             'invalid path: '//trim(path))
                                     exit
                                 end if
+
                             end if
+
                         else
                             call json%throw_exception(&
                                     'Error in json_get_by_path_jsonpath_bracket: '//&
