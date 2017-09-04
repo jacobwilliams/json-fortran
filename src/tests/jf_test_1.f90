@@ -153,6 +153,14 @@ contains
       else
         write(error_unit,'(A)') 'data(1).array(2) = '//trim(cval)
       end if
+      write(error_unit,'(A)') ''
+      call json%get('escape', cval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A)') 'escape = '//trim(cval)
+      end if
 
       ! get a logical value:
       call json%get('data(1).tf1', lval)

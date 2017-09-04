@@ -6721,7 +6721,7 @@
 
             !get info about the current variable:
             call json%info(tmp,name=name)
-            if (json%path_mode==2) then
+            if (json%path_mode==2_IK) then
                 name = encode_rfc6901(name)
             end if
 
@@ -6731,7 +6731,7 @@
                 !get info about the parent:
                 call json%info(tmp%parent,var_type=var_type,&
                                n_children=n_children,name=parent_name)
-                if (json%path_mode==2) then
+                if (json%path_mode==2_IK) then
                     parent_name = encode_rfc6901(parent_name)
                 end if
 
@@ -6758,7 +6758,7 @@
                         end if
                     end do
                     select case(json%path_mode)
-                    case(3)
+                    case(3_IK)
                         ! JSONPath "bracket-notation"
                         ! example: `$['key'][1]`
                         ! [note: this uses 1-based indices]
@@ -6766,11 +6766,11 @@
                         call add_to_path(start_array//single_quote//parent_name//&
                                          single_quote//end_array//&
                                          start_array//trim(adjustl(istr))//end_array,CK_'')
-                    case(2)
+                    case(2_IK)
                         ! rfc6901
                         call integer_to_string(i-1,int_fmt,istr) ! 0-based index
                         call add_to_path(parent_name//slash//trim(adjustl(istr)))
-                    case(1)
+                    case(1_IK)
                         ! default
                         call integer_to_string(i,int_fmt,istr)
                         if (use_brackets) then
@@ -6787,7 +6787,7 @@
 
                     !process parent on the next pass
                     select case(json%path_mode)
-                    case(3)
+                    case(3_IK)
                         call add_to_path(start_array//single_quote//name//&
                                          single_quote//end_array,CK_'')
                     case default
@@ -6807,7 +6807,7 @@
             else
                 !the last one:
                 select case(json%path_mode)
-                case(3)
+                case(3_IK)
                     call add_to_path(start_array//single_quote//name//&
                                      single_quote//end_array,CK_'')
                 case default
@@ -6836,10 +6836,10 @@
         path = CK_''
     else
         select case (json%path_mode)
-        case(3)
+        case(3_IK)
             ! add the outer level object identifier:
             path = root//path
-        case(2)
+        case(2_IK)
             ! add the root slash:
             path = slash//path
         end select
@@ -6866,21 +6866,21 @@
             !! (ignored if `json%path_mode/=1`)
 
         select case (json%path_mode)
-        case(3)
+        case(3_IK)
             ! in this case, the options are ignored
             if (.not. allocated(path)) then
                 path = str
             else
                 path = str//path
             end if
-        case(2)
+        case(2_IK)
             ! in this case, the options are ignored
             if (.not. allocated(path)) then
                 path = str
             else
                 path = str//slash//path
             end if
-        case(1)
+        case(1_IK)
             ! default path format
             if (.not. allocated(path)) then
                 path = str
