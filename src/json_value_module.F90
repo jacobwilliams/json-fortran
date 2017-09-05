@@ -857,7 +857,8 @@
     character(kind=CDK,len=10) :: e            !! real exponent digits
     character(kind=CDK,len=2)  :: sgn          !! sign flag: `ss` or `sp`
     character(kind=CDK,len=2)  :: rl_edit_desc !! `G`, `E`, `EN`, or `ES`
-    integer(IK)                :: istat        !! `iostat` flag for write statements
+    integer(IK)                :: istat        !! `iostat` flag for
+                                               !! write statements
     logical(LK)                :: sgn_prnt     !! print sign flag
 
     !reset exception to false:
@@ -1102,13 +1103,14 @@
     implicit none
 
     type(json_value),pointer          :: from     !! this is the structure to clone
-    type(json_value),pointer          :: to       !! the clone is put here
-                                                  !! (it must not already be associated)
+    type(json_value),pointer          :: to       !! the clone is put here (it
+                                                  !! must not already be associated)
     type(json_value),pointer,optional :: parent   !! to%parent
     type(json_value),pointer,optional :: previous !! to%previous
     type(json_value),pointer,optional :: next     !! to%next
     type(json_value),pointer,optional :: children !! to%children
-    logical,optional                  :: tail     !! if "to" is the tail of its parent's children
+    logical,optional                  :: tail     !! if "to" is the tail of
+                                                  !! its parent's children
 
     nullify(to)
 
@@ -1467,7 +1469,8 @@
 !
 !### Example
 !
-!  The following example is an array with `var_type=json_integer`, `n_sets=3`, and `set_size=4`
+!  The following example is an array with `var_type=json_integer`,
+!  `n_sets=3`, and `set_size=4`
 !
 !```json
 !    {
@@ -1486,9 +1489,12 @@
     class(json_core),intent(inout)   :: json
     type(json_value),pointer         :: p          !! a JSON linked list
     logical(LK),intent(out)          :: is_matrix  !! true if it is a valid matrix
-    integer(IK),intent(out),optional :: var_type   !! variable type of data in the matrix (if all elements have the same type)
-    integer(IK),intent(out),optional :: n_sets     !! number of data sets (i.e., matrix rows if using row-major order)
-    integer(IK),intent(out),optional :: set_size   !! size of each data set (i.e., matrix cols if using row-major order)
+    integer(IK),intent(out),optional :: var_type   !! variable type of data in the matrix
+                                                   !! (if all elements have the same type)
+    integer(IK),intent(out),optional :: n_sets     !! number of data sets (i.e., matrix
+                                                   !! rows if using row-major order)
+    integer(IK),intent(out),optional :: set_size   !! size of each data set (i.e., matrix
+                                                   !! cols if using row-major order)
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
     type(json_value),pointer :: p_row       !! for getting a set
@@ -6341,12 +6347,8 @@
                     if (create) created = .false. ! should always exist
                 end if
 
-                !keep trailing space or not:
-                if (json%trailing_spaces_significant) then
-                    ilen = len(path)
-                else
-                    ilen = len_trim(path)
-                end if
+                !path length (don't need trailing spaces:)
+                ilen = len_trim(path)
 
                 if (ilen>1) then
 
