@@ -731,26 +731,6 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Return the lowercase version of the `CK` character.
-
-    pure elemental function lowercase_character(c) result(c_lower)
-
-    implicit none
-
-    character(kind=CK,len=1),intent(in) :: c
-    character(kind=CK,len=1)            :: c_lower
-
-    integer :: i  !! index in uppercase array
-
-    i = index(upper,c)
-    c_lower = merge(lower(i:i),c,i>0)
-
-    end function lowercase_character
-!*****************************************************************************************
-
-!*****************************************************************************************
-!> author: Jacob Williams
-!
 !  Returns lowercase version of the `CK` string.
 
     pure elemental function lowercase_string(str) result(s_lower)
@@ -761,23 +741,21 @@
     character(kind=CK,len=(len(str)))   :: s_lower  !! lowercase version of the string
 
     integer :: i  !! counter
-    integer :: n  !! length of input string
+    integer :: j  !! index of uppercase character
 
-    s_lower = CK_''
-    n = len_trim(str)
+    s_lower = str
 
-    if (n>0) then
-        do concurrent (i=1:n)
-            s_lower(i:i) = lowercase_character(str(i:i))
-        end do
-    end if
+    do i = 1, len_trim(str)
+        j = index(upper,s_lower(i:i))
+        if (j>0) s_lower(i:i) = lower(j:j)
+    end do
 
     end function lowercase_string
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Replace all occurances of `s1` in `str` with `s2`.
+!  Replace all occurrences of `s1` in `str` with `s2`.
 !
 !  A case-sensitive match is used.
 !
