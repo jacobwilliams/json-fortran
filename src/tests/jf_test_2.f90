@@ -391,10 +391,11 @@ contains
 
     end subroutine add_variables_to_input
 
-end module jf_test_2_mod
+    end module jf_test_2_mod
 !*****************************************************************************************
 
 !*****************************************************************************************
+#ifndef INTERGATED_TESTS
 program jf_test_2
 
     !! Second unit test.
@@ -407,4 +408,5 @@ program jf_test_2
     if (n_errors /= 0) stop 1
 
 end program jf_test_2
+#endif
 !*****************************************************************************************

@@ -430,9 +430,10 @@ contains
 
     end subroutine print_json_variable
 
-end module jf_test_1_mod
+    end module jf_test_1_mod
 !*****************************************************************************************
 
+#ifndef INTERGATED_TESTS
 !*****************************************************************************************
 program jf_test_1
 
@@ -447,3 +448,4 @@ program jf_test_1
 
 end program jf_test_1
 !*****************************************************************************************
+#endif
