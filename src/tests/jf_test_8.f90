@@ -123,7 +123,7 @@ contains
 
     end subroutine test_8
 
-    end module jf_test_8_mod
+end module jf_test_8_mod
 !*****************************************************************************************
 
 #ifndef INTERGATED_TESTS    

@@ -213,7 +213,7 @@ contains
 
     end subroutine test_16
 
-    end module jf_test_16_mod
+end module jf_test_16_mod
 !*****************************************************************************************
 
 #ifndef INTERGATED_TESTS    

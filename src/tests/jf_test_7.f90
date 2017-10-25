@@ -257,7 +257,7 @@ contains
 
     end subroutine test_7
 
-    end module jf_test_7_mod
+end module jf_test_7_mod
 !*****************************************************************************************
 
 
