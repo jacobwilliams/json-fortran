@@ -135,7 +135,7 @@ contains
 
     end subroutine test_3
 
-    end module jf_test_3_mod
+end module jf_test_3_mod
 !*****************************************************************************************
 
 #ifndef INTERGATED_TESTS
