@@ -215,8 +215,8 @@
                                          !! * 1 -- Default mode (see [[json_get_by_path_default]])
                                          !! * 2 -- as RFC 6901 "JSON Pointer" paths
                                          !!   (see [[json_get_by_path_rfc6901]])
-                                         !! * 3 -- JSONPath "bracket-notation" (currently only
-                                         !!   used in [[json_get_path]])
+                                         !! * 3 -- JSONPath "bracket-notation"
+                                         !!   see [[json_get_by_path_jsonpath_bracket]])
 
         character(kind=CK,len=1) :: path_separator = dot !! The `path` separator to use
                                                          !! in the "default" mode for
@@ -6230,7 +6230,7 @@
 !  of the structure. If it is not present, then the first key
 !  is taken to be in the `me` object.
 !
-!  Single or double quotes may be used
+!  Single or double quotes may be used.
 !
 !### Example
 !
