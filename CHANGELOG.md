@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.1.0 (2017-11-05)](#610-2017-11-05)
     - [6.0.0 (2017-08-24)](#600-2017-08-24)
     - [5.3.0 (2017-04-07)](#530-2017-04-07)
     - [5.2.0 (2017-03-05)](#520-2017-03-05)
@@ -23,7 +24,23 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.0.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.1.0...HEAD)
+
+### [6.1.0](https://github.com/jacobwilliams/json-fortran/tree/6.1.0) (2017-11-05)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.0.0...6.1.0)
+or [Download v6.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.1.0)
+
+**Enhancements:**
+
+- Added an optional `allow_duplicate_keys` argument to the various `initialize` routines. This is True by default. If False, then duplicate keys are considered an error. Also added `check_for_duplicate_keys` and `check_children_for_duplicate_keys` methods that can be called. [\#250](https://github.com/jacobwilliams/json-fortran/issues/250) [\#290](https://github.com/jacobwilliams/json-fortran/pull/290) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added support for JSONPath "bracket-notation" mode for specifying paths to JSON variables. [\#266](https://github.com/jacobwilliams/json-fortran/issues/266) [\#292](https://github.com/jacobwilliams/json-fortran/pull/292) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Replaced `CMAKE_INSTALL_LIBDIR` with `INSTALL_LIB_DIR` in the CMake project. [\#286](https://github.com/jacobwilliams/json-fortran/pull/286)  ([foeroyingur](https://github.com/foeroyingur))
+- Fixed bug in the `lowercase_string` routine that could cause a crash for Debug builds. [\#293](https://github.com/jacobwilliams/json-fortran/issues/293)  [\#294](https://github.com/jacobwilliams/json-fortran/pull/294) ([jacobwilliams](https://github.com/jacobwilliams))
+
 
 ### [6.0.0](https://github.com/jacobwilliams/json-fortran/tree/6.0.0) (2017-08-24)
 
