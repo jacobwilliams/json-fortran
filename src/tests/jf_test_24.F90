@@ -104,6 +104,27 @@ contains
         error_cnt = error_cnt + 1
     end if
 
+    write(*,*) ''
+    write(*,*) 'JSONPath bracket mode'
+    call json%initialize(path_mode=3_IK)
+
+    write(*,'(A)') '$["jsonpath"]'
+    call json%create(p, '$["jsonpath"]')
+
+    write(*,'(A)') '$["jsonpath"]["array"][2]'
+    call json%create(p, '$["jsonpath"]["array"][2]')
+
+    write(*,'(A)') '$["jsonpath"]["a"]["aa"]["aaa"][1]'
+    call json%add_by_path(p,'$["jsonpath"]["a"]["aa"]["aaa"][1]', '3.0' , found)
+
+    write(*,'(A)') '$["jsonpath"]["a"]["aa"]["aaa"][3]'
+    call json%add_by_path(p,'$["jsonpath"]["a"]["aa"]["aaa"][3]', 4.0_rk, found, was_created)
+
+    if (.not. was_created) then
+        write(error_unit,'(A)') 'Error: JSONPath test failed.'
+        error_cnt = error_cnt + 1
+    end if
+
     write(error_unit,'(A)') 'validating...'
     call json%validate(p,is_valid,error_msg)
     if (.not. is_valid) then

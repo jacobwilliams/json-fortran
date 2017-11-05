@@ -186,25 +186,25 @@
                                                       !! type is different from the return type (for
                                                       !! example, integer to double).
 
-        logical(LK) :: trailing_spaces_significant = .false.    !! for name and path comparisons, is trailing
-                                                                !! space to be considered significant.
+        logical(LK) :: trailing_spaces_significant = .false.    !! for name and path comparisons, if trailing
+                                                                !! space is to be considered significant.
 
-        logical(LK) :: case_sensitive_keys = .true.    !! for name and path comparisons, are they
-                                                       !! case sensitive.
+        logical(LK) :: case_sensitive_keys = .true.    !! if name and path comparisons
+                                                       !! are case sensitive.
 
         logical(LK) :: no_whitespace = .false. !! when printing a JSON string, don't include
                                                !! non-significant spaces or line breaks.
                                                !! If true, the entire structure will be
                                                !! printed on one line.
 
-        logical(LK) :: unescaped_strings = .true.  !! If false, then the raw escaped
+        logical(LK) :: unescaped_strings = .true.  !! If false, then the escaped
                                                    !! string is returned from [[json_get_string]]
                                                    !! and similar routines. If true [default],
                                                    !! then the string is returned unescaped.
 
         logical(LK) :: allow_comments = .true.  !! if true, any comments will be ignored when
                                                 !! parsing a file. The comment token is defined
-                                                !! by the `comment_char` string.
+                                                !! by the `comment_char` character variable.
         character(kind=CK,len=1) :: comment_char = CK_'!'  !! comment token when
                                                            !! `allow_comments` is true.
                                                            !! Examples: '`!`' or '`#`'.
@@ -215,6 +215,8 @@
                                          !! * 1 -- Default mode (see [[json_get_by_path_default]])
                                          !! * 2 -- as RFC 6901 "JSON Pointer" paths
                                          !!   (see [[json_get_by_path_rfc6901]])
+                                         !! * 3 -- JSONPath "bracket-notation" (currently only
+                                         !!   used in [[json_get_path]])
 
         character(kind=CK,len=1) :: path_separator = dot !! The `path` separator to use
                                                          !! in the "default" mode for
@@ -434,6 +436,7 @@
         procedure,private :: MAYBEWRAP(json_get_alloc_string_vec_by_path)
         procedure,private :: json_get_by_path_default
         procedure,private :: json_get_by_path_rfc6901
+        procedure,private :: json_get_by_path_jsonpath_bracket
 
         procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]]
                                                                     !! structure to an allocatable
@@ -701,6 +704,7 @@
         procedure :: push_char
         procedure :: get_current_line_from_file_stream
         procedure :: get_current_line_from_file_sequential
+        procedure :: convert
 
     end type json_core
     !*********************************************************
@@ -853,7 +857,8 @@
     character(kind=CDK,len=10) :: e            !! real exponent digits
     character(kind=CDK,len=2)  :: sgn          !! sign flag: `ss` or `sp`
     character(kind=CDK,len=2)  :: rl_edit_desc !! `G`, `E`, `EN`, or `ES`
-    integer(IK)                :: istat        !! `iostat` flag for write statements
+    integer(IK)                :: istat        !! `iostat` flag for
+                                               !! write statements
     logical(LK)                :: sgn_prnt     !! print sign flag
 
     !reset exception to false:
@@ -888,7 +893,7 @@
     if (present(unescape_strings)) &
         me%unescaped_strings = unescape_strings
     if (present(path_mode)) then
-        if (path_mode==1_IK .or. path_mode==2_IK) then
+        if (path_mode==1_IK .or. path_mode==2_IK .or. path_mode==3_IK) then
             me%path_mode = path_mode
         else
             me%path_mode = 1_IK  ! just to have a valid value
@@ -1098,13 +1103,14 @@
     implicit none
 
     type(json_value),pointer          :: from     !! this is the structure to clone
-    type(json_value),pointer          :: to       !! the clone is put here
-                                                  !! (it must not already be associated)
+    type(json_value),pointer          :: to       !! the clone is put here (it
+                                                  !! must not already be associated)
     type(json_value),pointer,optional :: parent   !! to%parent
     type(json_value),pointer,optional :: previous !! to%previous
     type(json_value),pointer,optional :: next     !! to%next
     type(json_value),pointer,optional :: children !! to%children
-    logical,optional                  :: tail     !! if "to" is the tail of its parent's children
+    logical,optional                  :: tail     !! if "to" is the tail of
+                                                  !! its parent's children
 
     nullify(to)
 
@@ -1463,7 +1469,8 @@
 !
 !### Example
 !
-!  The following example is an array with `var_type=json_integer`, `n_sets=3`, and `set_size=4`
+!  The following example is an array with `var_type=json_integer`,
+!  `n_sets=3`, and `set_size=4`
 !
 !```json
 !    {
@@ -1482,9 +1489,12 @@
     class(json_core),intent(inout)   :: json
     type(json_value),pointer         :: p          !! a JSON linked list
     logical(LK),intent(out)          :: is_matrix  !! true if it is a valid matrix
-    integer(IK),intent(out),optional :: var_type   !! variable type of data in the matrix (if all elements have the same type)
-    integer(IK),intent(out),optional :: n_sets     !! number of data sets (i.e., matrix rows if using row-major order)
-    integer(IK),intent(out),optional :: set_size   !! size of each data set (i.e., matrix cols if using row-major order)
+    integer(IK),intent(out),optional :: var_type   !! variable type of data in the matrix
+                                                   !! (if all elements have the same type)
+    integer(IK),intent(out),optional :: n_sets     !! number of data sets (i.e., matrix
+                                                   !! rows if using row-major order)
+    integer(IK),intent(out),optional :: set_size   !! size of each data set (i.e., matrix
+                                                   !! cols if using row-major order)
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
     type(json_value),pointer :: p_row       !! for getting a set
@@ -5512,6 +5522,9 @@
 !
 !  * The original JSON-Fortran defaults
 !  * [RFC 6901](https://tools.ietf.org/html/rfc6901)
+!
+!@warning if `found` is present, we should clear any exceptions that are thrown
+!         to be consistent with other routines. This is not currently being done.
 
     subroutine json_get_by_path(json, me, path, p, found)
 
@@ -5524,16 +5537,26 @@
                                                    !! specify by `path`
     logical(LK),intent(out),optional     :: found  !! true if it was found
 
+    character(kind=CK,len=max_integer_str_len),allocatable :: path_mode_str !! string version
+                                                                            !! of `json%path_mode`
+
     nullify(p)
 
     if (.not. json%exception_thrown) then
 
-        ! note: it can only be 1 or 2 (which was checked in initialize)
+        ! note: it can only be 1 or 2 (3 not currently enabled)
         select case (json%path_mode)
         case(1_IK)
             call json%json_get_by_path_default(me, path, p, found)
         case(2_IK)
             call json%json_get_by_path_rfc6901(me, path, p, found)
+        case(3_IK)
+            call json%json_get_by_path_jsonpath_bracket(me, path, p, found)
+        case default
+            call integer_to_string(json%path_mode,int_fmt,path_mode_str)
+            call json%throw_exception('Error in json_get_by_path: Unsupported path_mode: '//&
+                                        trim(path_mode_str))
+            if (present(found)) found = .false.
         end select
 
     else
@@ -5551,8 +5574,8 @@
 !  By default, the leaf node and any empty array elements
 !  are created as `json_null` values.
 !
-!  It only works for the default path mode. An error will be
-!  thrown if RFC 6901 mode is enabled.
+!  It only works for `path_mode=1` or `path_mode=3`.
+!  An error will be thrown for `path_mode=2` (RFC 6901).
 !
 !### See also
 !  * [[json_get_by_path]]
@@ -5572,22 +5595,37 @@
                                                          !! (as opposed to already being there)
 
     type(json_value),pointer :: tmp
+    character(kind=CK,len=max_integer_str_len) :: path_mode_str !! string version
+                                                                !! of `json%path_mode`
 
     if (present(p)) nullify(p)
 
     if (.not. json%exception_thrown) then
 
-        ! note: path_mode can only be 1 or 2 (which was checked in initialize)
         select case (json%path_mode)
         case(1_IK)
             call json%json_get_by_path_default(me,path,tmp,found,&
                                                 create_it=.true.,&
                                                 was_created=was_created)
             if (present(p)) p => tmp
-        case(2_IK)
-            ! the problem here is there isn't really a way to disambiguate
-            ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
-            call json%throw_exception('Create by path not supported in RFC 6901 path mode.')
+        case(3_IK)
+           call json%json_get_by_path_jsonpath_bracket(me,path,tmp,found,&
+                                                       create_it=.true.,&
+                                                       was_created=was_created)
+           if (present(p)) p => tmp
+
+        case default
+
+            if (json%path_mode==2_IK) then
+                ! the problem here is there isn't really a way to disambiguate
+                ! the array elements, so '/a/0' could be 'a(1)' or 'a.0'.
+                call json%throw_exception('Error in json_create_by_path: '//&
+                                          'Create by path not supported in RFC 6901 path mode.')
+            else
+                call integer_to_string(json%path_mode,int_fmt,path_mode_str)
+                call json%throw_exception('Error in json_create_by_path: Unsupported path_mode: '//&
+                                            trim(path_mode_str))
+            end if
             if (present(found)) then
                 call json%clear_exceptions()
                 found = .false.
@@ -5633,13 +5671,17 @@
 !### Example
 !
 !````fortran
+!    type(json_core) :: json
 !    type(json_value),pointer :: dat,p
 !    logical :: found
 !    !...
+!    call json%initialize(path_mode=1) ! this is the default so not strictly necessary.
 !    call json%get(dat,'data(2).version',p,found)
 !````
 !
 !### Notes
+!  The syntax used here is a subset of the
+!  [http://goessner.net/articles/JsonPath/](JSONPath) "dot–notation".
 !  The following special characters are used to denote paths:
 !
 !  * `$`           - root
@@ -5653,7 +5695,12 @@
 !  Or, the alternate [[json_get_by_path_rfc6901]] could be used.
 !
 !### See also
-!  * [[json_get_by_path_rfc6901]] - alternate version with different path convention.
+!  * [[json_get_by_path_rfc6901]]
+!  * [[json_get_by_path_jsonpath_bracket]]
+!
+!@note The syntax is inherited from FSON, and is basically a subset
+!      of JSONPath "dot-notation", with the addition allowance of () for
+!      array elements.
 !
 !@note JSON `null` values are used here for unknown variables when `create_it` is True.
 !      So, it is possible that an existing null variable can be converted to another
@@ -5661,6 +5708,9 @@
 !      to avoid having to use another type (say `json_unknown`) that would have to be
 !      converted to null once all the variables have been created (user would have
 !      had to do this).
+!
+!@warning See (**) in code. I think we need to protect for memory leaks when
+!         changing the type of a variable that already exists.
 
     subroutine json_get_by_path_default(json,me,path,p,found,create_it,was_created)
 
@@ -5682,17 +5732,17 @@
                                                         !! was actually created. Otherwise
                                                         !! it will be false.
 
-    integer(IK)              :: i            !! counter of characters in `path`
-    integer(IK)              :: length       !! significant length of `path`
-    integer(IK)              :: child_i      !! index for getting children
-    character(kind=CK,len=1) :: c            !! a character in the `path`
-    logical(LK)              :: array        !! flag when searching for array index in `path`
-    type(json_value),pointer :: tmp          !! temp variables for getting child objects
-    logical(LK)              :: child_found  !! if the child value was found
-    logical(LK)              :: create       !! if the object is to be created
-    logical(LK)              :: created      !! if `create` is true, then this will be
-                                             !! true if the leaf object had to be created
-    integer(IK)              :: j            !! counter of children when creating object
+    integer(IK)              :: i           !! counter of characters in `path`
+    integer(IK)              :: length      !! significant length of `path`
+    integer(IK)              :: child_i     !! index for getting children
+    character(kind=CK,len=1) :: c           !! a character in the `path`
+    logical(LK)              :: array       !! flag when searching for array index in `path`
+    type(json_value),pointer :: tmp         !! temp variables for getting child objects
+    logical(LK)              :: child_found !! if the child value was found
+    logical(LK)              :: create      !! if the object is to be created
+    logical(LK)              :: created     !! if `create` is true, then this will be
+                                            !! true if the leaf object had to be created
+    integer(IK)              :: j           !! counter of children when creating object
 
     nullify(p)
 
@@ -5756,7 +5806,7 @@
                         !  What about the case: aaa.bbb(1)(3) ?
                         !  Is that already handled?
 
-                        if (p%var_type==json_null) then
+                        if (p%var_type==json_null) then             ! (**)
                             ! if p was also created, then we need to
                             ! convert it into an object here:
                             p%var_type = json_object
@@ -5805,7 +5855,7 @@
                     call json%get_child(p, child_i, tmp, child_found)
                     if (.not. child_found) then
 
-                        if (p%var_type==json_null) then
+                        if (p%var_type==json_null) then            ! (**)
                             ! if p was also created, then we need to
                             ! convert it into an array here:
                             p%var_type = json_array
@@ -5848,11 +5898,12 @@
                     if (child_i < i) then
                         nullify(tmp)
                         if (create) then
-                            if (p%var_type==json_null) then
+                            if (p%var_type==json_null) then            ! (**)
                                 ! if p was also created, then we need to
                                 ! convert it into an object here:
                                 p%var_type = json_object
                             end if
+
                             ! don't want to throw exceptions in this case
                             call json%get_child(p, path(child_i:i-1), tmp, child_found)
                             if (.not. child_found) then
@@ -5903,11 +5954,12 @@
             if (child_i <= length) then
                 nullify(tmp)
                 if (create) then
-                    if (p%var_type==json_null) then
+                    if (p%var_type==json_null) then            ! (**)
                         ! if p was also created, then we need to
                         ! convert it into an object here:
                         p%var_type = json_object
                     end if
+
                     call json%get_child(p, path(child_i:i-1), tmp, child_found)
                     if (.not. child_found) then
                         ! have to create this child
@@ -5975,14 +6027,17 @@
 !### Example
 !
 !````fortran
+!    type(json_core) :: json
 !    type(json_value),pointer :: dat,p
 !    logical :: found
 !    !...
+!    call json%initialize(path_mode=2)
 !    call json%get(dat,'/data/2/version',p,found)
 !````
 !
 !### See also
-!  * [[json_get_by_path_default]] - alternate version with different path convention.
+!  * [[json_get_by_path_default]]
+!  * [[json_get_by_path_jsonpath_bracket]]
 !
 !### Reference
 !  * [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
@@ -5997,6 +6052,9 @@
 !         (according to the standard, evaluation of non-unique references
 !         should fail). Like [[json_get_by_path_default]], this one will just return
 !         the first instance it encounters. This might be changed in the future.
+!
+!@warning I think the standard indicates that the input paths should use
+!         escaped JSON strings (currently we are assuming they are not escaped).
 
     subroutine json_get_by_path_rfc6901(json, me, path, p, found)
 
@@ -6161,6 +6219,426 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!> author: Jacob Williams
+!  date: 9/2/2017
+!
+!  Returns the [[json_value]] pointer given the path string,
+!  using the "JSON Pointer" path specification defined by the
+!  JSONPath "bracket-notation".
+!
+!  The first character `$` is optional, and signifies the root
+!  of the structure. If it is not present, then the first key
+!  is taken to be in the `me` object.
+!
+!  Single or double quotes may be used
+!
+!### Example
+!
+!````fortran
+!    type(json_core) :: json
+!    type(json_value),pointer :: dat,p
+!    logical :: found
+!    !...
+!    call json%initialize(path_mode=3)
+!    call json%get(dat,"$['store']['book'][1]['title']",p,found)
+!````
+!
+!### See also
+!  * [[json_get_by_path_default]]
+!  * [[json_get_by_path_rfc6901]]
+!
+!### Reference
+!  * [JSONPath](http://goessner.net/articles/JsonPath/)
+!
+!@note Uses 1-based array indices (same as [[json_get_by_path_default]],
+!      but unlike [[json_get_by_path_rfc6901]] which uses 0-based indices).
+!
+!@note When `create_it=True`, if the variable already exists and is a type
+!      that is not compatible with the usage in the `path`, then it is
+!      destroyed and replaced with what is specified in the `path`. Note that
+!      this applies the all variables in the path as it is created. Currently,
+!      this behavior is different from [[json_get_by_path_default]].
+!
+!@note JSON `null` values are used here for unknown variables
+!      when `create_it` is True.
+!
+!@warning Note that if using single quotes, this routine cannot parse
+!         a key containing `']`. If using double quotes, this routine
+!         cannot parse a key containing `"]`. If the key contains both
+!         `']` and `"]`, there is no way to parse it using this routine.
+
+    subroutine json_get_by_path_jsonpath_bracket(json,me,path,p,found,create_it,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me          !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path        !! path to the variable
+                                                        !! (using JSONPath
+                                                        !! "bracket-notation")
+    type(json_value),pointer,intent(out) :: p           !! pointer to the variable
+                                                        !! specify by `path`
+    logical(LK),intent(out),optional     :: found       !! true if it was found
+    logical(LK),intent(in),optional      :: create_it   !! if a variable is not present
+                                                        !! in the path, then it is created.
+                                                        !! the leaf node is returned as
+                                                        !! a `null` json type and can be
+                                                        !! changed by the caller.
+    logical(LK),intent(out),optional     :: was_created !! if `create_it` is true, this
+                                                        !! will be true if the variable
+                                                        !! was actually created. Otherwise
+                                                        !! it will be false.
+
+    character(kind=CK,len=:),allocatable :: token  !! a token in the path
+                                                   !! (between the `['']` or
+                                                   !! `[]` characters)
+    integer(IK)              :: istart             !! location of current '['
+                                                   !! character in the path
+    integer(IK)              :: iend               !! location of current ']'
+                                                   !! character in the path
+    integer(IK)              :: ival               !! integer array index value
+    logical(LK)              :: status_ok          !! error flag
+    type(json_value),pointer :: tmp                !! temporary variable for
+                                                   !! traversing the structure
+    integer(IK)              :: i                  !! counter
+    integer(IK)              :: ilen               !! length of `path` string
+    logical(LK)              :: double_quotes      !! if the keys are enclosed in `"`,
+                                                   !! rather than `'` tokens.
+    logical(LK)              :: create             !! if the object is to be created
+    logical(LK)              :: created            !! if `create` is true, then this will be
+                                                   !! true if the leaf object had to be created
+    integer(IK)              :: j                  !! counter of children when creating object
+
+    !TODO instead of reallocating `token` all the time, just
+    !     allocate a big size and keep track of the length,
+    !     then just reallocate only if necessary.
+    !     [would probably be inefficient if there was a very large token,
+    !     and then a bunch of small ones... but for similarly-sized ones
+    !     it should be way more efficient since it would avoid most
+    !     reallocations.]
+
+    nullify(p)
+
+    if (.not. json%exception_thrown) then
+
+        if (present(create_it)) then
+            create = create_it
+        else
+            create = .false.
+        end if
+
+        p => me ! initialize
+        created = .false.
+
+        if (path==CK_'') then
+            call json%throw_exception('Error in json_get_by_path_jsonpath_bracket: '//&
+                                      'invalid path specification: '//trim(path))
+        else
+
+            if (path(1:1)==root .or. path(1:1)==start_array) then ! the first character must be
+                                                                  ! a `$` (root) or a `[`
+                                                                  ! (element of `me`)
+
+                if (path(1:1)==root) then
+                    ! go to the root
+                    do while (associated (p%parent))
+                        p => p%parent
+                    end do
+                    if (create) created = .false. ! should always exist
+                end if
+
+                !path length (don't need trailing spaces:)
+                ilen = len_trim(path)
+
+                if (ilen>1) then
+
+                    istart = 2   ! initialize first '[' location index
+
+                    do
+
+                        if (istart>ilen) exit  ! finished
+
+                        ! must be the next start bracket:
+                        if (path(istart:istart) /= start_array) then
+                            call json%throw_exception(&
+                                    'Error in json_get_by_path_jsonpath_bracket: '//&
+                                    'expecting "[", found: "'//trim(path(istart:istart))//&
+                                    '" in path: '//trim(path))
+                            exit
+                        end if
+
+                        ! get the next token by checking:
+                        !
+                        ! * [''] -- is the token after istart a quote?
+                        !           if so, then search for the next `']`
+                        !
+                        ! * [1] -- if not, then maybe it is a number,
+                        !          so search for the next `]`
+
+                        ! verify length of remaining string
+                        if (istart+2<=ilen) then
+
+                            double_quotes = path(istart+1:istart+1) == quotation_mark   ! ["
+
+                            if (double_quotes .or. path(istart+1:istart+1)==single_quote) then  ! ['
+
+                                ! it might be a key value: ['abc']
+
+                                istart = istart + 1 ! move counter to ' index
+                                if (double_quotes) then
+                                    iend = istart + index(path(istart+1:ilen),&
+                                           quotation_mark//end_array)  ! "]
+                                else
+                                    iend = istart + index(path(istart+1:ilen),&
+                                           single_quote//end_array)  ! ']
+                                end if
+                                if (iend>istart) then
+
+                                    !     istart  iend
+                                    !       |       |
+                                    ! ['p']['abcdefg']
+
+                                    if (iend>istart+1) then
+                                        token = path(istart+1:iend-1)
+                                    else
+                                        token = CK_''  ! blank string
+                                    end if
+                                    ! remove trailing spaces in
+                                    ! the token here if necessary:
+                                    if (.not. json%trailing_spaces_significant) &
+                                        token = trim(token)
+
+                                    if (create) then
+                                        ! have a token, create it if necessary
+
+                                        ! we need to convert it into an object here
+                                        ! (e.g., if p was also just created)
+                                        ! and destroy its data to prevent a memory leak
+                                        call json%convert(p,json_object)
+
+                                        ! don't want to throw exceptions in this case
+                                        call json%get_child(p,token,tmp,status_ok)
+                                        if (.not. status_ok) then
+                                            ! have to create this child
+                                            ! [make it a null since we don't
+                                            ! know what it is yet]
+                                            call json_value_create(tmp)
+                                            call to_null(tmp,token)
+                                            call json%add(p,tmp)
+                                            status_ok = .true.
+                                            created = .true.
+                                        else
+                                            ! it was already there.
+                                            created = .false.
+                                        end if
+                                    else
+                                        ! have a token, see if it is valid:
+                                        call json%get_child(p,token,tmp,status_ok)
+                                    end if
+
+                                    if (status_ok) then
+                                        ! it was found
+                                        p => tmp
+                                    else
+                                        call json%throw_exception(&
+                                                'Error in json_get_by_path_jsonpath_bracket: '//&
+                                                'invalid token found: "'//token//&
+                                                '" in path: '//trim(path))
+                                        exit
+                                    end if
+                                    iend = iend + 1 ! move counter to ] index
+                                else
+                                    call json%throw_exception(&
+                                            'Error in json_get_by_path_jsonpath_bracket: '//&
+                                            'invalid path: '//trim(path))
+                                    exit
+                                end if
+
+                            else
+
+                                ! it might be an integer value: [123]
+
+                                iend = istart + index(path(istart+1:ilen),end_array)   ! ]
+                                if (iend>istart+1) then
+
+                                    ! this should be an integer:
+                                    token = path(istart+1:iend-1)
+
+                                    ! verify that there are no spaces or other
+                                    ! characters in the string:
+                                    do i=1,len(token)
+                                        ! It must only contain (0..9) characters
+                                        ! (it must be unsigned)
+                                        if (scan(token(i:i),CK_'0123456789')<1) then
+                                            status_ok = .false.
+                                            exit
+                                        end if
+                                    end do
+                                    if (status_ok) then
+                                        call string_to_integer(token,ival,status_ok)
+                                        if (status_ok) status_ok = ival>0  ! assuming 1-based array indices
+                                    end if
+
+                                    if (status_ok) then
+
+                                        ! have a valid integer to use as an index
+                                        ! see if this element is really there:
+                                        call json%get_child(p,ival,tmp,status_ok)
+
+                                        if (create .and. .not. status_ok) then
+
+                                            ! have to create it:
+
+                                            if (.not.(p%var_type==json_object .or. p%var_type==json_array)) then
+                                                ! we need to convert it into an array here
+                                                ! (e.g., if p was also just created)
+                                                ! and destroy its data to prevent a memory leak
+                                                call json%convert(p,json_array)
+                                            end if
+
+                                            ! have to create this element
+                                            ! [make it a null]
+                                            ! (and any missing ones before it)
+                                            do j = 1, ival
+                                                nullify(tmp)
+                                                call json%get_child(p, j, tmp, status_ok)
+                                                if (.not. status_ok) then
+                                                    call json_value_create(tmp)
+                                                    call to_null(tmp)  ! array element doesn't need a name
+                                                    call json%add(p,tmp)
+                                                    if (j==ival) created = .true.
+                                                else
+                                                    if (j==ival) created = .false.
+                                                end if
+                                            end do
+                                            status_ok = .true.
+
+                                        else
+                                            created = .false.
+                                        end if
+
+                                        if (status_ok) then
+                                            ! found it
+                                            p => tmp
+                                        else
+                                            ! not found
+                                            call json%throw_exception(&
+                                                    'Error in json_get_by_path_jsonpath_bracket: '//&
+                                                    'invalid array index found: "'//token//&
+                                                    '" in path: '//trim(path))
+                                            exit
+                                        end if
+                                    else
+                                        call json%throw_exception(&
+                                                'Error in json_get_by_path_jsonpath_bracket: '//&
+                                                'invalid token: "'//token//&
+                                                '" in path: '//trim(path))
+                                        exit
+                                    end if
+
+                                else
+                                    call json%throw_exception(&
+                                            'Error in json_get_by_path_jsonpath_bracket: '//&
+                                            'invalid path: '//trim(path))
+                                    exit
+                                end if
+
+                            end if
+
+                        else
+                            call json%throw_exception(&
+                                    'Error in json_get_by_path_jsonpath_bracket: '//&
+                                    'invalid path: '//trim(path))
+                            exit
+                        end if
+
+                        ! set up for next token:
+                        istart = iend + 1
+
+                    end do
+
+                end if
+
+            else
+                call json%throw_exception(&
+                        'Error in json_get_by_path_jsonpath_bracket: '//&
+                        'expecting "'//root//'", found: "'//path(1:1)//&
+                        '" in path: '//trim(path))
+            end if
+
+        end if
+
+        if (json%exception_thrown) then
+            nullify(p)
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+        else
+            if (present(found)) found = .true.
+        end if
+
+        ! if it had to be created:
+        if (present(was_created)) was_created = created
+
+    else
+        if (present(found)) found = .false.
+        if (present(was_created)) was_created = .false.
+    end if
+
+    end subroutine json_get_by_path_jsonpath_bracket
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Convert an existing JSON variable `p` to a different variable type.
+!  The existing variable (and its children) is destroyed. It is replaced
+!  in the structure by a new variable of type `var_type`
+!  (which can be a `json_null`, `json_object` or `json_array`).
+!
+!@note This is an internal routine used when creating variables by path.
+
+    subroutine convert(json,p,var_type)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer :: p  !! the variable to convert
+    integer(IK),intent(in) :: var_type !! the variable type to convert `p` to
+
+    type(json_value),pointer :: tmp  !! temporary variable
+    character(kind=CK,len=:),allocatable :: name !! the name of a JSON variable
+
+    logical :: convert_it  !! if `p` needs to be converted
+
+    convert_it = p%var_type /= var_type
+
+    if (convert_it) then
+
+        call json%info(p,name=name) ! get existing name
+
+        select case (var_type)
+        case(json_object)
+            call json%create_object(tmp,name)
+        case(json_array)
+            call json%create_array(tmp,name)
+        case(json_null)
+            call json%create_null(tmp,name)
+        case default
+            call json%throw_exception('Error in convert: invalid var_type value.')
+            return
+        end select
+
+        call json%replace(p,tmp,destroy=.true.)
+        p => tmp
+        nullify(tmp)
+
+    end if
+
+    end subroutine convert
+!*****************************************************************************************
+
+!*****************************************************************************************
 !>
 !  Alternate version of [[json_get_by_path]] where "path" is kind=CDK.
 
@@ -6194,6 +6672,12 @@
 !
 !@note If `json%path_mode/=1`, then the `use_alt_array_tokens`
 !      and `path_sep` inputs are ignored if present.
+!
+!@note [http://goessner.net/articles/JsonPath/](JSONPath) (`path_mode=3`)
+!      does not specify whether or not the keys should be escaped (this routine
+!      assumes not, as does http://jsonpath.com).
+!      Also, we are using Fortran-style 1-based array indices,
+!      not 0-based, to agree with the assumption in `path_mode=1`
 
     subroutine json_get_path(json, p, path, found, use_alt_array_tokens, path_sep)
 
@@ -6205,15 +6689,18 @@
     logical(LK),intent(out),optional                 :: found !! true if there were no problems
     logical(LK),intent(in),optional :: use_alt_array_tokens   !! if true, then '()' are used for array elements
                                                               !! otherwise, '[]' are used [default]
+                                                              !! (only used if `path_mode=1`)
     character(kind=CK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
                                                               !! (otherwise use `json%path_separator`)
+                                                              !! (only used if `path_mode=1`)
 
     type(json_value),pointer                   :: tmp            !! for traversing the structure
     type(json_value),pointer                   :: element        !! for traversing the structure
     integer(IK)                                :: var_type       !! JSON variable type flag
     character(kind=CK,len=:),allocatable       :: name           !! variable name
     character(kind=CK,len=:),allocatable       :: parent_name    !! variable's parent name
-    character(kind=CK,len=max_integer_str_len) :: istr           !! for integer to string conversion (array indices)
+    character(kind=CK,len=max_integer_str_len) :: istr           !! for integer to string conversion
+                                                                 !! (array indices)
     integer(IK)                                :: i              !! counter
     integer(IK)                                :: n_children     !! number of children for parent
     logical(LK)                                :: use_brackets   !! to use '[]' characters for arrays
@@ -6236,7 +6723,7 @@
 
             !get info about the current variable:
             call json%info(tmp,name=name)
-            if (json%path_mode==2) then
+            if (json%path_mode==2_IK) then
                 name = encode_rfc6901(name)
             end if
 
@@ -6246,7 +6733,7 @@
                 !get info about the parent:
                 call json%info(tmp%parent,var_type=var_type,&
                                n_children=n_children,name=parent_name)
-                if (json%path_mode==2) then
+                if (json%path_mode==2_IK) then
                     parent_name = encode_rfc6901(parent_name)
                 end if
 
@@ -6273,10 +6760,20 @@
                         end if
                     end do
                     select case(json%path_mode)
-                    case(2)
+                    case(3_IK)
+                        ! JSONPath "bracket-notation"
+                        ! example: `$['key'][1]`
+                        ! [note: this uses 1-based indices]
+                        call integer_to_string(i,int_fmt,istr)
+                        call add_to_path(start_array//single_quote//parent_name//&
+                                         single_quote//end_array//&
+                                         start_array//trim(adjustl(istr))//end_array,CK_'')
+                    case(2_IK)
+                        ! rfc6901
                         call integer_to_string(i-1,int_fmt,istr) ! 0-based index
                         call add_to_path(parent_name//slash//trim(adjustl(istr)))
-                    case(1)
+                    case(1_IK)
+                        ! default
                         call integer_to_string(i,int_fmt,istr)
                         if (use_brackets) then
                             call add_to_path(parent_name//start_array//&
@@ -6291,7 +6788,13 @@
                 case (json_object)
 
                     !process parent on the next pass
-                    call add_to_path(name,path_sep)
+                    select case(json%path_mode)
+                    case(3_IK)
+                        call add_to_path(start_array//single_quote//name//&
+                                         single_quote//end_array,CK_'')
+                    case default
+                        call add_to_path(name,path_sep)
+                    end select
 
                 case default
 
@@ -6305,7 +6808,13 @@
 
             else
                 !the last one:
-                call add_to_path(name,path_sep)
+                select case(json%path_mode)
+                case(3_IK)
+                    call add_to_path(start_array//single_quote//name//&
+                                     single_quote//end_array,CK_'')
+                case default
+                    call add_to_path(name,path_sep)
+                end select
             end if
 
             if (associated(tmp%parent)) then
@@ -6328,10 +6837,14 @@
     if (json%exception_thrown .or. .not. allocated(path)) then
         path = CK_''
     else
-        if (json%path_mode==2) then
+        select case (json%path_mode)
+        case(3_IK)
+            ! add the outer level object identifier:
+            path = root//path
+        case(2_IK)
             ! add the root slash:
             path = slash//path
-        end if
+        end select
     end if
 
     !optional output:
@@ -6355,14 +6868,21 @@
             !! (ignored if `json%path_mode/=1`)
 
         select case (json%path_mode)
-        case(2)
+        case(3_IK)
+            ! in this case, the options are ignored
+            if (.not. allocated(path)) then
+                path = str
+            else
+                path = str//path
+            end if
+        case(2_IK)
             ! in this case, the options are ignored
             if (.not. allocated(path)) then
                 path = str
             else
                 path = str//slash//path
             end if
-        case(1)
+        case(1_IK)
             ! default path format
             if (.not. allocated(path)) then
                 path = str

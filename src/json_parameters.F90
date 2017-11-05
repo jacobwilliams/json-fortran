@@ -52,6 +52,7 @@
     character(kind=CK,len=*),parameter :: dot             = CK_'.'  !! for [[json_get_by_path]]
     character(kind=CK,len=*),parameter :: tilde           = CK_'~'  !! RFC 6901 escape character
     character(kind=CK,len=*),parameter :: percent         = CK_'%'  !! Fortran path separator
+    character(kind=CK,len=*),parameter :: single_quote    = CK_"'"  !! for JSONPath bracket-notation
     character(kind=CK,len=*),parameter :: bspace          = achar(8,  kind=CK)
     character(kind=CK,len=*),parameter :: horizontal_tab  = achar(9,  kind=CK)
     character(kind=CK,len=*),parameter :: newline         = achar(10, kind=CK)
