@@ -237,6 +237,13 @@
                                                      !! will also check for duplicates. If True
                                                      !! [default] then no special checks are done
 
+        logical(LK) :: escape_solidus = .false.   !! If True then the solidus "`/`" is always escaped
+                                                  !! ("`\/`") when serializing JSON.
+                                                  !! If False [default], then it is not escaped.
+                                                  !! Note that this option does not affect parsing
+                                                  !! (both escaped and unescaped versions are still
+                                                  !! valid in all cases).
+
         contains
 
         private
@@ -792,7 +799,8 @@
                                   path_mode,&
                                   path_separator,&
                                   compress_vectors,&
-                                  allow_duplicate_keys) result(json_core_object)
+                                  allow_duplicate_keys,&
+                                  escape_solidus) result(json_core_object)
 
     implicit none
 
@@ -810,7 +818,8 @@
                                 path_mode,&
                                 path_separator,&
                                 compress_vectors,&
-                                allow_duplicate_keys)
+                                allow_duplicate_keys,&
+                                escape_solidus)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -845,7 +854,8 @@
                                path_mode,&
                                path_separator,&
                                compress_vectors,&
-                               allow_duplicate_keys)
+                               allow_duplicate_keys,&
+                               escape_solidus)
 
     implicit none
 
@@ -921,6 +931,11 @@
     ! checking for duplicate keys:
     if (present(allow_duplicate_keys)) then
         me%allow_duplicate_keys = allow_duplicate_keys
+    end if
+
+    ! if escaping the forward slash:
+    if (present(escape_solidus)) then
+        me%escape_solidus = escape_solidus
     end if
 
     !Set the format for real numbers:
@@ -1975,7 +1990,7 @@
                 if (associated(child)) then
                     p%children => p%children%next
                     p%n_children = p%n_children - 1
-                    call json_value_destroy(json,child,.false.)
+                    call json%destroy(child,.false.)
                 else
                     call json%throw_exception('Error in json_value_destroy: '//&
                                               'Malformed JSON linked list')
@@ -1986,7 +2001,7 @@
             nullify(child)
         end if
 
-        if (associated(p%next) .and. des_next) call json_value_destroy(json,p%next)
+        if (associated(p%next) .and. des_next) call json%destroy(p%next)
 
         if (associated(p%previous)) nullify(p%previous)
         if (associated(p%parent))   nullify(p%parent)
@@ -2418,7 +2433,6 @@
     logical(LK) :: has_duplicate !! to check for duplicate keys
     character(kind=CK,len=:),allocatable :: path  !! path to duplicate key
     logical(LK) :: status_ok !! to check for existing exception
-    logical(LK) :: status_ok2 !! to check for a new exception
     character(kind=CK,len=:),allocatable :: exception_msg  !! error message for an existing exception
     character(kind=CK,len=:),allocatable :: exception_msg2  !! error message for a new exception
 
@@ -5257,7 +5271,7 @@
 
                     ! print the name
                     if (allocated(element%name)) then
-                        call escape_string(element%name,str_escaped)
+                        call escape_string(element%name,str_escaped,json%escape_solidus)
                         if (json%no_whitespace) then
                             !compact printing - no extra space
                             call write_it(repeat(space, spaces)//quotation_mark//&
@@ -5384,7 +5398,7 @@
 
             if (allocated(p%str_value)) then
                 ! have to escape the string for printing:
-                call escape_string(p%str_value,str_escaped)
+                call escape_string(p%str_value,str_escaped,json%escape_solidus)
                 call write_it( s//quotation_mark// &
                                str_escaped//quotation_mark, &
                                comma=print_comma, &
@@ -6863,7 +6877,7 @@
         !! prepend the string to the path
         implicit none
         character(kind=CK,len=*),intent(in) :: str  !! string to prepend to `path`
-        character(kind=CK,len=1),intent(in),optional :: path_sep
+        character(kind=CK,len=*),intent(in),optional :: path_sep
             !! path separator (default is '.').
             !! (ignored if `json%path_mode/=1`)
 
@@ -7678,7 +7692,7 @@
                     value = me%str_value
                 else
                     ! return the escaped version:
-                    call escape_string(me%str_value, value)
+                    call escape_string(me%str_value, value, json%escape_solidus)
                 end if
             else
                call json%throw_exception('Error in json_get_string: '//&

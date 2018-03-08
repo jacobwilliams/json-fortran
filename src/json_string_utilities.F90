@@ -293,12 +293,14 @@
 !
 !  Add the escape characters to a string for adding to JSON.
 
-    subroutine escape_string(str_in, str_out)
+    subroutine escape_string(str_in, str_out, escape_solidus)
 
     implicit none
 
     character(kind=CK,len=*),intent(in)              :: str_in
     character(kind=CK,len=:),allocatable,intent(out) :: str_out
+    logical(LK),intent(in) :: escape_solidus  !! if the solidus (forward slash)
+                                              !! is also to be escaped
 
     integer(IK) :: i    !! counter
     integer(IK) :: ipos !! accumulated string size
@@ -308,20 +310,29 @@
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp !! workaround for bug in gfortran 6.1
 #endif
+    logical :: to_be_escaped !! if there are characters to be escaped
 
-    character(kind=CK,len=*),parameter :: specials = quotation_mark//&
+    character(kind=CK,len=*),parameter :: specials_no_slash = quotation_mark//&
                                                      backslash//&
-                                                     slash//&
                                                      bspace//&
                                                      formfeed//&
                                                      newline//&
                                                      carriage_return//&
                                                      horizontal_tab
 
+    character(kind=CK,len=*),parameter :: specials = specials_no_slash//slash
+
+
     !Do a quick scan for the special characters,
     ! if any are present, then process the string,
     ! otherwise, return the string as is.
-    if (scan(str_in,specials)>0) then
+    if (escape_solidus) then
+        to_be_escaped = scan(str_in,specials)>0
+    else
+        to_be_escaped = scan(str_in,specials_no_slash)>0
+    end if
+
+    if (to_be_escaped) then
 
         str_out = repeat(space,chunk_size)
         ipos = 1
@@ -351,9 +362,14 @@
                 str_out(ipos:ipos+1) = backslash//c
                 ipos = ipos + 2
 
-            case(quotation_mark,slash)
+            case(quotation_mark)
                 str_out(ipos:ipos+1) = backslash//c
                 ipos = ipos + 2
+            case(slash)
+                if (escape_solidus) then
+                    str_out(ipos:ipos+1) = backslash//c
+                    ipos = ipos + 2
+                end if
             case(bspace)
                 str_out(ipos:ipos+1) = '\b'
                 ipos = ipos + 2
