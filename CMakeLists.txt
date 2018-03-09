@@ -135,14 +135,18 @@ add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
 set_target_properties ( ${LIB_NAME}-static
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
+  if(NOT MSVC_IDE)
   PREFIX lib
+  endif()
   VERSION ${VERSION}
   ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
   Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
 set_target_properties ( ${LIB_NAME}
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
+  if(NOT MSVC_IDE)
   PREFIX lib
+  endif()
   SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR}
   VERSION ${VERSION}
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
@@ -277,6 +281,9 @@ if ( ENABLE_TESTS )
   set ( UNIT_TESTS '' )
   foreach ( UNIT_TEST ${JF_TEST_SRCS} )
     get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
+    if(MSVC_IDE)
+    link_directories(${CMAKE_BINARY_DIR}/lib)
+    endif()
     add_executable ( ${TEST} EXCLUDE_FROM_ALL ${UNIT_TEST} )
     target_link_libraries ( ${TEST} ${LIB_NAME} )
     add_dependencies ( check ${TEST} )
@@ -412,3 +419,8 @@ install(FILES
    "${CMAKE_CURRENT_BINARY_DIR}/json-fortran.pc"
    DESTINATION "${INSTALL_LIB_DIR}/pkgconfig"
 )
+
+if(MSVC_IDE)
+   INCLUDE_DIRECTORIES("src")
+   SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
+endif()
