@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.2.0 (2018-03-10)](#620-2018-03-10)
     - [6.1.0 (2017-11-05)](#610-2017-11-05)
     - [6.0.0 (2017-08-24)](#600-2017-08-24)
     - [5.3.0 (2017-04-07)](#530-2017-04-07)
@@ -24,7 +25,22 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.1.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.2.0...HEAD)
+
+### [6.2.0](https://github.com/jacobwilliams/json-fortran/tree/6.2.0) (2018-03-10)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.1.0...6.2.0)
+or [Download v6.2.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.2.0)
+
+**Enhancements:**
+
+- Allow the unit tests to be run from within the Visual Studio solution [\#295](https://github.com/jacobwilliams/json-fortran/issues/295) ([Hugh-walsh](https://github.com/Hugh-walsh), [jacobwilliams](https://github.com/jacobwilliams))
+- Compiling now works for the CMake-produced Visual Studio solution on Windows (note that the CMake-produced solution is a bit different from the other one provided). [\#70](https://github.com/jacobwilliams/json-fortran/issues/70) [\#309](https://github.com/jacobwilliams/json-fortran/pull/309) ([handrake0724](https://github.com/handrake0724), [jacobwilliams](https://github.com/jacobwilliams))
+- Added a new option `escape_solidus` to specify if the forward slash ("`/`") is to be escaped when serializing JSON. By default, it is no longer escaped (this changes the behavior introduced in 6.0.0) [\#304](https://github.com/jacobwilliams/json-fortran/issues/304) [\#305](https://github.com/jacobwilliams/json-fortran/pull/305) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fixed an issue causing a problem with the NAG compiler [\#303](https://github.com/jacobwilliams/json-fortran/issues/303) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.1.0](https://github.com/jacobwilliams/json-fortran/tree/6.1.0) (2017-11-05)
 

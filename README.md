@@ -96,8 +96,7 @@ Currently, several ways are provided to build the JSON-fortran library
 
 * A [CMake](http://www.cmake.org) build
 system is provided. This build system has been tested on Mac and Linux
-using the Intel Fortran Compiler, gfortran 4.9, and NAG Fortran 6.0. It has not been
-tested on Windows. This CMake based build provides an install target,
+using the Intel Fortran Compiler, gfortran 4.9, and NAG Fortran 6.0. It does also work on Windows (but note that the Visual Studio project it generates is not quite the same as the one mentioned above). This CMake based build provides an install target,
 and exports from both the install location and the build location so
 that building and using JSON-Fortran in another CMake based project is
 trivial. To get started with the CMake based build, set the
@@ -114,7 +113,7 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 6.1.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 6.2.0 REQUIRED )
 include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
