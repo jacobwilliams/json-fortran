@@ -22,7 +22,7 @@ contains
     type(json_core) :: json_c
     integer :: i
 
-    character(kind=CK,len=*),parameter :: str = CK_'{"vars":{"a/first":1,"a\/second":2}}'
+    character(kind=CK,len=*),parameter :: str = CK_'{"vars":{"a/first":1,"a\/second":2,"a\\b\\c\/third/blah/blah":3}}'
     character(len=*),dimension(2),parameter :: tf = ['True ','False']
 
     error_cnt = 0

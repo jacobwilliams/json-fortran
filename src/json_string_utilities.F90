@@ -369,6 +369,9 @@
                 if (escape_solidus) then
                     str_out(ipos:ipos+1) = backslash//c
                     ipos = ipos + 2
+                else
+                    str_out(ipos:ipos) = c
+                    ipos = ipos + 1
                 end if
             case(bspace)
                 str_out(ipos:ipos+1) = '\b'
