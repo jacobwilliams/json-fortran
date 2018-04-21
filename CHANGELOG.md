@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.3.0 (2018-04-20)](#630-2018-04-20)
     - [6.2.0 (2018-03-10)](#620-2018-03-10)
     - [6.1.0 (2017-11-05)](#610-2017-11-05)
     - [6.0.0 (2017-08-24)](#600-2017-08-24)
@@ -25,7 +26,22 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.2.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.3.0...HEAD)
+
+### [6.3.0](https://github.com/jacobwilliams/json-fortran/tree/6.3.0) (2018-04-20)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.2.0...6.3.0)
+or [Download v6.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.3.0)
+
+**Enhancements:**
+
+- Add a FoBiS configuration file that can be used to build the library, tests, and documentation. [\#310](https://github.com/jacobwilliams/json-fortran/issues/310) [\#311](https://github.com/jacobwilliams/json-fortran/pull/311) ([jacobwilliams](https://github.com/jacobwilliams))
+- CMake produced Visual Studio Project [\#70](https://github.com/jacobwilliams/json-fortran/issues/70) ([jacobwilliams](https://github.com/jacobwilliams))
+- Minor changes: renamed some of the example files and reverted back to older versions of FoBiS and markdown for documentation building on Travis-CI [\#313](https://github.com/jacobwilliams/json-fortran/pull/313) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fixed a bug in the escaping logic where `/` characters in strings would not be printed under some circumstances. This bug was introduced in the 6.2.0 release. [\#312](https://github.com/jacobwilliams/json-fortran/issues/312) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.2.0](https://github.com/jacobwilliams/json-fortran/tree/6.2.0) (2018-03-10)
 
