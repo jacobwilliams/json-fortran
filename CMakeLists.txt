@@ -301,9 +301,9 @@ if ( ENABLE_TESTS )
     endif()
   endforeach ( UNIT_TEST )
 
-  set_property ( TEST jf_test_3
+  set_property ( TEST jf_test_03
     APPEND
-    PROPERTY DEPENDS jf_test_2 )
+    PROPERTY DEPENDS jf_test_02 )
 
   # Validate output
   if ( JSONLINT )
