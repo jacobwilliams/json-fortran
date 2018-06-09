@@ -918,8 +918,6 @@
     character(kind=CK,len=*),intent(in)  :: name   !! the new name
     logical(LK),intent(out),optional     :: found  !! if the variable was found
 
-    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
-
     call me%json_file_rename(to_unicode(path),name,found)
 
     end subroutine json_file_rename_path_ascii
