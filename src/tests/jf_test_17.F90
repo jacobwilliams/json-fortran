@@ -7,7 +7,7 @@
 
 module jf_test_17_mod
 
-    use json_module, CK => json_CK
+    use json_module, CK => json_CK, CDK => json_CDK
     use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
     implicit none
@@ -24,6 +24,11 @@ contains
 
     type(json_core) :: json
     type(json_value),pointer :: p,q
+    type(json_file) :: f
+
+    character(kind=CK,len=*),parameter :: json_string = &
+        '{"city": ["New York","Los Angeles","Chicago"], '//&
+        '"value": 1, "iflag": true, "struct":{"vec":[1,2,3]}}'
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -35,8 +40,7 @@ contains
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Original:'
-    call json%parse(p, '{"city": ["New York","Los Angeles","Chicago"], '//&
-                       '"value": 1, "iflag": true, "struct":{"vec":[1,2,3]}}')
+    call json%parse(p, json_string)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -46,13 +50,16 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Rename: "city" to "cities"'
     call json%get(p,'city',q)
-    call json%rename(q,'cities')
+    call json%rename(q,'cities')     ! also test the unicode ones
+    call json%rename(q,CK_'cities')
+    call json%rename(q,CDK_'cities')
     call json%print(p,output_unit)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
     nullify(q)
+
     !verify that it was renamed:
     call json%get(p,'cities',q)
     if (json%failed()) then
@@ -63,8 +70,51 @@ contains
     end if
     nullify(q)
 
+    ! rename by specifying the path:
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'Rename: "iflag" to "flag"'
+    call json%rename_by_path(p,'iflag','flag')
+    call json%print(p,output_unit)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
+    call json%get(p,'flag',q)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        write(error_unit,'(A)') 'Success!'
+    end if
+    nullify(q)
+
+    ! unicode wrappers:
+    call json%rename_by_path(p,CK_'flag',  CK_'iflag')
+    call json%rename_by_path(p,CK_'iflag', CDK_'flag')
+    call json%rename_by_path(p,CDK_'flag', CK_'iflag')
+    call json%rename_by_path(p,CDK_'iflag',CDK_'flag')
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        write(error_unit,'(A)') 'Success!'
+    end if
+
     !cleanup:
     call json%destroy(p)
+
+    ! test the corresponding json_file version:
+    call f%load_from_string(json_string)
+    call f%rename(CK_'iflag',  CK_'flag')
+    call f%rename(CK_'flag',   CDK_'iflag')
+    call f%rename(CDK_'iflag', CK_'flag')
+    call f%rename(CDK_'flag',  CDK_'iflag')
+    if (f%failed()) then
+        call f%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        write(error_unit,'(A)') 'Success!'
+    end if
 
     end subroutine test_17
 
