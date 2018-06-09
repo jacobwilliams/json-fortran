@@ -102,6 +102,11 @@
 #endif
 
         !>
+        !  Verify that a path is valid
+        !  (i.e., a variable with this path exists in the file).
+        generic,public :: valid_path => MAYBEWRAP(json_file_valid_path)
+
+        !>
         !  Get a variable from a [[json_file(type)]], by specifying the path.
         generic,public :: get => MAYBEWRAP(json_file_get_object),      &
                                  MAYBEWRAP(json_file_get_integer),     &
@@ -168,6 +173,13 @@
         procedure,public :: traverse => json_file_traverse
 
         ! ***************************************************
+        ! operators
+        ! ***************************************************
+
+        generic,public :: operator(.in.) => MAYBEWRAP(json_file_valid_path_op)
+        procedure,pass(me) :: MAYBEWRAP(json_file_valid_path_op)
+
+        ! ***************************************************
         ! private routines
         ! ***************************************************
 
@@ -188,6 +200,9 @@
         procedure :: json_file_rename_path_ascii
         procedure :: json_file_rename_name_ascii
 #endif
+
+        !validate path:
+        procedure :: MAYBEWRAP(json_file_valid_path)
 
         !get:
         procedure :: MAYBEWRAP(json_file_get_object)
@@ -864,6 +879,92 @@
     p => me%p
 
     end subroutine json_file_get_root
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  A wrapper for [[json_file_valid_path]] for the `.in.` operator
+
+    function json_file_valid_path_op(path,me) result(found)
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in) :: path   !! the path to the variable
+    class(json_file),intent(in)         :: me     !! the JSON file
+    logical(LK)                         :: found  !! if the variable was found
+
+    type(json_core) :: core_copy !! a copy of `core` from `me`
+
+    ! This is sort of a hack. Since `me` has to have `intent(in)`
+    ! for the operator to work, we need to make a copy of `me%core`
+    ! so we can call the low level routine (since it needs it to
+    ! be `intent(inout)`) because it's technically possible for this
+    ! function to raise an exception. This normally should never
+    ! happen here unless the JSON structure is malformed.
+
+    core_copy = me%core ! copy the settings (need them to know
+                        ! how to interpret the path)
+
+    found = core_copy%valid_path(me%p, path) ! call the low-level routine
+
+    call core_copy%destroy() ! just in case (but not really necessary)
+
+    end function json_file_valid_path_op
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_valid_path_op]], where "path" is kind=CDK.
+
+    function wrap_json_file_valid_path_op(path,me) result(found)
+
+    implicit none
+
+    character(kind=CDK,len=*),intent(in) :: path   !! the path to the variable
+    class(json_file),intent(in)          :: me     !! the JSON file
+    logical(LK)                          :: found  !! if the variable was found
+
+    found = to_unicode(path) .in. me
+
+    end function wrap_json_file_valid_path_op
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Returns true if the `path` is present in the JSON file.
+
+    function json_file_valid_path(me,path) result(found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path   !! the path to the variable
+    logical(LK)                         :: found  !! if the variable was found
+
+    found = me%core%valid_path(me%p, path)
+
+    end function json_file_valid_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_valid_path]], where "path" is kind=CDK.
+
+    function wrap_json_file_valid_path(me,path) result(found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path   !! the path to the variable
+    logical(LK)                          :: found  !! if the variable was found
+
+    found = me%valid_path(to_unicode(path))
+
+    end function wrap_json_file_valid_path
 !*****************************************************************************************
 
 !*****************************************************************************************

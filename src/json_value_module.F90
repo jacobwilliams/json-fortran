@@ -666,6 +666,12 @@
         generic,public :: get_path => MAYBEWRAP(json_get_path)
         procedure :: MAYBEWRAP(json_get_path)
 
+        !>
+        !  verify if a path is valid
+        !  (i.e., a variable with this path exists in the file).
+        generic,public :: valid_path => MAYBEWRAP(json_valid_path)
+        procedure :: MAYBEWRAP(json_valid_path)
+
         procedure,public :: remove              => json_value_remove        !! Remove a [[json_value]] from a
                                                                             !! linked-list structure.
         procedure,public :: replace             => json_value_replace       !! Replace a [[json_value]] in a
@@ -5538,6 +5544,47 @@
 
 !*****************************************************************************************
 !>
+!  Returns true if the `path` is present in the `p` JSON structure.
+!
+!@note Just a wrapper for [[json_get_by_path]], so it uses the
+!      specified `path_mode` and other settings.
+
+    function json_valid_path(json, p, path) result(found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p      !! a JSON linked list
+    character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
+    logical(LK)                          :: found  !! true if it was found
+
+    type(json_value),pointer :: tmp  !! pointer to the variable specified by `path`
+
+    call json%get(p, path, tmp, found)
+
+    end function json_valid_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_valid_path]] where "path" is kind=CDK.
+
+    function wrap_json_valid_path(json, p, path) result(found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: p      !! a JSON linked list
+    character(kind=CDK,len=*),intent(in) :: path   !! path to the variable
+    logical(LK)                          :: found  !! true if it was found
+
+    found = json%valid_path(p, to_unicode(path))
+
+    end function wrap_json_valid_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
 !  Returns the [[json_value]] pointer given the path string.
 !
 !  It uses either of two methods:
@@ -5556,7 +5603,7 @@
     type(json_value),pointer,intent(in)  :: me     !! a JSON linked list
     character(kind=CK,len=*),intent(in)  :: path   !! path to the variable
     type(json_value),pointer,intent(out) :: p      !! pointer to the variable
-                                                   !! specify by `path`
+                                                   !! specified by `path`
     logical(LK),intent(out),optional     :: found  !! true if it was found
 
     character(kind=CK,len=max_integer_str_len),allocatable :: path_mode_str !! string version
@@ -5822,8 +5869,8 @@
 !  * [[json_get_by_path_jsonpath_bracket]]
 !
 !@note The syntax is inherited from FSON, and is basically a subset
-!      of JSONPath "dot-notation", with the addition allowance of () for
-!      array elements.
+!      of JSONPath "dot-notation", with the additional allowance of
+!      () for array elements.
 !
 !@note JSON `null` values are used here for unknown variables when `create_it` is True.
 !      So, it is possible that an existing null variable can be converted to another
