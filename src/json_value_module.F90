@@ -278,21 +278,21 @@
                                  json_value_add_string_vec_val_ascii
 #endif
 
-    procedure,private :: json_value_add_member
-    procedure,private :: MAYBEWRAP(json_value_add_integer)
-    procedure,private :: MAYBEWRAP(json_value_add_null)
-    procedure,private :: MAYBEWRAP(json_value_add_integer_vec)
-    procedure,private :: MAYBEWRAP(json_value_add_double)
-    procedure,private :: MAYBEWRAP(json_value_add_double_vec)
-    procedure,private :: MAYBEWRAP(json_value_add_logical)
-    procedure,private :: MAYBEWRAP(json_value_add_logical_vec)
-    procedure,private :: MAYBEWRAP(json_value_add_string)
-    procedure,private :: MAYBEWRAP(json_value_add_string_vec)
+        procedure,private :: json_value_add_member
+        procedure,private :: MAYBEWRAP(json_value_add_integer)
+        procedure,private :: MAYBEWRAP(json_value_add_null)
+        procedure,private :: MAYBEWRAP(json_value_add_integer_vec)
+        procedure,private :: MAYBEWRAP(json_value_add_double)
+        procedure,private :: MAYBEWRAP(json_value_add_double_vec)
+        procedure,private :: MAYBEWRAP(json_value_add_logical)
+        procedure,private :: MAYBEWRAP(json_value_add_logical_vec)
+        procedure,private :: MAYBEWRAP(json_value_add_string)
+        procedure,private :: MAYBEWRAP(json_value_add_string_vec)
 #ifdef USE_UCS4
-    procedure,private :: json_value_add_string_name_ascii
-    procedure,private :: json_value_add_string_val_ascii
-    procedure,private :: json_value_add_string_vec_name_ascii
-    procedure,private :: json_value_add_string_vec_val_ascii
+        procedure,private :: json_value_add_string_name_ascii
+        procedure,private :: json_value_add_string_val_ascii
+        procedure,private :: json_value_add_string_vec_name_ascii
+        procedure,private :: json_value_add_string_vec_val_ascii
 #endif
 
         !>
@@ -625,8 +625,16 @@
 
         !>
         !  Rename a [[json_value]] variable.
-        generic,public :: rename => MAYBEWRAP(json_value_rename)
+        generic,public :: rename => MAYBEWRAP(json_value_rename),&
+                                    MAYBEWRAP(json_rename_by_path)
         procedure :: MAYBEWRAP(json_value_rename)
+        procedure :: MAYBEWRAP(json_rename_by_path)
+#ifdef USE_UCS4
+        generic,public :: rename => json_rename_by_path_name_ascii,&
+                                    json_rename_by_path_path_ascii
+        procedure :: json_rename_by_path_name_ascii
+        procedure :: json_rename_by_path_path_ascii
+#endif
 
         !>
         !  get info about a [[json_value]]
@@ -5676,6 +5684,107 @@
     call json%create(me,to_unicode(path),p,found,was_created)
 
     end subroutine wrap_json_create_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Rename a [[json_value]], given the path.
+
+    subroutine json_rename_by_path(json, me, path, name, found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer,intent(in)  :: me
+    character(kind=CK,len=*),intent(in)  :: path
+    character(kind=CK,len=*),intent(in)  :: name  !! the new name
+    logical(LK),intent(out),optional     :: found
+
+    type(json_value),pointer :: p
+
+    if ( json%exception_thrown ) then
+        if ( present(found) ) found = .false.
+        return
+    end if
+
+    nullify(p)
+    call json%get(me=me, path=path, p=p)
+
+    if (.not. associated(p)) then
+        call json%throw_exception('Error in json_rename_by_path:'//&
+                                  ' Unable to resolve path: '//trim(path))
+    else
+        call json%rename(p,name)
+        nullify(p)
+    end if
+
+    if (json%exception_thrown) then
+        if (present(found)) then
+            found = .false.
+            call json%clear_exceptions()
+        end if
+    else
+        if (present(found)) found = .true.
+    end if
+
+    end subroutine json_rename_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_rename_by_path]], where "path" and "name" are kind=CDK
+
+    subroutine wrap_json_rename_by_path(json, me, path, name, found)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer,intent(in)   :: me
+    character(kind=CDK,len=*),intent(in)  :: path
+    character(kind=CDK,len=*),intent(in)  :: name
+    logical(LK),intent(out),optional      :: found
+
+    call json%rename(me,to_unicode(path),to_unicode(name),found)
+
+    end subroutine wrap_json_rename_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_rename_by_path]], where "name" is kind=CDK
+
+    subroutine json_rename_by_path_name_ascii(json, me, path, name, found)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer,intent(in)   :: me
+    character(kind=CK,len=*),intent(in)   :: path
+    character(kind=CDK,len=*),intent(in)  :: name
+    logical(LK),intent(out),optional      :: found
+
+    call json%rename(me,path,to_unicode(name),found)
+
+    end subroutine json_rename_by_path_name_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_rename_by_path]], where "path" is kind=CDK
+
+    subroutine json_rename_by_path_path_ascii(json, me, path, name, found)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer,intent(in)   :: me
+    character(kind=CDK,len=*),intent(in)  :: path
+    character(kind=CK,len=*),intent(in)   :: name
+    logical(LK),intent(out),optional      :: found
+
+    call json%rename(me,to_unicode(path),name,found)
+
+    end subroutine json_rename_by_path_path_ascii
 !*****************************************************************************************
 
 !*****************************************************************************************

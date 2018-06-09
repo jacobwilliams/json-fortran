@@ -92,6 +92,15 @@
                                         json_file_print_1, &
                                         json_file_print_2
 
+
+        !>
+        !  Rename a variable, specifying it by path
+        generic,public :: rename => MAYBEWRAP(json_file_rename)
+#ifdef USE_UCS4
+        generic,public :: rename => json_file_rename_path_ascii, &
+                                    json_file_rename_name_ascii
+#endif
+
         !>
         !  Get a variable from a [[json_file(type)]], by specifying the path.
         generic,public :: get => MAYBEWRAP(json_file_get_object),      &
@@ -172,6 +181,13 @@
         !get info:
         procedure :: MAYBEWRAP(json_file_variable_info)
         procedure :: MAYBEWRAP(json_file_variable_matrix_info)
+
+        !rename:
+        procedure :: MAYBEWRAP(json_file_rename)
+#ifdef USE_UCS4
+        procedure :: json_file_rename_path_ascii
+        procedure :: json_file_rename_name_ascii
+#endif
 
         !get:
         procedure :: MAYBEWRAP(json_file_get_object)
@@ -848,6 +864,82 @@
     p => me%p
 
     end subroutine json_file_get_root
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Rename a variable in a JSON file.
+
+    subroutine json_file_rename(me,path,name,found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path   !! the path to the variable
+    character(kind=CK,len=*),intent(in) :: name   !! the new name
+    logical(LK),intent(out),optional    :: found  !! if the variable was found
+
+    call me%core%rename(me%p, path, name, found)
+
+    end subroutine json_file_rename
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_rename]], where "path" and "name" are kind=CDK.
+
+    subroutine wrap_json_file_rename(me,path,name,found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path   !! the path to the variable
+    character(kind=CDK,len=*),intent(in) :: name   !! the new name
+    logical(LK),intent(out),optional     :: found  !! if the variable was found
+
+    call me%json_file_rename(to_unicode(path),to_unicode(name),found)
+
+    end subroutine wrap_json_file_rename
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Wrapper for [[json_file_rename]] where "path" is kind=CDK).
+
+    subroutine json_file_rename_path_ascii(me,path,name,found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path   !! the path to the variable
+    character(kind=CK,len=*),intent(in)  :: name   !! the new name
+    logical(LK),intent(out),optional     :: found  !! if the variable was found
+
+    call me%json_file_rename(to_unicode(path),name,found)
+
+    end subroutine json_file_rename_path_ascii
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Wrapper for [[json_file_rename]] where "name" is kind=CDK).
+
+    subroutine json_file_rename_name_ascii(me,path,name,found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path   !! the path to the variable
+    character(kind=CDK,len=*),intent(in) :: name   !! the new name
+    logical(LK),intent(out),optional     :: found  !! if the variable was found
+
+    call me%json_file_rename(path,to_unicode(name),found)
+
+    end subroutine json_file_rename_name_ascii
 !*****************************************************************************************
 
 !*****************************************************************************************
