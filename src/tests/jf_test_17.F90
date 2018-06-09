@@ -73,7 +73,7 @@ contains
     ! rename by specifying the path:
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Rename: "iflag" to "flag"'
-    call json%rename_by_path(p,'iflag','flag')
+    call json%rename(p,'iflag','flag')
     call json%print(p,output_unit)
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -89,10 +89,10 @@ contains
     nullify(q)
 
     ! unicode wrappers:
-    call json%rename_by_path(p,CK_'flag',  CK_'iflag')
-    call json%rename_by_path(p,CK_'iflag', CDK_'flag')
-    call json%rename_by_path(p,CDK_'flag', CK_'iflag')
-    call json%rename_by_path(p,CDK_'iflag',CDK_'flag')
+    call json%rename(p,CK_'flag',  CK_'iflag')
+    call json%rename(p,CK_'iflag', CDK_'flag')
+    call json%rename(p,CDK_'flag', CK_'iflag')
+    call json%rename(p,CDK_'iflag',CDK_'flag')
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

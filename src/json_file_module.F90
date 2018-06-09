@@ -880,7 +880,7 @@
     character(kind=CK,len=*),intent(in) :: name   !! the new name
     logical(LK),intent(out),optional    :: found  !! if the variable was found
 
-    call me%core%rename_by_path(me%p, path, name, found)
+    call me%core%rename(me%p, path, name, found)
 
     end subroutine json_file_rename
 !*****************************************************************************************

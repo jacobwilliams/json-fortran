@@ -387,17 +387,6 @@
 #endif
 
         !>
-        !  Rename a variable, by specifying its path.
-        generic,public :: rename_by_path => MAYBEWRAP(json_rename_by_path)
-        procedure :: MAYBEWRAP(json_rename_by_path)
-#ifdef USE_UCS4
-        generic,public :: rename_by_path => json_rename_by_path_name_ascii,&
-                                            json_rename_by_path_path_ascii
-        procedure :: json_rename_by_path_name_ascii
-        procedure :: json_rename_by_path_path_ascii
-#endif
-
-        !>
         !  Create a [[json_value]] linked list using the
         !  path to the variables. Optionally return a
         !  pointer to the variable.
@@ -636,8 +625,16 @@
 
         !>
         !  Rename a [[json_value]] variable.
-        generic,public :: rename => MAYBEWRAP(json_value_rename)
+        generic,public :: rename => MAYBEWRAP(json_value_rename),&
+                                    MAYBEWRAP(json_rename_by_path)
         procedure :: MAYBEWRAP(json_value_rename)
+        procedure :: MAYBEWRAP(json_rename_by_path)
+#ifdef USE_UCS4
+        generic,public :: rename => json_rename_by_path_name_ascii,&
+                                    json_rename_by_path_path_ascii
+        procedure :: json_rename_by_path_name_ascii
+        procedure :: json_rename_by_path_path_ascii
+#endif
 
         !>
         !  get info about a [[json_value]]
@@ -5747,7 +5744,7 @@
     character(kind=CDK,len=*),intent(in)  :: name
     logical(LK),intent(out),optional      :: found
 
-    call json%rename_by_path(me,to_unicode(path),to_unicode(name),found)
+    call json%rename(me,to_unicode(path),to_unicode(name),found)
 
     end subroutine wrap_json_rename_by_path
 !*****************************************************************************************
@@ -5766,7 +5763,7 @@
     character(kind=CDK,len=*),intent(in)  :: name
     logical(LK),intent(out),optional      :: found
 
-    call json%rename_by_path(me,path,to_unicode(name),found)
+    call json%rename(me,path,to_unicode(name),found)
 
     end subroutine json_rename_by_path_name_ascii
 !*****************************************************************************************
@@ -5785,7 +5782,7 @@
     character(kind=CK,len=*),intent(in)   :: name
     logical(LK),intent(out),optional      :: found
 
-    call json%rename_by_path(me,to_unicode(path),name,found)
+    call json%rename(me,to_unicode(path),name,found)
 
     end subroutine json_rename_by_path_path_ascii
 !*****************************************************************************************
