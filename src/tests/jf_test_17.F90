@@ -116,6 +116,55 @@ contains
         write(error_unit,'(A)') 'Success!'
     end if
 
+    ! test the .in. operator and valid_path:
+    if (CDK_'city' .in. f ) then
+        write(error_unit,'(A)') '.in. operator Success!'
+    else
+        error_cnt = error_cnt + 1
+        write(error_unit,'(A)') '.in. operator failed: "city"'
+    end if
+    if (CK_'city' .in. f)  then
+        write(error_unit,'(A)') '.in. operator Success!'
+    else
+        error_cnt = error_cnt + 1
+        write(error_unit,'(A)') '.in. operator failed: "city"'
+    end if
+    if ('struct.vec' .in. f)  then
+        write(error_unit,'(A)') '.in. operator Success!'
+    else
+        error_cnt = error_cnt + 1
+        write(error_unit,'(A)') '.in. operator failed: "struct.vec"'
+    end if
+
+    if (f%valid_path(CDK_'city')) then
+        write(error_unit,'(A)') 'valid_path Success!'
+    else
+        error_cnt = error_cnt + 1
+        write(error_unit,'(A)') 'valid_path failed: "city"'
+    end if
+    if (f%valid_path(CK_'city')) then
+        write(error_unit,'(A)') 'valid_path Success!'
+    else
+        error_cnt = error_cnt + 1
+        write(error_unit,'(A)') 'valid_path failed: "city"'
+    end if
+    if (f%valid_path(CK_'struct.vec')) then
+        write(error_unit,'(A)') 'valid_path Success!'
+    else
+        error_cnt = error_cnt + 1
+        write(error_unit,'(A)') 'valid_path failed: "struct.vec"'
+    end if
+    ! try one not there:
+    if (.not. f%valid_path(CK_'?????????')) then
+        write(error_unit,'(A)') 'valid_path Success!'
+    else
+        error_cnt = error_cnt + 1
+        write(error_unit,'(A)') 'valid_path failed: "?????????"'
+    end if
+
+    ! cleanup:
+    call f%destroy()
+
     end subroutine test_17
 
 end module jf_test_17_mod
