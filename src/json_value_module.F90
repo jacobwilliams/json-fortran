@@ -5756,7 +5756,7 @@
 !>
 !  Alternate version of [[json_rename_by_path]], where "name" is kind=CDK
 
-    subroutine wrap_json_rename_by_path_name_ascii(json, me, path, name, found)
+    subroutine json_rename_by_path_name_ascii(json, me, path, name, found)
 
     implicit none
 
@@ -5768,7 +5768,7 @@
 
     call json%rename_by_path(me,path,to_unicode(name),found)
 
-    end subroutine wrap_json_rename_by_path_name_ascii
+    end subroutine json_rename_by_path_name_ascii
 !*****************************************************************************************
 
 !*****************************************************************************************
