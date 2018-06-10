@@ -1823,7 +1823,7 @@
         call tracebackqq(string=trim(msg), user_exit_code=0)
 #else
         write(error_unit,'(A)') 'JSON-Fortran Exception: '//trim(msg)
-        error stop 'JSON-Fortran Exception'
+        error stop 1
 #endif
 
     elseif (json%is_verbose) then
@@ -1831,9 +1831,9 @@
         write(output_unit,'(A)') '***********************'
         write(output_unit,'(A)') 'JSON-Fortran Exception: '//trim(msg)
 
-#if defined __GFORTRAN__
-        !call backtrace()  ! (have to compile with -fbacktrace -fall-intrinsics flags)
-#endif
+!#if defined __GFORTRAN__
+!        call backtrace()  ! (have to compile with -fbacktrace -fall-intrinsics flags)
+!#endif
 
 #ifdef __INTEL_COMPILER
         call tracebackqq(user_exit_code=-1)  ! print a traceback and return
