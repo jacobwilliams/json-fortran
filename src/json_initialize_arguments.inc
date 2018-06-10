@@ -66,3 +66,11 @@ logical(LK),intent(in),optional :: allow_duplicate_keys
   !!   keys are found, an error is thrown. A call to
   !!   [[json_value_validate]] will also check for
   !!   duplicates.
+logical(LK),intent(in),optional :: escape_solidus
+  !! * If True then the solidus "`/`" is always escaped
+  !!   "`\/`" when serializing JSON
+  !! * If False [default], then it is not escaped.
+  !! Note that this option does not affect parsing
+  !! (both escaped and unescaped are still valid in
+  !! all cases).
+

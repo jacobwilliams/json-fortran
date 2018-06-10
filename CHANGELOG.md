@@ -4,6 +4,9 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.3.0 (2018-04-20)](#630-2018-04-20)
+    - [6.2.0 (2018-03-10)](#620-2018-03-10)
+    - [6.1.0 (2017-11-05)](#610-2017-11-05)
     - [6.0.0 (2017-08-24)](#600-2017-08-24)
     - [5.3.0 (2017-04-07)](#530-2017-04-07)
     - [5.2.0 (2017-03-05)](#520-2017-03-05)
@@ -23,7 +26,53 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.0.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.3.0...HEAD)
+
+### [6.3.0](https://github.com/jacobwilliams/json-fortran/tree/6.3.0) (2018-04-20)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.2.0...6.3.0)
+or [Download v6.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.3.0)
+
+**Enhancements:**
+
+- Add a FoBiS configuration file that can be used to build the library, tests, and documentation. [\#310](https://github.com/jacobwilliams/json-fortran/issues/310) [\#311](https://github.com/jacobwilliams/json-fortran/pull/311) ([jacobwilliams](https://github.com/jacobwilliams))
+- CMake produced Visual Studio Project [\#70](https://github.com/jacobwilliams/json-fortran/issues/70) ([jacobwilliams](https://github.com/jacobwilliams))
+- Minor changes: renamed some of the example files and reverted back to older versions of FoBiS and markdown for documentation building on Travis-CI [\#313](https://github.com/jacobwilliams/json-fortran/pull/313) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fixed a bug in the escaping logic where `/` characters in strings would not be printed under some circumstances. This bug was introduced in the 6.2.0 release. [\#312](https://github.com/jacobwilliams/json-fortran/issues/312) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [6.2.0](https://github.com/jacobwilliams/json-fortran/tree/6.2.0) (2018-03-10)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.1.0...6.2.0)
+or [Download v6.2.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.2.0)
+
+**Enhancements:**
+
+- Allow the unit tests to be run from within the Visual Studio solution [\#295](https://github.com/jacobwilliams/json-fortran/issues/295) ([Hugh-walsh](https://github.com/Hugh-walsh), [jacobwilliams](https://github.com/jacobwilliams))
+- Compiling now works for the CMake-produced Visual Studio solution on Windows (note that the CMake-produced solution is a bit different from the other one provided). [\#70](https://github.com/jacobwilliams/json-fortran/issues/70) [\#309](https://github.com/jacobwilliams/json-fortran/pull/309) ([handrake0724](https://github.com/handrake0724), [jacobwilliams](https://github.com/jacobwilliams))
+- Added a new option `escape_solidus` to specify if the forward slash ("`/`") is to be escaped when serializing JSON. By default, it is no longer escaped (this changes the behavior introduced in 6.0.0) [\#304](https://github.com/jacobwilliams/json-fortran/issues/304) [\#305](https://github.com/jacobwilliams/json-fortran/pull/305) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Fixed an issue causing a problem with the NAG compiler [\#303](https://github.com/jacobwilliams/json-fortran/issues/303) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [6.1.0](https://github.com/jacobwilliams/json-fortran/tree/6.1.0) (2017-11-05)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.0.0...6.1.0)
+or [Download v6.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.1.0)
+
+**Enhancements:**
+
+- Added an optional `allow_duplicate_keys` argument to the various `initialize` routines. This is True by default. If False, then duplicate keys are considered an error. Also added `check_for_duplicate_keys` and `check_children_for_duplicate_keys` methods that can be called. [\#250](https://github.com/jacobwilliams/json-fortran/issues/250) [\#290](https://github.com/jacobwilliams/json-fortran/pull/290) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added support for JSONPath "bracket-notation" mode for specifying paths to JSON variables. [\#266](https://github.com/jacobwilliams/json-fortran/issues/266) [\#292](https://github.com/jacobwilliams/json-fortran/pull/292) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed issues:**
+
+- Replaced `CMAKE_INSTALL_LIBDIR` with `INSTALL_LIB_DIR` in the CMake project. [\#286](https://github.com/jacobwilliams/json-fortran/pull/286)  ([foeroyingur](https://github.com/foeroyingur))
+- Fixed bug in the `lowercase_string` routine that could cause a crash for Debug builds. [\#293](https://github.com/jacobwilliams/json-fortran/issues/293)  [\#294](https://github.com/jacobwilliams/json-fortran/pull/294) ([jacobwilliams](https://github.com/jacobwilliams))
+
 
 ### [6.0.0](https://github.com/jacobwilliams/json-fortran/tree/6.0.0) (2017-08-24)
 

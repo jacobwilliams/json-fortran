@@ -293,12 +293,14 @@
 !
 !  Add the escape characters to a string for adding to JSON.
 
-    subroutine escape_string(str_in, str_out)
+    subroutine escape_string(str_in, str_out, escape_solidus)
 
     implicit none
 
     character(kind=CK,len=*),intent(in)              :: str_in
     character(kind=CK,len=:),allocatable,intent(out) :: str_out
+    logical(LK),intent(in) :: escape_solidus  !! if the solidus (forward slash)
+                                              !! is also to be escaped
 
     integer(IK) :: i    !! counter
     integer(IK) :: ipos !! accumulated string size
@@ -308,20 +310,29 @@
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp !! workaround for bug in gfortran 6.1
 #endif
+    logical :: to_be_escaped !! if there are characters to be escaped
 
-    character(kind=CK,len=*),parameter :: specials = quotation_mark//&
+    character(kind=CK,len=*),parameter :: specials_no_slash = quotation_mark//&
                                                      backslash//&
-                                                     slash//&
                                                      bspace//&
                                                      formfeed//&
                                                      newline//&
                                                      carriage_return//&
                                                      horizontal_tab
 
+    character(kind=CK,len=*),parameter :: specials = specials_no_slash//slash
+
+
     !Do a quick scan for the special characters,
     ! if any are present, then process the string,
     ! otherwise, return the string as is.
-    if (scan(str_in,specials)>0) then
+    if (escape_solidus) then
+        to_be_escaped = scan(str_in,specials)>0
+    else
+        to_be_escaped = scan(str_in,specials_no_slash)>0
+    end if
+
+    if (to_be_escaped) then
 
         str_out = repeat(space,chunk_size)
         ipos = 1
@@ -351,9 +362,17 @@
                 str_out(ipos:ipos+1) = backslash//c
                 ipos = ipos + 2
 
-            case(quotation_mark,slash)
+            case(quotation_mark)
                 str_out(ipos:ipos+1) = backslash//c
                 ipos = ipos + 2
+            case(slash)
+                if (escape_solidus) then
+                    str_out(ipos:ipos+1) = backslash//c
+                    ipos = ipos + 2
+                else
+                    str_out(ipos:ipos) = c
+                    ipos = ipos + 1
+                end if
             case(bspace)
                 str_out(ipos:ipos+1) = '\b'
                 ipos = ipos + 2
@@ -731,26 +750,6 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Return the lowercase version of the `CK` character.
-
-    pure elemental function lowercase_character(c) result(c_lower)
-
-    implicit none
-
-    character(kind=CK,len=1),intent(in) :: c
-    character(kind=CK,len=1)            :: c_lower
-
-    integer :: i  !! index in uppercase array
-
-    i = index(upper,c)
-    c_lower = merge(lower(i:i),c,i>0)
-
-    end function lowercase_character
-!*****************************************************************************************
-
-!*****************************************************************************************
-!> author: Jacob Williams
-!
 !  Returns lowercase version of the `CK` string.
 
     pure elemental function lowercase_string(str) result(s_lower)
@@ -761,23 +760,21 @@
     character(kind=CK,len=(len(str)))   :: s_lower  !! lowercase version of the string
 
     integer :: i  !! counter
-    integer :: n  !! length of input string
+    integer :: j  !! index of uppercase character
 
-    s_lower = CK_''
-    n = len_trim(str)
+    s_lower = str
 
-    if (n>0) then
-        do concurrent (i=1:n)
-            s_lower(i:i) = lowercase_character(str(i:i))
-        end do
-    end if
+    do i = 1, len_trim(str)
+        j = index(upper,s_lower(i:i))
+        if (j>0) s_lower(i:i) = lower(j:j)
+    end do
 
     end function lowercase_string
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Replace all occurances of `s1` in `str` with `s2`.
+!  Replace all occurrences of `s1` in `str` with `s2`.
 !
 !  A case-sensitive match is used.
 !

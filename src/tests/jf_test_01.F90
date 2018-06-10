@@ -95,13 +95,22 @@ contains
       call core%initialize(unescape_strings=.true.)
       call core%traverse(p,print_json_variable)
 
+      namelist_style = .false.
+      write(error_unit,'(A)') ''
+      write(error_unit,'(A)') 'printing each variable [JSONPath style]'
+      write(error_unit,'(A)') ''
+      call core%initialize(path_mode=3,unescape_strings=.false.)
+      call core%traverse(p,print_json_variable)
+
+      call core%destroy()
+
       ! -------------------------
 
       ! extract data from the parsed value
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'get some data from the file...'
 
-      call json%initialize(path_separator=json_CK_'%')  ! use fortran-style paths
+      call json%initialize(path_mode=1,path_separator=json_CK_'%')  ! use fortran-style paths
 
       call json%get('version%svn', ival)
       if (json%failed()) then
@@ -143,6 +152,14 @@ contains
         error_cnt = error_cnt + 1
       else
         write(error_unit,'(A)') 'data(1).array(2) = '//trim(cval)
+      end if
+      write(error_unit,'(A)') ''
+      call json%get('escape', cval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A)') 'escape = '//trim(cval)
       end if
 
       ! get a logical value:
@@ -357,6 +374,44 @@ contains
         error_cnt = error_cnt + 1
       end if
 
+      write(error_unit,'(A)') ''
+      write(error_unit,'(A)') ''
+      write(error_unit,'(A)') 'get some data from the file (bracket notation)...'
+
+      call json%initialize(path_mode=3)
+
+      ! get an integer value:
+      write(error_unit,'(A)') ''
+      call json%get("$['version']['svn']", ival)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A,I5)') "$['version']['svn'] = ",ival
+      end if
+      ! get a character value:
+      write(error_unit,'(A)') ''
+      call json%get("$['data'][1]['name']", cval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        write(error_unit,'(A)') "$['data'][1]['array'][2] = "//trim(cval)
+      end if
+      ! get a logical value (use double quotes):
+      write(error_unit,'(A)') ''
+      call json%get('$["data"][1]["tf1"]', lval)
+      if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+      else
+        if (lval) then
+            write(error_unit,'(A)') '$["data"][1]["tf1"] = True'
+        else
+            write(error_unit,'(A)') '$["data"][1]["tf1"] = False'
+        end if
+      end if
+
     end if
 
     ! clean up
@@ -433,6 +488,7 @@ contains
 end module jf_test_1_mod
 !*****************************************************************************************
 
+#ifndef INTERGATED_TESTS
 !*****************************************************************************************
 program jf_test_1
 
@@ -447,3 +503,4 @@ program jf_test_1
 
 end program jf_test_1
 !*****************************************************************************************
+#endif

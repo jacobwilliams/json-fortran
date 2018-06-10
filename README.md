@@ -90,14 +90,28 @@ script) with the [NAG Fortran compiler 6.0](http://www.nag.com/nagware/NP/NP_des
 Currently, several ways are provided to build the JSON-fortran library
 (libjsonfortran).
 
-* A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the JSON-Fortran library and the unit tests.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
+* A build script, `build.sh` is provided in the project root directory. This script uses [FoBiS](https://github.com/szaghi/FoBiS) to build the JSON-Fortran library and the unit tests on Unix-like systems.  Edit the script to use either the [Intel Fortran Compiler](https://software.intel.com/en-us/fortran-compilers) or [Gfortran](https://gcc.gnu.org/wiki/GFortran).  Note that version 1.2.5 of FoBiS (or later) is required.
+
+* A [FoBiS](https://github.com/szaghi/FoBiS) configuration file (`json-fortran.fobis`) is also provided that can also build the library and examples. Use the `mode` flag to indicate what to build. For example:
+
+  * To build all the examples using gfortran: `FoBiS.py build -f json-fortran.fobis -mode tests-gnu`
+  * To build all the examples using ifort: `FoBiS.py build -f json-fortran.fobis -mode tests-intel`
+  * To build a static library using gfortran: `FoBiS.py build -f json-fortran.fobis -mode static-gnu`
+  * To build a static library using ifort: `FoBiS.py build -f json-fortran.fobis -mode static-intel`
+
+  The full set of modes are: `static-gnu`, `static-gnu-debug`, `static-intel`, `static-intel-debug`, `shared-gnu`, `shared-gnu-debug`, `shared-intel`, `shared-intel-debug`, `tests-gnu`, `tests-gnu-debug`, `tests-intel`, `tests-intel-debug`
+
+  To generate the documentation using [ford](https://github.com/cmacmackin/ford), run:
+
+```
+  FoBis.py rule --execute makedoc -f json-fortran.fobis
+```
 
 * A [Visual Studio](https://www.visualstudio.com) project is included for building the library (and unit tests) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
 * A [CMake](http://www.cmake.org) build
 system is provided. This build system has been tested on Mac and Linux
-using the Intel Fortran Compiler, gfortran 4.9, and NAG Fortran 6.0. It has not been
-tested on Windows. This CMake based build provides an install target,
+using the Intel Fortran Compiler, gfortran 4.9, and NAG Fortran 6.0. It does also work on Windows (but note that the Visual Studio project it generates is not quite the same as the one mentioned above). This CMake based build provides an install target,
 and exports from both the install location and the build location so
 that building and using JSON-Fortran in another CMake based project is
 trivial. To get started with the CMake based build, set the
@@ -114,10 +128,10 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 6.0.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 6.3.0 REQUIRED )
 include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
-file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.f90" )
+file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
 foreach ( UNIT_TEST ${JF_TEST_SRCS} )
   get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
   add_executable ( ${TEST} ${UNIT_TEST} )

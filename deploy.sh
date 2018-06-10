@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to deploy documentation after successfull build of master branch or tag
+# Script to deploy documentation after successful build of master branch or tag
 # If running under travis-ci this will automatically deploy updates to the master branch's
 # documentation on build events for the master branch, and will add/update documentation for
 # any new/updated tags that are pushed.
@@ -20,7 +20,7 @@ if [ "$TRAVIS" ]; then #running under travis
             git commit -m "Development documentation updated by travis job $TRAVIS_JOB_NUMBER for commits $TRAVIS_COMMIT_RANGE" || true
             git push -fq origin gh-pages > /dev/null 2>&1 || true
 	fi
-	# If publishing a new/updated tag, deploy it's documentation
+	# If publishing a new/updated tag, deploy its documentation
 	if [ "$TRAVIS_TAG" ] && [ "$(ls -A "$TRAVIS_BUILD_DIR/doc")" ] ; then #not empty
 	    cd "$TRAVIS_BUILD_DIR" || exit 1
 	    git clone -q --branch=gh-pages "https://${GH_TOKEN}@github.com/$TRAVIS_REPO_SLUG" gh-pages >/dev/null 2>&1
