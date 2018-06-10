@@ -39,7 +39,7 @@ contains
         write(error_unit,'(A)') 'escape_solidus = '//trim(tf(i))
         write(error_unit,'(A)') ''
 
-        call json%initialize(escape_solidus=(i==1))
+        call json%initialize(escape_solidus=(i==1), stop_on_error=.true.)
         call json%load_from_string(str)
         call json%print_file()
 
