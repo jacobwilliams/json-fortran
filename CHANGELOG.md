@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.4.0 (2018-06-10)](#640-2018-06-10)
     - [6.3.0 (2018-04-20)](#630-2018-04-20)
     - [6.2.0 (2018-03-10)](#620-2018-03-10)
     - [6.1.0 (2017-11-05)](#610-2017-11-05)
@@ -24,9 +25,25 @@
     - [2.0.0 (2014-12-27)](#200-2014-12-27)
     - [1.0.0 (2014-06-23)](#100-2014-06-23)
 
+
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.3.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.4.0...HEAD)
+
+### [6.4.0](https://github.com/jacobwilliams/json-fortran/tree/6.4.0) (2018-06-10)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.3.0...6.4.0)
+or [Download v6.4.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.4.0)
+
+**Enhancements:**
+
+- Addition optional `stop_on_error` argument to the various `initialize()` routines to immediately stop the program if an exception is raised. [\#318](https://github.com/jacobwilliams/json-fortran/issues/318) [\#320](https://github.com/jacobwilliams/json-fortran/pull/320) ([jacobwilliams](https://github.com/jacobwilliams))
+
+- Added routines to check if a name key is present in a `json_file` object, which is also available using the `.in.` operator. [\#316](https://github.com/jacobwilliams/json-fortran/issues/316) [\#319](https://github.com/jacobwilliams/json-fortran/pull/319) ([jacobwilliams](https://github.com/jacobwilliams))
+
+- Added routines to rename a json variable by specifying the path. [\#314](https://github.com/jacobwilliams/json-fortran/issues/314) [\#317](https://github.com/jacobwilliams/json-fortran/pull/317) ([jacobwilliams](https://github.com/jacobwilliams))
+
+- Added a Fobis rule for running the test programs. [\#321](https://github.com/jacobwilliams/json-fortran/issues/321) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.3.0](https://github.com/jacobwilliams/json-fortran/tree/6.3.0) (2018-04-20)
 
