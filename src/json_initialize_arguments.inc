@@ -73,4 +73,7 @@ logical(LK),intent(in),optional :: escape_solidus
   !! Note that this option does not affect parsing
   !! (both escaped and unescaped are still valid in
   !! all cases).
+logical(LK),intent(in),optional :: stop_on_error
+  !! If an exception is raised, then immediately quit.
+  !! (Default is False).
 

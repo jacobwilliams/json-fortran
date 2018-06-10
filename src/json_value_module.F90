@@ -167,6 +167,11 @@
 
         logical(LK) :: is_verbose = .false.        !! if true, all exceptions are
                                                    !! immediately printed to console.
+
+        logical(LK) :: stop_on_error = .false.    !! if true, then the program is
+                                                   !! stopped immediately when an
+                                                   !! exception is raised.
+
         logical(LK) :: exception_thrown = .false.  !! The error flag. Will be set to true
                                                    !! when an error is thrown in the class.
                                                    !! Many of the methods will check this
@@ -814,7 +819,8 @@
                                   path_separator,&
                                   compress_vectors,&
                                   allow_duplicate_keys,&
-                                  escape_solidus) result(json_core_object)
+                                  escape_solidus,&
+                                  stop_on_error) result(json_core_object)
 
     implicit none
 
@@ -833,7 +839,8 @@
                                 path_separator,&
                                 compress_vectors,&
                                 allow_duplicate_keys,&
-                                escape_solidus)
+                                escape_solidus,&
+                                stop_on_error)
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -869,7 +876,8 @@
                                path_separator,&
                                compress_vectors,&
                                allow_duplicate_keys,&
-                               escape_solidus)
+                               escape_solidus,&
+                               stop_on_error)
 
     implicit none
 
@@ -904,6 +912,8 @@
     !various optional inputs:
     if (present(spaces_per_tab)) &
         me%spaces_per_tab = spaces_per_tab
+    if (present(stop_on_error)) &
+        me%stop_on_error = stop_on_error
     if (present(verbose)) &
         me%is_verbose = verbose
     if (present(strict_type_checking)) &
@@ -1789,6 +1799,8 @@
 !
 !@note If `is_verbose` is true, this will also print a
 !      traceback if the Intel compiler is used.
+!
+!@note If `stop_on_error` is true, then the program is stopped.
 
     subroutine json_throw_exception(json,msg)
 
@@ -1804,14 +1816,31 @@
     json%exception_thrown = .true.
     json%err_message = trim(msg)
 
-    if (json%is_verbose) then
+    if (json%stop_on_error) then
+
+#ifdef __INTEL_COMPILER
+        ! for Intel, we raise a traceback and quit
+        call tracebackqq(string=trim(msg), user_exit_code=0)
+#else
+        write(error_unit,'(A)') 'JSON-Fortran Exception: '//trim(msg)
+        error stop 1
+#endif
+
+    elseif (json%is_verbose) then
+
         write(output_unit,'(A)') '***********************'
         write(output_unit,'(A)') 'JSON-Fortran Exception: '//trim(msg)
-        !call backtrace()     ! gfortran (use -fbacktrace -fall-intrinsics flags)
+
+!#if defined __GFORTRAN__
+!        call backtrace()  ! (have to compile with -fbacktrace -fall-intrinsics flags)
+!#endif
+
 #ifdef __INTEL_COMPILER
         call tracebackqq(user_exit_code=-1)  ! print a traceback and return
 #endif
+
         write(output_unit,'(A)') '***********************'
+
     end if
 
     end subroutine json_throw_exception
