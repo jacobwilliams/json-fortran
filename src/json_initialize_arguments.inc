@@ -75,5 +75,5 @@ logical(LK),intent(in),optional :: escape_solidus
   !! all cases).
 logical(LK),intent(in),optional :: stop_on_error
   !! If an exception is raised, then immediately quit.
-  !! (Default if False).
+  !! (Default is False).
 
