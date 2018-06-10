@@ -101,11 +101,9 @@ Currently, several ways are provided to build the JSON-fortran library
 
   The full set of modes are: `static-gnu`, `static-gnu-debug`, `static-intel`, `static-intel-debug`, `shared-gnu`, `shared-gnu-debug`, `shared-intel`, `shared-intel-debug`, `tests-gnu`, `tests-gnu-debug`, `tests-intel`, `tests-intel-debug`
 
-  To generate the documentation using [ford](https://github.com/cmacmackin/ford), run:
+  To generate the documentation using [ford](https://github.com/cmacmackin/ford), run: ```FoBis.py rule --execute makedoc -f json-fortran.fobis```
 
-```
-  FoBis.py rule --execute makedoc -f json-fortran.fobis
-```
+  To run all the tests, run: ```FoBis.py rule --execute tests -f json-fortran.fobis```
 
 * A [Visual Studio](https://www.visualstudio.com) project is included for building the library (and unit tests) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
