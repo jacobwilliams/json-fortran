@@ -371,7 +371,8 @@
                                             path_separator,&
                                             compress_vectors,&
                                             allow_duplicate_keys,&
-                                            escape_solidus)
+                                            escape_solidus,&
+                                            stop_on_error)
 
     implicit none
 
@@ -390,7 +391,8 @@
                             path_separator,&
                             compress_vectors,&
                             allow_duplicate_keys,&
-                            escape_solidus)
+                            escape_solidus,&
+                            stop_on_error)
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
@@ -456,7 +458,8 @@
                                   path_separator,&
                                   compress_vectors,&
                                   allow_duplicate_keys,&
-                                  escape_solidus) result(file_object)
+                                  escape_solidus,&
+                                  stop_on_error) result(file_object)
 
     implicit none
 
@@ -477,7 +480,8 @@
                                 path_separator,&
                                 compress_vectors,&
                                 allow_duplicate_keys,&
-                                escape_solidus)
+                                escape_solidus,&
+                                stop_on_error)
 
     if (present(p)) file_object%p => p
 
