@@ -394,6 +394,7 @@
                                             compress_vectors,&
                                             allow_duplicate_keys,&
                                             escape_solidus,&
+                                            stop_on_error,&
                                             finalize)
 
     implicit none
@@ -416,7 +417,8 @@
                             path_separator,&
                             compress_vectors,&
                             allow_duplicate_keys,&
-                            escape_solidus)
+                            escape_solidus,&
+                            stop_on_error)
 
     if (present(finalize)) me%finalize = finalize
 
@@ -485,6 +487,7 @@
                                   compress_vectors,&
                                   allow_duplicate_keys,&
                                   escape_solidus,&
+                                  stop_on_error,&
                                   finalize) result(file_object)
 
     implicit none
@@ -510,6 +513,7 @@
                                 compress_vectors,&
                                 allow_duplicate_keys,&
                                 escape_solidus,&
+                                stop_on_error,&
                                 finalize)
 
     if (present(p)) file_object%p => p
