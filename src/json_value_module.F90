@@ -731,6 +731,13 @@
         procedure :: get_current_line_from_file_stream
         procedure :: get_current_line_from_file_sequential
         procedure :: convert
+        procedure :: to_string
+        procedure :: to_logical
+        procedure :: to_integer
+        procedure :: to_double
+        procedure :: to_null
+        procedure :: to_object
+        procedure :: to_array
 
     end type json_core
     !*********************************************************
@@ -1746,7 +1753,11 @@
     type(json_value),pointer,intent(in) :: p
     character(kind=CK,len=*),intent(in) :: name !! new variable name
 
-    p%name = name
+    if (json%trailing_spaces_significant) then
+        p%name = name
+    else
+        p%name = trim(name)
+    end if
 
     end subroutine json_value_rename
 !*****************************************************************************************
@@ -1974,7 +1985,7 @@
 !````fortran
 !    type(json_value),pointer :: var
 !    call json_value_create(var)
-!    call to_double(var,1.0_RK)
+!    call json%to_double(var,1.0_RK)
 !````
 !
 !### Notes
@@ -2766,7 +2777,7 @@
         call json%info(p_var,var_type)
         select case (var_type)
         case (json_null,json_logical,json_integer,json_double,json_string)
-            call to_logical(p_var,val)    !update the value
+            call json%to_logical(p_var,val)    !update the value
         case default
             found = .false.
             call json%throw_exception('Error in json_update_logical: '//&
@@ -2826,7 +2837,7 @@
         call json%info(p_var,var_type)
         select case (var_type)
         case (json_null,json_logical,json_integer,json_double,json_string)
-            call to_double(p_var,val)    !update the value
+            call json%to_double(p_var,val)    !update the value
         case default
             found = .false.
             call json%throw_exception('Error in json_update_double: '//&
@@ -2886,7 +2897,7 @@
         call json%info(p_var,var_type)
         select case (var_type)
         case (json_null,json_logical,json_integer,json_double,json_string)
-            call to_integer(p_var,val)    !update the value
+            call json%to_integer(p_var,val)    !update the value
         case default
             found = .false.
             call json%throw_exception('Error in json_update_integer: '//&
@@ -2951,7 +2962,7 @@
         call json%info(p_var,var_type)
         select case (var_type)
         case (json_null,json_logical,json_integer,json_double,json_string)
-            call to_string(p_var,val,trim_str=trim_str,adjustl_str=adjustl_str) ! update the value
+            call json%to_string(p_var,val,trim_str=trim_str,adjustl_str=adjustl_str) ! update the value
         case default
             found = .false.
             call json%throw_exception('Error in json_update_string: '//&
@@ -6046,7 +6057,7 @@
                             ! have to create this child
                             ! [make it an array]
                             call json_value_create(tmp)
-                            call to_array(tmp,path(child_i:i-1))
+                            call json%to_array(tmp,path(child_i:i-1))
                             call json%add(p,tmp)
                             created = .true.
                         else
@@ -6097,7 +6108,7 @@
                             call json%get_child(p, j, tmp, child_found)
                             if (.not. child_found) then
                                 call json_value_create(tmp)
-                                call to_null(tmp)  ! array element doesn't need a name
+                                call json%to_null(tmp)  ! array element doesn't need a name
                                 call json%add(p,tmp)
                                 if (j==child_i) created = .true.
                             else
@@ -6138,7 +6149,7 @@
                                 ! have to create this child
                                 ! [make it an object]
                                 call json_value_create(tmp)
-                                call to_object(tmp,path(child_i:i-1))
+                                call json%to_object(tmp,path(child_i:i-1))
                                 call json%add(p,tmp)
                                 created = .true.
                             else
@@ -6193,7 +6204,7 @@
                         ! have to create this child
                         ! (make it a null since it is the leaf)
                         call json_value_create(tmp)
-                        call to_null(tmp,path(child_i:i-1))
+                        call json%to_null(tmp,path(child_i:i-1))
                         call json%add(p,tmp)
                         created = .true.
                     else
@@ -6209,7 +6220,7 @@
                 if (create .and. created) then
                     ! make leaf p a null, but only
                     ! if it wasn't there
-                    call to_null(p)
+                    call json%to_null(p)
                 end if
             end if
 
@@ -6651,7 +6662,7 @@
                                             ! [make it a null since we don't
                                             ! know what it is yet]
                                             call json_value_create(tmp)
-                                            call to_null(tmp,token)
+                                            call json%to_null(tmp,token)
                                             call json%add(p,tmp)
                                             status_ok = .true.
                                             created = .true.
@@ -6732,7 +6743,7 @@
                                                 call json%get_child(p, j, tmp, status_ok)
                                                 if (.not. status_ok) then
                                                     call json_value_create(tmp)
-                                                    call to_null(tmp)  ! array element doesn't need a name
+                                                    call json%to_null(tmp)  ! array element doesn't need a name
                                                     call json%add(p,tmp)
                                                     if (j==ival) created = .true.
                                                 else
@@ -8899,13 +8910,13 @@
             case (start_object)
 
                 ! start object
-                call to_object(value)    !allocate class
+                call json%to_object(value)    !allocate class
                 call json%parse_object(unit, str, value)
 
             case (start_array)
 
                 ! start array
-                call to_array(value)    !allocate class
+                call json%to_array(value)    !allocate class
                 call json%parse_array(unit, str, value)
 
             case (end_array)
@@ -8917,7 +8928,7 @@
             case (quotation_mark)
 
                 ! string
-                call to_string(value)    !allocate class
+                call json%to_string(value)    !allocate class
 
                 select case (value%var_type)
                 case (json_string)
@@ -8937,20 +8948,20 @@
                 !true
                 call json%parse_for_chars(unit, str, true_str(2:))
                 !allocate class and set value:
-                if (.not. json%exception_thrown) call to_logical(value,.true.)
+                if (.not. json%exception_thrown) call json%to_logical(value,.true.)
 
             case (CK_'f') !false_str(1:1) gfortran bug work around
 
                 !false
                 call json%parse_for_chars(unit, str, false_str(2:))
                 !allocate class and set value:
-                if (.not. json%exception_thrown) call to_logical(value,.false.)
+                if (.not. json%exception_thrown) call json%to_logical(value,.false.)
 
             case (CK_'n') !null_str(1:1) gfortran bug work around
 
                 !null
                 call json%parse_for_chars(unit, str, null_str(2:))
-                if (.not. json%exception_thrown) call to_null(value)    !allocate class
+                if (.not. json%exception_thrown) call json%to_null(value) ! allocate class
 
             case(CK_'-', CK_'0': CK_'9')
 
@@ -8994,7 +9005,7 @@
     character(kind=CK,len=*),intent(in) :: name  !! variable name
 
     call json_value_create(p)
-    call to_logical(p,val,name)
+    call json%to_logical(p,val,name)
 
     end subroutine json_value_create_logical
 !*****************************************************************************************
@@ -9042,7 +9053,7 @@
     character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
-    call to_integer(p,val,name)
+    call json%to_integer(p,val,name)
 
     end subroutine json_value_create_integer
 !*****************************************************************************************
@@ -9091,7 +9102,7 @@
     character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
-    call to_double(p,val,name)
+    call json%to_double(p,val,name)
 
     end subroutine json_value_create_double
 !*****************************************************************************************
@@ -9142,7 +9153,7 @@
     logical(LK),intent(in),optional     :: adjustl_str   !! if ADJUSTL() should be called for the `val`
 
     call json_value_create(p)
-    call to_string(p,val,name,trim_str,adjustl_str)
+    call json%to_string(p,val,name,trim_str,adjustl_str)
 
     end subroutine json_value_create_string
 !*****************************************************************************************
@@ -9192,7 +9203,7 @@
     character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
-    call to_null(p,name)
+    call json%to_null(p,name)
 
     end subroutine json_value_create_null
 !*****************************************************************************************
@@ -9242,7 +9253,7 @@
     character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
-    call to_object(p,name)
+    call json%to_object(p,name)
 
     end subroutine json_value_create_object
 !*****************************************************************************************
@@ -9289,7 +9300,7 @@
     character(kind=CK,len=*),intent(in) :: name
 
     call json_value_create(p)
-    call to_array(p,name)
+    call json%to_array(p,name)
 
     end subroutine json_value_create_array
 !*****************************************************************************************
@@ -9319,11 +9330,12 @@
 !
 !  Change the [[json_value]] variable to a logical.
 
-    subroutine to_logical(p,val,name)
+    subroutine to_logical(json,p,val,name)
 
     implicit none
 
-    type(json_value),intent(inout)               :: p
+    class(json_core),intent(inout)               :: json
+    type(json_value),pointer                     :: p
     logical(LK),intent(in),optional              :: val   !! if the value is also to be set
                                                           !! (if not present, then .false. is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
@@ -9339,7 +9351,7 @@
     end if
 
     !name:
-    if (present(name)) p%name = trim(name)
+    if (present(name)) call json%rename(p,name)
 
     end subroutine to_logical
 !*****************************************************************************************
@@ -9349,11 +9361,12 @@
 !
 !  Change the [[json_value]] variable to an integer.
 
-    subroutine to_integer(p,val,name)
+    subroutine to_integer(json,p,val,name)
 
     implicit none
 
-    type(json_value),intent(inout)               :: p
+    class(json_core),intent(inout)               :: json
+    type(json_value),pointer                     :: p
     integer(IK),intent(in),optional              :: val   !! if the value is also to be set
                                                           !! (if not present, then 0 is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
@@ -9369,7 +9382,7 @@
     end if
 
     !name:
-    if (present(name)) p%name = trim(name)
+    if (present(name)) call json%rename(p,name)
 
     end subroutine to_integer
 !*****************************************************************************************
@@ -9379,11 +9392,12 @@
 !
 !  Change the [[json_value]] variable to a double.
 
-    subroutine to_double(p,val,name)
+    subroutine to_double(json,p,val,name)
 
     implicit none
 
-    type(json_value),intent(inout)               :: p
+    class(json_core),intent(inout)               :: json
+    type(json_value),pointer                     :: p
     real(RK),intent(in),optional                 :: val   !! if the value is also to be set
                                                           !! (if not present, then 0.0_rk is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
@@ -9399,7 +9413,7 @@
     end if
 
     !name:
-    if (present(name)) p%name = trim(name)
+    if (present(name)) call json%rename(p,name)
 
     end subroutine to_double
 !*****************************************************************************************
@@ -9412,11 +9426,12 @@
 !### Modified
 !  * Izaak Beekman : 02/24/2015
 
-    subroutine to_string(p,val,name,trim_str,adjustl_str)
+    subroutine to_string(json,p,val,name,trim_str,adjustl_str)
 
     implicit none
 
-    type(json_value),intent(inout)               :: p
+    class(json_core),intent(inout)  :: json
+    type(json_value),pointer        :: p
     character(kind=CK,len=*),intent(in),optional :: val   !! if the value is also to be set
                                                           !! (if not present, then '' is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
@@ -9460,7 +9475,7 @@
     end if
 
     !name:
-    if (present(name)) p%name = name
+    if (present(name)) call json%rename(p,name)
 
     end subroutine to_string
 !*****************************************************************************************
@@ -9470,11 +9485,12 @@
 !
 !  Change the [[json_value]] variable to a null.
 
-    subroutine to_null(p,name)
+    subroutine to_null(json,p,name)
 
     implicit none
 
-    type(json_value),intent(inout)               :: p
+    class(json_core),intent(inout)               :: json
+    type(json_value),pointer                     :: p
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -9482,7 +9498,7 @@
     p%var_type = json_null
 
     !name:
-    if (present(name)) p%name = trim(name)
+    if (present(name)) call json%rename(p,name)
 
     end subroutine to_null
 !*****************************************************************************************
@@ -9492,11 +9508,12 @@
 !
 !  Change the [[json_value]] variable to an object.
 
-    subroutine to_object(p,name)
+    subroutine to_object(json,p,name)
 
     implicit none
 
-    type(json_value),intent(inout)               :: p
+    class(json_core),intent(inout)               :: json
+    type(json_value),pointer                     :: p
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -9504,7 +9521,7 @@
     p%var_type = json_object
 
     !name:
-    if (present(name)) p%name = trim(name)
+    if (present(name)) call json%rename(p,name)
 
     end subroutine to_object
 !*****************************************************************************************
@@ -9514,11 +9531,12 @@
 !
 !  Change the [[json_value]] variable to an array.
 
-    subroutine to_array(p,name)
+    subroutine to_array(json,p,name)
 
     implicit none
 
-    type(json_value),intent(inout)               :: p
+    class(json_core),intent(inout)               :: json
+    type(json_value),pointer                     :: p
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
@@ -9526,7 +9544,7 @@
     p%var_type = json_array
 
     !name:
-    if (present(name)) p%name = trim(name)
+    if (present(name)) call json%rename(p,name)
 
     end subroutine to_array
 !*****************************************************************************************
@@ -9944,10 +9962,10 @@
                     !string to value:
                     if (is_integer) then
                         ival = json%string_to_int(tmp)
-                        call to_integer(value,ival)
+                        call json%to_integer(value,ival)
                     else
                         rval = json%string_to_dble(tmp)
-                        call to_double(value,rval)
+                        call json%to_double(value,rval)
                     end if
 
                     exit    !finished
