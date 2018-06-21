@@ -2927,7 +2927,7 @@
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
 
-    subroutine json_update_string(json,p,path,val,found)
+    subroutine json_update_string(json,p,path,val,found,trim_str,adjustl_str)
 
     implicit none
 
@@ -2936,6 +2936,11 @@
     character(kind=CK,len=*),intent(in) :: path
     character(kind=CK,len=*),intent(in) :: val
     logical(LK),intent(out)             :: found
+    logical(LK),intent(in),optional     :: trim_str    !! if TRIM() should be called for the `val`
+                                                       !! (only used if `val` is present)
+    logical(LK),intent(in),optional     :: adjustl_str !! if ADJUSTL() should be called for the `val`
+                                                       !! (only used if `val` is present)
+                                                       !! (note that ADJUSTL is done before TRIM)
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
@@ -2946,7 +2951,7 @@
         call json%info(p_var,var_type)
         select case (var_type)
         case (json_null,json_logical,json_integer,json_double,json_string)
-            call to_string(p_var,val)    !update the value
+            call to_string(p_var,val,trim_str=trim_str,adjustl_str=adjustl_str) ! update the value
         case default
             found = .false.
             call json%throw_exception('Error in json_update_string: '//&
@@ -2964,7 +2969,7 @@
 !>
 !  Alternate version of [[json_update_string]], where `path` and `value` are kind=CDK.
 
-    subroutine wrap_json_update_string(json,p,path,val,found)
+    subroutine wrap_json_update_string(json,p,path,val,found,trim_str,adjustl_str)
 
     implicit none
 
@@ -2973,8 +2978,13 @@
     character(kind=CDK,len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
+    logical(LK),intent(in),optional     :: trim_str       !! if TRIM() should be called for the `val`
+                                                          !! (only used if `val` is present)
+    logical(LK),intent(in),optional     :: adjustl_str    !! if ADJUSTL() should be called for the `val`
+                                                          !! (only used if `val` is present)
+                                                          !! (note that ADJUSTL is done before TRIM)
 
-    call json%update(p,to_unicode(path),to_unicode(val),found)
+    call json%update(p,to_unicode(path),to_unicode(val),found,trim_str,adjustl_str)
 
     end subroutine wrap_json_update_string
 !*****************************************************************************************
@@ -2983,7 +2993,7 @@
 !>
 !  Alternate version of [[json_update_string]], where `path` is kind=CDK.
 
-    subroutine json_update_string_name_ascii(json,p,path,val,found)
+    subroutine json_update_string_name_ascii(json,p,path,val,found,trim_str,adjustl_str)
 
     implicit none
 
@@ -2992,8 +3002,13 @@
     character(kind=CDK,len=*),intent(in) :: path
     character(kind=CK, len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
+    logical(LK),intent(in),optional     :: trim_str       !! if TRIM() should be called for the `val`
+                                                          !! (only used if `val` is present)
+    logical(LK),intent(in),optional     :: adjustl_str    !! if ADJUSTL() should be called for the `val`
+                                                          !! (only used if `val` is present)
+                                                          !! (note that ADJUSTL is done before TRIM)
 
-    call json%update(p,to_unicode(path),val,found)
+    call json%update(p,to_unicode(path),val,found,trim_str,adjustl_str)
 
     end subroutine json_update_string_name_ascii
 !*****************************************************************************************
@@ -3002,7 +3017,7 @@
 !>
 !  Alternate version of [[json_update_string]], where `val` is kind=CDK.
 
-    subroutine json_update_string_val_ascii(json,p,path,val,found)
+    subroutine json_update_string_val_ascii(json,p,path,val,found,trim_str,adjustl_str)
 
     implicit none
 
@@ -3011,8 +3026,13 @@
     character(kind=CK, len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
+    logical(LK),intent(in),optional     :: trim_str       !! if TRIM() should be called for the `val`
+                                                          !! (only used if `val` is present)
+    logical(LK),intent(in),optional     :: adjustl_str    !! if ADJUSTL() should be called for the `val`
+                                                          !! (only used if `val` is present)
+                                                          !! (note that ADJUSTL is done before TRIM)
 
-    call json%update(p,path,to_unicode(val),found)
+    call json%update(p,path,to_unicode(val),found,trim_str,adjustl_str)
 
     end subroutine json_update_string_val_ascii
 !*****************************************************************************************
@@ -3566,7 +3586,8 @@
 !         then this routine will destroy it and replace it with the
 !         new value.
 
-    subroutine json_add_string_by_path(json,me,path,value,found,was_created)
+    subroutine json_add_string_by_path(json,me,path,value,found,&
+                                            was_created,trim_str,adjustl_str)
 
     implicit none
 
@@ -3576,6 +3597,8 @@
     character(kind=CK,len=*),intent(in) :: value        !! the value to add
     logical(LK),intent(out),optional    :: found        !! if the variable was found
     logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+    logical(LK),intent(in),optional     :: trim_str     !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional     :: adjustl_str  !! if ADJUSTL() should be called for each element
 
     type(json_value),pointer :: p
     type(json_value),pointer :: tmp
@@ -3611,7 +3634,7 @@
                 p%str_value = value
             else
                 call json%info(p,name=name)
-                call json%create_string(tmp,value,name)
+                call json%create_string(tmp,value,name,trim_str,adjustl_str)
                 call json%replace(p,tmp,destroy=.true.)
             end if
 
@@ -3629,7 +3652,8 @@
 !>
 !  Wrapper to [[json_add_string_by_path]] where "path" is kind=CDK.
 
-    subroutine wrap_json_add_string_by_path(json,me,path,value,found,was_created)
+    subroutine wrap_json_add_string_by_path(json,me,path,value,found,&
+                                                was_created,trim_str,adjustl_str)
 
     implicit none
 
@@ -3639,8 +3663,11 @@
     character(kind=CDK,len=*),intent(in) :: value       !! the value to add
     logical(LK),intent(out),optional     :: found       !! if the variable was found
     logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+    logical(LK),intent(in),optional      :: trim_str    !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional      :: adjustl_str !! if ADJUSTL() should be called for each element
 
-    call json%json_add_string_by_path(me,to_unicode(path),to_unicode(value),found,was_created)
+    call json%json_add_string_by_path(me,to_unicode(path),to_unicode(value),&
+                                        found,was_created,trim_str,adjustl_str)
 
     end subroutine wrap_json_add_string_by_path
 !*****************************************************************************************
@@ -3649,7 +3676,8 @@
 !>
 !  Wrapper for [[json_add_string_by_path]] where "path" is kind=CDK.
 
-    subroutine json_add_string_by_path_path_ascii(json,me,path,value,found,was_created)
+    subroutine json_add_string_by_path_path_ascii(json,me,path,value,found,&
+                                                    was_created,trim_str,adjustl_str)
 
     implicit none
 
@@ -3659,6 +3687,8 @@
     character(kind=CK,len=*),intent(in)  :: value        !! the value to add
     logical(LK),intent(out),optional     :: found        !! if the variable was found
     logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+    logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for each element
 
     call json%json_add_string_by_path(me,to_unicode(path),value,found,was_created)
 
@@ -3669,7 +3699,8 @@
 !>
 !  Wrapper for [[json_add_string_by_path]] where "value" is kind=CDK.
 
-    subroutine json_add_string_by_path_value_ascii(json,me,path,value,found,was_created)
+    subroutine json_add_string_by_path_value_ascii(json,me,path,value,found,&
+                                                        was_created,trim_str,adjustl_str)
 
     implicit none
 
@@ -3679,6 +3710,8 @@
     character(kind=CDK,len=*),intent(in) :: value        !! the value to add
     logical(LK),intent(out),optional     :: found        !! if the variable was found
     logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+    logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for each element
 
     call json%json_add_string_by_path(me,path,to_unicode(value),found,was_created)
 
@@ -3884,7 +3917,7 @@
 !@note The `ilen` input can be used to specify the actual lengths of the
 !      the strings in the array. They must all be `<= len(value)`.
 
-    subroutine json_add_string_vec_by_path(json,me,path,value,found,was_created,ilen)
+    subroutine json_add_string_vec_by_path(json,me,path,value,found,was_created,ilen,trim_str,adjustl_str)
 
     implicit none
 
@@ -3898,6 +3931,8 @@
                                                          !! element in `value`. If not present,
                                                          !! the full `len(value)` string is added
                                                          !! for each element.
+    logical(LK),intent(in),optional     :: trim_str      !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional     :: adjustl_str   !! if ADJUSTL() should be called for each element
 
     type(json_value),pointer :: p   !! pointer to path (which may exist)
     type(json_value),pointer :: var !! new variable that is created
@@ -3946,9 +3981,11 @@
             !populate each element of the array:
             do i=1,size(value)
                 if (present(ilen)) then
-                    call json%add(var, CK_'', value(i)(1:ilen(i)))
+                    call json%add(var, CK_'', value(i)(1:ilen(i)), &
+                                  trim_str=trim_str, adjustl_str=adjustl_str)
                 else
-                    call json%add(var, CK_'', value(i))
+                    call json%add(var, CK_'', value(i), &
+                                  trim_str=trim_str, adjustl_str=adjustl_str)
                 end if
             end do
         end if
@@ -3966,7 +4003,8 @@
 !  Wrapper for [[json_add_string_vec_by_path]] where "path" and "value" are kind=CDK).
 
     subroutine wrap_json_add_string_vec_by_path(json,me,path,value,&
-                                                found,was_created,ilen)
+                                                found,was_created,ilen,&
+                                                trim_str,adjustl_str)
 
     implicit none
 
@@ -3980,9 +4018,11 @@
                                                          !! element in `value`. If not present,
                                                          !! the full `len(value)` string is added
                                                          !! for each element.
+    logical(LK),intent(in),optional  :: trim_str         !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional  :: adjustl_str      !! if ADJUSTL() should be called for each element
 
     call json%json_add_string_vec_by_path(me,to_unicode(path),to_unicode(value),&
-                                            found,was_created,ilen)
+                                            found,was_created,ilen,trim_str,adjustl_str)
 
     end subroutine wrap_json_add_string_vec_by_path
 !*****************************************************************************************
@@ -3992,7 +4032,8 @@
 !  Wrapper for [[json_add_string_vec_by_path]] where "value" is kind=CDK).
 
     subroutine json_add_string_vec_by_path_value_ascii(json,me,path,value,&
-                                                        found,was_created,ilen)
+                                                        found,was_created,ilen,&
+                                                        trim_str,adjustl_str)
 
     implicit none
 
@@ -4006,9 +4047,11 @@
                                                          !! element in `value`. If not present,
                                                          !! the full `len(value)` string is added
                                                          !! for each element.
+    logical(LK),intent(in),optional  :: trim_str         !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional  :: adjustl_str      !! if ADJUSTL() should be called for each element
 
     call json%json_add_string_vec_by_path(me,path,to_unicode(value),&
-                                            found,was_created,ilen)
+                                            found,was_created,ilen,trim_str,adjustl_str)
 
     end subroutine json_add_string_vec_by_path_value_ascii
 !*****************************************************************************************
@@ -4018,7 +4061,8 @@
 !  Wrapper for [[json_add_string_vec_by_path]] where "path" is kind=CDK).
 
     subroutine json_add_string_vec_by_path_path_ascii(json,me,path,value,&
-                                                        found,was_created,ilen)
+                                                        found,was_created,ilen,&
+                                                        trim_str,adjustl_str)
 
     implicit none
 
@@ -4032,6 +4076,8 @@
                                                          !! element in `value`. If not present,
                                                          !! the full `len(value)` string is added
                                                          !! for each element.
+    logical(LK),intent(in),optional  :: trim_str         !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional  :: adjustl_str      !! if ADJUSTL() should be called for each element
 
     call json%json_add_string_vec_by_path(me,to_unicode(path),value,&
                                             found,was_created,ilen)
@@ -4391,19 +4437,21 @@
 !@note This routine is part of the public API that can be
 !      used to build a JSON structure using [[json_value]] pointers.
 
-    subroutine json_value_add_string(json, p, name, val)
+    subroutine json_value_add_string(json, p, name, val, trim_str, adjustl_str)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name  !! name of the variable
-    character(kind=CK,len=*),intent(in) :: val   !! value
+    character(kind=CK,len=*),intent(in) :: name        !! name of the variable
+    character(kind=CK,len=*),intent(in) :: val         !! value
+    logical(LK),intent(in),optional     :: trim_str    !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional     :: adjustl_str !! if ADJUSTL() should be called for the `val`
 
     type(json_value),pointer :: var
 
     !create the variable:
-    call json%create_string(var,val,name)
+    call json%create_string(var,val,name,trim_str,adjustl_str)
 
     !add it:
     call json%add(p, var)
@@ -4415,16 +4463,18 @@
 !>
 !  Alternate version of [[json_value_add_string]] where `name` and `val` are kind=CDK.
 
-    subroutine wrap_json_value_add_string(json, p, name, val)
+    subroutine wrap_json_value_add_string(json, p, name, val, trim_str, adjustl_str)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
-    character(kind=CDK,len=*),intent(in) :: val    !! value
+    character(kind=CDK,len=*),intent(in) :: name        !! name of the variable
+    character(kind=CDK,len=*),intent(in) :: val         !! value
+    logical(LK),intent(in),optional      :: trim_str    !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str !! if ADJUSTL() should be called for the `val`
 
-    call json%add(p, to_unicode(name), to_unicode(val))
+    call json%add(p, to_unicode(name), to_unicode(val), trim_str, adjustl_str)
 
     end subroutine wrap_json_value_add_string
 !*****************************************************************************************
@@ -4433,16 +4483,18 @@
 !>
 !  Alternate version of [[json_value_add_string]] where `name` is kind=CDK.
 
-    subroutine json_value_add_string_name_ascii(json, p, name, val)
+    subroutine json_value_add_string_name_ascii(json, p, name, val, trim_str, adjustl_str)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name   !! name of the variable
-    character(kind=CK, len=*),intent(in) :: val    !! value
+    character(kind=CDK,len=*),intent(in) :: name        !! name of the variable
+    character(kind=CK, len=*),intent(in) :: val         !! value
+    logical(LK),intent(in),optional      :: trim_str    !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str !! if ADJUSTL() should be called for the `val`
 
-    call json%add(p, to_unicode(name), val)
+    call json%add(p, to_unicode(name), val, trim_str, adjustl_str)
 
     end subroutine json_value_add_string_name_ascii
 !*****************************************************************************************
@@ -4451,16 +4503,18 @@
 !>
 !  Alternate version of [[json_value_add_string]] where `val` is kind=CDK.
 
-    subroutine json_value_add_string_val_ascii(json, p, name, val)
+    subroutine json_value_add_string_val_ascii(json, p, name, val, trim_str, adjustl_str)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CK, len=*),intent(in) :: name   !! name of the variable
-    character(kind=CDK,len=*),intent(in) :: val    !! value
+    character(kind=CK, len=*),intent(in) :: name        !! name of the variable
+    character(kind=CDK,len=*),intent(in) :: val         !! value
+    logical(LK),intent(in),optional      :: trim_str    !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str !! if ADJUSTL() should be called for the `val`
 
-    call json%add(p, name, to_unicode(val))
+    call json%add(p, name, to_unicode(val), trim_str, adjustl_str)
 
     end subroutine json_value_add_string_val_ascii
 !*****************************************************************************************
@@ -4486,39 +4540,14 @@
     logical(LK),intent(in),optional                  :: adjustl_str !! if ADJUSTL() should be called for each element
 
     type(json_value),pointer :: var
-    integer(IK) :: i
-    logical(LK) :: trim_string, adjustl_string
-    character(kind=CK,len=:),allocatable :: str
-
-    !if the string is to be trimmed or not:
-    if (present(trim_str)) then
-        trim_string = trim_str
-    else
-        trim_string = .false.
-    end if
-    if (present(adjustl_str)) then
-        adjustl_string = adjustl_str
-    else
-        adjustl_string = .false.
-    end if
+    integer(IK) :: i  !! counter
 
     !create the variable as an array:
     call json%create_array(var,name)
 
     !populate the array:
     do i=1,size(val)
-
-        !the string to write:
-        str = val(i)
-        if (adjustl_string) str = adjustl(str)
-        if (trim_string)    str = trim(str)
-
-        !write it:
-        call json%add(var, CK_'', str)
-
-        !cleanup
-        deallocate(str)
-
+        call json%add(var, CK_'', val(i), trim_str, adjustl_str)
     end do
 
     !add it:
@@ -6593,8 +6622,8 @@
                                 end if
                                 if (iend>istart) then
 
-                                    !     istart  iend
-                                    !       |       |
+                                    !     istart  iend
+                                    !       |       |
                                     ! ['p']['abcdefg']
 
                                     if (iend>istart+1) then
@@ -9101,7 +9130,7 @@
 !     call json%create_string(p,'value','hello')
 !````
 
-    subroutine json_value_create_string(json,p,val,name)
+    subroutine json_value_create_string(json,p,val,name,trim_str,adjustl_str)
 
     implicit none
 
@@ -9109,9 +9138,11 @@
     type(json_value),pointer            :: p
     character(kind=CK,len=*),intent(in) :: val
     character(kind=CK,len=*),intent(in) :: name
+    logical(LK),intent(in),optional     :: trim_str      !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional     :: adjustl_str   !! if ADJUSTL() should be called for the `val`
 
     call json_value_create(p)
-    call to_string(p,val,name)
+    call to_string(p,val,name,trim_str,adjustl_str)
 
     end subroutine json_value_create_string
 !*****************************************************************************************
@@ -9123,7 +9154,7 @@
 !  with actual character string arguments for `name` and `val` that are BOTH of
 !  'DEFAULT' or 'ISO_10646' character kind.
 
-    subroutine wrap_json_value_create_string(json,p,val,name)
+    subroutine wrap_json_value_create_string(json,p,val,name,trim_str,adjustl_str)
 
     implicit none
 
@@ -9131,8 +9162,10 @@
     type(json_value),pointer             :: p
     character(kind=CDK,len=*),intent(in) :: val
     character(kind=CDK,len=*),intent(in) :: name
+    logical(LK),intent(in),optional     :: trim_str      !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional     :: adjustl_str   !! if ADJUSTL() should be called for the `val`
 
-    call json%create_string(p,to_unicode(val),to_unicode(name))
+    call json%create_string(p,to_unicode(val),to_unicode(name),trim_str,adjustl_str)
 
     end subroutine wrap_json_value_create_string
 !*****************************************************************************************
@@ -9379,7 +9412,7 @@
 !### Modified
 !  * Izaak Beekman : 02/24/2015
 
-    subroutine to_string(p,val,name)
+    subroutine to_string(p,val,name,trim_str,adjustl_str)
 
     implicit none
 
@@ -9387,18 +9420,47 @@
     character(kind=CK,len=*),intent(in),optional :: val   !! if the value is also to be set
                                                           !! (if not present, then '' is used).
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
+    logical(LK),intent(in),optional     :: trim_str       !! if TRIM() should be called for the `val`
+                                                          !! (only used if `val` is present)
+    logical(LK),intent(in),optional     :: adjustl_str    !! if ADJUSTL() should be called for the `val`
+                                                          !! (only used if `val` is present)
+                                                          !! (note that ADJUSTL is done before TRIM)
+
+    character(kind=CK,len=:),allocatable :: str !! temp string for `trim()` and/or `adjustl()`
+    logical :: trim_string    !! if the string is to be trimmed
+    logical :: adjustl_string !! if the string is to be adjusted left
 
     !set type and value:
     call destroy_json_data(p)
     p%var_type = json_string
     if (present(val)) then
-        p%str_value = val
+
+        if (present(trim_str)) then
+            trim_string = trim_str
+        else
+            trim_string = .false.
+        end if
+        if (present(adjustl_str)) then
+            adjustl_string = adjustl_str
+        else
+            adjustl_string = .false.
+        end if
+
+        if (trim_string .or. adjustl_string) then
+            str = val
+            if (adjustl_string) str = adjustl(str)
+            if (trim_string)    str = trim(str)
+            p%str_value = str
+        else
+            p%str_value = val
+        end if
+
     else
-        p%str_value = CK_''    !default value
+        p%str_value = CK_''  ! default value
     end if
 
     !name:
-    if (present(name)) p%name = trim(name)
+    if (present(name)) p%name = name
 
     end subroutine to_string
 !*****************************************************************************************
