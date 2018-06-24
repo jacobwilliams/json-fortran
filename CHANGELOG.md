@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.5.0 (2018-06-23)](#640-2018-06-23)
     - [6.4.0 (2018-06-10)](#640-2018-06-10)
     - [6.3.0 (2018-04-20)](#630-2018-04-20)
     - [6.2.0 (2018-03-10)](#620-2018-03-10)
@@ -25,10 +26,19 @@
     - [2.0.0 (2014-12-27)](#200-2014-12-27)
     - [1.0.0 (2014-06-23)](#100-2014-06-23)
 
-
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.4.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.5.0...HEAD)
+
+### [6.5.0](https://github.com/jacobwilliams/json-fortran/tree/6.5.0) (2018-06-23)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.4.0...6.5.0)
+or [Download v6.5.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.5.0)
+
+**Enhancements & Fixed Issues:**
+
+- Added optional `trim` and `adjustl` arguments were added to all the various routines for adding strings and string vectors to JSON [\#323](https://github.com/jacobwilliams/json-fortran/issues/323) ([jacobwilliams](https://github.com/jacobwilliams))
+- The `trailing_spaces_significant` flag is now respected for name keys when creating a JSON structure. [\#324](https://github.com/jacobwilliams/json-fortran/issues/324) [\#326](https://github.com/jacobwilliams/json-fortran/issues/326) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.4.0](https://github.com/jacobwilliams/json-fortran/tree/6.4.0) (2018-06-10)
 
