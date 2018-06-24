@@ -605,7 +605,9 @@
 
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: filename  !! the filename to open
-    integer(IK),intent(in),optional      :: unit      !! the unit number to use (if not present, a newunit is used)
+    integer(IK),intent(in),optional      :: unit      !! the unit number to use
+                                                      !! (if not present, a newunit
+                                                      !! is used)
 
     call me%core%parse(file=filename, p=me%p, unit=unit)
 
@@ -1735,7 +1737,7 @@
 !
 !  Add a character string to a json file.
 
-    subroutine json_file_add_string(me,path,val,found,was_created)
+    subroutine json_file_add_string(me,path,val,found,was_created,trim_str,adjustl_str)
 
     implicit none
 
@@ -1744,10 +1746,13 @@
     character(kind=CK,len=*),intent(in) :: val          !! value
     logical(LK),intent(out),optional    :: found        !! if the variable was found
     logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+    logical(LK),intent(in),optional     :: trim_str     !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional     :: adjustl_str  !! if ADJUSTL() should be called for the `val`
+                                                        !! (note that ADJUSTL is done before TRIM)
 
     if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
 
-    call me%core%add_by_path(me%p,path,val,found,was_created)
+    call me%core%add_by_path(me%p,path,val,found,was_created,trim_str,adjustl_str)
 
     end subroutine json_file_add_string
 !*****************************************************************************************
@@ -1757,7 +1762,7 @@
 !
 !  Alternate version of [[json_file_add_string]], where "path" and "val" are kind=CDK.
 
-    subroutine wrap_json_file_add_string(me,path,val,found,was_created)
+    subroutine wrap_json_file_add_string(me,path,val,found,was_created,trim_str,adjustl_str)
 
     implicit none
 
@@ -1766,8 +1771,12 @@
     character(kind=CDK,len=*),intent(in) :: val          !! value
     logical(LK),intent(out),optional     :: found        !! if the variable was found
     logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+    logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for the `val`
+                                                         !! (note that ADJUSTL is done before TRIM)
 
-    call me%json_file_add_string(to_unicode(path),to_unicode(val),found,was_created)
+    call me%json_file_add_string(to_unicode(path),to_unicode(val),found,&
+                                    was_created,trim_str,adjustl_str)
 
     end subroutine wrap_json_file_add_string
 !*****************************************************************************************
@@ -1777,7 +1786,8 @@
 !
 !  Wrapper for [[json_file_add_string]] where "path" is kind=CDK).
 
-    subroutine json_file_add_string_path_ascii(me,path,val,found,was_created)
+    subroutine json_file_add_string_path_ascii(me,path,val,found,&
+                                                    was_created,trim_str,adjustl_str)
 
     implicit none
 
@@ -1786,10 +1796,14 @@
     character(kind=CK,len=*),intent(in)  :: val          !! value
     logical(LK),intent(out),optional     :: found        !! if the variable was found
     logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+    logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for the `val`
+                                                         !! (note that ADJUSTL is done before TRIM)
 
     if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
 
-    call me%json_file_add_string(to_unicode(path),val,found,was_created)
+    call me%json_file_add_string(to_unicode(path),val,found,&
+                                    was_created,trim_str,adjustl_str)
 
     end subroutine json_file_add_string_path_ascii
 !*****************************************************************************************
@@ -1799,7 +1813,8 @@
 !
 !  Wrapper for [[json_file_add_string]] where "val" is kind=CDK).
 
-    subroutine json_file_add_string_value_ascii(me,path,val,found,was_created)
+    subroutine json_file_add_string_value_ascii(me,path,val,found,&
+                                                    was_created,trim_str,adjustl_str)
 
     implicit none
 
@@ -1808,12 +1823,16 @@
     character(kind=CDK,len=*),intent(in) :: val          !! value
     logical(LK),intent(out),optional     :: found        !! if the variable was found
     logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+    logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for the `val`
+                                                         !! (note that ADJUSTL is done before TRIM)
 
     if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
 
-    call me%json_file_add_string(path,to_unicode(val),found,was_created)
+    call me%json_file_add_string(path,to_unicode(val),found,&
+                                    was_created,trim_str,adjustl_str)
 
-end subroutine json_file_add_string_value_ascii
+    end subroutine json_file_add_string_value_ascii
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1821,23 +1840,27 @@ end subroutine json_file_add_string_value_ascii
 !
 !  Add a string vector to a JSON file.
 
-    subroutine json_file_add_string_vec(me,path,vec,found,was_created,ilen)
+    subroutine json_file_add_string_vec(me,path,vec,found,&
+                                            was_created,ilen,trim_str,adjustl_str)
 
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CK,len=*),intent(in)              :: path  !! the path to the variable
-    character(kind=CK,len=*),dimension(:),intent(in) :: vec   !! the value vector
+    character(kind=CK,len=*),intent(in)              :: path         !! the path to the variable
+    character(kind=CK,len=*),dimension(:),intent(in) :: vec          !! the value vector
     logical(LK),intent(out),optional                 :: found        !! if the variable was found
     logical(LK),intent(out),optional                 :: was_created  !! if the variable had to be created
-    integer(IK),dimension(:),intent(in),optional     :: ilen   !! the string lengths of each
-                                                               !! element in `value`. If not present,
-                                                               !! the full `len(value)` string is added
-                                                               !! for each element.
+    integer(IK),dimension(:),intent(in),optional     :: ilen         !! the string lengths of each
+                                                                     !! element in `value`. If not present,
+                                                                     !! the full `len(value)` string is added
+                                                                     !! for each element.
+    logical(LK),intent(in),optional                  :: trim_str     !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional                  :: adjustl_str  !! if ADJUSTL() should be called for each element
+                                                                     !! (note that ADJUSTL is done before TRIM)
 
     if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
 
-    call me%core%add_by_path(me%p,path,vec,found,was_created,ilen)
+    call me%core%add_by_path(me%p,path,vec,found,was_created,ilen,trim_str,adjustl_str)
 
     end subroutine json_file_add_string_vec
 !*****************************************************************************************
@@ -1847,21 +1870,26 @@ end subroutine json_file_add_string_value_ascii
 !
 !  Alternate version of [[json_file_add_string_vec]], where "path" and "vec" are kind=CDK.
 
-    subroutine wrap_json_file_add_string_vec(me,path,vec,found,was_created,ilen)
+    subroutine wrap_json_file_add_string_vec(me,path,vec,found,&
+                                                was_created,ilen,trim_str,adjustl_str)
 
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CDK,len=*),intent(in)             :: path  !! the path to the variable
-    character(kind=CDK,len=*),dimension(:),intent(in):: vec   !! the value vector
+    character(kind=CDK,len=*),intent(in)             :: path         !! the path to the variable
+    character(kind=CDK,len=*),dimension(:),intent(in):: vec          !! the value vector
     logical(LK),intent(out),optional                 :: found        !! if the variable was found
     logical(LK),intent(out),optional                 :: was_created  !! if the variable had to be created
-    integer(IK),dimension(:),intent(in),optional     :: ilen   !! the string lengths of each
-                                                               !! element in `value`. If not present,
-                                                               !! the full `len(value)` string is added
-                                                               !! for each element.
+    integer(IK),dimension(:),intent(in),optional     :: ilen         !! the string lengths of each
+                                                                     !! element in `value`. If not present,
+                                                                     !! the full `len(value)` string is added
+                                                                     !! for each element.
+    logical(LK),intent(in),optional                  :: trim_str     !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional                  :: adjustl_str  !! if ADJUSTL() should be called for each element
+                                                                     !! (note that ADJUSTL is done before TRIM)
 
-    call me%json_file_add_string_vec(to_unicode(path),to_unicode(vec),found,was_created,ilen)
+    call me%json_file_add_string_vec(to_unicode(path),to_unicode(vec),found,&
+                                        was_created,ilen,trim_str,adjustl_str)
 
     end subroutine wrap_json_file_add_string_vec
 !*****************************************************************************************
@@ -1871,21 +1899,26 @@ end subroutine json_file_add_string_value_ascii
 !
 !  Alternate version of [[json_file_add_string_vec]], where "path" is kind=CDK.
 
-    subroutine json_file_add_string_vec_path_ascii(me,path,vec,found,was_created,ilen)
+    subroutine json_file_add_string_vec_path_ascii(me,path,vec,found,&
+                                                    was_created,ilen,trim_str,adjustl_str)
 
     implicit none
 
     class(json_file),intent(inout)                   :: me
-    character(kind=CDK,len=*),intent(in)             :: path  !! the path to the variable
-    character(kind=CK,len=*),dimension(:),intent(in) :: vec   !! the value vector
+    character(kind=CDK,len=*),intent(in)             :: path         !! the path to the variable
+    character(kind=CK,len=*),dimension(:),intent(in) :: vec          !! the value vector
     logical(LK),intent(out),optional                 :: found        !! if the variable was found
     logical(LK),intent(out),optional                 :: was_created  !! if the variable had to be created
-    integer(IK),dimension(:),intent(in),optional     :: ilen   !! the string lengths of each
-                                                               !! element in `value`. If not present,
-                                                               !! the full `len(value)` string is added
-                                                               !! for each element.
+    integer(IK),dimension(:),intent(in),optional     :: ilen         !! the string lengths of each
+                                                                     !! element in `value`. If not present,
+                                                                     !! the full `len(value)` string is added
+                                                                     !! for each element.
+    logical(LK),intent(in),optional                  :: trim_str     !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional                  :: adjustl_str  !! if ADJUSTL() should be called for each element
+                                                                     !! (note that ADJUSTL is done before TRIM)
 
-    call me%json_file_add_string_vec(to_unicode(path),vec,found,was_created,ilen)
+    call me%json_file_add_string_vec(to_unicode(path),vec,found,&
+                                        was_created,ilen,trim_str,adjustl_str)
 
     end subroutine json_file_add_string_vec_path_ascii
 !*****************************************************************************************
@@ -1895,21 +1928,26 @@ end subroutine json_file_add_string_value_ascii
 !
 !  Alternate version of [[json_file_add_string_vec]], where "vec" is kind=CDK.
 
-    subroutine json_file_add_string_vec_vec_ascii(me,path,vec,found,was_created,ilen)
+    subroutine json_file_add_string_vec_vec_ascii(me,path,vec,found,&
+                                                    was_created,ilen,trim_str,adjustl_str)
 
     implicit none
 
     class(json_file),intent(inout)                    :: me
-    character(kind=CK,len=*),intent(in)               :: path  !! the path to the variable
-    character(kind=CDK,len=*),dimension(:),intent(in) :: vec   !! the value vector
+    character(kind=CK,len=*),intent(in)               :: path         !! the path to the variable
+    character(kind=CDK,len=*),dimension(:),intent(in) :: vec          !! the value vector
     logical(LK),intent(out),optional                  :: found        !! if the variable was found
     logical(LK),intent(out),optional                  :: was_created  !! if the variable had to be created
-    integer(IK),dimension(:),intent(in),optional      :: ilen   !! the string lengths of each
-                                                                !! element in `value`. If not present,
-                                                                !! the full `len(value)` string is added
-                                                                !! for each element.
+    integer(IK),dimension(:),intent(in),optional      :: ilen         !! the string lengths of each
+                                                                      !! element in `value`. If not present,
+                                                                      !! the full `len(value)` string is added
+                                                                      !! for each element.
+    logical(LK),intent(in),optional                   :: trim_str     !! if TRIM() should be called for each element
+    logical(LK),intent(in),optional                   :: adjustl_str  !! if ADJUSTL() should be called for each element
+                                                                      !! (note that ADJUSTL is done before TRIM)
 
-    call me%json_file_add_string_vec(path,to_unicode(vec),found,was_created,ilen)
+    call me%json_file_add_string_vec(path,to_unicode(vec),found,&
+                                        was_created,ilen,trim_str,adjustl_str)
 
     end subroutine json_file_add_string_vec_vec_ascii
 !*****************************************************************************************
@@ -2054,7 +2092,7 @@ end subroutine json_file_add_string_value_ascii
 !### See also
 !  * [[json_update_string]]
 
-    subroutine json_file_update_string(me,path,val,found)
+    subroutine json_file_update_string(me,path,val,found,trim_str,adjustl_str)
 
     implicit none
 
@@ -2062,8 +2100,11 @@ end subroutine json_file_add_string_value_ascii
     character(kind=CK,len=*),intent(in) :: path
     character(kind=CK,len=*),intent(in) :: val
     logical(LK),intent(out)             :: found
+    logical(LK),intent(in),optional     :: trim_str     !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional     :: adjustl_str  !! if ADJUSTL() should be called for the `val`
+                                                        !! (note that ADJUSTL is done before TRIM)
 
-    if (.not. me%core%failed()) call me%core%update(me%p,path,val,found)
+    if (.not. me%core%failed()) call me%core%update(me%p,path,val,found,trim_str,adjustl_str)
 
     end subroutine json_file_update_string
 !*****************************************************************************************
@@ -2072,7 +2113,7 @@ end subroutine json_file_add_string_value_ascii
 !>
 !  Alternate version of [[json_file_update_string]], where "path" and "val" are kind=CDK.
 
-    subroutine wrap_json_file_update_string(me,path,val,found)
+    subroutine wrap_json_file_update_string(me,path,val,found,trim_str,adjustl_str)
 
     implicit none
 
@@ -2080,8 +2121,11 @@ end subroutine json_file_add_string_value_ascii
     character(kind=CDK,len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
+    logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for the `val`
+                                                         !! (note that ADJUSTL is done before TRIM)
 
-    call me%update(to_unicode(path),to_unicode(val),found)
+    call me%update(to_unicode(path),to_unicode(val),found,trim_str,adjustl_str)
 
     end subroutine wrap_json_file_update_string
 !*****************************************************************************************
@@ -2090,7 +2134,7 @@ end subroutine json_file_add_string_value_ascii
 !>
 !  Alternate version of [[json_file_update_string]], where "path" is kind=CDK.
 
-    subroutine json_file_update_string_name_ascii(me,path,val,found)
+    subroutine json_file_update_string_name_ascii(me,path,val,found,trim_str,adjustl_str)
 
     implicit none
 
@@ -2098,8 +2142,11 @@ end subroutine json_file_add_string_value_ascii
     character(kind=CDK,len=*),intent(in) :: path
     character(kind=CK, len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
+    logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for the `val`
+                                                         !! (note that ADJUSTL is done before TRIM)
 
-    call me%update(to_unicode(path),val,found)
+    call me%update(to_unicode(path),val,found,trim_str,adjustl_str)
 
     end subroutine json_file_update_string_name_ascii
 !*****************************************************************************************
@@ -2108,7 +2155,7 @@ end subroutine json_file_add_string_value_ascii
 !>
 !  Alternate version of [[json_file_update_string]], where "val" is kind=CDK.
 
-    subroutine json_file_update_string_val_ascii(me,path,val,found)
+    subroutine json_file_update_string_val_ascii(me,path,val,found,trim_str,adjustl_str)
 
     implicit none
 
@@ -2116,8 +2163,11 @@ end subroutine json_file_add_string_value_ascii
     character(kind=CK, len=*),intent(in) :: path
     character(kind=CDK,len=*),intent(in) :: val
     logical(LK),intent(out)              :: found
+    logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for the `val`
+                                                         !! (note that ADJUSTL is done before TRIM)
 
-    call me%update(path,to_unicode(val),found)
+    call me%update(path,to_unicode(val),found,trim_str,adjustl_str)
 
     end subroutine json_file_update_string_val_ascii
 !*****************************************************************************************
