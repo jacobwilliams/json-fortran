@@ -5680,9 +5680,6 @@
 !
 !  * The original JSON-Fortran defaults
 !  * [RFC 6901](https://tools.ietf.org/html/rfc6901)
-!
-!@warning if `found` is present, we should clear any exceptions that are thrown
-!         to be consistent with other routines. This is not currently being done.
 
     subroutine json_get_by_path(json, me, path, p, found)
 
@@ -5716,6 +5713,10 @@
                                         trim(path_mode_str))
             if (present(found)) found = .false.
         end select
+
+        if (present(found)) then
+            if (.not. found) call json%clear_exceptions()
+        end if
 
     else
         if (present(found)) found = .false.
