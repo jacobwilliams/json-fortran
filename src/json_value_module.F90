@@ -7755,7 +7755,7 @@
             case (json_integer)
                 value = (me%int_value > 0_IK)
             case (json_double)
-                value = (me%int_value > 0.0_RK)
+                value = (me%dbl_value > 0.0_RK)
             case (json_string)
                 value = (me%str_value == true_str)
             case default
