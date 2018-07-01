@@ -4,7 +4,7 @@
 !
 !  JSON-Fortran support module for string manipulation.
 !
-!## License
+!### License
 !  * JSON-Fortran is released under a BSD-style license.
 !    See the [LICENSE](https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE)
 !    file for details.

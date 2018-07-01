@@ -353,7 +353,7 @@
 !  Initialize the [[json_core(type)]] for this [[json_file]].
 !  This is just a wrapper for [[json_initialize]].
 !
-!@note: This does not destroy the data in the file.
+!@note This does not destroy the data in the file.
 !
 !@note [[initialize_json_core]], [[json_initialize]],
 !      [[initialize_json_core_in_file]], and [[initialize_json_file]]
@@ -401,9 +401,9 @@
 !>
 !  Set the [[json_core(type)]] for this [[json_file]].
 !
-!@note: This does not destroy the data in the file.
+!@note This does not destroy the data in the file.
 !
-!@note: This one is used if you want to initialize the file with
+!@note This one is used if you want to initialize the file with
 !       an already-existing [[json_core(type)]] (presumably, this was already
 !       initialized by a call to [[initialize_json_core]] or similar).
 
