@@ -3880,7 +3880,7 @@
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: me           !! the JSON structure
     character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
-    real(RK),dimension(:),intent(in)     :: value        !! the vector to add
+    real(RK),dimension(:),intent(in)    :: value        !! the vector to add
     logical(LK),intent(out),optional    :: found        !! if the variable was found
     logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
 
@@ -5294,8 +5294,8 @@
     logical(LK) :: is_array      !! if this is an element in an array
     integer(IK) :: var_type      !! for getting the variable type of children
     integer(IK) :: var_type_prev !! for getting the variable type of children
-    logical(LK) :: is_vector !! if all elements of a vector
-                             !! are scalars of the same type
+    logical(LK) :: is_vector     !! if all elements of a vector
+                                 !! are scalars of the same type
     character(kind=CK,len=:),allocatable :: str_escaped !! escaped version of
                                                         !! `name` or `str_value`
 
@@ -8938,7 +8938,7 @@
     type(json_value),pointer            :: value  !! JSON data that is extracted
 
     logical(LK)              :: eof !! end-of-file flag
-    character(kind=CK,len=1) :: c   !! character read from file (or string)
+    character(kind=CK,len=1) :: c   !! character read from file (or string) by [[pop_char]]
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp  !! this is a work-around for a bug
                                                  !! in the gfortran 4.9 compiler.
@@ -9227,8 +9227,8 @@
     type(json_value),pointer             :: p
     character(kind=CDK,len=*),intent(in) :: val
     character(kind=CDK,len=*),intent(in) :: name
-    logical(LK),intent(in),optional     :: trim_str      !! if TRIM() should be called for the `val`
-    logical(LK),intent(in),optional     :: adjustl_str   !! if ADJUSTL() should be called for the `val`
+    logical(LK),intent(in),optional      :: trim_str      !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str   !! if ADJUSTL() should be called for the `val`
 
     call json%create_string(p,to_unicode(val),to_unicode(name),trim_str,adjustl_str)
 
@@ -9432,7 +9432,7 @@
     if (present(val)) then
         p%int_value = val
     else
-        p%int_value = 0    !default value
+        p%int_value = 0_IK    !default value
     end if
 
     !name:
@@ -9616,9 +9616,9 @@
     character(kind=CK,len=*),intent(in) :: str     !! JSON string (if parsing from a string)
     type(json_value),pointer            :: parent  !! the parsed object will be added as a child of this
 
-    type(json_value),pointer :: pair
-    logical(LK) :: eof
-    character(kind=CK,len=1) :: c
+    type(json_value),pointer :: pair  !! temp variable
+    logical(LK)              :: eof   !! end of file flag
+    character(kind=CK,len=1) :: c     !! character returned by [[pop_char]]
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp  !! this is a work-around for a bug
                                                  !! in the gfortran 4.9 compiler.
@@ -9719,9 +9719,9 @@
     character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
     type(json_value),pointer            :: array
 
-    type(json_value),pointer :: element
-    logical(LK) :: eof
-    character(kind=CK,len=1) :: c
+    type(json_value),pointer :: element !! temp variable for array element
+    logical(LK)              :: eof     !! end of file flag
+    character(kind=CK,len=1) :: c       !! character returned by [[pop_char]]
 
     do
 
@@ -9783,14 +9783,17 @@
     character(kind=CK,len=*),intent(in)              :: str   !! JSON string (if parsing from a string)
     character(kind=CK,len=:),allocatable,intent(out) :: string !! the string (unescaped if necessary)
 
-    logical(LK) :: eof, is_hex, escape
-    character(kind=CK,len=1) :: c
-    character(kind=CK,len=4) :: hex
-    integer(IK) :: i
-    integer(IK) :: ip !! index to put next character,
-                      !! to speed up by reducing the number of character string reallocations.
+    logical(LK)              :: eof      !! end of file flag
+    logical(LK)              :: is_hex   !! it is a hex string
+    logical(LK)              :: escape   !! for escape string parsing
+    character(kind=CK,len=1) :: c        !! character returned by [[pop_char]]
+    character(kind=CK,len=4) :: hex      !! hex string
+    integer(IK)              :: i        !! counter
+    integer(IK)              :: ip       !! index to put next character,
+                                         !! to speed up by reducing the number
+                                         !! of character string reallocations.
     character(kind=CK,len=:),allocatable :: string_unescaped !! temp variable
-    character(kind=CK,len=:),allocatable :: error_message !! for string unescaping
+    character(kind=CK,len=:),allocatable :: error_message    !! for string unescaping
 
     !at least return a blank string if there is a problem:
     string = repeat(space, chunk_size)
@@ -9903,9 +9906,10 @@
     character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
     character(kind=CK,len=*),intent(in) :: chars  !! the string to check for.
 
-    integer(IK) :: i, length
-    logical(LK) :: eof
-    character(kind=CK,len=1) :: c
+    integer(IK) :: i               !! counter
+    integer(IK) :: length          !! trimmed length of `chars`
+    logical(LK) :: eof             !! end of file flag
+    character(kind=CK,len=1) :: c  !! character returned by [[pop_char]]
 
     if (.not. json%exception_thrown) then
 
@@ -9949,16 +9953,16 @@
     character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
     type(json_value),pointer            :: value
 
-    character(kind=CK,len=:),allocatable :: tmp
-    character(kind=CK,len=1) :: c
-    logical(LK) :: eof
-    real(RK) :: rval
-    integer(IK) :: ival
-    logical(LK) :: first
-    logical(LK) :: is_integer
-    integer(IK) :: ip !! index to put next character
-                      !! [to speed up by reducing the number
-                      !! of character string reallocations]
+    character(kind=CK,len=:),allocatable :: tmp !! temp string
+    character(kind=CK,len=1) :: c           !! character returned by [[pop_char]]
+    logical(LK)              :: eof         !! end of file flag
+    real(RK)                 :: rval        !! real value
+    integer(IK)              :: ival        !! integer value
+    logical(LK)              :: first       !! first character
+    logical(LK)              :: is_integer  !! it is an integer
+    integer(IK)              :: ip          !! index to put next character
+                                            !! [to speed up by reducing the number
+                                            !! of character string reallocations]
 
     if (.not. json%exception_thrown) then
 
@@ -10241,7 +10245,8 @@
     implicit none
 
     class(json_core),intent(inout) :: json
-    integer, intent(in), optional  :: io_unit
+    integer, intent(in), optional  :: io_unit  !! unit number for
+                                               !! printing error message
 
     character(kind=CK,len=:),allocatable :: error_msg  !! error message
     logical :: status_ok !! false if there were any errors thrown
