@@ -2715,21 +2715,21 @@
 !> author: Jacob Williams
 !  date: 12/6/2014
 !
-!  Given the path string, remove the variable from
-!  the [[json_value]] structure, if it exists.
+!  Given the path string, remove the variable
+!  from [[json_value]], if it exists.
 
-    subroutine json_value_remove_if_present(json,p,name)
+    subroutine json_value_remove_if_present(json,p,path)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path  !! the path to the variable to remove
 
     type(json_value),pointer :: p_var
     logical(LK) :: found
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) call json%remove(p_var)
 
     end subroutine json_value_remove_if_present
@@ -2737,17 +2737,17 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_remove_if_present]], where `name` is kind=CDK.
+!  Alternate version of [[json_value_remove_if_present]], where `path` is kind=CDK.
 
-    subroutine wrap_json_value_remove_if_present(json,p,name)
+    subroutine wrap_json_value_remove_if_present(json,p,path)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
 
-    call json%remove_if_present(p,to_unicode(name))
+    call json%remove_if_present(p,to_unicode(path))
 
     end subroutine wrap_json_value_remove_if_present
 !*****************************************************************************************
