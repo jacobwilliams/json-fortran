@@ -116,7 +116,7 @@
 
     implicit none
 
-    character(kind=CK,len=*),intent(in) :: str        !! the string to conver to an integer
+    character(kind=CK,len=*),intent(in) :: str        !! the string to convert to an integer
     integer(IK),intent(out)             :: ival       !! the integer value
     logical(LK),intent(out)             :: status_ok  !! true if there were no errors
 
@@ -193,8 +193,8 @@
 
     implicit none
 
-    character(kind=CK,len=*),intent(in) :: str
-    real(RK),intent(out)                :: rval
+    character(kind=CK,len=*),intent(in) :: str        !! the string to convert to a real
+    real(RK),intent(out)                :: rval       !! `str` converted to a real value
     logical(LK),intent(out)             :: status_ok  !! true if there were no errors
 
     integer(IK) :: ierr  !! read iostat error code
@@ -321,7 +321,6 @@
                                                      horizontal_tab
 
     character(kind=CK,len=*),parameter :: specials = specials_no_slash//slash
-
 
     !Do a quick scan for the special characters,
     ! if any are present, then process the string,

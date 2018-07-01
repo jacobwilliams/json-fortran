@@ -7208,8 +7208,8 @@
     implicit none
 
     class(json_core),intent(inout)      :: json
-    character(kind=CK,len=*),intent(in) :: str
-    integer(IK)                         :: ival
+    character(kind=CK,len=*),intent(in) :: str   !! a string
+    integer(IK)                         :: ival  !! `str` converted to an integer
 
     logical(LK) :: status_ok !! error flag for [[string_to_integer]]
 
@@ -7274,7 +7274,7 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
-    integer(IK),intent(out)             :: value
+    integer(IK),intent(out)             :: value  !! the integer value
 
     logical(LK) :: status_ok !! for [[string_to_integer]]
 
