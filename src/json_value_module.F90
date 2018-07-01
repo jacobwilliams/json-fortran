@@ -7176,19 +7176,20 @@
     type(json_value),pointer,intent(in)               :: p     !! a JSON linked list object
     character(kind=CDK,len=:),allocatable,intent(out) :: path  !! path to the variable
     logical(LK),intent(out),optional                  :: found !! true if there were no problems
-    logical(LK),intent(in),optional :: use_alt_array_tokens    !! if true, then '()' are used for array elements
-                                                               !! otherwise, '[]' are used [default]
-    character(kind=CDK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
-                                                               !! (default is '.')
+    logical(LK),intent(in),optional :: use_alt_array_tokens    !! if true, then '()' are used
+                                                               !! for array elements otherwise,
+                                                               !! '[]' are used [default]
+    character(kind=CDK,len=1),intent(in),optional :: path_sep  !! character to use for path
+                                                               !! separator (default is '.')
 
     character(kind=CK,len=:),allocatable :: ck_path  !! path to the variable
-    character(kind=CK,len=1) :: sep
-
-    ! from unicode:
-    sep = path_sep
 
     ! call the main routine:
-    call json_get_path(json,p,ck_path,found,use_alt_array_tokens,sep)
+    if (present(path_sep)) then
+        call json%get_path(p,ck_path,found,use_alt_array_tokens,to_unicode(path_sep))
+    else
+        call json%get_path(p,ck_path,found,use_alt_array_tokens)
+    end if
 
     ! from unicode:
     path = ck_path
@@ -7210,7 +7211,7 @@
     character(kind=CK,len=*),intent(in) :: str
     integer(IK)                         :: ival
 
-    logical(LK) :: status_ok !! error flag
+    logical(LK) :: status_ok !! error flag for [[string_to_integer]]
 
     if (.not. json%exception_thrown) then
 
@@ -7243,7 +7244,7 @@
     character(kind=CK,len=*),intent(in) :: str   !! a string
     real(RK)                            :: rval  !! `str` converted to a double
 
-    logical(LK) :: status_ok  !! error flag
+    logical(LK) :: status_ok  !! error flag for [[string_to_real]]
 
     if (.not. json%exception_thrown) then
 
