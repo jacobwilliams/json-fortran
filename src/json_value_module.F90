@@ -7275,14 +7275,16 @@
     type(json_value),pointer,intent(in) :: me
     integer(IK),intent(out)             :: value
 
-    value = 0
+    logical(LK) :: status_ok !! for [[string_to_integer]]
+
+    value = 0_IK
     if ( json%exception_thrown ) return
 
     if (me%var_type == json_integer) then
         value = me%int_value
     else
         if (json%strict_type_checking) then
-            call json%throw_exception('Error in get_integer:'//&
+            call json%throw_exception('Error in json_get_integer:'//&
                  ' Unable to resolve value to integer: '//me%name)
         else
             !type conversions
@@ -7295,8 +7297,16 @@
                 else
                     value = 0
                 end if
+            case (json_string)
+                call string_to_integer(me%str_value,value,status_ok)
+                if (.not. status_ok) then
+                    value = 0_IK
+                    call json%throw_exception('Error in json_get_integer:'//&
+                         ' Unable to convert string value to integer: me.'//&
+                         me%name//' = '//trim(me%str_value))
+                end if
             case default
-                call json%throw_exception('Error in get_integer:'//&
+                call json%throw_exception('Error in json_get_integer:'//&
                      ' Unable to resolve value to integer: '//me%name)
             end select
         end if
@@ -7491,6 +7501,8 @@
     type(json_value),pointer       :: me
     real(RK),intent(out)           :: value
 
+    logical(LK) :: status_ok !! for [[string_to_real]]
+
     value = 0.0_RK
     if ( json%exception_thrown ) return
 
@@ -7510,6 +7522,14 @@
                     value = 1.0_RK
                 else
                     value = 0.0_RK
+                end if
+            case (json_string)
+                call string_to_real(me%str_value,value,status_ok)
+                if (.not. status_ok) then
+                    value = 0.0_RK
+                    call json%throw_exception('Error in json_get_double:'//&
+                         ' Unable to convert string value to double: me.'//&
+                         me%name//' = '//trim(me%str_value))
                 end if
             case default
                 call json%throw_exception('Error in json_get_double:'//&
@@ -7703,6 +7723,13 @@
 !*****************************************************************************************
 !>
 !  Get a logical value from a [[json_value]].
+!
+!### Note
+!  If `strict_type_checking` is False, then the following assumptions are made:
+!
+!  * For integers: a value > 0 is True
+!  * For doubles: a value > 0 is True
+!  * For strings: 'true' is True, and everything else is false. [case sensitive match]
 
     subroutine json_get_logical(json, me, value)
 
@@ -7726,7 +7753,11 @@
             !type conversions
             select case (me%var_type)
             case (json_integer)
-                value = (me%int_value > 0)
+                value = (me%int_value > 0_IK)
+            case (json_double)
+                value = (me%int_value > 0.0_RK)
+            case (json_string)
+                value = (me%str_value == true_str)
             case default
                 call json%throw_exception('Error in json_get_logical: '//&
                                           'Unable to resolve value to logical: '//&
