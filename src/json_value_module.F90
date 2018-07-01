@@ -8776,9 +8776,14 @@
     integer(IK),intent(in)              :: iunit !! file unit number
     character(kind=CK,len=*),intent(in) :: str   !! string with JSON data
 
-    character(kind=CK,len=:),allocatable :: line, arrow_str
-    character(kind=CK,len=10) :: line_str, char_str
-    integer(IK) :: i, i_nl_prev, i_nl
+    character(kind=CK,len=:),allocatable :: line      !! line containing the error
+    character(kind=CK,len=:),allocatable :: arrow_str !! arrow string that points
+                                                      !! to the current character
+    character(kind=CK,len=max_integer_str_len) :: line_str !! current line number string
+    character(kind=CK,len=max_integer_str_len) :: char_str !! current character count string
+    integer(IK) :: i          !! line number counter
+    integer(IK) :: i_nl_prev  !! index of previous newline character
+    integer(IK) :: i_nl       !! index of current newline character
 
     !  If there was an error reading the file, then
     !   print the line where the error occurred:
@@ -8896,8 +8901,10 @@
     integer(IK),intent(in)                           :: iunit  !! file unit number
     character(kind=CK,len=:),allocatable,intent(out) :: line   !! current line
 
-    integer(IK) :: istart,iend,ios
-    character(kind=CK,len=1) :: c
+    integer(IK)              :: istart  !! start position of current line
+    integer(IK)              :: iend    !! end position of current line
+    integer(IK)              :: ios     !! file read `iostat` code
+    character(kind=CK,len=1) :: c       !! a character read from the file
 
     istart = json%ipos
     do
@@ -8934,11 +8941,13 @@
 
     class(json_core),intent(inout)      :: json
     integer(IK),intent(in)              :: unit   !! file unit number
-    character(kind=CK,len=*),intent(in) :: str    !! string containing JSON data (only used if unit=0)
+    character(kind=CK,len=*),intent(in) :: str    !! string containing JSON
+                                                  !! data (only used if `unit=0`)
     type(json_value),pointer            :: value  !! JSON data that is extracted
 
     logical(LK)              :: eof !! end-of-file flag
-    character(kind=CK,len=1) :: c   !! character read from file (or string) by [[pop_char]]
+    character(kind=CK,len=1) :: c   !! character read from file
+                                    !! (or string) by [[pop_char]]
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp  !! this is a work-around for a bug
                                                  !! in the gfortran 4.9 compiler.
@@ -10051,7 +10060,7 @@
 !  * [[push_char]]
 !
 !@note This routine ignores non-printing ASCII characters
-!      (iachar<=31) that are in strings.
+!      (`iachar<=31`) that are in strings.
 
     recursive subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,popped)
 
@@ -10061,7 +10070,7 @@
     integer(IK),intent(in)               :: unit          !! file unit number (if parsing
                                                           !! from a file)
     character(kind=CK,len=*),intent(in)  :: str           !! JSON string (if parsing from a
-                                                          !! string) -- only used if unit=0
+                                                          !! string) -- only used if `unit=0`
     logical(LK),intent(in),optional      :: skip_ws       !! to ignore whitespace [default False]
     logical(LK),intent(in),optional      :: skip_comments !! to ignore comment lines [default False]
     logical(LK),intent(out)              :: eof           !! true if the end of the file has
