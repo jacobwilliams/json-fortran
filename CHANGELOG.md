@@ -4,7 +4,8 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
-    - [6.5.0 (2018-06-23)](#640-2018-06-23)
+    - [6.6.0 (2018-07-01)](#660-2018-07-01)
+    - [6.5.0 (2018-06-23)](#650-2018-06-23)
     - [6.4.0 (2018-06-10)](#640-2018-06-10)
     - [6.3.0 (2018-04-20)](#630-2018-04-20)
     - [6.2.0 (2018-03-10)](#620-2018-03-10)
@@ -28,7 +29,23 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.5.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.6.0...HEAD)
+
+### [6.6.0](https://github.com/jacobwilliams/json-fortran/tree/6.6.0) (2018-07-01)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.5.0...6.6.0)
+or [Download v6.6.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.6.0)
+
+**Enhancements [\#332](https://github.com/jacobwilliams/json-fortran/pull/332) ([jacobwilliams](https://github.com/jacobwilliams))**
+
+- Now, attempting to get a string variable as an integer, double, or logical will attempt to convert it to a string if `strict_type_checking=False`. Formerly these cases would raise an exception. [\#331](https://github.com/jacobwilliams/json-fortran/issues/331)
+- Fixed an inconsistency in `json_get_by_path()`. Now if using the optional `found` argument, any exceptions raised by this routine are cleared. [\#330](https://github.com/jacobwilliams/json-fortran/issues/330)
+- Changed the `name` argument in `json_value_remove_if_present()` to 'path' to be consistent with other routines since it is really a path. [\#329](https://github.com/jacobwilliams/json-fortran/issues/329)
+- Various documentation string updates.
+
+**Fixed bugs:**
+
+- Fixed a bug in `wrap_json_get_path()` where an optional argument was being used without checking if it was present. [\#333](https://github.com/jacobwilliams/json-fortran/issues/333)
 
 ### [6.5.0](https://github.com/jacobwilliams/json-fortran/tree/6.5.0) (2018-06-23)
 
