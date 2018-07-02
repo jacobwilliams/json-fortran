@@ -9,6 +9,9 @@ module jf_test_22_mod
 
     implicit none
 
+    private
+    public :: test_22
+
     character(len=*),parameter :: dir = '../files/inputs/'      !! working directory
     character(len=*),parameter :: filename = 'comments.json'    !! file to read
 

@@ -9,6 +9,9 @@ module jf_test_25_mod
 
     implicit none
 
+    private
+    public :: test_25
+
 contains
 
     subroutine test_25(error_cnt)

@@ -11,6 +11,9 @@ module jf_test_13_mod
 
     implicit none
 
+    private
+    public :: test_13
+
 contains
 
     subroutine test_13(error_cnt)

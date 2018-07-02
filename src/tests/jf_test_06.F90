@@ -12,6 +12,9 @@ module jf_test_6_mod
 
     implicit none
 
+    private
+    public :: test_6
+
     character(len=*),parameter :: dir = '../files/inputs/'   !! working directory
 
 contains

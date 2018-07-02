@@ -12,6 +12,9 @@ module jf_test_16_mod
 
     implicit none
 
+    private
+    public :: test_16
+
 contains
 
     subroutine test_16(error_cnt)
@@ -216,7 +219,7 @@ contains
 end module jf_test_16_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS    
+#ifndef INTERGATED_TESTS
 !*****************************************************************************************
 program jf_test_16
 

@@ -11,6 +11,9 @@ module jf_test_12_mod
 
     implicit none
 
+    private
+    public :: test_12
+
     character(len=*),parameter :: dir = '../files/'         !! Path to write JSON file to
     character(len=*),parameter :: file = 'test12.json'      !! Filename to write
     real(wp), parameter        :: TOL = 100*epsilon(1.0_wp) !! Tolerance for real comparisons

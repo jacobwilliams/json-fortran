@@ -11,6 +11,9 @@ module jf_test_14_mod
 
     implicit none
 
+    private
+    public :: test_14
+
     character(len=*),parameter :: dir = '../files/inputs/'  !! working directory
     character(len=*),parameter :: filename1 = 'test1.json'  !! the file to read
     integer :: icount = 0  !! a count of the number of "name" variables found

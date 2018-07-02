@@ -11,6 +11,9 @@ module jf_test_10_mod
 
     implicit none
 
+    private
+    public :: test_10
+
     character(len=*),parameter :: filename = 'test1.json'
     character(len=*),parameter :: dir = '../files/inputs/' !working directory
 

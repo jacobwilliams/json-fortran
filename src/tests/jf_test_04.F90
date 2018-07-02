@@ -12,6 +12,9 @@ module jf_test_4_mod
 
     implicit none
 
+    private
+    public :: test_4
+
     character(len=*),parameter :: dir = '../files/'         !! working directory
     character(len=*),parameter :: filename4 = 'test4.json'
 

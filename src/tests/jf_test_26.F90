@@ -1,9 +1,12 @@
 module jf_test_26_mod
 
-use json_module, rk=>json_rk, ik=>json_ik, ck=>json_ck, cdk=>json_cdk, lk=>json_lk
-use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
+    use json_module, rk=>json_rk, ik=>json_ik, ck=>json_ck, cdk=>json_cdk, lk=>json_lk
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
-implicit none
+    implicit none
+
+    private
+    public :: test_26
 
 contains
 

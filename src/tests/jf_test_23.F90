@@ -9,6 +9,9 @@ module jf_test_23_mod
 
     implicit none
 
+    private
+    public :: test_23
+
     character(len=*),parameter :: dir = '../files/inputs/'    !! working directory
     character(len=*),parameter :: filename1 = 'test1.json'    !! file to read
 
