@@ -7,7 +7,7 @@
 !  The [[json_file_module]] provides a higher-level interface to some
 !  of these routines.
 !
-!## License
+!### License
 !  * JSON-Fortran is released under a BSD-style license.
 !    See the [LICENSE](https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE)
 !    file for details.
@@ -2108,9 +2108,11 @@
 
     class(json_core),intent(inout)  :: json
     type(json_value),pointer        :: p
-    logical(LK),intent(in),optional :: destroy  !! If destroy is not present, it is also destroyed.
-                                                !! If destroy is present and true, it is destroyed.
-                                                !! If destroy is present and false, it is not destroyed.
+    logical(LK),intent(in),optional :: destroy  !! Option to destroy `p` after it is removed:
+                                                !!
+                                                !! * If `destroy` is not present, it is also destroyed.
+                                                !! * If `destroy` is present and true, it is destroyed.
+                                                !! * If `destroy` is present and false, it is not destroyed.
 
     type(json_value),pointer :: parent,previous,next
     logical(LK) :: destroy_it
@@ -2713,21 +2715,21 @@
 !> author: Jacob Williams
 !  date: 12/6/2014
 !
-!  Given the path string, remove the variable from
-!  the [[json_value]] structure, if it exists.
+!  Given the path string, remove the variable
+!  from [[json_value]], if it exists.
 
-    subroutine json_value_remove_if_present(json,p,name)
+    subroutine json_value_remove_if_present(json,p,path)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: name
+    character(kind=CK,len=*),intent(in) :: path  !! the path to the variable to remove
 
     type(json_value),pointer :: p_var
     logical(LK) :: found
 
-    call json%get(p,name,p_var,found)
+    call json%get(p,path,p_var,found)
     if (found) call json%remove(p_var)
 
     end subroutine json_value_remove_if_present
@@ -2735,17 +2737,17 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_value_remove_if_present]], where `name` is kind=CDK.
+!  Alternate version of [[json_value_remove_if_present]], where `path` is kind=CDK.
 
-    subroutine wrap_json_value_remove_if_present(json,p,name)
+    subroutine wrap_json_value_remove_if_present(json,p,path)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: name
+    character(kind=CDK,len=*),intent(in) :: path
 
-    call json%remove_if_present(p,to_unicode(name))
+    call json%remove_if_present(p,to_unicode(path))
 
     end subroutine wrap_json_value_remove_if_present
 !*****************************************************************************************
@@ -2757,6 +2759,8 @@
 !  Given the path string, if the variable is present,
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
+!
+!@note If the variable is not a scalar, an exception will be thrown.
 
     subroutine json_update_logical(json,p,path,val,found)
 
@@ -2764,9 +2768,9 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: path
-    logical(LK),intent(in)              :: val
-    logical(LK),intent(out)             :: found
+    character(kind=CK,len=*),intent(in) :: path  !! path to the variable in the structure
+    logical(LK),intent(in)              :: val   !! the new value
+    logical(LK),intent(out)             :: found !! if the variable was found and was a scalar.
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
@@ -2801,9 +2805,9 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: path
-    logical(LK),intent(in)               :: val
-    logical(LK),intent(out)              :: found
+    character(kind=CDK,len=*),intent(in) :: path  !! path to the variable in the structure
+    logical(LK),intent(in)               :: val   !! the new value
+    logical(LK),intent(out)              :: found !! if the variable was found and was a scalar.
 
     call json%update(p,to_unicode(path),val,found)
 
@@ -2817,6 +2821,8 @@
 !  Given the path string, if the variable is present,
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
+!
+!@note If the variable is not a scalar, an exception will be thrown.
 
     subroutine json_update_double(json,p,path,val,found)
 
@@ -2824,9 +2830,9 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: path
-    real(RK),intent(in)                 :: val
-    logical(LK),intent(out)             :: found
+    character(kind=CK,len=*),intent(in) :: path   !! path to the variable in the structure
+    real(RK),intent(in)                 :: val    !! the new value
+    logical(LK),intent(out)             :: found  !! if the variable was found and was a scalar.
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
@@ -2861,9 +2867,9 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: path
-    real(RK),intent(in)                  :: val
-    logical(LK),intent(out)              :: found
+    character(kind=CDK,len=*),intent(in) :: path  !! path to the variable in the structure
+    real(RK),intent(in)                  :: val   !! the new value
+    logical(LK),intent(out)              :: found !! if the variable was found and was a scalar.
 
     call json%update(p,to_unicode(path),val,found)
 
@@ -2877,6 +2883,8 @@
 !  Given the path string, if the variable is present,
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
+!
+!@note If the variable is not a scalar, an exception will be thrown.
 
     subroutine json_update_integer(json,p,path,val,found)
 
@@ -2884,9 +2892,9 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: path
-    integer(IK),intent(in)              :: val
-    logical(LK),intent(out)             :: found
+    character(kind=CK,len=*),intent(in) :: path  !! path to the variable in the structure
+    integer(IK),intent(in)              :: val   !! the new value
+    logical(LK),intent(out)             :: found !! if the variable was found and was a scalar.
 
     type(json_value),pointer :: p_var
     integer(IK) :: var_type
@@ -2921,9 +2929,9 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: path
-    integer(IK),intent(in)               :: val
-    logical(LK),intent(out)              :: found
+    character(kind=CDK,len=*),intent(in) :: path  !! path to the variable in the structure
+    integer(IK),intent(in)               :: val   !! the new value
+    logical(LK),intent(out)              :: found !! if the variable was found and was a scalar.
 
     call json%update(p,to_unicode(path),val,found)
 
@@ -2937,6 +2945,8 @@
 !  Given the path string, if the variable is present,
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
+!
+!@note If the variable is not a scalar, an exception will be thrown.
 
     subroutine json_update_string(json,p,path,val,found,trim_str,adjustl_str)
 
@@ -2944,9 +2954,9 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: p
-    character(kind=CK,len=*),intent(in) :: path
-    character(kind=CK,len=*),intent(in) :: val
-    logical(LK),intent(out)             :: found
+    character(kind=CK,len=*),intent(in) :: path  !! path to the variable in the structure
+    character(kind=CK,len=*),intent(in) :: val   !! the new value
+    logical(LK),intent(out)             :: found !! if the variable was found and was a scalar.
     logical(LK),intent(in),optional     :: trim_str    !! if TRIM() should be called for the `val`
                                                        !! (only used if `val` is present)
     logical(LK),intent(in),optional     :: adjustl_str !! if ADJUSTL() should be called for the `val`
@@ -2986,9 +2996,9 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: path
-    character(kind=CDK,len=*),intent(in) :: val
-    logical(LK),intent(out)              :: found
+    character(kind=CDK,len=*),intent(in) :: path  !! path to the variable in the structure
+    character(kind=CDK,len=*),intent(in) :: val   !! the new value
+    logical(LK),intent(out)              :: found !! if the variable was found and was a scalar.
     logical(LK),intent(in),optional     :: trim_str       !! if TRIM() should be called for the `val`
                                                           !! (only used if `val` is present)
     logical(LK),intent(in),optional     :: adjustl_str    !! if ADJUSTL() should be called for the `val`
@@ -3010,9 +3020,9 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CDK,len=*),intent(in) :: path
-    character(kind=CK, len=*),intent(in) :: val
-    logical(LK),intent(out)              :: found
+    character(kind=CDK,len=*),intent(in) :: path  !! path to the variable in the structure
+    character(kind=CK, len=*),intent(in) :: val   !! the new value
+    logical(LK),intent(out)              :: found !! if the variable was found and was a scalar.
     logical(LK),intent(in),optional     :: trim_str       !! if TRIM() should be called for the `val`
                                                           !! (only used if `val` is present)
     logical(LK),intent(in),optional     :: adjustl_str    !! if ADJUSTL() should be called for the `val`
@@ -3034,9 +3044,9 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer             :: p
-    character(kind=CK, len=*),intent(in) :: path
-    character(kind=CDK,len=*),intent(in) :: val
-    logical(LK),intent(out)              :: found
+    character(kind=CK, len=*),intent(in) :: path  !! path to the variable in the structure
+    character(kind=CDK,len=*),intent(in) :: val   !! the new value
+    logical(LK),intent(out)              :: found !! if the variable was found and was a scalar.
     logical(LK),intent(in),optional     :: trim_str       !! if TRIM() should be called for the `val`
                                                           !! (only used if `val` is present)
     logical(LK),intent(in),optional     :: adjustl_str    !! if ADJUSTL() should be called for the `val`
@@ -3057,7 +3067,9 @@
     implicit none
 
     class(json_core),intent(inout) :: json
-    type(json_value),pointer       :: p
+    type(json_value),pointer       :: p       !! `p` should be a `json_object`
+                                              !! or a `json_array` (although this
+                                              !! is not currently checked)
     type(json_value),pointer       :: member  !! the child member
                                               !! to add to `p`
 
@@ -3868,7 +3880,7 @@
     class(json_core),intent(inout)      :: json
     type(json_value),pointer            :: me           !! the JSON structure
     character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
-    real(RK),dimension(:),intent(in)     :: value        !! the vector to add
+    real(RK),dimension(:),intent(in)    :: value        !! the vector to add
     logical(LK),intent(out),optional    :: found        !! if the variable was found
     logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
 
@@ -4100,7 +4112,7 @@
 !> author: Jacob Williams
 !  date: 1/19/2014
 !
-!  Add a real value child to the [[json_value]] variable
+!  Add a real value child to the [[json_value]] variable.
 !
 !@note This routine is part of the public API that can be
 !      used to build a JSON structure using [[json_value]] pointers.
@@ -4147,7 +4159,7 @@
 !> author: Jacob Williams
 !  date: 1/20/2014
 !
-!  Add a real vector to the structure.
+!  Add a real vector child to the [[json_value]] variable.
 !
 !@note This routine is part of the public API that can be
 !      used to build a JSON structure using [[json_value]] pointers.
@@ -4198,7 +4210,7 @@
 
 !*****************************************************************************************
 !>
-!  Add a NULL value child to the [[json_value]] variable
+!  Add a NULL value child to the [[json_value]] variable.
 !
 !@note This routine is part of the public API that can be
 !      used to build a JSON structure using [[json_value]] pointers.
@@ -4243,7 +4255,7 @@
 !> author: Jacob Williams
 !  date: 1/20/2014
 !
-!  Add an integer value child to the [[json_value]] variable
+!  Add an integer value child to the [[json_value]] variable.
 !
 !@note This routine is part of the public API that can be
 !      used to build a JSON structure using [[json_value]] pointers.
@@ -4290,7 +4302,7 @@
 !> author: Jacob Williams
 !  date: 1/20/2014
 !
-!  Add an integer vector to the structure.
+!  Add a integer vector child to the [[json_value]] variable.
 !
 !@note This routine is part of the public API that can be
 !      used to build a JSON structure using [[json_value]] pointers.
@@ -4343,7 +4355,7 @@
 !> author: Jacob Williams
 !  date: 1/20/2014
 !
-!  Add a logical value child to the [[json_value]] variable
+!  Add a logical value child to the [[json_value]] variable.
 !
 !@note This routine is part of the public API that can be
 !      used to build a JSON structure using [[json_value]] pointers.
@@ -4390,7 +4402,7 @@
 !> author: Jacob Williams
 !  date: 1/20/2014
 !
-!  Add a logical vector to the structure.
+!  Add a logical vector child to the [[json_value]] variable.
 !
 !@note This routine is part of the public API that can be
 !      used to build a JSON structure using [[json_value]] pointers.
@@ -4534,7 +4546,7 @@
 !> author: Jacob Williams
 !  date: 1/19/2014
 !
-!  Add an array of character strings to the structure.
+!  Add a character string vector child to the [[json_value]] variable.
 !
 !@note This routine is part of the public API that can be
 !      used to build a JSON structure using [[json_value]] pointers.
@@ -4629,7 +4641,7 @@
 
 !*****************************************************************************************
 !>
-!  Count the number of children.
+!  Count the number of children in the object or array.
 !
 !### History
 !  * JW : 1/4/2014 : Original routine removed.
@@ -4641,8 +4653,10 @@
     implicit none
 
     class(json_core),intent(inout)      :: json
-    type(json_value),pointer,intent(in) :: p
-    integer(IK)                         :: count  !! number of children
+    type(json_value),pointer,intent(in) :: p      !! this should normally be a `json_object`
+                                                  !! or a `json_array`. For any other
+                                                  !! variable type this will return 0.
+    integer(IK)                         :: count  !! number of children in `p`.
 
     if (associated(p)) then
         count = p%n_children
@@ -5258,7 +5272,7 @@
     logical(LK),intent(in),optional      :: need_comma        !! if it needs a comma after it
     logical(LK),intent(in),optional      :: colon             !! if the colon was just written
     character(kind=CK,len=:),intent(inout),allocatable :: str
-                                                      !! if iunit==unit2str (-1) then the structure is
+                                                      !! if `iunit==unit2str` (-1) then the structure is
                                                       !! printed to this string rather than
                                                       !! a file. This mode is used by
                                                       !! [[json_value_to_string]].
@@ -5266,16 +5280,22 @@
                                                              !! from an array being printed
                                                              !! on one line [default is False]
 
-    character(kind=CK,len=max_numeric_str_len) :: tmp !! for val to string conversions
-    character(kind=CK,len=:),allocatable :: s
-    type(json_value),pointer :: element
-    integer(IK) :: tab, i, count, spaces
-    logical(LK) :: print_comma
-    logical(LK) :: write_file, write_string
-    logical(LK) :: is_array
-    integer(IK) :: var_type,var_type_prev
-    logical(LK) :: is_vector !! if all elements of a vector
-                             !! are scalars of the same type
+    character(kind=CK,len=max_numeric_str_len) :: tmp !! for value to string conversions
+    character(kind=CK,len=:),allocatable :: s !! the string of spaces for
+                                              !! indenting (see `tab` and `spaces`)
+    type(json_value),pointer :: element !! for getting children
+    integer(IK) :: tab           !! number of `tabs` for indenting
+    integer(IK) :: spaces        !! number of spaces for indenting
+    integer(IK) :: i             !! counter
+    integer(IK) :: count         !! number of children
+    logical(LK) :: print_comma   !! if the comma will be printed after the value
+    logical(LK) :: write_file    !! if we are writing to a file
+    logical(LK) :: write_string  !! if we are writing to a string
+    logical(LK) :: is_array      !! if this is an element in an array
+    integer(IK) :: var_type      !! for getting the variable type of children
+    integer(IK) :: var_type_prev !! for getting the variable type of children
+    logical(LK) :: is_vector     !! if all elements of a vector
+                                 !! are scalars of the same type
     character(kind=CK,len=:),allocatable :: str_escaped !! escaped version of
                                                         !! `name` or `str_value`
 
@@ -5660,9 +5680,6 @@
 !
 !  * The original JSON-Fortran defaults
 !  * [RFC 6901](https://tools.ietf.org/html/rfc6901)
-!
-!@warning if `found` is present, we should clear any exceptions that are thrown
-!         to be consistent with other routines. This is not currently being done.
 
     subroutine json_get_by_path(json, me, path, p, found)
 
@@ -5696,6 +5713,10 @@
                                         trim(path_mode_str))
             if (present(found)) found = .false.
         end select
+
+        if (present(found)) then
+            if (.not. found) call json%clear_exceptions()
+        end if
 
     else
         if (present(found)) found = .false.
@@ -5805,6 +5826,8 @@
 !*****************************************************************************************
 !>
 !  Rename a [[json_value]], given the path.
+!
+!@note this is a wrapper for [[json_value_rename]].
 
     subroutine json_rename_by_path(json, me, path, name, found)
 
@@ -5812,9 +5835,9 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: me
-    character(kind=CK,len=*),intent(in)  :: path
+    character(kind=CK,len=*),intent(in)  :: path  !! path to the variable to rename
     character(kind=CK,len=*),intent(in)  :: name  !! the new name
-    logical(LK),intent(out),optional     :: found
+    logical(LK),intent(out),optional     :: found !! if there were no errors
 
     type(json_value),pointer :: p
 
@@ -7153,19 +7176,20 @@
     type(json_value),pointer,intent(in)               :: p     !! a JSON linked list object
     character(kind=CDK,len=:),allocatable,intent(out) :: path  !! path to the variable
     logical(LK),intent(out),optional                  :: found !! true if there were no problems
-    logical(LK),intent(in),optional :: use_alt_array_tokens    !! if true, then '()' are used for array elements
-                                                               !! otherwise, '[]' are used [default]
-    character(kind=CDK,len=1),intent(in),optional :: path_sep  !! character to use for path separator
-                                                               !! (default is '.')
+    logical(LK),intent(in),optional :: use_alt_array_tokens    !! if true, then '()' are used
+                                                               !! for array elements otherwise,
+                                                               !! '[]' are used [default]
+    character(kind=CDK,len=1),intent(in),optional :: path_sep  !! character to use for path
+                                                               !! separator (default is '.')
 
     character(kind=CK,len=:),allocatable :: ck_path  !! path to the variable
-    character(kind=CK,len=1) :: sep
-
-    ! from unicode:
-    sep = path_sep
 
     ! call the main routine:
-    call json_get_path(json,p,ck_path,found,use_alt_array_tokens,sep)
+    if (present(path_sep)) then
+        call json%get_path(p,ck_path,found,use_alt_array_tokens,to_unicode(path_sep))
+    else
+        call json%get_path(p,ck_path,found,use_alt_array_tokens)
+    end if
 
     ! from unicode:
     path = ck_path
@@ -7184,10 +7208,10 @@
     implicit none
 
     class(json_core),intent(inout)      :: json
-    character(kind=CK,len=*),intent(in) :: str
-    integer(IK)                         :: ival
+    character(kind=CK,len=*),intent(in) :: str   !! a string
+    integer(IK)                         :: ival  !! `str` converted to an integer
 
-    logical(LK) :: status_ok !! error flag
+    logical(LK) :: status_ok !! error flag for [[string_to_integer]]
 
     if (.not. json%exception_thrown) then
 
@@ -7217,10 +7241,10 @@
     implicit none
 
     class(json_core),intent(inout)      :: json
-    character(kind=CK,len=*),intent(in) :: str
-    real(RK)                            :: rval
+    character(kind=CK,len=*),intent(in) :: str   !! a string
+    real(RK)                            :: rval  !! `str` converted to a double
 
-    logical(LK) :: status_ok  !! error flag
+    logical(LK) :: status_ok  !! error flag for [[string_to_real]]
 
     if (.not. json%exception_thrown) then
 
@@ -7250,16 +7274,18 @@
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: me
-    integer(IK),intent(out)             :: value
+    integer(IK),intent(out)             :: value  !! the integer value
 
-    value = 0
+    logical(LK) :: status_ok !! for [[string_to_integer]]
+
+    value = 0_IK
     if ( json%exception_thrown ) return
 
     if (me%var_type == json_integer) then
         value = me%int_value
     else
         if (json%strict_type_checking) then
-            call json%throw_exception('Error in get_integer:'//&
+            call json%throw_exception('Error in json_get_integer:'//&
                  ' Unable to resolve value to integer: '//me%name)
         else
             !type conversions
@@ -7272,8 +7298,16 @@
                 else
                     value = 0
                 end if
+            case (json_string)
+                call string_to_integer(me%str_value,value,status_ok)
+                if (.not. status_ok) then
+                    value = 0_IK
+                    call json%throw_exception('Error in json_get_integer:'//&
+                         ' Unable to convert string value to integer: me.'//&
+                         me%name//' = '//trim(me%str_value))
+                end if
             case default
-                call json%throw_exception('Error in get_integer:'//&
+                call json%throw_exception('Error in json_get_integer:'//&
                      ' Unable to resolve value to integer: '//me%name)
             end select
         end if
@@ -7309,7 +7343,7 @@
     call json%get(me=me, path=path, p=p)
 
     if (.not. associated(p)) then
-        call json%throw_exception('Error in json_get_integer:'//&
+        call json%throw_exception('Error in json_get_integer_by_path:'//&
             ' Unable to resolve path: '// trim(path))
     else
         call json%get(p,value)
@@ -7468,6 +7502,8 @@
     type(json_value),pointer       :: me
     real(RK),intent(out)           :: value
 
+    logical(LK) :: status_ok !! for [[string_to_real]]
+
     value = 0.0_RK
     if ( json%exception_thrown ) return
 
@@ -7487,6 +7523,14 @@
                     value = 1.0_RK
                 else
                     value = 0.0_RK
+                end if
+            case (json_string)
+                call string_to_real(me%str_value,value,status_ok)
+                if (.not. status_ok) then
+                    value = 0.0_RK
+                    call json%throw_exception('Error in json_get_double:'//&
+                         ' Unable to convert string value to double: me.'//&
+                         me%name//' = '//trim(me%str_value))
                 end if
             case default
                 call json%throw_exception('Error in json_get_double:'//&
@@ -7526,7 +7570,7 @@
 
     if (.not. associated(p)) then
 
-        call json%throw_exception('Error in json_get_double:'//&
+        call json%throw_exception('Error in json_get_double_by_path:'//&
                              ' Unable to resolve path: '//trim(path))
 
     else
@@ -7680,6 +7724,13 @@
 !*****************************************************************************************
 !>
 !  Get a logical value from a [[json_value]].
+!
+!### Note
+!  If `strict_type_checking` is False, then the following assumptions are made:
+!
+!  * For integers: a value > 0 is True
+!  * For doubles: a value > 0 is True
+!  * For strings: 'true' is True, and everything else is false. [case sensitive match]
 
     subroutine json_get_logical(json, me, value)
 
@@ -7703,7 +7754,11 @@
             !type conversions
             select case (me%var_type)
             case (json_integer)
-                value = (me%int_value > 0)
+                value = (me%int_value > 0_IK)
+            case (json_double)
+                value = (me%dbl_value > 0.0_RK)
+            case (json_string)
+                value = (me%str_value == true_str)
             case default
                 call json%throw_exception('Error in json_get_logical: '//&
                                           'Unable to resolve value to logical: '//&
@@ -7743,7 +7798,7 @@
 
     if (.not. associated(p)) then
 
-        call json%throw_exception('Error in json_get_logical:'//&
+        call json%throw_exception('Error in json_get_logical_by_path:'//&
                              ' Unable to resolve path: '//trim(path))
 
     else
@@ -7952,7 +8007,7 @@
                                             json%compact_real,value)
                         value = trim(value)
                     else
-                        call json%throw_exception('Error in dbl_value: '//&
+                        call json%throw_exception('Error in json_get_string: '//&
                                                   'me%int_value not allocated')
                     end if
 
@@ -8722,9 +8777,14 @@
     integer(IK),intent(in)              :: iunit !! file unit number
     character(kind=CK,len=*),intent(in) :: str   !! string with JSON data
 
-    character(kind=CK,len=:),allocatable :: line, arrow_str
-    character(kind=CK,len=10) :: line_str, char_str
-    integer(IK) :: i, i_nl_prev, i_nl
+    character(kind=CK,len=:),allocatable :: line      !! line containing the error
+    character(kind=CK,len=:),allocatable :: arrow_str !! arrow string that points
+                                                      !! to the current character
+    character(kind=CK,len=max_integer_str_len) :: line_str !! current line number string
+    character(kind=CK,len=max_integer_str_len) :: char_str !! current character count string
+    integer(IK) :: i          !! line number counter
+    integer(IK) :: i_nl_prev  !! index of previous newline character
+    integer(IK) :: i_nl       !! index of current newline character
 
     !  If there was an error reading the file, then
     !   print the line where the error occurred:
@@ -8842,8 +8902,10 @@
     integer(IK),intent(in)                           :: iunit  !! file unit number
     character(kind=CK,len=:),allocatable,intent(out) :: line   !! current line
 
-    integer(IK) :: istart,iend,ios
-    character(kind=CK,len=1) :: c
+    integer(IK)              :: istart  !! start position of current line
+    integer(IK)              :: iend    !! end position of current line
+    integer(IK)              :: ios     !! file read `iostat` code
+    character(kind=CK,len=1) :: c       !! a character read from the file
 
     istart = json%ipos
     do
@@ -8880,11 +8942,13 @@
 
     class(json_core),intent(inout)      :: json
     integer(IK),intent(in)              :: unit   !! file unit number
-    character(kind=CK,len=*),intent(in) :: str    !! string containing JSON data (only used if unit=0)
+    character(kind=CK,len=*),intent(in) :: str    !! string containing JSON
+                                                  !! data (only used if `unit=0`)
     type(json_value),pointer            :: value  !! JSON data that is extracted
 
     logical(LK)              :: eof !! end-of-file flag
-    character(kind=CK,len=1) :: c   !! character read from file (or string)
+    character(kind=CK,len=1) :: c   !! character read from file
+                                    !! (or string) by [[pop_char]]
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp  !! this is a work-around for a bug
                                                  !! in the gfortran 4.9 compiler.
@@ -9173,8 +9237,8 @@
     type(json_value),pointer             :: p
     character(kind=CDK,len=*),intent(in) :: val
     character(kind=CDK,len=*),intent(in) :: name
-    logical(LK),intent(in),optional     :: trim_str      !! if TRIM() should be called for the `val`
-    logical(LK),intent(in),optional     :: adjustl_str   !! if ADJUSTL() should be called for the `val`
+    logical(LK),intent(in),optional      :: trim_str      !! if TRIM() should be called for the `val`
+    logical(LK),intent(in),optional      :: adjustl_str   !! if ADJUSTL() should be called for the `val`
 
     call json%create_string(p,to_unicode(val),to_unicode(name),trim_str,adjustl_str)
 
@@ -9378,7 +9442,7 @@
     if (present(val)) then
         p%int_value = val
     else
-        p%int_value = 0    !default value
+        p%int_value = 0_IK    !default value
     end if
 
     !name:
@@ -9562,9 +9626,9 @@
     character(kind=CK,len=*),intent(in) :: str     !! JSON string (if parsing from a string)
     type(json_value),pointer            :: parent  !! the parsed object will be added as a child of this
 
-    type(json_value),pointer :: pair
-    logical(LK) :: eof
-    character(kind=CK,len=1) :: c
+    type(json_value),pointer :: pair  !! temp variable
+    logical(LK)              :: eof   !! end of file flag
+    character(kind=CK,len=1) :: c     !! character returned by [[pop_char]]
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp  !! this is a work-around for a bug
                                                  !! in the gfortran 4.9 compiler.
@@ -9665,9 +9729,9 @@
     character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
     type(json_value),pointer            :: array
 
-    type(json_value),pointer :: element
-    logical(LK) :: eof
-    character(kind=CK,len=1) :: c
+    type(json_value),pointer :: element !! temp variable for array element
+    logical(LK)              :: eof     !! end of file flag
+    character(kind=CK,len=1) :: c       !! character returned by [[pop_char]]
 
     do
 
@@ -9729,14 +9793,17 @@
     character(kind=CK,len=*),intent(in)              :: str   !! JSON string (if parsing from a string)
     character(kind=CK,len=:),allocatable,intent(out) :: string !! the string (unescaped if necessary)
 
-    logical(LK) :: eof, is_hex, escape
-    character(kind=CK,len=1) :: c
-    character(kind=CK,len=4) :: hex
-    integer(IK) :: i
-    integer(IK) :: ip !! index to put next character,
-                      !! to speed up by reducing the number of character string reallocations.
+    logical(LK)              :: eof      !! end of file flag
+    logical(LK)              :: is_hex   !! it is a hex string
+    logical(LK)              :: escape   !! for escape string parsing
+    character(kind=CK,len=1) :: c        !! character returned by [[pop_char]]
+    character(kind=CK,len=4) :: hex      !! hex string
+    integer(IK)              :: i        !! counter
+    integer(IK)              :: ip       !! index to put next character,
+                                         !! to speed up by reducing the number
+                                         !! of character string reallocations.
     character(kind=CK,len=:),allocatable :: string_unescaped !! temp variable
-    character(kind=CK,len=:),allocatable :: error_message !! for string unescaping
+    character(kind=CK,len=:),allocatable :: error_message    !! for string unescaping
 
     !at least return a blank string if there is a problem:
     string = repeat(space, chunk_size)
@@ -9849,9 +9916,10 @@
     character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
     character(kind=CK,len=*),intent(in) :: chars  !! the string to check for.
 
-    integer(IK) :: i, length
-    logical(LK) :: eof
-    character(kind=CK,len=1) :: c
+    integer(IK) :: i               !! counter
+    integer(IK) :: length          !! trimmed length of `chars`
+    logical(LK) :: eof             !! end of file flag
+    character(kind=CK,len=1) :: c  !! character returned by [[pop_char]]
 
     if (.not. json%exception_thrown) then
 
@@ -9895,16 +9963,16 @@
     character(kind=CK,len=*),intent(in) :: str    !! JSON string (if parsing from a string)
     type(json_value),pointer            :: value
 
-    character(kind=CK,len=:),allocatable :: tmp
-    character(kind=CK,len=1) :: c
-    logical(LK) :: eof
-    real(RK) :: rval
-    integer(IK) :: ival
-    logical(LK) :: first
-    logical(LK) :: is_integer
-    integer(IK) :: ip !! index to put next character
-                      !! [to speed up by reducing the number
-                      !! of character string reallocations]
+    character(kind=CK,len=:),allocatable :: tmp !! temp string
+    character(kind=CK,len=1) :: c           !! character returned by [[pop_char]]
+    logical(LK)              :: eof         !! end of file flag
+    real(RK)                 :: rval        !! real value
+    integer(IK)              :: ival        !! integer value
+    logical(LK)              :: first       !! first character
+    logical(LK)              :: is_integer  !! it is an integer
+    integer(IK)              :: ip          !! index to put next character
+                                            !! [to speed up by reducing the number
+                                            !! of character string reallocations]
 
     if (.not. json%exception_thrown) then
 
@@ -9993,7 +10061,7 @@
 !  * [[push_char]]
 !
 !@note This routine ignores non-printing ASCII characters
-!      (iachar<=31) that are in strings.
+!      (`iachar<=31`) that are in strings.
 
     recursive subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,popped)
 
@@ -10003,7 +10071,7 @@
     integer(IK),intent(in)               :: unit          !! file unit number (if parsing
                                                           !! from a file)
     character(kind=CK,len=*),intent(in)  :: str           !! JSON string (if parsing from a
-                                                          !! string) -- only used if unit=0
+                                                          !! string) -- only used if `unit=0`
     logical(LK),intent(in),optional      :: skip_ws       !! to ignore whitespace [default False]
     logical(LK),intent(in),optional      :: skip_comments !! to ignore comment lines [default False]
     logical(LK),intent(out)              :: eof           !! true if the end of the file has
@@ -10187,7 +10255,8 @@
     implicit none
 
     class(json_core),intent(inout) :: json
-    integer, intent(in), optional  :: io_unit
+    integer, intent(in), optional  :: io_unit  !! unit number for
+                                               !! printing error message
 
     character(kind=CK,len=:),allocatable :: error_msg  !! error message
     logical :: status_ok !! false if there were any errors thrown
