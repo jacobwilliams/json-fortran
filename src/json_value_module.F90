@@ -5687,10 +5687,11 @@
 !>
 !  Returns the [[json_value]] pointer given the path string.
 !
-!  It uses either of two methods:
+!  It uses one of three methods:
 !
 !  * The original JSON-Fortran defaults
 !  * [RFC 6901](https://tools.ietf.org/html/rfc6901)
+!  * [JSONPath](http://goessner.net/articles/JsonPath/) "bracket-notation"
 
     subroutine json_get_by_path(json, me, path, p, found)
 
@@ -5710,7 +5711,6 @@
 
     if (.not. json%exception_thrown) then
 
-        ! note: it can only be 1 or 2 (3 not currently enabled)
         select case (json%path_mode)
         case(1_IK)
             call json%json_get_by_path_default(me, path, p, found)
