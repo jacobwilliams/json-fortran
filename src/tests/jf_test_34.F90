@@ -67,7 +67,7 @@ contains
         call json%destroy(p)
 
         call json%create_array(p,'integer_array')
-        call json%create_integer(e,1,'')
+        call json%create_integer(e,1,CK_'')
         call json%add(p,e)
         call json%string_info(p,max_str_len=max_str_len,ilen=ilen,found=found)
         call json%destroy(p)
@@ -79,7 +79,7 @@ contains
         call json%destroy(p)
 
         call json%create_array(p,'integer_array')
-        call json%create_integer(e,1,'')
+        call json%create_integer(e,1,CK_'')
         call json%add(p,e)
         call json%string_info(p,max_str_len=max_str_len,ilen=ilen)
         call json%clear_exceptions()
@@ -136,6 +136,11 @@ contains
         call json%destroy(p)
 
     end do
+
+    ! rename:
+    call json%initialize(trailing_spaces_significant=.true.)
+    call json%create_integer(p,1,CK_'a')
+    call json%rename(p,CK_'b  ')
 
     end subroutine test_34
 
