@@ -1103,6 +1103,13 @@
 !
 !  Create a deep copy of a [[json_value]] linked-list structure.
 !
+!### Notes
+!
+!  * If `from` has children, then they are also cloned.
+!  * The parent of `from` is not linked to `to`.
+!  * If `from` is an element of an array, then the previous and
+!    next entries are not cloned (only that element and it's children, if any).
+!
 !### Example
 !
 !````fortran
@@ -1182,10 +1189,12 @@
         if (present(next))        to%next        => next
         if (present(children))    to%children    => children
         if (present(tail)) then
-            if (tail) to%parent%tail => to
+            if (tail .and. associated(to%parent)) to%parent%tail => to
         end if
 
-        if (associated(from%next)) then
+        if (associated(from%next) .and. associated(to%parent)) then
+            ! we only clone the next entry in an array
+            ! if the parent has also been cloned
             allocate(to%next)
             call json_value_clone_func(from%next,&
                                        to%next,&
@@ -2643,7 +2652,9 @@
 
             ! now, check next one:
             if (associated(p%next)) then
-                call check_if_valid(p%next,require_parent=require_parent)
+                ! if it's an element in an
+                ! array, then require a parent:
+                call check_if_valid(p%next,require_parent=.true.)
             end if
 
             if (associated(p%children)) then
