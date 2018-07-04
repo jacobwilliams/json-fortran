@@ -3078,33 +3078,47 @@
     implicit none
 
     class(json_core),intent(inout) :: json
-    type(json_value),pointer       :: p       !! `p` should be a `json_object`
-                                              !! or a `json_array` (although this
-                                              !! is not currently checked)
+    type(json_value),pointer       :: p       !! `p` must be a `json_object`
+                                              !! or a `json_array`
     type(json_value),pointer       :: member  !! the child member
                                               !! to add to `p`
 
+    integer(IK) :: var_type  !! variable type of `p`
+
     if (.not. json%exception_thrown) then
 
-        ! associate the parent
-        member%parent => p
+        if (associated(p)) then
 
-        ! add to linked list
-        if (associated(p%children)) then
+            call json%info(p,var_type=var_type)
 
-            p%tail%next => member
-            member%previous => p%tail
+            select case (var_type)
+            case(json_object, json_array)
+
+                ! associate the parent
+                member%parent => p
+
+                ! add to linked list
+                if (associated(p%children)) then
+                    p%tail%next => member
+                    member%previous => p%tail
+                else
+                    p%children => member
+                    member%previous => null()  !first in the list
+                end if
+
+                ! new member is now the last one in the list
+                p%tail => member
+                p%n_children = p%n_children + 1
+
+            case default
+                call json%throw_exception('Error in json_value_add_member: '//&
+                                          'can only add child to object or array')
+            end select
 
         else
-
-            p%children => member
-            member%previous => null()  !first in the list
-
+            call json%throw_exception('Error in json_value_add_member: '//&
+                                      'the pointer is not associated')
         end if
-
-        ! new member is now the last one in the list
-        p%tail => member
-        p%n_children = p%n_children + 1
 
     end if
 
