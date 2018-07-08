@@ -169,6 +169,11 @@
                                     json_file_update_string_val_ascii
 #endif
 
+        !>
+        !  Remove a variable from a [[json_file(type)]]
+        !  by specifying the path.
+        generic,public :: remove =>  MAYBEWRAP(json_file_remove)
+
         !traverse
         procedure,public :: traverse => json_file_traverse
 
@@ -243,6 +248,9 @@
         procedure :: json_file_update_string_name_ascii
         procedure :: json_file_update_string_val_ascii
 #endif
+
+        !remove:
+        procedure :: MAYBEWRAP(json_file_remove)
 
         !print_file:
         procedure :: json_file_print_to_console
@@ -2190,6 +2198,42 @@
     call me%core%traverse(me%p,traverse_callback)
 
     end subroutine json_file_traverse
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 7/7/2018
+!
+!  Remove a variable from a JSON file.
+!
+!@note This is just a wrapper to [[remove_if_present]].
+
+    subroutine json_file_remove(me,path)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path !! the path to the variable
+
+    call me%core%remove_if_present(me%p,path)
+
+    end subroutine json_file_remove
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_remove]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_remove(me,path)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path !! the path to the variable
+
+    call me%remove(to_unicode(path))
+
+    end subroutine wrap_json_file_remove
 !*****************************************************************************************
 
 !*****************************************************************************************

@@ -44,7 +44,7 @@ contains
 
         call json%initialize(escape_solidus=(i==1), stop_on_error=.true.)
         call json%load_from_string(str)
-        call json%print_file()
+        call json%print_file(error_unit)
 
         if (json%failed()) then
             call json%print_error_message(error_unit)

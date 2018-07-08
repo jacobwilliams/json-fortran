@@ -168,7 +168,7 @@
         logical(LK) :: is_verbose = .false.        !! if true, all exceptions are
                                                    !! immediately printed to console.
 
-        logical(LK) :: stop_on_error = .false.    !! if true, then the program is
+        logical(LK) :: stop_on_error = .false.     !! if true, then the program is
                                                    !! stopped immediately when an
                                                    !! exception is raised.
 
@@ -3078,33 +3078,47 @@
     implicit none
 
     class(json_core),intent(inout) :: json
-    type(json_value),pointer       :: p       !! `p` should be a `json_object`
-                                              !! or a `json_array` (although this
-                                              !! is not currently checked)
+    type(json_value),pointer       :: p       !! `p` must be a `json_object`
+                                              !! or a `json_array`
     type(json_value),pointer       :: member  !! the child member
                                               !! to add to `p`
 
+    integer(IK) :: var_type  !! variable type of `p`
+
     if (.not. json%exception_thrown) then
 
-        ! associate the parent
-        member%parent => p
+        if (associated(p)) then
 
-        ! add to linked list
-        if (associated(p%children)) then
+            call json%info(p,var_type=var_type)
 
-            p%tail%next => member
-            member%previous => p%tail
+            select case (var_type)
+            case(json_object, json_array)
+
+                ! associate the parent
+                member%parent => p
+
+                ! add to linked list
+                if (associated(p%children)) then
+                    p%tail%next => member
+                    member%previous => p%tail
+                else
+                    p%children => member
+                    member%previous => null()  !first in the list
+                end if
+
+                ! new member is now the last one in the list
+                p%tail => member
+                p%n_children = p%n_children + 1
+
+            case default
+                call json%throw_exception('Error in json_value_add_member: '//&
+                                          'can only add child to object or array')
+            end select
 
         else
-
-            p%children => member
-            member%previous => null()  !first in the list
-
+            call json%throw_exception('Error in json_value_add_member: '//&
+                                      'the pointer is not associated')
         end if
-
-        ! new member is now the last one in the list
-        p%tail => member
-        p%n_children = p%n_children + 1
 
     end if
 
@@ -5687,10 +5701,11 @@
 !>
 !  Returns the [[json_value]] pointer given the path string.
 !
-!  It uses either of two methods:
+!  It uses one of three methods:
 !
 !  * The original JSON-Fortran defaults
 !  * [RFC 6901](https://tools.ietf.org/html/rfc6901)
+!  * [JSONPath](http://goessner.net/articles/JsonPath/) "bracket-notation"
 
     subroutine json_get_by_path(json, me, path, p, found)
 
@@ -5710,7 +5725,6 @@
 
     if (.not. json%exception_thrown) then
 
-        ! note: it can only be 1 or 2 (3 not currently enabled)
         select case (json%path_mode)
         case(1_IK)
             call json%json_get_by_path_default(me, path, p, found)
@@ -6294,8 +6308,9 @@
 !  are user-specified. To fully conform to the RFC 6901 standard,
 !  should probably set (via `initialize`):
 !
-!  * `trailing_spaces_significant` = .true. [this is not the default setting]
-!  * `case_sensitive_keys` = .true.         [this is the default setting]
+!  * `case_sensitive_keys = .true.`         [this is the default setting]
+!  * `trailing_spaces_significant = .true.` [this is *not* the default setting]
+!  * `allow_duplicate_keys = .false.`       [this is *not* the default setting]
 !
 !### Example
 !
@@ -6440,7 +6455,7 @@
                             end if
                             if (status_ok) then
                                 ! if we make it this far, it should be
-                                ! convertable to an integer, so do it.
+                                ! convertible to an integer, so do it.
                                 call string_to_integer(token,ival,status_ok)
                             end if
                         end if
@@ -6739,6 +6754,7 @@
 
                                     ! verify that there are no spaces or other
                                     ! characters in the string:
+                                    status_ok = .true.
                                     do i=1,len(token)
                                         ! It must only contain (0..9) characters
                                         ! (it must be unsigned)
@@ -9875,7 +9891,7 @@
                     !  start accumulating the hex string (should be the next 4 characters)
                     if (escape) then
                         escape = .false.
-                        is_hex = (c=='u')    !the next four characters are the hex string
+                        is_hex = (c==CK_'u')    !the next four characters are the hex string
                     else
                         escape = (c==backslash)
                     end if
