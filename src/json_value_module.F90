@@ -168,7 +168,7 @@
         logical(LK) :: is_verbose = .false.        !! if true, all exceptions are
                                                    !! immediately printed to console.
 
-        logical(LK) :: stop_on_error = .false.    !! if true, then the program is
+        logical(LK) :: stop_on_error = .false.     !! if true, then the program is
                                                    !! stopped immediately when an
                                                    !! exception is raised.
 
@@ -6308,8 +6308,9 @@
 !  are user-specified. To fully conform to the RFC 6901 standard,
 !  should probably set (via `initialize`):
 !
-!  * `trailing_spaces_significant` = .true. [this is not the default setting]
-!  * `case_sensitive_keys` = .true.         [this is the default setting]
+!  * `case_sensitive_keys = .true.`         [this is the default setting]
+!  * `trailing_spaces_significant = .true.` [this is *not* the default setting]
+!  * `allow_duplicate_keys = .false.`       [this is *not* the default setting]
 !
 !### Example
 !
@@ -6454,7 +6455,7 @@
                             end if
                             if (status_ok) then
                                 ! if we make it this far, it should be
-                                ! convertable to an integer, so do it.
+                                ! convertible to an integer, so do it.
                                 call string_to_integer(token,ival,status_ok)
                             end if
                         end if
@@ -6753,6 +6754,7 @@
 
                                     ! verify that there are no spaces or other
                                     ! characters in the string:
+                                    status_ok = .true.
                                     do i=1,len(token)
                                         ! It must only contain (0..9) characters
                                         ! (it must be unsigned)
@@ -9889,7 +9891,7 @@
                     !  start accumulating the hex string (should be the next 4 characters)
                     if (escape) then
                         escape = .false.
-                        is_hex = (c=='u')    !the next four characters are the hex string
+                        is_hex = (c==CK_'u')    !the next four characters are the hex string
                     else
                         escape = (c==backslash)
                     end if
