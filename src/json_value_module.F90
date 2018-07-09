@@ -463,11 +463,11 @@
         !    type(json_core) :: json
         !    type(json_value) :: p
         !    !...
-        !    call json%print(p,'test.json')  !this is [[json_print_2]]
+        !    call json%print(p,'test.json')  !this is [[json_print_to_filename]]
         !````
-        generic,public :: print => json_print_1,json_print_2
-        procedure :: json_print_1
-        procedure :: json_print_2
+        generic,public :: print => json_print_to_unit,json_print_to_filename
+        procedure :: json_print_to_unit
+        procedure :: json_print_to_filename
 
         !>
         !  Destructor routine for a [[json_value]] pointer.
@@ -5225,7 +5225,7 @@
 !
 !  Print the [[json_value]] structure to a file.
 
-    subroutine json_print_1(json,p,iunit)
+    subroutine json_print_to_unit(json,p,iunit)
 
     implicit none
 
@@ -5234,15 +5234,16 @@
     integer(IK),intent(in)               :: iunit   !! the file unit (the file must
                                                     !! already have been opened, can't be -1).
 
-    character(kind=CK,len=:),allocatable :: dummy
+    character(kind=CK,len=:),allocatable :: dummy !! dummy for `str` argument
+                                                  !! to [[json_value_print]]
 
     if (iunit/=unit2str) then
         call json%json_value_print(p,iunit,str=dummy, indent=1_IK, colon=.true.)
     else
-        call json%throw_exception('Error in json_print_1: iunit must not be -1.')
+        call json%throw_exception('Error in json_print_to_unit: iunit must not be -1.')
     end if
 
-    end subroutine json_print_1
+    end subroutine json_print_to_unit
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5251,7 +5252,7 @@
 !
 !  Print the [[json_value]] structure to a file.
 
-    subroutine json_print_2(json,p,filename)
+    subroutine json_print_to_filename(json,p,filename)
 
     implicit none
 
@@ -5260,18 +5261,19 @@
     character(kind=CDK,len=*),intent(in) :: filename  !! the filename to print to
                                                       !! (should not already be open)
 
-    integer(IK) :: iunit,istat
+    integer(IK) :: iunit  !! file unit for `open` statement
+    integer(IK) :: istat  !! `iostat` code for `open` statement
 
     open(newunit=iunit,file=filename,status='REPLACE',iostat=istat FILE_ENCODING )
     if (istat==0) then
         call json%print(p,iunit)
         close(iunit,iostat=istat)
     else
-        call json%throw_exception('Error in json_print_2: could not open file: '//&
+        call json%throw_exception('Error in json_print_to_filename: could not open file: '//&
                               trim(filename))
     end if
 
-    end subroutine json_print_2
+    end subroutine json_print_to_filename
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -5291,16 +5293,17 @@
 
     class(json_core),intent(inout)       :: json
     type(json_value),pointer,intent(in)  :: p
-    integer(IK),intent(in)               :: iunit             !! file unit to write to (6=console)
+    integer(IK),intent(in)               :: iunit             !! file unit to write to (the
+                                                              !! file is assumed to be open)
     integer(IK),intent(in),optional      :: indent            !! indention level
     logical(LK),intent(in),optional      :: is_array_element  !! if this is an array element
     logical(LK),intent(in),optional      :: need_comma        !! if it needs a comma after it
     logical(LK),intent(in),optional      :: colon             !! if the colon was just written
     character(kind=CK,len=:),intent(inout),allocatable :: str
-                                                      !! if `iunit==unit2str` (-1) then the structure is
-                                                      !! printed to this string rather than
-                                                      !! a file. This mode is used by
-                                                      !! [[json_value_to_string]].
+                                                      !! if `iunit==unit2str` (-1) then
+                                                      !! the structure is printed to this
+                                                      !! string rather than a file. This mode
+                                                      !! is used by [[json_value_to_string]].
     logical(LK),intent(in),optional :: is_compressed_vector  !! if True, this is an element
                                                              !! from an array being printed
                                                              !! on one line [default is False]
@@ -5325,6 +5328,16 @@
                                                         !! `name` or `str_value`
 
     if (.not. json%exception_thrown) then
+
+        if (.not. associated(p)) then
+            ! note: a null() pointer will trigger this error.
+            ! However, if the pointer is undefined, then this will
+            ! crash (if this wasn't here it would crash below when
+            ! we try to access the contents)
+            call json%throw_exception('Error in json_value_print: '//&
+                                      'the pointer is not associated')
+            return
+        end if
 
         if (present(is_compressed_vector)) then
             is_vector = is_compressed_vector
@@ -5420,6 +5433,7 @@
                     ! recursive print of the element
                     call json%json_value_print(element, iunit=iunit, indent=tab + 1, &
                                     need_comma=i<count, colon=.true., str=str)
+                    if (json%exception_thrown) return
 
                     ! get the next child the list:
                     element => element%next
@@ -5500,6 +5514,8 @@
                         call json%json_value_print(element, iunit=iunit, indent=tab,&
                                         need_comma=i<count, is_array_element=.true., str=str)
                     end if
+                    if (json%exception_thrown) return
+
                     ! get the next child the list:
                     element => element%next
 
