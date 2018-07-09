@@ -176,7 +176,10 @@
                                                    !! when an error is thrown in the class.
                                                    !! Many of the methods will check this
                                                    !! and return immediately if it is true.
-        character(kind=CK,len=:),allocatable :: err_message !! the error message
+        character(kind=CK,len=:),allocatable :: err_message
+                                                   !! the error message.
+                                                   !! if `exception_thrown=False` then
+                                                   !! this variable is not allocated.
 
         integer(IK) :: char_count = 0    !! character position in the current line
         integer(IK) :: line_count = 1    !! lines read counter
@@ -1804,7 +1807,7 @@
 
     !clear the flag and message:
     json%exception_thrown = .false.
-    json%err_message = CK_''
+    if (allocated(json%err_message)) deallocate(json%err_message)
 
     end subroutine json_clear_exceptions
 !*****************************************************************************************
@@ -1908,6 +1911,7 @@
 !
 !### See also
 !  * [[json_failed]]
+!  * [[json_throw_exception]]
 
     pure subroutine json_check_for_errors(json,status_ok,error_msg)
 
@@ -1923,11 +1927,10 @@
 
     if (present(error_msg)) then
         if (json%exception_thrown) then
-            if (allocated(json%err_message)) then
-                error_msg = json%err_message
-            else
-                error_msg = 'Unknown error.'  ! this should never happen
-            end if
+            ! if an exception has been thrown,
+            ! then this will always be allocated
+            ! [see json_throw_exception]
+            error_msg = json%err_message
         end if
     end if
 
@@ -8877,8 +8880,8 @@
         end if
 
         !create the error message:
-        json%err_message = json%err_message//newline//&
-                           'line: '//trim(adjustl(line_str))//', '//&
+        if (allocated(json%err_message)) json%err_message = json%err_message//newline
+        json%err_message = 'line: '//trim(adjustl(line_str))//', '//&
                            'character: '//trim(adjustl(char_str))//newline//&
                            trim(line)//newline//arrow_str
 
