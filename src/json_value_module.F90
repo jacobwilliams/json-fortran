@@ -1909,24 +1909,26 @@
 !### See also
 !  * [[json_failed]]
 
-    subroutine json_check_for_errors(json,status_ok,error_msg)
+    pure subroutine json_check_for_errors(json,status_ok,error_msg)
 
     implicit none
 
-    class(json_core),intent(inout) :: json
-    logical(LK),intent(out) :: status_ok !! true if there were no errors
-    character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! the error message (if there were errors)
+    class(json_core),intent(in) :: json
+    logical(LK),intent(out),optional :: status_ok !! true if there were no errors
+    character(kind=CK,len=:),allocatable,intent(out),optional :: error_msg !! the error message.
+                                                                           !! (not allocated if
+                                                                           !! there were no errors)
 
-    status_ok = .not. json%exception_thrown
+    if (present(status_ok)) status_ok = .not. json%exception_thrown
 
-    if (.not. status_ok) then
-        if (allocated(json%err_message)) then
-            error_msg = json%err_message
-        else
-            error_msg = 'Unknown error.'
+    if (present(error_msg)) then
+        if (json%exception_thrown) then
+            if (allocated(json%err_message)) then
+                error_msg = json%err_message
+            else
+                error_msg = 'Unknown error.'  ! this should never happen
+            end if
         end if
-    else
-        error_msg = CK_''
     end if
 
     end subroutine json_check_for_errors
