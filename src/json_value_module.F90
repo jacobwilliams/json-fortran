@@ -176,7 +176,10 @@
                                                    !! when an error is thrown in the class.
                                                    !! Many of the methods will check this
                                                    !! and return immediately if it is true.
-        character(kind=CK,len=:),allocatable :: err_message !! the error message
+        character(kind=CK,len=:),allocatable :: err_message
+                                                   !! the error message.
+                                                   !! if `exception_thrown=False` then
+                                                   !! this variable is not allocated.
 
         integer(IK) :: char_count = 0    !! character position in the current line
         integer(IK) :: line_count = 1    !! lines read counter
@@ -1804,7 +1807,7 @@
 
     !clear the flag and message:
     json%exception_thrown = .false.
-    json%err_message = CK_''
+    if (allocated(json%err_message)) deallocate(json%err_message)
 
     end subroutine json_clear_exceptions
 !*****************************************************************************************
@@ -1908,25 +1911,27 @@
 !
 !### See also
 !  * [[json_failed]]
+!  * [[json_throw_exception]]
 
-    subroutine json_check_for_errors(json,status_ok,error_msg)
+    pure subroutine json_check_for_errors(json,status_ok,error_msg)
 
     implicit none
 
-    class(json_core),intent(inout) :: json
-    logical(LK),intent(out) :: status_ok !! true if there were no errors
-    character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! the error message (if there were errors)
+    class(json_core),intent(in) :: json
+    logical(LK),intent(out),optional :: status_ok !! true if there were no errors
+    character(kind=CK,len=:),allocatable,intent(out),optional :: error_msg !! the error message.
+                                                                           !! (not allocated if
+                                                                           !! there were no errors)
 
-    status_ok = .not. json%exception_thrown
+    if (present(status_ok)) status_ok = .not. json%exception_thrown
 
-    if (.not. status_ok) then
-        if (allocated(json%err_message)) then
+    if (present(error_msg)) then
+        if (json%exception_thrown) then
+            ! if an exception has been thrown,
+            ! then this will always be allocated
+            ! [see json_throw_exception]
             error_msg = json%err_message
-        else
-            error_msg = 'Unknown error.'
         end if
-    else
-        error_msg = CK_''
     end if
 
     end subroutine json_check_for_errors
@@ -8875,8 +8880,8 @@
         end if
 
         !create the error message:
-        json%err_message = json%err_message//newline//&
-                           'line: '//trim(adjustl(line_str))//', '//&
+        if (allocated(json%err_message)) json%err_message = json%err_message//newline
+        json%err_message = 'line: '//trim(adjustl(line_str))//', '//&
                            'character: '//trim(adjustl(char_str))//newline//&
                            trim(line)//newline//arrow_str
 

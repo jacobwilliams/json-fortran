@@ -52,10 +52,16 @@ contains
     call json%get(p2,'logical',d)
     call json%get(p2,'integer',tf)
     call json%get(p2,'real',   tf)
+
     call json%check_for_errors(status_ok, error_msg)  !error condition true
+    call json%check_for_errors(status_ok)             !error condition true
+    call json%check_for_errors(error_msg=error_msg)   !error condition true
+
     call json%initialize(print_signs=.true.)  !print signs flag
 
     call json%check_for_errors(status_ok, error_msg)  !error condition false
+    call json%check_for_errors(status_ok)             !error condition false
+    call json%check_for_errors(error_msg=error_msg)   !error condition false - not allocated
 
     call file1%move(file2) !should throw an exception since points are not associated
     call file1%initialize()
