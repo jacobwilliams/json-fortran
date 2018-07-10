@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.7.0 (2018-07-10)](#670-2018-07-10)
     - [6.6.0 (2018-07-01)](#660-2018-07-01)
     - [6.5.0 (2018-06-23)](#650-2018-06-23)
     - [6.4.0 (2018-06-10)](#640-2018-06-10)
@@ -29,7 +30,25 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.6.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.7.0...HEAD)
+
+
+### [6.7.0](https://github.com/jacobwilliams/json-fortran/tree/6.7.0) (2018-07-10)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.6.0...6.7.0)
+or [Download v6.7.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.7.0)
+
+**Enhancements:**
+
+- Made the two arguments to `json_check_for_errors()` optional, so now either or both can be used. Note that if no error has been raised, then `error_msg` is now returned unallocated. [\#344](https://github.com/jacobwilliams/json-fortran/issues/344) [\#345](https://github.com/jacobwilliams/json-fortran/pull/345) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added an additional error check in `json_value_print()` to check for an unassociated pointer. [\#342](https://github.com/jacobwilliams/json-fortran/issues/342) [\#343](https://github.com/jacobwilliams/json-fortran/pull/343) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added `remove()` method to `json_file` [\#339](https://github.com/jacobwilliams/json-fortran/issues/339) [\#340](https://github.com/jacobwilliams/json-fortran/pull/340) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added additional error checks to `json_value_add_member()`. Now it will raise an exception if try to add a child to a non-array or non-object. [\#337](https://github.com/jacobwilliams/json-fortran/issues/337) [\#338](https://github.com/jacobwilliams/json-fortran/pull/338) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added some additional unit tests to increase coverage [\#336](https://github.com/jacobwilliams/json-fortran/pull/336) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed bugs:**
+
+- Fixed a bug in `json_value_clone_func()` where it could crash if attempting to clone an array element. Updated this routine to improve behavior when cloning an array element (the subsequent entries are no longer cloned). [\#334](https://github.com/jacobwilliams/json-fortran/issues/334) [\#335](https://github.com/jacobwilliams/json-fortran/pull/335) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.6.0](https://github.com/jacobwilliams/json-fortran/tree/6.6.0) (2018-07-01)
 
