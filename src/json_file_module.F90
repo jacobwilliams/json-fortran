@@ -31,7 +31,7 @@
     !  used to open a file and get data from it.
     !
     !  A `json_file` contains only two items: an instance of a [[json_core(type)]],
-    !  which use used for all data manipulation, and a [[json_value]],
+    !  which is used for all data manipulation, and a [[json_value]] pointer,
     !  which is used to construct the linked-list data structure.
     !  Note that most methods in the `json_file` class are simply wrappers
     !  to the lower-level routines in the [[json_value_module]].
@@ -56,6 +56,9 @@
     !    call json%destroy()
     !    end program test
     !```
+    !
+    !@warning The `destroy()` method must be called before the variable
+    !         goes out of scope or a memory leak will occur.
 
     type,public :: json_file
 
@@ -91,7 +94,6 @@
         generic,public :: print_file => json_file_print_to_console, &
                                         json_file_print_1, &
                                         json_file_print_2
-
 
         !>
         !  Rename a variable, specifying it by path
