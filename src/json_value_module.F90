@@ -2097,9 +2097,9 @@
 
         if (associated(p%next) .and. des_next) call json%destroy(p%next)
 
-        if (associated(p%previous)) nullify(p%previous)
-        if (associated(p%parent))   nullify(p%parent)
-        if (associated(p%tail))     nullify(p%tail)
+        nullify(p%previous)
+        nullify(p%parent)
+        nullify(p%tail)
 
         if (associated(p)) deallocate(p)
         nullify(p)
