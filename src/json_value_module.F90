@@ -3743,7 +3743,7 @@
     logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for each element
     logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for each element
 
-    call json%json_add_string_by_path(me,to_unicode(path),value,found,was_created)
+    call json%json_add_string_by_path(me,to_unicode(path),value,found,was_created,trim_str,adjustl_str)
 
     end subroutine json_add_string_by_path_path_ascii
 !*****************************************************************************************
@@ -3766,7 +3766,7 @@
     logical(LK),intent(in),optional      :: trim_str     !! if TRIM() should be called for each element
     logical(LK),intent(in),optional      :: adjustl_str  !! if ADJUSTL() should be called for each element
 
-    call json%json_add_string_by_path(me,path,to_unicode(value),found,was_created)
+    call json%json_add_string_by_path(me,path,to_unicode(value),found,was_created,trim_str,adjustl_str)
 
     end subroutine json_add_string_by_path_value_ascii
 !*****************************************************************************************
@@ -4133,7 +4133,7 @@
     logical(LK),intent(in),optional  :: adjustl_str      !! if ADJUSTL() should be called for each element
 
     call json%json_add_string_vec_by_path(me,to_unicode(path),value,&
-                                            found,was_created,ilen)
+                                            found,was_created,ilen,trim_str,adjustl_str)
 
     end subroutine json_add_string_vec_by_path_path_ascii
 !*****************************************************************************************
