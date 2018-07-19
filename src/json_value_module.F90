@@ -807,7 +807,7 @@
     implicit none
 
     class(json_core),intent(out) :: me
-    
+
     end subroutine destroy_json_core
 !*****************************************************************************************
 
