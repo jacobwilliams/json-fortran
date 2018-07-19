@@ -45,8 +45,10 @@
     character(kind=CK,len=*),parameter :: end_array       = CK_']'  !! end of a JSON array
     character(kind=CK,len=*),parameter :: delimiter       = CK_','  !! delimiter for JSON
     character(kind=CK,len=*),parameter :: colon_char      = CK_':'  !! colon character for JSON
-    character(kind=CK,len=*),parameter :: start_array_alt = CK_'('  !! alternate start of JSON array for [[json_get_by_path_default]]
-    character(kind=CK,len=*),parameter :: end_array_alt   = CK_')'  !! alternate end of JSON array for [[json_get_by_path_default]]
+    character(kind=CK,len=*),parameter :: start_array_alt = CK_'('  !! alternate start of JSON array for
+                                                                    !! [[json_get_by_path_default]]
+    character(kind=CK,len=*),parameter :: end_array_alt   = CK_')'  !! alternate end of JSON array for 
+                                                                    !! [[json_get_by_path_default]]
     character(kind=CK,len=*),parameter :: root            = CK_'$'  !! root for [[json_get_by_path_default]]
     character(kind=CK,len=*),parameter :: this            = CK_'@'  !! 'this' for [[json_get_by_path_default]]
     character(kind=CK,len=*),parameter :: dot             = CK_'.'  !! path separator for [[json_get_by_path_default]]

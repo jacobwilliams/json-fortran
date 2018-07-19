@@ -721,30 +721,31 @@
                                                                            !! children for duplicate keys
 
         !other private routines:
-        procedure :: name_equal
-        procedure :: name_strings_equal
-        procedure :: json_value_print
-        procedure :: string_to_int
-        procedure :: string_to_dble
-        procedure :: parse_value
-        procedure :: parse_number
-        procedure :: parse_string
-        procedure :: parse_for_chars
-        procedure :: parse_object
-        procedure :: parse_array
-        procedure :: annotate_invalid_json
-        procedure :: pop_char
-        procedure :: push_char
-        procedure :: get_current_line_from_file_stream
-        procedure :: get_current_line_from_file_sequential
-        procedure :: convert
-        procedure :: to_string
-        procedure :: to_logical
-        procedure :: to_integer
-        procedure :: to_double
-        procedure :: to_null
-        procedure :: to_object
-        procedure :: to_array
+        procedure        :: name_equal
+        procedure        :: name_strings_equal
+        procedure        :: json_value_print
+        procedure        :: string_to_int
+        procedure        :: string_to_dble
+        procedure        :: parse_value
+        procedure        :: parse_number
+        procedure        :: parse_string
+        procedure        :: parse_for_chars
+        procedure        :: parse_object
+        procedure        :: parse_array
+        procedure        :: annotate_invalid_json
+        procedure        :: pop_char
+        procedure        :: push_char
+        procedure        :: get_current_line_from_file_stream
+        procedure,nopass :: get_current_line_from_file_sequential
+        procedure        :: convert
+        procedure        :: to_string
+        procedure        :: to_logical
+        procedure        :: to_integer
+        procedure        :: to_double
+        procedure        :: to_null
+        procedure        :: to_object
+        procedure        :: to_array
+        procedure,nopass :: json_value_clone_func
 
     end type json_core
     !*********************************************************
@@ -806,7 +807,7 @@
     implicit none
 
     class(json_core),intent(out) :: me
-
+    
     end subroutine destroy_json_core
 !*****************************************************************************************
 
@@ -1143,8 +1144,7 @@
                                       !! (it must not already be associated)
 
     !call the main function:
-    ! [note: this is not part of json_core class]
-    call json_value_clone_func(from,to)
+    call json%json_value_clone_func(from,to)
 
     end subroutine json_clone
 !*****************************************************************************************
@@ -8937,11 +8937,10 @@
 !  The file is assumed to be opened.
 !  This is the SEQUENTIAL version (see also [[get_current_line_from_file_stream]]).
 
-    subroutine get_current_line_from_file_sequential(json,iunit,line)
+    subroutine get_current_line_from_file_sequential(iunit,line)
 
     implicit none
 
-    class(json_core),intent(inout)                   :: json
     integer(IK),intent(in)                           :: iunit  !! file unit number
     character(kind=CK,len=:),allocatable,intent(out) :: line   !! current line
 
