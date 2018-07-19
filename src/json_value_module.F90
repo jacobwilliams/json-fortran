@@ -2052,9 +2052,10 @@
     logical(LK),intent(in),optional :: destroy_next !! if true, then `p%next`
                                                     !! is also destroyed (default is true)
 
-    logical(LK) :: des_next  !! local copy of `destroy_next` optional argument
-    type(json_value), pointer :: child  !! for getting child elements
-    logical :: circular  !! to check to malformed linked lists
+    logical(LK)              :: des_next  !! local copy of `destroy_next`
+                                          !! optional argument
+    type(json_value),pointer :: child     !! for getting child elements
+    logical                  :: circular  !! to check to malformed linked lists
 
     if (associated(p)) then
 
@@ -2154,8 +2155,10 @@
                                                 !! * If `destroy` is present and true, it is destroyed.
                                                 !! * If `destroy` is present and false, it is not destroyed.
 
-    type(json_value),pointer :: parent,previous,next
-    logical(LK) :: destroy_it
+    type(json_value),pointer :: parent     !! pointer to parent
+    type(json_value),pointer :: previous   !! pointer to previous
+    type(json_value),pointer :: next       !! pointer to next
+    logical(LK)              :: destroy_it !! if `p` should be destroyed
 
     if (associated(p)) then
 
@@ -2324,11 +2327,16 @@
     implicit none
 
     class(json_core),intent(inout) :: json
-    type(json_value),pointer       :: p1
-    type(json_value),pointer       :: p2
+    type(json_value),pointer       :: p1  !! swap with `p2`
+    type(json_value),pointer       :: p2  !! swap with `p1`
 
-    logical :: same_parent,first_last,adjacent
-    type(json_value),pointer :: a,b
+    logical                  :: same_parent !! if `p1` and `p2` have the same parent
+    logical                  :: first_last  !! if `p1` and `p2` are the first,last or
+                                            !! last,first children of a common parent
+    logical                  :: adjacent    !! if `p1` and `p2` are adjacent
+                                            !! elements in an array
+    type(json_value),pointer :: a           !! temporary variable
+    type(json_value),pointer :: b           !! temporary variable
 
     if (json%exception_thrown) return
 
@@ -2349,8 +2357,6 @@
                                 associated(p2%parent) .and. &
                                 associated(p1%parent,p2%parent) )
                 if (same_parent) then
-                    !if p1,p2 are the first,last or last,first
-                    !children of a common parent
                     first_last = (associated(p1%parent%children,p1) .and. &
                                   associated(p2%parent%tail,p2)) .or. &
                                  (associated(p1%parent%tail,p1) .and. &
