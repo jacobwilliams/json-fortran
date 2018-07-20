@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.8.0 (2018-07-19)](#680-2018-07-19)
     - [6.7.0 (2018-07-10)](#670-2018-07-10)
     - [6.6.0 (2018-07-01)](#660-2018-07-01)
     - [6.5.0 (2018-06-23)](#650-2018-06-23)
@@ -30,8 +31,24 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.7.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.8.0...HEAD)
 
+### [6.8.0](https://github.com/jacobwilliams/json-fortran/tree/6.8.0) (2018-07-19)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.7.0...6.8.0)
+or [Download v6.8.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.8.0)
+
+**Enhancements:**
+
+- Added some additional checks so that the `destroy` method could still be used to destroy some malformed JSON linked lists. Also updated the `validate` method to check for circular references.
+[\#346](https://github.com/jacobwilliams/json-fortran/issues/346) [\#349](https://github.com/jacobwilliams/json-fortran/pull/349) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added missing arguments (`trim_str` and `adjustl_str`) to some of the string wrapper routines. [\#347](https://github.com/jacobwilliams/json-fortran/issues/347) [\#348](https://github.com/jacobwilliams/json-fortran/pull/348) ([jacobwilliams](https://github.com/jacobwilliams))
+- Various minor changes to remove some compiler warnings and a line length standards violation.
+- Various documentation string updates.
+
+**Fixed bugs:**
+
+- Fixed a dangling pointer bug in the `destroy` method that was causing unpredictable behavior in this routine which could cause a crash for some compilers [\#307](https://github.com/jacobwilliams/json-fortran/issues/307) [\#350](https://github.com/jacobwilliams/json-fortran/pull/350) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.7.0](https://github.com/jacobwilliams/json-fortran/tree/6.7.0) (2018-07-10)
 
