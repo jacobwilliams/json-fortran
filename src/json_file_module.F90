@@ -64,7 +64,8 @@
 
         private
 
-        type(json_core) :: core !! The instance of the [[json_core(type)]] factory used for this file.
+        type(json_core)          :: core         !! The instance of the [[json_core(type)]]
+                                                 !! factory used for this file.
         type(json_value),pointer :: p => null()  !! the JSON structure read from the file
 
     contains

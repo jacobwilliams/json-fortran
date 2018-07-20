@@ -433,44 +433,45 @@
 !  * `\t`        - horizontal tab
 !  * `\uXXXX`    - 4 hexadecimal digits
 
-    subroutine unescape_string(str_in, str_out, error_message)
+    subroutine unescape_string(str, error_message)
 
     implicit none
 
-    character(kind=CK,len=*),intent(in)              :: str_in  !! string as stored in a [[json_value]]
-    character(kind=CK,len=:),allocatable,intent(out) :: str_out !! decoded string
-    character(kind=CK,len=:),allocatable,intent(out) :: error_message !! will be allocated if there was an error
+    character(kind=CK,len=:),allocatable,intent(inout) :: str           !! in: string as stored
+                                                                        !! in a [[json_value]].
+                                                                        !! out: decoded string.
+    character(kind=CK,len=:),allocatable,intent(out)   :: error_message !! will be allocated if
+                                                                        !! there was an error
 
     integer :: i   !! counter
-    integer :: n   !! length of str_in
-    integer :: m   !! length of str_out
+    integer :: n   !! length of `str`
+    integer :: m   !! length of `str_tmp`
     character(kind=CK,len=1) :: c  !! for scanning each character in string
+    character(kind=CK,len=:),allocatable :: str_tmp !! temp decoded string (if the input
+                                                    !! string contains an escape character
+                                                    !! and needs to be decoded).
 
-#if defined __GFORTRAN__
-    character(kind=CK,len=:),allocatable :: tmp  !! for GFortran bug workaround
-#endif
-
-    if (scan(str_in,backslash)>0) then
+    if (scan(str,backslash)>0) then
 
         !there is at least one escape character, so process this string:
 
-        n = len(str_in)
-        str_out = repeat(space,n) !size the output string (will be trimmed later)
-        m = 0  !counter in str_out
-        i = 0  !counter in str_in
+        n = len(str)
+        str_tmp = repeat(space,n) !size the output string (will be trimmed later)
+        m = 0  !counter in str_tmp
+        i = 0  !counter in str
 
         do
 
             i = i + 1
             if (i>n) exit ! finished
-            c = str_in(i:i) ! get next character in the string
+            c = str(i:i) ! get next character in the string
 
             if (c == backslash) then
 
                 if (i<n) then
 
                     i = i + 1
-                    c = str_in(i:i) !character after the escape
+                    c = str(i:i) !character after the escape
 
                     if (any(c == [quotation_mark,backslash,slash, &
                          to_unicode(['b','f','n','r','t'])])) then
@@ -491,7 +492,7 @@
                         end select
 
                         m = m + 1
-                        str_out(m:m) = c
+                        str_tmp(m:m) = c
 
                     else if (c == 'u') then !expecting 4 hexadecimal digits after
                                             !the escape character    [\uXXXX]
@@ -505,23 +506,23 @@
 
                         if (i+4<=n) then
                             m = m + 1
-                            str_out(m:m+5) = str_in(i-1:i+4)
+                            str_tmp(m:m+5) = str(i-1:i+4)
                             i = i + 4
                             m = m + 5
                         else
                             error_message = 'Error in unescape_string:'//&
-                                                 ' Invalid hexadecimal sequence'//&
-                                                 ' in string: '//str_in(i-1:)
-                            if (allocated(str_out)) deallocate(str_out)
+                                            ' Invalid hexadecimal sequence'//&
+                                            ' in string: '//str(i-1:)
+                            if (allocated(str_tmp)) deallocate(str_tmp)
                             return
                         end if
 
                     else
                         !unknown escape character
                         error_message = 'Error in unescape_string:'//&
-                                             ' unknown escape sequence in string "'//&
-                                             trim(str_in)//'" ['//backslash//c//']'
-                        if (allocated(str_out)) deallocate(str_out)
+                                        ' unknown escape sequence in string "'//&
+                                        trim(str)//'" ['//backslash//c//']'
+                        if (allocated(str_tmp)) deallocate(str_tmp)
                         return
                     end if
 
@@ -530,28 +531,19 @@
                     ! the string [this may not be valid syntax,
                     ! but just keep it]
                     m = m + 1
-                    str_out(m:m) = c
+                    str_tmp(m:m) = c
                 end if
 
             else
                 m = m + 1
-                str_out(m:m) = c
+                str_tmp(m:m) = c
             end if
 
         end do
 
         !trim trailing space:
-#if defined __GFORTRAN__
-        ! workaround for Gfortran 6.1.0 bug
-        tmp = str_out(1:m)
-        str_out = tmp
-#else
-        str_out = str_out(1:m)
-#endif
+        str = str_tmp(1:m)
 
-    else
-        !there are no escape characters, so return as is:
-        str_out = str_in
     end if
 
     end subroutine unescape_string

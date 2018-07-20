@@ -9887,8 +9887,7 @@
     integer(IK)              :: ip       !! index to put next character,
                                          !! to speed up by reducing the number
                                          !! of character string reallocations.
-    character(kind=CK,len=:),allocatable :: string_unescaped !! temp variable
-    character(kind=CK,len=:),allocatable :: error_message    !! for string unescaping
+    character(kind=CK,len=:),allocatable :: error_message !! for string unescaping
 
     !at least return a blank string if there is a problem:
     string = repeat(space, chunk_size)
@@ -9970,16 +9969,11 @@
         end if
 
         !string is returned unescaped:
-        call unescape_string(string,string_unescaped,error_message)
+        call unescape_string(string,error_message)
         if (allocated(error_message)) then
             call json%throw_exception(error_message)
-        else
-            string = string_unescaped
+            deallocate(error_message)  !cleanup
         end if
-
-        !cleanup:
-        if (allocated(error_message))    deallocate(error_message)
-        if (allocated(string_unescaped)) deallocate(string_unescaped)
 
     end if
 
