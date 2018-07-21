@@ -8752,11 +8752,11 @@
         !  but we'll allocate something here just in case.
         p%name = trim(file)  !use the file name
 
-        ! parse as a value
+            ! parse as a value
         call json%parse_value(unit=iunit, str=CK_'', value=p)
 
-        ! close the file if necessary
-        close(unit=iunit, iostat=istat)
+            ! close the file if necessary
+            close(unit=iunit, iostat=istat)
 
         ! check for errors:
         if (json%exception_thrown) then
@@ -9868,22 +9868,22 @@
 !  * Jacob Williams : 6/16/2014 : Added hex validation.
 !  * Jacob Williams : 12/3/2015 : Fixed some bugs.
 !  * Jacob Williams : 8/23/2015 : `string` is now returned unescaped.
+!  * Jacob Williams : 7/21/2018 : moved hex validate to [[unescape_string]].
 
     subroutine parse_string(json, unit, str, string)
 
     implicit none
 
     class(json_core),intent(inout)                   :: json
-    integer(IK),intent(in)                           :: unit  !! file unit number (if parsing from a file)
-    character(kind=CK,len=*),intent(in)              :: str   !! JSON string (if parsing from a string)
-    character(kind=CK,len=:),allocatable,intent(out) :: string !! the string (unescaped if necessary)
+    integer(IK),intent(in)                           :: unit   !! file unit number (if
+                                                               !! parsing from a file)
+    character(kind=CK,len=*),intent(in)              :: str    !! JSON string (if parsing
+                                                               !! from a string)
+    character(kind=CK,len=:),allocatable,intent(out) :: string !! the string (unescaped
+                                                               !! if necessary)
 
     logical(LK)              :: eof      !! end of file flag
-    logical(LK)              :: is_hex   !! it is a hex string
-    logical(LK)              :: escape   !! for escape string parsing
     character(kind=CK,len=1) :: c        !! character returned by [[pop_char]]
-    character(kind=CK,len=4) :: hex      !! hex string
-    integer(IK)              :: i        !! counter
     integer(IK)              :: ip       !! index to put next character,
                                          !! to speed up by reducing the number
                                          !! of character string reallocations.
@@ -9895,10 +9895,7 @@
     if (.not. json%exception_thrown) then
 
         !initialize:
-        ip     = 1
-        is_hex = .false.
-        escape = .false.
-        i      = 0
+        ip = 1
 
         do
 
@@ -9910,10 +9907,8 @@
                 call json%throw_exception('Error in parse_string: Expecting end of string')
                 return
 
-            else if (c==quotation_mark .and. .not. escape) then  !end of string
+            else if (c==quotation_mark) then  !end of string
 
-                if (is_hex) call json%throw_exception('Error in parse_string:'//&
-                                                 ' incomplete hex string: \u'//trim(hex))
                 exit
 
             else
@@ -9924,36 +9919,6 @@
                 !append to string:
                 string(ip:ip) = c
                 ip = ip + 1
-
-                !hex validation:
-                if (is_hex) then  !accumulate the four characters after '\u'
-
-                    i=i+1
-                    hex(i:i) = c
-                    if (i==4) then
-                        if (valid_json_hex(hex)) then
-                            i = 0
-                            hex = CK_''
-                            is_hex = .false.
-                        else
-                            call json%throw_exception('Error in parse_string:'//&
-                                                 ' invalid hex string: \u'//trim(hex))
-                            exit
-                        end if
-                    end if
-
-                else
-
-                    !when the '\u' string is encountered, then
-                    !  start accumulating the hex string (should be the next 4 characters)
-                    if (escape) then
-                        escape = .false.
-                        is_hex = (c==CK_'u')    !the next four characters are the hex string
-                    else
-                        escape = (c==backslash)
-                    end if
-
-                end if
 
             end if
 
@@ -9968,7 +9933,8 @@
             end if
         end if
 
-        !string is returned unescaped:
+        ! string is returned unescaped:
+        ! (this will also validate any hex strings present)
         call unescape_string(string,error_message)
         if (allocated(error_message)) then
             call json%throw_exception(error_message)

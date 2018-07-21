@@ -473,29 +473,34 @@
                     i = i + 1
                     c = str(i:i) !character after the escape
 
-                    if (any(c == [quotation_mark,backslash,slash, &
-                         to_unicode(['b','f','n','r','t'])])) then
-
-                        select case(c)
-                        case (quotation_mark,backslash,slash)
-                            !use d as is
-                        case (CK_'b')
-                             c = bspace
-                        case (CK_'f')
-                             c = formfeed
-                        case (CK_'n')
-                             c = newline
-                        case (CK_'r')
-                             c = carriage_return
-                        case (CK_'t')
-                             c = horizontal_tab
-                        end select
-
+                    select case(c)
+                    case (quotation_mark,backslash,slash)
+                        !use d as is
+                        m = m + 1
+                        str_tmp(m:m) = c
+                    case (CK_'b')
+                        c = bspace
+                        m = m + 1
+                        str_tmp(m:m) = c
+                    case (CK_'f')
+                        c = formfeed
+                        m = m + 1
+                        str_tmp(m:m) = c
+                    case (CK_'n')
+                        c = newline
+                        m = m + 1
+                        str_tmp(m:m) = c
+                    case (CK_'r')
+                        c = carriage_return
+                        m = m + 1
+                        str_tmp(m:m) = c
+                    case (CK_'t')
+                        c = horizontal_tab
                         m = m + 1
                         str_tmp(m:m) = c
 
-                    else if (c == 'u') then !expecting 4 hexadecimal digits after
-                                            !the escape character    [\uXXXX]
+                    case (CK_'u') ! expecting 4 hexadecimal digits after
+                                  ! the escape character    [\uXXXX]
 
                         !for now, we are just returning them as is
                         ![not checking to see if it is a valid hex value]
@@ -505,33 +510,47 @@
                         !   \uXXXX
 
                         if (i+4<=n) then
-                            m = m + 1
-                            str_tmp(m:m+5) = str(i-1:i+4)
-                            i = i + 4
-                            m = m + 5
+
+                            ! validate the hex string:
+                            if (valid_json_hex(str(i+1:i+4))) then
+                                m = m + 1
+                                str_tmp(m:m+5) = str(i-1:i+4)
+                                i = i + 4
+                                m = m + 5
+                            else
+                                error_message = 'Error in unescape_string:'//&
+                                                ' Invalid hexadecimal sequence in string "'//&
+                                                trim(str)//'" ['//str(i-1:i+4)//']'
+                                if (allocated(str_tmp)) deallocate(str_tmp)
+                                return
+                            end if
                         else
                             error_message = 'Error in unescape_string:'//&
-                                            ' Invalid hexadecimal sequence'//&
-                                            ' in string: '//str(i-1:)
+                                            ' Invalid hexadecimal sequence in string "'//&
+                                            trim(str)//'" ['//str(i-1:)//']'
                             if (allocated(str_tmp)) deallocate(str_tmp)
                             return
                         end if
 
-                    else
+                    case default
+
                         !unknown escape character
                         error_message = 'Error in unescape_string:'//&
                                         ' unknown escape sequence in string "'//&
                                         trim(str)//'" ['//backslash//c//']'
                         if (allocated(str_tmp)) deallocate(str_tmp)
                         return
-                    end if
+
+                    end select
 
                 else
-                    !an escape character is the last character in
-                    ! the string [this may not be valid syntax,
-                    ! but just keep it]
-                    m = m + 1
-                    str_tmp(m:m) = c
+                    ! an escape character is the last character in
+                    ! the string. This is an error.
+                    error_message = 'Error in unescape_string:'//&
+                                    ' invalid escape character in string "'//&
+                                    trim(str)//'"'
+                    if (allocated(str_tmp)) deallocate(str_tmp)
+                    return
                 end if
 
             else
