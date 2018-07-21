@@ -1917,7 +1917,7 @@
 !  * [[json_failed]]
 !  * [[json_throw_exception]]
 
-    pure subroutine json_check_for_errors(json,status_ok,error_msg)
+    subroutine json_check_for_errors(json,status_ok,error_msg)
 
     implicit none
 
@@ -1927,6 +1927,10 @@
                                                                            !! (not allocated if
                                                                            !! there were no errors)
 
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: tmp  !! workaround for gfortran bugs
+#endif
+
     if (present(status_ok)) status_ok = .not. json%exception_thrown
 
     if (present(error_msg)) then
@@ -1934,7 +1938,12 @@
             ! if an exception has been thrown,
             ! then this will always be allocated
             ! [see json_throw_exception]
+#if defined __GFORTRAN__
+            tmp = json%err_message
+            error_msg = tmp
+#else
             error_msg = json%err_message
+#endif
         end if
     end if
 
@@ -8752,11 +8761,8 @@
         !  but we'll allocate something here just in case.
         p%name = trim(file)  !use the file name
 
-            ! parse as a value
+        ! parse as a value
         call json%parse_value(unit=iunit, str=CK_'', value=p)
-
-            ! close the file if necessary
-            close(unit=iunit, iostat=istat)
 
         ! check for errors:
         if (json%exception_thrown) then
@@ -8772,6 +8778,9 @@
                 end if
             end if
         end if
+
+        ! close the file:
+        close(unit=iunit, iostat=istat)
 
     else
 
@@ -8872,8 +8881,8 @@
     integer(IK) :: i_nl_prev  !! index of previous newline character
     integer(IK) :: i_nl       !! index of current newline character
 
-    !  If there was an error reading the file, then
-    !   print the line where the error occurred:
+    ! If there was an error reading the file, then
+    ! print the line where the error occurred:
     if (json%exception_thrown) then
 
         !the counters for the current line and the last character read:
@@ -8918,8 +8927,13 @@
         end if
 
         !create the error message:
-        if (allocated(json%err_message)) json%err_message = json%err_message//newline
-        json%err_message = 'line: '//trim(adjustl(line_str))//', '//&
+        if (allocated(json%err_message)) then
+            json%err_message = json%err_message//newline
+        else
+            json%err_message = ''
+        end if
+        json%err_message = json%err_message//&
+                           'line: '//trim(adjustl(line_str))//', '//&
                            'character: '//trim(adjustl(char_str))//newline//&
                            trim(line)//newline//arrow_str
 
@@ -9883,6 +9897,7 @@
                                                                !! if necessary)
 
     logical(LK)              :: eof      !! end of file flag
+    logical(LK)              :: escape   !! for escape string parsing
     character(kind=CK,len=1) :: c        !! character returned by [[pop_char]]
     integer(IK)              :: ip       !! index to put next character,
                                          !! to speed up by reducing the number
@@ -9895,7 +9910,8 @@
     if (.not. json%exception_thrown) then
 
         !initialize:
-        ip = 1
+        escape = .false.
+        ip     = 1
 
         do
 
@@ -9907,7 +9923,7 @@
                 call json%throw_exception('Error in parse_string: Expecting end of string')
                 return
 
-            else if (c==quotation_mark) then  !end of string
+            else if (c==quotation_mark .and. .not. escape) then  !end of string
 
                 exit
 
@@ -9919,6 +9935,15 @@
                 !append to string:
                 string(ip:ip) = c
                 ip = ip + 1
+
+                ! check for escape character, so we don't
+                ! exit prematurely if escaping a quotation
+                ! character:
+                if (escape) then
+                    escape = .false.
+                else
+                    escape = (c==backslash)
+                end if
 
             end if
 

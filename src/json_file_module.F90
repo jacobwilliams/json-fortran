@@ -320,10 +320,17 @@
     implicit none
 
     class(json_file),intent(inout) :: me
-    logical(LK),intent(out) :: status_ok !! true if there were no errors
-    character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! the error message (if there were errors)
+    logical(LK),intent(out),optional :: status_ok !! true if there were no errors
+    character(kind=CK,len=:),allocatable,intent(out),optional :: error_msg !! the error message
+                                                                           !! (if there were errors)
 
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: tmp  !! workaround for gfortran bugs
+    call me%core%check_for_errors(status_ok,tmp)
+    error_msg = tmp
+#else
     call me%core%check_for_errors(status_ok,error_msg)
+#endif
 
     end subroutine json_file_check_for_errors
 !*****************************************************************************************

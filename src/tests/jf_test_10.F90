@@ -144,7 +144,7 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. size(str_vec)==6 .and. &
+        if (found .and. size(str_vec)==7 .and. &
             str_vec(1)=='..\path\to\files\file1.txt') then
             write(error_unit,'(A)') '...success'
         else
@@ -303,7 +303,7 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. size(str_vec)==6 .and. &
+        if (found .and. size(str_vec)==7 .and. &
             str_vec(1)=='..\path\to\files\file1.txt') then
             write(error_unit,'(A)') '...success'
         else
