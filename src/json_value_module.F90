@@ -8926,6 +8926,15 @@
             line = CK_''
         end if
 
+        ! add a newline for the error display if necessary:
+        line = trim(line)
+        if (len(line)>0) then
+            i = len(line)
+            if (line(i:i)/=newline) line = line//newline
+        else
+            line = line//newline
+        end if
+
         !create the error message:
         if (allocated(json%err_message)) then
             json%err_message = json%err_message//newline
@@ -8935,7 +8944,7 @@
         json%err_message = json%err_message//&
                            'line: '//trim(adjustl(line_str))//', '//&
                            'character: '//trim(adjustl(char_str))//newline//&
-                           trim(line)//newline//arrow_str
+                           line//arrow_str
 
         if (allocated(line)) deallocate(line)
 
