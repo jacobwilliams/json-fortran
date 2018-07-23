@@ -1917,7 +1917,7 @@
 !  * [[json_failed]]
 !  * [[json_throw_exception]]
 
-    pure subroutine json_check_for_errors(json,status_ok,error_msg)
+    subroutine json_check_for_errors(json,status_ok,error_msg)
 
     implicit none
 
@@ -1927,6 +1927,10 @@
                                                                            !! (not allocated if
                                                                            !! there were no errors)
 
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: tmp  !! workaround for gfortran bugs
+#endif
+
     if (present(status_ok)) status_ok = .not. json%exception_thrown
 
     if (present(error_msg)) then
@@ -1934,7 +1938,12 @@
             ! if an exception has been thrown,
             ! then this will always be allocated
             ! [see json_throw_exception]
+#if defined __GFORTRAN__
+            tmp = json%err_message
+            error_msg = tmp
+#else
             error_msg = json%err_message
+#endif
         end if
     end if
 
@@ -8755,9 +8764,6 @@
         ! parse as a value
         call json%parse_value(unit=iunit, str=CK_'', value=p)
 
-        ! close the file if necessary
-        close(unit=iunit, iostat=istat)
-
         ! check for errors:
         if (json%exception_thrown) then
             call json%annotate_invalid_json(iunit,CK_'')
@@ -8772,6 +8778,9 @@
                 end if
             end if
         end if
+
+        ! close the file:
+        close(unit=iunit, iostat=istat)
 
     else
 
@@ -8872,8 +8881,8 @@
     integer(IK) :: i_nl_prev  !! index of previous newline character
     integer(IK) :: i_nl       !! index of current newline character
 
-    !  If there was an error reading the file, then
-    !   print the line where the error occurred:
+    ! If there was an error reading the file, then
+    ! print the line where the error occurred:
     if (json%exception_thrown) then
 
         !the counters for the current line and the last character read:
@@ -8917,11 +8926,25 @@
             line = CK_''
         end if
 
+        ! add a newline for the error display if necessary:
+        line = trim(line)
+        if (len(line)>0) then
+            i = len(line)
+            if (line(i:i)/=newline) line = line//newline
+        else
+            line = line//newline
+        end if
+
         !create the error message:
-        if (allocated(json%err_message)) json%err_message = json%err_message//newline
-        json%err_message = 'line: '//trim(adjustl(line_str))//', '//&
+        if (allocated(json%err_message)) then
+            json%err_message = json%err_message//newline
+        else
+            json%err_message = ''
+        end if
+        json%err_message = json%err_message//&
+                           'line: '//trim(adjustl(line_str))//', '//&
                            'character: '//trim(adjustl(char_str))//newline//&
-                           trim(line)//newline//arrow_str
+                           line//arrow_str
 
         if (allocated(line)) deallocate(line)
 
@@ -9008,6 +9031,11 @@
     iend = json%ipos
     do
         read(iunit,pos=iend,iostat=ios) c
+        if (IS_IOSTAT_END(ios)) then
+            ! account for end of file without linebreak
+            iend=iend-1
+            exit
+        end if
         if (c==newline .or. ios/=0) exit
         iend=iend+1
     end do
@@ -9868,27 +9896,27 @@
 !  * Jacob Williams : 6/16/2014 : Added hex validation.
 !  * Jacob Williams : 12/3/2015 : Fixed some bugs.
 !  * Jacob Williams : 8/23/2015 : `string` is now returned unescaped.
+!  * Jacob Williams : 7/21/2018 : moved hex validate to [[unescape_string]].
 
     subroutine parse_string(json, unit, str, string)
 
     implicit none
 
     class(json_core),intent(inout)                   :: json
-    integer(IK),intent(in)                           :: unit  !! file unit number (if parsing from a file)
-    character(kind=CK,len=*),intent(in)              :: str   !! JSON string (if parsing from a string)
-    character(kind=CK,len=:),allocatable,intent(out) :: string !! the string (unescaped if necessary)
+    integer(IK),intent(in)                           :: unit   !! file unit number (if
+                                                               !! parsing from a file)
+    character(kind=CK,len=*),intent(in)              :: str    !! JSON string (if parsing
+                                                               !! from a string)
+    character(kind=CK,len=:),allocatable,intent(out) :: string !! the string (unescaped
+                                                               !! if necessary)
 
     logical(LK)              :: eof      !! end of file flag
-    logical(LK)              :: is_hex   !! it is a hex string
     logical(LK)              :: escape   !! for escape string parsing
     character(kind=CK,len=1) :: c        !! character returned by [[pop_char]]
-    character(kind=CK,len=4) :: hex      !! hex string
-    integer(IK)              :: i        !! counter
     integer(IK)              :: ip       !! index to put next character,
                                          !! to speed up by reducing the number
                                          !! of character string reallocations.
-    character(kind=CK,len=:),allocatable :: string_unescaped !! temp variable
-    character(kind=CK,len=:),allocatable :: error_message    !! for string unescaping
+    character(kind=CK,len=:),allocatable :: error_message !! for string unescaping
 
     !at least return a blank string if there is a problem:
     string = repeat(space, chunk_size)
@@ -9896,10 +9924,8 @@
     if (.not. json%exception_thrown) then
 
         !initialize:
-        ip     = 1
-        is_hex = .false.
         escape = .false.
-        i      = 0
+        ip     = 1
 
         do
 
@@ -9913,8 +9939,6 @@
 
             else if (c==quotation_mark .and. .not. escape) then  !end of string
 
-                if (is_hex) call json%throw_exception('Error in parse_string:'//&
-                                                 ' incomplete hex string: \u'//trim(hex))
                 exit
 
             else
@@ -9926,34 +9950,13 @@
                 string(ip:ip) = c
                 ip = ip + 1
 
-                !hex validation:
-                if (is_hex) then  !accumulate the four characters after '\u'
-
-                    i=i+1
-                    hex(i:i) = c
-                    if (i==4) then
-                        if (valid_json_hex(hex)) then
-                            i = 0
-                            hex = CK_''
-                            is_hex = .false.
-                        else
-                            call json%throw_exception('Error in parse_string:'//&
-                                                 ' invalid hex string: \u'//trim(hex))
-                            exit
-                        end if
-                    end if
-
+                ! check for escape character, so we don't
+                ! exit prematurely if escaping a quotation
+                ! character:
+                if (escape) then
+                    escape = .false.
                 else
-
-                    !when the '\u' string is encountered, then
-                    !  start accumulating the hex string (should be the next 4 characters)
-                    if (escape) then
-                        escape = .false.
-                        is_hex = (c==CK_'u')    !the next four characters are the hex string
-                    else
-                        escape = (c==backslash)
-                    end if
-
+                    escape = (c==backslash)
                 end if
 
             end if
@@ -9969,17 +9972,13 @@
             end if
         end if
 
-        !string is returned unescaped:
-        call unescape_string(string,string_unescaped,error_message)
+        ! string is returned unescaped:
+        ! (this will also validate any hex strings present)
+        call unescape_string(string,error_message)
         if (allocated(error_message)) then
             call json%throw_exception(error_message)
-        else
-            string = string_unescaped
+            deallocate(error_message)  !cleanup
         end if
-
-        !cleanup:
-        if (allocated(error_message))    deallocate(error_message)
-        if (allocated(string_unescaped)) deallocate(string_unescaped)
 
     end if
 
