@@ -9028,7 +9028,7 @@
         end if
         istart = istart-1  !rewind until the beginning of the line
     end do
-    iend = istart
+    iend = json%ipos
     do
         read(iunit,pos=iend,iostat=ios) c
         if (IS_IOSTAT_END(ios)) then
