@@ -74,6 +74,8 @@ contains
                     do j = 1, min(len(error_msg), len(expected_error_msg))
                         if (error_msg(j:j) /= expected_error_msg(j:j)) then
                             write(error_unit,'(I3,1X,A,A,A,A,A)') j, '"', error_msg(j:j), '" /= "', expected_error_msg(j:j), '"'
+                        else
+                            write(error_unit,'(I3,1X,A,A,A,A,A)') j, '"', error_msg(j:j), '" == "', expected_error_msg(j:j), '"'
                         end if
                     end do
                     error_cnt = error_cnt + 1
