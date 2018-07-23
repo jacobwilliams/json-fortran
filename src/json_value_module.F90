@@ -9028,9 +9028,14 @@
         end if
         istart = istart-1  !rewind until the beginning of the line
     end do
-    iend = json%ipos
+    iend = istart
     do
         read(iunit,pos=iend,iostat=ios) c
+        if (IS_IOSTAT_END(ios)) then
+            ! account for end of file without linebreak
+            iend=iend-1
+            exit
+        end if
         if (c==newline .or. ios/=0) exit
         iend=iend+1
     end do
