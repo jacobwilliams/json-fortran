@@ -62,7 +62,7 @@ contains
 
             if (i==1) then
                 call json%check_for_errors(status_ok, error_msg=error_msg)
-                expected_error_msg = CK_'Error in parse_array: Unexpected charact9er encountered when parsing array.'//newline//&
+                expected_error_msg = CK_'Error in parse_array: Unexpected character encountered when parsing array.'//newline//&
                                      CK_'line: 13, character: 1'//newline//&
                                      CK_'}'//newline//'^'
                 if (error_msg /= expected_error_msg) then
