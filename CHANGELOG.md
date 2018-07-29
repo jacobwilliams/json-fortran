@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.9.0 (2018-07-29)](#690-2018-07-29)
     - [6.8.0 (2018-07-19)](#680-2018-07-19)
     - [6.7.0 (2018-07-10)](#670-2018-07-10)
     - [6.6.0 (2018-07-01)](#660-2018-07-01)
@@ -31,7 +32,28 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.8.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.9.0...HEAD)
+
+### [6.9.0](https://github.com/jacobwilliams/json-fortran/tree/6.9.0) (2018-07-29)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.8.0...6.9.0)
+or [Download v6.9.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.9.0)
+
+**Enhancements:**
+
+- Some efficiency improvements when parsing strings. [\#352](https://github.com/jacobwilliams/json-fortran/pull/352) ([jacobwilliams](https://github.com/jacobwilliams))
+  - Speed up the `unescape_string()` routine. [\#351](https://github.com/jacobwilliams/json-fortran/issues/351)
+  - Some cleanup and efficiency improvements for hex string validation. [\#354](https://github.com/jacobwilliams/json-fortran/issues/354)
+- Various updates to error message reporting.
+  - The two arguments to `json_file_check_for_errors()` are now optional to match the core routine.
+  [\#356](https://github.com/jacobwilliams/json-fortran/issues/356)
+  - Some adjustments to error messages for invalid hex strings. Validation of hex strings is now done in the `unescape_string()` routine. [\#354](https://github.com/jacobwilliams/json-fortran/issues/354)
+  - A string that ends in an escape character `\` is now flagged as invalid. [\#353](https://github.com/jacobwilliams/json-fortran/issues/353)
+
+**Fixed bugs:**
+
+- Fixed a bug in the `annotate_invalid_json()` routine. [\#355](https://github.com/jacobwilliams/json-fortran/issues/355)
+- Fixed an issue with the `jf_test_06` unit test failing on Windows. [\#357](https://github.com/jacobwilliams/json-fortran/issues/357)
 
 ### [6.8.0](https://github.com/jacobwilliams/json-fortran/tree/6.8.0) (2018-07-19)
 
