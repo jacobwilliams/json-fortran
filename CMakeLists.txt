@@ -11,6 +11,9 @@
 
 cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 
+# Use MSVS folders to organize projects on windows
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(PROJECT_DESCRIPTION "A Fortran 2008 JSON API")
 set(PROJECT_URL "https://github.com/jacobwilliams/json-fortran")
 
@@ -239,7 +242,7 @@ if ( ENABLE_TESTS )
   enable_testing()
 
   # emulate GNU Autotools `make check`
-  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG>)
 
   find_program ( JSONLINT jsonlint )
   find_program ( DIFF     diff )
