@@ -242,7 +242,7 @@ if ( ENABLE_TESTS )
   enable_testing()
 
   # emulate GNU Autotools `make check`
-  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG>)
+  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG> --output-on-failure)
   add_custom_target(build_tests) # Make target to build all tests
   add_dependencies(build_tests ${LIB_NAME} ${LIB_NAME}-static)
 
