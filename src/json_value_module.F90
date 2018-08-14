@@ -1669,15 +1669,6 @@
         if (present(set_size)) set_size = 0
     end if
 
-    if (present(matrix_column_size)) then
-        do i = 1, size(matrix_column_size,dim=1)
-            do j = 1, size(matrix_column_size,dim=2)
-                write(0,*) matrix_column_size(i,j)
-                write(0,*) matrix_vec(i,j,1:matrix_column_size(i,j))
-            end do
-        end do
-    end if
-
     end subroutine json_matrix_info
 !*****************************************************************************************
 
@@ -1710,7 +1701,7 @@
     integer(IK),intent(out),optional    :: set_size  !! size of each data set (i.e., matrix
                                                      !! cols if using row-major order)
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
-    integer(IK),dimension(:,:),allocatable,intent(inout),optional :: matrix_column_size      !! # of columns in (matrix,row)
+    integer(IK),dimension(:,:),allocatable,intent(inout),optional :: matrix_column_size   !! # of columns in (matrix,row)
     real(RK),dimension(:,:,:),allocatable,intent(inout),optional :: matrix_vec      !! # of columns in (matrix,row)
 
     type(json_value),pointer :: p_var
