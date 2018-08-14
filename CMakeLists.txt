@@ -267,7 +267,7 @@ if ( ENABLE_TESTS )
       get_filename_component ( TESTNAME "${VALID_JSON}" NAME )
       add_test ( NAME validate-${TESTNAME}
 	WORKING_DIRECTORY "${DATA_DIR}/inputs"
-	COMMAND ${JSONLINT} "--allow=nonescape-characters" "${VALID_JSON}" )
+	COMMAND ${JSONLINT} "--allow=nonescape-characters --allow non-portable" "${VALID_JSON}" )
     endforeach ()
 
     foreach ( INVALID ${INVALID_JSON} )
