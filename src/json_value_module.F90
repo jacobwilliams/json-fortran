@@ -1631,12 +1631,14 @@
                             exit main
                         end if
                         call json%info(p_element,var_type=element_vartype)
-                        call json%get(p_element, vec)
-                        associate (vec_size => size(vec))
-                            if (present(matrix_vec)) matrix_vec(i,j,1:vec_size) = vec(1:vec_size)
-                            max_vec_size = MAX(vec_size, max_vec_size)
-                        end associate
-                        if (allocated(vec)) deallocate(vec)
+                        if (present(matrix_vec)) then
+                            call json%get(p_element, vec) !! NOTE: this is only set up for reals, not integers
+                            associate (vec_size => size(vec))
+                                matrix_vec(i,j,1:vec_size) = vec(1:vec_size)
+                                max_vec_size = MAX(vec_size, max_vec_size)
+                            end associate
+                            if (allocated(vec)) deallocate(vec)
+                        end if
 
                         if (i==1 .and. j==1) vartype = element_vartype  !type of first element
                                                                         !in the row
