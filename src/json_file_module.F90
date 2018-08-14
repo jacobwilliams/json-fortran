@@ -121,6 +121,8 @@
                                  MAYBEWRAP(json_file_get_logical_vec), &
                                  MAYBEWRAP(json_file_get_string_vec),  &
                                  MAYBEWRAP(json_file_get_alloc_string_vec),  &
+                                 MAYBEWRAP(json_file_get_matrix),      &
+                                 MAYBEWRAP(json_file_get_matrix_vector),     &
                                  json_file_get_root
 
         !>
@@ -223,6 +225,8 @@
         procedure :: MAYBEWRAP(json_file_get_logical_vec)
         procedure :: MAYBEWRAP(json_file_get_string_vec)
         procedure :: MAYBEWRAP(json_file_get_alloc_string_vec)
+        procedure :: MAYBEWRAP(json_file_get_matrix)
+        procedure :: MAYBEWRAP(json_file_get_matrix_vector)
         procedure :: json_file_get_root
 
         !add:
@@ -1237,6 +1241,78 @@
     call me%core%get(me%p, path, vec, found)
 
     end subroutine json_file_get_double_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Ian Porter
+!  date: 8/13/2018
+!
+!  Get a real(RK) matrix of vectors from a JSON file.
+
+    subroutine json_file_get_matrix(me, path, vec, found)
+
+    implicit none
+
+    class(json_file),intent(inout)                :: me
+    character(kind=CK,len=*),intent(in)           :: path  !! the path to the variable
+    real(RK),dimension(:,:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional              :: found !! if it was really found
+    real(RK),dimension(:),allocatable :: vec2   !! the value vector
+    integer(IK) :: var_type  !! var type
+    integer(IK) :: n_sets    !! # of sets of matrices
+    integer(IK) :: set_size  !! # of rows in each matrix
+    logical(LK) :: is_matrix !! flag for whether it is a matrix
+
+    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size)
+    if (is_matrix) then
+        if (n_sets /= 1) then
+            !! error. n_sets can only be > 1 if 3d matrix (:,:,:)
+        else
+!        allocate(var(1:n_sets)
+!        associate(vec_r1 => vec(1,:))
+!    !        call me%core%get(me%p, path, vec_r1, found)
+!            call me%core%get(me%p, path, vec2, found)
+!        end associate
+        end if
+    end if
+
+    end subroutine json_file_get_matrix
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Ian Porter
+!  date: 8/13/2018
+!
+!  Get a real(RK) matrix of vectors from a JSON file.
+
+    subroutine json_file_get_matrix_vector(me, path, vec, found)
+
+    implicit none
+
+    class(json_file),intent(inout)                :: me
+    character(kind=CK,len=*),intent(in)           :: path  !! the path to the variable
+    real(RK),dimension(:,:,:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional              :: found !! if it was really found
+    real(RK),dimension(:),allocatable :: vec2   !! the value vector
+    integer(IK) :: var_type  !! var type
+    integer(IK) :: n_sets    !! # of sets of matrices
+    integer(IK) :: set_size  !! # of rows in each matrix
+    logical(LK) :: is_matrix !! flag for whether it is a matrix
+
+    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size)
+    if (is_matrix) then
+        if (n_sets == 1) then
+            !! single matrix rather than set of matrices
+        else
+!        allocate(var(1:n_sets)
+!        associate(vec_r1 => vec(1,:))
+!    !        call me%core%get(me%p, path, vec_r1, found)
+!            call me%core%get(me%p, path, vec2, found)
+!        end associate
+        end if
+    end if
+
+    end subroutine json_file_get_matrix_vector
 !*****************************************************************************************
 
 !*****************************************************************************************
