@@ -30,7 +30,8 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
-    real(wp), dimension(:,:),allocatable :: ddd
+    real(wp), dimension(:,:),allocatable :: dd
+    real(wp), dimension(:,:,:),allocatable :: ddd
     type(json_file) :: json
     logical :: found, file_exists
 
@@ -53,7 +54,7 @@ contains
     if (file_exists) then
         call json%load_file(filename = dir//filename36)
     else
-        inquire(file=dir2//filename36,exist=file_exists)
+        inquire(file=dir2//filename36,exist=file_exists) !! cmake for VS integration places in different folder
         if (file_exists) call json%load_file(filename = dir2//filename36)
     end if
     if (json%failed()) then
@@ -76,7 +77,13 @@ contains
         write(error_unit,'(A)') 'extract data...'
 
         write(error_unit,'(A)') '--------------------------'
-        call json%get('fooList', ddd, found)
+        call json%get('fooList', dd, found)
+        if (json%failed()) then
+            call json%print_error_message(error_unit)
+            error_cnt = error_cnt + 1
+        end if
+        if (found) write(error_unit,'(A,I5)') 'dd = ',dd
+        call json%get('fooList3x', ddd, found)
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1

@@ -1245,7 +1245,7 @@
 
 !*****************************************************************************************
 !> author: Ian Porter
-!  date: 8/13/2018
+!  date: 8/14/2018
 !
 !  Get a real(RK) matrix of vectors from a JSON file.
 
@@ -1253,27 +1253,28 @@
 
     implicit none
 
-    class(json_file),intent(inout)                :: me
-    character(kind=CK,len=*),intent(in)           :: path  !! the path to the variable
+    class(json_file),intent(inout)                  :: me
+    character(kind=CK,len=*),intent(in)             :: path  !! the path to the variable
     real(RK),dimension(:,:),allocatable,intent(out) :: vec   !! the value vector
-    logical(LK),intent(out),optional              :: found !! if it was really found
-    real(RK),dimension(:),allocatable :: vec2   !! the value vector
+    logical(LK),intent(out),optional                :: found !! if it was really found
     integer(IK) :: var_type  !! var type
     integer(IK) :: n_sets    !! # of sets of matrices
     integer(IK) :: set_size  !! # of rows in each matrix
+    integer(IK) :: i         !! counter
     logical(LK) :: is_matrix !! flag for whether it is a matrix
+    integer(IK),dimension(:,:),allocatable :: matrix_column_size
+    real(RK),dimension(:,:,:),allocatable :: matrix_vec
 
-    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size)
+    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size, &
+      &                      matrix_column_size=matrix_column_size,matrix_vec=matrix_vec)
+
     if (is_matrix) then
-        if (n_sets /= 1) then
-            !! error. n_sets can only be > 1 if 3d matrix (:,:,:)
-        else
-!        allocate(var(1:n_sets)
-!        associate(vec_r1 => vec(1,:))
-!    !        call me%core%get(me%p, path, vec_r1, found)
-!            call me%core%get(me%p, path, vec2, found)
-!        end associate
-        end if
+        associate (max_vec_size => maxval(matrix_column_size(1,:)))
+            allocate(vec(set_size,max_vec_size),source=0.0_RK)
+            do i = 1, set_size
+                vec(i,1:matrix_column_size(1,i)) = matrix_vec(1,i,1:matrix_column_size(1,i))
+            end do
+        end associate
     end if
 
     end subroutine json_file_get_matrix
@@ -1281,7 +1282,7 @@
 
 !*****************************************************************************************
 !> author: Ian Porter
-!  date: 8/13/2018
+!  date: 8/14/2018
 !
 !  Get a real(RK) matrix of vectors from a JSON file.
 
@@ -1289,27 +1290,31 @@
 
     implicit none
 
-    class(json_file),intent(inout)                :: me
-    character(kind=CK,len=*),intent(in)           :: path  !! the path to the variable
+    class(json_file),intent(inout)                    :: me
+    character(kind=CK,len=*),intent(in)               :: path  !! the path to the variable
     real(RK),dimension(:,:,:),allocatable,intent(out) :: vec   !! the value vector
-    logical(LK),intent(out),optional              :: found !! if it was really found
-    real(RK),dimension(:),allocatable :: vec2   !! the value vector
+    logical(LK),intent(out),optional                  :: found !! if it was really found
     integer(IK) :: var_type  !! var type
     integer(IK) :: n_sets    !! # of sets of matrices
     integer(IK) :: set_size  !! # of rows in each matrix
+    integer(IK) :: i         !! counter
+    integer(IK) :: j         !! counter
     logical(LK) :: is_matrix !! flag for whether it is a matrix
+    integer(IK),dimension(:,:),allocatable :: matrix_column_size
+    real(RK),dimension(:,:,:),allocatable :: matrix_vec
 
-    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size)
+    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size, &
+      &                      matrix_column_size=matrix_column_size,matrix_vec=matrix_vec)
+
     if (is_matrix) then
-        if (n_sets == 1) then
-            !! single matrix rather than set of matrices
-        else
-!        allocate(var(1:n_sets)
-!        associate(vec_r1 => vec(1,:))
-!    !        call me%core%get(me%p, path, vec_r1, found)
-!            call me%core%get(me%p, path, vec2, found)
-!        end associate
-        end if
+        associate (max_vec_size => maxval(matrix_column_size(:,:)))
+            allocate(vec(n_sets,set_size,max_vec_size),source=0.0_RK)
+            do j = 1, n_sets
+                do i = 1, set_size
+                    vec(j,i,1:matrix_column_size(j,i)) = matrix_vec(j,i,1:matrix_column_size(j,i))
+                end do
+            end do
+        end associate
     end if
 
     end subroutine json_file_get_matrix_vector

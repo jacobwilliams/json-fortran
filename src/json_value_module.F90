@@ -1544,7 +1544,7 @@
 !    }
 !```
 
-    subroutine json_matrix_info(json,p,is_matrix,var_type,n_sets,set_size,name)
+    subroutine json_matrix_info(json,p,is_matrix,var_type,n_sets,set_size,name,matrix_column_size,matrix_vec)
 
     implicit none
 
@@ -1558,6 +1558,8 @@
     integer(IK),intent(out),optional :: set_size   !! size of each data set (i.e., matrix
                                                    !! cols if using row-major order)
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+    integer(IK),dimension(:,:),allocatable,intent(inout),optional :: matrix_column_size      !! # of columns in (matrix,row)
+    real(RK),dimension(:,:,:),allocatable,intent(inout),optional :: matrix_vec      !! # of columns in (matrix,row)
 
     type(json_value),pointer :: p_row       !! for getting a set
     type(json_value),pointer :: p_element   !! for getting an element in a set
@@ -1569,6 +1571,9 @@
     integer(IK) :: icount          !! number of elements in a set
     integer     :: i               !! counter
     integer     :: j               !! counter
+    integer(IK) :: max_vec_size    !! max size of # of columns in matrix
+    integer,parameter::max_def_size=1000   !! default size of each row, to be replaced
+    real(RK),dimension(:),allocatable :: vec
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: p_name  !! temporary variable for getting name
 #endif
@@ -1585,14 +1590,14 @@
         end if
     end if
 #else
-    call json%info(p,vartype,nr,name)
+    call json%info(p,vartype,nr,name) !! get the vartype and # of children
 #endif
 
-    is_matrix = (vartype==json_array)
+    is_matrix = (vartype==json_array) !! ensure is matrix
 
     if (is_matrix) then
-
-        main : do i=1,nr
+        max_vec_size=0
+        main : do i=1,nr !! loop over all sets of matrices
 
             nullify(p_row)
             call json%get_child(p,i,p_row)
@@ -1602,7 +1607,14 @@
                                           'Malformed JSON linked list')
                 exit main
             end if
-            call json%info(p_row,var_type=row_vartype,n_children=icount)
+            call json%info(p_row,var_type=row_vartype,n_children=icount) !! get # of rows in matrix(i)
+
+            if (present(matrix_column_size)) then
+                if (.not. allocated(matrix_column_size)) allocate(matrix_column_size(nr,icount),source=0)
+            end if
+            if (present(matrix_vec)) then
+                if (.not. allocated(matrix_vec)) allocate(matrix_vec(nr,icount,max_def_size),source=0.0_rk)
+            end if
 
             if (row_vartype==json_array) then
                 if (i==1) nc = icount  !number of columns in first row
@@ -1610,7 +1622,8 @@
                     !see if all the variables in this row are the same type:
                     do j=1,icount
                         nullify(p_element)
-                        call json%get_child(p_row,j,p_element)
+                        call json%get_child(p_row,j,p_element) !! NOTE: p_element%n_children is # of columns in row
+                        if (present(matrix_column_size)) matrix_column_size(i,j) = p_element%n_children
                         if (.not. associated(p_element)) then
                             is_matrix = .false.
                             call json%throw_exception('Error in json_matrix_info: '//&
@@ -1618,6 +1631,13 @@
                             exit main
                         end if
                         call json%info(p_element,var_type=element_vartype)
+                        call json%get(p_element, vec)
+                        associate (vec_size => size(vec))
+                            if (present(matrix_vec)) matrix_vec(i,j,1:vec_size) = vec(1:vec_size)
+                            max_vec_size = MAX(vec_size, max_vec_size)
+                        end associate
+                        if (allocated(vec)) deallocate(vec)
+
                         if (i==1 .and. j==1) vartype = element_vartype  !type of first element
                                                                         !in the row
                         if (vartype/=element_vartype) then
@@ -1649,6 +1669,15 @@
         if (present(set_size)) set_size = 0
     end if
 
+    if (present(matrix_column_size)) then
+        do i = 1, size(matrix_column_size,dim=1)
+            do j = 1, size(matrix_column_size,dim=2)
+                write(0,*) matrix_column_size(i,j)
+                write(0,*) matrix_vec(i,j,1:matrix_column_size(i,j))
+            end do
+        end do
+    end if
+
     end subroutine json_matrix_info
 !*****************************************************************************************
 
@@ -1664,7 +1693,7 @@
 !      variable is not found.
 
     subroutine json_matrix_info_by_path(json,p,path,is_matrix,found,&
-                                        var_type,n_sets,set_size,name)
+                                        var_type,n_sets,set_size,name,matrix_column_size,matrix_vec)
 
     implicit none
 
@@ -1681,6 +1710,8 @@
     integer(IK),intent(out),optional    :: set_size  !! size of each data set (i.e., matrix
                                                      !! cols if using row-major order)
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
+    integer(IK),dimension(:,:),allocatable,intent(inout),optional :: matrix_column_size      !! # of columns in (matrix,row)
+    real(RK),dimension(:,:,:),allocatable,intent(inout),optional :: matrix_vec      !! # of columns in (matrix,row)
 
     type(json_value),pointer :: p_var
     logical(LK) :: ok
@@ -1706,7 +1737,7 @@
 
         !get info about the variable:
 #if defined __GFORTRAN__
-        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size)
+        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,matrix_column_size=matrix_column_size,matrix_vec=matrix_vec)
         if (present(name)) then !workaround for gfortran bug
             if (allocated(p_var%name)) then
                 p_name = p_var%name
@@ -1716,7 +1747,7 @@
             end if
         end if
 #else
-        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name)
+        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name,matrix_column_size,matrix_vec)
 #endif
         if (json%exception_thrown .and. present(found)) then
             found = .false.
