@@ -32,6 +32,8 @@ contains
     integer,intent(out) :: error_cnt
     real(wp), dimension(:,:),allocatable :: dd
     real(wp), dimension(:,:,:),allocatable :: ddd
+    integer, dimension(:),allocatable :: dd_size
+    integer, dimension(:,:),allocatable :: ddd_size
     type(json_file) :: json
     logical :: found, file_exists
 
@@ -77,13 +79,13 @@ contains
         write(error_unit,'(A)') 'extract data...'
 
         write(error_unit,'(A)') '--------------------------'
-        call json%get('fooList', dd, found)
+        call json%get('fooList', dd, found, dd_size)
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
         if (found) write(error_unit,'(A,I5)') 'dd = ',dd
-        call json%get('fooList3x', ddd, found)
+        call json%get('fooList3x', ddd, found, ddd_size)
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1

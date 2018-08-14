@@ -1249,14 +1249,15 @@
 !
 !  Get a real(RK) matrix of vectors from a JSON file.
 
-    subroutine json_file_get_matrix(me, path, vec, found)
+    subroutine json_file_get_matrix(me, path, vec, found, vec_size)
 
     implicit none
 
     class(json_file),intent(inout)                  :: me
-    character(kind=CK,len=*),intent(in)             :: path  !! the path to the variable
-    real(RK),dimension(:,:),allocatable,intent(out) :: vec   !! the value vector
-    logical(LK),intent(out),optional                :: found !! if it was really found
+    character(kind=CK,len=*),intent(in)             :: path     !! the path to the variable
+    real(RK),dimension(:,:),allocatable,intent(out) :: vec      !! the value vector
+    logical(LK),intent(out),optional                :: found    !! if it was really found
+    integer(IK),dimension(:),allocatable,intent(out),optional :: vec_size !! the # of values provided in each vec(x,:)
     integer(IK) :: var_type  !! var type
     integer(IK) :: n_sets    !! # of sets of matrices
     integer(IK) :: set_size  !! # of rows in each matrix
@@ -1271,6 +1272,7 @@
     if (is_matrix) then
         associate (max_vec_size => maxval(matrix_column_size(1,:)))
             allocate(vec(set_size,max_vec_size),source=0.0_RK)
+            if (present(vec_size)) vec_size = matrix_column_size(1,:)
             do i = 1, set_size
                 vec(i,1:matrix_column_size(1,i)) = matrix_vec(1,i,1:matrix_column_size(1,i))
             end do
@@ -1286,7 +1288,7 @@
 !
 !  Get a real(RK) matrix of vectors from a JSON file.
 
-    subroutine json_file_get_matrix_vector(me, path, vec, found)
+    subroutine json_file_get_matrix_vector(me, path, vec, found, vec_size)
 
     implicit none
 
@@ -1294,6 +1296,7 @@
     character(kind=CK,len=*),intent(in)               :: path  !! the path to the variable
     real(RK),dimension(:,:,:),allocatable,intent(out) :: vec   !! the value vector
     logical(LK),intent(out),optional                  :: found !! if it was really found
+    integer(IK),dimension(:,:),allocatable,intent(out),optional :: vec_size !! the # of values provided in each vec(x,x,:)
     integer(IK) :: var_type  !! var type
     integer(IK) :: n_sets    !! # of sets of matrices
     integer(IK) :: set_size  !! # of rows in each matrix
@@ -1309,6 +1312,7 @@
     if (is_matrix) then
         associate (max_vec_size => maxval(matrix_column_size(:,:)))
             allocate(vec(n_sets,set_size,max_vec_size),source=0.0_RK)
+            if (present(vec_size)) vec_size = matrix_column_size
             do j = 1, n_sets
                 do i = 1, set_size
                     vec(j,i,1:matrix_column_size(j,i)) = matrix_vec(j,i,1:matrix_column_size(j,i))
