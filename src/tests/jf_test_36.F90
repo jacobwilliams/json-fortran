@@ -91,7 +91,7 @@ contains
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
-        if (found) write(error_unit,'(A,I5)') 'ddd = ',ddd
+        if (found) write(error_unit,'(A,es13.6)') 'ddd = ',ddd
 
         write(error_unit,'(A)') ''
 
