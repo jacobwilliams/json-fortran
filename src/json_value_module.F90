@@ -256,6 +256,11 @@
                                                   !! (both escaped and unescaped versions are still
                                                   !! valid in all cases).
 
+        integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
+                              !! when `use_unformatted_stream=True`
+        character(kind=CK,len=stream_chunk_size) :: chunk = CK_'' !! a chunk read from a stream file
+                                                                  !! when `use_unformatted_stream=True`
+
         contains
 
         private
@@ -917,6 +922,8 @@
     me%char_count   = 0
     me%line_count   = 1
     me%ipos         = 1
+    me%ichunk       = 0
+    me%chunk        = ''
 
 #ifdef USE_UCS4
     ! reopen stdout and stderr with utf-8 encoding
@@ -10147,7 +10154,7 @@
 !@note This routine ignores non-printing ASCII characters
 !      (`iachar<=31`) that are in strings.
 
-    recursive subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,popped)
+    subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,popped)
 
     implicit none
 
@@ -10169,6 +10176,10 @@
     logical(LK)              :: ignore_comments !! if comment lines are to be ignored
     logical(LK)              :: parsing_comment !! if we are in the process
                                                 !! of parsing a comment line
+
+    logical,parameter :: chunk_it = .true. !! if true, stream files are read in chunks,
+                                           !! rather than one character at a time.
+                                           !! this speeds up the parsing dramatically.
 
     if (.not. json%exception_thrown) then
 
@@ -10201,15 +10212,36 @@
 
                     !read the next character:
                     if (use_unformatted_stream) then
-                        read(unit=unit,pos=json%ipos,iostat=ios) c
+
+                        if (chunk_it) then
+                            ! in this case, we read the file in chunks.
+                            ! if we already have the character we need,
+                            ! then get it from the chunk. Otherwise,
+                            ! read another chunk
+
+                            if (json%ichunk<1) then
+                                json%ichunk = 0
+                                read(unit=unit,pos=json%ipos,iostat=ios) json%chunk
+                            else
+                                ios = 0
+                            end if
+                            json%ichunk = json%ichunk + 1
+                            c = json%chunk(json%ichunk:json%ichunk)
+                            if (json%ichunk==len(json%chunk)) then
+                                json%ichunk = 0 ! reset
+                            else
+                                ! we have to finish getting
+                                ! characters from this chunk:
+                                if (IS_IOSTAT_END(ios)) ios = 0
+                            end if
+                        else
+                            read(unit=unit,pos=json%ipos,iostat=ios) c
+                        end if
+
                     else
                         read(unit=unit,fmt='(A1)',advance='NO',iostat=ios) c
                     end if
                     json%ipos = json%ipos + 1
-
-                    !....note: maybe try read the file in chunks...
-                    !.... or use asynchronous read with double buffering
-                    !     (see Modern Fortran: Style and Usage)
 
                 else    !read from the string
 
@@ -10302,6 +10334,7 @@
             !in this case, c is ignored, and we just
             !decrement the stream position counter:
             json%ipos = json%ipos - 1
+            json%ichunk = json%ichunk - 1
 
         else
 
