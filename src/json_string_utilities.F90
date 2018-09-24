@@ -345,7 +345,7 @@
             c = str_in(i:i)    !get next character in the input string
 
             !if the string is not big enough, then add another chunk:
-            if (ipos+3>len(str_out)) str_out = str_out // repeat(space, chunk_size)
+            if (ipos+3>len(str_out)) str_out = str_out // blank_chunk
 
             select case(c)
             case(backslash)
