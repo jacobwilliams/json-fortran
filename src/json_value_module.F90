@@ -9088,6 +9088,7 @@
         !the routine is being called incorrectly.
         if (.not. associated(value)) then
             call json%throw_exception('Error in parse_value: value pointer not associated.')
+            return
         end if
 
         ! pop the next non whitespace character off the file
