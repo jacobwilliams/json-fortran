@@ -732,6 +732,7 @@
         procedure        :: json_value_print
         procedure        :: string_to_int
         procedure        :: string_to_dble
+        procedure        :: parse_end => json_parse_end
         procedure        :: parse_value
         procedure        :: parse_number
         procedure        :: parse_string
@@ -8719,7 +8720,7 @@
     logical(LK) :: has_duplicate  !! if checking for duplicate keys
     character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
 
-    !clear any exceptions and initialize:
+    ! clear any exceptions and initialize:
     call json%initialize()
 
     if ( present(unit) ) then
@@ -8731,7 +8732,7 @@
 
         iunit = unit
 
-        !check to see if the file is already open
+        ! check to see if the file is already open
         ! if it is, then use it, otherwise open the file with the name given.
         inquire(unit=iunit, opened=is_open, iostat=istat)
         if (istat==0 .and. .not. is_open) then
@@ -8745,7 +8746,7 @@
                     iostat      = istat &
                     FILE_ENCODING )
         else
-            !if the file is already open, then we need to make sure
+            ! if the file is already open, then we need to make sure
             ! that it is open with the correct form/access/etc...
         end if
 
@@ -8779,6 +8780,7 @@
 
         ! parse as a value
         call json%parse_value(unit=iunit, str=CK_'', value=p)
+        call json%parse_end(unit=iunit, str=CK_'')
 
         ! check for errors:
         if (json%exception_thrown) then
@@ -8828,7 +8830,7 @@
     logical(LK) :: has_duplicate  !! if checking for duplicate keys
     character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
 
-    !clear any exceptions and initialize:
+    ! clear any exceptions and initialize:
     call json%initialize()
 
     ! create the value and associate the pointer
@@ -8840,6 +8842,7 @@
 
     ! parse as a value
     call json%parse_value(unit=iunit, str=str, value=p)
+    call json%parse_end(unit=iunit, str=str)
 
     if (json%exception_thrown) then
         call json%annotate_invalid_json(iunit,str)
@@ -8856,6 +8859,41 @@
     end if
 
     end subroutine json_parse_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  An error checking routine to call after a file (or string) has been parsed.
+!  It will throw an exception if there are any other non-whitespace characters
+!  in the file.
+
+    subroutine json_parse_end(json, unit, str)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    integer(IK),intent(in)              :: unit   !! file unit number
+    character(kind=CK,len=*),intent(in) :: str    !! string containing JSON
+                                                  !! data (only used if `unit=0`)
+
+    logical(LK)              :: eof !! end-of-file flag
+    character(kind=CK,len=1) :: c   !! character read from file
+                                    !! (or string) by [[pop_char]]
+
+    ! first check for exceptions:
+    if (json%exception_thrown) return
+
+    ! pop the next non whitespace character off the file
+    call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                        skip_comments=json%allow_comments, popped=c)
+
+    if (.not. eof) then
+        call json%throw_exception('Error in json_parse_end:'//&
+                                  ' Unexpected character found after parsing value. "'//&
+                                  c//'"')
+    end if
+
+    end subroutine json_parse_end
 !*****************************************************************************************
 
 !*****************************************************************************************
