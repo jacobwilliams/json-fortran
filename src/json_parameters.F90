@@ -113,16 +113,19 @@
         !! 6 = sign + leading 0 + decimal + 'E' + exponent sign + 1 extra
     character(kind=CDK,len=*),parameter :: int_fmt  = '(ss,I0)' !! minimum width format for integers
 
-    integer(IK),parameter :: max_integer_str_len = 256 !! maximum string length of an integer.
-                                                       !! This is totally arbitrary (any way
-                                                       !! to get the compiler to tell us this?)
+    integer(IK),parameter :: max_integer_str_len = 256_IK !! maximum string length of an integer.
+                                                          !! This is totally arbitrary (any way
+                                                          !! to get the compiler to tell us this?)
 
-    integer(IK),parameter :: chunk_size = 100_IK  !! for allocatable strings: allocate chunks of this size
+    integer(IK),parameter :: chunk_size = 256_IK  !! for allocatable strings: allocate chunks of this size
     integer(IK),parameter :: unit2str = -1_IK  !! unit number to cause stuff to be
                                                !! output to strings rather than files.
                                                !! See 9.5.6.12 in the F2003/08 standard
+    character(kind=CK,len=*),parameter :: blank_chunk = repeat(space, chunk_size) !! a blank string
 
     integer(IK),parameter :: seq_chunk_size = 256_IK !! chunk size for reading sequential files
+
+    integer(IK),parameter :: stream_chunk_size = 256_IK !! chunk size for reading stream files
 
     integer(IK),parameter :: pushed_char_size = 10_IK !! size for `pushed_char`
                                                       !! array in [[json_core(type)]]

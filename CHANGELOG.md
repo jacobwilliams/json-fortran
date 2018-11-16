@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.10.0 (2019-10-20)](#610-2019-10-20)
     - [6.9.0 (2018-07-29)](#690-2018-07-29)
     - [6.8.0 (2018-07-19)](#680-2018-07-19)
     - [6.7.0 (2018-07-10)](#670-2018-07-10)
@@ -32,7 +33,21 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.9.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.10.0...HEAD)
+
+### [6.10.0](https://github.com/jacobwilliams/json-fortran/tree/6.10.0) (2019-10-20)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.9.0...6.10.0)
+or [Download v6.10.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.10.0)
+
+**Enhancements:**
+
+- Speed up JSON file parsing [\#363](https://github.com/jacobwilliams/json-fortran/issues/363) [\#366](https://github.com/jacobwilliams/json-fortran/pull/366) ([jacobwilliams](https://github.com/jacobwilliams))
+- CMake updates for Windows \(MSVS solutions\) [\#361](https://github.com/jacobwilliams/json-fortran/pull/361) ([zbeekman](https://github.com/zbeekman))
+
+**Bug fixes:**
+
+- Parser no longer stops after main object, ignoring the rest of the file [\#369](https://github.com/jacobwilliams/json-fortran/issues/369) [\#370](https://github.com/jacobwilliams/json-fortran/pull/370) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.9.0](https://github.com/jacobwilliams/json-fortran/tree/6.9.0) (2018-07-29)
 
