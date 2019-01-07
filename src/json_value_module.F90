@@ -5281,7 +5281,7 @@
                          !! since it is being allocated in chunks.
 
     str = repeat(space, print_str_chunk_size)
-    iloc = 0
+    iloc = 0_IK
     call json%json_value_print(p, iunit=unit2str, str=str, iloc=iloc, indent=1_IK, colon=.true.)
 
     ! trim the string if necessary:
@@ -5311,7 +5311,7 @@
                                                    !! to [[json_value_print]]
 
     if (iunit/=unit2str) then
-        idummy = 1_IK
+        idummy = 0_IK
         call json%json_value_print(p,iunit,str=dummy,iloc=idummy,indent=1_IK,colon=.true.)
     else
         call json%throw_exception('Error in json_print_to_unit: iunit must not be -1.')
