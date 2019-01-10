@@ -22,13 +22,8 @@ A Fortran 2008 JSON API
 Status
 ------
 [![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
-[![Codecov](https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobwilliams/json-fortran)
-
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
-[![Blocked by Vendor Bug](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=vendor%20bug&title=Blocked%20by%20Vendor%20Bug)](https://waffle.io/jacobwilliams/json-fortran)
-[![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/#contributing)
-[![In Progress](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=In%20Progress&title=In%20Progress)](https://waffle.io/jacobwilliams/json-fortran)
-[![Needs Review](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Needs%20Review&title=Needs%20Review)](https://waffle.io/jacobwilliams/json-fortran)
+[![Codecov](https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobwilliams/json-fortran)
 
 Take a look at the
 [CHANGELOG](https://github.com/jacobwilliams/json-fortran/blob/master/CHANGELOG.md#unreleased)
@@ -47,7 +42,7 @@ Download
 --------------------
 
 [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
-[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg?maxAge=2592000)](http://braumeister.org/formula/json-fortran)
+[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg?style=plastic)](http://braumeister.org/formula/json-fortran)
 
 Download the official versioned releases
 [here](https://github.com/jacobwilliams/json-fortran/releases/latest).
@@ -101,11 +96,9 @@ Currently, several ways are provided to build the JSON-fortran library
 
   The full set of modes are: `static-gnu`, `static-gnu-debug`, `static-intel`, `static-intel-debug`, `shared-gnu`, `shared-gnu-debug`, `shared-intel`, `shared-intel-debug`, `tests-gnu`, `tests-gnu-debug`, `tests-intel`, `tests-intel-debug`
 
-  To generate the documentation using [ford](https://github.com/cmacmackin/ford), run:
+  To generate the documentation using [ford](https://github.com/cmacmackin/ford), run: ```FoBis.py rule --execute makedoc -f json-fortran.fobis```
 
-```
-  FoBis.py rule --execute makedoc -f json-fortran.fobis
-```
+  To run all the tests, run: ```FoBis.py rule --execute tests -f json-fortran.fobis```
 
 * A [Visual Studio](https://www.visualstudio.com) project is included for building the library (and unit tests) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
@@ -128,7 +121,7 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 6.3.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 6.10.0 REQUIRED )
 include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
@@ -160,6 +153,9 @@ Contributing
 ------------
 
 [![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/.github/CONTRIBUTING.md)
+[![Blocked by Vendor Bug](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=vendor%20bug&title=Blocked%20by%20Vendor%20Bug)](https://waffle.io/jacobwilliams/json-fortran)
+[![In Progress](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=In%20Progress&title=In%20Progress)](https://waffle.io/jacobwilliams/json-fortran)
+[![Needs Review](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Needs%20Review&title=Needs%20Review)](https://waffle.io/jacobwilliams/json-fortran)
 
 Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/.github/CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo/)
 

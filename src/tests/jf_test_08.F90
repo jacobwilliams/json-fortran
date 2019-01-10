@@ -12,6 +12,9 @@ module jf_test_8_mod
 
     implicit none
 
+    private
+    public :: test_8
+
 contains
 
     subroutine test_8(error_cnt)
@@ -126,7 +129,7 @@ contains
 end module jf_test_8_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS    
+#ifndef INTERGATED_TESTS
 !*****************************************************************************************
 program jf_test_8
 

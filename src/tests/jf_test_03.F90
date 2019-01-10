@@ -12,7 +12,10 @@ module jf_test_3_mod
 
     implicit none
 
-    character(len=*),parameter :: dir = '../files/inputs/'               !working directory
+    private
+    public :: test_3
+
+    character(len=*),parameter :: dir = '../files/inputs/' !! working directory
     character(len=*),parameter :: filename2 = 'test2.json'
 
 contains
@@ -139,7 +142,7 @@ end module jf_test_3_mod
 !*****************************************************************************************
 
 #ifndef INTERGATED_TESTS
-   
+
 !*****************************************************************************************
 program jf_test_3
 

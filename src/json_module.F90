@@ -22,12 +22,12 @@
 #pragma pop_macro("USE_UCS4")
 #endif
 !
-!## License
+!### License
 !  * JSON-Fortran is released under a BSD-style license.
 !    See the [LICENSE](https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE)
 !    file for details.
 !
-!## History
+!### History
 !  * Joseph A. Levin : March 2012 : Original [FSON](https://github.com/josephalevin/fson)
 !    code [retrieved on 12/2/2013].
 !  * Jacob Williams : 2/8/2014 : Extensive modifications to the original FSON code.
@@ -39,7 +39,7 @@
 !    (e.g., allocatable strings, newunit, generic, class, and abstract interface).
 !  * Development continues at: [Github](http://github.com/jacobwilliams/json-fortran)
 !
-!## See also
+!### See also
 !  * [json-fortran development site](http://github.com/jacobwilliams/json-fortran)
 !  * [json-fortran online documentation](http://jacobwilliams.github.io/json-fortran)
 !  * [JSON website](http://www.json.org/)

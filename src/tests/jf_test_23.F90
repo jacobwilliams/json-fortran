@@ -9,6 +9,9 @@ module jf_test_23_mod
 
     implicit none
 
+    private
+    public :: test_23
+
     character(len=*),parameter :: dir = '../files/inputs/'    !! working directory
     character(len=*),parameter :: filename1 = 'test1.json'    !! file to read
 
@@ -65,7 +68,7 @@ contains
       ! print the parsed data to the console
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the file...'
-      call json%print_file()
+      call json%print_file(error_unit)
       if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

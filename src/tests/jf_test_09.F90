@@ -11,6 +11,9 @@ module jf_test_9_mod
 
     implicit none
 
+    private
+    public :: test_9
+
     !small file - 0.0 sec : http://www.json-generator.com
     !character(len=*),parameter :: filename = 'random1.json'
 

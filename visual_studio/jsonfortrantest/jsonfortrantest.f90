@@ -2,20 +2,20 @@
 !>
 !  Entry point for the unified unit test application.
 !
-!  Runs through all the tests in the `tests` folder
-!  Returns 1 if there are any errors.
+!  Runs all the tests in the `tests` folder
+!  Returns `1` if there are any errors.
 
     program jsonfortrantest
 
-    use jf_test_1_mod , only: test_1
-    use jf_test_2_mod , only: test_2
-    use jf_test_3_mod , only: test_3
-    use jf_test_4_mod , only: test_4
-    use jf_test_5_mod , only: test_5
-    use jf_test_6_mod , only: test_6
-    use jf_test_7_mod , only: test_7
-    use jf_test_8_mod , only: test_8
-    use jf_test_9_mod , only: test_9
+    use jf_test_1_mod  , only: test_1
+    use jf_test_2_mod  , only: test_2
+    use jf_test_3_mod  , only: test_3
+    use jf_test_4_mod  , only: test_4
+    use jf_test_5_mod  , only: test_5
+    use jf_test_6_mod  , only: test_6
+    use jf_test_7_mod  , only: test_7
+    use jf_test_8_mod  , only: test_8
+    use jf_test_9_mod  , only: test_9
     use jf_test_10_mod , only: test_10
     use jf_test_11_mod , only: test_11
     use jf_test_12_mod , only: test_12
@@ -34,8 +34,14 @@
     use jf_test_25_mod , only: test_25
     use jf_test_26_mod , only: test_26
     use jf_test_27_mod , only: test_27
+    use jf_test_28_mod , only: test_28
     use jf_test_29_mod , only: test_29
     use jf_test_30_mod , only: test_30
+    use jf_test_31_mod , only: test_31
+    use jf_test_32_mod , only: test_32
+    use jf_test_33_mod , only: test_33
+    use jf_test_34_mod , only: test_34
+    use jf_test_35_mod , only: test_35
 
     implicit none
 
@@ -43,15 +49,15 @@
 
     n_errors = 0
 
-    call test_1(n_errors);  if (n_errors /= 0) stop 1
-    call test_2(n_errors);  if (n_errors /= 0) stop 1
-    call test_3(n_errors);  if (n_errors /= 0) stop 1
-    call test_4(n_errors);  if (n_errors /= 0) stop 1
-    call test_5(n_errors);  if (n_errors /= 0) stop 1
-    call test_6(n_errors);  if (n_errors /= 0) stop 1
-    call test_7(n_errors);  if (n_errors /= 0) stop 1
-    call test_8(n_errors);  if (n_errors /= 0) stop 1
-    call test_9(n_errors);  if (n_errors /= 0) stop 1
+    call test_1 (n_errors); if (n_errors /= 0) stop 1
+    call test_2 (n_errors); if (n_errors /= 0) stop 1
+    call test_3 (n_errors); if (n_errors /= 0) stop 1
+    call test_4 (n_errors); if (n_errors /= 0) stop 1
+    call test_5 (n_errors); if (n_errors /= 0) stop 1
+    call test_6 (n_errors); if (n_errors /= 0) stop 1
+    call test_7 (n_errors); if (n_errors /= 0) stop 1
+    call test_8 (n_errors); if (n_errors /= 0) stop 1
+    call test_9 (n_errors); if (n_errors /= 0) stop 1
     call test_10(n_errors); if (n_errors /= 0) stop 1
     call test_11(n_errors); if (n_errors /= 0) stop 1
     call test_12(n_errors); if (n_errors /= 0) stop 1
@@ -70,8 +76,14 @@
     call test_25(n_errors); if (n_errors /= 0) stop 1
     call test_26(n_errors); if (n_errors /= 0) stop 1
     call test_27(n_errors); if (n_errors /= 0) stop 1
+    call test_28(n_errors); if (n_errors /= 0) stop 1
     call test_29(n_errors); if (n_errors /= 0) stop 1
     call test_30(n_errors); if (n_errors /= 0) stop 1
+    call test_31(n_errors); if (n_errors /= 0) stop 1
+    call test_32(n_errors); if (n_errors /= 0) stop 1
+    call test_33(n_errors); if (n_errors /= 0) stop 1
+    call test_34(n_errors); if (n_errors /= 0) stop 1
+    call test_35(n_errors); if (n_errors /= 0) stop 1
 
     end program jsonfortrantest
 !*****************************************************************************************

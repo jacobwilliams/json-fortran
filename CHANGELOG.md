@@ -4,6 +4,13 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.10.0 (2019-10-20)](#610-2019-10-20)
+    - [6.9.0 (2018-07-29)](#690-2018-07-29)
+    - [6.8.0 (2018-07-19)](#680-2018-07-19)
+    - [6.7.0 (2018-07-10)](#670-2018-07-10)
+    - [6.6.0 (2018-07-01)](#660-2018-07-01)
+    - [6.5.0 (2018-06-23)](#650-2018-06-23)
+    - [6.4.0 (2018-06-10)](#640-2018-06-10)
     - [6.3.0 (2018-04-20)](#630-2018-04-20)
     - [6.2.0 (2018-03-10)](#620-2018-03-10)
     - [6.1.0 (2017-11-05)](#610-2017-11-05)
@@ -26,7 +33,117 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.3.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.10.0...HEAD)
+
+### [6.10.0](https://github.com/jacobwilliams/json-fortran/tree/6.10.0) (2019-10-20)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.9.0...6.10.0)
+or [Download v6.10.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.10.0)
+
+**Enhancements:**
+
+- Speed up JSON file parsing [\#363](https://github.com/jacobwilliams/json-fortran/issues/363) [\#366](https://github.com/jacobwilliams/json-fortran/pull/366) ([jacobwilliams](https://github.com/jacobwilliams))
+- CMake updates for Windows \(MSVS solutions\) [\#361](https://github.com/jacobwilliams/json-fortran/pull/361) ([zbeekman](https://github.com/zbeekman))
+
+**Bug fixes:**
+
+- Parser no longer stops after main object, ignoring the rest of the file [\#369](https://github.com/jacobwilliams/json-fortran/issues/369) [\#370](https://github.com/jacobwilliams/json-fortran/pull/370) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [6.9.0](https://github.com/jacobwilliams/json-fortran/tree/6.9.0) (2018-07-29)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.8.0...6.9.0)
+or [Download v6.9.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.9.0)
+
+**Enhancements:**
+
+- Some efficiency improvements when parsing strings. [\#352](https://github.com/jacobwilliams/json-fortran/pull/352) ([jacobwilliams](https://github.com/jacobwilliams))
+  - Speed up the `unescape_string()` routine. [\#351](https://github.com/jacobwilliams/json-fortran/issues/351)
+  - Some cleanup and efficiency improvements for hex string validation. [\#354](https://github.com/jacobwilliams/json-fortran/issues/354)
+- Various updates to error message reporting.
+  - The two arguments to `json_file_check_for_errors()` are now optional to match the core routine.
+  [\#356](https://github.com/jacobwilliams/json-fortran/issues/356)
+  - Some adjustments to error messages for invalid hex strings. Validation of hex strings is now done in the `unescape_string()` routine. [\#354](https://github.com/jacobwilliams/json-fortran/issues/354)
+  - A string that ends in an escape character `\` is now flagged as invalid. [\#353](https://github.com/jacobwilliams/json-fortran/issues/353)
+
+**Fixed bugs:**
+
+- Fixed a bug in the `annotate_invalid_json()` routine. [\#355](https://github.com/jacobwilliams/json-fortran/issues/355)
+- Fixed an issue with the `jf_test_06` unit test failing on Windows. [\#357](https://github.com/jacobwilliams/json-fortran/issues/357)
+
+### [6.8.0](https://github.com/jacobwilliams/json-fortran/tree/6.8.0) (2018-07-19)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.7.0...6.8.0)
+or [Download v6.8.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.8.0)
+
+**Enhancements:**
+
+- Added some additional checks so that the `destroy` method could still be used to destroy some malformed JSON linked lists. Also updated the `validate` method to check for circular references.
+[\#346](https://github.com/jacobwilliams/json-fortran/issues/346) [\#349](https://github.com/jacobwilliams/json-fortran/pull/349) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added missing arguments (`trim_str` and `adjustl_str`) to some of the string wrapper routines. [\#347](https://github.com/jacobwilliams/json-fortran/issues/347) [\#348](https://github.com/jacobwilliams/json-fortran/pull/348) ([jacobwilliams](https://github.com/jacobwilliams))
+- Various minor changes to remove some compiler warnings and a line length standards violation.
+- Various documentation string updates.
+
+**Fixed bugs:**
+
+- Fixed a dangling pointer bug in the `destroy` method that was causing unpredictable behavior in this routine which could cause a crash for some compilers [\#307](https://github.com/jacobwilliams/json-fortran/issues/307) [\#350](https://github.com/jacobwilliams/json-fortran/pull/350) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [6.7.0](https://github.com/jacobwilliams/json-fortran/tree/6.7.0) (2018-07-10)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.6.0...6.7.0)
+or [Download v6.7.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.7.0)
+
+**Enhancements:**
+
+- Made the two arguments to `json_check_for_errors()` optional, so now either or both can be used. Note that if no error has been raised, then `error_msg` is now returned unallocated. [\#344](https://github.com/jacobwilliams/json-fortran/issues/344) [\#345](https://github.com/jacobwilliams/json-fortran/pull/345) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added an additional error check in `json_value_print()` to check for an unassociated pointer. [\#342](https://github.com/jacobwilliams/json-fortran/issues/342) [\#343](https://github.com/jacobwilliams/json-fortran/pull/343) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added `remove()` method to `json_file` [\#339](https://github.com/jacobwilliams/json-fortran/issues/339) [\#340](https://github.com/jacobwilliams/json-fortran/pull/340) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added additional error checks to `json_value_add_member()`. Now it will raise an exception if try to add a child to a non-array or non-object. [\#337](https://github.com/jacobwilliams/json-fortran/issues/337) [\#338](https://github.com/jacobwilliams/json-fortran/pull/338) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added some additional unit tests to increase coverage [\#336](https://github.com/jacobwilliams/json-fortran/pull/336) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Fixed bugs:**
+
+- Fixed a bug in `json_value_clone_func()` where it could crash if attempting to clone an array element. Updated this routine to improve behavior when cloning an array element (the subsequent entries are no longer cloned). [\#334](https://github.com/jacobwilliams/json-fortran/issues/334) [\#335](https://github.com/jacobwilliams/json-fortran/pull/335) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [6.6.0](https://github.com/jacobwilliams/json-fortran/tree/6.6.0) (2018-07-01)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.5.0...6.6.0)
+or [Download v6.6.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.6.0)
+
+**Enhancements [\#332](https://github.com/jacobwilliams/json-fortran/pull/332) ([jacobwilliams](https://github.com/jacobwilliams))**
+
+- Now, attempting to get a string variable as an integer, double, or logical will attempt to convert it to a string if `strict_type_checking=False`. Formerly these cases would raise an exception. [\#331](https://github.com/jacobwilliams/json-fortran/issues/331)
+- Fixed an inconsistency in `json_get_by_path()`. Now if using the optional `found` argument, any exceptions raised by this routine are cleared. [\#330](https://github.com/jacobwilliams/json-fortran/issues/330)
+- Changed the `name` argument in `json_value_remove_if_present()` to 'path' to be consistent with other routines since it is really a path. [\#329](https://github.com/jacobwilliams/json-fortran/issues/329)
+- Various documentation string updates.
+
+**Fixed bugs:**
+
+- Fixed a bug in `wrap_json_get_path()` where an optional argument was being used without checking if it was present. [\#333](https://github.com/jacobwilliams/json-fortran/issues/333)
+
+### [6.5.0](https://github.com/jacobwilliams/json-fortran/tree/6.5.0) (2018-06-23)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.4.0...6.5.0)
+or [Download v6.5.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.5.0)
+
+**Enhancements & Fixed Issues:**
+
+- Added optional `trim` and `adjustl` arguments were added to all the various routines for adding strings and string vectors to JSON [\#323](https://github.com/jacobwilliams/json-fortran/issues/323) ([jacobwilliams](https://github.com/jacobwilliams))
+- The `trailing_spaces_significant` flag is now respected for name keys when creating a JSON structure. [\#324](https://github.com/jacobwilliams/json-fortran/issues/324) [\#326](https://github.com/jacobwilliams/json-fortran/issues/326) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [6.4.0](https://github.com/jacobwilliams/json-fortran/tree/6.4.0) (2018-06-10)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.3.0...6.4.0)
+or [Download v6.4.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.4.0)
+
+**Enhancements:**
+
+- Added optional `stop_on_error` argument to the various `initialize()` routines to immediately stop the program if an exception is raised. [\#318](https://github.com/jacobwilliams/json-fortran/issues/318) [\#320](https://github.com/jacobwilliams/json-fortran/pull/320) ([jacobwilliams](https://github.com/jacobwilliams))
+
+- Added routines to check if a name key is present in a `json_file` object, which is also available using the `.in.` operator. [\#316](https://github.com/jacobwilliams/json-fortran/issues/316) [\#319](https://github.com/jacobwilliams/json-fortran/pull/319) ([jacobwilliams](https://github.com/jacobwilliams))
+
+- Added routines to rename a json variable by specifying the path. [\#314](https://github.com/jacobwilliams/json-fortran/issues/314) [\#317](https://github.com/jacobwilliams/json-fortran/pull/317) ([jacobwilliams](https://github.com/jacobwilliams))
+
+- Added a Fobis rule for running the test programs. [\#321](https://github.com/jacobwilliams/json-fortran/issues/321) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.3.0](https://github.com/jacobwilliams/json-fortran/tree/6.3.0) (2018-04-20)
 

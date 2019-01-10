@@ -9,6 +9,9 @@ module jf_test_30_mod
 
     implicit none
 
+    private
+    public :: test_30
+
 contains
 
     subroutine test_30(error_cnt)
@@ -41,7 +44,7 @@ contains
 
         call json%initialize(escape_solidus=(i==1), stop_on_error=.true.)
         call json%load_from_string(str)
-        call json%print_file()
+        call json%print_file(error_unit)
 
         if (json%failed()) then
             call json%print_error_message(error_unit)

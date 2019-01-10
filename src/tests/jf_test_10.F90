@@ -11,6 +11,9 @@ module jf_test_10_mod
 
     implicit none
 
+    private
+    public :: test_10
+
     character(len=*),parameter :: filename = 'test1.json'
     character(len=*),parameter :: dir = '../files/inputs/' !working directory
 
@@ -141,7 +144,7 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. size(str_vec)==6 .and. &
+        if (found .and. size(str_vec)==7 .and. &
             str_vec(1)=='..\path\to\files\file1.txt') then
             write(error_unit,'(A)') '...success'
         else
@@ -300,7 +303,7 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. size(str_vec)==6 .and. &
+        if (found .and. size(str_vec)==7 .and. &
             str_vec(1)=='..\path\to\files\file1.txt') then
             write(error_unit,'(A)') '...success'
         else

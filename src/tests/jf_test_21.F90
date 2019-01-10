@@ -12,6 +12,9 @@ module jf_test_21_mod
 
     implicit none
 
+    private
+    public :: test_21
+
     character(len=*),parameter :: dir = '../files/'    !! working directory
 
 contains

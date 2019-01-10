@@ -11,6 +11,9 @@ module jf_test_11_mod
 
     implicit none
 
+    private
+    public :: test_11
+
     character(len=*),parameter :: dir = '../files/inputs/'  !! working directory
 #ifdef USE_UCS4
     character(len=*),parameter :: unicode_file = 'hello-world-ucs4.json'

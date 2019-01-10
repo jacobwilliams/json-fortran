@@ -12,6 +12,9 @@ module jf_test_18_mod
 
     implicit none
 
+    private
+    public :: test_18
+
 contains
 
     subroutine test_18(error_cnt)
@@ -27,6 +30,7 @@ contains
     integer :: ival
     logical :: found
     logical,dimension(4) :: ok
+    integer,dimension(4) :: iresult
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -50,19 +54,23 @@ contains
 
     call json%initialize(trailing_spaces_significant=.true.,&
                          case_sensitive_keys=.true.)
-    call go([1,2,3,4])
+    iresult = [1,2,3,4]
+    call go(iresult)
 
     call json%initialize(trailing_spaces_significant=.false.,&
                          case_sensitive_keys=.true.)
-    call go([1,2,1,2])
+    iresult = [1,2,1,2]
+    call go(iresult)
 
     call json%initialize(trailing_spaces_significant=.true.,&
                          case_sensitive_keys=.false.)
-    call go([1,1,3,3])
+    iresult = [1,1,3,3]
+    call go(iresult)
 
     call json%initialize(trailing_spaces_significant=.false.,&
                          case_sensitive_keys=.false.)
-    call go([1,1,1,1])
+    iresult = [1,1,1,1]
+    call go(iresult)
 
     !cleanup:
     call json%destroy(p)

@@ -31,7 +31,7 @@
 #        --compiler : gnu or gfortran for gfortran, intel or ifort for intel compiler
 #                     A custom compiler may also be specified here, e.g. ftn
 #
-#        --cflags : Enter any aditiol/custom compiler flags here and make sure they are
+#        --cflags : Enter any additional/custom compiler flags here and make sure they are
 #                   properly quoted
 #
 #        --help : Print a usage message and exit.

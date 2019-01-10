@@ -8,16 +8,26 @@ if ( NOT Fortran_FLAGS_INIT )
     "Enable compiler run-time checks? (Enabling this will turn off most compiler optimizations.)" )
   mark_as_advanced ( ENABLE_RUNTIME_CHECKS )
 
+  if ( "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" )
+    set(pre /)
+    set(spc :)
+    set(Q /Q)
+  else()
+    set(pre -)
+    set(spc " ")
+    set(Q -)
+  endif()
   if ( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "Intel" )
+    set(TRACE_FLAG -traceback)
     if ( ENABLE_BACK_TRACE )
-      set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -traceback")
+      set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${pre}traceback")
     endif ()
     if ( ENABLE_COMPILE_TIME_WARNINGS )
       # The following warning might be triggered by ifort unless explicitly silenced:
       # warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure
       # name. (R1214.4). In the context of F2008 this is an erroneous warning.
       # See https://prd1idz.cps.intel.com/en-us/forums/topic/486629
-      set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -warn -stand f08 -diag-disable 7601 -diag-disable 5142" )
+      set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${pre}warn ${pre}stand${spc}f08 ${Q}diag-disable${spc}7601 ${Q}diag-disable${spc}5142" )
     endif ()
     if ( ENABLE_RUNTIME_CHECKS )
       set ( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check all" )

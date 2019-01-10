@@ -30,8 +30,8 @@ print_creation_date: true
 creation_date: %Y-%m-%d %H:%M %z
 extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
             ifcore:https://software.intel.com/en-us/node/525900
-md_extensions: markdown.extensions.toc(anchorlink=False)
-               markdown.extensions.smarty(smart_quotes=False)
+md_extensions: markdown.extensions.toc
+               markdown.extensions.smarty
 ---
 
 --------------------
@@ -57,7 +57,7 @@ Official Releases
 
 The **current stable release** is **{!.VERSION!}** and can be [downloaded
 on GitHub](https://github.com/jacobwilliams/json-fortran/releases/latest)
-or installed with [Homebrew](http://brew.sh) on Mac OSX. The
+or installed with [Homebrew](http://brew.sh) on MacOS. The
 documentation for the current version, **{!.VERSION!}**, can be
 found [here](http://jacobwilliams.github.io/json-fortran/{!.VERSION!}/index.html)[^1], and a
 list of changes from the previous version are
@@ -74,6 +74,7 @@ Miscellaneous
 
 *[API]: Application Programming Interface: a set of routines, protocols, and tools for building software applications
 *[JSON]: JavaScript Object Notation: A human friendly syntax for storing and exchanging data
+*[variable type]: json_unknown, json_null, json_object, json_array, json_logical, json_integer, json_double, json_string
 *[current stable release]: {!.VERSION!}
 *[latest stable release]: {!.VERSION!}
 

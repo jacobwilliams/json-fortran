@@ -1,22 +1,37 @@
 !*****************************************************************************************
 !>
+!  Module for the 28th unit test.
 !  Unit test for [[json_value_reverse]].
 !
 !@note This uses Fortran 2008 auto LHS assignments.
 
-    program jf_test_28
+module jf_test_28_mod
 
     use json_module
     use iso_fortran_env
 
     implicit none
 
+    private
+    public :: test_28
+
+contains
+
+    subroutine test_28(error_cnt)
+
+    implicit none
+
+    integer,intent(out) :: error_cnt
+
     type(json_core) :: json
     type(json_value),pointer :: p,vec
     integer(json_IK),dimension(:),allocatable :: ivec
-    integer(json_IK),dimension(:),allocatable :: ivec_value,ivec_value_reversed
+    integer(json_IK),dimension(:),allocatable :: ivec_value
+    integer(json_IK),dimension(:),allocatable :: ivec_value_reversed
     character(kind=json_CK,len=:),allocatable :: str
     integer :: i !! counter
+
+    error_cnt = 0
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -68,7 +83,7 @@
 
         if (json%failed()) then
             call json%print_error_message(error_unit)
-            stop 1
+            error_cnt = error_cnt + 1
         else
 
             if (allocated(ivec)) then
@@ -77,24 +92,43 @@
                         write(output_unit,'(A)') 'reverse test passed'
                     else
                         write(output_unit,'(A,*(I3,1X))') 'reverse test failed: ', ivec
-                        stop 1
+                        error_cnt = error_cnt + 1
                     end if
                 else
                     if (size(ivec)==0) then
                         write(output_unit,'(A)') 'reverse test passed'
                     else
                         write(output_unit,'(A,*(I3,1X))') 'reverse test failed: ', ivec
-                        stop 1
+                        error_cnt = error_cnt + 1
                     end if
                 end if
             else
                 write(output_unit,'(A)') 'reverse test failed: error getting ivec'
-                stop 1
+                error_cnt = error_cnt + 1
             end if
 
         end if
 
     end do
 
-    end program jf_test_28
+    end subroutine test_28
+
+    end module jf_test_28_mod
 !*****************************************************************************************
+
+#ifndef INTERGATED_TESTS
+!*****************************************************************************************
+program jf_test_28
+
+    !! 28th unit test.
+
+    use jf_test_28_mod , only: test_28
+    implicit none
+    integer :: n_errors
+    n_errors = 0
+    call test_28(n_errors)
+    if (n_errors /= 0) stop 1
+
+end program jf_test_28
+!*****************************************************************************************
+#endif

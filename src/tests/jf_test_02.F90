@@ -12,6 +12,9 @@ module jf_test_2_mod
 
     implicit none
 
+    private
+    public :: test_2
+
     character(len=*),parameter :: dir = '../files/'    !! working directory
     character(len=*),parameter :: filename2 = 'test2.json'
 
@@ -47,6 +50,16 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+
+    ! first we test an incorrect usage case:
+    ! [trying to print a null json_value pointer]
+    nullify(p)
+    call json%print(p,error_unit)
+    if (.not. json%failed()) then
+        write(error_unit,'(A)') 'Error: printing a null pointer should have raised an exception.'
+        error_cnt = error_cnt + 1
+    end if
+    call json%initialize()  ! clears exceptions
 
     !root:
     call json%create_object(p,dir//filename2)    ! create the value and associate the pointer
