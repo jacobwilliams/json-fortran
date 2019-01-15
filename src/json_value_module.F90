@@ -5702,7 +5702,9 @@
         logical(LK) :: add_comma       !! if a delimiter is to be added after string
         logical(LK) :: add_line_break  !! if a line break is to be added after string
         logical(LK) :: add_space       !! if a space is to be added after the comma
-        integer(IK) :: n               !! length of actual string appended to `str`
+        integer(IK) :: n               !! length of actual string `s` appended to `str`
+        integer(IK) :: room_left       !! number of characters left in `str`
+        integer(IK) :: n_chunks_to_add !! number of chunks to add to `str` for appending `s`
 
         if (present(comma)) then
             add_comma = comma
@@ -5752,9 +5754,11 @@
             if (add_line_break) s = s // newline
 
             n = len(s)
-            if (len(str)-iloc < n) then
+            room_left = len(str)-iloc
+            if (room_left < n) then
                 ! need to add another chunk to fit this string:
-                str = str // repeat(space, print_str_chunk_size)
+                n_chunks_to_add = max(1_IK, ceiling( real(len(s)-room_left,RK) / real(chunk_size,RK), IK ) )
+                str = str // repeat(space, print_str_chunk_size*n_chunks_to_add)
             end if
             ! append s to str:
             str(iloc+1:iloc+n-1) = s
