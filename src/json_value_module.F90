@@ -5761,7 +5761,7 @@
                 str = str // repeat(space, print_str_chunk_size*n_chunks_to_add)
             end if
             ! append s to str:
-            str(iloc+1:iloc+n-1) = s
+            str(iloc+1:iloc+n) = s
             iloc = iloc + n
 
         end if
