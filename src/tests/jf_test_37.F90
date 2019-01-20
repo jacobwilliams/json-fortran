@@ -6,7 +6,7 @@
 
 module jf_test_37_mod
 
-    use json_module, CK => json_CK
+    use json_module, CK => json_CK, CDK => json_CDK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -63,6 +63,38 @@ contains
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
+
+# ifdef USE_UCS4
+
+    ! also test default character kind when unicode is enabled:
+
+    call json%parse(p, CDK_'{"a": ["1", "2", "3"]}')
+    f = json_file(p,no_whitespace=.true.)
+    call f%print_file(error_unit)
+    write(error_unit,'(A)') ''
+    call check_for_error()
+    call f%destroy()
+
+    call json%parse(p, CDK_'{"b": ["4", "5", "6"]}')
+    f = json_file(p,json)
+    call f%print_file(error_unit)
+    write(error_unit,'(A)') ''
+    call check_for_error()
+    call f%destroy()
+
+    f = json_file(CDK_'{"x": [1,2,3]}',no_whitespace=.true.)
+    call f%print_file(error_unit)
+    write(error_unit,'(A)') ''
+    call check_for_error()
+    call f%destroy()
+
+    f = json_file(CDK_'{"y": [4,5,6]}',json)
+    call f%print_file(error_unit)
+    write(error_unit,'(A)') ''
+    call check_for_error()
+    call f%destroy()
+
+# endif
 
     if (error_cnt==0) then
         write(error_unit,'(A)') ''
