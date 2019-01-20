@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [6.11.0 (2019-01-19)](#611-2019-01-19)
     - [6.10.0 (2019-10-20)](#610-2019-10-20)
     - [6.9.0 (2018-07-29)](#690-2018-07-29)
     - [6.8.0 (2018-07-19)](#680-2018-07-19)
@@ -33,7 +34,16 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.10.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.11.0...HEAD)
+
+### [6.11.0](https://github.com/jacobwilliams/json-fortran/tree/6.11.0) (2019-01-19)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.10.0...6.11.0)
+or [Download v6.11.0](https://github.com/jacobwilliams/json-fortran/releases/tag/6.11.0)
+
+**Enhancements:**
+
+- Speed up writing JSON to a string [\#377](https://github.com/jacobwilliams/json-fortran/issues/377) [\#378](https://github.com/jacobwilliams/json-fortran/pull/378) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.10.0](https://github.com/jacobwilliams/json-fortran/tree/6.10.0) (2019-10-20)
 
