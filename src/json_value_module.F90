@@ -927,7 +927,7 @@
     if (use_unformatted_stream) then
         me%filesize = 0
         me%ichunk   = 0
-        me%chunk    = repeat(' ', stream_chunk_size) ! default chunk size
+        me%chunk    = repeat(space, stream_chunk_size) ! default chunk size
     end if
 
 #ifdef USE_UCS4
@@ -5277,8 +5277,15 @@
     type(json_value),pointer,intent(in)              :: p
     character(kind=CK,len=:),intent(out),allocatable :: str  !! prints structure to this string
 
-    str = CK_''
-    call json%json_value_print(p, iunit=unit2str, str=str, indent=1_IK, colon=.true.)
+    integer(IK) :: iloc  !! used to keep track of size of str
+                         !! since it is being allocated in chunks.
+
+    str = repeat(space, print_str_chunk_size)
+    iloc = 0_IK
+    call json%json_value_print(p, iunit=unit2str, str=str, iloc=iloc, indent=1_IK, colon=.true.)
+
+    ! trim the string if necessary:
+    if (len(str)>iloc) str = str(1:iloc)
 
     end subroutine json_value_to_string
 !*****************************************************************************************
@@ -5298,11 +5305,14 @@
     integer(IK),intent(in)               :: iunit   !! the file unit (the file must
                                                     !! already have been opened, can't be -1).
 
-    character(kind=CK,len=:),allocatable :: dummy !! dummy for `str` argument
-                                                  !! to [[json_value_print]]
+    character(kind=CK,len=:),allocatable :: dummy  !! dummy for `str` argument
+                                                   !! to [[json_value_print]]
+    integer(IK)                          :: idummy !! dummy for `iloc` argument
+                                                   !! to [[json_value_print]]
 
     if (iunit/=unit2str) then
-        call json%json_value_print(p,iunit,str=dummy, indent=1_IK, colon=.true.)
+        idummy = 0_IK
+        call json%json_value_print(p,iunit,str=dummy,iloc=idummy,indent=1_IK,colon=.true.)
     else
         call json%throw_exception('Error in json_print_to_unit: iunit must not be -1.')
     end if
@@ -5351,7 +5361,7 @@
 
     recursive subroutine json_value_print(json,p,iunit,str,indent,&
                                           need_comma,colon,is_array_element,&
-                                          is_compressed_vector)
+                                          is_compressed_vector,iloc)
 
     implicit none
 
@@ -5368,13 +5378,16 @@
                                                       !! the structure is printed to this
                                                       !! string rather than a file. This mode
                                                       !! is used by [[json_value_to_string]].
+    integer(IK),intent(inout) :: iloc  !! current index in `str`. should be set to 0 initially.
+                                       !! [only used when `str` is used.]
     logical(LK),intent(in),optional :: is_compressed_vector  !! if True, this is an element
                                                              !! from an array being printed
                                                              !! on one line [default is False]
 
     character(kind=CK,len=max_numeric_str_len) :: tmp !! for value to string conversions
-    character(kind=CK,len=:),allocatable :: s !! the string of spaces for
-                                              !! indenting (see `tab` and `spaces`)
+    character(kind=CK,len=:),allocatable :: s_indent !! the string of spaces for
+                                                     !! indenting (see `tab` and `spaces`)
+    character(kind=CK,len=:),allocatable :: s !! the string appended to `str`
     type(json_value),pointer :: element !! for getting children
     integer(IK) :: tab           !! number of `tabs` for indenting
     integer(IK) :: spaces        !! number of spaces for indenting
@@ -5439,9 +5452,9 @@
 
         !if the colon was the last thing written
         if (present(colon)) then
-            s = CK_''
+            s_indent = CK_''
         else
-            s = repeat(space, spaces)
+            s_indent = repeat(space, spaces)
         end if
 
         select case (p%var_type)
@@ -5452,11 +5465,13 @@
 
             if (count==0) then    !special case for empty object
 
-                call write_it( s//start_object//end_object, comma=print_comma )
+                s = s_indent//start_object//end_object
+                call write_it( comma=print_comma )
 
             else
 
-                call write_it( s//start_object )
+                s = s_indent//start_object
+                call write_it()
 
                 !if an object is in an array, there is an extra tab:
                 if (is_array) then
@@ -5479,13 +5494,13 @@
                         call escape_string(element%name,str_escaped,json%escape_solidus)
                         if (json%no_whitespace) then
                             !compact printing - no extra space
-                            call write_it(repeat(space, spaces)//quotation_mark//&
-                                          str_escaped//quotation_mark//colon_char,&
-                                          advance=.false.)
+                            s = repeat(space, spaces)//quotation_mark//&
+                                          str_escaped//quotation_mark//colon_char
+                            call write_it(advance=.false.)
                         else
-                            call write_it(repeat(space, spaces)//quotation_mark//&
-                                          str_escaped//quotation_mark//colon_char//space,&
-                                          advance=.false.)
+                            s = repeat(space, spaces)//quotation_mark//&
+                                          str_escaped//quotation_mark//colon_char//space
+                            call write_it(advance=.false.)
                         end if
                     else
                         call json%throw_exception('Error in json_value_print:'//&
@@ -5496,7 +5511,7 @@
 
                     ! recursive print of the element
                     call json%json_value_print(element, iunit=iunit, indent=tab + 1, &
-                                    need_comma=i<count, colon=.true., str=str)
+                                    need_comma=i<count, colon=.true., str=str, iloc=iloc)
                     if (json%exception_thrown) return
 
                     ! get the next child the list:
@@ -5505,8 +5520,12 @@
                 end do
 
                 ! [one fewer tab if it isn't an array element]
-                if (.not. is_array) s = repeat(space, max(0,spaces-json%spaces_per_tab))
-                call write_it( s//end_object, comma=print_comma )
+                if (.not. is_array) then
+                    s = repeat(space, max(0,spaces-json%spaces_per_tab))//end_object
+                else
+                    s = s_indent//end_object
+                end if
+                call write_it( comma=print_comma )
                 nullify(element)
 
             end if
@@ -5547,11 +5566,13 @@
 
             if (count==0) then    !special case for empty array
 
-                call write_it( s//start_array//end_array, comma=print_comma )
+                s = s_indent//start_array//end_array
+                call write_it( comma=print_comma )
 
             else
 
-                call write_it( s//start_array, advance=(.not. is_vector) )
+                s = s_indent//start_array
+                call write_it( advance=(.not. is_vector) )
 
                 !if an array is in an array, there is an extra tab:
                 if (is_array) then
@@ -5572,11 +5593,13 @@
                     ! recursive print of the element
                     if (is_vector) then
                         call json%json_value_print(element, iunit=iunit, indent=0,&
-                                        need_comma=i<count, is_array_element=.false., str=str,&
+                                        need_comma=i<count, is_array_element=.false., &
+                                        str=str, iloc=iloc,&
                                         is_compressed_vector = .true.)
                     else
                         call json%json_value_print(element, iunit=iunit, indent=tab,&
-                                        need_comma=i<count, is_array_element=.true., str=str)
+                                        need_comma=i<count, is_array_element=.true., &
+                                        str=str, iloc=iloc)
                     end if
                     if (json%exception_thrown) return
 
@@ -5587,10 +5610,11 @@
 
                 !indent the closing array character:
                 if (is_vector) then
-                    call write_it( end_array,comma=print_comma )
+                    s = end_array
+                    call write_it( comma=print_comma )
                 else
-                    call write_it( repeat(space, max(0,spaces-json%spaces_per_tab))//end_array,&
-                                   comma=print_comma )
+                    s = repeat(space, max(0,spaces-json%spaces_per_tab))//end_array
+                    call write_it( comma=print_comma )
                 end if
                 nullify(element)
 
@@ -5598,18 +5622,18 @@
 
         case (json_null)
 
-            call write_it( s//null_str, comma=print_comma, &
-                            advance=(.not. is_vector),&
-                            space_after_comma=is_vector )
+            s = s_indent//null_str
+            call write_it( comma=print_comma, &
+                           advance=(.not. is_vector),&
+                           space_after_comma=is_vector )
 
         case (json_string)
 
             if (allocated(p%str_value)) then
                 ! have to escape the string for printing:
                 call escape_string(p%str_value,str_escaped,json%escape_solidus)
-                call write_it( s//quotation_mark// &
-                               str_escaped//quotation_mark, &
-                               comma=print_comma, &
+                s = s_indent//quotation_mark//str_escaped//quotation_mark
+                call write_it( comma=print_comma, &
                                advance=(.not. is_vector),&
                                space_after_comma=is_vector )
             else
@@ -5621,22 +5645,25 @@
         case (json_logical)
 
             if (p%log_value) then
-                call write_it( s//true_str, comma=print_comma, &
-                                advance=(.not. is_vector),&
-                                space_after_comma=is_vector )
+                s = s_indent//true_str
+                call write_it( comma=print_comma, &
+                               advance=(.not. is_vector),&
+                               space_after_comma=is_vector )
             else
-                call write_it( s//false_str, comma=print_comma, &
-                                advance=(.not. is_vector),&
-                                space_after_comma=is_vector )
+                s = s_indent//false_str
+                call write_it( comma=print_comma, &
+                               advance=(.not. is_vector),&
+                               space_after_comma=is_vector )
             end if
 
         case (json_integer)
 
             call integer_to_string(p%int_value,int_fmt,tmp)
 
-            call write_it( s//trim(tmp), comma=print_comma, &
-                            advance=(.not. is_vector),&
-                            space_after_comma=is_vector )
+            s = s_indent//trim(tmp)
+            call write_it( comma=print_comma, &
+                           advance=(.not. is_vector),&
+                           space_after_comma=is_vector )
 
         case (json_double)
 
@@ -5647,9 +5674,10 @@
                 call real_to_string(p%dbl_value,default_real_fmt,json%compact_real,tmp)
             end if
 
-            call write_it( s//trim(tmp), comma=print_comma, &
-                            advance=(.not. is_vector),&
-                            space_after_comma=is_vector )
+            s = s_indent//trim(tmp)
+            call write_it( comma=print_comma, &
+                           advance=(.not. is_vector),&
+                           space_after_comma=is_vector )
 
         case default
 
@@ -5657,20 +5685,16 @@
 
         end select
 
-        !cleanup:
-        if (allocated(s)) deallocate(s)
-
     end if
 
     contains
 
-        subroutine write_it(s,advance,comma,space_after_comma)
+        subroutine write_it(advance,comma,space_after_comma)
 
-        !! write the string to the file (or the output string)
+        !! write the string `s` to the file (or the output string)
 
         implicit none
 
-        character(kind=CK,len=*),intent(in) :: s  !! string to print
         logical(LK),intent(in),optional :: advance           !! to add line break or not
         logical(LK),intent(in),optional :: comma             !! print comma after the string
         logical(LK),intent(in),optional :: space_after_comma !! print a space after the comma
@@ -5678,7 +5702,9 @@
         logical(LK) :: add_comma       !! if a delimiter is to be added after string
         logical(LK) :: add_line_break  !! if a line break is to be added after string
         logical(LK) :: add_space       !! if a space is to be added after the comma
-        character(kind=CK,len=:),allocatable :: s2  !! temporary string
+        integer(IK) :: n               !! length of actual string `s` appended to `str`
+        integer(IK) :: room_left       !! number of characters left in `str`
+        integer(IK) :: n_chunks_to_add !! number of chunks to add to `str` for appending `s`
 
         if (present(comma)) then
             add_comma = comma
@@ -5706,30 +5732,39 @@
                                                       ! we are printing whitespace
         end if
 
-        !string to print:
-        s2 = s
+        ! string to print:
         if (add_comma) then
-            s2 = s2 // delimiter
-            if (add_space) s2 = s2 // space
+            if (add_space) then
+                s = s // delimiter // space
+            else
+                s = s // delimiter
+            end if
         end if
 
         if (write_file) then
 
             if (add_line_break) then
-                write(iunit,fmt='(A)') s2
+                write(iunit,fmt='(A)') s
             else
-                write(iunit,fmt='(A)',advance='NO') s2
+                write(iunit,fmt='(A)',advance='NO') s
             end if
 
         else    !write string
 
-            str = str // s2
-            if (add_line_break) str = str // newline
+            if (add_line_break) s = s // newline
+
+            n = len(s)
+            room_left = len(str)-iloc
+            if (room_left < n) then
+                ! need to add another chunk to fit this string:
+                n_chunks_to_add = max(1_IK, ceiling( real(len(s)-room_left,RK) / real(chunk_size,RK), IK ) )
+                str = str // repeat(space, print_str_chunk_size*n_chunks_to_add)
+            end if
+            ! append s to str:
+            str(iloc+1:iloc+n) = s
+            iloc = iloc + n
 
         end if
-
-        !cleanup:
-        if (allocated(s2)) deallocate(s2)
 
         end subroutine write_it
 
@@ -8098,7 +8133,7 @@
                 case (json_integer)
 
                     if (allocated(me%int_value)) then
-                        value = repeat(' ', max_integer_str_len)
+                        value = repeat(space, max_integer_str_len)
                         call integer_to_string(me%int_value,int_fmt,value)
                         value = trim(value)
                     else
@@ -8109,7 +8144,7 @@
                 case (json_double)
 
                     if (allocated(me%dbl_value)) then
-                        value = repeat(' ', max_numeric_str_len)
+                        value = repeat(space, max_numeric_str_len)
                         call real_to_string(me%dbl_value,json%real_fmt,&
                                             json%compact_real,value)
                         value = trim(value)
@@ -8767,7 +8802,7 @@
     if (istat==0) then
 
         if (use_unformatted_stream) then
-            ! save the file save to be read:
+            ! save the file size to be read:
             inquire(unit=iunit, size=json%filesize, iostat=istat)
         end if
 
@@ -10267,7 +10302,7 @@
                             if (json%filesize<json%ipos+len(json%chunk)-1) then
                                 ! for the last chunk, we resize
                                 ! it to the correct size:
-                                json%chunk = repeat(' ', json%filesize-json%ipos+1)
+                                json%chunk = repeat(space, json%filesize-json%ipos+1)
                             end if
                             read(unit=unit,pos=json%ipos,iostat=ios) json%chunk
                         else
@@ -10381,7 +10416,7 @@
 
             !in this case, c is ignored, and we just
             !decrement the stream position counter:
-            json%ipos   = json%ipos - 1
+            json%ipos = json%ipos - 1
             json%ichunk = json%ichunk - 1
 
         else
