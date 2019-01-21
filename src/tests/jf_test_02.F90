@@ -7,8 +7,8 @@
 
 module jf_test_2_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, wp => json_RK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -193,7 +193,7 @@ contains
     !trajectory variables:
     call add_variables_to_input(json, traj, 'Rx', 'km', 'J2000', 'EARTH', [1.0_wp, 2.0_wp, 3.0_wp], error_cnt )
     call add_variables_to_input(json, traj, 'Ry', 'km', 'J2000', 'EARTH', [10.0_wp, 20.0_wp, 30.0_wp], error_cnt )
-    call add_variables_to_input(json, traj, 'Rz', 'km', 'J2000', 'EARTH', [100.0_wp, 200.0d0, 300.0_wp], error_cnt )
+    call add_variables_to_input(json, traj, 'Rz', 'km', 'J2000', 'EARTH', [100.0_wp, 200.0_wp, 300.0_wp], error_cnt )
     call add_variables_to_input(json, traj, 'Vx', 'km/s', 'J2000', 'EARTH', [1.0e-3_wp, 2.0e-3_wp, 3.0e-3_wp], error_cnt )
     call add_variables_to_input(json, traj, 'Vy', 'km/s', 'J2000', 'EARTH', [2.0e-3_wp, 20.0e-3_wp, 3.0e-3_wp], error_cnt )
     call add_variables_to_input(json, traj, 'Vz', 'km/s', 'J2000', 'EARTH', [3.0e-3_wp, 30.0e-3_wp, 40.0e-3_wp], error_cnt )

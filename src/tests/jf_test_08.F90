@@ -3,12 +3,12 @@
 !  Module for the eighth unit test.
 !
 !# HISTORY
-!  * Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
+!  * Izaak Beekman : 2/18/2015 : Created (refactored original json_example.f90 file)
 
 module jf_test_8_mod
 
     use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 

@@ -6,8 +6,8 @@
 
 module jf_test_10_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, wp => json_RK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -176,7 +176,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_update_real [variable present]...'
-    call f2%update('data[2].real',100.0d0,found)
+    call f2%update('data[2].real',100.0_wp,found)
     if (f2%failed()) then
         call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -189,7 +189,7 @@ contains
         end if
     end if
     write(error_unit,'(A)') 'json_file_update_real [variable not present]...'
-    call f2%update('new_real',1776.0d0,found)
+    call f2%update('new_real',1776.0_wp,found)
     if (f2%failed()) then
         call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -269,7 +269,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_update_double...'
-    call json%update(p,'data(2).real',-1.0d0,found)
+    call json%update(p,'data(2).real',-1.0_wp,found)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -315,7 +315,7 @@ contains
     write(error_unit,'(A)') 'json_create...'
     write(error_unit,'(A)') 'json_create_logical...'; call json%destroy(p); call json%create_logical(p,.true.,'foo')
     write(error_unit,'(A)') 'json_create_integer...'; call json%destroy(p); call json%create_integer(p,1000,'foo')
-    write(error_unit,'(A)') 'json_create_double ...'; call json%destroy(p); call json%create_double (p,9.0d0,'foo')
+    write(error_unit,'(A)') 'json_create_double ...'; call json%destroy(p); call json%create_double (p,9.0_wp,'foo')
     write(error_unit,'(A)') 'json_create_string ...'; call json%destroy(p); call json%create_string (p,'foo','bar')
     write(error_unit,'(A)') 'json_create_null   ...'; call json%destroy(p); call json%create_null   (p,'foo')
     write(error_unit,'(A)') 'json_create_object ...'; call json%destroy(p); call json%create_object (p,'foo')
