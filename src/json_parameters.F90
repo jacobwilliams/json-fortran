@@ -64,9 +64,15 @@
     character(kind=CK,len=*),parameter :: slash           = achar(47, kind=CK) !! JSON special character
     character(kind=CK,len=*),parameter :: backslash       = achar(92, kind=CK) !! JSON special character
 
+    !> default real number format statement (for writing real values to strings and files).
+    !  Note that this can be overridden by calling [[json_initialize]].
+#ifdef REAL32
+    character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E17.8E3)'
+#elif REAL128
+    character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E46.35E5)'
+#else
     character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E27.17E4)'
-        !! default real number format statement (for writing real values to strings and files).
-        !! Note that this can be overridden by calling [[json_initialize]].
+#endif
 
     character(kind=CK,len=*),parameter :: star = CK_'*' !! for invalid numbers and
                                                         !! list-directed real output

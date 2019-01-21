@@ -283,8 +283,16 @@
                                  MAYBEWRAP(json_value_add_null), &
                                  MAYBEWRAP(json_value_add_integer), &
                                  MAYBEWRAP(json_value_add_integer_vec), &
+#ifndef REAL32
+                                 MAYBEWRAP(json_value_add_real32), &
+                                 MAYBEWRAP(json_value_add_real32_vec), &
+#endif
                                  MAYBEWRAP(json_value_add_double), &
                                  MAYBEWRAP(json_value_add_double_vec), &
+#ifdef REAL128
+                                 MAYBEWRAP(json_value_add_real64), &
+                                 MAYBEWRAP(json_value_add_real64_vec), &
+#endif
                                  MAYBEWRAP(json_value_add_logical), &
                                  MAYBEWRAP(json_value_add_logical_vec), &
                                  MAYBEWRAP(json_value_add_string), &
@@ -300,8 +308,16 @@
         procedure,private :: MAYBEWRAP(json_value_add_integer)
         procedure,private :: MAYBEWRAP(json_value_add_null)
         procedure,private :: MAYBEWRAP(json_value_add_integer_vec)
+#ifndef REAL32
+        procedure,private :: MAYBEWRAP(json_value_add_real32)
+        procedure,private :: MAYBEWRAP(json_value_add_real32_vec)
+#endif
         procedure,private :: MAYBEWRAP(json_value_add_double)
         procedure,private :: MAYBEWRAP(json_value_add_double_vec)
+#ifdef REAL128
+        procedure,private :: MAYBEWRAP(json_value_add_real64)
+        procedure,private :: MAYBEWRAP(json_value_add_real64_vec)
+#endif
         procedure,private :: MAYBEWRAP(json_value_add_logical)
         procedure,private :: MAYBEWRAP(json_value_add_logical_vec)
         procedure,private :: MAYBEWRAP(json_value_add_string)
@@ -331,7 +347,14 @@
         !      methods, which do a similar thing (and can be used for
         !      scalars and vectors, etc.)
         generic,public :: update => MAYBEWRAP(json_update_logical),&
+#ifndef REAL32
+                                    MAYBEWRAP(json_update_real32),&
+#endif
                                     MAYBEWRAP(json_update_double),&
+#ifdef REAL128
+                                    MAYBEWRAP(json_update_real64),&
+#endif
+
                                     MAYBEWRAP(json_update_integer),&
                                     MAYBEWRAP(json_update_string)
 #ifdef USE_UCS4
@@ -339,7 +362,13 @@
                                     json_update_string_val_ascii
 #endif
         procedure,private :: MAYBEWRAP(json_update_logical)
+#ifndef REAL32
+        procedure,private :: MAYBEWRAP(json_update_real32)
+#endif
         procedure,private :: MAYBEWRAP(json_update_double)
+#ifdef REAL128
+        procedure,private :: MAYBEWRAP(json_update_real64)
+#endif
         procedure,private :: MAYBEWRAP(json_update_integer)
         procedure,private :: MAYBEWRAP(json_update_string)
 #ifdef USE_UCS4
@@ -375,11 +404,23 @@
 
         generic,public :: add_by_path => MAYBEWRAP(json_add_member_by_path),&
                                          MAYBEWRAP(json_add_integer_by_path),&
+#ifndef REAL32
+                                         MAYBEWRAP(json_add_real32_by_path),&
+#endif
                                          MAYBEWRAP(json_add_double_by_path),&
+#ifdef REAL128
+                                         MAYBEWRAP(json_add_real64_by_path),&
+#endif
                                          MAYBEWRAP(json_add_logical_by_path),&
                                          MAYBEWRAP(json_add_string_by_path),&
                                          MAYBEWRAP(json_add_integer_vec_by_path),&
+#ifndef REAL32
+                                         MAYBEWRAP(json_add_real32_vec_by_path),&
+#endif
                                          MAYBEWRAP(json_add_double_vec_by_path),&
+#ifdef REAL128
+                                         MAYBEWRAP(json_add_real64_vec_by_path),&
+#endif
                                          MAYBEWRAP(json_add_logical_vec_by_path),&
                                          MAYBEWRAP(json_add_string_vec_by_path)
 #ifdef USE_UCS4
@@ -390,11 +431,23 @@
 #endif
         procedure :: MAYBEWRAP(json_add_member_by_path)
         procedure :: MAYBEWRAP(json_add_integer_by_path)
+#ifndef REAL32
+        procedure :: MAYBEWRAP(json_add_real32_by_path)
+#endif
         procedure :: MAYBEWRAP(json_add_double_by_path)
+#ifdef REAL128
+        procedure :: MAYBEWRAP(json_add_real64_by_path)
+#endif
         procedure :: MAYBEWRAP(json_add_logical_by_path)
         procedure :: MAYBEWRAP(json_add_string_by_path)
         procedure :: MAYBEWRAP(json_add_integer_vec_by_path)
+#ifndef REAL32
+        procedure :: MAYBEWRAP(json_add_real32_vec_by_path)
+#endif
         procedure :: MAYBEWRAP(json_add_double_vec_by_path)
+#ifdef REAL128
+        procedure :: MAYBEWRAP(json_add_real64_vec_by_path)
+#endif
         procedure :: MAYBEWRAP(json_add_logical_vec_by_path)
         procedure :: MAYBEWRAP(json_add_string_vec_by_path)
 #ifdef USE_UCS4
@@ -429,8 +482,16 @@
                                   MAYBEWRAP(json_get_by_path),             &
             json_get_integer,     MAYBEWRAP(json_get_integer_by_path),     &
             json_get_integer_vec, MAYBEWRAP(json_get_integer_vec_by_path), &
+#ifndef REAL32
+            json_get_real32,      MAYBEWRAP(json_get_real32_by_path),      &
+            json_get_real32_vec,  MAYBEWRAP(json_get_real32_vec_by_path),  &
+#endif
             json_get_double,      MAYBEWRAP(json_get_double_by_path),      &
             json_get_double_vec,  MAYBEWRAP(json_get_double_vec_by_path),  &
+#ifdef REAL128
+            json_get_real64,      MAYBEWRAP(json_get_real64_by_path),      &
+            json_get_real64_vec,  MAYBEWRAP(json_get_real64_vec_by_path),  &
+#endif
             json_get_logical,     MAYBEWRAP(json_get_logical_by_path),     &
             json_get_logical_vec, MAYBEWRAP(json_get_logical_vec_by_path), &
             json_get_string,      MAYBEWRAP(json_get_string_by_path),      &
@@ -440,8 +501,16 @@
 
         procedure,private :: json_get_integer
         procedure,private :: json_get_integer_vec
+#ifndef REAL32
+        procedure,private :: json_get_real32
+        procedure,private :: json_get_real32_vec
+#endif
         procedure,private :: json_get_double
         procedure,private :: json_get_double_vec
+#ifdef REAL128
+        procedure,private :: json_get_real64
+        procedure,private :: json_get_real64_vec
+#endif
         procedure,private :: json_get_logical
         procedure,private :: json_get_logical_vec
         procedure,private :: json_get_string
@@ -451,8 +520,16 @@
         procedure,private :: MAYBEWRAP(json_get_by_path)
         procedure,private :: MAYBEWRAP(json_get_integer_by_path)
         procedure,private :: MAYBEWRAP(json_get_integer_vec_by_path)
+#ifndef REAL32
+        procedure,private :: MAYBEWRAP(json_get_real32_by_path)
+        procedure,private :: MAYBEWRAP(json_get_real32_vec_by_path)
+#endif
         procedure,private :: MAYBEWRAP(json_get_double_by_path)
         procedure,private :: MAYBEWRAP(json_get_double_vec_by_path)
+#ifdef REAL128
+        procedure,private :: MAYBEWRAP(json_get_real64_by_path)
+        procedure,private :: MAYBEWRAP(json_get_real64_vec_by_path)
+#endif
         procedure,private :: MAYBEWRAP(json_get_logical_by_path)
         procedure,private :: MAYBEWRAP(json_get_logical_vec_by_path)
         procedure,private :: MAYBEWRAP(json_get_string_by_path)
@@ -542,6 +619,14 @@
         !````
         generic,public :: create_double => MAYBEWRAP(json_value_create_double)
         procedure :: MAYBEWRAP(json_value_create_double)
+#ifndef REAL32
+        generic,public :: create_double => MAYBEWRAP(json_value_create_real32)
+        procedure :: MAYBEWRAP(json_value_create_real32)
+#endif
+#ifdef REAL128
+        generic,public :: create_double => MAYBEWRAP(json_value_create_real64)
+        procedure :: MAYBEWRAP(json_value_create_real64)
+#endif
 
         !>
         !  Allocate a [[json_value]] pointer and make it an array variable.
@@ -2951,6 +3036,86 @@
     end subroutine wrap_json_update_double
 !*****************************************************************************************
 
+#ifndef REAL32
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_update_double]], where `val` is `real32`.
+
+    subroutine json_update_real32(json,p,path,val,found)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p
+    character(kind=CK,len=*),intent(in) :: path   !! path to the variable in the structure
+    real(real32),intent(in)             :: val    !! the new value
+    logical(LK),intent(out)             :: found  !! if the variable was found and was a scalar.
+
+    call json%update(p,path,real(val,RK),found)
+
+    end subroutine json_update_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_update_real32]], where `path` is kind=CDK.
+
+    subroutine wrap_json_update_real32(json,p,path,val,found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CDK,len=*),intent(in) :: path  !! path to the variable in the structure
+    real(real32),intent(in)              :: val   !! the new value
+    logical(LK),intent(out)              :: found !! if the variable was found and was a scalar.
+
+    call json%update(p,to_unicode(path),real(val,RK),found)
+
+    end subroutine wrap_json_update_real32
+!*****************************************************************************************
+#endif
+
+#ifdef REAL128
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_update_double]], where `val` is `real64`.
+
+    subroutine json_update_real64(json,p,path,val,found)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p
+    character(kind=CK,len=*),intent(in) :: path   !! path to the variable in the structure
+    real(real64),intent(in)             :: val    !! the new value
+    logical(LK),intent(out)             :: found  !! if the variable was found and was a scalar.
+
+    call json%update(p,path,real(val,RK),found)
+
+    end subroutine json_update_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_update_real64]], where `path` is kind=CDK.
+
+    subroutine wrap_json_update_real64(json,p,path,val,found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CDK,len=*),intent(in) :: path  !! path to the variable in the structure
+    real(real64),intent(in)              :: val   !! the new value
+    logical(LK),intent(out)              :: found !! if the variable was found and was a scalar.
+
+    call json%update(p,to_unicode(path),real(val,RK),found)
+
+    end subroutine wrap_json_update_real64
+!*****************************************************************************************
+#endif
+
 !*****************************************************************************************
 !> author: Jacob Williams
 !  date: 12/6/2014
@@ -3603,6 +3768,90 @@
     end subroutine wrap_json_add_double_by_path
 !*****************************************************************************************
 
+#ifndef REAL32
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_add_double_by_path]] where value=real32.
+
+    subroutine json_add_real32_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    real(real32),intent(in)             :: value        !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    call json%add_by_path(me,path,real(value,RK),found,was_created)
+
+    end subroutine json_add_real32_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_real32_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_real32_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    real(real32),intent(in)              :: value       !! the value to add
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%add_by_path(me,to_unicode(path),real(value,RK),found,was_created)
+
+    end subroutine wrap_json_add_real32_by_path
+!*****************************************************************************************
+#endif
+
+#ifdef REAL128
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_add_double_by_path]] where value=real32.
+
+    subroutine json_add_real64_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    real(real64),intent(in)             :: value        !! the value to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    call json%add_by_path(me,path,real(value,RK),found,was_created)
+
+    end subroutine json_add_real64_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_real64_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_real64_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    real(real64),intent(in)              :: value       !! the value to add
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%add_by_path(me,to_unicode(path),real(value,RK),found,was_created)
+
+    end subroutine wrap_json_add_real64_by_path
+!*****************************************************************************************
+#endif
+
 !*****************************************************************************************
 !>
 !  Add a logical value to a [[json_value]], given the path.
@@ -4022,6 +4271,90 @@
     end subroutine wrap_json_add_double_vec_by_path
 !*****************************************************************************************
 
+#ifndef REAL32
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_double_by_path]] for adding a double vector by path.
+
+    subroutine json_add_real32_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    real(real32),dimension(:),intent(in) :: value        !! the vector to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%add_by_path(me,path,real(value,RK),found,was_created)
+
+    end subroutine json_add_real32_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_real32_vec_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_real32_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(real32),dimension(:),intent(in) :: value        !! the vector to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%add_by_path(me,to_unicode(path),real(value,RK),found,was_created)
+
+    end subroutine wrap_json_add_real32_vec_by_path
+!*****************************************************************************************
+#endif
+
+#ifdef REAL128
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_double_by_path]] for adding a double vector by path.
+
+    subroutine json_add_real64_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    real(real64),dimension(:),intent(in) :: value        !! the vector to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%add_by_path(me,path,real(value,RK),found,was_created)
+
+    end subroutine json_add_real64_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_real64_vec_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_real64_vec_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(real64),dimension(:),intent(in) :: value        !! the vector to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%add_by_path(me,to_unicode(path),real(value,RK),found,was_created)
+
+    end subroutine wrap_json_add_real64_vec_by_path
+!*****************************************************************************************
+#endif
+
 !*****************************************************************************************
 !>
 !  Wrapper to [[json_add_string_by_path]] for adding a string vector by path.
@@ -4296,6 +4629,154 @@
 
     end subroutine wrap_json_value_add_double_vec
 !*****************************************************************************************
+
+#ifndef REAL32
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_double]] where `val` is `real32`.
+
+    subroutine json_value_add_real32(json,p,name,val)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p
+    character(kind=CK,len=*),intent(in) :: name  !! variable name
+    real(real32),intent(in)             :: val   !! real value
+
+    call json%add(p,name,real(val,RK))
+
+    end subroutine json_value_add_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_real32]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_real32(json,p,name,val)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CDK,len=*),intent(in) :: name  !! variable name
+    real(real32),intent(in)              :: val   !! real value
+
+    call json%add(p, to_unicode(name), val)
+
+    end subroutine wrap_json_value_add_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_double_vec]] where `val` is `real32`.
+
+    subroutine json_value_add_real32_vec(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CK,len=*),intent(in)  :: name
+    real(real32),dimension(:),intent(in) :: val
+
+    call json%add(p,name,real(val,RK))
+
+    end subroutine json_value_add_real32_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_real32_vec]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_real32_vec(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CDK,len=*),intent(in) :: name
+    real(real32),dimension(:),intent(in) :: val
+
+    call json%add(p, to_unicode(name), val)
+
+    end subroutine wrap_json_value_add_real32_vec
+!*****************************************************************************************
+#endif
+
+#ifdef REAL128
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_double]] where `val` is `real64`.
+
+    subroutine json_value_add_real64(json,p,name,val)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p
+    character(kind=CK,len=*),intent(in) :: name  !! variable name
+    real(real64),intent(in)             :: val   !! real value
+
+    call json%add(p,name,real(val,RK))
+
+    end subroutine json_value_add_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_real64]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_real64(json,p,name,val)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CDK,len=*),intent(in) :: name  !! variable name
+    real(real64),intent(in)              :: val   !! real value
+
+    call json%add(p, to_unicode(name), val)
+
+    end subroutine wrap_json_value_add_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_double_vec]] where `val` is `real64`.
+
+    subroutine json_value_add_real64_vec(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CK,len=*),intent(in)  :: name
+    real(real64),dimension(:),intent(in) :: val
+
+    call json%add(p, name, real(val,RK))
+
+    end subroutine json_value_add_real64_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_real64_vec]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_real64_vec(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CDK,len=*),intent(in) :: name
+    real(real64),dimension(:),intent(in) :: val
+
+    call json%add(p, to_unicode(name), val)
+
+    end subroutine wrap_json_value_add_real64_vec
+!*****************************************************************************************
+#endif
 
 !*****************************************************************************************
 !>
@@ -7863,6 +8344,254 @@
     end subroutine wrap_json_get_double_vec_by_path
 !*****************************************************************************************
 
+#ifndef REAL32
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_double]] where value=real32.
+
+    subroutine json_get_real32(json, me, value)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: me
+    real(real32),intent(out)       :: value
+
+    real(RK) :: tmp
+
+    call json%get(me, tmp)
+    value = real(tmp,RK)
+
+    end subroutine json_get_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_double_by_path]] where value=real32.
+
+    subroutine json_get_real32_by_path(json, me, path, value, found)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me
+    character(kind=CK,len=*),intent(in) :: path
+    real(real32),intent(out)            :: value
+    logical(LK),intent(out),optional    :: found
+
+    real(RK) :: tmp
+
+    call json%get(me, path, tmp, found)
+    value = real(tmp,RK)
+
+    end subroutine json_get_real32_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_real32_by_path]], where "path" is kind=CDK
+
+    subroutine wrap_json_get_real32_by_path(json, me, path, value, found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me
+    character(kind=CDK,len=*),intent(in) :: path
+    real(real32),intent(out)             :: value
+    logical(LK),intent(out),optional     :: found
+
+    call json%get(me,to_unicode(path),value,found)
+
+    end subroutine wrap_json_get_real32_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_double_vec]] where `vec` is `real32`.
+
+    subroutine json_get_real32_vec(json, me, vec)
+
+    implicit none
+
+    class(json_core),intent(inout)                    :: json
+    type(json_value),pointer                          :: me
+    real(real32),dimension(:),allocatable,intent(out) :: vec
+
+    real(RK),dimension(:),allocatable :: tmp
+
+    call json%get(me, tmp)
+    if (allocated(tmp)) vec = real(tmp,RK)
+
+    end subroutine json_get_real32_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_double_vec_by_path]] where `vec` is `real32`.
+
+    subroutine json_get_real32_vec_by_path(json, me, path, vec, found)
+
+    implicit none
+
+    class(json_core),intent(inout)                    :: json
+    type(json_value),pointer,intent(in)               :: me
+    character(kind=CK,len=*),intent(in)               :: path
+    real(real32),dimension(:),allocatable,intent(out) :: vec
+    logical(LK),intent(out),optional                  :: found
+
+    real(RK),dimension(:),allocatable :: tmp
+
+    call json%get(me, path, tmp, found)
+    if (allocated(tmp)) vec = real(tmp,RK)
+
+    end subroutine json_get_real32_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_real32_vec_by_path]], where "path" is kind=CDK
+
+    subroutine wrap_json_get_real32_vec_by_path(json, me, path, vec, found)
+
+    implicit none
+
+    class(json_core),intent(inout)                    :: json
+    type(json_value),pointer                          :: me
+    character(kind=CDK,len=*),intent(in)              :: path
+    real(real32),dimension(:),allocatable,intent(out) :: vec
+    logical(LK),intent(out),optional                  :: found
+
+    call json%get(me, to_unicode(path), vec, found)
+
+    end subroutine wrap_json_get_real32_vec_by_path
+!*****************************************************************************************
+#endif
+
+#ifdef REAL128
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_double]] where `value` is `real64`.
+
+    subroutine json_get_real64(json, me, value)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: me
+    real(real64),intent(out)       :: value
+
+    real(RK) :: tmp
+
+    call json%get(me, tmp)
+    value = real(tmp,RK)
+
+    end subroutine json_get_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_double_by_path]] where `value` is `real64`.
+
+    subroutine json_get_real64_by_path(json, me, path, value, found)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me
+    character(kind=CK,len=*),intent(in) :: path
+    real(real64),intent(out)            :: value
+    logical(LK),intent(out),optional    :: found
+
+    real(RK) :: tmp
+
+    call json%get(me, path, tmp, found)
+    value = real(tmp,RK)
+
+    end subroutine json_get_real64_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_real64_by_path]], where "path" is kind=CDK
+
+    subroutine wrap_json_get_real64_by_path(json, me, path, value, found)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me
+    character(kind=CDK,len=*),intent(in) :: path
+    real(real64),intent(out)             :: value
+    logical(LK),intent(out),optional     :: found
+
+    call json%get(me,to_unicode(path),value,found)
+
+    end subroutine wrap_json_get_real64_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_double_vec]] where `vec` is `real64`.
+
+    subroutine json_get_real64_vec(json, me, vec)
+
+    implicit none
+
+    class(json_core),intent(inout)                    :: json
+    type(json_value),pointer                          :: me
+    real(real64),dimension(:),allocatable,intent(out) :: vec
+
+    real(RK),dimension(:),allocatable :: tmp
+
+    call json%get(me, tmp)
+    if (allocated(tmp)) vec = real(tmp,RK)
+
+    end subroutine json_get_real64_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_double_vec_by_path]] where `vec` is `real64`.
+
+    subroutine json_get_real64_vec_by_path(json, me, path, vec, found)
+
+    implicit none
+
+    class(json_core),intent(inout)                    :: json
+    type(json_value),pointer,intent(in)               :: me
+    character(kind=CK,len=*),intent(in)               :: path
+    real(real64),dimension(:),allocatable,intent(out) :: vec
+    logical(LK),intent(out),optional                  :: found
+
+    real(RK),dimension(:),allocatable :: tmp
+
+    call json%get(me, path, tmp, found)
+    if (allocated(tmp)) vec = real(tmp,RK)
+
+    end subroutine json_get_real64_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_real64_vec_by_path]], where "path" is kind=CDK
+
+    subroutine wrap_json_get_real64_vec_by_path(json, me, path, vec, found)
+
+    implicit none
+
+    class(json_core),intent(inout)                    :: json
+    type(json_value),pointer                          :: me
+    character(kind=CDK,len=*),intent(in)              :: path
+    real(real64),dimension(:),allocatable,intent(out) :: vec
+    logical(LK),intent(out),optional                  :: found
+
+    call json%get(me, to_unicode(path), vec, found)
+
+    end subroutine wrap_json_get_real64_vec_by_path
+!*****************************************************************************************
+#endif
+
 !*****************************************************************************************
 !>
 !  Get a logical value from a [[json_value]].
@@ -9394,6 +10123,86 @@
 
     end subroutine wrap_json_value_create_double
 !*****************************************************************************************
+
+#ifndef REAL32
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_create_double]] where val=real32.
+!
+!@note The value is converted into a `real(RK)` variable internally.
+
+    subroutine json_value_create_real32(json,p,val,name)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p
+    real(real32),intent(in)             :: val
+    character(kind=CK,len=*),intent(in) :: name
+
+    call json%create_double(p,real(val,RK),name)
+
+    end subroutine json_value_create_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_create_real32]] where "name" is kind(CDK).
+
+    subroutine wrap_json_value_create_real32(json,p,val,name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    real(real32),intent(in)              :: val
+    character(kind=CDK,len=*),intent(in) :: name
+
+    call json%create_double(p,val,to_unicode(name))
+
+    end subroutine wrap_json_value_create_real32
+!*****************************************************************************************
+#endif
+
+#ifdef REAL128
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_create_double]] where val=real64.
+!
+!@note The value is converted into a `real(RK)` variable internally.
+
+    subroutine json_value_create_real64(json,p,val,name)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p
+    real(real64),intent(in)             :: val
+    character(kind=CK,len=*),intent(in) :: name
+
+    call json%create_double(p,real(val,RK),name)
+
+    end subroutine json_value_create_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_create_real64]] where "name" is kind(CDK).
+
+    subroutine wrap_json_value_create_real64(json,p,val,name)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    real(real64),intent(in)              :: val
+    character(kind=CDK,len=*),intent(in) :: name
+
+    call json%create_double(p,val,to_unicode(name))
+
+    end subroutine wrap_json_value_create_real64
+!*****************************************************************************************
+#endif
 
 !*****************************************************************************************
 !> author: Jacob Williams
