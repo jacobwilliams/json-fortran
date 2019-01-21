@@ -28,7 +28,7 @@ contains
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
     type(json_file)                   :: f
-    type(json_value),pointer          :: p, p_value
+    type(json_value),pointer          :: p, p_value, p_vec
     type(json_core)                   :: json
     logical(LK)                       :: found
     real(wp)                          :: rval  !! a single-precision number
@@ -67,6 +67,18 @@ contains
     end if
 
     call json%create_double(p_value,1.0,'d')
+    call json%get(p_value, rval)
+    if (rval /= 1.0) then
+        write(error_unit,*) 'Error: 1.0 /= ', rval
+        error_cnt = error_cnt + 1
+    end if
+
+    call json%get(p, 'vec1', p_vec)
+    call json%get(p_vec, rvec)
+    if (any([1.0_wp, 2.0_wp, 3.0_wp]/=rvec)) then
+        write(error_unit,*) 'Error: [1.0_wp, 2.0_wp, 3.0_wp] /= ', rvec
+        error_cnt = error_cnt + 1
+    end if
 
     call json%destroy(p)
     call json%destroy(p_value)
