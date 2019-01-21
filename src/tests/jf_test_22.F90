@@ -4,7 +4,7 @@
 
 module jf_test_22_mod
 
-    use json_module, CK => json_CK
+    use json_module, CK => json_CK, IK => json_IK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -57,7 +57,7 @@ contains
       ! print the parsed data to the console
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the file...'
-      call json%print_file(error_unit)
+      call json%print_file(int(error_unit,IK))
       if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

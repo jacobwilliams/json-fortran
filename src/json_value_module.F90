@@ -1579,8 +1579,8 @@
     integer(IK) :: nr              !! number of children of `p`
     integer(IK) :: nc              !! number of elements in first child of `p`
     integer(IK) :: icount          !! number of elements in a set
-    integer     :: i               !! counter
-    integer     :: j               !! counter
+    integer(IK) :: i               !! counter
+    integer(IK) :: j               !! counter
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: p_name  !! temporary variable for getting name
 #endif

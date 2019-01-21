@@ -843,7 +843,7 @@
 
     class(json_file),intent(inout)  :: me
 
-    call me%core%print(me%p,iunit=output_unit)
+    call me%core%print(me%p,iunit=int(output_unit,IK))
 
     end subroutine json_file_print_to_console
 !*****************************************************************************************

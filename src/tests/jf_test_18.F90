@@ -7,7 +7,7 @@
 
 module jf_test_18_mod
 
-    use json_module
+    use json_module, IK => json_IK, LK => json_LK
     use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
     implicit none
@@ -27,10 +27,10 @@ contains
 
     type(json_core) :: json
     type(json_value),pointer :: p
-    integer :: ival
-    logical :: found
-    logical,dimension(4) :: ok
-    integer,dimension(4) :: iresult
+    integer(IK) :: ival
+    logical(LK) :: found
+    logical(LK),dimension(4) :: ok
+    integer(IK),dimension(4) :: iresult
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -49,7 +49,7 @@ contains
         error_cnt = error_cnt + 1
     end if
     write(error_unit,'(A)') ''
-    call json%print(p,error_unit)
+    call json%print(p,int(error_unit,IK))
     write(error_unit,'(A)') ''
 
     call json%initialize(trailing_spaces_significant=.true.,&
@@ -83,7 +83,7 @@ contains
 
         implicit none
 
-        integer,dimension(4),intent(in) :: iresult !! correct answers
+        integer(IK),dimension(4),intent(in) :: iresult !! correct answers
 
         call json%get(p,'a.val',   ival,found); ok(1) = ival==iresult(1)
         call json%get(p,'A.Val',   ival,found); ok(2) = ival==iresult(2)

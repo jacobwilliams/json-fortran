@@ -6,7 +6,7 @@
 
 module jf_test_12_mod
 
-    use json_module, CK => json_CK, wp => json_RK
+    use json_module, CK => json_CK, wp => json_RK, IK => json_IK, LK => json_LK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -28,20 +28,20 @@ contains
 
     integer,parameter :: imx = 5, jmx = 3, kmx = 4 !! dimensions for raw work array of primitive type
 
-    type(json_core)                       :: json              !! factory for manipulating `json_value` pointers
-    integer,dimension(3)                  :: shape             !! shape of work array
-    integer, dimension(:), allocatable    :: fetched_shape     !! retrieved shape
-    type(json_value), pointer             :: root, meta_array  !! json nodes to work with
-    type(json_value), pointer             :: tmp_json_ptr
-    type(json_file)                       :: my_file
-    real(wp),dimension(imx,jmx,kmx)       :: raw_array         !! raw work array
-    real(wp)                              :: array_element
-    real(wp), dimension(:), allocatable   :: fetched_array
-    character(kind=CK,len=:), allocatable :: description
-    integer                               :: i,j,k             !! loop indices
-    integer                               :: array_length, lun
-    logical                               :: existed
-    logical, dimension(:), allocatable    :: SOS
+    type(json_core)                        :: json              !! factory for manipulating `json_value` pointers
+    integer(IK),dimension(3)               :: shape             !! shape of work array
+    integer(IK), dimension(:), allocatable :: fetched_shape     !! retrieved shape
+    type(json_value), pointer              :: root, meta_array  !! json nodes to work with
+    type(json_value), pointer              :: tmp_json_ptr
+    type(json_file)                        :: my_file
+    real(wp),dimension(imx,jmx,kmx)        :: raw_array         !! raw work array
+    real(wp)                               :: array_element
+    real(wp), dimension(:), allocatable    :: fetched_array
+    character(kind=CK,len=:), allocatable  :: description
+    integer                                :: i,j,k             !! loop indices
+    integer(IK)                            :: array_length, lun
+    logical(LK)                            :: existed
+    logical(LK), dimension(:), allocatable :: SOS
 
     error_cnt = 0
     call json%initialize(verbose=.true.,real_format='G')
@@ -68,10 +68,10 @@ contains
     call json%add(meta_array, 'shape', shape)
     call check_errors()
 
-    call json%add(meta_array, 'total size', size(raw_array))
+    call json%add(meta_array, 'total size', int(size(raw_array),IK))
     call check_errors()
 
-    call json%update(meta_array, 'total size', size(raw_array), found=existed)
+    call json%update(meta_array, 'total size', int(size(raw_array),IK), found=existed)
     call check_errors(existed)
 
     call json%add(meta_array, CK_'description', 'test data')
@@ -91,7 +91,7 @@ contains
     call check_errors()
 
     write(error_unit,'(A)') "Print the JSON object to stderr:"
-    call json%print(root,error_unit)
+    call json%print(root,int(error_unit,IK))
     call check_errors()
 
     call json%get(root,'$.array data.data(1)',array_element)
@@ -215,8 +215,8 @@ contains
 
         class(json_core),intent(inout)      :: json
         type(json_value),pointer,intent(in) :: element
-        integer,intent(in)                  :: i        !! index
-        integer,intent(in)                  :: count    !! size of array
+        integer(IK),intent(in)              :: i        !! index
+        integer(IK),intent(in)              :: count    !! size of array
 
         integer :: useless !! assign count to this to silence warnings
 

@@ -6,7 +6,7 @@
 
 module jf_test_14_mod
 
-    use json_module
+    use json_module, IK => json_IK
     use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
     implicit none
@@ -69,7 +69,7 @@ contains
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') ' All names changed to '//new_name//':'
         write(error_unit,'(A)') ''
-        call json%print(p,output_unit)
+        call json%print(p,int(output_unit,IK))
         write(error_unit,'(A)') ''
     end if
 
@@ -103,7 +103,7 @@ contains
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') ' All names changed to '//new_name//':'
         write(error_unit,'(A)') ''
-        call f%print_file(output_unit)
+        call f%print_file(int(output_unit,IK))
         write(error_unit,'(A)') ''
     end if
 
@@ -121,11 +121,11 @@ contains
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: p
-    logical,intent(out)                 :: finished
+    logical(json_LK),intent(out)        :: finished
 
-    integer :: var_type
+    integer(IK) :: var_type
     character(kind=json_CK,len=:),allocatable :: str
-    logical :: found
+    logical(json_LK) :: found
 
     !get info about this variable:
     call json%info(p,var_type=var_type,name=str)

@@ -6,7 +6,7 @@
 
 module jf_test_11_mod
 
-    use json_module, wp => json_RK
+    use json_module, wp => json_RK, IK => json_IK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -133,7 +133,7 @@ contains
 
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') 'Printing same file, but now to stdout:'
-        call clone%print_file(output_unit)
+        call clone%print_file(int(output_unit,IK))
         if (clone%failed()) then
            call clone%print_error_message(error_unit)
            error_cnt = error_cnt + 1
@@ -247,7 +247,7 @@ contains
 
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') 'Printing same file, but now to stdout:'
-        call json%print_file(output_unit)
+        call json%print_file(int(output_unit,IK))
         if (json%failed()) then
            call json%print_error_message(error_unit)
            error_cnt = error_cnt + 1
