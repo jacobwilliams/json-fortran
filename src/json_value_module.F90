@@ -6002,7 +6002,7 @@
 
                 ! [one fewer tab if it isn't an array element]
                 if (.not. is_array) then
-                    s = repeat(space, max(0,spaces-json%spaces_per_tab))//end_object
+                    s = repeat(space, max(0_IK,spaces-json%spaces_per_tab))//end_object
                 else
                     s = s_indent//end_object
                 end if
@@ -6073,7 +6073,7 @@
 
                     ! recursive print of the element
                     if (is_vector) then
-                        call json%json_value_print(element, iunit=iunit, indent=0,&
+                        call json%json_value_print(element, iunit=iunit, indent=0_IK,&
                                         need_comma=i<count, is_array_element=.false., &
                                         str=str, iloc=iloc,&
                                         is_compressed_vector = .true.)
@@ -6094,7 +6094,7 @@
                     s = end_array
                     call write_it( comma=print_comma )
                 else
-                    s = repeat(space, max(0,spaces-json%spaces_per_tab))//end_array
+                    s = repeat(space, max(0_IK,spaces-json%spaces_per_tab))//end_array
                     call write_it( comma=print_comma )
                 end if
                 nullify(element)
@@ -9708,7 +9708,7 @@
         call integer_to_string(json%char_count, int_fmt, char_str)
 
         !draw the arrow string that points to the current character:
-        arrow_str = repeat('-',max( 0, json%char_count - 1) )//'^'
+        arrow_str = repeat('-',max( 0_IK, json%char_count - 1) )//'^'
 
         if (json%line_count>0 .and. json%char_count>0) then
 
