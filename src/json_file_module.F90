@@ -267,15 +267,16 @@
     !> author: Izaak Beekman
     !  date: 07/23/2015
     !
-    !  Structure constructor to initialize a [[json_file(type)]] object
-    !  with an existing [[json_value]] object, and either the [[json_core(type)]]
-    !  settings or a [[json_core(type)]] instance.
+    !  Structure constructor to initialize a [[json_file(type)]]
+    !  object with an existing [[json_value]] object or a JSON
+    !  string, and either the [[json_core(type)]] settings or a
+    !  [[json_core(type)]] instance.
     !
     !### Example
     !
     !```fortran
     ! ...
-    ! type(json_file)  :: my_file
+    ! type(json_file) :: my_file
     ! type(json_value),pointer :: json_object
     ! type(json_core) :: json_core_object
     ! ...
@@ -285,10 +286,17 @@
     ! !or:
     !   my_file = json_file(json_object,verbose=.true.)
     ! !or:
+    !   my_file = json_file('{"x": [1]}',verbose=.true.)
+    ! !or:
     !   my_file = json_file(json_object,json_core_object)
+    ! !or:
+    !   my_file = json_file('{"x": [1]}',json_core_object)
     !```
     interface json_file
-       module procedure initialize_json_file, initialize_json_file_v2
+       module procedure initialize_json_file, &
+                        initialize_json_file_v2, &
+                        MAYBEWRAP(initialize_json_file_from_string), &
+                        MAYBEWRAP(initialize_json_file_from_string_v2)
     end interface
     !*************************************************************************************
 
@@ -374,7 +382,9 @@
 !@note This does not destroy the data in the file.
 !
 !@note [[initialize_json_core]], [[json_initialize]],
-!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      [[initialize_json_core_in_file]], [[initialize_json_file]],
+!      [[initialize_json_file_v2]], [[initialize_json_file_from_string]],
+!      and [[initialize_json_file_from_string_v2]]
 !      all have a similar interface.
 
     subroutine initialize_json_core_in_file(me,verbose,compact_reals,&
@@ -461,7 +471,9 @@
 !  It also calls the `initialize()` method.
 !
 !@note [[initialize_json_core]], [[json_initialize]],
-!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      [[initialize_json_core_in_file]], [[initialize_json_file]],
+!      [[initialize_json_file_v2]], [[initialize_json_file_from_string]],
+!      and [[initialize_json_file_from_string_v2]]
 !      all have a similar interface.
 
     function initialize_json_file(p,verbose,compact_reals,&
@@ -526,6 +538,151 @@
     file_object%core = json_core_object
 
     end function initialize_json_file_v2
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 01/19/2019
+!
+!  Cast a JSON string as a [[json_file(type)]] object.
+!  It also calls the `initialize()` method.
+!
+!### Example
+!
+!```fortran
+!  type(json_file) :: f
+!  f = json_file('{"key ": 1}', trailing_spaces_significant=.true.)
+!```
+!
+!@note [[initialize_json_core]], [[json_initialize]],
+!      [[initialize_json_core_in_file]], [[initialize_json_file]],
+!      [[initialize_json_file_v2]], [[initialize_json_file_from_string]],
+!      and [[initialize_json_file_from_string_v2]]
+!      all have a similar interface.
+
+    function initialize_json_file_from_string(str,verbose,compact_reals,&
+                                  print_signs,real_format,spaces_per_tab,&
+                                  strict_type_checking,&
+                                  trailing_spaces_significant,&
+                                  case_sensitive_keys,&
+                                  no_whitespace,&
+                                  unescape_strings,&
+                                  comment_char,&
+                                  path_mode,&
+                                  path_separator,&
+                                  compress_vectors,&
+                                  allow_duplicate_keys,&
+                                  escape_solidus,&
+                                  stop_on_error) result(file_object)
+
+    implicit none
+
+    type(json_file) :: file_object
+    character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
+#include "json_initialize_arguments.inc"
+
+    call file_object%initialize(verbose,compact_reals,&
+                                print_signs,real_format,spaces_per_tab,&
+                                strict_type_checking,&
+                                trailing_spaces_significant,&
+                                case_sensitive_keys,&
+                                no_whitespace,&
+                                unescape_strings,&
+                                comment_char,&
+                                path_mode,&
+                                path_separator,&
+                                compress_vectors,&
+                                allow_duplicate_keys,&
+                                escape_solidus,&
+                                stop_on_error)
+
+    call file_object%load_from_string(str)
+
+    end function initialize_json_file_from_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[initialize_json_file_from_string]], where "str" is kind=CDK.
+
+    function wrap_initialize_json_file_from_string(str,verbose,compact_reals,&
+                                  print_signs,real_format,spaces_per_tab,&
+                                  strict_type_checking,&
+                                  trailing_spaces_significant,&
+                                  case_sensitive_keys,&
+                                  no_whitespace,&
+                                  unescape_strings,&
+                                  comment_char,&
+                                  path_mode,&
+                                  path_separator,&
+                                  compress_vectors,&
+                                  allow_duplicate_keys,&
+                                  escape_solidus,&
+                                  stop_on_error) result(file_object)
+
+    implicit none
+
+    type(json_file) :: file_object
+    character(kind=CDK,len=*),intent(in) :: str  !! string to load JSON data from
+#include "json_initialize_arguments.inc"
+
+    file_object = initialize_json_file_from_string(&
+                                  to_unicode(str),verbose,compact_reals,&
+                                  print_signs,real_format,spaces_per_tab,&
+                                  strict_type_checking,&
+                                  trailing_spaces_significant,&
+                                  case_sensitive_keys,&
+                                  no_whitespace,&
+                                  unescape_strings,&
+                                  comment_char,&
+                                  path_mode,&
+                                  path_separator,&
+                                  compress_vectors,&
+                                  allow_duplicate_keys,&
+                                  escape_solidus,&
+                                  stop_on_error)
+
+    end function wrap_initialize_json_file_from_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/19/2019
+!
+!  Cast a JSON string and a [[json_core(type)]] object
+!  as a [[json_file(type)]] object.
+
+    function initialize_json_file_from_string_v2(str, json_core_object) &
+                                        result(file_object)
+
+    implicit none
+
+    type(json_file)                     :: file_object
+    character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
+    type(json_core),intent(in)          :: json_core_object
+
+    file_object%core = json_core_object
+    call file_object%load_from_string(str)
+
+    end function initialize_json_file_from_string_v2
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[initialize_json_file_from_string_v2]], where "str" is kind=CDK.
+
+    function wrap_initialize_json_file_from_string_v2(str,json_core_object) &
+                                        result(file_object)
+
+    implicit none
+
+    type(json_file)                      :: file_object
+    character(kind=CDK,len=*),intent(in) :: str  !! string to load JSON data from
+    type(json_core),intent(in)           :: json_core_object
+
+    file_object = initialize_json_file_from_string_v2(to_unicode(str),json_core_object)
+
+    end function wrap_initialize_json_file_from_string_v2
 !*****************************************************************************************
 
 !*****************************************************************************************
