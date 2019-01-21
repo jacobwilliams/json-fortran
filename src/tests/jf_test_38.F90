@@ -49,6 +49,9 @@ contains
     call json%parse(p, '{"a": 1.0}')
 
     call json%update(p,'a',2.0_wp,found)
+    call json%update(p,CK_'a',2.0_wp,found)
+    call json%update(p,CDK_'a',2.0_wp,found)
+
     call json%add_by_path(p,'b',3.0_wp)
     call json%add_by_path(p,'vec1',[1.0_wp, 2.0_wp, 3.0_wp])
     call json%add(p,'c',4.0_wp)
