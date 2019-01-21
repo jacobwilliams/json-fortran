@@ -5,7 +5,7 @@
 module jf_test_24_mod
 
     use json_module, rk => json_rk, lk => json_lk, ik => json_ik, ck => json_ck, cdk => json_cdk
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 

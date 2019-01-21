@@ -7,8 +7,8 @@
 
 module jf_test_1_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, wp => json_RK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 

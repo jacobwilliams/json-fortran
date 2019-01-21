@@ -354,8 +354,8 @@
         !### Example
         !
         !````fortran
-        !    use, intrinsic :: iso_fortran_env, only: output_unit, wp=>real64
-        !    use json_module
+        !    use, intrinsic :: iso_fortran_env, only: output_unit
+        !    use json_module, wp=>json_RK
         !    type(json_core) :: json
         !    type(json_value) :: p
         !    call json%create_object(p,'root') ! create the root
