@@ -7,7 +7,7 @@
 
 module jf_test_2_mod
 
-    use json_module, wp => json_RK
+    use json_module, wp => json_RK, IK => json_IK, LK => json_LK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -31,11 +31,11 @@ contains
     type(json_value),pointer :: p, inp, traj, tmp1, tmp2, p_tmp, p_integer_array, p_clone
     type(json_core) :: json  !! factory for manipulating `json_value` pointers
 
-    integer :: iunit
+    integer(IK) :: iunit
     character(kind=json_CK,len=:),allocatable :: name
-    integer :: ival,ival_clone
-    logical :: found
-    logical :: is_valid
+    integer(IK) :: ival,ival_clone
+    logical(LK) :: found
+    logical(LK) :: is_valid
     character(kind=json_CK,len=:),allocatable :: error_msg
 
     write(error_unit,'(A)') ''
@@ -54,7 +54,7 @@ contains
     ! first we test an incorrect usage case:
     ! [trying to print a null json_value pointer]
     nullify(p)
-    call json%print(p,error_unit)
+    call json%print(p,int(error_unit,IK))
     if (.not. json%failed()) then
         write(error_unit,'(A)') 'Error: printing a null pointer should have raised an exception.'
         error_cnt = error_cnt + 1
@@ -121,12 +121,12 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%add(inp, 'integer_scalar', 1)
+    call json%add(inp, 'integer_scalar', 1_IK)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%add(inp, 'integer_array', [2,4,99])
+    call json%add(inp, 'integer_array', [2_IK,4_IK,99_IK])
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -228,7 +228,7 @@ contains
     write(error_unit,'(A)') '============='
     write(error_unit,'(A)') ' p_clone'
     write(error_unit,'(A)') '============='
-    call json%print(p_clone,error_unit)
+    call json%print(p_clone,int(error_unit,IK))
     write(error_unit,'(A)') '============='
     write(error_unit,'(A)') ''
 
@@ -240,7 +240,7 @@ contains
         error_cnt = error_cnt + 1
     else
         !now, change one and verify that they are independent:
-        call json%update(p_clone,'inputs.integer_scalar',100,found)
+        call json%update(p_clone,'inputs.integer_scalar',100_IK,found)
         if (json%failed()) write(error_unit,'(A)') 'json%update Error for p_clone'
         call json%get(p,'inputs.integer_scalar',ival)
         if (json%failed()) write(error_unit,'(A)') 'json%get Error for p'
@@ -250,7 +250,7 @@ contains
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
-            if (ival==1 .and. ival_clone==100) then
+            if (ival==1_IK .and. ival_clone==100_IK) then
                 write(error_unit,'(A)') 'json%clone ... passed'
             else
                 write(error_unit,'(A)') 'Error: ival /= ival_clone'

@@ -35,7 +35,7 @@ contains
     type(json_file) :: json
     type(json_core) :: core  !! factory for manipulating `json_value` pointers
 
-    integer :: i
+    integer(json_IK) :: i
     character(kind=json_CK,len=10) :: istr
     character(kind=json_CK,len=:),allocatable :: string,name
     logical(json_LK) :: found

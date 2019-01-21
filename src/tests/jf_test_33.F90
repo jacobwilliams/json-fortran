@@ -67,7 +67,7 @@ contains
                 error_cnt = error_cnt + 1
                 exit
             end if
-            call json%print(p_var_clone,output_unit)
+            call json%print(p_var_clone,int(output_unit,IK))
             call json%validate(p_var_clone,is_valid,error_msg)
             if (.not. is_valid) then
                 error_cnt = error_cnt + 1

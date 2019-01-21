@@ -44,9 +44,9 @@ contains
     call f%add(cdk_'test.vector.unicode(4)', [cdk_'cdk, cdk'])
 
     !add a json_value pointer:
-    call json%create_integer(tmp,999,'') ! note that the name will be replaced
-                                         ! with the name given in the path
-                                         ! when it is added.
+    call json%create_integer(tmp,999_IK,'') ! note that the name will be replaced
+                                            ! with the name given in the path
+                                            ! when it is added.
     call f%add('inputs.pointer',tmp)
 
     write(error_unit,'(A)') 'validating...'

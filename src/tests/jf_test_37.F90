@@ -6,7 +6,7 @@
 
 module jf_test_37_mod
 
-    use json_module, CK => json_CK, CDK => json_CDK
+    use json_module, CK => json_CK, CDK => json_CDK, IK => json_IK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -40,26 +40,26 @@ contains
 
     call json%parse(p, CK_'{"a": ["1", "2", "3"]}')
     f = json_file(p,no_whitespace=.true.)
-    call f%print_file(error_unit)
+    call f%print_file(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     call json%parse(p, CK_'{"b": ["4", "5", "6"]}')
     f = json_file(p,json)
-    call f%print_file(error_unit)
+    call f%print_file(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     f = json_file(CK_'{"x": [1,2,3]}',no_whitespace=.true.)
-    call f%print_file(error_unit)
+    call f%print_file(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     f = json_file(CK_'{"y": [4,5,6]}',json)
-    call f%print_file(error_unit)
+    call f%print_file(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
@@ -70,26 +70,26 @@ contains
 
     call json%parse(p, CDK_'{"a": ["1", "2", "3"]}')
     f = json_file(p,no_whitespace=.true.)
-    call f%print_file(error_unit)
+    call f%print_file(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     call json%parse(p, CDK_'{"b": ["4", "5", "6"]}')
     f = json_file(p,json)
-    call f%print_file(error_unit)
+    call f%print_file(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     f = json_file(CDK_'{"x": [1,2,3]}',no_whitespace=.true.)
-    call f%print_file(error_unit)
+    call f%print_file(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     f = json_file(CDK_'{"y": [4,5,6]}',json)
-    call f%print_file(error_unit)
+    call f%print_file(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()

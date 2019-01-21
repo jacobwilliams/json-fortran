@@ -7,7 +7,7 @@
 
 module jf_test_5_mod
 
-    use json_module, wp => json_RK
+    use json_module, wp => json_RK, IK => json_IK, LK => json_LK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -29,11 +29,11 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
-    integer :: vv
-    integer,dimension(:),allocatable :: vvv
+    integer(IK) :: vv
+    integer(IK),dimension(:),allocatable :: vvv
     real(wp) :: d
     type(json_file) :: json
-    logical :: found
+    logical(LK) :: found
 
     error_cnt = 0
     call json%initialize()
@@ -60,7 +60,7 @@ contains
 
         ! print the parsed data to the console:
         write(error_unit,'(A)') 'print file...'
-        call json%print_file(error_unit)
+        call json%print_file(int(error_unit,IK))
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1

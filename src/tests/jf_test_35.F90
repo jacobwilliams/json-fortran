@@ -43,13 +43,13 @@ contains
         if (i==1) then
             call json%create_object(p_root, '')
             call json%create_array(p_array, 'array')
-            call json%add(p_array,'',1)
+            call json%add(p_array,'',1_IK)
             call json%add(p_root,p_array)
             call json%add(p_root,p_array)  ! this creates a malformed JSON structure
         elseif (i==2) then
             call json%create_array(p_array, '')
             call json%create_object(p_root, 'object')
-            call json%add(p_root,'int',1)
+            call json%add(p_root,'int',1_IK)
             call json%add(p_array,p_root)
             call json%add(p_array,p_root)  ! this creates a malformed JSON structure
             ! note: below we will destroy p_root, which is the duplicate array element
@@ -58,7 +58,7 @@ contains
         ! test initialize_json_core:
         call json%initialize()
 
-        call json%print(p_root,error_unit)
+        call json%print(p_root,int(error_unit,IK))
 
         ! validate it:
         call json%validate(p_root,is_valid,error_msg)
