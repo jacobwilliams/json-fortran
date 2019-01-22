@@ -2692,7 +2692,7 @@
     real(real64),intent(in)             :: val
     logical(LK),intent(out)             :: found
 
-    call me%update(me%p,path,real(val,RK),found)
+    call me%update(path,real(val,RK),found)
 
     end subroutine json_file_update_real64
 !*****************************************************************************************
