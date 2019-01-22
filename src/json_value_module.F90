@@ -6006,7 +6006,7 @@
                     end if
 
                     ! recursive print of the element
-                    call json%json_value_print(element, iunit=iunit, indent=tab + 1, &
+                    call json%json_value_print(element, iunit=iunit, indent=tab + 1_IK, &
                                     need_comma=i<count, colon=.true., str=str, iloc=iloc)
                     if (json%exception_thrown) return
 
@@ -7072,7 +7072,7 @@
                         end if
                         if (status_ok) then
                             ! ival is an array index (0-based)
-                            call json%get_child(p,ival+1,tmp,child_found)
+                            call json%get_child(p,ival+1_IK,tmp,child_found)
                             if (child_found) then
                                 p => tmp
                             else
@@ -7670,7 +7670,7 @@
                                          start_array//trim(adjustl(istr))//end_array,CK_'')
                     case(2_IK)
                         ! rfc6901
-                        call integer_to_string(i-1,int_fmt,istr) ! 0-based index
+                        call integer_to_string(i-1_IK,int_fmt,istr) ! 0-based index
                         call add_to_path(parent_name//slash//trim(adjustl(istr)))
                     case(1_IK)
                         ! default
@@ -9723,7 +9723,7 @@
         call integer_to_string(json%char_count, int_fmt, char_str)
 
         !draw the arrow string that points to the current character:
-        arrow_str = repeat('-',max( 0_IK, json%char_count - 1) )//'^'
+        arrow_str = repeat('-',max( 0_IK, json%char_count - 1_IK) )//'^'
 
         if (json%line_count>0 .and. json%char_count>0) then
 
