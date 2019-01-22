@@ -116,7 +116,7 @@
 #ifndef REAL32
                                  MAYBEWRAP(json_file_get_real32),      &
 #endif
-                                 MAYBEWRAP(json_file_get_double),      &
+                                 MAYBEWRAP(json_file_get_real),        &
 #ifdef REAL128
                                  MAYBEWRAP(json_file_get_real64),      &
 #endif
@@ -126,7 +126,7 @@
 #ifndef REAL32
                                  MAYBEWRAP(json_file_get_real32_vec),  &
 #endif
-                                 MAYBEWRAP(json_file_get_double_vec),  &
+                                 MAYBEWRAP(json_file_get_real_vec),    &
 #ifdef REAL128
                                  MAYBEWRAP(json_file_get_real64_vec),  &
 #endif
@@ -157,7 +157,7 @@
 #ifndef REAL32
                                  MAYBEWRAP(json_file_add_real32),      &
 #endif
-                                 MAYBEWRAP(json_file_add_double),      &
+                                 MAYBEWRAP(json_file_add_real),        &
 #ifdef REAL128
                                  MAYBEWRAP(json_file_add_real64),      &
 #endif
@@ -167,7 +167,7 @@
 #ifndef REAL32
                                  MAYBEWRAP(json_file_add_real32_vec),  &
 #endif
-                                 MAYBEWRAP(json_file_add_double_vec),  &
+                                 MAYBEWRAP(json_file_add_real_vec),    &
 #ifdef REAL128
                                  MAYBEWRAP(json_file_add_real64_vec),  &
 #endif
@@ -248,7 +248,7 @@
 #ifndef REAL32
         procedure :: MAYBEWRAP(json_file_get_real32)
 #endif
-        procedure :: MAYBEWRAP(json_file_get_double)
+        procedure :: MAYBEWRAP(json_file_get_real)
 #ifdef REAL128
         procedure :: MAYBEWRAP(json_file_get_real64)
 #endif
@@ -258,7 +258,7 @@
 #ifndef REAL32
         procedure :: MAYBEWRAP(json_file_get_real32_vec)
 #endif
-        procedure :: MAYBEWRAP(json_file_get_double_vec)
+        procedure :: MAYBEWRAP(json_file_get_real_vec)
 #ifdef REAL128
         procedure :: MAYBEWRAP(json_file_get_real64_vec)
 #endif
@@ -273,7 +273,7 @@
 #ifndef REAL32
         procedure :: MAYBEWRAP(json_file_add_real32)
 #endif
-        procedure :: MAYBEWRAP(json_file_add_double)
+        procedure :: MAYBEWRAP(json_file_add_real)
 #ifdef REAL128
         procedure :: MAYBEWRAP(json_file_add_real64)
 #endif
@@ -283,7 +283,7 @@
 #ifndef REAL32
         procedure :: MAYBEWRAP(json_file_add_real32_vec)
 #endif
-        procedure :: MAYBEWRAP(json_file_add_double_vec)
+        procedure :: MAYBEWRAP(json_file_add_real_vec)
 #ifdef REAL128
         procedure :: MAYBEWRAP(json_file_add_real64_vec)
 #endif
@@ -1404,7 +1404,7 @@
 !
 !  Get a real(RK) variable value from a JSON file.
 
-    subroutine json_file_get_double (me, path, val, found)
+    subroutine json_file_get_real (me, path, val, found)
 
     implicit none
 
@@ -1415,14 +1415,14 @@
 
     call me%core%get(me%p, path=path, value=val, found=found)
 
-    end subroutine json_file_get_double
+    end subroutine json_file_get_real
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_file_get_double]], where "path" is kind=CDK.
+!  Alternate version of [[json_file_get_real]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_get_double (me, path, val, found)
+    subroutine wrap_json_file_get_real (me, path, val, found)
 
     implicit none
 
@@ -1433,7 +1433,7 @@
 
     call me%get(to_unicode(path), val, found)
 
-    end subroutine wrap_json_file_get_double
+    end subroutine wrap_json_file_get_real
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1442,7 +1442,7 @@
 !
 !  Get a real(RK) vector from a JSON file.
 
-    subroutine json_file_get_double_vec(me, path, vec, found)
+    subroutine json_file_get_real_vec(me, path, vec, found)
 
     implicit none
 
@@ -1453,14 +1453,14 @@
 
     call me%core%get(me%p, path, vec, found)
 
-    end subroutine json_file_get_double_vec
+    end subroutine json_file_get_real_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_file_get_double_vec]], where "path" is kind=CDK.
+!  Alternate version of [[json_file_get_real_vec]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_get_double_vec(me, path, vec, found)
+    subroutine wrap_json_file_get_real_vec(me, path, vec, found)
 
     implicit none
 
@@ -1471,7 +1471,7 @@
 
     call me%get(to_unicode(path), vec, found)
 
-    end subroutine wrap_json_file_get_double_vec
+    end subroutine wrap_json_file_get_real_vec
 !*****************************************************************************************
 
 #ifndef REAL32
@@ -1479,7 +1479,7 @@
 !> author: Jacob Williams
 !  date: 1/21/2019
 !
-!  Alternate version of [[json_file_get_double]] where `val` is `real32`.
+!  Alternate version of [[json_file_get_real]] where `val` is `real32`.
 
     subroutine json_file_get_real32 (me, path, val, found)
 
@@ -1517,7 +1517,7 @@
 !> author: Jacob Williams
 !  date: 1/21/2019
 !
-!  Alternate version of [[json_file_get_double_vec]] where `vec` is `real32`.
+!  Alternate version of [[json_file_get_real_vec]] where `vec` is `real32`.
 
     subroutine json_file_get_real32_vec(me, path, vec, found)
 
@@ -1557,7 +1557,7 @@
 !> author: Jacob Williams
 !  date: 1/21/2019
 !
-!  Alternate version of [[json_file_get_double]] where `val` is `real64`.
+!  Alternate version of [[json_file_get_real]] where `val` is `real64`.
 
     subroutine json_file_get_real64 (me, path, val, found)
 
@@ -1595,7 +1595,7 @@
 !> author: Jacob Williams
 !  date: 1/21/2019
 !
-!  Alternate version of [[json_file_get_double_vec]] where `vec` is `real64`.
+!  Alternate version of [[json_file_get_real_vec]] where `vec` is `real64`.
 
     subroutine json_file_get_real64_vec(me, path, vec, found)
 
@@ -1960,7 +1960,7 @@
 !
 !  Add a real(RK) variable value to a JSON file.
 
-    subroutine json_file_add_double(me,path,val,found,was_created)
+    subroutine json_file_add_real(me,path,val,found,was_created)
 
     implicit none
 
@@ -1974,15 +1974,15 @@
 
     call me%core%add_by_path(me%p,path,val,found,was_created)
 
-    end subroutine json_file_add_double
+    end subroutine json_file_add_real
 !*****************************************************************************************
 
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Alternate version of [[json_file_add_double]], where "path" is kind=CDK.
+!  Alternate version of [[json_file_add_real]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_add_double(me,path,val,found,was_created)
+    subroutine wrap_json_file_add_real(me,path,val,found,was_created)
 
     implicit none
 
@@ -1992,9 +1992,9 @@
     logical(LK),intent(out),optional     :: found        !! if the variable was found
     logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
 
-    call me%json_file_add_double(to_unicode(path),val,found,was_created)
+    call me%json_file_add_real(to_unicode(path),val,found,was_created)
 
-    end subroutine wrap_json_file_add_double
+    end subroutine wrap_json_file_add_real
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -2002,7 +2002,7 @@
 !
 !  Add a real(RK) vector to a JSON file.
 
-    subroutine json_file_add_double_vec(me,path,vec,found,was_created)
+    subroutine json_file_add_real_vec(me,path,vec,found,was_created)
 
     implicit none
 
@@ -2016,15 +2016,15 @@
 
     call me%core%add_by_path(me%p,path,vec,found,was_created)
 
-    end subroutine json_file_add_double_vec
+    end subroutine json_file_add_real_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Alternate version of [[json_file_add_double_vec]], where "path" is kind=CDK.
+!  Alternate version of [[json_file_add_real_vec]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_add_double_vec(me,path,vec,found,was_created)
+    subroutine wrap_json_file_add_real_vec(me,path,vec,found,was_created)
 
     implicit none
 
@@ -2034,16 +2034,16 @@
     logical(LK),intent(out),optional     :: found        !! if the variable was found
     logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
 
-    call me%json_file_add_double_vec(to_unicode(path),vec,found,was_created)
+    call me%json_file_add_real_vec(to_unicode(path),vec,found,was_created)
 
-    end subroutine wrap_json_file_add_double_vec
+    end subroutine wrap_json_file_add_real_vec
 !*****************************************************************************************
 
 #ifndef REAL32
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Alternate version of [[json_file_add_double]] where `val` is `real32`.
+!  Alternate version of [[json_file_add_real]] where `val` is `real32`.
 
     subroutine json_file_add_real32(me,path,val,found,was_created)
 
@@ -2083,7 +2083,7 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Alternate version of [[json_file_add_double_vec]] where `vec` is `real32`.
+!  Alternate version of [[json_file_add_real_vec]] where `vec` is `real32`.
 
     subroutine json_file_add_real32_vec(me,path,vec,found,was_created)
 
@@ -2125,7 +2125,7 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Alternate version of [[json_file_add_double]] where `val` is `real64`.
+!  Alternate version of [[json_file_add_real]] where `val` is `real64`.
 
     subroutine json_file_add_real64(me,path,val,found,was_created)
 
@@ -2165,7 +2165,7 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Alternate version of [[json_file_add_double_vec]] where `vec` is `real64`.
+!  Alternate version of [[json_file_add_real_vec]] where `vec` is `real64`.
 
     subroutine json_file_add_real64_vec(me,path,vec,found,was_created)
 
@@ -2600,9 +2600,6 @@
 !  Given the path string, if the variable is present in the file,
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
-!
-!### See also
-!  * [[json_update_double]]
 
     subroutine json_file_update_real(me,path,val,found)
 

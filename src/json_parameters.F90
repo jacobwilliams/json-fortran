@@ -29,13 +29,16 @@
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter :: json_array     = 3  !! Array JSON data type
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter :: json_logical   = 4  !! Logical JSON data type
+    integer(IK),parameter :: json_logical   = 4  !! Logical JSON data type (`logical(LK)`)
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter :: json_integer   = 5  !! Integer JSON data type
+    integer(IK),parameter :: json_integer   = 5  !! Integer JSON data type (`integer(IK)`)
+                                                 !! (see [[json_file_variable_info]] and [[json_info]]).
+    integer(IK),parameter :: json_real      = 6  !! Real number JSON data type (`real(RK)`)
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter :: json_double    = 6  !! Double JSON data type
+    integer(IK),parameter :: json_string    = 7  !! String JSON data type (`character(CK)`)
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter :: json_string    = 7  !! String JSON data type
+    integer(IK),parameter :: json_double    = json_real  !! Equivalent to `json_real` for
+                                                         !! backward compatibility.
 
     !special JSON characters
     character(kind=CK,len=*),parameter :: space           = CK_' '  !! space character

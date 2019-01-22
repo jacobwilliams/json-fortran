@@ -48,7 +48,7 @@ contains
 
     call json%create_object(p,'root')
 
-    call json%create_double(tmp,99.9_rk,'double') !  (note: it gets renamed when added below)
+    call json%create_real(tmp,99.9_rk,'double') !  (note: it gets renamed when added below)
 
     call json%create(p,'a'          )
     call json%create(p,'b'          )

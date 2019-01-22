@@ -315,7 +315,7 @@ contains
     write(error_unit,'(A)') 'json_create...'
     write(error_unit,'(A)') 'json_create_logical...'; call json%destroy(p); call json%create_logical(p,.true.,'foo')
     write(error_unit,'(A)') 'json_create_integer...'; call json%destroy(p); call json%create_integer(p,1000_IK,'foo')
-    write(error_unit,'(A)') 'json_create_double ...'; call json%destroy(p); call json%create_double (p,9.0_wp,'foo')
+    write(error_unit,'(A)') 'json_create_real   ...'; call json%destroy(p); call json%create_real   (p,9.0_wp,'foo')
     write(error_unit,'(A)') 'json_create_string ...'; call json%destroy(p); call json%create_string (p,'foo','bar')
     write(error_unit,'(A)') 'json_create_null   ...'; call json%destroy(p); call json%create_null   (p,'foo')
     write(error_unit,'(A)') 'json_create_object ...'; call json%destroy(p); call json%create_object (p,'foo')

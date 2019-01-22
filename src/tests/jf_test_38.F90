@@ -69,7 +69,7 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-    call json%create_double(p_value,1.0,'d')
+    call json%create_real(p_value,1.0_wp,'d')
     call json%get(p_value, rval)
     if (rval /= 1.0) then
         write(error_unit,*) 'Error: 1.0 /= ', rval
