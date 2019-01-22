@@ -2719,7 +2719,7 @@
         logical,intent(in) :: require_parent !! the first one may be a root (so no parent),
                                              !! but all descendants must have a parent.
 
-        integer :: i !! counter
+        integer(IK) :: i !! counter
         type(json_value),pointer :: element
         type(json_value),pointer :: previous
 
@@ -2833,7 +2833,7 @@
 
                 previous => null()
                 element => p%children
-                do i = 1, p%n_children
+                do i = 1_IK, p%n_children
                     if (.not. associated(element%parent,p)) then
                         error_msg = 'child''s parent pointer not properly associated'
                         is_valid = .false.

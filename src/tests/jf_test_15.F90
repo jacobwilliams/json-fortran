@@ -85,7 +85,7 @@ contains
                             compact_reals=.true.,&
                             print_signs=.false.,&
                             real_format='E',&
-                            spaces_per_tab=4,&
+                            spaces_per_tab=4_IK,&
                             strict_type_checking=.true.,&
                             trailing_spaces_significant=.false.,&
                             case_sensitive_keys=.true.)

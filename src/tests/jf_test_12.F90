@@ -26,7 +26,7 @@ contains
 
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
-    integer,parameter :: imx = 5, jmx = 3, kmx = 4 !! dimensions for raw work array of primitive type
+    integer(IK),parameter :: imx = 5, jmx = 3, kmx = 4 !! dimensions for raw work array of primitive type
 
     type(json_core)                        :: json              !! factory for manipulating `json_value` pointers
     integer(IK),dimension(3)               :: shape             !! shape of work array
@@ -38,7 +38,7 @@ contains
     real(wp)                               :: array_element
     real(wp), dimension(:), allocatable    :: fetched_array
     character(kind=CK,len=:), allocatable  :: description
-    integer                                :: i,j,k             !! loop indices
+    integer(IK)                            :: i,j,k             !! loop indices
     integer(IK)                            :: array_length, lun
     logical(LK)                            :: existed
     logical(LK), dimension(:), allocatable :: SOS
@@ -54,8 +54,8 @@ contains
     write(error_unit,'(A)') ''
 
     ! populate the raw array
-    forall (i=1:imx,j=1:jmx,k=1:kmx) ! could use size(... , dim=...) instead of constants
-       raw_array(i,j,k) = i + (j-1)*imx + (k-1)*imx*jmx
+    forall (i=1_IK:imx,j=1_IK:jmx,k=1_IK:kmx) ! could use size(... , dim=...) instead of constants
+       raw_array(i,j,k) = i + (j-1_IK)*imx + (k-1_IK)*imx*jmx
     end forall
 
     call json%create_object(root,dir//file)
@@ -218,13 +218,13 @@ contains
         integer(IK),intent(in)              :: i        !! index
         integer(IK),intent(in)              :: count    !! size of array
 
-        integer :: useless !! assign count to this to silence warnings
+        integer(IK) :: useless !! assign count to this to silence warnings
 
         ! let's pretend we're c programmers!
         call json%get( element, raw_array( &
-             mod(i-1,imx) + 1, &            ! i index
-             mod((i-1)/imx,jmx) + 1, &      ! j index
-             mod((i-1)/imx/jmx,kmx) + 1 ) ) ! k inded
+             mod(i-1_IK,imx) + 1_IK, &            ! i index
+             mod((i-1_IK)/imx,jmx) + 1_IK, &      ! j index
+             mod((i-1_IK)/imx/jmx,kmx) + 1_IK ) ) ! k inded
 
         useless = count
 

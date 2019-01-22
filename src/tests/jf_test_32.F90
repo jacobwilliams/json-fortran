@@ -23,7 +23,6 @@ contains
     integer,intent(out) :: error_cnt
     integer :: i !! counter
     integer :: j !! counter
-    integer :: k !! counter
     type(json_core) :: json
     type(json_value),pointer :: p, p_var
     character(kind=CK,len=:),allocatable :: path_ck
