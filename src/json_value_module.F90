@@ -10985,60 +10985,53 @@
             !get the next character:
             call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., popped=c)
 
-            if (eof) then
-                call json%throw_exception('Error in parse_number:'//&
-                                     ' Unexpected end of file while parsing number.')
-                return
-            else
+            select case (c)
+            case(CK_'-',CK_'+')    !note: allowing a '+' as the first character here.
 
-                select case (c)
-                case(CK_'-',CK_'+')    !note: allowing a '+' as the first character here.
+                if (is_integer .and. (.not. first)) is_integer = .false.
 
-                    if (is_integer .and. (.not. first)) is_integer = .false.
+                !add it to the string:
+                !tmp = tmp // c   !...original
+                if (ip>len(tmp)) tmp = tmp // blank_chunk
+                tmp(ip:ip) = c
+                ip = ip + 1
 
-                    !add it to the string:
-                    !tmp = tmp // c   !...original
-                    if (ip>len(tmp)) tmp = tmp // blank_chunk
-                    tmp(ip:ip) = c
-                    ip = ip + 1
+            case(CK_'.',CK_'E',CK_'e')    !can be present in real numbers
 
-                case(CK_'.',CK_'E',CK_'e')    !can be present in real numbers
+                if (is_integer) is_integer = .false.
 
-                    if (is_integer) is_integer = .false.
+                !add it to the string:
+                !tmp = tmp // c   !...original
+                if (ip>len(tmp)) tmp = tmp // blank_chunk
+                tmp(ip:ip) = c
+                ip = ip + 1
 
-                    !add it to the string:
-                    !tmp = tmp // c   !...original
-                    if (ip>len(tmp)) tmp = tmp // blank_chunk
-                    tmp(ip:ip) = c
-                    ip = ip + 1
+            case(CK_'0':CK_'9')    !valid characters for numbers
 
-                case(CK_'0':CK_'9')    !valid characters for numbers
+                !add it to the string:
+                !tmp = tmp // c   !...original
+                if (ip>len(tmp)) tmp = tmp // blank_chunk
+                tmp(ip:ip) = c
+                ip = ip + 1
 
-                    !add it to the string:
-                    !tmp = tmp // c   !...original
-                    if (ip>len(tmp)) tmp = tmp // blank_chunk
-                    tmp(ip:ip) = c
-                    ip = ip + 1
+            case default
 
-                case default
+                !push back the last character read:
+                call json%push_char(c)
 
-                    !push back the last character read:
-                    call json%push_char(c)
+                !string to value:
+                if (is_integer) then
+                    ival = json%string_to_int(tmp)
+                    call json%to_integer(value,ival)
+                else
+                    rval = json%string_to_dble(tmp)
+                    call json%to_real(value,rval)
+                end if
 
-                    !string to value:
-                    if (is_integer) then
-                        ival = json%string_to_int(tmp)
-                        call json%to_integer(value,ival)
-                    else
-                        rval = json%string_to_dble(tmp)
-                        call json%to_real(value,rval)
-                    end if
+                exit    !finished
 
-                    exit    !finished
+            end select
 
-                end select
-
-            end if
             if (first) first = .false.
 
         end do
