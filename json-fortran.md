@@ -29,7 +29,7 @@ extra_filetypes: .inc !
 print_creation_date: true
 creation_date: %Y-%m-%d %H:%M %z
 extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
-            ifcore:https://software.intel.com/en-us/node/525900
+            ifcore:https://software.intel.com/en-us/fortran-compiler-developer-guide-and-reference-tracebackqq
 md_extensions: markdown.extensions.toc
                markdown.extensions.smarty
 ---
