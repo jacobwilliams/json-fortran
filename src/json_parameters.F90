@@ -29,13 +29,16 @@
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter :: json_array     = 3  !! Array JSON data type
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter :: json_logical   = 4  !! Logical JSON data type
+    integer(IK),parameter :: json_logical   = 4  !! Logical JSON data type (`logical(LK)`)
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter :: json_integer   = 5  !! Integer JSON data type
+    integer(IK),parameter :: json_integer   = 5  !! Integer JSON data type (`integer(IK)`)
+                                                 !! (see [[json_file_variable_info]] and [[json_info]]).
+    integer(IK),parameter :: json_real      = 6  !! Real number JSON data type (`real(RK)`)
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter :: json_double    = 6  !! Double JSON data type
+    integer(IK),parameter :: json_string    = 7  !! String JSON data type (`character(CK)`)
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter :: json_string    = 7  !! String JSON data type
+    integer(IK),parameter :: json_double    = json_real  !! Equivalent to `json_real` for
+                                                         !! backward compatibility.
 
     !special JSON characters
     character(kind=CK,len=*),parameter :: space           = CK_' '  !! space character
@@ -64,9 +67,15 @@
     character(kind=CK,len=*),parameter :: slash           = achar(47, kind=CK) !! JSON special character
     character(kind=CK,len=*),parameter :: backslash       = achar(92, kind=CK) !! JSON special character
 
+    !> default real number format statement (for writing real values to strings and files).
+    !  Note that this can be overridden by calling [[json_initialize]].
+#ifdef REAL32
+    character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E17.8E3)'
+#elif REAL128
+    character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E46.35E5)'
+#else
     character(kind=CDK,len=*),parameter :: default_real_fmt = '(ss,E27.17E4)'
-        !! default real number format statement (for writing real values to strings and files).
-        !! Note that this can be overridden by calling [[json_initialize]].
+#endif
 
     character(kind=CK,len=*),parameter :: star = CK_'*' !! for invalid numbers and
                                                         !! list-directed real output

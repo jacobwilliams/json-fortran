@@ -59,6 +59,10 @@
 !      integer(kind=int32) [4 bytes]
 #endif
 !      .
+!
+!@note In addition to the real kind specified by `RK`, interfaces for
+!      the real kinds with less precision are also provided in the library,
+!      but all are converted to `real(RK)` variables internally.
 
     module json_kinds
 
@@ -67,6 +71,15 @@
     implicit none
 
     private
+
+! used for the reals with less precision
+! than the default precision:
+#ifndef REAL32
+    public :: real32
+#endif
+#ifdef REAL128
+    public :: real64
+#endif
 
 #ifdef REAL32
     integer,parameter,public :: RK = real32   !! Default real kind [4 bytes]
@@ -92,7 +105,7 @@
 
     !*********************************************************
     !>
-    !  Processor dependendant 'DEFAULT' character kind.
+    !  Processor dependent 'DEFAULT' character kind.
     !  This is 1 byte for the Intel and Gfortran compilers.
     integer,parameter,public :: CDK = selected_char_kind('DEFAULT')
     !*********************************************************

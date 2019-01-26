@@ -36,6 +36,32 @@ include ( "cmake/checkOutOfSource.cmake" )
 #---------------------
 project ( jsonfortran NONE )
 
+#---------------------
+# Real and Integer kinds
+#---------------------
+
+SET(JSON_REAL_KIND "REAL64" CACHE STRING "Real kind parameter")
+SET_PROPERTY(CACHE JSON_REAL_KIND PROPERTY STRINGS REAL32 REAL64 REAL128)
+if(${JSON_REAL_KIND} MATCHES "REAL32")
+  add_definitions(-DREAL32)
+elseif(${JSON_REAL_KIND} MATCHES "REAL64")
+  add_definitions(-DREAL64)
+elseif(${JSON_REAL_KIND} MATCHES "REAL128")
+  add_definitions(-DREAL128)
+endif()
+
+SET(JSON_INT_KIND "INT32" CACHE STRING "Integer kind parameter")
+SET_PROPERTY(CACHE JSON_INT_KIND PROPERTY STRINGS INT8 INT16 INT32 INT64)
+if(${JSON_INT_KIND} MATCHES "INT8")
+  add_definitions(-DINT8)
+elseif(${JSON_INT_KIND} MATCHES "INT16")
+  add_definitions(-DINT16)
+elseif(${JSON_INT_KIND} MATCHES "INT32")
+  add_definitions(-DINT32)
+elseif(${JSON_INT_KIND} MATCHES "INT64")
+  add_definitions(-DINT64)
+endif()
+
 #----------------------------------
 # Get version (semantic versioning)
 # C.F. semver.org
