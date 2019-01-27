@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [7.0.0 (2019-01-26)](#700-2019-01-26)
     - [6.11.0 (2019-01-19)](#611-2019-01-19)
     - [6.10.0 (2019-10-20)](#610-2019-10-20)
     - [6.9.0 (2018-07-29)](#690-2018-07-29)
@@ -34,7 +35,29 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.11.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.0.0...HEAD)
+
+### [7.0.0](https://github.com/jacobwilliams/json-fortran/tree/7.0.0) (2019-01-26)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/6.11.0...7.0.0)
+or [Download v7.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/7.0.0)
+
+**Enhancements:**
+
+- Added support for multiple real kinds:
+  * The library now supports the default real kind specified (`real32`, `real64` and `real128`) as well as the kinds in this set with less precision than the default. For example, if `real64` is specified (which is the default), then both `real32` and `real64` are available in all the public APIs. Internally, the values are always stored in a variable of the default kind. [\#386](https://github.com/jacobwilliams/json-fortran/issues/386) [\#387](https://github.com/jacobwilliams/json-fortran/pull/387) ([jacobwilliams](https://github.com/jacobwilliams))
+  * Added a `create_real()` method and a `json_real` parameter to replace `create_double()` and `json_double`. The old versions are still available for backward compatibility.
+  * Added CMake options to control integer and real kinds [\#284](https://github.com/jacobwilliams/json-fortran/issues/284)
+  * Updated the default real format statement to correctly correspond to the specified real kind.
+- Added new `json_file` constructor functions for strings. This allows a `json_file` to be initialized using syntax such as: `f = json_file('{"x": 1}')`. [\#381](https://github.com/jacobwilliams/json-fortran/issues/381) [\#382](https://github.com/jacobwilliams/json-fortran/pull/382) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed some links in the documentation.
+
+**Bug fixes:**
+
+- Fixed an issue where the parser would fail if the JSON structure was just a lone integer. [\#388](https://github.com/jacobwilliams/json-fortran/issues/388) [\#389](https://github.com/jacobwilliams/json-fortran/pull/389) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed an issue where the unit tests did not compile when using `real32` or `real128`. [\#383](https://github.com/jacobwilliams/json-fortran/issues/383) [\#384](https://github.com/jacobwilliams/json-fortran/pull/384) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed various issues preventing compilation if the integer kind was changed from the default. [\#365](https://github.com/jacobwilliams/json-fortran/issues/365) [\#385](https://github.com/jacobwilliams/json-fortran/pull/385) ([jacobwilliams](https://github.com/jacobwilliams))
+- Renamed the integrated tests preprocessor flag to `INTEGRATED_TESTS` since it was mispelled. [\#390](https://github.com/jacobwilliams/json-fortran/issues/390) [\#391](https://github.com/jacobwilliams/json-fortran/pull/391) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [6.11.0](https://github.com/jacobwilliams/json-fortran/tree/6.11.0) (2019-01-19)
 
