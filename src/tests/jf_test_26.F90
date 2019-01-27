@@ -67,7 +67,7 @@ contains
 
 end module jf_test_26_mod
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_26
 

@@ -44,6 +44,8 @@
     use jf_test_35_mod , only: test_35
     use jf_test_36_mod , only: test_36
     use jf_test_37_mod , only: test_37
+    use jf_test_38_mod , only: test_38
+    use jf_test_39_mod , only: test_39
 
     implicit none
 
@@ -88,6 +90,8 @@
     call test_35(n_errors); if (n_errors /= 0) stop 1
     call test_36(n_errors); if (n_errors /= 0) stop 1
     call test_37(n_errors); if (n_errors /= 0) stop 1
+    call test_38(n_errors); if (n_errors /= 0) stop 1
+    call test_39(n_errors); if (n_errors /= 0) stop 1
 
     end program jsonfortrantest
 !*****************************************************************************************
