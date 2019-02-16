@@ -52,14 +52,14 @@ contains
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
-            call json%create_integer(new,33,'')   ! create a new element
+            call json%create_integer(new,33_IK,'')   ! create a new element
             call json%insert_after(element,new)   ! insert new element after x(3)
             if (json%failed()) then
                 call json%print_error_message(error_unit)
                 error_cnt = error_cnt + 1
             else
                 call json%get(p,'x',iarray)
-                if (.not. all(iarray==[1,2,3,33,4])) then
+                if (.not. all(iarray==[1_IK,2_IK,3_IK,33_IK,4_IK])) then
                     write(error_unit,'(A,1x,*(I2,1X))') 'Error: unexpected output:',iarray
                     error_cnt = error_cnt + 1
                 else
@@ -75,14 +75,14 @@ contains
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
-            call json%create_integer(new,44,'')   ! create a new element
+            call json%create_integer(new,44_IK,'')   ! create a new element
             call json%insert_after(element,new)   ! insert new element after x(5)
             if (json%failed()) then
                 call json%print_error_message(error_unit)
                 error_cnt = error_cnt + 1
             else
                 call json%get(p,'x',iarray)
-                if (.not. all(iarray==[1,2,3,33,4,44])) then
+                if (.not. all(iarray==[1_IK,2_IK,3_IK,33_IK,4_IK,44_IK])) then
                     write(error_unit,'(A,1x,*(I2,1X))') 'Error: unexpected output:',iarray
                     error_cnt = error_cnt + 1
                 else
@@ -98,14 +98,14 @@ contains
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
-            call json%create_integer(new,22,'')   ! create a new element
-            call json%insert_after(element,2,new) ! insert new element after x(2)
+            call json%create_integer(new,22_IK,'')   ! create a new element
+            call json%insert_after(element,2_IK,new) ! insert new element after x(2)
             if (json%failed()) then
                 call json%print_error_message(error_unit)
                 error_cnt = error_cnt + 1
             else
                 call json%get(p,'x',iarray)
-                if (.not. all(iarray==[1,2,22,3,33,4,44])) then
+                if (.not. all(iarray==[1_IK,2_IK,22_IK,3_IK,33_IK,4_IK,44_IK])) then
                     write(error_unit,'(A,1x,*(I2,1X))') 'Error: unexpected output:',iarray
                     error_cnt = error_cnt + 1
                 else
@@ -120,9 +120,9 @@ contains
         call json%create_object(root,'')
         call json%create_array(new,'array')
         call json%add(root,new)
-        call json%add(new,'',100)
-        call json%add(new,'',101)
-        call json%add(new,'',102)
+        call json%add(new,'',100_IK)
+        call json%add(new,'',101_IK)
+        call json%add(new,'',102_IK)
 
         call json%get(root,'array',iarray)
         if (json%failed()) then
@@ -130,14 +130,14 @@ contains
             error_cnt = error_cnt + 1
         end if
 
-        call json%get_child(new,2,elements)
+        call json%get_child(new,2_IK,elements)
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         else
-            call json%insert_after(element,7,elements) ! insert new element after x(7)
+            call json%insert_after(element,7_IK,elements) ! insert new element after x(7)
             call json%get(p,'x',iarray)
-            if (.not. all(iarray==[1,2,22,3,33,4,44,101,102])) then
+            if (.not. all(iarray==[1_IK,2_IK,22_IK,3_IK,33_IK,4_IK,44_IK,101_IK,102_IK])) then
                 write(error_unit,'(A,1x,*(I3,1X))') 'Error: unexpected output:',iarray
                 error_cnt = error_cnt + 1
             else
@@ -156,7 +156,7 @@ contains
                     call json%print_error_message(error_unit)
                     error_cnt = error_cnt + 1
                 else
-                    if (.not. all(iarray==[100])) then
+                    if (.not. all(iarray==[100_IK])) then
                         write(error_unit,'(A,1x,*(I3,1X))') 'Error: unexpected output:',iarray
                         error_cnt = error_cnt + 1
                     else
@@ -200,7 +200,7 @@ contains
 end module jf_test_20_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_20
 

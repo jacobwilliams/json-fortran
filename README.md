@@ -42,7 +42,7 @@ Download
 --------------------
 
 [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
-[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg?style=plastic)](http://braumeister.org/formula/json-fortran)
+[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg?style=plastic)](https://formulae.brew.sh/formula/json-fortran)
 
 Download the official versioned releases
 [here](https://github.com/jacobwilliams/json-fortran/releases/latest).
@@ -55,7 +55,7 @@ downloaded and installed with the [homebrew](http://brew.sh) package
 manager on Mac OS X. Once [homebrew](http://brew.sh) is installed,
 make sure that the formulae are up to date, view the package options
 and caveats, and install the
-[json-fortran formula](http://braumeister.org/formula/json-fortran):
+[json-fortran formula](https://formulae.brew.sh/formula/json-fortran):
 
 ```bash
 brew update
@@ -121,7 +121,7 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 6.10.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 7.0.0 REQUIRED )
 include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )

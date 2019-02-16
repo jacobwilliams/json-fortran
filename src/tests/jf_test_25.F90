@@ -55,7 +55,7 @@ contains
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'printing...'
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'getting data...'
@@ -149,7 +149,7 @@ contains
 end module jf_test_25_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_25
 

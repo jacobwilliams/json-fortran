@@ -4,8 +4,8 @@
 
 module jf_test_23_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, wp => json_RK, IK => json_IK, LK => json_LK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -31,16 +31,16 @@ contains
     character(kind=json_CK,len=:),allocatable :: cval
     character(kind=json_CK,len=:),allocatable :: key
     character(kind=json_CK,len=:),allocatable :: path
-    integer :: ival
+    integer(IK) :: ival
     real(wp) :: rval
-    logical :: found
+    logical(LK) :: found
     character(kind=json_CK,len=10),dimension(:),allocatable :: cval_array
     integer :: i !! counter
 
     error_cnt = 0
     call json%initialize(   trailing_spaces_significant=.true.,&
                             case_sensitive_keys=.true.,&
-                            path_mode=2) ! RFC6901 paths
+                            path_mode=2_IK) ! RFC6901 paths
     if (json%failed()) then
       call json%print_error_message(error_unit)
       error_cnt = error_cnt + 1
@@ -68,7 +68,7 @@ contains
       ! print the parsed data to the console
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the file...'
-      call json%print_file(error_unit)
+      call json%print_file(int(error_unit,IK))
       if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -221,7 +221,7 @@ contains
 
     call core%initialize(   trailing_spaces_significant=.true.,&
                             case_sensitive_keys=.true.,&
-                            path_mode=2) ! RFC6901 paths
+                            path_mode=2_IK) ! RFC6901 paths
 
     write(error_unit,'(A)') ''
     do i = 1, 4
@@ -292,7 +292,7 @@ contains
 end module jf_test_23_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_23
 

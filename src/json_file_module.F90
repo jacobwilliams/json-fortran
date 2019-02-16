@@ -113,11 +113,23 @@
         !  Get a variable from a [[json_file(type)]], by specifying the path.
         generic,public :: get => MAYBEWRAP(json_file_get_object),      &
                                  MAYBEWRAP(json_file_get_integer),     &
-                                 MAYBEWRAP(json_file_get_double),      &
+#ifndef REAL32
+                                 MAYBEWRAP(json_file_get_real32),      &
+#endif
+                                 MAYBEWRAP(json_file_get_real),        &
+#ifdef REAL128
+                                 MAYBEWRAP(json_file_get_real64),      &
+#endif
                                  MAYBEWRAP(json_file_get_logical),     &
                                  MAYBEWRAP(json_file_get_string),      &
                                  MAYBEWRAP(json_file_get_integer_vec), &
-                                 MAYBEWRAP(json_file_get_double_vec),  &
+#ifndef REAL32
+                                 MAYBEWRAP(json_file_get_real32_vec),  &
+#endif
+                                 MAYBEWRAP(json_file_get_real_vec),    &
+#ifdef REAL128
+                                 MAYBEWRAP(json_file_get_real64_vec),  &
+#endif
                                  MAYBEWRAP(json_file_get_logical_vec), &
                                  MAYBEWRAP(json_file_get_string_vec),  &
                                  MAYBEWRAP(json_file_get_alloc_string_vec),  &
@@ -144,11 +156,23 @@
         !```
         generic,public :: add => MAYBEWRAP(json_file_add_object),      &
                                  MAYBEWRAP(json_file_add_integer),     &
-                                 MAYBEWRAP(json_file_add_double),      &
+#ifndef REAL32
+                                 MAYBEWRAP(json_file_add_real32),      &
+#endif
+                                 MAYBEWRAP(json_file_add_real),        &
+#ifdef REAL128
+                                 MAYBEWRAP(json_file_add_real64),      &
+#endif
                                  MAYBEWRAP(json_file_add_logical),     &
                                  MAYBEWRAP(json_file_add_string),      &
                                  MAYBEWRAP(json_file_add_integer_vec), &
-                                 MAYBEWRAP(json_file_add_double_vec),  &
+#ifndef REAL32
+                                 MAYBEWRAP(json_file_add_real32_vec),  &
+#endif
+                                 MAYBEWRAP(json_file_add_real_vec),    &
+#ifdef REAL128
+                                 MAYBEWRAP(json_file_add_real64_vec),  &
+#endif
                                  MAYBEWRAP(json_file_add_logical_vec), &
                                  MAYBEWRAP(json_file_add_string_vec)
 #ifdef USE_UCS4
@@ -167,7 +191,13 @@
         !      scalars and vectors, etc.)
         generic,public :: update =>  MAYBEWRAP(json_file_update_integer),  &
                                      MAYBEWRAP(json_file_update_logical),  &
+#ifndef REAL32
+                                     MAYBEWRAP(json_file_update_real32),   &
+#endif
                                      MAYBEWRAP(json_file_update_real),     &
+#ifdef REAL128
+                                     MAYBEWRAP(json_file_update_real64),   &
+#endif
                                      MAYBEWRAP(json_file_update_string)
 #ifdef USE_UCS4
         generic,public :: update => json_file_update_string_name_ascii, &
@@ -217,11 +247,23 @@
         !get:
         procedure :: MAYBEWRAP(json_file_get_object)
         procedure :: MAYBEWRAP(json_file_get_integer)
-        procedure :: MAYBEWRAP(json_file_get_double)
+#ifndef REAL32
+        procedure :: MAYBEWRAP(json_file_get_real32)
+#endif
+        procedure :: MAYBEWRAP(json_file_get_real)
+#ifdef REAL128
+        procedure :: MAYBEWRAP(json_file_get_real64)
+#endif
         procedure :: MAYBEWRAP(json_file_get_logical)
         procedure :: MAYBEWRAP(json_file_get_string)
         procedure :: MAYBEWRAP(json_file_get_integer_vec)
-        procedure :: MAYBEWRAP(json_file_get_double_vec)
+#ifndef REAL32
+        procedure :: MAYBEWRAP(json_file_get_real32_vec)
+#endif
+        procedure :: MAYBEWRAP(json_file_get_real_vec)
+#ifdef REAL128
+        procedure :: MAYBEWRAP(json_file_get_real64_vec)
+#endif
         procedure :: MAYBEWRAP(json_file_get_logical_vec)
         procedure :: MAYBEWRAP(json_file_get_string_vec)
         procedure :: MAYBEWRAP(json_file_get_alloc_string_vec)
@@ -232,11 +274,23 @@
         !add:
         procedure :: MAYBEWRAP(json_file_add_object)
         procedure :: MAYBEWRAP(json_file_add_integer)
-        procedure :: MAYBEWRAP(json_file_add_double)
+#ifndef REAL32
+        procedure :: MAYBEWRAP(json_file_add_real32)
+#endif
+        procedure :: MAYBEWRAP(json_file_add_real)
+#ifdef REAL128
+        procedure :: MAYBEWRAP(json_file_add_real64)
+#endif
         procedure :: MAYBEWRAP(json_file_add_logical)
         procedure :: MAYBEWRAP(json_file_add_string)
         procedure :: MAYBEWRAP(json_file_add_integer_vec)
-        procedure :: MAYBEWRAP(json_file_add_double_vec)
+#ifndef REAL32
+        procedure :: MAYBEWRAP(json_file_add_real32_vec)
+#endif
+        procedure :: MAYBEWRAP(json_file_add_real_vec)
+#ifdef REAL128
+        procedure :: MAYBEWRAP(json_file_add_real64_vec)
+#endif
         procedure :: MAYBEWRAP(json_file_add_logical_vec)
         procedure :: MAYBEWRAP(json_file_add_string_vec)
 #ifdef USE_UCS4
@@ -249,7 +303,13 @@
         !update:
         procedure :: MAYBEWRAP(json_file_update_integer)
         procedure :: MAYBEWRAP(json_file_update_logical)
+#ifndef REAL32
+        procedure :: MAYBEWRAP(json_file_update_real32)
+#endif
         procedure :: MAYBEWRAP(json_file_update_real)
+#ifdef REAL128
+        procedure :: MAYBEWRAP(json_file_update_real64)
+#endif
         procedure :: MAYBEWRAP(json_file_update_string)
 #ifdef USE_UCS4
         procedure :: json_file_update_string_name_ascii
@@ -271,15 +331,16 @@
     !> author: Izaak Beekman
     !  date: 07/23/2015
     !
-    !  Structure constructor to initialize a [[json_file(type)]] object
-    !  with an existing [[json_value]] object, and either the [[json_core(type)]]
-    !  settings or a [[json_core(type)]] instance.
+    !  Structure constructor to initialize a [[json_file(type)]]
+    !  object with an existing [[json_value]] object or a JSON
+    !  string, and either the [[json_core(type)]] settings or a
+    !  [[json_core(type)]] instance.
     !
     !### Example
     !
     !```fortran
     ! ...
-    ! type(json_file)  :: my_file
+    ! type(json_file) :: my_file
     ! type(json_value),pointer :: json_object
     ! type(json_core) :: json_core_object
     ! ...
@@ -289,10 +350,17 @@
     ! !or:
     !   my_file = json_file(json_object,verbose=.true.)
     ! !or:
+    !   my_file = json_file('{"x": [1]}',verbose=.true.)
+    ! !or:
     !   my_file = json_file(json_object,json_core_object)
+    ! !or:
+    !   my_file = json_file('{"x": [1]}',json_core_object)
     !```
     interface json_file
-       module procedure initialize_json_file, initialize_json_file_v2
+       module procedure initialize_json_file, &
+                        initialize_json_file_v2, &
+                        MAYBEWRAP(initialize_json_file_from_string), &
+                        MAYBEWRAP(initialize_json_file_from_string_v2)
     end interface
     !*************************************************************************************
 
@@ -378,7 +446,9 @@
 !@note This does not destroy the data in the file.
 !
 !@note [[initialize_json_core]], [[json_initialize]],
-!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      [[initialize_json_core_in_file]], [[initialize_json_file]],
+!      [[initialize_json_file_v2]], [[initialize_json_file_from_string]],
+!      and [[initialize_json_file_from_string_v2]]
 !      all have a similar interface.
 
     subroutine initialize_json_core_in_file(me,verbose,compact_reals,&
@@ -465,7 +535,9 @@
 !  It also calls the `initialize()` method.
 !
 !@note [[initialize_json_core]], [[json_initialize]],
-!      [[initialize_json_core_in_file]], and [[initialize_json_file]]
+!      [[initialize_json_core_in_file]], [[initialize_json_file]],
+!      [[initialize_json_file_v2]], [[initialize_json_file_from_string]],
+!      and [[initialize_json_file_from_string_v2]]
 !      all have a similar interface.
 
     function initialize_json_file(p,verbose,compact_reals,&
@@ -530,6 +602,151 @@
     file_object%core = json_core_object
 
     end function initialize_json_file_v2
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 01/19/2019
+!
+!  Cast a JSON string as a [[json_file(type)]] object.
+!  It also calls the `initialize()` method.
+!
+!### Example
+!
+!```fortran
+!  type(json_file) :: f
+!  f = json_file('{"key ": 1}', trailing_spaces_significant=.true.)
+!```
+!
+!@note [[initialize_json_core]], [[json_initialize]],
+!      [[initialize_json_core_in_file]], [[initialize_json_file]],
+!      [[initialize_json_file_v2]], [[initialize_json_file_from_string]],
+!      and [[initialize_json_file_from_string_v2]]
+!      all have a similar interface.
+
+    function initialize_json_file_from_string(str,verbose,compact_reals,&
+                                  print_signs,real_format,spaces_per_tab,&
+                                  strict_type_checking,&
+                                  trailing_spaces_significant,&
+                                  case_sensitive_keys,&
+                                  no_whitespace,&
+                                  unescape_strings,&
+                                  comment_char,&
+                                  path_mode,&
+                                  path_separator,&
+                                  compress_vectors,&
+                                  allow_duplicate_keys,&
+                                  escape_solidus,&
+                                  stop_on_error) result(file_object)
+
+    implicit none
+
+    type(json_file) :: file_object
+    character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
+#include "json_initialize_arguments.inc"
+
+    call file_object%initialize(verbose,compact_reals,&
+                                print_signs,real_format,spaces_per_tab,&
+                                strict_type_checking,&
+                                trailing_spaces_significant,&
+                                case_sensitive_keys,&
+                                no_whitespace,&
+                                unescape_strings,&
+                                comment_char,&
+                                path_mode,&
+                                path_separator,&
+                                compress_vectors,&
+                                allow_duplicate_keys,&
+                                escape_solidus,&
+                                stop_on_error)
+
+    call file_object%load_from_string(str)
+
+    end function initialize_json_file_from_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[initialize_json_file_from_string]], where "str" is kind=CDK.
+
+    function wrap_initialize_json_file_from_string(str,verbose,compact_reals,&
+                                  print_signs,real_format,spaces_per_tab,&
+                                  strict_type_checking,&
+                                  trailing_spaces_significant,&
+                                  case_sensitive_keys,&
+                                  no_whitespace,&
+                                  unescape_strings,&
+                                  comment_char,&
+                                  path_mode,&
+                                  path_separator,&
+                                  compress_vectors,&
+                                  allow_duplicate_keys,&
+                                  escape_solidus,&
+                                  stop_on_error) result(file_object)
+
+    implicit none
+
+    type(json_file) :: file_object
+    character(kind=CDK,len=*),intent(in) :: str  !! string to load JSON data from
+#include "json_initialize_arguments.inc"
+
+    file_object = initialize_json_file_from_string(&
+                                  to_unicode(str),verbose,compact_reals,&
+                                  print_signs,real_format,spaces_per_tab,&
+                                  strict_type_checking,&
+                                  trailing_spaces_significant,&
+                                  case_sensitive_keys,&
+                                  no_whitespace,&
+                                  unescape_strings,&
+                                  comment_char,&
+                                  path_mode,&
+                                  path_separator,&
+                                  compress_vectors,&
+                                  allow_duplicate_keys,&
+                                  escape_solidus,&
+                                  stop_on_error)
+
+    end function wrap_initialize_json_file_from_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/19/2019
+!
+!  Cast a JSON string and a [[json_core(type)]] object
+!  as a [[json_file(type)]] object.
+
+    function initialize_json_file_from_string_v2(str, json_core_object) &
+                                        result(file_object)
+
+    implicit none
+
+    type(json_file)                     :: file_object
+    character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
+    type(json_core),intent(in)          :: json_core_object
+
+    file_object%core = json_core_object
+    call file_object%load_from_string(str)
+
+    end function initialize_json_file_from_string_v2
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[initialize_json_file_from_string_v2]], where "str" is kind=CDK.
+
+    function wrap_initialize_json_file_from_string_v2(str,json_core_object) &
+                                        result(file_object)
+
+    implicit none
+
+    type(json_file)                      :: file_object
+    character(kind=CDK,len=*),intent(in) :: str  !! string to load JSON data from
+    type(json_core),intent(in)           :: json_core_object
+
+    file_object = initialize_json_file_from_string_v2(to_unicode(str),json_core_object)
+
+    end function wrap_initialize_json_file_from_string_v2
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -690,7 +907,7 @@
 
     class(json_file),intent(inout)  :: me
 
-    call me%core%print(me%p,iunit=output_unit)
+    call me%core%print(me%p,iunit=int(output_unit,IK))
 
     end subroutine json_file_print_to_console
 !*****************************************************************************************
@@ -1191,7 +1408,7 @@
 !
 !  Get a real(RK) variable value from a JSON file.
 
-    subroutine json_file_get_double (me, path, val, found)
+    subroutine json_file_get_real (me, path, val, found)
 
     implicit none
 
@@ -1202,14 +1419,14 @@
 
     call me%core%get(me%p, path=path, value=val, found=found)
 
-    end subroutine json_file_get_double
+    end subroutine json_file_get_real
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_file_get_double]], where "path" is kind=CDK.
+!  Alternate version of [[json_file_get_real]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_get_double (me, path, val, found)
+    subroutine wrap_json_file_get_real (me, path, val, found)
 
     implicit none
 
@@ -1220,7 +1437,7 @@
 
     call me%get(to_unicode(path), val, found)
 
-    end subroutine wrap_json_file_get_double
+    end subroutine wrap_json_file_get_real
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1229,7 +1446,7 @@
 !
 !  Get a real(RK) vector from a JSON file.
 
-    subroutine json_file_get_double_vec(me, path, vec, found)
+    subroutine json_file_get_real_vec(me, path, vec, found)
 
     implicit none
 
@@ -1240,7 +1457,7 @@
 
     call me%core%get(me%p, path, vec, found)
 
-    end subroutine json_file_get_double_vec
+    end subroutine json_file_get_real_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1326,9 +1543,9 @@
 
 !*****************************************************************************************
 !>
-!  Alternate version of [[json_file_get_double_vec]], where "path" is kind=CDK.
+!  Alternate version of [[json_file_get_real_vec]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_get_double_vec(me, path, vec, found)
+    subroutine wrap_json_file_get_real_vec(me, path, vec, found)
 
     implicit none
 
@@ -1339,8 +1556,164 @@
 
     call me%get(to_unicode(path), vec, found)
 
-    end subroutine wrap_json_file_get_double_vec
+    end subroutine wrap_json_file_get_real_vec
 !*****************************************************************************************
+
+#ifndef REAL32
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/21/2019
+!
+!  Alternate version of [[json_file_get_real]] where `val` is `real32`.
+
+    subroutine json_file_get_real32 (me, path, val, found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path  !! the path to the variable
+    real(real32),intent(out)            :: val   !! value
+    logical(LK),intent(out),optional    :: found !! if it was really found
+
+    call me%core%get(me%p, path=path, value=val, found=found)
+
+    end subroutine json_file_get_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_get_real32]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_get_real32 (me, path, val, found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path  !! the path to the variable
+    real(real32),intent(out)             :: val   !! value
+    logical(LK),intent(out),optional     :: found !! if it was really found
+
+    call me%get(to_unicode(path), val, found)
+
+    end subroutine wrap_json_file_get_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/21/2019
+!
+!  Alternate version of [[json_file_get_real_vec]] where `vec` is `real32`.
+
+    subroutine json_file_get_real32_vec(me, path, vec, found)
+
+    implicit none
+
+    class(json_file),intent(inout)                    :: me
+    character(kind=CK,len=*),intent(in)               :: path  !! the path to the variable
+    real(real32),dimension(:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional                  :: found !! if it was really found
+
+    call me%core%get(me%p, path, vec, found)
+
+    end subroutine json_file_get_real32_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_get_real32_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_get_real32_vec(me, path, vec, found)
+
+    implicit none
+
+    class(json_file),intent(inout)                    :: me
+    character(kind=CDK,len=*),intent(in)              :: path  !! the path to the variable
+    real(real32),dimension(:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional                  :: found !! if it was really found
+
+    call me%get(to_unicode(path), vec, found)
+
+    end subroutine wrap_json_file_get_real32_vec
+!*****************************************************************************************
+#endif
+
+#ifdef REAL128
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/21/2019
+!
+!  Alternate version of [[json_file_get_real]] where `val` is `real64`.
+
+    subroutine json_file_get_real64 (me, path, val, found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path  !! the path to the variable
+    real(real64),intent(out)            :: val   !! value
+    logical(LK),intent(out),optional    :: found !! if it was really found
+
+    call me%core%get(me%p, path=path, value=val, found=found)
+
+    end subroutine json_file_get_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_get_real64]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_get_real64 (me, path, val, found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path  !! the path to the variable
+    real(real64),intent(out)             :: val   !! value
+    logical(LK),intent(out),optional     :: found !! if it was really found
+
+    call me%get(to_unicode(path), val, found)
+
+    end subroutine wrap_json_file_get_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/21/2019
+!
+!  Alternate version of [[json_file_get_real_vec]] where `vec` is `real64`.
+
+    subroutine json_file_get_real64_vec(me, path, vec, found)
+
+    implicit none
+
+    class(json_file),intent(inout)                    :: me
+    character(kind=CK,len=*),intent(in)               :: path  !! the path to the variable
+    real(real64),dimension(:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional                  :: found !! if it was really found
+
+    call me%core%get(me%p, path, vec, found)
+
+    end subroutine json_file_get_real64_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_get_real64_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_get_real64_vec(me, path, vec, found)
+
+    implicit none
+
+    class(json_file),intent(inout)                    :: me
+    character(kind=CDK,len=*),intent(in)              :: path  !! the path to the variable
+    real(real64),dimension(:),allocatable,intent(out) :: vec   !! the value vector
+    logical(LK),intent(out),optional                  :: found !! if it was really found
+
+    call me%get(to_unicode(path), vec, found)
+
+    end subroutine wrap_json_file_get_real64_vec
+!*****************************************************************************************
+#endif
 
 !*****************************************************************************************
 !> author: Jacob Williams
@@ -1672,7 +2045,7 @@
 !
 !  Add a real(RK) variable value to a JSON file.
 
-    subroutine json_file_add_double(me,path,val,found,was_created)
+    subroutine json_file_add_real(me,path,val,found,was_created)
 
     implicit none
 
@@ -1686,15 +2059,15 @@
 
     call me%core%add_by_path(me%p,path,val,found,was_created)
 
-    end subroutine json_file_add_double
+    end subroutine json_file_add_real
 !*****************************************************************************************
 
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Alternate version of [[json_file_add_double]], where "path" is kind=CDK.
+!  Alternate version of [[json_file_add_real]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_add_double(me,path,val,found,was_created)
+    subroutine wrap_json_file_add_real(me,path,val,found,was_created)
 
     implicit none
 
@@ -1704,9 +2077,9 @@
     logical(LK),intent(out),optional     :: found        !! if the variable was found
     logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
 
-    call me%json_file_add_double(to_unicode(path),val,found,was_created)
+    call me%json_file_add_real(to_unicode(path),val,found,was_created)
 
-    end subroutine wrap_json_file_add_double
+    end subroutine wrap_json_file_add_real
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1714,7 +2087,7 @@
 !
 !  Add a real(RK) vector to a JSON file.
 
-    subroutine json_file_add_double_vec(me,path,vec,found,was_created)
+    subroutine json_file_add_real_vec(me,path,vec,found,was_created)
 
     implicit none
 
@@ -1728,15 +2101,15 @@
 
     call me%core%add_by_path(me%p,path,vec,found,was_created)
 
-    end subroutine json_file_add_double_vec
+    end subroutine json_file_add_real_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Alternate version of [[json_file_add_double_vec]], where "path" is kind=CDK.
+!  Alternate version of [[json_file_add_real_vec]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_add_double_vec(me,path,vec,found,was_created)
+    subroutine wrap_json_file_add_real_vec(me,path,vec,found,was_created)
 
     implicit none
 
@@ -1746,10 +2119,174 @@
     logical(LK),intent(out),optional     :: found        !! if the variable was found
     logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
 
-    call me%json_file_add_double_vec(to_unicode(path),vec,found,was_created)
+    call me%json_file_add_real_vec(to_unicode(path),vec,found,was_created)
 
-    end subroutine wrap_json_file_add_double_vec
+    end subroutine wrap_json_file_add_real_vec
 !*****************************************************************************************
+
+#ifndef REAL32
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_real]] where `val` is `real32`.
+
+    subroutine json_file_add_real32(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    real(real32),intent(in)             :: val          !! value
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    call me%core%add_by_path(me%p,path,val,found,was_created)
+
+    end subroutine json_file_add_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_real32]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_real32(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(real32),intent(in)              :: val          !! value
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_real32(to_unicode(path),val,found,was_created)
+
+    end subroutine wrap_json_file_add_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_real_vec]] where `vec` is `real32`.
+
+    subroutine json_file_add_real32_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    real(real32),dimension(:),intent(in) :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%core%add_by_path(me%p,path,vec,found,was_created)
+
+    end subroutine json_file_add_real32_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_real32_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_real32_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(real32),dimension(:),intent(in) :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_real32_vec(to_unicode(path),vec,found,was_created)
+
+    end subroutine wrap_json_file_add_real32_vec
+!*****************************************************************************************
+#endif
+
+#ifdef REAL128
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_real]] where `val` is `real64`.
+
+    subroutine json_file_add_real64(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    real(real64),intent(in)             :: val          !! value
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    call me%core%add_by_path(me%p,path,val,found,was_created)
+
+    end subroutine json_file_add_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_real64]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_real64(me,path,val,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(real64),intent(in)              :: val          !! value
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_real64(to_unicode(path),val,found,was_created)
+
+    end subroutine wrap_json_file_add_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_real_vec]] where `vec` is `real64`.
+
+    subroutine json_file_add_real64_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    real(real64),dimension(:),intent(in) :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%core%add_by_path(me%p,path,vec,found,was_created)
+
+    end subroutine json_file_add_real64_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_real64_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_real64_vec(me,path,vec,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(real64),dimension(:),intent(in) :: vec          !! the value vector
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_real64_vec(to_unicode(path),vec,found,was_created)
+
+    end subroutine wrap_json_file_add_real64_vec
+!*****************************************************************************************
+#endif
 
 !*****************************************************************************************
 !> author: Jacob Williams
@@ -2148,9 +2685,6 @@
 !  Given the path string, if the variable is present in the file,
 !  and is a scalar, then update its value.
 !  If it is not present, then create it and set its value.
-!
-!### See also
-!  * [[json_update_double]]
 
     subroutine json_file_update_real(me,path,val,found)
 
@@ -2183,6 +2717,86 @@
 
     end subroutine wrap_json_file_update_real
 !*****************************************************************************************
+
+#ifndef REAL32
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/21/2019
+!
+!  Alternate version of [[json_file_update_real]] where `val` is `real32`.
+
+    subroutine json_file_update_real32(me,path,val,found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path
+    real(real32),intent(in)             :: val
+    logical(LK),intent(out)             :: found
+
+    call me%update(path,real(val,RK),found)
+
+    end subroutine json_file_update_real32
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_update_real32]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_update_real32(me,path,val,found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path
+    real(real32),intent(in)              :: val
+    logical(LK),intent(out)              :: found
+
+    call me%update(to_unicode(path),val,found)
+
+    end subroutine wrap_json_file_update_real32
+!*****************************************************************************************
+#endif
+
+#ifdef REAL128
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/21/2019
+!
+!  Alternate version of [[json_file_update_real]] where `val` is `real64`.
+
+    subroutine json_file_update_real64(me,path,val,found)
+
+    implicit none
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: path
+    real(real64),intent(in)             :: val
+    logical(LK),intent(out)             :: found
+
+    call me%update(path,real(val,RK),found)
+
+    end subroutine json_file_update_real64
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_file_update_real64]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_update_real64(me,path,val,found)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path
+    real(real64),intent(in)              :: val
+    logical(LK),intent(out)              :: found
+
+    call me%update(to_unicode(path),val,found)
+
+    end subroutine wrap_json_file_update_real64
+!*****************************************************************************************
+#endif
 
 !*****************************************************************************************
 !> author: Jacob Williams

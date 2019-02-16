@@ -23,7 +23,6 @@ contains
     integer,intent(out) :: error_cnt
     integer :: i !! counter
     integer :: j !! counter
-    integer :: k !! counter
     type(json_core) :: json
     type(json_value),pointer :: p, p_var
     character(kind=CK,len=:),allocatable :: path_ck
@@ -110,7 +109,7 @@ contains
 end module jf_test_32_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_32
 
