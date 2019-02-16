@@ -3,12 +3,12 @@
 !  Module for the eighth unit test.
 !
 !# HISTORY
-!  * Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
+!  * Izaak Beekman : 2/18/2015 : Created (refactored original json_example.f90 file)
 
 module jf_test_8_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, IK => json_IK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -63,7 +63,7 @@ contains
         error_cnt = error_cnt + 1
     end if
     write(output_unit,'(A)') '{ "part a" : '
-    call json%print(p,output_unit)  ! print to console
+    call json%print(p,int(output_unit,IK))  ! print to console
     write(output_unit,'(A)') ','
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -86,7 +86,7 @@ contains
         error_cnt = error_cnt + 1
     end if
     write(output_unit,'(A)') '"part b" : '
-    call json%print(p,output_unit)  ! print to console
+    call json%print(p,int(output_unit,IK))  ! print to console
     write(output_unit,'(A)') ','
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -111,7 +111,7 @@ contains
         error_cnt = error_cnt + 1
     end if
     write(output_unit,'(A)') '"part c" : '
-    call json%print(p,output_unit)  ! print to console
+    call json%print(p,int(output_unit,IK))  ! print to console
     write(output_unit,'(A)') '}'
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -129,7 +129,7 @@ contains
 end module jf_test_8_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_8
 

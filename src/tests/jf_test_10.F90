@@ -6,8 +6,8 @@
 
 module jf_test_10_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, wp => json_RK, IK => json_IK, LK => json_LK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -32,9 +32,9 @@ contains
     type(json_value),pointer :: p
     type(json_core) :: json       !! factory for manipulating `json_value` pointers
     character(kind=json_CK,len=:),allocatable :: str,name
-    logical :: found,lval
-    integer :: var_type,n_children
-    integer(json_ik) :: ival
+    logical(LK) :: found,lval
+    integer(IK) :: var_type,n_children
+    integer(IK) :: ival
 
     character(kind=json_CDK,len=*),parameter :: json_str = '{ "blah": 123 }'
 
@@ -127,7 +127,7 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. ival==1_JSON_IK) then
+        if (found .and. ival==1_IK) then
             write(error_unit,'(A)') '...success'
         else
             write(error_unit,'(A,1X,I5)') 'Error: incorrect result: ', ival
@@ -176,7 +176,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_update_real [variable present]...'
-    call f2%update('data[2].real',100.0d0,found)
+    call f2%update('data[2].real',100.0_wp,found)
     if (f2%failed()) then
         call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -189,7 +189,7 @@ contains
         end if
     end if
     write(error_unit,'(A)') 'json_file_update_real [variable not present]...'
-    call f2%update('new_real',1776.0d0,found)
+    call f2%update('new_real',1776.0_wp,found)
     if (f2%failed()) then
         call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -269,7 +269,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_update_double...'
-    call json%update(p,'data(2).real',-1.0d0,found)
+    call json%update(p,'data(2).real',-1.0_wp,found)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -314,8 +314,8 @@ contains
 
     write(error_unit,'(A)') 'json_create...'
     write(error_unit,'(A)') 'json_create_logical...'; call json%destroy(p); call json%create_logical(p,.true.,'foo')
-    write(error_unit,'(A)') 'json_create_integer...'; call json%destroy(p); call json%create_integer(p,1000,'foo')
-    write(error_unit,'(A)') 'json_create_double ...'; call json%destroy(p); call json%create_double (p,9.0d0,'foo')
+    write(error_unit,'(A)') 'json_create_integer...'; call json%destroy(p); call json%create_integer(p,1000_IK,'foo')
+    write(error_unit,'(A)') 'json_create_real   ...'; call json%destroy(p); call json%create_real   (p,9.0_wp,'foo')
     write(error_unit,'(A)') 'json_create_string ...'; call json%destroy(p); call json%create_string (p,'foo','bar')
     write(error_unit,'(A)') 'json_create_null   ...'; call json%destroy(p); call json%create_null   (p,'foo')
     write(error_unit,'(A)') 'json_create_object ...'; call json%destroy(p); call json%create_object (p,'foo')
@@ -337,7 +337,7 @@ contains
 end module jf_test_10_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_10
 

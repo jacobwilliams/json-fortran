@@ -7,8 +7,8 @@
 
 module jf_test_3_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, wp => json_RK, IK => json_IK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -27,7 +27,7 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
-    integer :: ival
+    integer(IK) :: ival
     character(kind=json_CK,len=:),allocatable :: cval
     real(wp) :: rval
     type(json_file) :: json    !the JSON structure read from the file:
@@ -141,7 +141,7 @@ contains
 end module jf_test_3_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 
 !*****************************************************************************************
 program jf_test_3

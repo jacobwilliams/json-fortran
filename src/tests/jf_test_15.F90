@@ -7,8 +7,8 @@
 
 module jf_test_15_mod
 
-    use json_module, CK => json_CK
-    use, intrinsic :: iso_fortran_env , only: error_unit,output_unit,wp=>real64
+    use json_module, CK => json_CK, wp => json_RK, IK => json_IK, LK => json_LK
+    use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
     implicit none
 
@@ -28,10 +28,10 @@ contains
     type(json_core) :: json
     type(json_value),pointer :: p,p2
     type(json_file) :: file1, file2
-    logical :: found,status_ok
-    integer :: var_type,i,n_children
+    logical(LK) :: found,status_ok
+    integer(IK) :: var_type,i,n_children
     real(wp) :: d
-    logical :: tf
+    logical(LK) :: tf
     character(kind=CK,len=:),allocatable :: error_msg
 
     write(error_unit,'(A)') ''
@@ -66,7 +66,7 @@ contains
     call file1%move(file2) !should throw an exception since points are not associated
     call file1%initialize()
 
-    call file1%print_file(-1)   !invalid input
+    call file1%print_file(-1_IK)   !invalid input
     call file1%initialize()
 
     call file1%print_file(filename='') !invalid filename
@@ -85,18 +85,18 @@ contains
                             compact_reals=.true.,&
                             print_signs=.false.,&
                             real_format='E',&
-                            spaces_per_tab=4,&
+                            spaces_per_tab=4_IK,&
                             strict_type_checking=.true.,&
                             trailing_spaces_significant=.false.,&
                             case_sensitive_keys=.true.)
 
-    call json%get_child(p2,-99,p)  !invalid index
+    call json%get_child(p2,-99_IK,p)  !invalid index
     call json%initialize()  !clear exceptions
 
     call json%get_child(p2,'this child does not exist',p)  !invalid index
     call json%initialize()  !clear exceptions
 
-    call json%print(p2,-1) !invalid input
+    call json%print(p2,-1_IK) !invalid input
     call json%initialize()  !clear exceptions
 
     call json%print(p2,filename='') !invalid input
@@ -107,7 +107,7 @@ contains
 end module jf_test_15_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_15
 

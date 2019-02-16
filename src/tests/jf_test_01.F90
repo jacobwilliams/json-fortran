@@ -7,8 +7,8 @@
 
 module jf_test_1_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, wp => json_RK, IK => json_IK, LK => json_LK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -31,17 +31,17 @@ contains
     type(json_value),pointer :: p !! a pointer for low-level manipulations
     type(json_core) :: core       !! factory for manipulating `json_value` pointers
     integer,intent(out) :: error_cnt
-    integer :: ival
+    integer(IK) :: ival
     character(kind=json_CK,len=:),allocatable :: cval
     real(wp) :: rval
-    logical :: found
-    logical :: lval
-    integer,dimension(:),allocatable :: ivec
-    integer,dimension(:),allocatable :: ilen
+    logical(LK) :: found
+    logical(LK) :: lval
+    integer(IK),dimension(:),allocatable :: ivec
+    integer(IK),dimension(:),allocatable :: ilen
     real(wp),dimension(:),allocatable :: rvec
     character(kind=json_CK,len=1),dimension(:),allocatable :: cvec
     character(kind=json_CK,len=:),dimension(:),allocatable :: acvec
-    logical,dimension(:),allocatable :: lvec
+    logical(LK),dimension(:),allocatable :: lvec
 
     error_cnt = 0
     call json%initialize()
@@ -72,7 +72,7 @@ contains
       ! print the parsed data to the console
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the file...'
-      call json%print_file(error_unit)
+      call json%print_file(int(error_unit,IK))
       if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -102,7 +102,7 @@ contains
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing each variable [JSONPath style]'
       write(error_unit,'(A)') ''
-      call core%initialize(path_mode=3,unescape_strings=.false.)
+      call core%initialize(path_mode=3_IK,unescape_strings=.false.)
       call core%traverse(p,print_json_variable)
 
       call core%destroy()
@@ -113,7 +113,7 @@ contains
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'get some data from the file...'
 
-      call json%initialize(path_mode=1,path_separator=json_CK_'%')  ! use fortran-style paths
+      call json%initialize(path_mode=1_IK,path_separator=json_CK_'%')  ! use fortran-style paths
 
       call json%get('version%svn', ival)
       if (json%failed()) then
@@ -336,7 +336,7 @@ contains
 
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the modified structure...'
-      call json%print_file(error_unit)
+      call json%print_file(int(error_unit,IK))
       if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -362,7 +362,7 @@ contains
       !call json%update(p,'real',[1.0_wp, 2.0_wp, 3.0_wp],found)   !don't have one like this yet...
 
       !use the json_file procedure to update a variable:
-      call json%update('version.svn',999,found)
+      call json%update('version.svn',999_IK,found)
       if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -370,7 +370,7 @@ contains
 
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the modified structure...'
-      call json%print_file(error_unit)
+      call json%print_file(int(error_unit,IK))
       if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -379,7 +379,7 @@ contains
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'printing the modified structure (compact mode)...'
       call json%initialize(no_whitespace=.true.)
-      call json%print_file(error_unit)
+      call json%print_file(int(error_unit,IK))
       if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -389,7 +389,7 @@ contains
       write(error_unit,'(A)') ''
       write(error_unit,'(A)') 'get some data from the file (bracket notation)...'
 
-      call json%initialize(path_mode=3)
+      call json%initialize(path_mode=3_IK)
 
       ! get an integer value:
       write(error_unit,'(A)') ''
@@ -445,13 +445,13 @@ contains
 
     class(json_core),intent(inout)      :: json
     type(json_value),pointer,intent(in) :: p
-    logical(json_LK),intent(out)        :: finished  !! set true to stop traversing
+    logical(LK),intent(out)        :: finished  !! set true to stop traversing
 
     character(kind=json_CK,len=:),allocatable :: path !! path to the variable
-    logical(json_LK) :: found !! error flag
+    logical(LK) :: found !! error flag
     type(json_value),pointer :: child !! variable's first child
     character(kind=json_CK,len=:),allocatable :: value !! variable value as a string
-    integer(json_IK) :: var_type !! JSON variable type
+    integer(IK) :: var_type !! JSON variable type
 
     call json%get_child(p,child)
     finished = .false.
@@ -499,7 +499,7 @@ contains
 end module jf_test_1_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_1
 

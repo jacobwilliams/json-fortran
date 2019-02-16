@@ -7,8 +7,8 @@
 
 module jf_test_7_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, IK => json_IK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -92,7 +92,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%add(a,'ints', [1,2,3])
+    call json%add(a,'ints', [1_IK,2_IK,3_IK])
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -118,7 +118,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%add(c,'val1', 1066)
+    call json%add(c,'val1', 1066_IK)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -128,7 +128,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%add(d,'val2', 1815)
+    call json%add(d,'val2', 1815_IK)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -144,7 +144,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%add(e1,'int1', 1)
+    call json%add(e1,'int1', 1_IK)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -154,12 +154,12 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%add(e2,'int1', 1)
+    call json%add(e2,'int1', 1_IK)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%add(e2,'int2', 2)
+    call json%add(e2,'int2', 2_IK)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -226,7 +226,7 @@ contains
     nullify(e2)
     nullify(escaped_string)
 
-    call json%print(root,output_unit)  !print to the console
+    call json%print(root,int(output_unit,IK))  !print to the console
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -246,7 +246,7 @@ contains
 
     ! remove the escaped string entry
     if (found) call json%remove(escaped_string,destroy=.true.)
-    call json%print(root,error_unit)  !print to stderr
+    call json%print(root,int(error_unit,IK))  !print to stderr
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -264,7 +264,7 @@ end module jf_test_7_mod
 !*****************************************************************************************
 
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_7
 
