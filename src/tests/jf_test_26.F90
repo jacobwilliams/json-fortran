@@ -22,6 +22,8 @@ contains
     logical(lk) :: is_valid
     character(kind=CK,len=:),allocatable :: error_msg
 
+    error_cnt = 0
+
     call f%initialize()  ! specify whatever init options you want.
 
     write(error_unit,'(A)') 'adding data to json_file...'
@@ -76,7 +78,7 @@ program jf_test_26
     use jf_test_26_mod , only: test_26
     implicit none
     integer :: n_errors
-    n_errors = 0
+
     call test_26(n_errors)
     if (n_errors /= 0) stop 1
 
