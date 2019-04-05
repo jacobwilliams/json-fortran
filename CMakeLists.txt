@@ -386,10 +386,7 @@ install ( TARGETS ${LIB_NAME} ${LIB_NAME}-static
 # Code to  fix the dylib install name on Mac.
 include ( cmake/fixupInstallNameDir.cmake )
 
-install ( DIRECTORY "${MODULE_DIR}/" DESTINATION  "${INSTALL_MOD_DIR}"
-  FILES_MATCHING
-  PATTERN "*.*"
-  PATTERN "*/" EXCLUDE) # Don't get $<CONFIG> subdirectory when building with MSVS
+install ( DIRECTORY "${MODULE_DIR}/" DESTINATION  "${INSTALL_MOD_DIR}" )
 
 #------------------------------------------
 # Add portable unistall command to makefile
