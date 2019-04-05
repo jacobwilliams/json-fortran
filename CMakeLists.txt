@@ -386,7 +386,14 @@ install ( TARGETS ${LIB_NAME} ${LIB_NAME}-static
 # Code to  fix the dylib install name on Mac.
 include ( cmake/fixupInstallNameDir.cmake )
 
-install ( DIRECTORY "${MODULE_DIR}/" DESTINATION  "${INSTALL_MOD_DIR}" )
+set(MOD_DIR_TO_INSTALL "${MODULE_DIR}")
+set(MOD_DESTINATION_DIR "${INSTALL_MOD_DIR}")
+install(
+  CODE "file(GLOB_RECURSE MODULE_FILES \"${MOD_DIR_TO_INSTALL}/*.mod\")"
+  CODE "file(GLOB_RECURSE SUBMOD_FILES \"${MOD_DIR_TO_INSTALL}/*.smod\")"
+  CODE "file(INSTALL \${MODULE_FILES} DESTINATION \"\${CMAKE_INSTALL_PREFIX}/${MOD_DESTINATION_DIR}\")"
+  CODE "file(INSTALL \${SUBMOD_FILES} DESTINATION \"\${CMAKE_INSTALL_PREFIX}/${MOD_DESTINATION_DIR}\")"
+  )
 
 #------------------------------------------
 # Add portable unistall command to makefile
