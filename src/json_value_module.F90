@@ -5387,20 +5387,68 @@
 
         if (associated(p%children)) then
 
-            child => p%children
+            ! If getting first or last child, we can do this quickly.
+            ! Otherwise, traverse the list.
+            if (idx==1) then
 
-            do i = 1, idx - 1
+                child => p%children  ! first one
 
-                if (associated(child%next)) then
-                    child => child%next
+            elseif (idx==p%n_children) then
+
+                if (associated(p%tail)) then
+                    child => p%tail  ! last one
                 else
                     call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                              ' child%next is not associated.')
-                    nullify(child)
-                    exit
+                                              ' child%tail is not associated.')
                 end if
 
-            end do
+            elseif (idx<1 .or. idx>p%n_children) then
+
+                call json%throw_exception('Error in json_value_get_child_by_index:'//&
+                                          ' idx is out of range.')
+
+            else
+
+                ! if idx is closer to the end, we traverse the list backward from tail,
+                ! otherwise we traverse it forward from children:
+
+                if (p%n_children-idx < idx) then  ! traverse backward
+
+                    child => p%tail
+
+                    do i = 1, p%n_children - idx
+
+                        if (associated(child%previous)) then
+                            child => child%previous
+                        else
+                            call json%throw_exception('Error in json_value_get_child_by_index:'//&
+                                                      ' child%previous is not associated.')
+                            nullify(child)
+                            exit
+                        end if
+
+                    end do
+
+                else  ! traverse forward
+
+                    child => p%children
+
+                    do i = 1, idx - 1
+
+                        if (associated(child%next)) then
+                            child => child%next
+                        else
+                            call json%throw_exception('Error in json_value_get_child_by_index:'//&
+                                                      ' child%next is not associated.')
+                            nullify(child)
+                            exit
+                        end if
+
+                    end do
+
+                end if
+
+            end if
 
         else
 
