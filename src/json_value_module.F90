@@ -143,13 +143,13 @@
     !### Usage
     !````fortran
     !    program test
-    !     use json_module
+    !     use json_module, wp=>json_RK
     !     implicit none
     !     type(json_core) :: json     !<--have to declare this
     !     type(json_value),pointer :: p
     !     call json%create_object(p,'')   !create the root
     !     call json%add(p,'year',1805)    !add some data
-    !     call json%add(p,'value',1.0_RK) !add some data
+    !     call json%add(p,'value',1.0_wp) !add some data
     !     call json%print(p,'test.json')  !write it to a file
     !     call json%destroy(p)            !cleanup
     !    end program test
