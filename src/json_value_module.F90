@@ -1997,14 +1997,18 @@
 !>
 !  Alternate version of [[json_throw_exception]], where `msg` is kind=CDK.
 
-    subroutine wrap_json_throw_exception(json,msg)
+    subroutine wrap_json_throw_exception(json,msg,found)
 
     implicit none
 
     class(json_core),intent(inout)  :: json
     character(kind=CDK,len=*),intent(in) :: msg    !! the error message
+    logical(LK),intent(inout),optional  :: found  !! if the caller is handling the
+                                                  !! exception with an optimal return
+                                                  !! argument. If so, `json%stop_on_error`
+                                                  !! is ignored.
 
-    call json%throw_exception(to_unicode(msg))
+    call json%throw_exception(to_unicode(msg),found)
 
     end subroutine wrap_json_throw_exception
 !*****************************************************************************************
