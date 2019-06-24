@@ -1449,7 +1449,8 @@
                     ! it isn't a string, so there is no length
                     call json%throw_exception('Error in json_string_info: '//&
                                               'When strict_type_checking is true '//&
-                                              'the variable must be a character string.')
+                                              'the variable must be a character string.',&
+                                              found)
                 end if
             else
                 ! in this case, we have to get the value
@@ -1516,9 +1517,9 @@
             else
                 ! it isn't a string, so there is no length
                 call json%throw_exception('Error in json_string_info: '//&
-                                            'When strict_type_checking is true '//&
-                                            'the array must contain only '//&
-                                            'character strings.')
+                                          'When strict_type_checking is true '//&
+                                          'the array must contain only '//&
+                                          'character strings.',found)
             end if
         else
             ! in this case, we have to get the value
@@ -1941,7 +1942,7 @@
 !
 !@note If `stop_on_error` is true, then the program is stopped.
 
-    subroutine json_throw_exception(json,msg)
+    subroutine json_throw_exception(json,msg,found)
 
 #ifdef __INTEL_COMPILER
     use ifcore, only: tracebackqq
@@ -1951,11 +1952,18 @@
 
     class(json_core),intent(inout)      :: json
     character(kind=CK,len=*),intent(in) :: msg    !! the error message
+    logical(LK),intent(inout),optional  :: found  !! if the caller is handling the
+                                                  !! exception with an optimal return
+                                                  !! argument. If so, `json%stop_on_error`
+                                                  !! is ignored.
+
+    logical(LK) :: stop_on_error
 
     json%exception_thrown = .true.
     json%err_message = trim(msg)
+    stop_on_error = json%stop_on_error .and. .not. present(found)
 
-    if (json%stop_on_error) then
+    if (stop_on_error) then
 
 #ifdef __INTEL_COMPILER
         ! for Intel, we raise a traceback and quit
@@ -1989,14 +1997,18 @@
 !>
 !  Alternate version of [[json_throw_exception]], where `msg` is kind=CDK.
 
-    subroutine wrap_json_throw_exception(json,msg)
+    subroutine wrap_json_throw_exception(json,msg,found)
 
     implicit none
 
     class(json_core),intent(inout)  :: json
     character(kind=CDK,len=*),intent(in) :: msg    !! the error message
+    logical(LK),intent(inout),optional  :: found  !! if the caller is handling the
+                                                  !! exception with an optimal return
+                                                  !! argument. If so, `json%stop_on_error`
+                                                  !! is ignored.
 
-    call json%throw_exception(to_unicode(msg))
+    call json%throw_exception(to_unicode(msg),found)
 
     end subroutine wrap_json_throw_exception
 !*****************************************************************************************
@@ -2960,7 +2972,7 @@
         case default
             found = .false.
             call json%throw_exception('Error in json_update_logical: '//&
-                                      'the variable is not a scalar value')
+                                      'the variable is not a scalar value',found)
         end select
 
     else
@@ -3022,7 +3034,7 @@
         case default
             found = .false.
             call json%throw_exception('Error in json_update_real: '//&
-                                      'the variable is not a scalar value')
+                                      'the variable is not a scalar value',found)
         end select
 
     else
@@ -3164,7 +3176,7 @@
         case default
             found = .false.
             call json%throw_exception('Error in json_update_integer: '//&
-                                      'the variable is not a scalar value')
+                                      'the variable is not a scalar value',found)
         end select
 
     else
@@ -3231,7 +3243,7 @@
         case default
             found = .false.
             call json%throw_exception('Error in json_update_string: '//&
-                                      'the variable is not a scalar value')
+                                      'the variable is not a scalar value',found)
         end select
 
     else
@@ -3549,7 +3561,7 @@
 
         if (.not. associated(p)) then
             call json%throw_exception('Error in json_add_member_by_path:'//&
-                                      ' Input pointer p is not associated.')
+                                      ' Input pointer p is not associated.',found)
             if (present(found)) then
                 found = .false.
                 call json%clear_exceptions()
@@ -3563,7 +3575,7 @@
             if (.not. associated(tmp)) then
 
                 call json%throw_exception('Error in json_add_member_by_path:'//&
-                                          ' Unable to resolve path: '//trim(path))
+                                          ' Unable to resolve path: '//trim(path),found)
                 if (present(found)) then
                     found = .false.
                     call json%clear_exceptions()
@@ -3644,7 +3656,7 @@
         if (.not. associated(p)) then
 
             call json%throw_exception('Error in json_add_integer_by_path:'//&
-                                      ' Unable to resolve path: '//trim(path))
+                                      ' Unable to resolve path: '//trim(path),found)
             if (present(found)) then
                 found = .false.
                 call json%clear_exceptions()
@@ -3731,7 +3743,7 @@
         if (.not. associated(p)) then
 
             call json%throw_exception('Error in json_add_real_by_path:'//&
-                                      ' Unable to resolve path: '//trim(path))
+                                      ' Unable to resolve path: '//trim(path),found)
             if (present(found)) then
                 found = .false.
                 call json%clear_exceptions()
@@ -3902,7 +3914,7 @@
         if (.not. associated(p)) then
 
             call json%throw_exception('Error in json_add_logical_by_path:'//&
-                                      ' Unable to resolve path: '//trim(path))
+                                      ' Unable to resolve path: '//trim(path),found)
             if (present(found)) then
                 found = .false.
                 call json%clear_exceptions()
@@ -3992,7 +4004,7 @@
         if (.not. associated(p)) then
 
             call json%throw_exception('Error in json_add_string_by_path:'//&
-                                      ' Unable to resolve path: '//trim(path))
+                                      ' Unable to resolve path: '//trim(path),found)
             if (present(found)) then
                 found = .false.
                 call json%clear_exceptions()
@@ -4406,7 +4418,7 @@
         if (present(ilen)) then
             if (size(ilen)/=size(value)) then
                 call json%throw_exception('Error in json_add_string_vec_by_path: '//&
-                                          'Invalid size of ilen input vector.')
+                                          'Invalid size of ilen input vector.',found)
                 if (present(found)) then
                     found = .false.
                     call json%clear_exceptions()
@@ -4419,7 +4431,7 @@
                 do i = 1, size(value)
                     if (ilen(i)>len(value)) then
                         call json%throw_exception('Error in json_add_string_vec_by_path: '//&
-                                                  'Invalid ilen element.')
+                                                  'Invalid ilen element.',found)
                         if (present(found)) then
                             found = .false.
                             call json%clear_exceptions()
@@ -5399,13 +5411,13 @@
                     child => p%tail  ! last one
                 else
                     call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                              ' child%tail is not associated.')
+                                              ' child%tail is not associated.',found)
                 end if
 
             elseif (idx<1 .or. idx>p%n_children) then
 
                 call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                          ' idx is out of range.')
+                                          ' idx is out of range.',found)
 
             else
 
@@ -5422,7 +5434,7 @@
                             child => child%previous
                         else
                             call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                                      ' child%previous is not associated.')
+                                                      ' child%previous is not associated.',found)
                             nullify(child)
                             exit
                         end if
@@ -5439,7 +5451,7 @@
                             child => child%next
                         else
                             call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                                      ' child%next is not associated.')
+                                                      ' child%next is not associated.',found)
                             nullify(child)
                             exit
                         end if
@@ -5453,7 +5465,7 @@
         else
 
             call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                      ' p%children is not associated.')
+                                      ' p%children is not associated.',found)
 
         end if
 
@@ -5539,7 +5551,7 @@
                     if (.not. associated(child)) then
                         call json%throw_exception(&
                             'Error in json_value_get_child_by_name: '//&
-                            'Malformed JSON linked list')
+                            'Malformed JSON linked list',found)
                         exit
                     end if
                     if (allocated(child%name)) then
@@ -5557,14 +5569,14 @@
                 !did not find anything:
                 call json%throw_exception(&
                     'Error in json_value_get_child_by_name: '//&
-                    'child variable '//trim(name)//' was not found.')
+                    'child variable '//trim(name)//' was not found.',found)
                 nullify(child)
             end if
 
         else
             call json%throw_exception(&
                 'Error in json_value_get_child_by_name: '//&
-                'pointer is not associated.')
+                'pointer is not associated.',found)
         end if
 
         ! found output:
@@ -6535,7 +6547,7 @@
 
     if (.not. associated(p)) then
         call json%throw_exception('Error in json_rename_by_path:'//&
-                                  ' Unable to resolve path: '//trim(path))
+                                  ' Unable to resolve path: '//trim(path),found)
     else
         call json%rename(p,name)
         nullify(p)
@@ -6781,7 +6793,7 @@
                 end if
                 if (.not. associated(p)) then
                     call json%throw_exception('Error in json_get_by_path_default:'//&
-                                              ' Error getting array element')
+                                              ' Error getting array element',found)
                     exit
                 end if
                 child_i = i + 1
@@ -6789,7 +6801,8 @@
             case (end_array,end_array_alt)
 
                 if (.not. array) then
-                    call json%throw_exception('Error in json_get_by_path_default: Unexpected '//c)
+                    call json%throw_exception('Error in json_get_by_path_default:'//&
+                                              ' Unexpected '//c,found)
                     exit
                 end if
                 array = .false.
@@ -6874,7 +6887,7 @@
 
                     if (.not. associated(p)) then
                         call json%throw_exception('Error in json_get_by_path_default:'//&
-                                                  ' Error getting child member.')
+                                                  ' Error getting child member.',found)
                         exit
                     end if
 
@@ -6936,7 +6949,7 @@
                 if (present(found)) found = .true.    !everything seems to be ok
             else
                 call json%throw_exception('Error in json_get_by_path_default:'//&
-                                          ' variable not found: '//trim(path))
+                                          ' variable not found: '//trim(path),found)
                 if (present(found)) then
                     found = .false.
                     call json%clear_exceptions()
@@ -7130,7 +7143,7 @@
                         end if
                         if (.not. status_ok) then
                             call json%throw_exception('Error in json_get_by_path_rfc6901: '//&
-                                                        'invalid path specification: '//trim(path))
+                                                      'invalid path specification: '//trim(path),found)
                             exit
                         end if
                     end if
@@ -7144,7 +7157,7 @@
 
             else
                 call json%throw_exception('Error in json_get_by_path_rfc6901: '//&
-                                            'invalid path specification: '//trim(path))
+                                            'invalid path specification: '//trim(path),found)
             end if
         end if
 
@@ -7279,7 +7292,7 @@
 
         if (path==CK_'') then
             call json%throw_exception('Error in json_get_by_path_jsonpath_bracket: '//&
-                                      'invalid path specification: '//trim(path))
+                                      'invalid path specification: '//trim(path),found)
         else
 
             if (path(1:1)==root .or. path(1:1)==start_array) then ! the first character must be
@@ -7310,7 +7323,7 @@
                             call json%throw_exception(&
                                     'Error in json_get_by_path_jsonpath_bracket: '//&
                                     'expecting "[", found: "'//trim(path(istart:istart))//&
-                                    '" in path: '//trim(path))
+                                    '" in path: '//trim(path),found)
                             exit
                         end if
 
@@ -7390,14 +7403,14 @@
                                         call json%throw_exception(&
                                                 'Error in json_get_by_path_jsonpath_bracket: '//&
                                                 'invalid token found: "'//token//&
-                                                '" in path: '//trim(path))
+                                                '" in path: '//trim(path),found)
                                         exit
                                     end if
                                     iend = iend + 1 ! move counter to ] index
                                 else
                                     call json%throw_exception(&
                                             'Error in json_get_by_path_jsonpath_bracket: '//&
-                                            'invalid path: '//trim(path))
+                                            'invalid path: '//trim(path),found)
                                     exit
                                 end if
 
@@ -7473,21 +7486,21 @@
                                             call json%throw_exception(&
                                                     'Error in json_get_by_path_jsonpath_bracket: '//&
                                                     'invalid array index found: "'//token//&
-                                                    '" in path: '//trim(path))
+                                                    '" in path: '//trim(path),found)
                                             exit
                                         end if
                                     else
                                         call json%throw_exception(&
                                                 'Error in json_get_by_path_jsonpath_bracket: '//&
                                                 'invalid token: "'//token//&
-                                                '" in path: '//trim(path))
+                                                '" in path: '//trim(path),found)
                                         exit
                                     end if
 
                                 else
                                     call json%throw_exception(&
                                             'Error in json_get_by_path_jsonpath_bracket: '//&
-                                            'invalid path: '//trim(path))
+                                            'invalid path: '//trim(path),found)
                                     exit
                                 end if
 
@@ -7496,7 +7509,7 @@
                         else
                             call json%throw_exception(&
                                     'Error in json_get_by_path_jsonpath_bracket: '//&
-                                    'invalid path: '//trim(path))
+                                    'invalid path: '//trim(path),found)
                             exit
                         end if
 
@@ -7511,7 +7524,7 @@
                 call json%throw_exception(&
                         'Error in json_get_by_path_jsonpath_bracket: '//&
                         'expecting "'//root//'", found: "'//path(1:1)//&
-                        '" in path: '//trim(path))
+                        '" in path: '//trim(path),found)
             end if
 
         end if
@@ -7693,7 +7706,7 @@
                     do i = 1, n_children
                         if (.not. associated(element)) then
                             call json%throw_exception('Error in json_get_path: '//&
-                                                      'malformed JSON structure. ')
+                                                      'malformed JSON structure. ',found)
                             exit
                         end if
                         if (associated(element,tmp)) then
@@ -7703,7 +7716,7 @@
                         end if
                         if (i==n_children) then ! it wasn't found (should never happen)
                             call json%throw_exception('Error in json_get_path: '//&
-                                                      'malformed JSON structure. ')
+                                                      'malformed JSON structure. ',found)
                             exit
                         end if
                     end do
@@ -7749,7 +7762,7 @@
                     call json%throw_exception('Error in json_get_path: '//&
                                               'malformed JSON structure. '//&
                                               'A variable that is not an object '//&
-                                              'or array should not have a child.')
+                                              'or array should not have a child.',found)
                     exit
 
                 end select
@@ -7778,7 +7791,7 @@
 
     else
         call json%throw_exception('Error in json_get_path: '//&
-                                  'input pointer is not associated')
+                                  'input pointer is not associated',found)
     end if
 
     !for errors, return blank string:
@@ -8030,7 +8043,7 @@
 
     if (.not. associated(p)) then
         call json%throw_exception('Error in json_get_integer_by_path:'//&
-            ' Unable to resolve path: '// trim(path))
+            ' Unable to resolve path: '// trim(path),found)
     else
         call json%get(p,value)
         nullify(p)
@@ -8257,7 +8270,7 @@
     if (.not. associated(p)) then
 
         call json%throw_exception('Error in json_get_real_by_path:'//&
-                             ' Unable to resolve path: '//trim(path))
+                             ' Unable to resolve path: '//trim(path),found)
 
     else
 
@@ -8733,7 +8746,7 @@
     if (.not. associated(p)) then
 
         call json%throw_exception('Error in json_get_logical_by_path:'//&
-                             ' Unable to resolve path: '//trim(path))
+                             ' Unable to resolve path: '//trim(path),found)
 
     else
 
@@ -9006,7 +9019,7 @@
 
     if (.not. associated(p)) then
         call json%throw_exception('Error in json_get_string_by_path:'//&
-                                  ' Unable to resolve path: '//trim(path))
+                                  ' Unable to resolve path: '//trim(path),found)
 
     else
 
@@ -9468,7 +9481,7 @@
 
     if (.not. associated(p)) then
         call json%throw_exception('Error in json_get_array:'//&
-             ' Unable to resolve path: '//trim(path))
+                                  ' Unable to resolve path: '//trim(path),found)
     else
        call json%get(me=p,array_callback=array_callback)
        nullify(p)
