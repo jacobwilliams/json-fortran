@@ -152,12 +152,7 @@ Some examples can also be found on the [wiki](https://github.com/jacobwilliams/j
 Contributing
 ------------
 
-[![Ready in backlog](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Ready&title=Ready)](https://github.com/jacobwilliams/json-fortran/blob/master/.github/CONTRIBUTING.md)
-[![Blocked by Vendor Bug](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=vendor%20bug&title=Blocked%20by%20Vendor%20Bug)](https://waffle.io/jacobwilliams/json-fortran)
-[![In Progress](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=In%20Progress&title=In%20Progress)](https://waffle.io/jacobwilliams/json-fortran)
-[![Needs Review](https://badge.waffle.io/jacobwilliams/json-fortran.png?label=Needs%20Review&title=Needs%20Review)](https://waffle.io/jacobwilliams/json-fortran)
-
-Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/.github/CONTRIBUTING.md) then claim something in [the "ready" column on our Waffle.io](https://waffle.io/jacobwilliams/json-fortran) and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo/)
+Want to help?  Take a quick look at our [contributing guidelines](https://github.com/jacobwilliams/json-fortran/blob/master/.github/CONTRIBUTING.md) then claim something and [Fork. Commit. Pull request.](https://help.github.com/articles/fork-a-repo/)
 
 [top](#json-fortran)
 
@@ -173,7 +168,6 @@ Miscellaneous
 * JSON-Fortran is a fork and extensive upgrade of the Fortran 95 [FSON](https://github.com/josephalevin/fson) code. The reason for the split was to be able to incorporate object-oriented and other nice features of the Fortran 2003 and 2008 standards.  Many thanks to the original authors of FSON.
 * For more information about JSON, see: <http://www.json.org/>
 * [json-fortran on Travis CI](https://travis-ci.org/jacobwilliams/json-fortran)
-* [json-fortran on Waffle.IO](https://waffle.io/jacobwilliams/json-fortran)
 * [json-fortran on Codecov.IO](https://codecov.io/gh/jacobwilliams/json-fortran)
 
 [top](#json-fortran)
