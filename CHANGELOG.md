@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [7.1.0 (2019-06-23)](#710-2019-06-23)
     - [7.0.0 (2019-01-26)](#700-2019-01-26)
     - [6.11.0 (2019-01-19)](#611-2019-01-19)
     - [6.10.0 (2019-10-20)](#610-2019-10-20)
@@ -35,7 +36,22 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.0.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.1.0...HEAD)
+
+### [7.1.0](https://github.com/jacobwilliams/json-fortran/tree/7.1.0) (2019-06-23)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.0.0...7.1.0)
+or [Download v7.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/7.1.0)
+
+**Enhancements:**
+
+- Added a Visual Studio Code workspace file [\#399](https://github.com/jacobwilliams/json-fortran/issues/399) [\#400](https://github.com/jacobwilliams/json-fortran/pull/400) ([jacobwilliams](https://github.com/jacobwilliams))
+- Improvements to `json_value_get_child_by_index` efficiency [\#401](https://github.com/jacobwilliams/json-fortran/issues/401) [\#402](https://github.com/jacobwilliams/json-fortran/pull/402) ([jacobwilliams](https://github.com/jacobwilliams))
+- Updates to CMake install rule for better compatibility with Visual Studio [\#396](https://github.com/jacobwilliams/json-fortran/pull/396) ([zbeekman](https://github.com/zbeekman))
+
+**Bug fixes:**
+- Fix for undeclared variable causing failing test on Mac [\#392](https://github.com/jacobwilliams/json-fortran/pull/392) ([porteri](https://github.com/porteri))
+- Fixed a bug where using `json%add()` to create new variables in a structure would stop the program if `stop_on_failure` was enabled. [\#403](https://github.com/jacobwilliams/json-fortran/issues/403) [\#404](https://github.com/jacobwilliams/json-fortran/pull/404) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [7.0.0](https://github.com/jacobwilliams/json-fortran/tree/7.0.0) (2019-01-26)
 
