@@ -7,7 +7,7 @@
 
 module jf_test_16_mod
 
-    use json_module, CK => json_CK
+    use json_module, CK => json_CK, IK => json_IK
     use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
     implicit none
@@ -44,14 +44,14 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%print(p,error_unit)
+    call json%print(p,int(error_unit,IK))
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Swap: cities <-> iflag'
     call json%get(p,'cities',p1)
     call json%get(p,'iflag',p2)
     call json%swap(p1,p2)
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -64,7 +64,7 @@ contains
     call json%get(p,'iflag',p1)
     call json%get(p,'value',p2)
     call json%swap(p1,p2)
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -77,7 +77,7 @@ contains
     call json%get(p,'iflag',p1)
     call json%get(p,'struct.vec',p2)
     call json%swap(p1,p2)
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -102,7 +102,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%print(p,error_unit)
+    call json%print(p,int(error_unit,IK))
 
     !this one is not allowed, and should fail:
     write(error_unit,'(A)') ''
@@ -110,7 +110,7 @@ contains
     call json%get(p,'vars(1).label',p1)
     call json%get(p,'vars',p2)
     call json%swap(p1,p2)
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     if (.not. json%failed()) then
         write(error_unit,'(A)') 'Error: this should have failed.'
         error_cnt = error_cnt + 1
@@ -126,7 +126,7 @@ contains
     call json%get(p,'empty',p1)
     call json%get(p,'stats.str',p2)
     call json%swap(p1,p2)
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -149,7 +149,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%print(p,error_unit)
+    call json%print(p,int(error_unit,IK))
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Swap: color <-> height'
     call json%get(p,'color',p1)
@@ -159,7 +159,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     nullify(p1)
     nullify(p2)
     call json%destroy(p)
@@ -174,7 +174,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%print(p,error_unit)
+    call json%print(p,int(error_unit,IK))
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Swap: width <-> color'
     call json%get(p,'width',p1)
@@ -184,7 +184,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     nullify(p1)
     nullify(p2)
     call json%destroy(p)
@@ -199,7 +199,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%print(p,error_unit)
+    call json%print(p,int(error_unit,IK))
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Swap: width <-> height'
     call json%get(p,'width',p1)
@@ -209,7 +209,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     nullify(p1)
     nullify(p2)
     call json%destroy(p)
@@ -219,7 +219,7 @@ contains
 end module jf_test_16_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_16
 

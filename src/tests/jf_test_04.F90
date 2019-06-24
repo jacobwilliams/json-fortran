@@ -7,8 +7,8 @@
 
 module jf_test_4_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, wp => json_RK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -35,7 +35,7 @@ contains
     type(json_file) :: json
     type(json_core) :: core  !! factory for manipulating `json_value` pointers
 
-    integer :: i
+    integer(json_IK) :: i
     character(kind=json_CK,len=10) :: istr
     character(kind=json_CK,len=:),allocatable :: string,name
     logical(json_LK) :: found
@@ -163,7 +163,7 @@ contains
 end module jf_test_4_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_4
 

@@ -9,7 +9,7 @@ module jf_test_6_mod
 
     use json_module, CK => json_CK, LK => json_LK
     use json_parameters, only: newline
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -111,7 +111,7 @@ contains
 end module jf_test_6_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_6
 

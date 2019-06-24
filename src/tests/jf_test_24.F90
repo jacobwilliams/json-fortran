@@ -5,7 +5,7 @@
 module jf_test_24_mod
 
     use json_module, rk => json_rk, lk => json_lk, ik => json_ik, ck => json_ck, cdk => json_cdk
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -48,7 +48,7 @@ contains
 
     call json%create_object(p,'root')
 
-    call json%create_double(tmp,99.9_rk,'double') !  (note: it gets renamed when added below)
+    call json%create_real(tmp,99.9_rk,'double') !  (note: it gets renamed when added below)
 
     call json%create(p,'a'          )
     call json%create(p,'b'          )
@@ -58,17 +58,17 @@ contains
     call json%create(p,     'b.null',                      found=found)  ! add a null to keep
     call json%add_by_path(p,'b.bb'              , 1.0_rk , found)
     call json%add_by_path(p,'b.dble'            , tmp    , found)  ! add a json_value pointer
-    call json%add_by_path(p,'c.ccc'             , 2      , found)
+    call json%add_by_path(p,'c.ccc'             , 2_ik   , found)
     call json%add_by_path(p,'a.aa.aaa(1)'       , '3.0'  , found)
     call json%add_by_path(p,'a.aa.aaaa(3)'      , 4.0_rk , found)
-    call json%add_by_path(p,'a.array(1)'        , 5      , found)
+    call json%add_by_path(p,'a.array(1)'        , 5_ik   , found)
     call json%add_by_path(p,'a.array(2).scalar' , '6'    , found)
 
-    call json%add_by_path(p,'a.array(2).ivec' , [1,2,3], found)
+    call json%add_by_path(p,'a.array(2).ivec' , [1_ik,2_ik,3_ik], found)
     call json%add_by_path(p,'a.array(2).rvec' , [1.0_rk,2.0_rk,3.0_rk], found)
     call json%add_by_path(p,'a.array(2).lvec' , [.true.,.false.,.true.], found)
     call json%add_by_path(p,'a.array(2).cvec' , ['1 ','2 ','3 '], found)
-    call json%add_by_path(p,'a.array(2).cvec_trim' , ['1 ','2 ','3 '], found, ilen=[1,1,1])
+    call json%add_by_path(p,'a.array(2).cvec_trim' , ['1 ','2 ','3 '], found, ilen=[1_ik,1_ik,1_ik])
 
     call json%add_by_path(p,'a.array(2).logical', .true. , found, was_created)
 
@@ -98,7 +98,7 @@ contains
 
     ! now for variables that are already present:
     call json%add_by_path(p,'a.aa.aaaa(3)'      , 40.0_rk , found)
-    call json%add_by_path(p,'a.array(1)'        , 50      , found)
+    call json%add_by_path(p,'a.array(1)'        , 50_ik   , found)
     call json%add_by_path(p,'a.array(2).scalar' , '60'    , found)
     call json%add_by_path(p,'a.array(2).logical', .false. , found, was_created)
 
@@ -144,7 +144,7 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'printing...'
 
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
 
     ! clean up
     write(error_unit,'(A)') ''
@@ -160,7 +160,7 @@ contains
 end module jf_test_24_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_24
 

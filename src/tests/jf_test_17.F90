@@ -7,7 +7,7 @@
 
 module jf_test_17_mod
 
-    use json_module, CK => json_CK, CDK => json_CDK
+    use json_module, CK => json_CK, CDK => json_CDK, IK => json_IK
     use, intrinsic :: iso_fortran_env , only: error_unit,output_unit
 
     implicit none
@@ -48,7 +48,7 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-    call json%print(p,error_unit)
+    call json%print(p,int(error_unit,IK))
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Rename: "city" to "cities"'
@@ -56,7 +56,7 @@ contains
     call json%rename(q,'cities')     ! also test the unicode ones
     call json%rename(q,CK_'cities')
     call json%rename(q,CDK_'cities')
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -77,7 +77,7 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Rename: "iflag" to "flag"'
     call json%rename(p,'iflag','flag')
-    call json%print(p,output_unit)
+    call json%print(p,int(output_unit,IK))
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -173,7 +173,7 @@ contains
 end module jf_test_17_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_17
 

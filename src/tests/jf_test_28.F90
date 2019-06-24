@@ -7,7 +7,7 @@
 
 module jf_test_28_mod
 
-    use json_module
+    use json_module, IK => json_IK
     use iso_fortran_env
 
     implicit none
@@ -25,9 +25,9 @@ contains
 
     type(json_core) :: json
     type(json_value),pointer :: p,vec
-    integer(json_IK),dimension(:),allocatable :: ivec
-    integer(json_IK),dimension(:),allocatable :: ivec_value
-    integer(json_IK),dimension(:),allocatable :: ivec_value_reversed
+    integer(IK),dimension(:),allocatable :: ivec
+    integer(IK),dimension(:),allocatable :: ivec_value
+    integer(IK),dimension(:),allocatable :: ivec_value_reversed
     character(kind=json_CK,len=:),allocatable :: str
     integer :: i !! counter
 
@@ -69,14 +69,14 @@ contains
         write(output_unit,'(A)') ''
         write(output_unit,'(A)') 'Original:'
         write(output_unit,'(A)') ''
-        call json%print(vec,output_unit)
+        call json%print(vec,int(output_unit,IK))
 
         call json%reverse(vec)
 
         write(output_unit,'(A)') ''
         write(output_unit,'(A)') 'Reversed:'
         write(output_unit,'(A)') ''
-        call json%print(vec,output_unit)
+        call json%print(vec,int(output_unit,IK))
 
         call json%get(vec,ivec)
         call json%destroy(p)
@@ -116,7 +116,7 @@ contains
     end module jf_test_28_mod
 !*****************************************************************************************
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_28
 

@@ -22,6 +22,8 @@ contains
     logical(lk) :: is_valid
     character(kind=CK,len=:),allocatable :: error_msg
 
+    error_cnt = 0
+
     call f%initialize()  ! specify whatever init options you want.
 
     write(error_unit,'(A)') 'adding data to json_file...'
@@ -37,16 +39,15 @@ contains
     call f%add(ck_'test.scalar.unicode(2)',  cdk_'ck, cdk')
     call f%add(cdk_'test.scalar.unicode(3)', ck_'cdk, ck')
     call f%add(cdk_'test.scalar.unicode(4)', cdk_'cdk, cdk')
-    ! ... note: indentention isn't correct for vector of vectors when printed !TODO
     call f%add(ck_'test.vector.unicode(1)',  [ck_'ck, ck'])
     call f%add(ck_'test.vector.unicode(2)',  [cdk_'ck, cdk'])
     call f%add(cdk_'test.vector.unicode(3)', [ck_'cdk, ck'])
     call f%add(cdk_'test.vector.unicode(4)', [cdk_'cdk, cdk'])
 
     !add a json_value pointer:
-    call json%create_integer(tmp,999,'') ! note that the name will be replaced
-                                         ! with the name given in the path
-                                         ! when it is added.
+    call json%create_integer(tmp,999_IK,'') ! note that the name will be replaced
+                                            ! with the name given in the path
+                                            ! when it is added.
     call f%add('inputs.pointer',tmp)
 
     write(error_unit,'(A)') 'validating...'
@@ -67,7 +68,7 @@ contains
 
 end module jf_test_26_mod
 
-#ifndef INTERGATED_TESTS
+#ifndef INTEGRATED_TESTS
 !*****************************************************************************************
 program jf_test_26
 
@@ -76,7 +77,7 @@ program jf_test_26
     use jf_test_26_mod , only: test_26
     implicit none
     integer :: n_errors
-    n_errors = 0
+
     call test_26(n_errors)
     if (n_errors /= 0) stop 1
 
