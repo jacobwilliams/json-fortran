@@ -50,6 +50,7 @@ or [Download v7.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 - Updates to CMake install rule for better compatibility with Visual Studio [\#396](https://github.com/jacobwilliams/json-fortran/pull/396) ([zbeekman](https://github.com/zbeekman))
 
 **Bug fixes:**
+
 - Fix for undeclared variable causing failing test on Mac [\#392](https://github.com/jacobwilliams/json-fortran/pull/392) ([porteri](https://github.com/porteri))
 - Fixed a bug where using `json%add()` to create new variables in a structure would stop the program if `stop_on_failure` was enabled. [\#403](https://github.com/jacobwilliams/json-fortran/issues/403) [\#404](https://github.com/jacobwilliams/json-fortran/pull/404) ([jacobwilliams](https://github.com/jacobwilliams))
 
