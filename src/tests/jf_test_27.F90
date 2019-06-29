@@ -60,21 +60,13 @@ contains
 
     ! test json_file interface
     f = json_file(p)
+    nullify(p) ! data is now in f
     call f%initialize(compress_vectors=.true.)
     call f%print_file()
 
     if (f%failed()) then
       call f%print_error_message(error_unit)
       error_cnt = error_cnt + 1
-    end if
-
-    ! clean up
-    write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'destroy...'
-    call json%destroy(p)
-    if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
     end if
 
     end subroutine test_27

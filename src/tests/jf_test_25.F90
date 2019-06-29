@@ -35,8 +35,8 @@ contains
     error_cnt = 0
     call json%initialize( verbose=.false. )
     if (json%failed()) then
-      call json%print_error_message(error_unit)
-      error_cnt = error_cnt + 1
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
     end if
 
     write(error_unit,'(A)') ''
@@ -49,8 +49,8 @@ contains
     write(error_unit,'(A)') 'parsing...'
     call json%parse(p,json_str)
     if (json%failed()) then
-      call json%print_error_message(error_unit)
-      error_cnt = error_cnt + 1
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
     end if
 
     write(error_unit,'(A)') ''
@@ -63,13 +63,13 @@ contains
     ! get child, then array:
     call json%get_child(p,'str_array',tmp)
     if (json%failed()) then
-      call json%print_error_message(error_unit)
-      error_cnt = error_cnt + 1
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
     end if
     call json%get(tmp, vec, ilen)
     if (json%failed()) then
-      call json%print_error_message(error_unit)
-      error_cnt = error_cnt + 1
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
     end if
     if (allocated(vec) .and. allocated(ilen)) then
         if (all(ilen==[1,2,3,5])) then
@@ -85,15 +85,16 @@ contains
 
     ! try get by path:
     call json%get(p, 'str_array', vec, ilen, found)
-    if (json%failed()) then
-      call json%print_error_message(error_unit)
-      error_cnt = error_cnt + 1
-    end if
-    if (all(ilen==[1,2,3,5])) then
-        write(error_unit,'(A)') 'success!'
-    else
-        write(error_unit,'(A,1X,*(I5,1X))') 'failed: ', ilen
+    if (.not. found) then
+        call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
+    else
+        if (all(ilen==[1,2,3,5])) then
+            write(error_unit,'(A)') 'success!'
+        else
+            write(error_unit,'(A,1X,*(I5,1X))') 'failed: ', ilen
+            error_cnt = error_cnt + 1
+        end if
     end if
 
 #ifdef USE_UCS4
@@ -101,44 +102,42 @@ contains
     call json%get(p, CDK_'str_array', vec, ilen, found)
     call json%get(p, CK_'str_array',  vec, ilen)
     if (json%failed()) then
-      call json%print_error_message(error_unit)
-      error_cnt = error_cnt + 1
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
     end if
 #endif
 
     ! test json_file interface
     f = json_file(p)
+    nullify(p) ! data is now in f
     call f%get('str_array', vec, ilen, found)
-    if (f%failed()) then
-      call f%print_error_message(error_unit)
-      error_cnt = error_cnt + 1
-    end if
-    if (all(ilen==[1,2,3,5])) then
-        write(error_unit,'(A)') 'json_file success!'
-    else
-        write(error_unit,'(A,1X,*(I5,1X))') 'json_file failed: ', ilen
+    if (.not. found) then
+        call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
+    else
+        if (all(ilen==[1,2,3,5])) then
+            write(error_unit,'(A)') 'json_file success!'
+        else
+            write(error_unit,'(A,1X,*(I5,1X))') 'json_file failed: ', ilen
+            error_cnt = error_cnt + 1
+        end if
     end if
 #ifdef USE_UCS4
     ! unicode test
-    f = json_file(p)
     call f%get(CDK_'str_array', vec, ilen, found)
-    if (f%failed()) then
-      call f%print_error_message(error_unit)
-      error_cnt = error_cnt + 1
-    end if
-    if (all(ilen==[1,2,3,5])) then
-        write(error_unit,'(A)') 'json_file success!'
-    else
-        write(error_unit,'(A,1X,*(I5,1X))') 'json_file failed: ', ilen
+    if (.not. found) then
+        call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
+    else
+        if (all(ilen==[1,2,3,5])) then
+            write(error_unit,'(A)') 'json_file success!'
+        else
+            write(error_unit,'(A,1X,*(I5,1X))') 'json_file failed: ', ilen
+            error_cnt = error_cnt + 1
+        end if
     end if
 #endif
 
-    ! clean up
-    write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'destroy...'
-    call json%destroy(p)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
