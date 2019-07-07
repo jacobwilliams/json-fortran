@@ -52,17 +52,13 @@ contains
     write(error_unit,'(A)') 'get values as real...'
     call json%get('bad_reals',bad_reals,found)
 
-    if (json%failed()) then    !if there was an error reading the file
-
+    if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
-
     else
-
         write(error_unit,'(A)') 'printing...'
         write(error_unit,*) bad_reals
         write(error_unit,'(A)') ''
-
     end if
 
     call json%destroy()
