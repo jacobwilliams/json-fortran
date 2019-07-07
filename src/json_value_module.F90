@@ -1340,7 +1340,7 @@
 !
 !  Destroy the data within a [[json_value]], and reset type to `json_unknown`.
 
-    subroutine destroy_json_data(d)
+    pure subroutine destroy_json_data(d)
 
     implicit none
 
@@ -2176,7 +2176,7 @@
 !      method to validate a JSON structure that was manually
 !      created using [[json_value]] pointers.
 
-    recursive subroutine json_value_destroy(json,p,destroy_next)
+    pure recursive subroutine json_value_destroy(json,p,destroy_next)
 
     implicit none
 
@@ -6237,7 +6237,9 @@
 
         case default
 
-            call json%throw_exception('Error in json_value_print: unknown data type')
+            call integer_to_string(p%var_type,int_fmt,tmp)
+            call json%throw_exception('Error in json_value_print: '//&
+                                      'unknown data type: '//trim(tmp))
 
         end select
 

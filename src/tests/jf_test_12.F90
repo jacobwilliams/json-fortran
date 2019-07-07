@@ -166,8 +166,11 @@ contains
     call my_file%get('$array data.data',fetched_array)
     call check_file_errors(all(abs(fetched_array - reshape(raw_array,[size(raw_array)])) <= TOL))
 
-    call my_file%get(tmp_json_ptr)
-    call check_file_errors(associated(tmp_json_ptr,root))
+   ! Note: this test is no longer valid since json_file
+   !       function constructor was updated because
+   !       root is no longer associated.
+   !  call my_file%get(tmp_json_ptr)
+   !  call check_file_errors(associated(tmp_json_ptr,root))
 
     open(file=dir//file,newunit=lun,form='formatted',action='write')
     call my_file%print_file(lun)

@@ -65,6 +65,7 @@ contains
     write(error_unit,'(A)') 'json_file_move_pointer...'
     call f2%initialize()
     call f2%move(f)
+    call f%nullify() ! not strictly necessary since it's already done by move.
     if (f2%failed()) then
         call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1

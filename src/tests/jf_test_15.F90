@@ -63,7 +63,7 @@ contains
     call json%check_for_errors(status_ok)             !error condition false
     call json%check_for_errors(error_msg=error_msg)   !error condition false - not allocated
 
-    call file1%move(file2) !should throw an exception since points are not associated
+    call file1%move(file2) !should throw an exception since pointers are not associated
     call file1%initialize()
 
     call file1%print_file(-1_IK)   !invalid input

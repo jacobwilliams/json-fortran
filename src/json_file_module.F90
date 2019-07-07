@@ -68,8 +68,6 @@
                                                  !! factory used for this file.
         type(json_value),pointer :: p => null()  !! the JSON structure read from the file
 
-        logical :: finalize = .true. !! if true, the finalizer will destroy the data
-                                     !! in the class (both `p` and `json`).
     contains
 
         generic,public :: initialize => initialize_json_core_in_file,&
@@ -82,6 +80,7 @@
         generic,public :: load_from_string => MAYBEWRAP(json_file_load_from_string)
 
         procedure,public :: destroy => json_file_destroy
+        procedure,public :: nullify => json_file_nullify
         procedure,public :: move    => json_file_move_pointer
         generic,public   :: info    => MAYBEWRAP(json_file_variable_info)
         generic,public   :: matrix_info => MAYBEWRAP(json_file_variable_matrix_info)
@@ -154,7 +153,8 @@
         !  call f%print_file()
         !  end program test
         !```
-        generic,public :: add => MAYBEWRAP(json_file_add_object),      &
+        generic,public :: add => json_file_add, &
+                                 MAYBEWRAP(json_file_add_object),      &
                                  MAYBEWRAP(json_file_add_integer),     &
 #ifndef REAL32
                                  MAYBEWRAP(json_file_add_real32),      &
@@ -219,6 +219,9 @@
         generic,public :: operator(.in.) => MAYBEWRAP(json_file_valid_path_op)
         procedure,pass(me) :: MAYBEWRAP(json_file_valid_path_op)
 
+        generic,public :: assignment(=) => assign_json_file
+        procedure :: assign_json_file
+
         ! ***************************************************
         ! private routines
         ! ***************************************************
@@ -270,6 +273,7 @@
         procedure :: json_file_get_root
 
         !add:
+        procedure :: json_file_add
         procedure :: MAYBEWRAP(json_file_add_object)
         procedure :: MAYBEWRAP(json_file_add_integer)
 #ifndef REAL32
@@ -370,7 +374,6 @@
 !*****************************************************************************************
 !>
 !  Finalizer for [[json_file]] class.
-!  The finalizer is only called if `finalize` is true in the class.
 !
 !  Just a wrapper for [[json_file_destroy]].
 
@@ -380,7 +383,7 @@
 
     type(json_file),intent(inout) :: me
 
-    if (me%finalize) call me%destroy(destroy_core=.true.)
+    call me%destroy(destroy_core=.true.)
 
     end subroutine finalize_json_file
 !*****************************************************************************************
@@ -482,16 +485,12 @@
                                             compress_vectors,&
                                             allow_duplicate_keys,&
                                             escape_solidus,&
-                                            stop_on_error,&
-                                            finalize)
+                                            stop_on_error)
 
     implicit none
 
     class(json_file),intent(inout) :: me
 #include "json_initialize_arguments.inc"
-    logical(LK),intent(in),optional :: finalize  !! if true, the JSON data in the file will
-                                                 !! be destroyed when the variable goes out
-                                                 !! of scope [the default is true].
 
     call me%core%initialize(verbose,compact_reals,&
                             print_signs,real_format,spaces_per_tab,&
@@ -507,8 +506,6 @@
                             allow_duplicate_keys,&
                             escape_solidus,&
                             stop_on_error)
-
-    if (present(finalize)) me%finalize = finalize
 
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
@@ -577,18 +574,15 @@
                                   compress_vectors,&
                                   allow_duplicate_keys,&
                                   escape_solidus,&
-                                  stop_on_error,&
-                                  finalize) result(file_object)
+                                  stop_on_error) result(file_object)
 
     implicit none
 
     type(json_file) :: file_object
-    type(json_value),pointer,optional,intent(in) :: p  !! `json_value` object to cast
-                                                       !! as a `json_file` object
+    type(json_value),pointer,optional :: p  !! `json_value` object to cast
+                                            !! as a `json_file` object. This
+                                            !! will be nullified.
 #include "json_initialize_arguments.inc"
-    logical(LK),intent(in),optional :: finalize        !! if true, the JSON data in the file will
-                                                       !! be destroyed when the variable goes out
-                                                       !! of scope [the default is true].
 
     call file_object%initialize(verbose,compact_reals,&
                                 print_signs,real_format,spaces_per_tab,&
@@ -603,11 +597,15 @@
                                 compress_vectors,&
                                 allow_duplicate_keys,&
                                 escape_solidus,&
-                                stop_on_error,&
-                                finalize)
+                                stop_on_error)
 
-    if (present(p)) file_object%p => p
-    if (present(finalize)) file_object%finalize = finalize
+    if (present(p)) then
+        file_object%p => p
+        ! we have to nullify it to avoid
+        ! a dangling pointer when the file
+        ! goes out of scope
+        nullify(p)
+    end if
 
     end function initialize_json_file
 !*****************************************************************************************
@@ -619,8 +617,7 @@
 !  Cast a [[json_value]] pointer and a [[json_core(type)]] object
 !  as a [[json_file(type)]] object.
 
-    function initialize_json_file_v2(json_value_object,json_core_object,&
-                                        finalize) &
+    function initialize_json_file_v2(json_value_object,json_core_object) &
                                         result(file_object)
 
     implicit none
@@ -628,13 +625,9 @@
     type(json_file)                     :: file_object
     type(json_value),pointer,intent(in) :: json_value_object
     type(json_core),intent(in)          :: json_core_object
-    logical(LK),intent(in),optional     :: finalize  !! if true, the JSON data in the file will
-                                                     !! be destroyed when the variable goes out
-                                                     !! of scope [the default is true].
 
     file_object%p    => json_value_object
     file_object%core = json_core_object
-    if (present(finalize)) file_object%finalize = finalize
 
     end function initialize_json_file_v2
 !*****************************************************************************************
@@ -787,6 +780,34 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !
+!  Nullify the [[json_value]] pointer in a [[json_file(type)]],
+!  but do not destroy it.
+!
+!  This should normally only be done if the pointer is the target of
+!  another pointer outside the class that is still intended to be in
+!  scope after the [[json_file(type)]] has gone out of scope.
+!  Otherwise, this would result in a memory leak.
+!
+!### See also
+!  * [[json_file_destroy]]
+!
+!### History
+!  * 6/30/2019 : Created
+
+    subroutine json_file_nullify(me)
+
+    implicit none
+
+    class(json_file),intent(inout) :: me
+
+    nullify(me%p)
+
+    end subroutine json_file_nullify
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
 !  Destroy the [[json_value]] data in a [[json_file(type)]].
 !  This must be done when the variable is no longer needed,
 !  or will be reused to open a different file.
@@ -796,12 +817,15 @@
 !  is not necessary to prevent memory leaks, since a [[json_core(type)]]
 !  does not use pointers).
 !
+!### See also
+!  * [[json_file_nullify]]
+!
 !### History
 !  * 12/9/2013 : Created
 !  * 4/26/2016 : Added optional `destroy_core` argument
 !
 !@note This routine will be called automatically when the variable
-!      goes out of scope if `finalize` is true (which it is by default).
+!      goes out of scope.
 
     subroutine json_file_destroy(me,destroy_core)
 
@@ -1162,6 +1186,26 @@
     p => me%p
 
     end subroutine json_file_get_root
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Assignment operator for [[json_core(type)]].
+!  This will duplicate the [[json_core(type)]] and also
+!  perform a deep copy of the [[json_value(type)]] data structure.
+
+    subroutine assign_json_file(me,f)
+
+    implicit none
+
+    class(json_file),intent(out) :: me
+    type(json_file),intent(in)   :: f
+
+    me%core = f%core ! no pointers here so OK to copy
+    call me%core%clone(f%p,me%p)
+
+    end subroutine assign_json_file
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -1869,6 +1913,50 @@
     call me%get(to_unicode(path), vec, ilen, found)
 
     end subroutine wrap_json_file_get_alloc_string_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a [[json_value]] pointer as the root object to a JSON file.
+!
+!### Note
+!
+!  This is mostly equivalent to:
+!```fortran
+!    f = [[json_file]](p)
+!```
+!  But without the finalization calls.
+!
+!  And:
+!```fortran
+!    if (destroy_original) call [[json_file]]%destroy()
+!    call [[json_file]]%add('$',p)
+!```
+
+    subroutine json_file_add(me,p,destroy_original)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    type(json_value),pointer,intent(in)  :: p    !! pointer to the variable to add
+    logical(LK),intent(in),optional      :: destroy_original !! if the file currently contains
+                                                             !! an associated pointer, it is
+                                                             !! destroyed. [Default is True]
+
+    logical(LK) :: destroy   !! if `me%p` is to be destroyed
+
+    if (present(destroy_original)) then
+        destroy = destroy_original
+    else
+        destroy = .true. ! default
+    end if
+
+    if (destroy) call me%core%destroy(me%p)
+
+    me%p => p
+
+    end subroutine json_file_add
 !*****************************************************************************************
 
 !*****************************************************************************************
