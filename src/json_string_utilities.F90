@@ -147,11 +147,19 @@
 !
 !  Convert a real value to a string.
 !
+!### Note
+!  If the value is NaN, Infinity, or -Infinity, the string
+!  will be returned in quotes. This is so it will be printed
+!  in JSON as a string.
+!
 !### Modified
-!  * Izaak Beekman : 02/24/2015 : added the compact option.
+!  * Izaak Beekman  : 02/24/2015 : added the compact option.
 !  * Jacob Williams : 10/27/2015 : added the star option.
+!  * Jacob Williams : 07/07/2019 : added ieee cases.
 
     subroutine real_to_string(rval,real_fmt,compact_real,str)
+
+    use,intrinsic :: ieee_arithmetic
 
     implicit none
 
@@ -161,20 +169,39 @@
                                                          !! displayed with fewer characters
     character(kind=CK,len=*),intent(out) :: str          !! `rval` converted to a string.
 
-    integer(IK) :: istat
+    integer(IK) :: istat !! write `iostat` flag
 
-    if (real_fmt==star) then
+    if (ieee_is_finite(rval) .and. .not. ieee_is_nan(rval)) then
+
+        ! normal real numbers
+
+        if (real_fmt==star) then
+            write(str,fmt=*,iostat=istat) rval
+        else
+            write(str,fmt=real_fmt,iostat=istat) rval
+        end if
+
+        if (istat==0) then
+            !in this case, the default string will be compacted,
+            ! so that the same value is displayed with fewer characters.
+            if (compact_real) call compact_real_string(str)
+        else
+            str = repeat(star,len(str)) ! error
+        end if
+
+    else
+        ! special case for NaN, Infinity, and -Infinity
+
+        ! Let the compiler do the real to string conversion
+        ! like before, but put the result in quotes so it
+        ! gets printed as a string
         write(str,fmt=*,iostat=istat) rval
-    else
-        write(str,fmt=real_fmt,iostat=istat) rval
-    end if
+        if (istat==0) then
+            str = quotation_mark//trim(adjustl(str))//quotation_mark
+        else
+            str = repeat(star,len(str)) ! error
+        end if
 
-    if (istat==0) then
-        !in this case, the default string will be compacted,
-        ! so that the same value is displayed with fewer characters.
-        if (compact_real) call compact_real_string(str)
-    else
-        str = repeat(star,len(str))
     end if
 
     end subroutine real_to_string
