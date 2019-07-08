@@ -77,4 +77,23 @@ logical(LK),intent(in),optional :: escape_solidus
 logical(LK),intent(in),optional :: stop_on_error
   !! If an exception is raised, then immediately quit.
   !! (Default is False).
+integer(IK),intent(in),optional :: null_to_real_mode
+  !! if `strict_type_checking=false`:
+  !!
+  !! * 1 : an exception will be raised if
+  !!   try to retrieve a `null` as a real.
+  !! * 2 : a `null` retrieved as a real
+  !!   will return a NaN. [default]
+  !! * 3 : a `null` retrieved as a real
+  !!   will return 0.0.
+integer(IK),intent(in),optional :: non_normal_mode
+  !! How to serialize NaN, Infinity, and
+  !! -Infinity real values:
+  !!
+  !! * 1 : as strings (e.g., "NaN",
+  !!   "Infinity", "-Infinity") [default]
+  !! * 2 : as JSON `null` values
 
+logical(LK),intent(in),optional :: use_quiet_nan
+  !! if true [default], `null_to_real_mode` and [[string_to_real]]
+  !! will use `ieee_quiet_nan`. If false, `ieee_signaling_nan` will be used.

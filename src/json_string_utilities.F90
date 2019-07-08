@@ -11,6 +11,7 @@
 
     module json_string_utilities
 
+    use,intrinsic :: ieee_arithmetic
     use json_kinds
     use json_parameters
 
@@ -147,19 +148,12 @@
 !
 !  Convert a real value to a string.
 !
-!### Note
-!  If the value is NaN, Infinity, or -Infinity, the string
-!  will be returned in quotes. This is so it will be printed
-!  in JSON as a string.
-!
 !### Modified
 !  * Izaak Beekman  : 02/24/2015 : added the compact option.
 !  * Jacob Williams : 10/27/2015 : added the star option.
-!  * Jacob Williams : 07/07/2019 : added ieee cases.
+!  * Jacob Williams : 07/07/2019 : added null and ieee options.
 
-    subroutine real_to_string(rval,real_fmt,compact_real,str)
-
-    use,intrinsic :: ieee_arithmetic
+    subroutine real_to_string(rval,real_fmt,compact_real,non_normals_to_null,str)
 
     implicit none
 
@@ -167,6 +161,9 @@
     character(kind=CDK,len=*),intent(in) :: real_fmt     !! format for real numbers
     logical(LK),intent(in)               :: compact_real !! compact the string so that it is
                                                          !! displayed with fewer characters
+    logical(LK),intent(in)               :: non_normals_to_null !! If True, NaN, Infinity, or -Infinity are returned as `null`.
+                                                                !! If False, the string value will be returned in quotes
+                                                                !! (e.g., "NaN", "Infinity", or "-Infinity" )
     character(kind=CK,len=*),intent(out) :: str          !! `rval` converted to a string.
 
     integer(IK) :: istat !! write `iostat` flag
@@ -190,16 +187,21 @@
         end if
 
     else
-        ! special case for NaN, Infinity, and -Infinity
+        ! special cases for NaN, Infinity, and -Infinity
 
-        ! Let the compiler do the real to string conversion
-        ! like before, but put the result in quotes so it
-        ! gets printed as a string
-        write(str,fmt=*,iostat=istat) rval
-        if (istat==0) then
-            str = quotation_mark//trim(adjustl(str))//quotation_mark
+        if (non_normals_to_null) then
+            ! return it as a JSON null value
+            str = null_str
         else
-            str = repeat(star,len(str)) ! error
+            ! Let the compiler do the real to string conversion
+            ! like before, but put the result in quotes so it
+            ! gets printed as a string
+            write(str,fmt=*,iostat=istat) rval
+            if (istat==0) then
+                str = quotation_mark//trim(adjustl(str))//quotation_mark
+            else
+                str = repeat(star,len(str)) ! error
+            end if
         end if
 
     end if
@@ -219,19 +221,34 @@
 !    (e.g., when `str='1E-5'`).
 !  * Jacob Williams : 2/6/2017 : moved core logic to this routine.
 
-    subroutine string_to_real(str,rval,status_ok)
+    subroutine string_to_real(str,use_quiet_nan,rval,status_ok)
 
     implicit none
 
-    character(kind=CK,len=*),intent(in) :: str        !! the string to convert to a real
-    real(RK),intent(out)                :: rval       !! `str` converted to a real value
-    logical(LK),intent(out)             :: status_ok  !! true if there were no errors
+    character(kind=CK,len=*),intent(in) :: str           !! the string to convert to a real
+    logical(LK),intent(in)              :: use_quiet_nan !! if true, return NaN's as `ieee_quiet_nan`.
+                                                         !! otherwise, use `ieee_signaling_nan`.
+    real(RK),intent(out)                :: rval          !! `str` converted to a real value
+    logical(LK),intent(out)             :: status_ok     !! true if there were no errors
 
     integer(IK) :: ierr  !! read iostat error code
 
     read(str,fmt=*,iostat=ierr) rval
     status_ok = (ierr==0)
-    if (.not. status_ok) rval = 0.0_RK
+    if (.not. status_ok) then
+        rval = 0.0_RK
+    else
+        if (ieee_support_nan(rval)) then
+            if (ieee_is_nan(rval)) then
+                ! make sure to return the correct NaN
+                if (use_quiet_nan) then
+                    rval = ieee_value(rval,ieee_quiet_nan)
+                else
+                    rval = ieee_value(rval,ieee_signaling_nan)
+                end if
+            end if
+        end if
+    end if
 
     end subroutine string_to_real
 !*****************************************************************************************

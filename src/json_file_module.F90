@@ -472,41 +472,18 @@
 !      and [[initialize_json_file_from_string_v2]]
 !      all have a similar interface.
 
-    subroutine initialize_json_core_in_file(me,verbose,compact_reals,&
-                                            print_signs,real_format,spaces_per_tab,&
-                                            strict_type_checking,&
-                                            trailing_spaces_significant,&
-                                            case_sensitive_keys,&
-                                            no_whitespace,&
-                                            unescape_strings,&
-                                            comment_char,&
-                                            path_mode,&
-                                            path_separator,&
-                                            compress_vectors,&
-                                            allow_duplicate_keys,&
-                                            escape_solidus,&
-                                            stop_on_error)
+    subroutine initialize_json_core_in_file(me,&
+#include "json_initialize_dummy_arguments.inc"
+                                           )
 
     implicit none
 
     class(json_file),intent(inout) :: me
 #include "json_initialize_arguments.inc"
 
-    call me%core%initialize(verbose,compact_reals,&
-                            print_signs,real_format,spaces_per_tab,&
-                            strict_type_checking,&
-                            trailing_spaces_significant,&
-                            case_sensitive_keys,&
-                            no_whitespace,&
-                            unescape_strings,&
-                            comment_char,&
-                            path_mode,&
-                            path_separator,&
-                            compress_vectors,&
-                            allow_duplicate_keys,&
-                            escape_solidus,&
-                            stop_on_error)
-
+    call me%core%initialize(&
+#include "json_initialize_dummy_arguments.inc"
+                           )
     end subroutine initialize_json_core_in_file
 !*****************************************************************************************
 
@@ -561,20 +538,9 @@
 !      and [[initialize_json_file_from_string_v2]]
 !      all have a similar interface.
 
-    function initialize_json_file(p,verbose,compact_reals,&
-                                  print_signs,real_format,spaces_per_tab,&
-                                  strict_type_checking,&
-                                  trailing_spaces_significant,&
-                                  case_sensitive_keys,&
-                                  no_whitespace,&
-                                  unescape_strings,&
-                                  comment_char,&
-                                  path_mode,&
-                                  path_separator,&
-                                  compress_vectors,&
-                                  allow_duplicate_keys,&
-                                  escape_solidus,&
-                                  stop_on_error) result(file_object)
+    function initialize_json_file(p,&
+#include "json_initialize_dummy_arguments.inc"
+                                 ) result(file_object)
 
     implicit none
 
@@ -584,20 +550,9 @@
                                             !! will be nullified.
 #include "json_initialize_arguments.inc"
 
-    call file_object%initialize(verbose,compact_reals,&
-                                print_signs,real_format,spaces_per_tab,&
-                                strict_type_checking,&
-                                trailing_spaces_significant,&
-                                case_sensitive_keys,&
-                                no_whitespace,&
-                                unescape_strings,&
-                                comment_char,&
-                                path_mode,&
-                                path_separator,&
-                                compress_vectors,&
-                                allow_duplicate_keys,&
-                                escape_solidus,&
-                                stop_on_error)
+    call file_object%initialize(&
+#include "json_initialize_dummy_arguments.inc"
+                               )
 
     if (present(p)) then
         file_object%p => p
@@ -652,20 +607,9 @@
 !      and [[initialize_json_file_from_string_v2]]
 !      all have a similar interface.
 
-    function initialize_json_file_from_string(str,verbose,compact_reals,&
-                                  print_signs,real_format,spaces_per_tab,&
-                                  strict_type_checking,&
-                                  trailing_spaces_significant,&
-                                  case_sensitive_keys,&
-                                  no_whitespace,&
-                                  unescape_strings,&
-                                  comment_char,&
-                                  path_mode,&
-                                  path_separator,&
-                                  compress_vectors,&
-                                  allow_duplicate_keys,&
-                                  escape_solidus,&
-                                  stop_on_error) result(file_object)
+    function initialize_json_file_from_string(str,&
+#include "json_initialize_dummy_arguments.inc"
+                                             ) result(file_object)
 
     implicit none
 
@@ -673,21 +617,9 @@
     character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
 #include "json_initialize_arguments.inc"
 
-    call file_object%initialize(verbose,compact_reals,&
-                                print_signs,real_format,spaces_per_tab,&
-                                strict_type_checking,&
-                                trailing_spaces_significant,&
-                                case_sensitive_keys,&
-                                no_whitespace,&
-                                unescape_strings,&
-                                comment_char,&
-                                path_mode,&
-                                path_separator,&
-                                compress_vectors,&
-                                allow_duplicate_keys,&
-                                escape_solidus,&
-                                stop_on_error)
-
+    call file_object%initialize(&
+#include "json_initialize_dummy_arguments.inc"
+                               )
     call file_object%load_from_string(str)
 
     end function initialize_json_file_from_string
@@ -697,20 +629,9 @@
 !>
 !  Alternate version of [[initialize_json_file_from_string]], where "str" is kind=CDK.
 
-    function wrap_initialize_json_file_from_string(str,verbose,compact_reals,&
-                                  print_signs,real_format,spaces_per_tab,&
-                                  strict_type_checking,&
-                                  trailing_spaces_significant,&
-                                  case_sensitive_keys,&
-                                  no_whitespace,&
-                                  unescape_strings,&
-                                  comment_char,&
-                                  path_mode,&
-                                  path_separator,&
-                                  compress_vectors,&
-                                  allow_duplicate_keys,&
-                                  escape_solidus,&
-                                  stop_on_error) result(file_object)
+    function wrap_initialize_json_file_from_string(str,&
+#include "json_initialize_dummy_arguments.inc"
+                                                  ) result(file_object)
 
     implicit none
 
@@ -719,20 +640,9 @@
 #include "json_initialize_arguments.inc"
 
     file_object = initialize_json_file_from_string(&
-                                  to_unicode(str),verbose,compact_reals,&
-                                  print_signs,real_format,spaces_per_tab,&
-                                  strict_type_checking,&
-                                  trailing_spaces_significant,&
-                                  case_sensitive_keys,&
-                                  no_whitespace,&
-                                  unescape_strings,&
-                                  comment_char,&
-                                  path_mode,&
-                                  path_separator,&
-                                  compress_vectors,&
-                                  allow_duplicate_keys,&
-                                  escape_solidus,&
-                                  stop_on_error)
+                                  to_unicode(str),&
+#include "json_initialize_dummy_arguments.inc"
+                                                )
 
     end function wrap_initialize_json_file_from_string
 !*****************************************************************************************

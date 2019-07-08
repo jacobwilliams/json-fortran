@@ -15,6 +15,7 @@
     module json_value_module
 
     use,intrinsic :: iso_fortran_env, only: iostat_end,error_unit,output_unit
+    use,intrinsic :: ieee_arithmetic
     use json_kinds
     use json_parameters
     use json_string_utilities
@@ -255,6 +256,27 @@
                                                   !! Note that this option does not affect parsing
                                                   !! (both escaped and unescaped versions are still
                                                   !! valid in all cases).
+
+        integer(IK) :: null_to_real_mode = 2_IK   !! if `strict_type_checking=false`:
+                                                  !!
+                                                  !! * 1 : an exception will be raised if
+                                                  !!   try to retrieve a `null` as a real.
+                                                  !! * 2 : a `null` retrieved as a real
+                                                  !!   will return NaN. [default]
+                                                  !! * 3 : a `null` retrieved as a real
+                                                  !!   will return 0.0.
+
+        logical(LK) :: non_normals_to_null = .false. !! How to serialize NaN, Infinity,
+                                                     !! and -Infinity real values:
+                                                     !!
+                                                     !! * If true : as JSON `null` values
+                                                     !! * If false : as strings (e.g., "NaN",
+                                                     !!   "Infinity", "-Infinity") [default]
+
+        logical(LK) :: use_quiet_nan = .true. !! if true [default], `null_to_real_mode=2`
+                                              !! and [[string_to_real]] will use
+                                              !! `ieee_quiet_nan` for NaN values. If false,
+                                              !! `ieee_signaling_nan` will be used.
 
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
@@ -929,40 +951,18 @@
 !      [[initialize_json_core_in_file]], and [[initialize_json_file]]
 !      all have a similar interface.
 
-    function initialize_json_core(verbose,compact_reals,&
-                                  print_signs,real_format,spaces_per_tab,&
-                                  strict_type_checking,&
-                                  trailing_spaces_significant,&
-                                  case_sensitive_keys,&
-                                  no_whitespace,&
-                                  unescape_strings,&
-                                  comment_char,&
-                                  path_mode,&
-                                  path_separator,&
-                                  compress_vectors,&
-                                  allow_duplicate_keys,&
-                                  escape_solidus,&
-                                  stop_on_error) result(json_core_object)
+    function initialize_json_core(&
+#include "json_initialize_dummy_arguments.inc"
+                                 ) result(json_core_object)
 
     implicit none
 
     type(json_core) :: json_core_object
 #include "json_initialize_arguments.inc"
 
-    call json_core_object%initialize(verbose,compact_reals,&
-                                print_signs,real_format,spaces_per_tab,&
-                                strict_type_checking,&
-                                trailing_spaces_significant,&
-                                case_sensitive_keys,&
-                                no_whitespace,&
-                                unescape_strings,&
-                                comment_char,&
-                                path_mode,&
-                                path_separator,&
-                                compress_vectors,&
-                                allow_duplicate_keys,&
-                                escape_solidus,&
-                                stop_on_error)
+    call json_core_object%initialize(&
+#include "json_initialize_dummy_arguments.inc"
+                                    )
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -986,20 +986,9 @@
 !      [[initialize_json_core_in_file]], and [[initialize_json_file]]
 !      all have a similar interface.
 
-    subroutine json_initialize(me,verbose,compact_reals,&
-                               print_signs,real_format,spaces_per_tab,&
-                               strict_type_checking,&
-                               trailing_spaces_significant,&
-                               case_sensitive_keys,&
-                               no_whitespace,&
-                               unescape_strings,&
-                               comment_char,&
-                               path_mode,&
-                               path_separator,&
-                               compress_vectors,&
-                               allow_duplicate_keys,&
-                               escape_solidus,&
-                               stop_on_error)
+    subroutine json_initialize(me,&
+#include "json_initialize_dummy_arguments.inc"
+                              )
 
     implicit none
 
@@ -1087,6 +1076,33 @@
     ! if escaping the forward slash:
     if (present(escape_solidus)) then
         me%escape_solidus = escape_solidus
+    end if
+
+    ! how to handle null to read conversions:
+    if (present(null_to_real_mode)) then
+        select case (null_to_real_mode)
+        case(1_IK:3_IK)
+            me%null_to_real_mode = null_to_real_mode
+        case default
+            me%null_to_real_mode = 2_IK  ! just to have a valid value
+            call me%throw_exception('Invalid null_to_real_mode.')
+        end select
+    end if
+
+    ! how to handle NaN and Infinities:
+    if (present(non_normal_mode)) then
+        select case (non_normal_mode)
+        case(1_IK) ! use strings
+            me%non_normals_to_null = .false.
+        case(2_IK) ! use null
+            me%non_normals_to_null = .true.
+        case default
+            call me%throw_exception('Invalid non_normal_mode.')
+        end select
+    end if
+
+    if (present(use_quiet_nan)) then
+        me%use_quiet_nan = use_quiet_nan
     end if
 
     !Set the format for real numbers:
@@ -6224,10 +6240,10 @@
         case (json_real)
 
             if (allocated(json%real_fmt)) then
-                call real_to_string(p%dbl_value,json%real_fmt,json%compact_real,tmp)
+                call real_to_string(p%dbl_value,json%real_fmt,json%compact_real,json%non_normals_to_null,tmp)
             else
                 !use the default format (user has not called initialize() or specified one):
-                call real_to_string(p%dbl_value,default_real_fmt,json%compact_real,tmp)
+                call real_to_string(p%dbl_value,default_real_fmt,json%compact_real,json%non_normals_to_null,tmp)
             end if
 
             s = s_indent//trim(tmp)
@@ -7949,7 +7965,7 @@
 
     if (.not. json%exception_thrown) then
 
-        call string_to_real(str,rval,status_ok)
+        call string_to_real(str,json%use_quiet_nan,rval,status_ok)
 
         if (.not. status_ok) then    !if there was an error
             rval = 0.0_RK
@@ -8226,14 +8242,31 @@
                     value = 0.0_RK
                 end if
             case (json_string)
-                call string_to_real(me%str_value,value,status_ok)
+                call string_to_real(me%str_value,json%use_quiet_nan,value,status_ok)
                 if (.not. status_ok) then
                     value = 0.0_RK
                     call json%throw_exception('Error in json_get_real:'//&
                          ' Unable to convert string value to real: me.'//&
                          me%name//' = '//trim(me%str_value))
                 end if
+            case (json_null)
+                if (ieee_support_nan(value) .and. json%null_to_real_mode/=1_IK) then
+                    select case (json%null_to_real_mode)
+                    case(2_IK)
+                        if (json%use_quiet_nan) then
+                            value = ieee_value(value,ieee_quiet_nan)
+                        else
+                            value = ieee_value(value,ieee_signaling_nan)
+                        end if
+                    case(3_IK)
+                        value = 0.0_RK
+                    end select
+                else
+                    call json%throw_exception('Error in json_get_real:'//&
+                                              ' Cannot convert null to NaN: '//me%name)
+                end if
             case default
+
                 call json%throw_exception('Error in json_get_real:'//&
                                           ' Unable to resolve value to real: '//me%name)
             end select
@@ -8953,6 +8986,7 @@
                     if (allocated(me%dbl_value)) then
                         value = repeat(space, max_numeric_str_len)
                         call real_to_string(me%dbl_value,json%real_fmt,&
+                                            json%non_normals_to_null,&
                                             json%compact_real,value)
                         value = trim(value)
                     else

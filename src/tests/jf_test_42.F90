@@ -23,7 +23,7 @@ contains
     type(json_file) :: json          !! the JSON structure read from the file
     integer,intent(out) :: error_cnt !! error counter
 
-    character(kind=CK,len=*),parameter :: str = CK_'{"bad_reals": [1.0, "NaN", "+Infinity", "-Infinity", 4.0]}'
+    character(kind=CK,len=*),parameter :: str = CK_'{"bad_reals": [1.0, null, "NaN", "+Infinity", "-Infinity", 4.0]}'
 
     real(rk),dimension(:),allocatable :: bad_reals
     logical(lk) :: found
@@ -48,8 +48,10 @@ contains
     write(error_unit,'(A)') 'printing...'
     call json%print_file(int(error_unit,IK))
 
+    call json%initialize(use_quiet_nan=.false., null_to_real_mode=2_IK) ! signaling nan  ! segfault below??
+
     write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'get values as real...'
+    write(error_unit,'(A)') 'get values as real [signaling nan]...'
     call json%get('bad_reals',bad_reals,found)
 
     if (json%failed()) then
@@ -59,6 +61,27 @@ contains
         write(error_unit,'(A)') 'printing...'
         write(error_unit,*) bad_reals
         write(error_unit,'(A)') ''
+
+        call json%initialize(null_to_real_mode=3_IK) ! 0.0 nan
+
+        write(error_unit,'(A)') ''
+        write(error_unit,'(A)') 'get values as real [nan as 0.0]...'
+        call json%get('bad_reals',bad_reals,found)
+
+        write(error_unit,'(A)') 'printing...'
+        write(error_unit,*) bad_reals
+        write(error_unit,'(A)') ''
+
+        call json%initialize(use_quiet_nan=.true., null_to_real_mode=2_IK) ! quiet nan
+
+        write(error_unit,'(A)') ''
+        write(error_unit,'(A)') 'get values as real [quiet nan]...'
+        call json%get('bad_reals',bad_reals,found)
+
+        write(error_unit,'(A)') 'printing...'
+        write(error_unit,*) bad_reals
+        write(error_unit,'(A)') ''
+
     end if
 
     call json%destroy()
@@ -66,6 +89,15 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'now add back as a real...'
     call json%add('bad_reals', bad_reals)
+
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'serialize as strings:'
+    call json%initialize(non_normal_mode=1_IK)
+    call json%print_file(int(error_unit,IK))
+
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'serialize as null:'
+    call json%initialize(non_normal_mode=2_IK)
     call json%print_file(int(error_unit,IK))
     write(error_unit,'(A)') ''
 
@@ -73,6 +105,9 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+
+    !
+
 
     if (error_cnt==0) then
         write(error_unit,'(A)') 'Success!'
