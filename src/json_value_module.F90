@@ -1003,6 +1003,8 @@
     integer(IK)                :: istat        !! `iostat` flag for
                                                !! write statements
     logical(LK)                :: sgn_prnt     !! print sign flag
+    character(kind=CK,len=max_integer_str_len) :: istr !! for integer to
+                                                       !! string conversion
 
     !reset exception to false:
     call me%clear_exceptions()
@@ -1085,7 +1087,8 @@
             me%null_to_real_mode = null_to_real_mode
         case default
             me%null_to_real_mode = 2_IK  ! just to have a valid value
-            call me%throw_exception('Invalid null_to_real_mode.')
+            call integer_to_string(null_to_real_mode,int_fmt,istr)
+            call me%throw_exception('Invalid null_to_real_mode: '//istr)
         end select
     end if
 
@@ -1097,7 +1100,8 @@
         case(2_IK) ! use null
             me%non_normals_to_null = .true.
         case default
-            call me%throw_exception('Invalid non_normal_mode.')
+            call integer_to_string(non_normal_mode,int_fmt,istr)
+            call me%throw_exception('Invalid non_normal_mode: '//istr)
         end select
     end if
 
