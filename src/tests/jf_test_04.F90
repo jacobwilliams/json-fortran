@@ -101,7 +101,7 @@ contains
     write(error_unit,'(A)') 'write to string'
     write(error_unit,'(A)') ''
     !write it to a string, and print to console:
-    call core%print_to_string(p, string)
+    call core%deserialize(p, string)
     if (core%failed()) then
         call core%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -144,7 +144,7 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'read file'
 
-    call json%load_file(filename = dir//filename4)
+    call json%load(filename = dir//filename4)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

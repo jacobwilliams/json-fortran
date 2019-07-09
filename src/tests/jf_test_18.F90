@@ -40,7 +40,7 @@ contains
 
     error_cnt = 0
 
-    call json%parse(p, '{ "a" :{"val"  : 1},'//&
+    call json%load(p, '{ "a" :{"val"  : 1},'//&
                         ' "A" :{"Val"  : 2},'//&
                         ' "a ":{"val  ": 3},'//&
                         ' "A ":{"Val  ": 4} }' )

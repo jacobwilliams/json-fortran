@@ -414,7 +414,7 @@
         !    call json%add_by_path(p,'inputs.t',    0.0_wp  )
         !    call json%add_by_path(p,'inputs.x(1)', 100.0_wp)
         !    call json%add_by_path(p,'inputs.x(2)', 200.0_wp)
-        !    call json%print(p,output_unit)  ! now print to console
+        !    call json%print(p)  ! now print to console
         !````
         !
         !### Notes
@@ -501,25 +501,25 @@
         !      path.  The path version is split up into unicode and non-unicode versions.
 
         generic,public :: get => &
-                                  MAYBEWRAP(json_get_by_path),             &
-            json_get_integer,     MAYBEWRAP(json_get_integer_by_path),     &
-            json_get_integer_vec, MAYBEWRAP(json_get_integer_vec_by_path), &
+                                       MAYBEWRAP(json_get_by_path),             &
+            json_get_integer,          MAYBEWRAP(json_get_integer_by_path),     &
+            json_get_integer_vec,      MAYBEWRAP(json_get_integer_vec_by_path), &
 #ifndef REAL32
-            json_get_real32,      MAYBEWRAP(json_get_real32_by_path),      &
-            json_get_real32_vec,  MAYBEWRAP(json_get_real32_vec_by_path),  &
+            json_get_real32,           MAYBEWRAP(json_get_real32_by_path),      &
+            json_get_real32_vec,       MAYBEWRAP(json_get_real32_vec_by_path),  &
 #endif
-            json_get_real,      MAYBEWRAP(json_get_real_by_path),      &
-            json_get_real_vec,  MAYBEWRAP(json_get_real_vec_by_path),  &
+            json_get_real,             MAYBEWRAP(json_get_real_by_path),        &
+            json_get_real_vec,         MAYBEWRAP(json_get_real_vec_by_path),    &
 #ifdef REAL128
-            json_get_real64,      MAYBEWRAP(json_get_real64_by_path),      &
-            json_get_real64_vec,  MAYBEWRAP(json_get_real64_vec_by_path),  &
+            json_get_real64,           MAYBEWRAP(json_get_real64_by_path),      &
+            json_get_real64_vec,       MAYBEWRAP(json_get_real64_vec_by_path),  &
 #endif
-            json_get_logical,     MAYBEWRAP(json_get_logical_by_path),     &
-            json_get_logical_vec, MAYBEWRAP(json_get_logical_vec_by_path), &
-            json_get_string,      MAYBEWRAP(json_get_string_by_path),      &
-            json_get_string_vec,  MAYBEWRAP(json_get_string_vec_by_path),  &
-            json_get_alloc_string_vec,MAYBEWRAP(json_get_alloc_string_vec_by_path),&
-            json_get_array,       MAYBEWRAP(json_get_array_by_path)
+            json_get_logical,          MAYBEWRAP(json_get_logical_by_path),     &
+            json_get_logical_vec,      MAYBEWRAP(json_get_logical_vec_by_path), &
+            json_get_string,           MAYBEWRAP(json_get_string_by_path),      &
+            json_get_string_vec,       MAYBEWRAP(json_get_string_vec_by_path),  &
+            json_get_alloc_string_vec, MAYBEWRAP(json_get_alloc_string_vec_by_path),&
+            json_get_array,            MAYBEWRAP(json_get_array_by_path)
 
         procedure,private :: json_get_integer
         procedure,private :: json_get_integer_vec
@@ -562,12 +562,16 @@
         procedure,private :: json_get_by_path_rfc6901
         procedure,private :: json_get_by_path_jsonpath_bracket
 
-        procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]]
-                                                                    !! structure to an allocatable
-                                                                    !! string
+        !>
+        !  Print the [[json_value]] structure to an allocatable string
+        procedure,public :: deserialize => json_value_to_string
 
         !>
-        !  Print the [[json_value]] to a file.
+        !  The same as `deserialize`, but only here for backward compatibility
+        procedure,public :: print_to_string => json_value_to_string
+
+        !>
+        !  Print the [[json_value]] to an output unit or file.
         !
         !### Example
         !
@@ -577,7 +581,10 @@
         !    !...
         !    call json%print(p,'test.json')  !this is [[json_print_to_filename]]
         !````
-        generic,public :: print => json_print_to_unit,json_print_to_filename
+        generic,public :: print => json_print_to_console,&
+                                   json_print_to_unit,&
+                                   json_print_to_filename
+        procedure :: json_print_to_console
         procedure :: json_print_to_unit
         procedure :: json_print_to_filename
 
@@ -754,9 +761,18 @@
 
         !>
         !  Parse the JSON file and populate the [[json_value]] tree.
-        generic,public :: parse => json_parse_file, MAYBEWRAP(json_parse_string)
+        generic,public :: load => json_parse_file
         procedure :: json_parse_file
+
+        !>
+        !  Parse the JSON string and populate the [[json_value]] tree.
+        generic,public :: serialize => MAYBEWRAP(json_parse_string)
         procedure :: MAYBEWRAP(json_parse_string)
+
+        !>
+        !  Same as `load` and `serialize` but only here for backward compatibility.
+        generic,public :: parse => json_parse_file, &
+                                   MAYBEWRAP(json_parse_string)
 
         !>
         !  Throw an exception.
@@ -1258,7 +1274,7 @@
 !     implicit none
 !     type(json_core) :: json
 !     type(json_value),pointer :: j1, j2
-!     call json%parse('../files/inputs/test1.json',j1)
+!     call json%load('../files/inputs/test1.json',j1)
 !     call json%clone(j1,j2) !now have two independent copies
 !     call json%destroy(j1)  !destroys j1, but j2 remains
 !     call json%print(j2,'j2.json')
@@ -2048,7 +2064,7 @@
 !     type(json_file) :: json
 !     logical :: status_ok
 !     character(kind=CK,len=:),allocatable :: error_msg
-!     call json%load_file(filename='myfile.json')
+!     call json%load(filename='myfile.json')
 !     call json%check_for_errors(status_ok, error_msg)
 !     if (.not. status_ok) then
 !         write(*,*) 'Error: '//error_msg
@@ -2107,7 +2123,7 @@
 !    type(json_value),pointer :: p
 !    logical :: status_ok
 !    character(len=:),allocatable :: error_msg
-!    call json%parse(filename='myfile.json',p)
+!    call json%load(filename='myfile.json',p)
 !    if (json%failed()) then
 !        call json%check_for_errors(status_ok, error_msg)
 !        write(*,*) 'Error: '//error_msg
@@ -2121,7 +2137,7 @@
 !    type(json_file) :: f
 !    logical :: status_ok
 !    character(len=:),allocatable :: error_msg
-!    call f%load_file(filename='myfile.json')
+!    call f%load(filename='myfile.json')
 !    if (f%failed()) then
 !        call f%check_for_errors(status_ok, error_msg)
 !        write(*,*) 'Error: '//error_msg
@@ -3414,7 +3430,7 @@
 !   logical(json_LK) :: found
 !   type(json_core) :: json
 !   type(json_value),pointer :: p,new,element
-!   call json%parse(file='myfile.json', p=p)
+!   call json%load(file='myfile.json', p=p)
 !   call json%get(p,'x(3)',element,found) ! get pointer to an array element in the file
 !   call json%create_integer(new,1,'')    ! create a new element
 !   call json%insert_after(element,new)   ! insert new element after x(3)
@@ -5864,6 +5880,25 @@
     if (len(str)>iloc) str = str(1:iloc)
 
     end subroutine json_value_to_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Print the [[json_value]] structure to the console (`output_unit`).
+!
+!### Note
+!  * Just a wrapper for [[json_print_to_unit]].
+
+    subroutine json_print_to_console(json,p)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p
+
+    call json%print(p,int(output_unit,IK))
+
+    end subroutine json_print_to_console
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -9574,7 +9609,7 @@
 !````fortran
 !    type(json_core) :: json
 !    type(json_value),pointer :: p
-!    call json%parse(file='myfile.json', p=p)
+!    call json%load(file='myfile.json', p=p)
 !````
 !
 !### History
@@ -9788,7 +9823,7 @@
     type(json_value),pointer             :: p     !! output structure
     character(kind=CDK,len=*),intent(in) :: str   !! string with JSON data
 
-    call json%parse(p,to_unicode(str))
+    call json%load(p,to_unicode(str))
 
     end subroutine wrap_json_parse_string
 !*****************************************************************************************

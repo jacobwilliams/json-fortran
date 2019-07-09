@@ -45,7 +45,7 @@ contains
     nullify(p2)
     nullify(p)
 
-    call json%parse(p2, '{"int": 1, "real": 2.0, "logical": true}')
+    call json%load(p2, '{"int": 1, "real": 2.0, "logical": true}')
     call json%get(p2,'real',   i)
     call json%get(p2,'logical',i)
     call json%get(p2,'integer',d)
@@ -66,10 +66,10 @@ contains
     call file1%move(file2) !should throw an exception since pointers are not associated
     call file1%initialize()
 
-    call file1%print_file(-1_IK)   !invalid input
+    call file1%print(-1_IK)   !invalid input
     call file1%initialize()
 
-    call file1%print_file(filename='') !invalid filename
+    call file1%print(filename='') !invalid filename
     call file1%initialize()
 
     call file1%info('this path does not exist',found,var_type,n_children)

@@ -38,7 +38,7 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-    call json%print_file()
+    call json%print()
     call json%destroy()
 
     if (.not. json%failed() .and. error_cnt==0) then

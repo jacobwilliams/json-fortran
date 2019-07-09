@@ -43,8 +43,8 @@ contains
         write(error_unit,'(A)') ''
 
         call json%initialize(escape_solidus=(i==1), stop_on_error=.true.)
-        call json%load_from_string(str)
-        call json%print_file(int(error_unit,IK))
+        call json%serialize(str)
+        call json%print(int(error_unit,IK))
 
         if (json%failed()) then
             call json%print_error_message(error_unit)

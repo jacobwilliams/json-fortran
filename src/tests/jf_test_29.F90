@@ -63,7 +63,7 @@ contains
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') 'JSON string: '//json_str
 
-        call json%parse(p,json_str)
+        call json%load(p,json_str)
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
@@ -109,7 +109,7 @@ contains
 
             ! check when the string is parsed:
             call json%initialize(allow_duplicate_keys=.false.)
-            call json%parse(p,json_str)
+            call json%load(p,json_str)
             if (json%failed() .eqv. correct_has_duplicate) then
                 write(output_unit,'(A)') '   Test passed: parse'
             else
@@ -121,7 +121,7 @@ contains
 
             ! check by explicit call to validate:
             call json%initialize()  ! don't throw an exception when parsing
-            call json%parse(p,json_str)
+            call json%load(p,json_str)
             call json%initialize(allow_duplicate_keys=.false.)
             call json%validate(p,is_valid,error_msg)
             if (is_valid .eqv. (.not. correct_has_duplicate)) then

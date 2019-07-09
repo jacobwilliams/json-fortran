@@ -38,7 +38,7 @@ contains
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Original:'
-    call json%parse(p, '{"cities": ["New York","Los Angeles","Chicago"], '//&
+    call json%load(p, '{"cities": ["New York","Los Angeles","Chicago"], '//&
                        '"value": 1, "iflag": true, "struct":{"vec":[1,2,3]}}')
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -94,7 +94,7 @@ contains
     write(error_unit,'(A)') '.....................................'
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Original:'
-    call json%parse(p, '{ "stats": { "iflag": 0, "str": "ok" },'//&
+    call json%load(p, '{ "stats": { "iflag": 0, "str": "ok" },'//&
                         '"vars": [{ "label": "r", "value": 0.0 }, '//&
                                  '{ "label": "v", "value": 0.0 }],'//&
                         '"empty": { } }')
@@ -144,7 +144,7 @@ contains
     write(error_unit,'(A)') '.....................................'
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Original:'
-    call json%parse(p, '{ "color": "red", "width": 10, "height": 2 }')
+    call json%load(p, '{ "color": "red", "width": 10, "height": 2 }')
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -169,7 +169,7 @@ contains
     write(error_unit,'(A)') '.....................................'
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Original:'
-    call json%parse(p, '{ "color": "red", "width": 10, "height": 2 }')
+    call json%load(p, '{ "color": "red", "width": 10, "height": 2 }')
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -194,7 +194,7 @@ contains
     write(error_unit,'(A)') '.....................................'
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Original:'
-    call json%parse(p, '{ "color": "red", "width": 10, "height": 2 }')
+    call json%load(p, '{ "color": "red", "width": 10, "height": 2 }')
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

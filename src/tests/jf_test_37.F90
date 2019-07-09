@@ -38,28 +38,28 @@ contains
 
     call json%initialize(no_whitespace=.true.)
 
-    call json%parse(p, CK_'{"a": ["1", "2", "3"]}')
+    call json%load(p, CK_'{"a": ["1", "2", "3"]}')
     f = json_file(p,no_whitespace=.true.)
-    call f%print_file(int(error_unit,IK))
+    call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
-    call json%parse(p, CK_'{"b": ["4", "5", "6"]}')
+    call json%load(p, CK_'{"b": ["4", "5", "6"]}')
     f = json_file(p,json)
-    call f%print_file(int(error_unit,IK))
+    call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     f = json_file(CK_'{"x": [1,2,3]}',no_whitespace=.true.)
-    call f%print_file(int(error_unit,IK))
+    call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     f = json_file(CK_'{"y": [4,5,6]}',json)
-    call f%print_file(int(error_unit,IK))
+    call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
@@ -68,28 +68,28 @@ contains
 
     ! also test default character kind when unicode is enabled:
 
-    call json%parse(p, CDK_'{"a": ["1", "2", "3"]}')
+    call json%load(p, CDK_'{"a": ["1", "2", "3"]}')
     f = json_file(p,no_whitespace=.true.)
-    call f%print_file(int(error_unit,IK))
+    call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
-    call json%parse(p, CDK_'{"b": ["4", "5", "6"]}')
+    call json%load(p, CDK_'{"b": ["4", "5", "6"]}')
     f = json_file(p,json)
-    call f%print_file(int(error_unit,IK))
+    call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     f = json_file(CDK_'{"x": [1,2,3]}',no_whitespace=.true.)
-    call f%print_file(int(error_unit,IK))
+    call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     f = json_file(CDK_'{"y": [4,5,6]}',json)
-    call f%print_file(int(error_unit,IK))
+    call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()

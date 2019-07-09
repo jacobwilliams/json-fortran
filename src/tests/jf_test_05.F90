@@ -50,7 +50,7 @@ contains
 
     ! parse the json file:
     write(error_unit,'(A)') 'load file...'
-    call json%load_file(filename = dir//filename5)
+    call json%load(filename = dir//filename5)
     if (json%failed()) then
 
         call json%print_error_message(error_unit)
@@ -60,7 +60,7 @@ contains
 
         ! print the parsed data to the console:
         write(error_unit,'(A)') 'print file...'
-        call json%print_file(int(error_unit,IK))
+        call json%print(int(error_unit,IK))
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1

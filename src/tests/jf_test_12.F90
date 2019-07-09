@@ -173,7 +173,7 @@ contains
    !  call check_file_errors(associated(tmp_json_ptr,root))
 
     open(file=dir//file,newunit=lun,form='formatted',action='write')
-    call my_file%print_file(lun)
+    call my_file%print(lun)
     call check_file_errors()
     close(lun)
 

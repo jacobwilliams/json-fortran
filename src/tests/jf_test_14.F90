@@ -48,7 +48,7 @@ contains
 
     call json%initialize() !initialize the module
 
-    call json%parse(dir//filename1,p)  !read the file
+    call json%load(dir//filename1,p)  !read the file
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -83,7 +83,7 @@ contains
     new_name = 'Bob'
     icount = 0
     call f%initialize()
-    call f%load_file(dir//filename1)  !read the file
+    call f%load(dir//filename1)  !read the file
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -103,7 +103,7 @@ contains
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') ' All names changed to '//new_name//':'
         write(error_unit,'(A)') ''
-        call f%print_file(int(output_unit,IK))
+        call f%print(int(output_unit,IK))
         write(error_unit,'(A)') ''
     end if
 

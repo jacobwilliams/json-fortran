@@ -43,7 +43,7 @@ contains
 
     call json%initialize(strict_type_checking = .false.)
 
-    call json%load_from_string(json_string)
+    call json%serialize(json_string)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

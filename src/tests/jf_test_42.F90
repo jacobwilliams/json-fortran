@@ -39,14 +39,14 @@ contains
     ! parse the json string:
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'parsing string... '
-    call json%load_from_string(str)
+    call json%serialize(str)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'printing...'
-    call json%print_file(int(error_unit,IK))
+    call json%print(int(error_unit,IK))
 
     call json%initialize(use_quiet_nan=.false., null_to_real_mode=2_IK) ! signaling nan
 
@@ -93,12 +93,12 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'serialize as strings:'
     call json%initialize(non_normal_mode=1_IK)
-    call json%print_file(int(error_unit,IK))
+    call json%print(int(error_unit,IK))
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'serialize as null:'
     call json%initialize(non_normal_mode=2_IK)
-    call json%print_file(int(error_unit,IK))
+    call json%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
 
     if (json%failed()) then

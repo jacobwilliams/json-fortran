@@ -53,7 +53,7 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Loading file: '//trim(filename)//'...'
 
-    call f%load_file(dir//filename)  ! will call initialize()
+    call f%load(dir//filename)  ! will call initialize()
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -74,7 +74,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_load_from_string...'
-    call f%load_from_string(json_str)
+    call f%serialize(json_str)
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -83,7 +83,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_print_to_string...'
-    call f%print_to_string(str)
+    call f%deserialize(str)
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1

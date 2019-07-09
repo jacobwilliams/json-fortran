@@ -43,7 +43,7 @@ contains
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Original:'
-    call json%parse(p, json_string)
+    call json%load(p, json_string)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -107,7 +107,7 @@ contains
     call json%destroy(p)
 
     ! test the corresponding json_file version:
-    call f%load_from_string(json_string)
+    call f%serialize(json_string)
     call f%rename(CK_'iflag',  CK_'flag')
     call f%rename(CK_'flag',   CDK_'iflag')
     call f%rename(CDK_'iflag', CK_'flag')
