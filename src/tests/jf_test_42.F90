@@ -48,7 +48,7 @@ contains
     write(error_unit,'(A)') 'printing...'
     call json%print_file(int(error_unit,IK))
 
-    call json%initialize(use_quiet_nan=.false., null_to_real_mode=2_IK) ! signaling nan  ! segfault below??
+    call json%initialize(use_quiet_nan=.false., null_to_real_mode=2_IK) ! signaling nan
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'get values as real [signaling nan]...'
@@ -105,9 +105,6 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
-
-    !
-
 
     if (error_cnt==0) then
         write(error_unit,'(A)') 'Success!'
