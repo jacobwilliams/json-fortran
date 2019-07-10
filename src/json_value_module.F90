@@ -68,6 +68,49 @@
 #endif
     !*********************************************************
 
+    type,abstract :: json_data
+        !! to hold the various types of JSON data
+        private
+    end type json_data
+
+    type,extends(json_data),abstract :: json_data_with_children
+        !! a json data type that can have children
+        !! (an object or array)
+        integer(IK) :: n_children = 0   !! number of children
+    end type json_data_with_children
+
+    type,extends(json_data) :: json_real_type
+        !! a `json_real` variable
+        real(RK) :: value = 0.0_RK
+    end type json_real_type
+
+    type,extends(json_data) :: json_logical_type
+        !! a `json_logical` variable
+        logical(LK) :: value = .false.
+    end type json_logical_type
+
+    type,extends(json_data) :: json_string_type
+        !! a `json_string` variable
+        character(kind=CK,len=:),allocatable :: value
+    end type json_string_type
+
+    type,extends(json_data) :: json_integer_type
+        !! a `json_integer` variable
+        integer(IK) :: value = 0.0_IK
+    end type json_integer_type
+
+    type,extends(json_data) :: json_null_type
+        !! a `json_null` variable
+    end type json_null_type
+
+    type,extends(json_data_with_children) :: json_object_type
+        !! a `json_object` variable
+    end type json_object_type
+
+    type,extends(json_data_with_children) :: json_array_type
+        !! a `json_array` variable
+    end type json_array_type
+
     !*********************************************************
     !>
     !  Type used to construct the linked-list JSON structure.
@@ -103,13 +146,7 @@
     !
     !@warning Pointers of this type should only be allocated
     !         using the methods from [[json_core(type)]].
-
     type,public :: json_value
-
-        !force the constituents to be stored contiguously
-        ![note: on Intel, the order of the variables below
-        ! is significant to avoid the misaligned field warnings]
-        sequence
 
         private
 
@@ -122,15 +159,9 @@
 
         character(kind=CK,len=:),allocatable :: name  !! variable name (unescaped)
 
-        real(RK),allocatable                 :: dbl_value  !! real data for this variable
-        logical(LK),allocatable              :: log_value  !! logical data for this variable
-        character(kind=CK,len=:),allocatable :: str_value  !! string data for this variable
-                                                           !! (unescaped)
-        integer(IK),allocatable              :: int_value  !! integer data for this variable
-
-        integer(IK) :: var_type = json_unknown  !! variable type
-
-        integer(IK),private :: n_children = 0   !! number of children
+        class(json_data),allocatable :: data !! the JSON data.
+                                             !! when not allocated,
+                                             !! it is `json_unknown`
 
     end type json_value
     !*********************************************************
@@ -1327,15 +1358,8 @@
         allocate(to)
 
         !copy over the data variables:
-        ! [note: the allocate() statements don't work here for the
-        !  deferred-length characters in gfortran-4.9]
-        if (allocated(from%name))      to%name = from%name
-        if (allocated(from%dbl_value)) allocate(to%dbl_value,source=from%dbl_value)
-        if (allocated(from%log_value)) allocate(to%log_value,source=from%log_value)
-        if (allocated(from%str_value)) to%str_value = from%str_value
-        if (allocated(from%int_value)) allocate(to%int_value,source=from%int_value)
-        to%var_type   = from%var_type
-        to%n_children = from%n_children
+        if (allocated(from%name)) to%name = from%name
+        allocate(to%data, source=from%data)
 
         !allocate and associate the pointers as necessary:
 
@@ -1376,18 +1400,13 @@
 !
 !  Destroy the data within a [[json_value]], and reset type to `json_unknown`.
 
-    pure subroutine destroy_json_data(d)
+    pure subroutine destroy_json_data(me)
 
     implicit none
 
-    type(json_value),intent(inout) :: d
+    type(json_value),intent(inout) :: me
 
-    d%var_type = json_unknown
-
-    if (allocated(d%log_value)) deallocate(d%log_value)
-    if (allocated(d%int_value)) deallocate(d%int_value)
-    if (allocated(d%dbl_value)) deallocate(d%dbl_value)
-    if (allocated(d%str_value)) deallocate(d%str_value)
+    if (allocated(me%data)) deallocate(me%data)
 
     end subroutine destroy_json_data
 !*****************************************************************************************
@@ -1408,7 +1427,25 @@
     integer(IK),intent(out),optional :: n_children !! number of children
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    if (present(var_type))    var_type   = p%var_type
+    if (present(var_type)) then
+        if (allocated(p%data)) then
+            associate (data => p%data)
+                select type (data)
+                class is (json_string_type);  var_type = json_string
+                class is (json_real_type);    var_type = json_real
+                class is (json_integer_type); var_type = json_integer
+                class is (json_logical_type); var_type = json_logical
+                class is (json_array_type);   var_type = json_array
+                class is (json_object_type);  var_type = json_object
+                class is (json_null_type);    var_type = json_null
+                class default;                var_type = json_unknown
+                end select
+            end associate
+        else
+            var_type = json_unknown
+        end if
+    end if
+
     if (present(n_children))  n_children = json%count(p)
     if (present(name)) then
         if (allocated(p%name)) then
@@ -1453,7 +1490,6 @@
     logical(LK) :: initialized !! if the output array has been sized
     logical(LK) :: get_max_len !! if we are returning the `max_str_len`
     logical(LK) :: get_ilen    !! if we are returning the `ilen` array
-    integer(IK) :: var_type    !! variable type
 
     get_max_len = present(max_str_len)
     get_ilen    = present(ilen)
@@ -1465,41 +1501,49 @@
 
         if (get_max_len) max_str_len = 0
 
-        select case (p%var_type)
+        if (allocated(p%data)) then
+            associate (data => p%data)
 
-        case (json_array) ! it's an array
+                select type (data)
 
-            ! call routine for each element
-            call json%get(p, array_callback=get_string_lengths)
+                class is (json_array_type) ! it's an array
 
-        case default ! not an array
+                    ! call routine for each element
+                    call json%get(p, array_callback=get_string_lengths)
 
-            if (json%strict_type_checking) then
-                ! only allowing strings to be returned
-                ! as strings, so we can check size directly
-                call json%info(p,var_type=var_type)
-                if (var_type==json_string) then
-                    if (allocated(p%str_value) .and. get_max_len) &
-                        max_str_len = len(p%str_value)
-                else
-                    ! it isn't a string, so there is no length
-                    call json%throw_exception('Error in json_string_info: '//&
-                                              'When strict_type_checking is true '//&
-                                              'the variable must be a character string.',&
-                                              found)
-                end if
-            else
-                ! in this case, we have to get the value
-                ! as a string to know what size it is.
-                call json%get(p, value=cval)
-                if (.not. json%exception_thrown) then
-                    if (allocated(cval) .and. get_max_len) &
-                        max_str_len = len(cval)
-                end if
-            end if
+                class default ! not an array
 
-        end select
+                    if (json%strict_type_checking) then
+                        ! only allowing strings to be returned
+                        ! as strings, so we can check size directly
+                        select type (data)
+                        class is (json_string_type)
+                            if (allocated(data%value) .and. get_max_len) &
+                                max_str_len = len(data%value)
+                        class default
+                            ! it isn't a string, so there is no length
+                            call json%throw_exception('Error in json_string_info: '//&
+                                                      'When strict_type_checking is true '//&
+                                                      'the variable must be a character string.',&
+                                                      found)
+                        end select
+                    else
+                        ! in this case, we have to get the value
+                        ! as a string to know what size it is.
+                        call json%get(p, value=cval)
+                        if (.not. json%exception_thrown) then
+                            if (allocated(cval) .and. get_max_len) &
+                                max_str_len = len(cval)
+                        end if
+                    end if
 
+                end select
+
+            end associate
+        else
+            call json%throw_exception('Error in json_string_info: '//&
+                                      'JSON data not allocated.')
+        end if
     end if
 
     if (json%exception_thrown) then
@@ -1527,7 +1571,6 @@
         integer(IK),intent(in)              :: count    !! size of array
 
         character(kind=CK,len=:),allocatable :: cval
-        integer(IK) :: var_type
 
         if (json%exception_thrown) return
 
@@ -1539,24 +1582,26 @@
         if (json%strict_type_checking) then
             ! only allowing strings to be returned
             ! as strings, so we can check size directly
-            call json%info(element,var_type=var_type)
-            if (var_type==json_string) then
-                if (allocated(element%str_value)) then
-                    if (get_max_len) then
-                        if (len(element%str_value)>max_str_len) &
-                                max_str_len = len(element%str_value)
+            associate (data => element%data)
+                select type (data)
+                class is (json_string_type)
+                    if (allocated(data%value)) then
+                        if (get_max_len) then
+                            if (len(data%value)>max_str_len) &
+                                    max_str_len = len(data%value)
+                        end if
+                        if (get_ilen) ilen(i) = len(data%value)
+                    else
+                        if (get_ilen) ilen(i) = 0
                     end if
-                    if (get_ilen) ilen(i) = len(element%str_value)
-                else
-                    if (get_ilen) ilen(i) = 0
-                end if
-            else
-                ! it isn't a string, so there is no length
-                call json%throw_exception('Error in json_string_info: '//&
-                                          'When strict_type_checking is true '//&
-                                          'the array must contain only '//&
-                                          'character strings.',found)
-            end if
+                class default
+                    ! it isn't a string, so there is no length
+                    call json%throw_exception('Error in json_string_info: '//&
+                                              'When strict_type_checking is true '//&
+                                              'the array must contain only '//&
+                                              'character strings.',found)
+                end select
+            end associate
         else
             ! in this case, we have to get the value
             ! as a string to know what size it is.
@@ -2236,40 +2281,46 @@
 
         if (allocated(p%name)) deallocate(p%name)
 
-        call destroy_json_data(p)
-
         if (associated(p%next)) then
             ! check for circular references:
             if (associated(p, p%next)) nullify(p%next)
         end if
 
-        if (associated(p%children)) then
-            do while (p%n_children > 0)
-                child => p%children
-                if (associated(child)) then
-                    p%children => p%children%next
-                    p%n_children = p%n_children - 1
-                    ! check children for circular references:
-                    circular = (associated(p%children) .and. &
-                                associated(p%children,child))
-                    call json%destroy(child,destroy_next=.false.)
-                    if (circular) exit
-                else
-                    ! it is a malformed JSON object. But, we will
-                    ! press ahead with the destroy process, since
-                    ! otherwise, there would be no way to destroy it.
-                    exit
-                end if
-            end do
-            nullify(p%children)
-            nullify(child)
+        if (allocated(p%data)) then
+            associate (data => p%data)
+                select type (data)
+                class is (json_data_with_children)
+                    if (associated(p%children)) then
+                        do while (data%n_children > 0)
+                            child => p%children
+                            if (associated(child)) then
+                                p%children => p%children%next
+                                data%n_children = data%n_children - 1
+                                ! check children for circular references:
+                                circular = (associated(p%children) .and. &
+                                            associated(p%children,child))
+                                call json%destroy(child,destroy_next=.false.)
+                                if (circular) exit
+                            else
+                                ! it is a malformed JSON object. But, we will
+                                ! press ahead with the destroy process, since
+                                ! otherwise, there would be no way to destroy it.
+                                exit
+                            end if
+                        end do
+                        nullify(p%children)
+                        nullify(child)
+                    end if
+                end select
+            end associate
         end if
-
         if (associated(p%next) .and. des_next) call json%destroy(p%next)
 
         nullify(p%previous)
         nullify(p%parent)
         nullify(p%tail)
+
+        call destroy_json_data(p)
 
         if (associated(p)) deallocate(p)
         nullify(p)
@@ -2375,7 +2426,12 @@
 
             end if
 
-            parent%n_children = parent%n_children - 1
+            associate (parent_data => parent%data)
+                select type (parent_data)
+                class is (json_data_with_children)
+                    parent_data%n_children = parent_data%n_children - 1
+                end select
+            end associate
 
         end if
 
@@ -2773,65 +2829,11 @@
 
         if (is_valid .and. associated(p)) then
 
-            ! data type:
-            select case (p%var_type)
-            case(json_null,json_object,json_array)
-                if (allocated(p%log_value) .or. allocated(p%int_value) .or. &
-                    allocated(p%dbl_value) .or. allocated(p%str_value)) then
-                    error_msg = 'incorrect data allocated for '//&
-                                'json_null, json_object, or json_array variable type'
-                    is_valid = .false.
-                    return
-                end if
-            case(json_logical)
-                if (.not. allocated(p%log_value)) then
-                    error_msg = 'log_value should be allocated for json_logical variable type'
-                    is_valid = .false.
-                    return
-                else if (allocated(p%int_value) .or. &
-                    allocated(p%dbl_value) .or. allocated(p%str_value)) then
-                    error_msg = 'incorrect data allocated for json_logical variable type'
-                    is_valid = .false.
-                    return
-                end if
-            case(json_integer)
-                if (.not. allocated(p%int_value)) then
-                    error_msg = 'int_value should be allocated for json_integer variable type'
-                    is_valid = .false.
-                    return
-                else if (allocated(p%log_value) .or. &
-                    allocated(p%dbl_value) .or. allocated(p%str_value)) then
-                    error_msg = 'incorrect data allocated for json_integer variable type'
-                    is_valid = .false.
-                    return
-                end if
-            case(json_real)
-                if (.not. allocated(p%dbl_value)) then
-                    error_msg = 'dbl_value should be allocated for json_real variable type'
-                    is_valid = .false.
-                    return
-                else if (allocated(p%log_value) .or. allocated(p%int_value) .or. &
-                    allocated(p%str_value)) then
-                    error_msg = 'incorrect data allocated for json_real variable type'
-                    is_valid = .false.
-                    return
-                end if
-            case(json_string)
-                if (.not. allocated(p%str_value)) then
-                    error_msg = 'str_value should be allocated for json_string variable type'
-                    is_valid = .false.
-                    return
-                else if (allocated(p%log_value) .or. allocated(p%int_value) .or. &
-                    allocated(p%dbl_value)) then
-                    error_msg = 'incorrect data allocated for json_string variable type'
-                    is_valid = .false.
-                    return
-                end if
-            case default
+            if (.not. allocated(p%data)) then
                 error_msg = 'invalid JSON variable type'
                 is_valid = .false.
                 return
-            end select
+            end if
 
             if (require_parent .and. .not. associated(p%parent)) then
                 error_msg = 'parent pointer is not associated'
@@ -2841,12 +2843,17 @@
 
             if (.not. allocated(p%name)) then
                 if (associated(p%parent)) then
-                    if (p%parent%var_type/=json_array) then
-                        error_msg = 'JSON variable must have a name if not an '//&
-                                    'array element or the root'
-                        is_valid = .false.
-                        return
-                    end if
+                    associate (data => p%parent%data)
+                        select type (data)
+                        class is (json_array_type)
+                            ! array: OK not to have a name
+                        class default
+                            error_msg = 'JSON variable must have a name if not an '//&
+                                        'array element or the root'
+                            is_valid = .false.
+                            return
+                        end select
+                    end associate
                 end if
             end if
 
@@ -2871,60 +2878,73 @@
 
             if (associated(p%children)) then
 
-                if (p%var_type/=json_array .and. p%var_type/=json_object) then
-                    error_msg = 'only arrays and objects can have children'
+                if (allocated(p%data)) then
+                    associate (data => p%data)
+
+                        select type (data)
+                        class is (json_data_with_children)
+                            ! first validate children pointers:
+
+                            previous => null()
+                            element => p%children
+                            do i = 1_IK, data%n_children
+                                if (.not. associated(element%parent,p)) then
+                                    error_msg = 'child''s parent pointer not properly associated'
+                                    is_valid = .false.
+                                    return
+                                end if
+                                if (i==1 .and. associated(element%previous)) then
+                                    error_msg = 'first child shouldn''t have a previous'
+                                    is_valid = .false.
+                                    return
+                                end if
+                                if (i<data%n_children .and. .not. associated(element%next)) then
+                                    error_msg = 'not enough children'
+                                    is_valid = .false.
+                                    return
+                                end if
+                                if (i==data%n_children .and. associated(element%next)) then
+                                    error_msg = 'too many children'
+                                    is_valid = .false.
+                                    return
+                                end if
+                                if (i>1) then
+                                    if (.not. associated(previous,element%previous)) then
+                                        error_msg = 'previous pointer not properly associated'
+                                        is_valid = .false.
+                                        return
+                                    end if
+                                end if
+                                if (i==data%n_children .and. &
+                                    .not. associated(element%parent%tail,element)) then
+                                    error_msg = 'parent''s tail pointer not properly associated'
+                                    is_valid = .false.
+                                    return
+                                end if
+                                if (i<data%n_children) then
+                                    !setup next case:
+                                    previous => element
+                                    element => element%next
+                                end if
+                            end do
+
+                            !now check all the children:
+                            call check_if_valid(p%children,require_parent=.true.)
+
+                        class default
+
+                            error_msg = 'only arrays and objects can have children'
+                            is_valid = .false.
+                            return
+
+                        end select
+
+                    end associate
+                else
+                    error_msg = 'JSON data not allocated'
                     is_valid = .false.
                     return
                 end if
-
-                ! first validate children pointers:
-
-                previous => null()
-                element => p%children
-                do i = 1_IK, p%n_children
-                    if (.not. associated(element%parent,p)) then
-                        error_msg = 'child''s parent pointer not properly associated'
-                        is_valid = .false.
-                        return
-                    end if
-                    if (i==1 .and. associated(element%previous)) then
-                        error_msg = 'first child shouldn''t have a previous'
-                        is_valid = .false.
-                        return
-                    end if
-                    if (i<p%n_children .and. .not. associated(element%next)) then
-                        error_msg = 'not enough children'
-                        is_valid = .false.
-                        return
-                    end if
-                    if (i==p%n_children .and. associated(element%next)) then
-                        error_msg = 'too many children'
-                        is_valid = .false.
-                        return
-                    end if
-                    if (i>1) then
-                        if (.not. associated(previous,element%previous)) then
-                            error_msg = 'previous pointer not properly associated'
-                            is_valid = .false.
-                            return
-                        end if
-                    end if
-                    if (i==p%n_children .and. &
-                        .not. associated(element%parent%tail,element)) then
-                        error_msg = 'parent''s tail pointer not properly associated'
-                        is_valid = .false.
-                        return
-                    end if
-                    if (i<p%n_children) then
-                        !setup next case:
-                        previous => element
-                        element => element%next
-                    end if
-                end do
-
-                !now check all the children:
-                call check_if_valid(p%children,require_parent=.true.)
-
             end if
 
         end if
@@ -3375,38 +3395,42 @@
     type(json_value),pointer       :: member  !! the child member
                                               !! to add to `p`
 
-    integer(IK) :: var_type  !! variable type of `p`
-
     if (.not. json%exception_thrown) then
 
         if (associated(p)) then
 
-            call json%info(p,var_type=var_type)
+            if (allocated(p%data)) then
+                associate (data => p%data)
 
-            select case (var_type)
-            case(json_object, json_array)
+                    select type (data)
+                    class is (json_data_with_children)
 
-                ! associate the parent
-                member%parent => p
+                        ! associate the parent
+                        member%parent => p
 
-                ! add to linked list
-                if (associated(p%children)) then
-                    p%tail%next => member
-                    member%previous => p%tail
-                else
-                    p%children => member
-                    member%previous => null()  !first in the list
-                end if
+                        ! add to linked list
+                        if (associated(p%children)) then
+                            p%tail%next => member
+                            member%previous => p%tail
+                        else
+                            p%children => member
+                            member%previous => null()  !first in the list
+                        end if
 
-                ! new member is now the last one in the list
-                p%tail => member
-                p%n_children = p%n_children + 1
+                        ! new member is now the last one in the list
+                        p%tail => member
+                        data%n_children = data%n_children + 1
 
-            case default
+                    class default
+                        call json%throw_exception('Error in json_value_add_member: '//&
+                                                  'can only add child to object or array')
+                    end select
+
+                end associate
+            else
                 call json%throw_exception('Error in json_value_add_member: '//&
-                                          'can only add child to object or array')
-            end select
-
+                                          'JSON data not allocated')
+            end if
         else
             call json%throw_exception('Error in json_value_add_member: '//&
                                       'the pointer is not associated')
@@ -3497,8 +3521,13 @@
         end do
 
         if (associated(parent)) then
-            ! update parent's child counter:
-            parent%n_children = parent%n_children + n
+            associate (data => parent%data)
+                select type (data)
+                class is (json_data_with_children)
+                    ! update parent's child counter:
+                    data%n_children = data%n_children + n
+                end select
+            end associate
             ! if p is last of parents children then
             ! also have to update parent tail pointer:
             if (associated(parent%tail,p)) then
@@ -3510,8 +3539,12 @@
             ! element is apparently part of an existing list,
             ! so have to update that as well.
             if (associated(element%previous%parent)) then
-                element%previous%parent%n_children = &
-                    element%previous%parent%n_children - n
+                associate (data => element%previous%parent%data)
+                    select type (data)
+                    class is (json_data_with_children)
+                        data%n_children = data%n_children - n
+                    end select
+                end associate
                 element%previous%parent%tail => &
                     element%previous ! now the last one in the list
             else
@@ -3706,13 +3739,17 @@
             !      being changed (for example, if an array
             !      is being replaced with a scalar).
 
-            if (p%var_type==json_integer) then
-                p%int_value = value
-            else
-                call json%info(p,name=name)
-                call json%create_integer(tmp,value,name)
-                call json%replace(p,tmp,destroy=.true.)
-            end if
+            if (.not. allocated(p%data)) allocate(json_integer_type :: p%data)
+            associate (data => p%data)
+                select type (data)
+                class is (json_integer_type)
+                    data%value = value
+                class default
+                    call json%info(p,name=name)
+                    call json%create_integer(tmp,value,name)
+                    call json%replace(p,tmp,destroy=.true.)
+                end select
+            end associate
 
         end if
 
@@ -3793,13 +3830,17 @@
             !      being changed (for example, if an array
             !      is being replaced with a scalar).
 
-            if (p%var_type==json_real) then
-                p%dbl_value = value
-            else
-                call json%info(p,name=name)
-                call json%create_real(tmp,value,name)
-                call json%replace(p,tmp,destroy=.true.)
-            end if
+            if (.not. allocated(p%data)) allocate(json_real_type :: p%data)
+            associate (data => p%data)
+                select type (data)
+                class is (json_real_type)
+                    data%value = value
+                class default
+                    call json%info(p,name=name)
+                    call json%create_real(tmp,value,name)
+                    call json%replace(p,tmp,destroy=.true.)
+                end select
+            end associate
 
         end if
 
@@ -3964,13 +4005,17 @@
             !      being changed (for example, if an array
             !      is being replaced with a scalar).
 
-            if (p%var_type==json_logical) then
-                p%log_value = value
-            else
-                call json%info(p,name=name)
-                call json%create_logical(tmp,value,name)
-                call json%replace(p,tmp,destroy=.true.)
-            end if
+            if (.not. allocated(p%data)) allocate(json_logical_type :: p%data)
+            associate (data => p%data)
+                select type (data)
+                class is (json_logical_type)
+                    data%value = value
+                class default
+                    call json%info(p,name=name)
+                    call json%create_logical(tmp,value,name)
+                    call json%replace(p,tmp,destroy=.true.)
+                end select
+            end associate
 
         end if
 
@@ -4054,13 +4099,17 @@
             !      being changed (for example, if an array
             !      is being replaced with a scalar).
 
-            if (p%var_type==json_string) then
-                p%str_value = value
-            else
-                call json%info(p,name=name)
-                call json%create_string(tmp,value,name,trim_str,adjustl_str)
-                call json%replace(p,tmp,destroy=.true.)
-            end if
+            if (.not. allocated(p%data)) allocate(json_string_type :: p%data)
+            associate (data => p%data)
+                select type (data)
+                class is (json_string_type)
+                    data%value = value
+                class default
+                    call json%info(p,name=name)
+                    call json%create_string(tmp,value,name,trim_str,adjustl_str)
+                    call json%replace(p,tmp,destroy=.true.)
+                end select
+            end associate
 
         end if
 
@@ -5292,7 +5341,18 @@
     integer(IK)                         :: count  !! number of children in `p`.
 
     if (associated(p)) then
-        count = p%n_children
+        if (allocated(p%data)) then
+            associate (data => p%data)
+                select type (data)
+                class is (json_data_with_children)
+                    count = data%n_children
+                class default
+                    count = 0_IK
+                end select
+            end associate
+        else
+            count = 0_IK
+        end if
     else
         call json%throw_exception('Error in json_count: '//&
                                   'pointer is not associated.')
@@ -5433,76 +5493,93 @@
 
     if (.not. json%exception_thrown) then
 
-        if (associated(p%children)) then
+        if (allocated(p%data)) then
+            associate (data => p%data)
 
-            ! If getting first or last child, we can do this quickly.
-            ! Otherwise, traverse the list.
-            if (idx==1) then
+                select type (data)
+                class is (json_data_with_children)
 
-                child => p%children  ! first one
+                    if (associated(p%children)) then
 
-            elseif (idx==p%n_children) then
+                        ! If getting first or last child, we can do this quickly.
+                        ! Otherwise, traverse the list.
+                        if (idx==1) then
 
-                if (associated(p%tail)) then
-                    child => p%tail  ! last one
-                else
+                            child => p%children  ! first one
+
+                        elseif (idx==data%n_children) then
+
+                            if (associated(p%tail)) then
+                                child => p%tail  ! last one
+                            else
+                                call json%throw_exception('Error in json_value_get_child_by_index:'//&
+                                                          ' child%tail is not associated.',found)
+                            end if
+
+                        elseif (idx<1 .or. idx>data%n_children) then
+
+                            call json%throw_exception('Error in json_value_get_child_by_index:'//&
+                                                      ' idx is out of range.',found)
+
+                        else
+
+                            ! if idx is closer to the end, we traverse the list backward from tail,
+                            ! otherwise we traverse it forward from children:
+
+                            if (data%n_children-idx < idx) then  ! traverse backward
+
+                                child => p%tail
+
+                                do i = 1, data%n_children - idx
+
+                                    if (associated(child%previous)) then
+                                        child => child%previous
+                                    else
+                                        call json%throw_exception('Error in json_value_get_child_by_index:'//&
+                                                                  ' child%previous is not associated.',found)
+                                        nullify(child)
+                                        exit
+                                    end if
+
+                                end do
+
+                            else  ! traverse forward
+
+                                child => p%children
+
+                                do i = 1, idx - 1
+
+                                    if (associated(child%next)) then
+                                        child => child%next
+                                    else
+                                        call json%throw_exception('Error in json_value_get_child_by_index:'//&
+                                                                  ' child%next is not associated.',found)
+                                        nullify(child)
+                                        exit
+                                    end if
+
+                                end do
+
+                            end if
+
+                        end if
+
+                    else
+
+                        call json%throw_exception('Error in json_value_get_child_by_index:'//&
+                                                  ' p%children is not associated.',found)
+
+                    end if
+
+                class default
                     call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                              ' child%tail is not associated.',found)
-                end if
+                                              ' only objects and arrays can have children.',found)
+                end select
 
-            elseif (idx<1 .or. idx>p%n_children) then
-
-                call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                          ' idx is out of range.',found)
-
-            else
-
-                ! if idx is closer to the end, we traverse the list backward from tail,
-                ! otherwise we traverse it forward from children:
-
-                if (p%n_children-idx < idx) then  ! traverse backward
-
-                    child => p%tail
-
-                    do i = 1, p%n_children - idx
-
-                        if (associated(child%previous)) then
-                            child => child%previous
-                        else
-                            call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                                      ' child%previous is not associated.',found)
-                            nullify(child)
-                            exit
-                        end if
-
-                    end do
-
-                else  ! traverse forward
-
-                    child => p%children
-
-                    do i = 1, idx - 1
-
-                        if (associated(child%next)) then
-                            child => child%next
-                        else
-                            call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                                      ' child%next is not associated.',found)
-                            nullify(child)
-                            exit
-                        end if
-
-                    end do
-
-                end if
-
-            end if
-
+            end associate
         else
-
             call json%throw_exception('Error in json_value_get_child_by_index:'//&
-                                      ' p%children is not associated.',found)
-
+                                      ' JSON data not allocated.',found)
         end if
 
         ! found output:
@@ -5570,8 +5647,9 @@
                                                   !! found, no exception will be
                                                   !! thrown).
 
-    integer(IK) :: i,n_children
-    logical :: error
+    integer(IK) :: i          !! counter
+    integer(IK) :: n_children !! number of children in `p`
+    logical     :: error      !! will be false if `name` is found
 
     nullify(child)
 
@@ -5580,25 +5658,30 @@
         if (associated(p)) then
 
             error = .true.   ! will be false if it is found
-            if (p%var_type==json_object) then
-                n_children = json%count(p)
-                child => p%children    !start with first one
-                do i=1, n_children
-                    if (.not. associated(child)) then
-                        call json%throw_exception(&
-                            'Error in json_value_get_child_by_name: '//&
-                            'Malformed JSON linked list',found)
-                        exit
-                    end if
-                    if (allocated(child%name)) then
-                        !name string matching routine:
-                        if (json%name_equal(child,name)) then
-                            error = .false.
-                            exit
-                        end if
-                    end if
-                    child => child%next
-                end do
+            if (allocated(p%data)) then
+                associate (data => p%data)
+                    select type (data)
+                    class is (json_object_type)
+                        n_children = json%count(p)
+                        child => p%children    !start with first one
+                        do i=1, n_children
+                            if (.not. associated(child)) then
+                                call json%throw_exception(&
+                                    'Error in json_value_get_child_by_name: '//&
+                                    'Malformed JSON linked list',found)
+                                exit
+                            end if
+                            if (allocated(child%name)) then
+                                !name string matching routine:
+                                if (json%name_equal(child,name)) then
+                                    error = .false.
+                                    exit
+                                end if
+                            end if
+                            child => child%next
+                        end do
+                    end select
+                end associate
             end if
 
             if (error) then
@@ -5667,6 +5750,7 @@
     type(json_value),pointer :: child       !! pointer to a child of `p`
     integer(IK)              :: n_children  !! number of children of `p`
     logical(LK)              :: found       !! flag for `get_child`
+    integer(IK)              :: var_type    !! var type of `p`
 
     type :: alloc_str
         !! so we can have an array of allocatable strings
@@ -5678,78 +5762,71 @@
     ! initialize:
     has_duplicate =.false.
 
-    if (.not. json%exception_thrown) then
+    if (json%exception_thrown) return
+    if (.not. associated(p)) return
 
-        if (associated(p)) then
+    call json%info(p,var_type=var_type,n_children=n_children)
 
-            if (p%var_type==json_object) then
+    if (var_type/=json_object) return
 
-                ! number of items to check:
-                n_children = json%count(p)
-                allocate(names(n_children))
+    allocate(names(n_children))
 
-                ! first get a list of all the name keys:
-                do i=1, n_children
-                    call json%get_child(p,i,child,found) ! get by index
-                    if (.not. found) then
-                        call json%throw_exception(&
-                            'Error in json_check_children_for_duplicate_keys: '//&
-                            'Malformed JSON linked list')
-                        exit
-                    end if
-                    if (allocated(child%name)) then
-                        names(i)%str = child%name
-                    else
-                        call json%throw_exception(&
-                            'Error in json_check_children_for_duplicate_keys: '//&
-                            'Object child name is not allocated')
-                        exit
-                    end if
-                end do
-
-                if (.not. json%exception_thrown) then
-                    ! now check the list for duplicates:
-                    main: do i=1,n_children
-                        do j=1,i-1
-                            if (json%name_strings_equal(names(i)%str,names(j)%str)) then
-                                has_duplicate = .true.
-                                if (present(name)) then
-                                    name = names(i)%str
-                                end if
-                                if (present(path)) then
-                                    call json%get_child(p,names(i)%str,child,found) ! get by name
-                                    if (found) then
-                                        call json%get_path(child,path,found)
-                                        if (.not. found) then
-                                            ! should never happen since we know it is there
-                                            call json%throw_exception(&
-                                                    'Error in json_check_children_for_duplicate_keys: '//&
-                                                    'Could not get path')
-                                        end if
-                                    else
-                                        ! should never happen since we know it is there
-                                        call json%throw_exception(&
-                                            'Error in json_check_children_for_duplicate_keys: '//&
-                                            'Could not get child: '//trim(names(i)%str))
-                                    end if
-                                end if
-                                exit main
-                            end if
-                        end do
-                    end do main
-                end if
-
-                ! cleanup
-                do i=1,n_children
-                    if (allocated(names(i)%str)) deallocate(names(i)%str)
-                end do
-                if (allocated(names)) deallocate(names)
-
-            end if
-
+    ! first get a list of all the name keys:
+    do i=1, n_children
+        call json%get_child(p,i,child,found) ! get by index
+        if (.not. found) then
+            call json%throw_exception(&
+                'Error in json_check_children_for_duplicate_keys: '//&
+                'Malformed JSON linked list')
+            exit
         end if
+        if (allocated(child%name)) then
+            names(i)%str = child%name
+        else
+            call json%throw_exception(&
+                'Error in json_check_children_for_duplicate_keys: '//&
+                'Object child name is not allocated')
+            exit
+        end if
+    end do
 
+    if (.not. json%exception_thrown) then
+        ! now check the list for duplicates:
+        main: do i=1,n_children
+            do j=1,i-1
+                if (json%name_strings_equal(names(i)%str,names(j)%str)) then
+                    has_duplicate = .true.
+                    if (present(name)) then
+                        name = names(i)%str
+                    end if
+                    if (present(path)) then
+                        call json%get_child(p,names(i)%str,child,found) ! get by name
+                        if (found) then
+                            call json%get_path(child,path,found)
+                            if (.not. found) then
+                                ! should never happen since we know it is there
+                                call json%throw_exception(&
+                                        'Error in json_check_children_for_duplicate_keys: '//&
+                                        'Could not get path')
+                            end if
+                        else
+                            ! should never happen since we know it is there
+                            call json%throw_exception(&
+                                'Error in json_check_children_for_duplicate_keys: '//&
+                                'Could not get child: '//trim(names(i)%str))
+                        end if
+                    end if
+                    exit main
+                end if
+            end do
+        end do main
     end if
+
+    ! cleanup
+    do i=1,n_children
+        if (allocated(names(i)%str)) deallocate(names(i)%str)
+    end do
+    if (allocated(names)) deallocate(names)
 
     end subroutine json_check_children_for_duplicate_keys
 !*****************************************************************************************
@@ -5955,7 +6032,7 @@
         close(iunit,iostat=istat)
     else
         call json%throw_exception('Error in json_print_to_filename: could not open file: '//&
-                              trim(filename))
+                                  trim(filename))
     end if
 
     end subroutine json_print_to_filename
@@ -6068,236 +6145,241 @@
             s_indent = repeat(space, spaces)
         end if
 
-        select case (p%var_type)
+        if (allocated(p%data)) then
+            associate (data => p%data)
 
-        case (json_object)
+                select type (data)
 
-            count = json%count(p)
+                class is (json_object_type)
 
-            if (count==0) then    !special case for empty object
+                    count = json%count(p)
 
-                s = s_indent//start_object//end_object
-                call write_it( comma=print_comma )
+                    if (count==0) then    !special case for empty object
 
-            else
+                        s = s_indent//start_object//end_object
+                        call write_it( comma=print_comma )
 
-                s = s_indent//start_object
-                call write_it()
+                    else
 
-                !if an object is in an array, there is an extra tab:
-                if (is_array) then
-                    if ( .not. json%no_whitespace) tab = tab+1
-                    spaces = tab*json%spaces_per_tab
-                end if
+                        s = s_indent//start_object
+                        call write_it()
 
-                nullify(element)
-                element => p%children
-                do i = 1, count
+                        !if an object is in an array, there is an extra tab:
+                        if (is_array) then
+                            if ( .not. json%no_whitespace) tab = tab+1
+                            spaces = tab*json%spaces_per_tab
+                        end if
 
-                    if (.not. associated(element)) then
-                        call json%throw_exception('Error in json_value_print: '//&
-                                                  'Malformed JSON linked list')
-                        return
+                        nullify(element)
+                        element => p%children
+                        do i = 1, count
+
+                            if (.not. associated(element)) then
+                                call json%throw_exception('Error in json_value_print: '//&
+                                                          'Malformed JSON linked list')
+                                return
+                            end if
+
+                            ! print the name
+                            if (allocated(element%name)) then
+                                call escape_string(element%name,str_escaped,json%escape_solidus)
+                                if (json%no_whitespace) then
+                                    !compact printing - no extra space
+                                    s = repeat(space, spaces)//quotation_mark//&
+                                                str_escaped//quotation_mark//colon_char
+                                    call write_it(advance=.false.)
+                                else
+                                    s = repeat(space, spaces)//quotation_mark//&
+                                                str_escaped//quotation_mark//colon_char//space
+                                    call write_it(advance=.false.)
+                                end if
+                            else
+                                call json%throw_exception('Error in json_value_print:'//&
+                                                          ' element%name not allocated')
+                                nullify(element)
+                                return
+                            end if
+
+                            ! recursive print of the element
+                            call json%json_value_print(element, iunit=iunit, indent=tab + 1_IK, &
+                                            need_comma=i<count, colon=.true., str=str, iloc=iloc)
+                            if (json%exception_thrown) return
+
+                            ! get the next child the list:
+                            element => element%next
+
+                        end do
+
+                        ! [one fewer tab if it isn't an array element]
+                        if (.not. is_array) then
+                            s = repeat(space, max(0_IK,spaces-json%spaces_per_tab))//end_object
+                        else
+                            s = s_indent//end_object
+                        end if
+                        call write_it( comma=print_comma )
+                        nullify(element)
+
                     end if
 
-                    ! print the name
-                    if (allocated(element%name)) then
-                        call escape_string(element%name,str_escaped,json%escape_solidus)
-                        if (json%no_whitespace) then
-                            !compact printing - no extra space
-                            s = repeat(space, spaces)//quotation_mark//&
-                                          str_escaped//quotation_mark//colon_char
-                            call write_it(advance=.false.)
-                        else
-                            s = repeat(space, spaces)//quotation_mark//&
-                                          str_escaped//quotation_mark//colon_char//space
-                            call write_it(advance=.false.)
+                class is (json_array_type)
+
+                    count = json%count(p)
+
+                    if (json%compress_vectors) then
+                        ! check to see if every child is the same type,
+                        ! and a scalar:
+                        is_vector = .true.
+                        var_type_prev = -1   ! an invalid value
+                        nullify(element)
+                        element => p%children
+                        do i = 1, count
+                            if (.not. associated(element)) then
+                                call json%throw_exception('Error in json_value_print: '//&
+                                                          'Malformed JSON linked list')
+                                return
+                            end if
+                            ! check variable type of all the children.
+                            ! They must all be the same, and a scalar.
+                            call json%info(element,var_type=var_type)
+                            if (var_type==json_object .or. &
+                                var_type==json_array .or. &
+                                (i>1 .and. var_type/=var_type_prev)) then
+                                is_vector = .false.
+                                exit
+                            end if
+                            var_type_prev = var_type
+                            ! get the next child the list:
+                            element => element%next
+                        end do
+                    else
+                        is_vector = .false.
+                    end if
+
+                    if (count==0) then    !special case for empty array
+
+                        s = s_indent//start_array//end_array
+                        call write_it( comma=print_comma )
+
+                    else
+
+                        s = s_indent//start_array
+                        call write_it( advance=(.not. is_vector) )
+
+                        !if an array is in an array, there is an extra tab:
+                        if (is_array) then
+                            if ( .not. json%no_whitespace) tab = tab+1
+                            spaces = tab*json%spaces_per_tab
                         end if
+
+                        nullify(element)
+                        element => p%children
+                        do i = 1, count
+
+                            if (.not. associated(element)) then
+                                call json%throw_exception('Error in json_value_print: '//&
+                                                          'Malformed JSON linked list')
+                                return
+                            end if
+
+                            ! recursive print of the element
+                            if (is_vector) then
+                                call json%json_value_print(element, iunit=iunit, indent=0_IK,&
+                                                need_comma=i<count, is_array_element=.false., &
+                                                str=str, iloc=iloc,&
+                                                is_compressed_vector = .true.)
+                            else
+                                call json%json_value_print(element, iunit=iunit, indent=tab,&
+                                                need_comma=i<count, is_array_element=.true., &
+                                                str=str, iloc=iloc)
+                            end if
+                            if (json%exception_thrown) return
+
+                            ! get the next child the list:
+                            element => element%next
+
+                        end do
+
+                        !indent the closing array character:
+                        if (is_vector) then
+                            s = end_array
+                            call write_it( comma=print_comma )
+                        else
+                            s = repeat(space, max(0_IK,spaces-json%spaces_per_tab))//end_array
+                            call write_it( comma=print_comma )
+                        end if
+                        nullify(element)
+
+                    end if
+
+                class is (json_null_type)
+
+                    s = s_indent//null_str
+                    call write_it( comma=print_comma, &
+                                advance=(.not. is_vector),&
+                                space_after_comma=is_vector )
+
+                class is (json_string_type)
+
+                    if (allocated(data%value)) then
+                        ! have to escape the string for printing:
+                        call escape_string(data%value,str_escaped,json%escape_solidus)
+                        s = s_indent//quotation_mark//str_escaped//quotation_mark
+                        call write_it( comma=print_comma, &
+                                    advance=(.not. is_vector),&
+                                    space_after_comma=is_vector )
                     else
                         call json%throw_exception('Error in json_value_print:'//&
-                                                  ' element%name not allocated')
-                        nullify(element)
+                                                  ' JSON string not allocated')
                         return
                     end if
 
-                    ! recursive print of the element
-                    call json%json_value_print(element, iunit=iunit, indent=tab + 1_IK, &
-                                    need_comma=i<count, colon=.true., str=str, iloc=iloc)
-                    if (json%exception_thrown) return
+                class is (json_logical_type)
 
-                    ! get the next child the list:
-                    element => element%next
-
-                end do
-
-                ! [one fewer tab if it isn't an array element]
-                if (.not. is_array) then
-                    s = repeat(space, max(0_IK,spaces-json%spaces_per_tab))//end_object
-                else
-                    s = s_indent//end_object
-                end if
-                call write_it( comma=print_comma )
-                nullify(element)
-
-            end if
-
-        case (json_array)
-
-            count = json%count(p)
-
-            if (json%compress_vectors) then
-                ! check to see if every child is the same type,
-                ! and a scalar:
-                is_vector = .true.
-                var_type_prev = -1   ! an invalid value
-                nullify(element)
-                element => p%children
-                do i = 1, count
-                    if (.not. associated(element)) then
-                        call json%throw_exception('Error in json_value_print: '//&
-                                                  'Malformed JSON linked list')
-                        return
-                    end if
-                    ! check variable type of all the children.
-                    ! They must all be the same, and a scalar.
-                    call json%info(element,var_type=var_type)
-                    if (var_type==json_object .or. &
-                        var_type==json_array .or. &
-                        (i>1 .and. var_type/=var_type_prev)) then
-                        is_vector = .false.
-                        exit
-                    end if
-                    var_type_prev = var_type
-                    ! get the next child the list:
-                    element => element%next
-                end do
-            else
-                is_vector = .false.
-            end if
-
-            if (count==0) then    !special case for empty array
-
-                s = s_indent//start_array//end_array
-                call write_it( comma=print_comma )
-
-            else
-
-                s = s_indent//start_array
-                call write_it( advance=(.not. is_vector) )
-
-                !if an array is in an array, there is an extra tab:
-                if (is_array) then
-                    if ( .not. json%no_whitespace) tab = tab+1
-                    spaces = tab*json%spaces_per_tab
-                end if
-
-                nullify(element)
-                element => p%children
-                do i = 1, count
-
-                    if (.not. associated(element)) then
-                        call json%throw_exception('Error in json_value_print: '//&
-                                                  'Malformed JSON linked list')
-                        return
-                    end if
-
-                    ! recursive print of the element
-                    if (is_vector) then
-                        call json%json_value_print(element, iunit=iunit, indent=0_IK,&
-                                        need_comma=i<count, is_array_element=.false., &
-                                        str=str, iloc=iloc,&
-                                        is_compressed_vector = .true.)
+                    if (data%value) then
+                        s = s_indent//true_str
+                        call write_it( comma=print_comma, &
+                                    advance=(.not. is_vector),&
+                                    space_after_comma=is_vector )
                     else
-                        call json%json_value_print(element, iunit=iunit, indent=tab,&
-                                        need_comma=i<count, is_array_element=.true., &
-                                        str=str, iloc=iloc)
+                        s = s_indent//false_str
+                        call write_it( comma=print_comma, &
+                                    advance=(.not. is_vector),&
+                                    space_after_comma=is_vector )
                     end if
-                    if (json%exception_thrown) return
 
-                    ! get the next child the list:
-                    element => element%next
+                class is (json_integer_type)
 
-                end do
+                    call integer_to_string(data%value,int_fmt,tmp)
 
-                !indent the closing array character:
-                if (is_vector) then
-                    s = end_array
-                    call write_it( comma=print_comma )
-                else
-                    s = repeat(space, max(0_IK,spaces-json%spaces_per_tab))//end_array
-                    call write_it( comma=print_comma )
-                end if
-                nullify(element)
+                    s = s_indent//trim(tmp)
+                    call write_it( comma=print_comma, &
+                                advance=(.not. is_vector),&
+                                space_after_comma=is_vector )
 
-            end if
+                class is (json_real_type)
 
-        case (json_null)
+                    if (allocated(json%real_fmt)) then
+                        call real_to_string(data%value,json%real_fmt,json%compact_real,json%non_normals_to_null,tmp)
+                    else
+                        !use the default format (user has not called initialize() or specified one):
+                        call real_to_string(data%value,default_real_fmt,json%compact_real,json%non_normals_to_null,tmp)
+                    end if
 
-            s = s_indent//null_str
-            call write_it( comma=print_comma, &
-                           advance=(.not. is_vector),&
-                           space_after_comma=is_vector )
+                    s = s_indent//trim(tmp)
+                    call write_it( comma=print_comma, &
+                                advance=(.not. is_vector),&
+                                space_after_comma=is_vector )
 
-        case (json_string)
+                class default
+                    call json%throw_exception('Error in json_value_print: '//&
+                                              'unknown data type')
+                end select
 
-            if (allocated(p%str_value)) then
-                ! have to escape the string for printing:
-                call escape_string(p%str_value,str_escaped,json%escape_solidus)
-                s = s_indent//quotation_mark//str_escaped//quotation_mark
-                call write_it( comma=print_comma, &
-                               advance=(.not. is_vector),&
-                               space_after_comma=is_vector )
-            else
-                call json%throw_exception('Error in json_value_print:'//&
-                                          ' p%value_string not allocated')
-                return
-            end if
-
-        case (json_logical)
-
-            if (p%log_value) then
-                s = s_indent//true_str
-                call write_it( comma=print_comma, &
-                               advance=(.not. is_vector),&
-                               space_after_comma=is_vector )
-            else
-                s = s_indent//false_str
-                call write_it( comma=print_comma, &
-                               advance=(.not. is_vector),&
-                               space_after_comma=is_vector )
-            end if
-
-        case (json_integer)
-
-            call integer_to_string(p%int_value,int_fmt,tmp)
-
-            s = s_indent//trim(tmp)
-            call write_it( comma=print_comma, &
-                           advance=(.not. is_vector),&
-                           space_after_comma=is_vector )
-
-        case (json_real)
-
-            if (allocated(json%real_fmt)) then
-                call real_to_string(p%dbl_value,json%real_fmt,json%compact_real,json%non_normals_to_null,tmp)
-            else
-                !use the default format (user has not called initialize() or specified one):
-                call real_to_string(p%dbl_value,default_real_fmt,json%compact_real,json%non_normals_to_null,tmp)
-            end if
-
-            s = s_indent//trim(tmp)
-            call write_it( comma=print_comma, &
-                           advance=(.not. is_vector),&
-                           space_after_comma=is_vector )
-
-        case default
-
-            call integer_to_string(p%var_type,int_fmt,tmp)
+            end associate
+        else
             call json%throw_exception('Error in json_value_print: '//&
-                                      'unknown data type: '//trim(tmp))
-
-        end select
-
+                                      'JSON data not allocated')
+        end if
     end if
 
     contains
@@ -6463,7 +6545,7 @@
         case default
             call integer_to_string(json%path_mode,int_fmt,path_mode_str)
             call json%throw_exception('Error in json_get_by_path: Unsupported path_mode: '//&
-                                        trim(path_mode_str))
+                                      trim(path_mode_str))
             if (present(found)) found = .false.
         end select
 
@@ -6821,10 +6903,18 @@
                         !  What about the case: aaa.bbb(1)(3) ?
                         !  Is that already handled?
 
-                        if (p%var_type==json_null) then             ! (**)
-                            ! if p was also created, then we need to
-                            ! convert it into an object here:
-                            p%var_type = json_object
+                        ! if p was also created, then we need to
+                        ! convert it into an object here:
+                        if (allocated(p%data)) then
+                            associate (data => p%data)
+                                select type (data)
+                                class is (json_null_type)                 ! (**)
+                                    deallocate(p%data)
+                                    allocate(json_object_type :: p%data)
+                                end select
+                            end associate
+                        else
+                            allocate(json_object_type :: p%data)
                         end if
 
                         ! don't want to throw exceptions in this case
@@ -6871,12 +6961,19 @@
                     call json%get_child(p, child_i, tmp, child_found)
                     if (.not. child_found) then
 
-                        if (p%var_type==json_null) then            ! (**)
-                            ! if p was also created, then we need to
-                            ! convert it into an array here:
-                            p%var_type = json_array
+                        ! if p was also created, then we need to
+                        ! convert it into an array here:
+                        if (allocated(p%data)) then
+                            associate (data => p%data)
+                                select type (data)
+                                class is (json_null_type)                 ! (**)
+                                    deallocate(p%data)
+                                    allocate(json_array_type :: p%data)
+                                end select
+                            end associate
+                        else
+                            allocate(json_array_type :: p%data)
                         end if
-
                         ! have to create this element
                         ! [make it a null]
                         ! (and any missing ones before it)
@@ -6914,10 +7011,18 @@
                     if (child_i < i) then
                         nullify(tmp)
                         if (create) then
-                            if (p%var_type==json_null) then            ! (**)
-                                ! if p was also created, then we need to
-                                ! convert it into an object here:
-                                p%var_type = json_object
+                            ! if p was also created, then we need to
+                            ! convert it into an object here:
+                            if (allocated(p%data)) then
+                                associate (data => p%data)
+                                    select type (data)
+                                    class is (json_null_type)                 ! (**)
+                                        deallocate(p%data)
+                                        allocate(json_object_type :: p%data)
+                                    end select
+                                end associate
+                            else
+                                allocate(json_object_type :: p%data)
                             end if
 
                             ! don't want to throw exceptions in this case
@@ -6970,10 +7075,18 @@
             if (child_i <= length) then
                 nullify(tmp)
                 if (create) then
-                    if (p%var_type==json_null) then            ! (**)
-                        ! if p was also created, then we need to
-                        ! convert it into an object here:
-                        p%var_type = json_object
+                    ! if p was also created, then we need to
+                    ! convert it into an object here:
+                    if (allocated(p%data)) then
+                        associate (data => p%data)
+                            select type (data)
+                            class is (json_null_type)                 ! (**)
+                                deallocate(p%data)
+                                allocate(json_object_type :: p%data)
+                            end select
+                        end associate
+                    else
+                        allocate(json_object_type :: p%data)
                     end if
 
                     call json%get_child(p, path(child_i:i-1), tmp, child_found)
@@ -7214,7 +7327,7 @@
 
             else
                 call json%throw_exception('Error in json_get_by_path_rfc6901: '//&
-                                            'invalid path specification: '//trim(path),found)
+                                          'invalid path specification: '//trim(path),found)
             end if
         end if
 
@@ -7506,12 +7619,20 @@
                                         if (create .and. .not. status_ok) then
 
                                             ! have to create it:
-
-                                            if (.not.(p%var_type==json_object .or. p%var_type==json_array)) then
-                                                ! we need to convert it into an array here
-                                                ! (e.g., if p was also just created)
-                                                ! and destroy its data to prevent a memory leak
-                                                call json%convert(p,json_array)
+                                            if (allocated(p%data)) then
+                                                associate (data => p%data)
+                                                    select type (data)
+                                                    class is (json_data_with_children)
+                                                        ! already object or array
+                                                    class default
+                                                        ! we need to convert it into an array here
+                                                        ! (e.g., if p was also just created)
+                                                        ! and destroy its data to prevent a memory leak
+                                                        call json%convert(p,json_array)
+                                                    end select
+                                                end associate
+                                            else
+                                                allocate(json_array_type :: p%data)
                                             end if
 
                                             ! have to create this element
@@ -7626,10 +7747,12 @@
 
     type(json_value),pointer :: tmp  !! temporary variable
     character(kind=CK,len=:),allocatable :: name !! the name of a JSON variable
-
+    integer(IK) :: p_var_type  !! `var_type` of `p`
     logical :: convert_it  !! if `p` needs to be converted
 
-    convert_it = p%var_type /= var_type
+    call json%info(p,var_type=p_var_type)
+
+    convert_it = p_var_type /= var_type
 
     if (convert_it) then
 
@@ -8037,37 +8160,42 @@
     value = 0_IK
     if ( json%exception_thrown ) return
 
-    if (me%var_type == json_integer) then
-        value = me%int_value
-    else
-        if (json%strict_type_checking) then
-            call json%throw_exception('Error in json_get_integer:'//&
-                 ' Unable to resolve value to integer: '//me%name)
-        else
-            !type conversions
-            select case(me%var_type)
-            case (json_real)
-                value = int(me%dbl_value)
-            case (json_logical)
-                if (me%log_value) then
-                    value = 1
-                else
-                    value = 0
-                end if
-            case (json_string)
-                call string_to_integer(me%str_value,value,status_ok)
-                if (.not. status_ok) then
-                    value = 0_IK
-                    call json%throw_exception('Error in json_get_integer:'//&
-                         ' Unable to convert string value to integer: me.'//&
-                         me%name//' = '//trim(me%str_value))
-                end if
-            case default
+    associate (data => me%data)
+
+        select type (data)
+        class is (json_integer_type)
+            value = data%value
+        class default
+            if (json%strict_type_checking) then
                 call json%throw_exception('Error in json_get_integer:'//&
-                     ' Unable to resolve value to integer: '//me%name)
-            end select
-        end if
-    end if
+                                          ' Unable to resolve value to integer: '//me%name)
+            else
+                !type conversions
+                select type (data)
+                class is (json_real_type)
+                    value = int(data%value)
+                class is (json_logical_type)
+                    if (data%value) then
+                        value = 1
+                    else
+                        value = 0
+                    end if
+                class is (json_string_type)
+                    call string_to_integer(data%value,value,status_ok)
+                    if (.not. status_ok) then
+                        value = 0_IK
+                        call json%throw_exception('Error in json_get_integer:'//&
+                                                  ' Unable to convert string value to integer: me.'//&
+                                                  me%name//' = '//trim(data%value))
+                    end if
+                class default
+                    call json%throw_exception('Error in json_get_integer:'//&
+                                              ' Unable to resolve value to integer: '//me%name)
+                end select
+            end if
+        end select
+
+    end associate
 
     end subroutine json_get_integer
 !*****************************************************************************************
@@ -8100,7 +8228,7 @@
 
     if (.not. associated(p)) then
         call json%throw_exception('Error in json_get_integer_by_path:'//&
-            ' Unable to resolve path: '// trim(path),found)
+                                  ' Unable to resolve path: '// trim(path),found)
     else
         call json%get(p,value)
         nullify(p)
@@ -8153,13 +8281,15 @@
     logical(LK) :: initialized
 
     ! check for 0-length arrays first:
-    select case (me%var_type)
-    case (json_array)
-        if (json%count(me)==0) then
-            allocate(vec(0))
-            return
-        end if
-    end select
+    associate (data => me%data)
+        select type (data)
+        class is (json_array_type)
+            if (json%count(me)==0) then
+                allocate(vec(0))
+                return
+            end if
+        end select
+    end associate
 
     initialized = .false.
 
@@ -8263,54 +8393,59 @@
     value = 0.0_RK
     if ( json%exception_thrown ) return
 
-    if (me%var_type == json_real) then
-        value = me%dbl_value
-    else
-        if (json%strict_type_checking) then
-            call json%throw_exception('Error in json_get_real:'//&
-                                      ' Unable to resolve value to real: '//me%name)
-        else
-            !type conversions
-            select case (me%var_type)
-            case (json_integer)
-                value = me%int_value
-            case (json_logical)
-                if (me%log_value) then
-                    value = 1.0_RK
-                else
-                    value = 0.0_RK
-                end if
-            case (json_string)
-                call string_to_real(me%str_value,json%use_quiet_nan,value,status_ok)
-                if (.not. status_ok) then
-                    value = 0.0_RK
-                    call json%throw_exception('Error in json_get_real:'//&
-                         ' Unable to convert string value to real: me.'//&
-                         me%name//' = '//trim(me%str_value))
-                end if
-            case (json_null)
-                if (ieee_support_nan(value) .and. json%null_to_real_mode/=1_IK) then
-                    select case (json%null_to_real_mode)
-                    case(2_IK)
-                        if (json%use_quiet_nan) then
-                            value = ieee_value(value,ieee_quiet_nan)
-                        else
-                            value = ieee_value(value,ieee_signaling_nan)
-                        end if
-                    case(3_IK)
-                        value = 0.0_RK
-                    end select
-                else
-                    call json%throw_exception('Error in json_get_real:'//&
-                                              ' Cannot convert null to NaN: '//me%name)
-                end if
-            case default
+    associate (data => me%data)
 
+        select type (data)
+        class is (json_real_type)
+            value = data%value
+        class default
+            if (json%strict_type_checking) then
                 call json%throw_exception('Error in json_get_real:'//&
                                           ' Unable to resolve value to real: '//me%name)
-            end select
-        end if
-    end if
+            else
+                !type conversions
+                select type (data)
+                class is (json_integer_type)
+                    value = data%value
+                class is (json_logical_type)
+                    if (data%value) then
+                        value = 1.0_RK
+                    else
+                        value = 0.0_RK
+                    end if
+                class is (json_string_type)
+                    call string_to_real(data%value,json%use_quiet_nan,value,status_ok)
+                    if (.not. status_ok) then
+                        value = 0.0_RK
+                        call json%throw_exception('Error in json_get_real:'//&
+                                                  ' Unable to convert string value to real: me.'//&
+                                                  me%name//' = '//trim(data%value))
+                    end if
+                class is (json_null_type)
+                    if (ieee_support_nan(value) .and. json%null_to_real_mode/=1_IK) then
+                        select case (json%null_to_real_mode)
+                        case(2_IK)
+                            if (json%use_quiet_nan) then
+                                value = ieee_value(value,ieee_quiet_nan)
+                            else
+                                value = ieee_value(value,ieee_signaling_nan)
+                            end if
+                        case(3_IK)
+                            value = 0.0_RK
+                        end select
+                    else
+                        call json%throw_exception('Error in json_get_real:'//&
+                                                  ' Cannot convert null to NaN: '//me%name)
+                    end if
+                class default
+
+                    call json%throw_exception('Error in json_get_real:'//&
+                                              ' Unable to resolve value to real: '//me%name)
+                end select
+            end if
+        end select
+
+    end associate
 
     end subroutine json_get_real
 !*****************************************************************************************
@@ -8344,7 +8479,7 @@
     if (.not. associated(p)) then
 
         call json%throw_exception('Error in json_get_real_by_path:'//&
-                             ' Unable to resolve path: '//trim(path),found)
+                                  ' Unable to resolve path: '//trim(path),found)
 
     else
 
@@ -8401,13 +8536,15 @@
     logical(LK) :: initialized
 
     ! check for 0-length arrays first:
-    select case (me%var_type)
-    case (json_array)
-        if (json%count(me)==0) then
-            allocate(vec(0))
-            return
-        end if
-    end select
+    associate (data => me%data)
+        select type (data)
+        class is (json_array_type)
+            if (json%count(me)==0) then
+                allocate(vec(0))
+                return
+            end if
+        end select
+    end associate
 
     initialized = .false.
 
@@ -8764,29 +8901,34 @@
     value = .false.
     if ( json%exception_thrown ) return
 
-    if (me%var_type == json_logical) then
-        value = me%log_value
-    else
-        if (json%strict_type_checking) then
-            call json%throw_exception('Error in json_get_logical: '//&
-                                      'Unable to resolve value to logical: '//&
-                                      me%name)
-        else
-            !type conversions
-            select case (me%var_type)
-            case (json_integer)
-                value = (me%int_value > 0_IK)
-            case (json_real)
-                value = (me%dbl_value > 0.0_RK)
-            case (json_string)
-                value = (me%str_value == true_str)
-            case default
+    associate (data => me%data)
+
+        select type (data)
+        class is (json_logical_type)
+            value = data%value
+        class default
+            if (json%strict_type_checking) then
                 call json%throw_exception('Error in json_get_logical: '//&
                                           'Unable to resolve value to logical: '//&
                                           me%name)
-            end select
-        end if
-    end if
+            else
+                !type conversions
+                select type (data)
+                class is (json_integer_type)
+                    value = (data%value > 0_IK)
+                class is (json_real_type)
+                    value = (data%value > 0.0_RK)
+                class is (json_string_type)
+                    value = (data%value == true_str)
+                class default
+                    call json%throw_exception('Error in json_get_logical: '//&
+                                              'Unable to resolve value to logical: '//&
+                                              me%name)
+                end select
+            end if
+        end select
+
+    end associate
 
     end subroutine json_get_logical
 !*****************************************************************************************
@@ -8820,7 +8962,7 @@
     if (.not. associated(p)) then
 
         call json%throw_exception('Error in json_get_logical_by_path:'//&
-                             ' Unable to resolve path: '//trim(path),found)
+                                  ' Unable to resolve path: '//trim(path),found)
 
     else
 
@@ -8877,13 +9019,15 @@
     logical(LK) :: initialized
 
     ! check for 0-length arrays first:
-    select case (me%var_type)
-    case (json_array)
-        if (json%count(me)==0) then
-            allocate(vec(0))
-            return
-        end if
-    end select
+    associate (data => me%data)
+        select type (data)
+        class is (json_array_type)
+            if (json%count(me)==0) then
+                allocate(vec(0))
+                return
+            end if
+        end select
+    end associate
 
     initialized = .false.
 
@@ -8983,74 +9127,63 @@
     character(kind=CK,len=:),allocatable,intent(out) :: value
 
     value = CK_''
-    if (.not. json%exception_thrown) then
+    if (json%exception_thrown) return
 
-        if (me%var_type == json_string) then
+    associate (data => me%data)
 
-            if (allocated(me%str_value)) then
+        select type (data)
+        class is (json_string_type)
+
+            if (allocated(data%value)) then
                 if (json%unescaped_strings) then
                     ! default: it is stored already unescaped:
-                    value = me%str_value
+                    value = data%value
                 else
                     ! return the escaped version:
-                    call escape_string(me%str_value, value, json%escape_solidus)
+                    call escape_string(data%value, value, json%escape_solidus)
                 end if
             else
-               call json%throw_exception('Error in json_get_string: '//&
-                                         'me%str_value not allocated')
+                call json%throw_exception('Error in json_get_string: '//&
+                                          'JSON string not allocated')
             end if
 
-        else
+        class default
 
             if (json%strict_type_checking) then
                 call json%throw_exception('Error in json_get_string:'//&
-                                          ' Unable to resolve value to string: '//me%name)
+                                          ' Unable to resolve value to string: '//&
+                                          me%name)
             else
 
-                select case (me%var_type)
+                select type (data)
 
-                case (json_integer)
+                class is (json_integer_type)
 
-                    if (allocated(me%int_value)) then
-                        value = repeat(space, max_integer_str_len)
-                        call integer_to_string(me%int_value,int_fmt,value)
-                        value = trim(value)
+                    value = repeat(space, max_integer_str_len)
+                    call integer_to_string(data%value,int_fmt,value)
+                    value = trim(value)
+
+                class is (json_real_type)
+
+                    value = repeat(space, max_numeric_str_len)
+                    call real_to_string(data%value,json%real_fmt,&
+                                        json%non_normals_to_null,&
+                                        json%compact_real,value)
+                    value = trim(value)
+
+                class is (json_logical_type)
+
+                    if (data%value) then
+                        value = true_str
                     else
-                        call json%throw_exception('Error in json_get_string: '//&
-                                                  'me%int_value not allocated')
+                        value = false_str
                     end if
 
-                case (json_real)
-
-                    if (allocated(me%dbl_value)) then
-                        value = repeat(space, max_numeric_str_len)
-                        call real_to_string(me%dbl_value,json%real_fmt,&
-                                            json%non_normals_to_null,&
-                                            json%compact_real,value)
-                        value = trim(value)
-                    else
-                        call json%throw_exception('Error in json_get_string: '//&
-                                                  'me%int_value not allocated')
-                    end if
-
-                case (json_logical)
-
-                    if (allocated(me%log_value)) then
-                        if (me%log_value) then
-                            value = true_str
-                        else
-                            value = false_str
-                        end if
-                    else
-                        call json%throw_exception('Error in json_get_string: '//&
-                                                  'me%log_value not allocated')
-                    end if
-
-                case (json_null)
+                class is (json_null_type)
 
                     value = null_str
 
-                case default
+                class default
 
                     call json%throw_exception('Error in json_get_string: '//&
                                               'Unable to resolve value to characters: '//&
@@ -9059,9 +9192,9 @@
                 end select
 
             end if
-        end if
+        end select
 
-    end if
+    end associate
 
     end subroutine json_get_string
 !*****************************************************************************************
@@ -9154,13 +9287,15 @@
     logical(LK) :: initialized
 
     ! check for 0-length arrays first:
-    select case (me%var_type)
-    case (json_array)
-        if (json%count(me)==0) then
-            allocate(vec(0))
-            return
-        end if
-    end select
+    associate (data => me%data)
+        select type (data)
+        class is (json_array_type)
+            if (json%count(me)==0) then
+                allocate(vec(0))
+                return
+            end if
+        end select
+    end associate
 
     initialized = .false.
 
@@ -9286,14 +9421,16 @@
     integer(IK) :: max_len     !! the length of the longest string in the array
 
     ! check for 0-length arrays first:
-    select case (me%var_type)
-    case (json_array)
-        if (json%count(me)==0) then
-            allocate(character(kind=CK,len=0) :: vec(0))
-            allocate(ilen(0))
-            return
-        end if
-    end select
+    associate (data => me%data)
+        select type (data)
+        class is (json_array_type)
+            if (json%count(me)==0) then
+                allocate(character(kind=CK,len=0) :: vec(0))
+                allocate(ilen(0))
+                return
+            end if
+        end select
+    end associate
 
     initialized = .false.
 
@@ -9434,31 +9571,28 @@
 
     if ( json%exception_thrown ) return
 
-    nullify(element)
+    associate (data => me%data)
 
-    select case (me%var_type)
-    case (json_array)
-        count = json%count(me)
-        element => me%children
-        do i = 1, count ! callback for each child
-            if (.not. associated(element)) then
-                call json%throw_exception('Error in json_get_array: '//&
-                                          'Malformed JSON linked list')
-                return
-            end if
-            call array_callback(json, element, i, count)
-            if (json%exception_thrown) exit
-            element => element%next
-        end do
-    case default
+        select type (data)
+        class is (json_array_type)
+            count = json%count(me)
+            element => me%children
+            do i = 1, count ! callback for each child
+                if (.not. associated(element)) then
+                    call json%throw_exception('Error in json_get_array: '//&
+                                              'Malformed JSON linked list')
+                    return
+                end if
+                call array_callback(json, element, i, count)
+                if (json%exception_thrown) exit
+                element => element%next
+            end do
+        class default
+            call json%throw_exception('Error in json_get_array:'//&
+                                      ' Resolved value is not an array ')
+        end select
 
-        call json%throw_exception('Error in json_get_array:'//&
-                                  ' Resolved value is not an array ')
-
-    end select
-
-    !cleanup:
-    if (associated(element)) nullify(element)
+    end associate
 
     end subroutine json_get_array
 !*****************************************************************************************
@@ -9498,28 +9632,45 @@
         integer(IK) :: icount   !! number of children
 
         if (json%exception_thrown) return
-        call traverse_callback(json,p,finished) ! first call for this object
-        if (finished) return
 
-        !for arrays and objects, have to also call for all children:
-        if (p%var_type==json_array .or. p%var_type==json_object) then
+        if (associated(p)) then
 
-            icount = json%count(p) ! number of children
-            if (icount>0) then
-                element => p%children   ! first one
-                do i = 1, icount        ! call for each child
-                    if (.not. associated(element)) then
-                        call json%throw_exception('Error in json_traverse: '//&
-                                                  'Malformed JSON linked list')
-                        return
-                    end if
-                    call traverse(element)
-                    if (finished .or. json%exception_thrown) exit
-                    element => element%next
-                end do
+            call traverse_callback(json,p,finished) ! first call for this object
+            if (finished) return
+
+            if (allocated(p%data)) then
+                !for arrays and objects, have to also call for all children:
+                associate (data => p%data)
+
+                    select type (data)
+                    class is (json_data_with_children) ! array or object
+
+                        icount = json%count(p) ! number of children
+                        if (icount>0) then
+                            element => p%children   ! first one
+                            do i = 1, icount        ! call for each child
+                                if (.not. associated(element)) then
+                                    call json%throw_exception('Error in json_traverse: '//&
+                                                              'Malformed JSON linked list')
+                                    return
+                                end if
+                                call traverse(element)
+                                if (finished .or. json%exception_thrown) exit
+                                element => element%next
+                            end do
+                        end if
+                        nullify(element)
+
+                    end select
+
+                end associate
+            else
+                call json%throw_exception('Error in json_traverse: '//&
+                                          'JSON data not allocated')
             end if
-            nullify(element)
-
+        else
+            call json%throw_exception('Error in json_traverse: '//&
+                                      'Pointer is not associated')
         end if
 
         end subroutine traverse
@@ -10077,18 +10228,20 @@
                 ! string
                 call json%to_string(value)    !allocate class
 
-                select case (value%var_type)
-                case (json_string)
+                associate (data => value%data)
+                    select type (data)
+                    class is (json_string_type)
 #if defined __GFORTRAN__
-                    ! write to a tmp variable because of
-                    ! a bug in 4.9 gfortran compiler.
-                    call json%parse_string(unit,str,tmp)
-                    value%str_value = tmp
-                    if (allocated(tmp))  deallocate(tmp)
+                        ! write to a tmp variable because of
+                        ! a bug in 4.9 gfortran compiler.
+                        call json%parse_string(unit,str,tmp)
+                        data%value = tmp
+                        if (allocated(tmp)) deallocate(tmp)
 #else
-                    call json%parse_string(unit,str,value%str_value)
+                        call json%parse_string(unit,str,data%value)
 #endif
-                end select
+                    end select
+                end associate
 
             case (CK_'t') !true_str(1:1) gfortran bug work around
 
@@ -10569,13 +10722,18 @@
 
     !set type and value:
     call destroy_json_data(p)
-    p%var_type = json_logical
-    allocate(p%log_value)
-    if (present(val)) then
-        p%log_value = val
-    else
-        p%log_value = .false.    !default value
-    end if
+
+    allocate(json_logical_type :: p%data)
+    associate (data => p%data)
+        select type (data)
+        class is (json_logical_type)
+            if (present(val)) then
+                data%value = val
+            else
+                data%value = .false.    !default value
+            end if
+        end select
+    end associate
 
     !name:
     if (present(name)) call json%rename(p,name)
@@ -10600,13 +10758,18 @@
 
     !set type and value:
     call destroy_json_data(p)
-    p%var_type = json_integer
-    allocate(p%int_value)
-    if (present(val)) then
-        p%int_value = val
-    else
-        p%int_value = 0_IK    !default value
-    end if
+
+    allocate(json_integer_type :: p%data)
+    associate (data => p%data)
+        select type (data)
+        class is (json_integer_type)
+            if (present(val)) then
+                data%value = val
+            else
+                data%value = 0_IK    !default value
+            end if
+        end select
+    end associate
 
     !name:
     if (present(name)) call json%rename(p,name)
@@ -10631,13 +10794,18 @@
 
     !set type and value:
     call destroy_json_data(p)
-    p%var_type = json_real
-    allocate(p%dbl_value)
-    if (present(val)) then
-        p%dbl_value = val
-    else
-        p%dbl_value = 0.0_RK    !default value
-    end if
+
+    allocate(json_real_type :: p%data)
+    associate (data => p%data)
+        select type (data)
+        class is (json_real_type)
+            if (present(val)) then
+                data%value = val
+            else
+                data%value = 0.0_RK    !default value
+            end if
+        end select
+    end associate
 
     !name:
     if (present(name)) call json%rename(p,name)
@@ -10674,32 +10842,40 @@
 
     !set type and value:
     call destroy_json_data(p)
-    p%var_type = json_string
-    if (present(val)) then
 
-        if (present(trim_str)) then
-            trim_string = trim_str
-        else
-            trim_string = .false.
-        end if
-        if (present(adjustl_str)) then
-            adjustl_string = adjustl_str
-        else
-            adjustl_string = .false.
-        end if
+    allocate(json_string_type :: p%data)
+    associate (data => p%data)
+        select type (data)
+        class is (json_string_type)
 
-        if (trim_string .or. adjustl_string) then
-            str = val
-            if (adjustl_string) str = adjustl(str)
-            if (trim_string)    str = trim(str)
-            p%str_value = str
-        else
-            p%str_value = val
-        end if
+            if (present(val)) then
 
-    else
-        p%str_value = CK_''  ! default value
-    end if
+                if (present(trim_str)) then
+                    trim_string = trim_str
+                else
+                    trim_string = .false.
+                end if
+                if (present(adjustl_str)) then
+                    adjustl_string = adjustl_str
+                else
+                    adjustl_string = .false.
+                end if
+
+                if (trim_string .or. adjustl_string) then
+                    str = val
+                    if (adjustl_string) str = adjustl(str)
+                    if (trim_string)    str = trim(str)
+                    data%value = str
+                else
+                    data%value = val
+                end if
+
+            else
+                data%value = CK_''  ! default value
+            end if
+
+        end select
+    end associate
 
     !name:
     if (present(name)) call json%rename(p,name)
@@ -10722,7 +10898,7 @@
 
     !set type and value:
     call destroy_json_data(p)
-    p%var_type = json_null
+    allocate(json_null_type :: p%data)
 
     !name:
     if (present(name)) call json%rename(p,name)
@@ -10745,7 +10921,7 @@
 
     !set type and value:
     call destroy_json_data(p)
-    p%var_type = json_object
+    allocate(json_object_type :: p%data)
 
     !name:
     if (present(name)) call json%rename(p,name)
@@ -10768,7 +10944,7 @@
 
     !set type and value:
     call destroy_json_data(p)
-    p%var_type = json_array
+    allocate(json_array_type :: p%data)
 
     !name:
     if (present(name)) call json%rename(p,name)
@@ -10811,7 +10987,7 @@
                             skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
-                                 ' Unexpected end of file while parsing start of object.')
+                                      ' Unexpected end of file while parsing start of object.')
             return
         else if (end_object == c) then
             ! end of an empty object
@@ -10839,7 +11015,7 @@
                             skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
-                                 ' Unexpected end of file while parsing object member.')
+                                      ' Unexpected end of file while parsing object member.')
             return
         else if (colon_char == c) then
             ! parse the value
@@ -10861,7 +11037,7 @@
                             skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object: '//&
-                                 'End of file encountered when parsing an object')
+                                      'End of file encountered when parsing an object')
             return
         else if (delimiter == c) then
             ! read the next member
@@ -10919,7 +11095,7 @@
         if (eof) then
             ! The file ended before array was finished:
             call json%throw_exception('Error in parse_array: '//&
-                                 'End of file encountered when parsing an array.')
+                                      'End of file encountered when parsing an array.')
             exit
         else if (delimiter == c) then
             ! parse the next element
@@ -11063,12 +11239,12 @@
             call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., popped=c)
             if (eof) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected end of file while parsing.')
+                                          ' Unexpected end of file while parsing.')
                 return
             else if (c /= chars(i:i)) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected character: "'//c//'" (expecting "'//&
-                                     chars(i:i)//'")')
+                                          ' Unexpected character: "'//c//'" (expecting "'//&
+                                          chars(i:i)//'")')
                 return
             end if
         end do
