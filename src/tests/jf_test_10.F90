@@ -74,7 +74,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_load_from_string...'
-    call f%serialize(json_str)
+    call f%deserialize(json_str)
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -83,7 +83,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_print_to_string...'
-    call f%deserialize(str)
+    call f%serialize(str)
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1

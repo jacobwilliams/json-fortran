@@ -38,8 +38,8 @@ contains
     write(error_unit,'(A)') ''
 
     write(error_unit,'(A)') 'parsing...'
-    call json%load(p,json_str)
-    call json%load(p2,json_str)
+    call json%deserialize(p,json_str)
+    call json%deserialize(p2,json_str)
 
     if (json%failed()) then
         call json%print_error_message(error_unit)

@@ -115,7 +115,7 @@ contains
         end if
 
         write(error_unit,'(A)') ''
-        call json%deserialize(cval)
+        call json%serialize(cval)
         if (json%failed()) then
            call json%print_error_message(error_unit)
            error_cnt = error_cnt + 1

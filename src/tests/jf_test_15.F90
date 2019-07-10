@@ -45,7 +45,7 @@ contains
     nullify(p2)
     nullify(p)
 
-    call json%load(p2, '{"int": 1, "real": 2.0, "logical": true}')
+    call json%deserialize(p2, '{"int": 1, "real": 2.0, "logical": true}')
     call json%get(p2,'real',   i)
     call json%get(p2,'logical',i)
     call json%get(p2,'integer',d)

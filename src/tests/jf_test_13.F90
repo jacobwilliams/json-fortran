@@ -43,12 +43,12 @@ contains
 
         call my_file%initialize(real_format=trim(fmts(i)))
 
-        call my_file%serialize('{ "value": 1234.56789 }')
+        call my_file%deserialize('{ "value": 1234.56789 }')
         if (my_file%failed()) then
             call my_file%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
-        call my_file%deserialize(str)
+        call my_file%serialize(str)
         if (my_file%failed()) then
             call my_file%print_error_message(error_unit)
             error_cnt = error_cnt + 1

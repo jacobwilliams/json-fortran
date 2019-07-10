@@ -62,7 +62,7 @@ contains
         if (files(i)=='') then
             write(error_unit,'(A)') 'load string: '//invalid_str
             write(error_unit,'(A)') ''
-            call json%serialize(str = invalid_str)
+            call json%deserialize(str = invalid_str)
         else
             write(error_unit,'(A)') 'load file: '//trim(files(i))
             write(error_unit,'(A)') ''

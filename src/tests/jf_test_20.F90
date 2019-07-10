@@ -39,7 +39,7 @@ contains
 
     error_cnt = 0
 
-    call json%load(p,json_example)
+    call json%deserialize(p,json_example)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

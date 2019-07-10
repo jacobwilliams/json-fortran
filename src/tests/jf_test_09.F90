@@ -80,7 +80,7 @@ contains
     write(error_unit,'(A)') '================================='
 
     write(error_unit,'(A)') ''
-    write(error_unit,'(A)') '  Load a file using json_file%serialize'
+    write(error_unit,'(A)') '  Load a file using json_file%deserialize'
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Loading file: '//trim(filename)
 
@@ -88,7 +88,7 @@ contains
     call read_file(dir//filename, str)
 
     if (allocated(str)) then
-        call f%serialize(str)
+        call f%deserialize(str)
         call cpu_time(tend)
         write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time to parse: ',tend-tstart,' sec'
         if (f%failed()) then

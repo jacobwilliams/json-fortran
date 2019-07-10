@@ -40,10 +40,10 @@ contains
 
     error_cnt = 0
 
-    call json%load(p, '{ "a" :{"val"  : 1},'//&
-                        ' "A" :{"Val"  : 2},'//&
-                        ' "a ":{"val  ": 3},'//&
-                        ' "A ":{"Val  ": 4} }' )
+    call json%deserialize(p,'{ "a" :{"val"  : 1},'//&
+                             ' "A" :{"Val"  : 2},'//&
+                             ' "a ":{"val  ": 3},'//&
+                             ' "A ":{"Val  ": 4} }' )
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

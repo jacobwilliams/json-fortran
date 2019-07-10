@@ -38,14 +38,14 @@ contains
 
     call json%initialize(no_whitespace=.true.)
 
-    call json%load(p, CK_'{"a": ["1", "2", "3"]}')
+    call json%deserialize(p, CK_'{"a": ["1", "2", "3"]}')
     f = json_file(p,no_whitespace=.true.)
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
-    call json%load(p, CK_'{"b": ["4", "5", "6"]}')
+    call json%deserialize(p, CK_'{"b": ["4", "5", "6"]}')
     f = json_file(p,json)
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
@@ -68,14 +68,14 @@ contains
 
     ! also test default character kind when unicode is enabled:
 
-    call json%load(p, CDK_'{"a": ["1", "2", "3"]}')
+    call json%deserialize(p, CDK_'{"a": ["1", "2", "3"]}')
     f = json_file(p,no_whitespace=.true.)
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
-    call json%load(p, CDK_'{"b": ["4", "5", "6"]}')
+    call json%deserialize(p, CDK_'{"b": ["4", "5", "6"]}')
     f = json_file(p,json)
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''

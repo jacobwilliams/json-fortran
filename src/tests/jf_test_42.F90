@@ -39,7 +39,7 @@ contains
     ! parse the json string:
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'parsing string... '
-    call json%serialize(str)
+    call json%deserialize(str)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

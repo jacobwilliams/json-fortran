@@ -76,17 +76,29 @@
 
         procedure,public :: get_core => get_json_core_in_file
 
+        !>
+        !  Load JSON from a file.
         procedure,public :: load => json_file_load
 
         !>
         !  The same as `load`, but only here for backward compatibility
         procedure,public :: load_file => json_file_load
 
-        generic,public :: serialize => MAYBEWRAP(json_file_load_from_string)
+        !>
+        !  Load JSON from a string.
+        generic,public :: deserialize => MAYBEWRAP(json_file_load_from_string)
+
+        !>
+        !  The same as `deserialize`, but only here for backward compatibility
+        generic,public :: load_from_string => MAYBEWRAP(json_file_load_from_string)
+
+        !>
+        !  Print the [[json_value]] structure to an allocatable string
+        procedure,public :: serialize => json_file_print_to_string
 
         !>
         !  The same as `serialize`, but only here for backward compatibility
-        generic,public :: load_from_string => MAYBEWRAP(json_file_load_from_string)
+        procedure,public :: print_to_string => json_file_print_to_string
 
         procedure,public :: destroy => json_file_destroy
         procedure,public :: nullify => json_file_nullify
@@ -99,14 +111,6 @@
         procedure,public :: print_error_message => json_file_print_error_message
         procedure,public :: check_for_errors => json_file_check_for_errors
         procedure,public :: clear_exceptions => json_file_clear_exceptions
-
-        !>
-        !  Print the [[json_value]] structure to an allocatable string
-        procedure,public :: deserialize => json_file_print_to_string
-
-        !>
-        !  The same as `deserialize`, but only here for backward compatibility
-        procedure,public :: print_to_string => json_file_print_to_string
 
         generic,public :: print => json_file_print_to_console, &
                                    json_file_print_to_unit, &
@@ -641,7 +645,7 @@
     call file_object%initialize(&
 #include "json_initialize_dummy_arguments.inc"
                                )
-    call file_object%serialize(str)
+    call file_object%deserialize(str)
 
     end function initialize_json_file_from_string
 !*****************************************************************************************
@@ -685,7 +689,7 @@
     type(json_core),intent(in)          :: json_core_object
 
     file_object%core = json_core_object
-    call file_object%serialize(str)
+    call file_object%deserialize(str)
 
     end function initialize_json_file_from_string_v2
 !*****************************************************************************************
@@ -857,7 +861,7 @@
 !  Load JSON from a string:
 !```fortran
 !     type(json_file) :: f
-!     call f%serialize('{ "name": "Leonidas" }')
+!     call f%deserialize('{ "name": "Leonidas" }')
 !```
 
     subroutine json_file_load_from_string(me, str)
@@ -867,7 +871,7 @@
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
 
-    call me%core%serialize(me%p, str)
+    call me%core%deserialize(me%p, str)
 
     end subroutine json_file_load_from_string
 !*****************************************************************************************
@@ -883,7 +887,7 @@
     class(json_file),intent(inout)       :: me
     character(kind=CDK,len=*),intent(in) :: str
 
-    call me%serialize(to_unicode(str))
+    call me%deserialize(to_unicode(str))
 
     end subroutine wrap_json_file_load_from_string
 !*****************************************************************************************
@@ -970,7 +974,7 @@
 !     type(json_file) :: f
 !     character(kind=CK,len=:),allocatable :: str
 !     call f%load('my_file.json')
-!     call f%deserialize(str)
+!     call f%serialize(str)
 !```
 
     subroutine json_file_print_to_string(me,str)
@@ -980,7 +984,7 @@
     class(json_file),intent(inout)                   :: me
     character(kind=CK,len=:),allocatable,intent(out) :: str  !! string to print JSON data to
 
-    call me%core%deserialize(me%p,str)
+    call me%core%serialize(me%p,str)
 
     end subroutine json_file_print_to_string
 !*****************************************************************************************

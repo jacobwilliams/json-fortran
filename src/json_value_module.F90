@@ -563,14 +563,6 @@
         procedure,private :: json_get_by_path_jsonpath_bracket
 
         !>
-        !  Print the [[json_value]] structure to an allocatable string
-        procedure,public :: deserialize => json_value_to_string
-
-        !>
-        !  The same as `deserialize`, but only here for backward compatibility
-        procedure,public :: print_to_string => json_value_to_string
-
-        !>
         !  Print the [[json_value]] to an output unit or file.
         !
         !### Example
@@ -765,12 +757,20 @@
         procedure :: json_parse_file
 
         !>
+        !  Print the [[json_value]] structure to an allocatable string
+        procedure,public :: serialize => json_value_to_string
+
+        !>
+        !  The same as `serialize`, but only here for backward compatibility
+        procedure,public :: print_to_string => json_value_to_string
+
+        !>
         !  Parse the JSON string and populate the [[json_value]] tree.
-        generic,public :: serialize => MAYBEWRAP(json_parse_string)
+        generic,public :: deserialize => MAYBEWRAP(json_parse_string)
         procedure :: MAYBEWRAP(json_parse_string)
 
         !>
-        !  Same as `load` and `serialize` but only here for backward compatibility.
+        !  Same as `load` and `deserialize` but only here for backward compatibility.
         generic,public :: parse => json_parse_file, &
                                    MAYBEWRAP(json_parse_string)
 
@@ -9823,7 +9823,7 @@
     type(json_value),pointer             :: p     !! output structure
     character(kind=CDK,len=*),intent(in) :: str   !! string with JSON data
 
-    call json%serialize(p,to_unicode(str))
+    call json%deserialize(p,to_unicode(str))
 
     end subroutine wrap_json_parse_string
 !*****************************************************************************************

@@ -66,14 +66,14 @@ contains
             call my_file%initialize(no_whitespace=.true.)
 
             ! load from the original string:
-            call my_file%serialize(str_in)
+            call my_file%deserialize(str_in)
             if (my_file%failed()) then
                 call my_file%print_error_message(error_unit)
                 error_cnt = error_cnt + 1
             end if
 
             ! now, write it to a new string:
-            call my_file%deserialize(str_out)
+            call my_file%serialize(str_out)
             if (my_file%failed()) then
                 call my_file%print_error_message(error_unit)
                 error_cnt = error_cnt + 1
@@ -99,7 +99,7 @@ contains
 
             ! now load the string again to verify that it
             ! printed correctly without errors:
-            call my_file%serialize(str_out)
+            call my_file%deserialize(str_out)
             if (my_file%failed()) then
                 call my_file%print_error_message(error_unit)
                 error_cnt = error_cnt + 1

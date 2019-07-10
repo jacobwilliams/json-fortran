@@ -103,7 +103,7 @@ contains
         end select
 
         call json%initialize()
-        call json%load(p,str)
+        call json%deserialize(p,str)
 
         call json%matrix_info(p,is_matrix,var_type,&
                                 n_sets,set_size,name)

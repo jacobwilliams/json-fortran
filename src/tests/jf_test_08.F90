@@ -57,7 +57,7 @@ contains
     write(error_unit,'(A)') ' Valid test 1:'
     write(error_unit,'(A)') '**************'
     write(error_unit,'(A)') ''
-    call json%load(str=str, p=p)   ! read it from str
+    call json%deserialize(str=str, p=p)   ! read it from str
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -80,7 +80,7 @@ contains
     write(error_unit,'(A)') ' Valid test 2:'
     write(error_unit,'(A)') '**************'
     write(error_unit,'(A)') ''
-    call json%load(str=str2, p=p)   ! read it from str
+    call json%deserialize(str=str2, p=p)   ! read it from str
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -103,7 +103,7 @@ contains
     write(error_unit,'(A)') ' Invalid test:'
     write(error_unit,'(A)') '**************'
     write(error_unit,'(A)') ''
-    call json%load(str=str_invalid, p=p)   ! read it from str
+    call json%deserialize(str=str_invalid, p=p)   ! read it from str
     if (json%failed()) then
         call json%print_error_message(error_unit)
     else

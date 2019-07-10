@@ -63,7 +63,7 @@ contains
             !ivec_value_reversed = []
         end select
 
-        call json%load(p,str)
+        call json%deserialize(p,str)
         call json%get(p,'vec',vec)
 
         write(output_unit,'(A)') ''
