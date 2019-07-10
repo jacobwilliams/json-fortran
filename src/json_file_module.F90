@@ -57,7 +57,7 @@
     !    end program test
     !```
     !
-    !@note The `destroy()` method may be called to free the memory, but
+    !@note The `destroy()` method may be called to free the memory if necessary.
     !      [[json_file(type)]] includes a finalizer that also calls
     !      `destroy()` when the variable goes out of scope.
 
@@ -867,7 +867,7 @@
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
 
-    call me%core%load(str=str, p=me%p)
+    call me%core%serialize(me%p, str)
 
     end subroutine json_file_load_from_string
 !*****************************************************************************************
