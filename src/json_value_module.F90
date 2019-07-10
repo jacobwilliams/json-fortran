@@ -9823,7 +9823,7 @@
     type(json_value),pointer             :: p     !! output structure
     character(kind=CDK,len=*),intent(in) :: str   !! string with JSON data
 
-    call json%load(p,to_unicode(str))
+    call json%serialize(p,to_unicode(str))
 
     end subroutine wrap_json_parse_string
 !*****************************************************************************************
