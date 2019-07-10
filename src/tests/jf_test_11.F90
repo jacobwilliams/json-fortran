@@ -48,7 +48,7 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'parsing file: '//dir//unicode_file
 
-    call json%load_file(filename = dir//unicode_file)
+    call json%load(filename = dir//unicode_file)
 
     if (json%failed()) then    !if there was an error reading the file
 
@@ -115,7 +115,7 @@ contains
         end if
 
         write(error_unit,'(A)') ''
-        call json%print_to_string(cval)
+        call json%serialize(cval)
         if (json%failed()) then
            call json%print_error_message(error_unit)
            error_cnt = error_cnt + 1
@@ -125,7 +125,7 @@ contains
         end if
 
         write(error_unit,'(A)') ''
-        call clone%load_from_string(cval)
+        call clone%deserialize(cval)
         if ( clone%failed()) then
            call clone%print_error_message(error_unit)
            error_cnt = error_cnt + 1
@@ -133,7 +133,7 @@ contains
 
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') 'Printing same file, but now to stdout:'
-        call clone%print_file(int(output_unit,IK))
+        call clone%print(int(output_unit,IK))
         if (clone%failed()) then
            call clone%print_error_message(error_unit)
            error_cnt = error_cnt + 1
@@ -141,7 +141,7 @@ contains
 
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') 'Writing json file object to "../files/'//unicode_file//'"'
-        call clone%print_file('../files/'//unicode_file)
+        call clone%print('../files/'//unicode_file)
         if ( clone%failed() ) then
            call clone%print_error_message(error_unit)
            error_cnt = error_cnt + 1
@@ -169,7 +169,7 @@ contains
     write(error_unit,'(A)') 'parsing file: '//dir//ascii_equivalent
     write(error_unit,'(A)') 'This is the ascii equivalent of "../files/inputs/hello-world-ucs4.json"'
 
-    call json%load_file(filename = dir//ascii_equivalent)
+    call json%load(filename = dir//ascii_equivalent)
 
     if (json%failed()) then    !if there was an error reading the file
 
@@ -236,7 +236,7 @@ contains
         end if
 
         write(error_unit,'(A)') ''
-        call json%print_to_string(cval)
+        call json%serialize(cval)
         if (json%failed()) then
            call json%print_error_message(error_unit)
            error_cnt = error_cnt + 1
@@ -247,7 +247,7 @@ contains
 
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') 'Printing same file, but now to stdout:'
-        call json%print_file(int(output_unit,IK))
+        call json%print(int(output_unit,IK))
         if (json%failed()) then
            call json%print_error_message(error_unit)
            error_cnt = error_cnt + 1
@@ -255,7 +255,7 @@ contains
 
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') 'Writing json file object to "../files/'//ascii_equivalent//'"'
-        call json%print_file('../files/'//ascii_equivalent)
+        call json%print('../files/'//ascii_equivalent)
         if ( json%failed() ) then
            call json%print_error_message(error_unit)
            error_cnt = error_cnt + 1

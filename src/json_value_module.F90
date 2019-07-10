@@ -15,6 +15,7 @@
     module json_value_module
 
     use,intrinsic :: iso_fortran_env, only: iostat_end,error_unit,output_unit
+    use,intrinsic :: ieee_arithmetic
     use json_kinds
     use json_parameters
     use json_string_utilities
@@ -256,6 +257,27 @@
                                                   !! (both escaped and unescaped versions are still
                                                   !! valid in all cases).
 
+        integer(IK) :: null_to_real_mode = 2_IK   !! if `strict_type_checking=false`:
+                                                  !!
+                                                  !! * 1 : an exception will be raised if
+                                                  !!   try to retrieve a `null` as a real.
+                                                  !! * 2 : a `null` retrieved as a real
+                                                  !!   will return NaN. [default]
+                                                  !! * 3 : a `null` retrieved as a real
+                                                  !!   will return 0.0.
+
+        logical(LK) :: non_normals_to_null = .false. !! How to serialize NaN, Infinity,
+                                                     !! and -Infinity real values:
+                                                     !!
+                                                     !! * If true : as JSON `null` values
+                                                     !! * If false : as strings (e.g., "NaN",
+                                                     !!   "Infinity", "-Infinity") [default]
+
+        logical(LK) :: use_quiet_nan = .true. !! if true [default], `null_to_real_mode=2`
+                                              !! and [[string_to_real]] will use
+                                              !! `ieee_quiet_nan` for NaN values. If false,
+                                              !! `ieee_signaling_nan` will be used.
+
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
         integer :: filesize = 0 !! the file size when when `use_unformatted_stream=True`
@@ -392,7 +414,7 @@
         !    call json%add_by_path(p,'inputs.t',    0.0_wp  )
         !    call json%add_by_path(p,'inputs.x(1)', 100.0_wp)
         !    call json%add_by_path(p,'inputs.x(2)', 200.0_wp)
-        !    call json%print(p,output_unit)  ! now print to console
+        !    call json%print(p)  ! now print to console
         !````
         !
         !### Notes
@@ -479,25 +501,25 @@
         !      path.  The path version is split up into unicode and non-unicode versions.
 
         generic,public :: get => &
-                                  MAYBEWRAP(json_get_by_path),             &
-            json_get_integer,     MAYBEWRAP(json_get_integer_by_path),     &
-            json_get_integer_vec, MAYBEWRAP(json_get_integer_vec_by_path), &
+                                       MAYBEWRAP(json_get_by_path),             &
+            json_get_integer,          MAYBEWRAP(json_get_integer_by_path),     &
+            json_get_integer_vec,      MAYBEWRAP(json_get_integer_vec_by_path), &
 #ifndef REAL32
-            json_get_real32,      MAYBEWRAP(json_get_real32_by_path),      &
-            json_get_real32_vec,  MAYBEWRAP(json_get_real32_vec_by_path),  &
+            json_get_real32,           MAYBEWRAP(json_get_real32_by_path),      &
+            json_get_real32_vec,       MAYBEWRAP(json_get_real32_vec_by_path),  &
 #endif
-            json_get_real,      MAYBEWRAP(json_get_real_by_path),      &
-            json_get_real_vec,  MAYBEWRAP(json_get_real_vec_by_path),  &
+            json_get_real,             MAYBEWRAP(json_get_real_by_path),        &
+            json_get_real_vec,         MAYBEWRAP(json_get_real_vec_by_path),    &
 #ifdef REAL128
-            json_get_real64,      MAYBEWRAP(json_get_real64_by_path),      &
-            json_get_real64_vec,  MAYBEWRAP(json_get_real64_vec_by_path),  &
+            json_get_real64,           MAYBEWRAP(json_get_real64_by_path),      &
+            json_get_real64_vec,       MAYBEWRAP(json_get_real64_vec_by_path),  &
 #endif
-            json_get_logical,     MAYBEWRAP(json_get_logical_by_path),     &
-            json_get_logical_vec, MAYBEWRAP(json_get_logical_vec_by_path), &
-            json_get_string,      MAYBEWRAP(json_get_string_by_path),      &
-            json_get_string_vec,  MAYBEWRAP(json_get_string_vec_by_path),  &
-            json_get_alloc_string_vec,MAYBEWRAP(json_get_alloc_string_vec_by_path),&
-            json_get_array,       MAYBEWRAP(json_get_array_by_path)
+            json_get_logical,          MAYBEWRAP(json_get_logical_by_path),     &
+            json_get_logical_vec,      MAYBEWRAP(json_get_logical_vec_by_path), &
+            json_get_string,           MAYBEWRAP(json_get_string_by_path),      &
+            json_get_string_vec,       MAYBEWRAP(json_get_string_vec_by_path),  &
+            json_get_alloc_string_vec, MAYBEWRAP(json_get_alloc_string_vec_by_path),&
+            json_get_array,            MAYBEWRAP(json_get_array_by_path)
 
         procedure,private :: json_get_integer
         procedure,private :: json_get_integer_vec
@@ -540,12 +562,8 @@
         procedure,private :: json_get_by_path_rfc6901
         procedure,private :: json_get_by_path_jsonpath_bracket
 
-        procedure,public :: print_to_string => json_value_to_string !! Print the [[json_value]]
-                                                                    !! structure to an allocatable
-                                                                    !! string
-
         !>
-        !  Print the [[json_value]] to a file.
+        !  Print the [[json_value]] to an output unit or file.
         !
         !### Example
         !
@@ -555,7 +573,10 @@
         !    !...
         !    call json%print(p,'test.json')  !this is [[json_print_to_filename]]
         !````
-        generic,public :: print => json_print_to_unit,json_print_to_filename
+        generic,public :: print => json_print_to_console,&
+                                   json_print_to_unit,&
+                                   json_print_to_filename
+        procedure :: json_print_to_console
         procedure :: json_print_to_unit
         procedure :: json_print_to_filename
 
@@ -732,9 +753,26 @@
 
         !>
         !  Parse the JSON file and populate the [[json_value]] tree.
-        generic,public :: parse => json_parse_file, MAYBEWRAP(json_parse_string)
+        generic,public :: load => json_parse_file
         procedure :: json_parse_file
+
+        !>
+        !  Print the [[json_value]] structure to an allocatable string
+        procedure,public :: serialize => json_value_to_string
+
+        !>
+        !  The same as `serialize`, but only here for backward compatibility
+        procedure,public :: print_to_string => json_value_to_string
+
+        !>
+        !  Parse the JSON string and populate the [[json_value]] tree.
+        generic,public :: deserialize => MAYBEWRAP(json_parse_string)
         procedure :: MAYBEWRAP(json_parse_string)
+
+        !>
+        !  Same as `load` and `deserialize` but only here for backward compatibility.
+        generic,public :: parse => json_parse_file, &
+                                   MAYBEWRAP(json_parse_string)
 
         !>
         !  Throw an exception.
@@ -929,40 +967,18 @@
 !      [[initialize_json_core_in_file]], and [[initialize_json_file]]
 !      all have a similar interface.
 
-    function initialize_json_core(verbose,compact_reals,&
-                                  print_signs,real_format,spaces_per_tab,&
-                                  strict_type_checking,&
-                                  trailing_spaces_significant,&
-                                  case_sensitive_keys,&
-                                  no_whitespace,&
-                                  unescape_strings,&
-                                  comment_char,&
-                                  path_mode,&
-                                  path_separator,&
-                                  compress_vectors,&
-                                  allow_duplicate_keys,&
-                                  escape_solidus,&
-                                  stop_on_error) result(json_core_object)
+    function initialize_json_core(&
+#include "json_initialize_dummy_arguments.inc"
+                                 ) result(json_core_object)
 
     implicit none
 
     type(json_core) :: json_core_object
 #include "json_initialize_arguments.inc"
 
-    call json_core_object%initialize(verbose,compact_reals,&
-                                print_signs,real_format,spaces_per_tab,&
-                                strict_type_checking,&
-                                trailing_spaces_significant,&
-                                case_sensitive_keys,&
-                                no_whitespace,&
-                                unescape_strings,&
-                                comment_char,&
-                                path_mode,&
-                                path_separator,&
-                                compress_vectors,&
-                                allow_duplicate_keys,&
-                                escape_solidus,&
-                                stop_on_error)
+    call json_core_object%initialize(&
+#include "json_initialize_dummy_arguments.inc"
+                                    )
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -986,20 +1002,9 @@
 !      [[initialize_json_core_in_file]], and [[initialize_json_file]]
 !      all have a similar interface.
 
-    subroutine json_initialize(me,verbose,compact_reals,&
-                               print_signs,real_format,spaces_per_tab,&
-                               strict_type_checking,&
-                               trailing_spaces_significant,&
-                               case_sensitive_keys,&
-                               no_whitespace,&
-                               unescape_strings,&
-                               comment_char,&
-                               path_mode,&
-                               path_separator,&
-                               compress_vectors,&
-                               allow_duplicate_keys,&
-                               escape_solidus,&
-                               stop_on_error)
+    subroutine json_initialize(me,&
+#include "json_initialize_dummy_arguments.inc"
+                              )
 
     implicit none
 
@@ -1014,6 +1019,8 @@
     integer(IK)                :: istat        !! `iostat` flag for
                                                !! write statements
     logical(LK)                :: sgn_prnt     !! print sign flag
+    character(kind=CK,len=max_integer_str_len) :: istr !! for integer to
+                                                       !! string conversion
 
     !reset exception to false:
     call me%clear_exceptions()
@@ -1087,6 +1094,35 @@
     ! if escaping the forward slash:
     if (present(escape_solidus)) then
         me%escape_solidus = escape_solidus
+    end if
+
+    ! how to handle null to read conversions:
+    if (present(null_to_real_mode)) then
+        select case (null_to_real_mode)
+        case(1_IK:3_IK)
+            me%null_to_real_mode = null_to_real_mode
+        case default
+            me%null_to_real_mode = 2_IK  ! just to have a valid value
+            call integer_to_string(null_to_real_mode,int_fmt,istr)
+            call me%throw_exception('Invalid null_to_real_mode: '//istr)
+        end select
+    end if
+
+    ! how to handle NaN and Infinities:
+    if (present(non_normal_mode)) then
+        select case (non_normal_mode)
+        case(1_IK) ! use strings
+            me%non_normals_to_null = .false.
+        case(2_IK) ! use null
+            me%non_normals_to_null = .true.
+        case default
+            call integer_to_string(non_normal_mode,int_fmt,istr)
+            call me%throw_exception('Invalid non_normal_mode: '//istr)
+        end select
+    end if
+
+    if (present(use_quiet_nan)) then
+        me%use_quiet_nan = use_quiet_nan
     end if
 
     !Set the format for real numbers:
@@ -1238,7 +1274,7 @@
 !     implicit none
 !     type(json_core) :: json
 !     type(json_value),pointer :: j1, j2
-!     call json%parse('../files/inputs/test1.json',j1)
+!     call json%load('../files/inputs/test1.json',j1)
 !     call json%clone(j1,j2) !now have two independent copies
 !     call json%destroy(j1)  !destroys j1, but j2 remains
 !     call json%print(j2,'j2.json')
@@ -1340,7 +1376,7 @@
 !
 !  Destroy the data within a [[json_value]], and reset type to `json_unknown`.
 
-    subroutine destroy_json_data(d)
+    pure subroutine destroy_json_data(d)
 
     implicit none
 
@@ -2028,7 +2064,7 @@
 !     type(json_file) :: json
 !     logical :: status_ok
 !     character(kind=CK,len=:),allocatable :: error_msg
-!     call json%load_file(filename='myfile.json')
+!     call json%load(filename='myfile.json')
 !     call json%check_for_errors(status_ok, error_msg)
 !     if (.not. status_ok) then
 !         write(*,*) 'Error: '//error_msg
@@ -2087,7 +2123,7 @@
 !    type(json_value),pointer :: p
 !    logical :: status_ok
 !    character(len=:),allocatable :: error_msg
-!    call json%parse(filename='myfile.json',p)
+!    call json%load(filename='myfile.json',p)
 !    if (json%failed()) then
 !        call json%check_for_errors(status_ok, error_msg)
 !        write(*,*) 'Error: '//error_msg
@@ -2101,7 +2137,7 @@
 !    type(json_file) :: f
 !    logical :: status_ok
 !    character(len=:),allocatable :: error_msg
-!    call f%load_file(filename='myfile.json')
+!    call f%load(filename='myfile.json')
 !    if (f%failed()) then
 !        call f%check_for_errors(status_ok, error_msg)
 !        write(*,*) 'Error: '//error_msg
@@ -2176,7 +2212,7 @@
 !      method to validate a JSON structure that was manually
 !      created using [[json_value]] pointers.
 
-    recursive subroutine json_value_destroy(json,p,destroy_next)
+    pure recursive subroutine json_value_destroy(json,p,destroy_next)
 
     implicit none
 
@@ -3394,7 +3430,7 @@
 !   logical(json_LK) :: found
 !   type(json_core) :: json
 !   type(json_value),pointer :: p,new,element
-!   call json%parse(file='myfile.json', p=p)
+!   call json%load(file='myfile.json', p=p)
 !   call json%get(p,'x(3)',element,found) ! get pointer to an array element in the file
 !   call json%create_integer(new,1,'')    ! create a new element
 !   call json%insert_after(element,new)   ! insert new element after x(3)
@@ -5847,6 +5883,25 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!>
+!  Print the [[json_value]] structure to the console (`output_unit`).
+!
+!### Note
+!  * Just a wrapper for [[json_print_to_unit]].
+
+    subroutine json_print_to_console(json,p)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer,intent(in) :: p
+
+    call json%print(p,int(output_unit,IK))
+
+    end subroutine json_print_to_console
+!*****************************************************************************************
+
+!*****************************************************************************************
 !> author: Jacob Williams
 !  date: 6/20/2014
 !
@@ -6224,10 +6279,10 @@
         case (json_real)
 
             if (allocated(json%real_fmt)) then
-                call real_to_string(p%dbl_value,json%real_fmt,json%compact_real,tmp)
+                call real_to_string(p%dbl_value,json%real_fmt,json%compact_real,json%non_normals_to_null,tmp)
             else
                 !use the default format (user has not called initialize() or specified one):
-                call real_to_string(p%dbl_value,default_real_fmt,json%compact_real,tmp)
+                call real_to_string(p%dbl_value,default_real_fmt,json%compact_real,json%non_normals_to_null,tmp)
             end if
 
             s = s_indent//trim(tmp)
@@ -6237,7 +6292,9 @@
 
         case default
 
-            call json%throw_exception('Error in json_value_print: unknown data type')
+            call integer_to_string(p%var_type,int_fmt,tmp)
+            call json%throw_exception('Error in json_value_print: '//&
+                                      'unknown data type: '//trim(tmp))
 
         end select
 
@@ -7947,7 +8004,7 @@
 
     if (.not. json%exception_thrown) then
 
-        call string_to_real(str,rval,status_ok)
+        call string_to_real(str,json%use_quiet_nan,rval,status_ok)
 
         if (.not. status_ok) then    !if there was an error
             rval = 0.0_RK
@@ -8224,14 +8281,31 @@
                     value = 0.0_RK
                 end if
             case (json_string)
-                call string_to_real(me%str_value,value,status_ok)
+                call string_to_real(me%str_value,json%use_quiet_nan,value,status_ok)
                 if (.not. status_ok) then
                     value = 0.0_RK
                     call json%throw_exception('Error in json_get_real:'//&
                          ' Unable to convert string value to real: me.'//&
                          me%name//' = '//trim(me%str_value))
                 end if
+            case (json_null)
+                if (ieee_support_nan(value) .and. json%null_to_real_mode/=1_IK) then
+                    select case (json%null_to_real_mode)
+                    case(2_IK)
+                        if (json%use_quiet_nan) then
+                            value = ieee_value(value,ieee_quiet_nan)
+                        else
+                            value = ieee_value(value,ieee_signaling_nan)
+                        end if
+                    case(3_IK)
+                        value = 0.0_RK
+                    end select
+                else
+                    call json%throw_exception('Error in json_get_real:'//&
+                                              ' Cannot convert null to NaN: '//me%name)
+                end if
             case default
+
                 call json%throw_exception('Error in json_get_real:'//&
                                           ' Unable to resolve value to real: '//me%name)
             end select
@@ -8951,6 +9025,7 @@
                     if (allocated(me%dbl_value)) then
                         value = repeat(space, max_numeric_str_len)
                         call real_to_string(me%dbl_value,json%real_fmt,&
+                                            json%non_normals_to_null,&
                                             json%compact_real,value)
                         value = trim(value)
                     else
@@ -9534,7 +9609,7 @@
 !````fortran
 !    type(json_core) :: json
 !    type(json_value),pointer :: p
-!    call json%parse(file='myfile.json', p=p)
+!    call json%load(file='myfile.json', p=p)
 !````
 !
 !### History
@@ -9748,7 +9823,7 @@
     type(json_value),pointer             :: p     !! output structure
     character(kind=CDK,len=*),intent(in) :: str   !! string with JSON data
 
-    call json%parse(p,to_unicode(str))
+    call json%deserialize(p,to_unicode(str))
 
     end subroutine wrap_json_parse_string
 !*****************************************************************************************

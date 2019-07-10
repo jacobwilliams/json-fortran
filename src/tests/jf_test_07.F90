@@ -226,7 +226,7 @@ contains
     nullify(e2)
     nullify(escaped_string)
 
-    call json%print(root,int(output_unit,IK))  !print to the console
+    call json%print(root)  !print to the console
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

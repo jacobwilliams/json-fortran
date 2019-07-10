@@ -54,12 +54,12 @@ contains
     write(error_unit,'(A)') '================================='
 
     write(error_unit,'(A)') ''
-    write(error_unit,'(A)') '  Load a file using json_file%load_file'
+    write(error_unit,'(A)') '  Load a file using json_file%load'
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Loading file: '//trim(filename)
 
     call cpu_time(tstart)
-    call f%load_file(dir//filename) ! will automatically call initialize() with defaults
+    call f%load(dir//filename) ! will automatically call initialize() with defaults
     call cpu_time(tend)
     write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time: ',tend-tstart,' sec'
 
@@ -80,7 +80,7 @@ contains
     write(error_unit,'(A)') '================================='
 
     write(error_unit,'(A)') ''
-    write(error_unit,'(A)') '  Load a file using json_file%load_from_string'
+    write(error_unit,'(A)') '  Load a file using json_file%deserialize'
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Loading file: '//trim(filename)
 
@@ -88,7 +88,7 @@ contains
     call read_file(dir//filename, str)
 
     if (allocated(str)) then
-        call f%load_from_string(str)
+        call f%deserialize(str)
         call cpu_time(tend)
         write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time to parse: ',tend-tstart,' sec'
         if (f%failed()) then
