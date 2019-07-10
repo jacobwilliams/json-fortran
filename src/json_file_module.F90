@@ -244,8 +244,10 @@
         generic,public :: operator(.in.) => MAYBEWRAP(json_file_valid_path_op)
         procedure,pass(me) :: MAYBEWRAP(json_file_valid_path_op)
 
-        generic,public :: assignment(=) => assign_json_file
+        generic,public :: assignment(=) => assign_json_file,&
+                                           assign_json_file_to_string
         procedure :: assign_json_file
+        procedure,pass(me) :: assign_json_file_to_string
 
         ! ***************************************************
         ! private routines
@@ -1126,7 +1128,7 @@
 !*****************************************************************************************
 !> author: Jacob Williams
 !
-!  Assignment operator for [[json_core(type)]].
+!  Assignment operator for [[json_core(type)]] = [[json_core(type)]].
 !  This will duplicate the [[json_core(type)]] and also
 !  perform a deep copy of the [[json_value(type)]] data structure.
 
@@ -1141,6 +1143,45 @@
     call me%core%clone(f%p,me%p)
 
     end subroutine assign_json_file
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Assignment operator for character = [[json_core(type)]].
+!  This is just a wrapper for the [[json_value_to_string]] routine.
+!
+!### Note
+!  * If an exception is raised or the file contains no data,
+!    this will return an empty string.
+
+    subroutine assign_json_file_to_string(str,me)
+
+    implicit none
+
+    character(kind=CK,len=:),allocatable,intent(out) :: str
+    class(json_file),intent(in) :: me
+
+    type(json_core) :: core_copy !! a copy of `core` from `me`
+
+    if (me%core%failed() .or. .not. associated(me%p)) then
+        str = ''
+    else
+
+        ! This is sort of a hack. Since `me` has to have `intent(in)`
+        ! for the assignment to work, we need to make a copy of `me%core`
+        ! so we can call the low level routine (since it needs it to
+        ! be `intent(inout)`) because it's possible for this
+        ! function to raise an exception.
+
+        core_copy = me%core ! copy the parser settings
+
+        call core_copy%serialize(me%p,str)
+        if (me%core%failed()) str = ''
+
+    end if
+
+    end subroutine assign_json_file_to_string
 !*****************************************************************************************
 
 !*****************************************************************************************
