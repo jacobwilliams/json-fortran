@@ -101,7 +101,7 @@ contains
     write(error_unit,'(A)') 'write to string'
     write(error_unit,'(A)') ''
     !write it to a string, and print to console:
-    call core%deserialize(p, string)
+    call core%serialize(p, string)
     if (core%failed()) then
         call core%print_error_message(error_unit)
         error_cnt = error_cnt + 1
