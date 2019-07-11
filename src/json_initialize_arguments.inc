@@ -28,10 +28,11 @@ logical(LK),intent(in),optional :: no_whitespace
   !! done without adding any non-significant
   !! spaces or linebreaks (default is false)
 logical(LK),intent(in),optional :: unescape_strings
-  !! If false, then the raw escaped
-  !! string is returned from [[json_get_string]]
-  !! and similar routines. If true [default],
-  !! then the string is returned unescaped.
+  !! * If false, then the raw escaped
+  !!   string is returned from [[json_get_string]]
+  !!   and similar routines.
+  !! * If true [default], then the string
+  !!   is returned unescaped.
 character(kind=CK,len=1),intent(in),optional :: comment_char
   !! If present, this character is used
   !! to denote comments in the JSON file,
@@ -42,6 +43,7 @@ character(kind=CK,len=1),intent(in),optional :: comment_char
 integer(IK),intent(in),optional :: path_mode
   !! How the path strings are interpreted in the
   !! `get_by_path` routines:
+  !!
   !! * 1 -- Default mode (see [[json_get_by_path_default]])
   !! * 2 -- as RFC 6901 "JSON Pointer" paths
   !!   (see [[json_get_by_path_rfc6901]])
@@ -73,6 +75,7 @@ logical(LK),intent(in),optional :: escape_solidus
   !! * If True then the solidus "`/`" is always escaped
   !!   "`\/`" when serializing JSON
   !! * If False [default], then it is not escaped.
+  !!
   !! Note that this option does not affect parsing
   !! (both escaped and unescaped are still valid in
   !! all cases).
@@ -96,7 +99,8 @@ integer(IK),intent(in),optional :: non_normal_mode
   !!   "Infinity", "-Infinity") [default]
   !! * 2 : as JSON `null` values
 logical(LK),intent(in),optional :: use_quiet_nan
-  !! if true [default], `null_to_real_mode=2`
-  !! and [[string_to_real]] will use
-  !! `ieee_quiet_nan` for NaN values. If false,
-  !! `ieee_signaling_nan` will be used.
+  !! * If true [default], `null_to_real_mode=2`
+  !!   and [[string_to_real]] will use
+  !!   `ieee_quiet_nan` for NaN values.
+  !! * If false,
+  !!   `ieee_signaling_nan` will be used.
