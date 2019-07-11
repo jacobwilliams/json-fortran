@@ -896,6 +896,7 @@
                                                                            !! children for duplicate keys
 
         !other private routines:
+        procedure,nopass :: destroy_json_data
         procedure        :: name_equal
         procedure        :: name_strings_equal
         procedure        :: json_value_print
@@ -1400,13 +1401,13 @@
 !
 !  Destroy the data within a [[json_value]], and reset type to `json_unknown`.
 
-    pure subroutine destroy_json_data(me)
+    pure subroutine destroy_json_data(p)
 
     implicit none
 
-    type(json_value),intent(inout) :: me
+    type(json_value),intent(inout) :: p
 
-    if (allocated(me%data)) deallocate(me%data)
+    if (allocated(p%data)) deallocate(p%data)
 
     end subroutine destroy_json_data
 !*****************************************************************************************
@@ -1566,7 +1567,7 @@
         implicit none
 
         class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: element
+        type(json_value),pointer,intent(in) :: element  !! array element
         integer(IK),intent(in)              :: i        !! index
         integer(IK),intent(in)              :: count    !! size of array
 
@@ -1582,26 +1583,31 @@
         if (json%strict_type_checking) then
             ! only allowing strings to be returned
             ! as strings, so we can check size directly
-            associate (data => element%data)
-                select type (data)
-                class is (json_string_type)
-                    if (allocated(data%value)) then
-                        if (get_max_len) then
-                            if (len(data%value)>max_str_len) &
-                                    max_str_len = len(data%value)
+            if (allocated(element%data)) then
+                associate (data => element%data)
+                    select type (data)
+                    class is (json_string_type)
+                        if (allocated(data%value)) then
+                            if (get_max_len) then
+                                if (len(data%value)>max_str_len) &
+                                        max_str_len = len(data%value)
+                            end if
+                            if (get_ilen) ilen(i) = len(data%value)
+                        else
+                            if (get_ilen) ilen(i) = 0
                         end if
-                        if (get_ilen) ilen(i) = len(data%value)
-                    else
-                        if (get_ilen) ilen(i) = 0
-                    end if
-                class default
-                    ! it isn't a string, so there is no length
-                    call json%throw_exception('Error in json_string_info: '//&
-                                              'When strict_type_checking is true '//&
-                                              'the array must contain only '//&
-                                              'character strings.',found)
-                end select
-            end associate
+                    class default
+                        ! it isn't a string, so there is no length
+                        call json%throw_exception('Error in json_string_info: '//&
+                                                  'When strict_type_checking is true '//&
+                                                  'the array must contain only '//&
+                                                  'character strings.',found)
+                    end select
+                end associate
+            else
+                call json%throw_exception('Error in json_string_info: '//&
+                                          'JSON data not allocated.',found)
+            end if
         else
             ! in this case, we have to get the value
             ! as a string to know what size it is.
@@ -2320,7 +2326,7 @@
         nullify(p%parent)
         nullify(p%tail)
 
-        call destroy_json_data(p)
+        call json%destroy_json_data(p)
 
         if (associated(p)) deallocate(p)
         nullify(p)
@@ -5354,6 +5360,7 @@
             count = 0_IK
         end if
     else
+        count = 0_IK
         call json%throw_exception('Error in json_count: '//&
                                   'pointer is not associated.')
     end if
@@ -10721,7 +10728,7 @@
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
-    call destroy_json_data(p)
+    call json%destroy_json_data(p)
 
     allocate(json_logical_type :: p%data)
     associate (data => p%data)
@@ -10757,7 +10764,7 @@
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
-    call destroy_json_data(p)
+    call json%destroy_json_data(p)
 
     allocate(json_integer_type :: p%data)
     associate (data => p%data)
@@ -10793,7 +10800,7 @@
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
-    call destroy_json_data(p)
+    call json%destroy_json_data(p)
 
     allocate(json_real_type :: p%data)
     associate (data => p%data)
@@ -10841,7 +10848,7 @@
     logical :: adjustl_string !! if the string is to be adjusted left
 
     !set type and value:
-    call destroy_json_data(p)
+    call json%destroy_json_data(p)
 
     allocate(json_string_type :: p%data)
     associate (data => p%data)
@@ -10897,7 +10904,7 @@
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
-    call destroy_json_data(p)
+    call json%destroy_json_data(p)
     allocate(json_null_type :: p%data)
 
     !name:
@@ -10920,7 +10927,7 @@
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
-    call destroy_json_data(p)
+    call json%destroy_json_data(p)
     allocate(json_object_type :: p%data)
 
     !name:
@@ -10943,7 +10950,7 @@
     character(kind=CK,len=*),intent(in),optional :: name  !! if the name is also to be changed.
 
     !set type and value:
-    call destroy_json_data(p)
+    call json%destroy_json_data(p)
     allocate(json_array_type :: p%data)
 
     !name:
