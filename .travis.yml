@@ -12,40 +12,104 @@ cache:
     - $HOME/.cache/pip
     - $HOME/.local
 
-addons:
-  apt:
-    sources:
-      - kalakris-cmake
-      - ubuntu-toolchain-r-test
-    packages:
-      - gfortran-6
-      - binutils
-      - cmake
-      - python-pip
-      - graphviz
-
 # Build matrix: Run the three build systems and tests in parallel
-env:
-  global:
-    - CHECK_README_PROGS="no"
-  matrix:
-      # CMake build with unit tests, no documentation, with coverage analysis
-      # No unicode so that coverage combined with the build script will cover unicode
-      # and non-unicode code paths
-    - >
-      BUILD_SCRIPT="mkdir cmake-build &&
-      cd cmake-build &&
-      cmake .. &&
-      make -j 4 check"
-      CODE_COVERAGE="no"
-      DEPLOY_DOCUMENTATION="no"
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - kalakris-cmake
+            - ubuntu-toolchain-r-test
+          packages:
+            - gfortran-6
+            - binutils
+            - cmake
+            - python-pip
+      env:
+        - GFORTRAN=gfortran-6
+        - GCOV=gcov-6
+        # CMake build with unit tests, no documentation, with coverage analysis
+        # No unicode so that coverage combined with the build script will cover unicode
+        # and non-unicode code paths
+        - BUILD_SCRIPT="mkdir cmake-build && cd cmake-build && cmake .. && make -j 4 check"
+        - CODE_COVERAGE="no"
+        - DEPLOY_DOCUMENTATION="no"
 
-      # build with build.sh, make documentation, run unit tests and perform coverage analysis
-    - >
-      BUILD_SCRIPT="./build.sh --coverage --skip-documentation &&
-      ./build.sh --coverage --enable-unicode"
-      CODE_COVERAGE="yes"
-      DEPLOY_DOCUMENTATION="yes"
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gfortran-6
+            - binutils
+            - python-pip
+            - graphviz
+      env:
+        - GFORTRAN=gfortran-6
+        - GCOV=gcov-6
+        # build with build.sh, make documentation, run unit tests
+        # and perform coverage analysis
+        - BUILD_SCRIPT="./build.sh --coverage --skip-documentation && ./build.sh --coverage --enable-unicode"
+        - CODE_COVERAGE="yes"
+        - DEPLOY_DOCUMENTATION="yes"
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gfortran-7
+            - binutils
+            - python-pip
+      env:
+        - GFORTRAN=gfortran-7
+        - GCOV=gcov-7
+        # build with build.sh, run unit tests
+        - BUILD_SCRIPT="./build.sh --skip-documentation && ./build.sh --skip-documentation --enable-unicode"
+        - CODE_COVERAGE="no"
+        - DEPLOY_DOCUMENTATION="no"
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gfortran-8
+            - binutils
+            - python-pip
+      env:
+        - GFORTRAN=gfortran-8
+        - GCOV=gcov-8
+        # build with build.sh, run unit tests
+        - BUILD_SCRIPT="./build.sh --skip-documentation && ./build.sh --skip-documentation --enable-unicode"
+        - CODE_COVERAGE="no"
+        - DEPLOY_DOCUMENTATION="no"
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gfortran-9
+            - binutils
+            - python-pip
+      env:
+        - GFORTRAN=gfortran-9
+        - GCOV=gcov-9
+        # build with build.sh, run unit tests
+        - BUILD_SCRIPT="./build.sh --skip-documentation && ./build.sh --skip-documentation --enable-unicode"
+        - CODE_COVERAGE="no"
+        - DEPLOY_DOCUMENTATION="no"
 
 install:
   - |
@@ -53,18 +117,11 @@ install:
       mkdir "$HOME/.local/bin"
     fi
   - export PATH="$HOME/.local/bin:$PATH"
-  - export FC=/usr/bin/gfortran-6
-  - ln -fs /usr/bin/gfortran-6 "$HOME/.local/bin/gfortran" && gfortran --version
-  - ls -l /usr/bin/gfortran-6
-  - ln -fs /usr/bin/gcov-6 "$HOME/.local/bin/gcov" && gcov --version
+  - export FC=/usr/bin/$GFORTRAN
+  - ln -fs $FC "$HOME/.local/bin/gfortran" && gfortran --version
+  - ls -l $FC
+  - ln -fs /usr/bin/$GCOV "$HOME/.local/bin/gcov" && gcov --version
   - perl --version
-  - |
-    if ! which f90split; then
-      wget http://people.sc.fsu.edu/~jburkardt/f_src/f90split/f90split.f90 && \
-      gfortran -o f90split f90split.f90 && \
-      mv f90split "$HOME/.local/bin/" && \
-      rm f90split.f90
-    fi
   - pip install --upgrade pygooglechart
   - pip install --upgrade graphviz
   - (pip install --upgrade FoBiS.py==2.2.8 && FoBiS.py --version)
@@ -72,13 +129,6 @@ install:
   - (pip install --upgrade git+https://github.com/dmeranda/demjson.git && jsonlint --version)
 
 before_script:
-  - |
-    if [[ $CHECK_README_PROGS == [yY]* ]]; then
-      f90split README.md && \
-      for f in example*.md; do
-        mv $f src/tests/jf_test_${f%.md}.f90
-      done
-    fi
   - |
     if [ "$TRAVIS_TAG" ]; then
       if [[ "v$TRAVIS_TAG" != "v$(cat .VERSION)" ]]; then
@@ -102,8 +152,9 @@ after_success:
   - (yes | rm -r doc gh-pages) || true # wipe out doc dirs to avoid confusing codecov
   - |
     if [[ $CODE_COVERAGE == [yY]* ]]; then
+      alias gcov=$GCOV
       rm json_*.F90-*unicode.gcov || true
       mv json_*.F90.gcov src/
       mv jf_test*.[fF]90.gcov src/tests/
-      bash <(curl -s https://codecov.io/bash) -v -X gcov
+      bash <(curl -s https://codecov.io/bash) -v -X $GCOV
     fi
