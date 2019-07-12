@@ -28,7 +28,8 @@ matrix:
             - cmake
             - python-pip
       env:
-        - FC=gfortran-6
+        - GFORTRAN=gfortran-6
+        - GCOV=gcov-6
         # CMake build with unit tests, no documentation, with coverage analysis
         # No unicode so that coverage combined with the build script will cover unicode
         # and non-unicode code paths
@@ -48,7 +49,7 @@ matrix:
             - python-pip
             - graphviz
       env:
-        - FC=gfortran-6
+        - GFORTRAN=gfortran-6
         - GCOV=gcov-6
         # build with build.sh, make documentation, run unit tests
         # and perform coverage analysis
@@ -67,7 +68,8 @@ matrix:
             - binutils
             - python-pip
       env:
-        - FC=gfortran-7
+        - GFORTRAN=gfortran-7
+        - GCOV=gcov-7
         # build with build.sh, run unit tests
         - BUILD_SCRIPT="./build.sh --skip-documentation && ./build.sh --skip-documentation --enable-unicode"
         - CODE_COVERAGE="no"
@@ -84,7 +86,8 @@ matrix:
             - binutils
             - python-pip
       env:
-        - FC=gfortran-8
+        - GFORTRAN=gfortran-8
+        - GCOV=gcov-8
         # build with build.sh, run unit tests
         - BUILD_SCRIPT="./build.sh --skip-documentation && ./build.sh --skip-documentation --enable-unicode"
         - CODE_COVERAGE="no"
@@ -101,24 +104,23 @@ matrix:
             - binutils
             - python-pip
       env:
-        - FC=gfortran-9
+        - GFORTRAN=gfortran-9
+        - GCOV=gcov-9
         # build with build.sh, run unit tests
         - BUILD_SCRIPT="./build.sh --skip-documentation && ./build.sh --skip-documentation --enable-unicode"
         - CODE_COVERAGE="no"
         - DEPLOY_DOCUMENTATION="no"
 
 install:
-  # - |
-  #   if [[ ! -d "$HOME/.local/bin" ]]; then
-  #     mkdir "$HOME/.local/bin"
-  #   fi
-  # - export PATH="$HOME/.local/bin:$PATH"
-  # - export FC=/usr/bin/gfortran-6
-  # - ln -fs /usr/bin/gfortran-6 "$HOME/.local/bin/gfortran" && gfortran --version
-  # - ls -l /usr/bin/gfortran-6
-  # - ln -fs /usr/bin/gcov-6 "$HOME/.local/bin/gcov" && gcov --version
-  - gcov --version
-  - gfortran --version
+  - |
+    if [[ ! -d "$HOME/.local/bin" ]]; then
+      mkdir "$HOME/.local/bin"
+    fi
+  - export PATH="$HOME/.local/bin:$PATH"
+  - export FC=/usr/bin/$GFORTRAN
+  - ln -fs $FC "$HOME/.local/bin/gfortran" && gfortran --version
+  - ls -l $FC
+  - ln -fs /usr/bin/$GCOV "$HOME/.local/bin/gcov" && gcov --version
   - perl --version
   - pip install --upgrade pygooglechart
   - pip install --upgrade graphviz
