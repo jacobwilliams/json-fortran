@@ -8152,6 +8152,8 @@
 
     logical(LK) :: initialized
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     select case (me%var_type)
     case (json_array)
@@ -8165,6 +8167,8 @@
 
     !the callback function is called for each element of the array:
     call json%get(me, array_callback=get_int_from_array)
+
+    if (json%exception_thrown .and. allocated(vec)) deallocate(vec)
 
     contains
 
@@ -8400,6 +8404,8 @@
 
     logical(LK) :: initialized
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     select case (me%var_type)
     case (json_array)
@@ -8413,6 +8419,8 @@
 
     !the callback function is called for each element of the array:
     call json%get(me, array_callback=get_real_from_array)
+
+    if (json%exception_thrown .and. allocated(vec)) deallocate(vec)
 
     contains
 
@@ -8876,6 +8884,8 @@
 
     logical(LK) :: initialized
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     select case (me%var_type)
     case (json_array)
@@ -8889,6 +8899,8 @@
 
     !the callback function is called for each element of the array:
     call json%get(me, array_callback=get_logical_from_array)
+
+    if (json%exception_thrown .and. allocated(vec)) deallocate(vec)
 
     contains
 
@@ -9153,6 +9165,8 @@
 
     logical(LK) :: initialized
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     select case (me%var_type)
     case (json_array)
@@ -9166,6 +9180,8 @@
 
     !the callback function is called for each element of the array:
     call json%get(me, array_callback=get_chars_from_array)
+
+    if (json%exception_thrown .and. allocated(vec)) deallocate(vec)
 
     contains
 
@@ -9285,6 +9301,8 @@
     logical(LK) :: initialized !! if the output array has been sized
     integer(IK) :: max_len     !! the length of the longest string in the array
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     select case (me%var_type)
     case (json_array)
@@ -9301,6 +9319,11 @@
     if (.not. json%exception_thrown) then
         ! now get each string using the callback function:
         call json%get(me, array_callback=get_chars_from_array)
+    end if
+
+    if (json%exception_thrown) then
+        if (allocated(vec))  deallocate(vec)
+        if (allocated(ilen)) deallocate(ilen)
     end if
 
     contains
@@ -9434,8 +9457,6 @@
 
     if ( json%exception_thrown ) return
 
-    nullify(element)
-
     select case (me%var_type)
     case (json_array)
         count = json%count(me)
@@ -9451,14 +9472,9 @@
             element => element%next
         end do
     case default
-
         call json%throw_exception('Error in json_get_array:'//&
                                   ' Resolved value is not an array ')
-
     end select
-
-    !cleanup:
-    if (associated(element)) nullify(element)
 
     end subroutine json_get_array
 !*****************************************************************************************
