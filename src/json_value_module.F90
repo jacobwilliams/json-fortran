@@ -8287,6 +8287,8 @@
 
     logical(LK) :: initialized
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     associate (data => me%data)
         select type (data)
@@ -8302,6 +8304,8 @@
 
     !the callback function is called for each element of the array:
     call json%get(me, array_callback=get_int_from_array)
+
+    if (json%exception_thrown .and. allocated(vec)) deallocate(vec)
 
     contains
 
@@ -8542,6 +8546,8 @@
 
     logical(LK) :: initialized
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     associate (data => me%data)
         select type (data)
@@ -8557,6 +8563,8 @@
 
     !the callback function is called for each element of the array:
     call json%get(me, array_callback=get_real_from_array)
+
+    if (json%exception_thrown .and. allocated(vec)) deallocate(vec)
 
     contains
 
@@ -9025,6 +9033,8 @@
 
     logical(LK) :: initialized
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     associate (data => me%data)
         select type (data)
@@ -9040,6 +9050,8 @@
 
     !the callback function is called for each element of the array:
     call json%get(me, array_callback=get_logical_from_array)
+
+    if (json%exception_thrown .and. allocated(vec)) deallocate(vec)
 
     contains
 
@@ -9293,6 +9305,8 @@
 
     logical(LK) :: initialized
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     associate (data => me%data)
         select type (data)
@@ -9308,6 +9322,8 @@
 
     !the callback function is called for each element of the array:
     call json%get(me, array_callback=get_chars_from_array)
+
+    if (json%exception_thrown .and. allocated(vec)) deallocate(vec)
 
     contains
 
@@ -9427,6 +9443,8 @@
     logical(LK) :: initialized !! if the output array has been sized
     integer(IK) :: max_len     !! the length of the longest string in the array
 
+    if ( json%exception_thrown ) return
+
     ! check for 0-length arrays first:
     associate (data => me%data)
         select type (data)
@@ -9445,6 +9463,11 @@
     if (.not. json%exception_thrown) then
         ! now get each string using the callback function:
         call json%get(me, array_callback=get_chars_from_array)
+    end if
+
+    if (json%exception_thrown) then
+        if (allocated(vec))  deallocate(vec)
+        if (allocated(ilen)) deallocate(ilen)
     end if
 
     contains
