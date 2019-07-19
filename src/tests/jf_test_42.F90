@@ -23,7 +23,10 @@ contains
     type(json_file) :: json          !! the JSON structure read from the file
     integer,intent(out) :: error_cnt !! error counter
 
-    character(kind=CK,len=*),parameter :: str = CK_'{"bad_reals": [1.0, null, "NaN", "+Infinity", "-Infinity", 4.0]}'
+    character(kind=CK,len=*),parameter :: str = CK_'{'//&
+             '"bad_reals": [1.0, null, "NaN", "+Infinity", "-Infinity", 4.0],'//&
+             '"nonstandard_json": [.1e1, .1D1, .1d+1, +.1d1, +.1D1, +1.0, +1.0d0, +1.0D0]'//&
+             '}'
 
     real(rk),dimension(:),allocatable :: bad_reals
     logical(lk) :: found

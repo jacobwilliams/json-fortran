@@ -10110,7 +10110,7 @@
                 call json%parse_for_chars(unit, str, null_str(2:))
                 if (.not. json%exception_thrown) call json%to_null(value) ! allocate class
 
-            case(CK_'-', CK_'0': CK_'9')
+            case(CK_'-', CK_'0': CK_'9', CK_'.', CK_'+')
 
                 call json%push_char(c)
                 call json%parse_number(unit, str, value)
@@ -10118,8 +10118,8 @@
             case default
 
                 call json%throw_exception('Error in parse_value:'//&
-                                     ' Unexpected character while parsing value. "'//&
-                                     c//'"')
+                                          ' Unexpected character while parsing value. "'//&
+                                          c//'"')
 
             end select
         end if
@@ -11132,7 +11132,7 @@
                 tmp(ip:ip) = c
                 ip = ip + 1
 
-            case(CK_'.',CK_'E',CK_'e')    !can be present in real numbers
+            case(CK_'.',CK_'E',CK_'e',CK_'D',CK_'d')    !can be present in real numbers
 
                 if (is_integer) is_integer = .false.
 
