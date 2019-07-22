@@ -25,6 +25,9 @@ documentation from the documentation for official releases other than
 using the browser's back button. Feel free to bookmark this page, or
 the [main project page](|url|/index.html) for convenient navigation.
 
+* [7.1.0](http://jacobwilliams.github.io/json-fortran/7.1.0/index.html)
+   ([FORD](https://github.com/Fortran-FOSS-Programmers/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/7.1.0)
 * [7.0.0](http://jacobwilliams.github.io/json-fortran/7.0.0/index.html)
    ([FORD](https://github.com/Fortran-FOSS-Programmers/ford) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/7.0.0)

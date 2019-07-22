@@ -39,7 +39,6 @@ contains
     call f%add(ck_'test.scalar.unicode(2)',  cdk_'ck, cdk')
     call f%add(cdk_'test.scalar.unicode(3)', ck_'cdk, ck')
     call f%add(cdk_'test.scalar.unicode(4)', cdk_'cdk, cdk')
-    ! ... note: indentention isn't correct for vector of vectors when printed !TODO
     call f%add(ck_'test.vector.unicode(1)',  [ck_'ck, ck'])
     call f%add(ck_'test.vector.unicode(2)',  [cdk_'ck, cdk'])
     call f%add(cdk_'test.vector.unicode(3)', [ck_'cdk, ck'])
