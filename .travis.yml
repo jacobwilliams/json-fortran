@@ -23,6 +23,8 @@ matrix:
             - kalakris-cmake
             - ubuntu-toolchain-r-test
           packages:
+            - nodejs
+            - npm
             - gfortran-6
             - binutils
             - cmake
@@ -44,6 +46,8 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - nodejs
+            - npm
             - gfortran-6
             - binutils
             - python-pip
@@ -64,6 +68,8 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - nodejs
+            - npm
             - gfortran-7
             - binutils
             - python-pip
@@ -82,6 +88,8 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - nodejs
+            - npm
             - gfortran-8
             - binutils
             - python-pip
@@ -100,6 +108,8 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - nodejs
+            - npm
             - gfortran-9
             - binutils
             - python-pip
@@ -126,7 +136,12 @@ install:
   - pip install --upgrade graphviz
   - (pip install --upgrade FoBiS.py==2.2.8 && FoBiS.py --version)
   - (pip install --upgrade ford==6.0.0 && ford --version)
-  - (pip install --upgrade git+https://github.com/dmeranda/demjson.git && jsonlint --version)
+  - export NPM_PACKAGES="${HOME}/.npm-packages"
+  - mkdir "${HOME}/.npm-packages" || true
+  - npm config set prefix "${HOME}/.npm-packages"
+  - export PATH="${HOME}/.npm-packages/bin:$PATH"
+  - npm install -g jsonlint
+  - jsonlint --version || true # Why would you exit non-zero from --version ???!?!?! wth
 
 before_script:
   - |
