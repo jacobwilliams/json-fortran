@@ -289,13 +289,11 @@ if ( ENABLE_TESTS )
 
   find_program ( JSONLINT jsonlint )
   find_program ( DIFF     diff )
-  file ( COPY "${CMAKE_SOURCE_DIR}/files"
-    DESTINATION "${CMAKE_BINARY_DIR}/" )
 
-  set ( DATA_DIR "${CMAKE_BINARY_DIR}/files" )
+  set ( DATA_DIR "${CMAKE_SOURCE_DIR}/files" )
 
   set_directory_properties ( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
-    "${DATA_DIR}/test2.json;${DATA_DIR}/test4.json;${FORD_CLEAN_OUTPUTS}" )
+    "${FORD_CLEAN_OUTPUTS}" )
 
   # Validate input
   if ( JSONLINT )
@@ -309,26 +307,38 @@ if ( ENABLE_TESTS )
     foreach ( VALID_JSON ${JSON_INPUTS} )
       get_filename_component ( TESTNAME "${VALID_JSON}" NAME )
       add_test ( NAME validate-${TESTNAME}
-	WORKING_DIRECTORY "${DATA_DIR}/inputs"
-	COMMAND ${JSONLINT} "--allow=nonescape-characters" "${VALID_JSON}" )
+	      WORKING_DIRECTORY "${DATA_DIR}/inputs"
+	      COMMAND ${JSONLINT} "--allow=nonescape-characters" "${VALID_JSON}" )
     endforeach ()
 
     foreach ( INVALID ${INVALID_JSON} )
       get_filename_component ( TESTNAME "${INVALID}" NAME )
       add_test ( NAME validate-${TESTNAME}
-	WORKING_DIRECTORY "${DATA_DIR}/inputs"
-	COMMAND ${JSONLINT} "${INVALID}" )
+	      WORKING_DIRECTORY "${DATA_DIR}/inputs"
+	      COMMAND ${JSONLINT} "${INVALID}" )
       set_property ( TEST validate-${TESTNAME}
-	PROPERTY
-	WILL_FAIL TRUE)
+	      PROPERTY
+	      WILL_FAIL TRUE)
     endforeach ()
   endif ()
+
+  add_test(NAME jf-cleanup-fixture
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/files")
+  set_tests_properties(jf-cleanup-fixture
+    PROPERTIES FIXTURES_SETUP JF)
+  add_test(NAME jf-setup-fixture
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${DATA_DIR}" "${CMAKE_BINARY_DIR}/files")
+  set_tests_properties(jf-setup-fixture
+    PROPERTIES FIXTURES_SETUP JF
+    DEPENDS jf-cleanup-fixture)
 
   set ( UNIT_TESTS '' )
   foreach ( UNIT_TEST ${JF_TEST_SRCS} )
     get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
     if(MSVC_IDE)
-    link_directories(${CMAKE_BINARY_DIR}/lib)
+      link_directories(${CMAKE_BINARY_DIR}/lib)
     endif()
     add_executable ( ${TEST} EXCLUDE_FROM_ALL ${UNIT_TEST} )
     target_link_libraries ( ${TEST} ${LIB_NAME} )
@@ -340,11 +350,13 @@ if ( ENABLE_TESTS )
     add_test( NAME ${TEST}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
       COMMAND ./${TEST})
+    set_tests_properties( ${TEST}
+      PROPERTIES FIXTURES_REQUIRED JF)
     list ( APPEND UNIT_TESTS ${TEST} )
     if ( JSONLINT )
       set_property ( TEST ${TEST}
-	APPEND
-	PROPERTY DEPENDS validate-input1 validate-input2 )
+	      APPEND
+	      PROPERTY DEPENDS validate-input1 validate-input2 )
     endif()
   endforeach ( UNIT_TEST )
 
@@ -353,34 +365,37 @@ if ( ENABLE_TESTS )
     PROPERTY DEPENDS jf_test_02 )
 
   # Validate output
+  file( GLOB EXPECTED_OUTPUTS "${DATA_DIR}/expected-outputs/*.json")
+  if (NOT ${ENABLE_UNICODE})
+    list( REMOVE_ITEM EXPECTED_OUTPUTS "${DATA_DIR}/expected-outputs/hello-world-ucs4.json")
+  endif()
+  list( REMOVE_ITEM EXPECTED_OUTPUTS "${DATA_DIR}/expected-outputs/example2.json")
+
   if ( JSONLINT )
-    file ( GLOB JSON_FILES "${DATA_DIR}/*.json" )
-    foreach ( JSON_FILE ${JSON_FILES} )
+    foreach ( JSON_FILE ${EXPECTED_OUTPUTS} )
       get_filename_component ( TESTNAME ${JSON_FILE} NAME )
       add_test ( NAME validate-output-${TESTNAME}
-	WORKING_DIRECTORY "${DATA_DIR}"
-	COMMAND ${JSONLINT} "--allow=nonescape-characters" ${TESTNAME} )
+	      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/files"
+	      COMMAND ${JSONLINT} "--allow=nonescape-characters" ${TESTNAME} )
       set_property ( TEST validate-output-${TESTNAME}
-	APPEND
-	PROPERTY
-	DEPENDS ${UNIT_TESTS}
-	REQUIRED_FILES ${JSON_FILES} )
+	      APPEND
+	      PROPERTY
+	      DEPENDS ${UNIT_TESTS})
     endforeach ( JSON_FILE )
   endif ()
 
   # Check output for differences
   if ( DIFF )
-    file ( GLOB JSON_FILES "${DATA_DIR}/*.json" )
-    foreach ( JSON_FILE ${JSON_FILES} )
-      get_filename_component ( JSON_STEM ${JSON_FILE} NAME_WE )
-      add_test ( NAME regression-${JSON_STEM}.json
-	WORKING_DIRECTORY "${DATA_DIR}"
-	COMMAND ${DIFF} -q ${JSON_STEM}.json expected-outputs/${JSON_STEM}.json )
-      set_property ( TEST regression-${JSON_STEM}.json
-	APPEND
-	PROPERTY
-	DEPENDS ${UNIT_TESTS}
-	REQUIRED_FILES ${JSON_FILES} )
+    foreach ( JSON_FILE ${EXPECTED_OUTPUTS} )
+      get_filename_component (OUTPUT ${JSON_FILE} NAME )
+      add_test ( NAME regression-${OUTPUT}
+	      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/files"
+	      COMMAND ${DIFF} -q ${OUTPUT} expected-outputs/${OUTPUT} )
+      set_property ( TEST regression-${OUTPUT}
+	      APPEND
+	      PROPERTY
+	      DEPENDS ${UNIT_TESTS}
+	      REQUIRED_FILES ${EXPECTED_OUTPUTS} )
     endforeach ( JSON_FILE )
   else ()
     message ( WARNING
