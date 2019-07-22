@@ -36,6 +36,14 @@ include ( "cmake/checkOutOfSource.cmake" )
 #---------------------
 project ( jsonfortran NONE )
 
+if(CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
+  option(JSON_FORTRAN_USE_OpenCoarrays
+    "Build JSON-Fortran with support for linking against OpenCoarray programs" OFF)
+endif()
+if(JSON_FORTRAN_USE_OpenCoarrays)
+  find_package(OpenCoarrays)
+endif()
+
 #---------------------
 # Real and Integer kinds
 #---------------------
@@ -161,6 +169,14 @@ endif ()
 set ( LIB_NAME ${CMAKE_PROJECT_NAME} )
 add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
 add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
+
+if(JSON_FORTRAN_USE_OpenCoarrays)
+  target_link_libraries(${LIB_NAME}
+    PRIVATE OpenCoarrays::caf_mpi_static)
+  target_link_libraries(${LIB_NAME}-static
+    PRIVATE OpenCoarrays::caf_mpi_static)
+endif()
+
 set_target_properties ( ${LIB_NAME}-static
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
