@@ -313,8 +313,10 @@ contains
         end if
     end if
 
+    nullify(p)  ! p is just a pointer to f2
+
     write(error_unit,'(A)') 'json_create...'
-    write(error_unit,'(A)') 'json_create_logical...'; call json%destroy(p); call json%create_logical(p,.true.,'foo')
+    write(error_unit,'(A)') 'json_create_logical...'; call json%create_logical(p,.true.,'foo')
     write(error_unit,'(A)') 'json_create_integer...'; call json%destroy(p); call json%create_integer(p,1000_IK,'foo')
     write(error_unit,'(A)') 'json_create_real   ...'; call json%destroy(p); call json%create_real   (p,9.0_wp,'foo')
     write(error_unit,'(A)') 'json_create_string ...'; call json%destroy(p); call json%create_string (p,'foo','bar')
@@ -330,8 +332,8 @@ contains
     !--------------------------------
 
     !cleanup:
-    !call f%destroy()   !WARNING: causing "pointer being freed was not allocated" errors.... need to investigate
-    !call f2%destroy()
+    call f%destroy()
+    call f2%destroy()
 
     end subroutine test_10
 
