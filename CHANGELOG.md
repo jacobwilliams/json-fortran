@@ -38,6 +38,15 @@
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.1.0...HEAD)
 
+**Enhancements:**
+
+- Allow linking to JSON-Fortran from GFortran programs using
+  [OpenCoarrays](https://github.com/sourceryinstitute/OpenCoarrays#readme)
+  as the coarray runtime implementation. Use the
+  `-DJSON_FORTRAN_USE_OpenCoarrays:BOOL=ON` option to cmake to enable
+  this. (NOTE: The fact that this is required may be a bug in
+  GFortran.)
+
 ### [7.1.0](https://github.com/jacobwilliams/json-fortran/tree/7.1.0) (2019-06-23)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.0.0...7.1.0)
