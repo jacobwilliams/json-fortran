@@ -14,9 +14,6 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 # Use MSVS folders to organize projects on windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-option(JSON_FORTRAN_USE_OpenCoarrays
-  "Build VTKmofo with support for linking against OpenCoarray programs" OFF)
-
 set(PROJECT_DESCRIPTION "A Fortran 2008 JSON API")
 set(PROJECT_URL "https://github.com/jacobwilliams/json-fortran")
 
