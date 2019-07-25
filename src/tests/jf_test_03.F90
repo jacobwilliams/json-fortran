@@ -53,7 +53,7 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'parsing file: '//dir//filename2
 
-    call json%load_file(filename = dir//filename2)
+    call json%load(filename = dir//filename2)
 
     if (json%failed()) then    !if there was an error reading the file
 

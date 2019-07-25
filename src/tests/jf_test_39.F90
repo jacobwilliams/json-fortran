@@ -45,7 +45,7 @@ contains
     do i = 1, size(tests)
 
         json = json_file(trim(tests(i)),verbose=.true.,stop_on_error=.true.)
-        call json%print_file(int(error_unit,IK))
+        call json%print(int(error_unit,IK))
         write(error_unit,'(A)') ''
         if (json%failed()) then
             call json%print_error_message(error_unit)

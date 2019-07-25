@@ -38,6 +38,15 @@
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.1.0...HEAD)
 
+**Enhancements:**
+
+- Allow linking to JSON-Fortran from GFortran programs using
+  [OpenCoarrays](https://github.com/sourceryinstitute/OpenCoarrays#readme)
+  as the coarray runtime implementation. Use the
+  `-DJSON_FORTRAN_USE_OpenCoarrays:BOOL=ON` option to cmake to enable
+  this. (NOTE: The fact that this is required may be a bug in
+  GFortran.)
+
 ### [7.1.0](https://github.com/jacobwilliams/json-fortran/tree/7.1.0) (2019-06-23)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.0.0...7.1.0)
@@ -50,6 +59,7 @@ or [Download v7.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 - Updates to CMake install rule for better compatibility with Visual Studio [\#396](https://github.com/jacobwilliams/json-fortran/pull/396) ([zbeekman](https://github.com/zbeekman))
 
 **Bug fixes:**
+
 - Fix for undeclared variable causing failing test on Mac [\#392](https://github.com/jacobwilliams/json-fortran/pull/392) ([porteri](https://github.com/porteri))
 - Fixed a bug where using `json%add()` to create new variables in a structure would stop the program if `stop_on_failure` was enabled. [\#403](https://github.com/jacobwilliams/json-fortran/issues/403) [\#404](https://github.com/jacobwilliams/json-fortran/pull/404) ([jacobwilliams](https://github.com/jacobwilliams))
 

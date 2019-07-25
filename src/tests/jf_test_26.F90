@@ -62,7 +62,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'printing...'
-    call f%print_file()
+    call f%print()
 
     end subroutine test_26
 

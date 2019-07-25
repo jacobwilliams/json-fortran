@@ -46,7 +46,7 @@ contains
 
     call json%initialize(no_whitespace=.true.)
 
-    call json%parse(p, '{"a": 1.0}')
+    call json%deserialize(p, '{"a": 1.0}')
 
     call json%update(p,'a',2.0_wp,found)
     call json%update(p,CK_'a',2.0_wp,found)
@@ -95,7 +95,7 @@ contains
 
     call f%initialize(no_whitespace=.true.)
 
-    call f%load_from_string('{"a": 1.0}')
+    call f%deserialize('{"a": 1.0}')
 
     call f%update('a',2.0_wp,found)
     call f%add('b',3.0_wp)

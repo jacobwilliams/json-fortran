@@ -44,7 +44,7 @@ contains
 
     call json%initialize()
 
-    call json%parse(p,json_string)
+    call json%deserialize(p,json_string)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

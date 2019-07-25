@@ -53,7 +53,7 @@ contains
     write(error_unit,'(A)') 'JSON data:'
     write(error_unit,'(A)') '-------------'
     write(error_unit,'(A)') ''
-    call json%parse(p,json_example)
+    call json%deserialize(p,json_example)
     call json%print(p,int(error_unit,IK))
 
     !get some info:

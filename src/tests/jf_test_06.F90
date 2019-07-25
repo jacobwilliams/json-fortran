@@ -62,11 +62,11 @@ contains
         if (files(i)=='') then
             write(error_unit,'(A)') 'load string: '//invalid_str
             write(error_unit,'(A)') ''
-            call json%load_from_string(str = invalid_str)
+            call json%deserialize(str = invalid_str)
         else
             write(error_unit,'(A)') 'load file: '//trim(files(i))
             write(error_unit,'(A)') ''
-            call json%load_file(filename = dir//trim(files(i)))
+            call json%load(filename = dir//trim(files(i)))
         end if
         if (json%failed()) then
 

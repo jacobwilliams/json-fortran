@@ -53,7 +53,7 @@ contains
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'Loading file: '//trim(filename)//'...'
 
-    call f%load_file(dir//filename)  ! will call initialize()
+    call f%load(dir//filename)  ! will call initialize()
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -65,6 +65,7 @@ contains
     write(error_unit,'(A)') 'json_file_move_pointer...'
     call f2%initialize()
     call f2%move(f)
+    call f%nullify() ! not strictly necessary since it's already done by move.
     if (f2%failed()) then
         call f2%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -73,7 +74,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_load_from_string...'
-    call f%load_from_string(json_str)
+    call f%deserialize(json_str)
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -82,7 +83,7 @@ contains
     end if
 
     write(error_unit,'(A)') 'json_file_print_to_string...'
-    call f%print_to_string(str)
+    call f%serialize(str)
     if (f%failed()) then
         call f%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -312,8 +313,10 @@ contains
         end if
     end if
 
+    nullify(p)  ! p is just a pointer to f2
+
     write(error_unit,'(A)') 'json_create...'
-    write(error_unit,'(A)') 'json_create_logical...'; call json%destroy(p); call json%create_logical(p,.true.,'foo')
+    write(error_unit,'(A)') 'json_create_logical...'; call json%create_logical(p,.true.,'foo')
     write(error_unit,'(A)') 'json_create_integer...'; call json%destroy(p); call json%create_integer(p,1000_IK,'foo')
     write(error_unit,'(A)') 'json_create_real   ...'; call json%destroy(p); call json%create_real   (p,9.0_wp,'foo')
     write(error_unit,'(A)') 'json_create_string ...'; call json%destroy(p); call json%create_string (p,'foo','bar')
@@ -329,8 +332,8 @@ contains
     !--------------------------------
 
     !cleanup:
-    !call f%destroy()   !WARNING: causing "pointer being freed was not allocated" errors.... need to investigate
-    !call f2%destroy()
+    call f%destroy()
+    call f2%destroy()
 
     end subroutine test_10
 

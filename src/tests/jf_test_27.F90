@@ -48,7 +48,7 @@ contains
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'parsing...'
-    call json%parse(p,json_str)
+    call json%deserialize(p,json_str)
     if (json%failed()) then
       call json%print_error_message(error_unit)
       error_cnt = error_cnt + 1
@@ -60,21 +60,13 @@ contains
 
     ! test json_file interface
     f = json_file(p)
+    nullify(p) ! data is now in f
     call f%initialize(compress_vectors=.true.)
-    call f%print_file()
+    call f%print()
 
     if (f%failed()) then
       call f%print_error_message(error_unit)
       error_cnt = error_cnt + 1
-    end if
-
-    ! clean up
-    write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'destroy...'
-    call json%destroy(p)
-    if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
     end if
 
     end subroutine test_27

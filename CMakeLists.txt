@@ -39,6 +39,10 @@ include ( "cmake/checkOutOfSource.cmake" )
 #---------------------
 project ( jsonfortran NONE )
 
+if(CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
+  option(JSON_FORTRAN_USE_OpenCoarrays
+    "Build JSON-Fortran with support for linking against OpenCoarray programs" OFF)
+endif()
 if(JSON_FORTRAN_USE_OpenCoarrays)
   find_package(OpenCoarrays)
 endif()
@@ -288,7 +292,6 @@ if ( ENABLE_TESTS )
   add_dependencies(build_tests ${LIB_NAME} ${LIB_NAME}-static)
 
   find_program ( JSONLINT jsonlint )
-  find_program ( DIFF     diff )
 
   set ( DATA_DIR "${CMAKE_SOURCE_DIR}/files" )
 
@@ -385,22 +388,22 @@ if ( ENABLE_TESTS )
   endif ()
 
   # Check output for differences
-  if ( DIFF )
-    foreach ( JSON_FILE ${EXPECTED_OUTPUTS} )
-      get_filename_component (OUTPUT ${JSON_FILE} NAME )
-      add_test ( NAME regression-${OUTPUT}
-	      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/files"
-	      COMMAND ${DIFF} -q ${OUTPUT} expected-outputs/${OUTPUT} )
-      set_property ( TEST regression-${OUTPUT}
-	      APPEND
-	      PROPERTY
-	      DEPENDS ${UNIT_TESTS}
-	      REQUIRED_FILES ${EXPECTED_OUTPUTS} )
-    endforeach ( JSON_FILE )
-  else ()
-    message ( WARNING
-      "For full test coverage diff, or a similar tool must be present on your system" )
-  endif ()
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.14)
+    set( JSON_FORTRAN_COMPARE_FLAG "--ignore-eol")
+  endif()
+
+  foreach ( JSON_FILE ${EXPECTED_OUTPUTS} )
+    get_filename_component (OUTPUT ${JSON_FILE} NAME )
+    add_test ( NAME regression-${OUTPUT}
+	    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/files"
+	    COMMAND ${CMAKE_COMMAND} -E compare_files ${JSON_FORTRAN_COMPARE_FLAG} ${OUTPUT} expected-outputs/${OUTPUT} )
+    set_property ( TEST regression-${OUTPUT}
+	    APPEND
+	    PROPERTY
+	    DEPENDS ${UNIT_TESTS}
+	    REQUIRED_FILES ${EXPECTED_OUTPUTS} )
+  endforeach ( JSON_FILE )
+
 
 endif ()
 

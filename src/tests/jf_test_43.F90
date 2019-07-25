@@ -1,39 +1,41 @@
 !*****************************************************************************************
 !>
-! Module for the fifth unit test.
+! Module for the fourtieth unit test.
 !
 !# HISTORY
-!  * Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
+!  * Ian Porter : 8/14/2018
 
-module jf_test_5_mod
+module jf_test_40_mod
 
-    use json_module, wp => json_RK, IK => json_IK, LK => json_LK
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
+    use json_module
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
 
     implicit none
 
     private
-    public :: test_5
+    public :: test_40
 
-    character(len=*),parameter :: dir = '../files/inputs/'   !! working directory
-    character(len=*),parameter :: filename5 = 'test5.json'
+    character(len=*),parameter :: dir  = '../files/inputs/'   !! working directory
+    character(len=*),parameter :: dir2 = 'files/inputs/'      !! working directory
+    character(len=*),parameter :: filename40 = 'test40.json'  !! input filename
 
 contains
 
-    subroutine test_5(error_cnt)
+    subroutine test_40(error_cnt)
 
-    !! Github issue example: https://github.com/josephalevin/fson/issues/12
+    !! Github issue example: https://github.com/josephalevin/fson/issues/156
     !!
-    !! Read an existing file and extract some variables.
+    !! Read a matrix
 
     implicit none
 
     integer,intent(out) :: error_cnt
-    integer(IK) :: vv
-    integer(IK),dimension(:),allocatable :: vvv
-    real(wp) :: d
+    real(wp), dimension(:,:),allocatable :: dd
+    real(wp), dimension(:,:,:),allocatable :: ddd
+    integer, dimension(:),allocatable :: dd_size
+    integer, dimension(:,:),allocatable :: ddd_size
     type(json_file) :: json
-    logical(LK) :: found
+    logical :: found, file_exists
 
     error_cnt = 0
     call json%initialize()
@@ -44,13 +46,19 @@ contains
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
-    write(error_unit,'(A)') '   EXAMPLE 5'
+    write(error_unit,'(A)') '   EXAMPLE 40'
     write(error_unit,'(A)') '================================='
     write(error_unit,'(A)') ''
 
     ! parse the json file:
     write(error_unit,'(A)') 'load file...'
-    call json%load(filename = dir//filename5)
+    inquire(file=dir//filename40,exist=file_exists)
+    if (file_exists) then
+        call json%load_file(filename = dir//filename40)
+    else
+        inquire(file=dir2//filename40,exist=file_exists) !! cmake for VS integration places in different folder
+        if (file_exists) call json%load_file(filename = dir2//filename40)
+    end if
     if (json%failed()) then
 
         call json%print_error_message(error_unit)
@@ -60,7 +68,7 @@ contains
 
         ! print the parsed data to the console:
         write(error_unit,'(A)') 'print file...'
-        call json%print(int(error_unit,IK))
+        call json%print_file(error_unit)
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
@@ -71,26 +79,19 @@ contains
         write(error_unit,'(A)') 'extract data...'
 
         write(error_unit,'(A)') '--------------------------'
-        call json%get('Correl.ID2', vv, found)
+! TODO: Implement this
+!        call json%get('fooList', dd, found, dd_size)
+!        if (json%failed()) then
+!            call json%print_error_message(error_unit)
+!            error_cnt = error_cnt + 1
+!        end if
+!        if (found) write(error_unit,'(A,I5)') 'dd = ',dd
+        call json%get('fooList3x', ddd, found, ddd_size)
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
         end if
-        if (found) write(error_unit,'(A,I5)') 'vv = ',vv
-
-        call json%get('Correl.ID1', vvv, found)
-        if (json%failed()) then
-            call json%print_error_message(error_unit)
-            error_cnt = error_cnt + 1
-        end if
-        if (found) write(error_unit,'(A,*(I5,1X))') 'vvv= ',vvv
-
-        call json%get('Prior[3].mode', d, found)
-        if (json%failed()) then
-            call json%print_error_message(error_unit)
-            error_cnt = error_cnt + 1
-        end if
-        if (found) write(error_unit,'(A,E30.16)') 'd  = ',d
+        if (found) write(error_unit,'(A,es13.6)') 'ddd = ',ddd
 
         write(error_unit,'(A)') ''
 
@@ -103,24 +104,24 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-    end subroutine test_5
+  end subroutine test_40
 
-end module jf_test_5_mod
+end module jf_test_40_mod
 !*****************************************************************************************
 
-#ifndef INTEGRATED_TESTS
+#ifndef INTERGATED_TESTS
 !*****************************************************************************************
-program jf_test_5
+program jf_test_40
 
-    !! Fifth unit test.
+    !! Thirty sixth unit test.
 
-    use jf_test_5_mod , only: test_5
+    use jf_test_40_mod , only: test_40
     implicit none
     integer :: n_errors
-    n_errors = 0
-    call test_5(n_errors)
+
+    call test_40(n_errors)
     if (n_errors /= 0) stop 1
 
-end program jf_test_5
+end program jf_test_40
 !*****************************************************************************************
 #endif

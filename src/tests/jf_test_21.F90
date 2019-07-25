@@ -55,7 +55,7 @@ contains
 
     ! read array2 from file
     call jfile % initialize(real_format='E')
-    call jfile % load_file(dir//'test21.json')
+    call jfile % load(dir//'test21.json')
     call jfile % get('value',array2,found)
     call jfile % destroy()
 
