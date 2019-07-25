@@ -5,7 +5,7 @@
 !# HISTORY
 !  * Ian Porter : 8/14/2018
 
-module jf_test_40_mod
+module jf_test_43_mod
 
     use json_module
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
@@ -13,15 +13,15 @@ module jf_test_40_mod
     implicit none
 
     private
-    public :: test_40
+    public :: test_43
 
     character(len=*),parameter :: dir  = '../files/inputs/'   !! working directory
     character(len=*),parameter :: dir2 = 'files/inputs/'      !! working directory
-    character(len=*),parameter :: filename40 = 'test40.json'  !! input filename
+    character(len=*),parameter :: filename43 = 'test43.json'  !! input filename
 
 contains
 
-    subroutine test_40(error_cnt)
+    subroutine test_43(error_cnt)
 
     !! Github issue example: https://github.com/josephalevin/fson/issues/156
     !!
@@ -46,18 +46,18 @@ contains
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
-    write(error_unit,'(A)') '   EXAMPLE 40'
+    write(error_unit,'(A)') '   EXAMPLE 43'
     write(error_unit,'(A)') '================================='
     write(error_unit,'(A)') ''
 
     ! parse the json file:
     write(error_unit,'(A)') 'load file...'
-    inquire(file=dir//filename40,exist=file_exists)
+    inquire(file=dir//filename43,exist=file_exists)
     if (file_exists) then
-        call json%load_file(filename = dir//filename40)
+        call json%load_file(filename = dir//filename43)
     else
-        inquire(file=dir2//filename40,exist=file_exists) !! cmake for VS integration places in different folder
-        if (file_exists) call json%load_file(filename = dir2//filename40)
+        inquire(file=dir2//filename43,exist=file_exists) !! cmake for VS integration places in different folder
+        if (file_exists) call json%load_file(filename = dir2//filename43)
     end if
     if (json%failed()) then
 
@@ -104,24 +104,24 @@ contains
         error_cnt = error_cnt + 1
     end if
 
-  end subroutine test_40
+  end subroutine test_43
 
-end module jf_test_40_mod
+end module jf_test_43_mod
 !*****************************************************************************************
 
 #ifndef INTERGATED_TESTS
 !*****************************************************************************************
-program jf_test_40
+program jf_test_43
 
     !! Thirty sixth unit test.
 
-    use jf_test_40_mod , only: test_40
+    use jf_test_43_mod , only: test_43
     implicit none
     integer :: n_errors
 
-    call test_40(n_errors)
+    call test_43(n_errors)
     if (n_errors /= 0) stop 1
 
-end program jf_test_40
+end program jf_test_43
 !*****************************************************************************************
 #endif
