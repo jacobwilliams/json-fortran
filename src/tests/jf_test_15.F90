@@ -223,6 +223,7 @@ contains
 
         ! try to get info for an unassociated pointer,
         ! this should raise an exception:
+        p3 => null()
         call json%info(p3,var_type,n_children,name)
         call json%check_for_errors(status_ok)
         if (status_ok) then
