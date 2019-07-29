@@ -1408,14 +1408,28 @@
     integer(IK),intent(out),optional :: n_children !! number of children
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    if (present(var_type))    var_type   = p%var_type
-    if (present(n_children))  n_children = json%count(p)
-    if (present(name)) then
-        if (allocated(p%name)) then
-            name = p%name
-        else
-            name = CK_''
+    if (.not. json%exception_thrown .and. associated(p)) then
+
+        if (present(var_type))    var_type   = p%var_type
+        if (present(n_children))  n_children = json%count(p)
+        if (present(name)) then
+            if (allocated(p%name)) then
+                name = p%name
+            else
+                name = CK_''
+            end if
         end if
+
+    else ! error
+
+        if (.not. json%exception_thrown) then
+            call json%throw_exception('Error in json_info: '//&
+                                      'pointer is not associated.' )
+        end if
+        if (present(var_type))   var_type   = json_unknown
+        if (present(n_children)) n_children = 0
+        if (present(name))       name       = CK_''
+
     end if
 
     end subroutine json_info

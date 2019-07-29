@@ -26,7 +26,7 @@ contains
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
     type(json_core) :: json
-    type(json_value),pointer :: p,p2
+    type(json_value),pointer :: p,p2,p3
     type(json_file) :: file1, file2
     logical(LK) :: found,status_ok
     integer(IK) :: var_type,i,n_children
@@ -36,6 +36,7 @@ contains
     integer(IK),dimension(:),allocatable :: ivec
     real(wp),dimension(:),allocatable    :: rvec
     logical(LK),dimension(:),allocatable :: lvec
+    character(kind=CK,len=:),allocatable :: name
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -217,6 +218,18 @@ contains
 
         file1 = json_file(p2,json)  !constructor
         call file1%destroy(destroy_core=.true.)
+
+        !****************************************
+
+        ! try to get info for an unassociated pointer,
+        ! this should raise an exception:
+        p3 => null()
+        call json%info(p3,var_type,n_children,name)
+        call json%check_for_errors(status_ok)
+        if (status_ok) then
+            error_cnt=error_cnt+1
+            write(error_unit,'(A)') 'Error: info for unassociated pointer'
+        end if
 
         !****************************************
 
