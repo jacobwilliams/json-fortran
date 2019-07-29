@@ -1428,32 +1428,46 @@
     integer(IK),intent(out),optional :: n_children !! number of children
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    if (present(var_type)) then
-        if (allocated(p%data)) then
-            associate (data => p%data)
-                select type (data)
-                class is (json_string_type);  var_type = json_string
-                class is (json_real_type);    var_type = json_real
-                class is (json_integer_type); var_type = json_integer
-                class is (json_logical_type); var_type = json_logical
-                class is (json_array_type);   var_type = json_array
-                class is (json_object_type);  var_type = json_object
-                class is (json_null_type);    var_type = json_null
-                class default;                var_type = json_unknown
-                end select
-            end associate
-        else
-            var_type = json_unknown
-        end if
-    end if
+    if (.not. json%exception_thrown .and. associated(p)) then
 
-    if (present(n_children))  n_children = json%count(p)
-    if (present(name)) then
-        if (allocated(p%name)) then
-            name = p%name
-        else
-            name = CK_''
+        if (present(var_type)) then
+            if (allocated(p%data)) then
+                associate (data => p%data)
+                    select type (data)
+                    class is (json_string_type);  var_type = json_string
+                    class is (json_real_type);    var_type = json_real
+                    class is (json_integer_type); var_type = json_integer
+                    class is (json_logical_type); var_type = json_logical
+                    class is (json_array_type);   var_type = json_array
+                    class is (json_object_type);  var_type = json_object
+                    class is (json_null_type);    var_type = json_null
+                    class default;                var_type = json_unknown
+                    end select
+                end associate
+            else
+                var_type = json_unknown
+            end if
         end if
+
+        if (present(n_children))  n_children = json%count(p)
+        if (present(name)) then
+            if (allocated(p%name)) then
+                name = p%name
+            else
+                name = CK_''
+            end if
+        end if
+
+    else ! error
+
+        if (.not. json%exception_thrown) then
+            call json%throw_exception('Error in json_info: '//&
+                                      'pointer is not associated.' )
+        end if
+        if (present(var_type))   var_type   = json_unknown
+        if (present(n_children)) n_children = 0
+        if (present(name))       name       = CK_''
+
     end if
 
     end subroutine json_info
