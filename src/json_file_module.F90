@@ -159,8 +159,8 @@
                                  MAYBEWRAP(json_file_get_logical_vec), &
                                  MAYBEWRAP(json_file_get_string_vec),  &
                                  MAYBEWRAP(json_file_get_alloc_string_vec),  &
-                                 MAYBEWRAP(json_file_get_matrix),      &
-                                 MAYBEWRAP(json_file_get_matrix_vector),     &
+                                 ! MAYBEWRAP(json_file_get_matrix),      &
+                                 ! MAYBEWRAP(json_file_get_matrix_vector),     &
                                  json_file_get_root
 
         !>
@@ -299,8 +299,8 @@
         procedure :: MAYBEWRAP(json_file_get_logical_vec)
         procedure :: MAYBEWRAP(json_file_get_string_vec)
         procedure :: MAYBEWRAP(json_file_get_alloc_string_vec)
-        procedure :: MAYBEWRAP(json_file_get_matrix)
-        procedure :: MAYBEWRAP(json_file_get_matrix_vector)
+        ! procedure :: MAYBEWRAP(json_file_get_matrix)
+        ! procedure :: MAYBEWRAP(json_file_get_matrix_vector)
         procedure :: json_file_get_root
 
         !add:
@@ -1056,24 +1056,25 @@
 !      variable is not found.
 
     subroutine json_file_variable_matrix_info(me,path,is_matrix,found,&
-                                        var_type,n_sets,set_size,name)
+                                        var_type,n_sets,mx_set_size,is_uniform,name)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
-    character(kind=CK,len=*),intent(in) :: path      !! path to the variable
-    logical(LK),intent(out)             :: is_matrix !! true if it is a valid matrix
-    logical(LK),intent(out),optional    :: found     !! true if it was found
-    integer(IK),intent(out),optional    :: var_type  !! variable type of data in
-                                                     !! the matrix (if all elements have
-                                                     !! the same type)
-    integer(IK),intent(out),optional    :: n_sets    !! number of data sets (i.e., matrix
-                                                     !! rows if using row-major order)
-    integer(IK),intent(out),optional    :: set_size  !! size of each data set (i.e., matrix
-                                                     !! cols if using row-major order)
+    character(kind=CK,len=*),intent(in) :: path        !! path to the variable
+    logical(LK),intent(out)             :: is_matrix   !! true if it is a valid matrix
+    logical(LK),intent(out),optional    :: found       !! true if it was found
+    integer(IK),intent(out),optional    :: var_type    !! variable type of data in
+                                                       !! the matrix (if all elements have
+                                                       !! the same type)
+    integer(IK),intent(out),optional    :: n_sets      !! number of data sets (i.e., matrix
+                                                       !! rows if using row-major order)
+    integer(IK),intent(out),optional    :: mx_set_size !! size of each data set (i.e., matrix
+                                                       !! cols if using row-major order)
+    logical(LK),intent(out)              :: is_uniform !! true if it is dense/uniform matrix
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size,name)
+    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,mx_set_size,is_uniform,name)
 
     end subroutine json_file_variable_matrix_info
 !*****************************************************************************************
@@ -1087,7 +1088,7 @@
 !      variable is not found.
 
     subroutine wrap_json_file_variable_matrix_info(me,path,is_matrix,found,&
-                                                   var_type,n_sets,set_size,name)
+                                                   var_type,n_sets,mx_set_size,is_uniform,name)
 
     implicit none
 
@@ -1100,11 +1101,12 @@
                                                       !! the same type)
     integer(IK),intent(out),optional     :: n_sets    !! number of data sets (i.e., matrix
                                                       !! rows if using row-major order)
-    integer(IK),intent(out),optional     :: set_size  !! size of each data set (i.e., matrix
-                                                      !! cols if using row-major order)
+    integer(IK),intent(out),optional     :: mx_set_size !! size of each data set (i.e., matrix
+                                                        !! cols if using row-major order)
+    logical(LK),intent(out)              :: is_uniform !! true if it is dense/uniform matrix
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    call me%matrix_info(to_unicode(path),is_matrix,found,var_type,n_sets,set_size,name)
+    call me%matrix_info(to_unicode(path),is_matrix,found,var_type,n_sets,mx_set_size,is_uniform,name)
 
     end subroutine wrap_json_file_variable_matrix_info
 !*****************************************************************************************
@@ -1522,86 +1524,86 @@
     end subroutine json_file_get_real_vec
 !*****************************************************************************************
 
-!*****************************************************************************************
-!> author: Ian Porter
-!  date: 8/14/2018
-!
-!  Get a real(RK) matrix of vectors from a JSON file.
+! !*****************************************************************************************
+! !> author: Ian Porter
+! !  date: 8/14/2018
+! !
+! !  Get a real(RK) matrix of vectors from a JSON file.
 
-    subroutine json_file_get_matrix(me, path, vec, found, vec_size)
+!     subroutine json_file_get_matrix(me, path, vec, found, vec_size)
 
-    implicit none
+!     implicit none
 
-    class(json_file),intent(inout)                  :: me
-    character(kind=CK,len=*),intent(in)             :: path     !! the path to the variable
-    real(RK),dimension(:,:),allocatable,intent(out) :: vec      !! the value vector
-    logical(LK),intent(out),optional                :: found    !! if it was really found
-    integer(IK),dimension(:),allocatable,intent(out),optional :: vec_size !! the # of values provided in each vec(x,:)
-    integer(IK) :: var_type  !! var type
-    integer(IK) :: n_sets    !! # of sets of matrices
-    integer(IK) :: set_size  !! # of rows in each matrix
-    integer(IK) :: i         !! counter
-    logical(LK) :: is_matrix !! flag for whether it is a matrix
-    integer(IK),dimension(:,:),allocatable :: matrix_column_size
-    real(RK),dimension(:,:,:),allocatable :: matrix_vec
+!     class(json_file),intent(inout)                  :: me
+!     character(kind=CK,len=*),intent(in)             :: path     !! the path to the variable
+!     real(RK),dimension(:,:),allocatable,intent(out) :: vec      !! the value vector
+!     logical(LK),intent(out),optional                :: found    !! if it was really found
+!     integer(IK),dimension(:),allocatable,intent(out),optional :: vec_size !! the # of values provided in each vec(x,:)
+!     integer(IK) :: var_type  !! var type
+!     integer(IK) :: n_sets    !! # of sets of matrices
+!     integer(IK) :: mx_set_size  !! # of rows in each matrix
+!     integer(IK) :: i         !! counter
+!     logical(LK) :: is_matrix !! flag for whether it is a matrix
+!     integer(IK),dimension(:,:),allocatable :: matrix_column_size
+!     real(RK),dimension(:,:,:),allocatable :: matrix_vec
 
-    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size, &
-      &                      matrix_column_size=matrix_column_size,matrix_vec=matrix_vec)
+!     call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,mx_set_size, &
+!       &                      matrix_column_size=matrix_column_size,matrix_vec=matrix_vec)
 
-    if (is_matrix) then
-        associate (max_vec_size => maxval(matrix_column_size(1,:)))
-            allocate(vec(set_size,max_vec_size),source=0.0_RK)
-            if (present(vec_size)) vec_size = matrix_column_size(1,:)
-            do i = 1, set_size
-                vec(i,1:matrix_column_size(1,i)) = matrix_vec(1,i,1:matrix_column_size(1,i))
-            end do
-        end associate
-    end if
+!     if (is_matrix) then
+!         associate (max_vec_size => maxval(matrix_column_size(1,:)))
+!             allocate(vec(mx_set_size,max_vec_size),source=0.0_RK)
+!             if (present(vec_size)) vec_size = matrix_column_size(1,:)
+!             do i = 1, mx_set_size
+!                 vec(i,1:matrix_column_size(1,i)) = matrix_vec(1,i,1:matrix_column_size(1,i))
+!             end do
+!         end associate
+!     end if
 
-    end subroutine json_file_get_matrix
-!*****************************************************************************************
+!     end subroutine json_file_get_matrix
+! !*****************************************************************************************
 
-!*****************************************************************************************
-!> author: Ian Porter
-!  date: 8/14/2018
-!
-!  Get a real(RK) matrix of vectors from a JSON file.
+! !*****************************************************************************************
+! !> author: Ian Porter
+! !  date: 8/14/2018
+! !
+! !  Get a real(RK) matrix of vectors from a JSON file.
 
-    subroutine json_file_get_matrix_vector(me, path, vec, found, vec_size)
+!     subroutine json_file_get_matrix_vector(me, path, vec, found, vec_size)
 
-    implicit none
+!     implicit none
 
-    class(json_file),intent(inout)                    :: me
-    character(kind=CK,len=*),intent(in)               :: path  !! the path to the variable
-    real(RK),dimension(:,:,:),allocatable,intent(out) :: vec   !! the value vector
-    logical(LK),intent(out),optional                  :: found !! if it was really found
-    integer(IK),dimension(:,:),allocatable,intent(out),optional :: vec_size !! the # of values provided in each vec(x,x,:)
-    integer(IK) :: var_type  !! var type
-    integer(IK) :: n_sets    !! # of sets of matrices
-    integer(IK) :: set_size  !! # of rows in each matrix
-    integer(IK) :: i         !! counter
-    integer(IK) :: j         !! counter
-    logical(LK) :: is_matrix !! flag for whether it is a matrix
-    integer(IK),dimension(:,:),allocatable :: matrix_column_size
-    real(RK),dimension(:,:,:),allocatable :: matrix_vec
+!     class(json_file),intent(inout)                    :: me
+!     character(kind=CK,len=*),intent(in)               :: path  !! the path to the variable
+!     real(RK),dimension(:,:,:),allocatable,intent(out) :: vec   !! the value vector
+!     logical(LK),intent(out),optional                  :: found !! if it was really found
+!     integer(IK),dimension(:,:),allocatable,intent(out),optional :: vec_size !! the # of values provided in each vec(x,x,:)
+!     integer(IK) :: var_type  !! var type
+!     integer(IK) :: n_sets    !! # of sets of matrices
+!     integer(IK) :: mx_set_size  !! # of rows in each matrix
+!     integer(IK) :: i         !! counter
+!     integer(IK) :: j         !! counter
+!     logical(LK) :: is_matrix !! flag for whether it is a matrix
+!     integer(IK),dimension(:,:),allocatable :: matrix_column_size
+!     real(RK),dimension(:,:,:),allocatable :: matrix_vec
 
-    call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,set_size, &
-      &                      matrix_column_size=matrix_column_size,matrix_vec=matrix_vec)
+!     call me%core%matrix_info(me%p,path,is_matrix,found,var_type,n_sets,mx_set_size, &
+!       &                      matrix_column_size=matrix_column_size,matrix_vec=matrix_vec)
 
-    if (is_matrix) then
-        associate (max_vec_size => maxval(matrix_column_size(:,:)))
-            allocate(vec(n_sets,set_size,max_vec_size),source=0.0_RK)
-            if (present(vec_size)) vec_size = matrix_column_size
-            do j = 1, n_sets
-                do i = 1, set_size
-                    vec(j,i,1:matrix_column_size(j,i)) = matrix_vec(j,i,1:matrix_column_size(j,i))
-                end do
-            end do
-        end associate
-    end if
+!     if (is_matrix) then
+!         associate (max_vec_size => maxval(matrix_column_size(:,:)))
+!             allocate(vec(n_sets,mx_set_size,max_vec_size),source=0.0_RK)
+!             if (present(vec_size)) vec_size = matrix_column_size
+!             do j = 1, n_sets
+!                 do i = 1, mx_set_size
+!                     vec(j,i,1:matrix_column_size(j,i)) = matrix_vec(j,i,1:matrix_column_size(j,i))
+!                 end do
+!             end do
+!         end associate
+!     end if
 
-    end subroutine json_file_get_matrix_vector
-!*****************************************************************************************
+!     end subroutine json_file_get_matrix_vector
+! !*****************************************************************************************
 
 !*****************************************************************************************
 !>

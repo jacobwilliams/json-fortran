@@ -1672,16 +1672,18 @@
 !  A [[json_value]] is a valid rank 2 matrix if all of the following are true:
 !
 !  * The var_type is *json_array*
-!  * Each child is also a *json_array*, each of which has the same number of elements
+!  * Each child is also a *json_array*
 !  * Each individual element has the same variable type (integer, logical, etc.)
 !
 !  The idea here is that if it is a valid matrix, it can be interoperable with
-!  a Fortran rank 2 array of the same type.
+!  a Fortran rank 2 array of the same type. If the children have differing lengths
+!  that can optionally be considered a matrix if the option to allow ragged edge
+!  matrices.
 !
 !### Example
 !
 !  The following example is an array with `var_type=json_integer`,
-!  `n_sets=3`, and `set_size=4`
+!  `n_sets=3`, and `mx_set_size=4`
 !
 !```json
 !    {
@@ -1693,22 +1695,21 @@
 !    }
 !```
 
-    subroutine json_matrix_info(json,p,is_matrix,var_type,n_sets,set_size,name,matrix_column_size,matrix_vec)
+    subroutine json_matrix_info(json,p,is_matrix,var_type,n_sets,mx_set_size,is_uniform,name)
 
     implicit none
 
     class(json_core),intent(inout)   :: json
-    type(json_value),pointer         :: p          !! a JSON linked list
-    logical(LK),intent(out)          :: is_matrix  !! true if it is a valid matrix
-    integer(IK),intent(out),optional :: var_type   !! variable type of data in the matrix
-                                                   !! (if all elements have the same type)
-    integer(IK),intent(out),optional :: n_sets     !! number of data sets (i.e., matrix
-                                                   !! rows if using row-major order)
-    integer(IK),intent(out),optional :: set_size   !! size of each data set (i.e., matrix
-                                                   !! cols if using row-major order)
+    type(json_value),pointer         :: p           !! a JSON linked list
+    logical(LK),intent(out)          :: is_matrix   !! true if it is a valid matrix
+    integer(IK),intent(out),optional :: var_type    !! variable type of data in the matrix
+                                                    !! (if all elements have the same type)
+    integer(IK),intent(out),optional :: n_sets      !! number of data sets (i.e., matrix
+                                                    !! rows if using row-major order)
+    integer(IK),intent(out),optional :: mx_set_size !! size of the largest data set (i.e., matrix
+                                                    !! cols if using row-major order)
+    logical(LK),intent(out),optional :: is_uniform  !! If the matrix is regular/dense or ragged
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
-    integer(IK),dimension(:,:),allocatable,intent(inout),optional :: matrix_column_size      !! # of columns in (matrix,row)
-    real(RK),dimension(:,:,:),allocatable,intent(inout),optional :: matrix_vec      !! # of columns in (matrix,row)
 
     type(json_value),pointer :: p_row       !! for getting a set
     type(json_value),pointer :: p_element   !! for getting an element in a set
@@ -1720,12 +1721,12 @@
     integer(IK) :: icount          !! number of elements in a set
     integer(IK) :: i               !! counter
     integer(IK) :: j               !! counter
-    integer(IK) :: max_vec_size    !! max size of # of columns in matrix
-    integer,parameter::max_def_size=1000   !! default size of each row, to be replaced
-    real(RK),dimension(:),allocatable :: vec
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: p_name  !! temporary variable for getting name
 #endif
+
+    if (present(is_uniform)) is_uniform = .true.
+    if (present(mx_set_size)) mx_set_size = 0
 
     !get info about the variable:
 #if defined __GFORTRAN__
@@ -1745,8 +1746,7 @@
     is_matrix = (vartype==json_array) !! ensure is matrix
 
     if (is_matrix) then
-        max_vec_size=0
-        main : do i=1,nr !! loop over all sets of matrices
+        main : do i=1,nr
 
             nullify(p_row)
             call json%get_child(p,i,p_row)
@@ -1756,51 +1756,32 @@
                                           'Malformed JSON linked list')
                 exit main
             end if
-            call json%info(p_row,var_type=row_vartype,n_children=icount) !! get # of rows in matrix(i)
-
-            if (present(matrix_column_size)) then
-                if (.not. allocated(matrix_column_size)) allocate(matrix_column_size(nr,icount),source=0)
-            end if
-            if (present(matrix_vec)) then
-                if (.not. allocated(matrix_vec)) allocate(matrix_vec(nr,icount,max_def_size),source=0.0_rk)
-            end if
+            call json%info(p_row,var_type=row_vartype,n_children=icount) !! get # of columns in matrix
 
             if (row_vartype==json_array) then
                 if (i==1) nc = icount  !number of columns in first row
-                if (icount==nc) then   !make sure each row has the same number of columns
-                    !see if all the variables in this row are the same type:
-                    do j=1,icount
-                        nullify(p_element)
-                        call json%get_child(p_row,j,p_element) !! NOTE: p_element%n_children is # of columns in row
-                        if (present(matrix_column_size)) matrix_column_size(i,j) = p_element%n_children
-                        if (.not. associated(p_element)) then
-                            is_matrix = .false.
-                            call json%throw_exception('Error in json_matrix_info: '//&
-                                                      'Malformed JSON linked list')
-                            exit main
-                        end if
-                        call json%info(p_element,var_type=element_vartype)
-                        if (present(matrix_vec)) then
-                            call json%get(p_element, vec) !! NOTE: this is only set up for reals, not integers
-                            associate (vec_size => size(vec))
-                                matrix_vec(i,j,1:vec_size) = vec(1:vec_size)
-                                max_vec_size = MAX(vec_size, max_vec_size)
-                            end associate
-                            if (allocated(vec)) deallocate(vec)
-                        end if
+                if (icount /= nc) is_uniform = .false.   !make sure each row has the same number of columns
+                if (present(mx_set_size)) mx_set_size = max(mx_set_size, icount)
+                !see if all the variables in this row are the same type:
+                do j=1,icount
+                    nullify(p_element)
+                    call json%get_child(p_row,j,p_element) !! NOTE: p_element%n_children is # of columns in row
+                    if (.not. associated(p_element)) then
+                        is_matrix = .false.
+                        call json%throw_exception('Error in json_matrix_info: '//&
+                            'Malformed JSON linked list')
+                        exit main
+                    end if
+                    call json%info(p_element,var_type=element_vartype)
 
-                        if (i==1 .and. j==1) vartype = element_vartype  !type of first element
-                                                                        !in the row
-                        if (vartype/=element_vartype) then
-                            !not all variables are the same time
-                            is_matrix = .false.
-                            exit main
-                        end if
-                    end do
-                else
-                    is_matrix = .false.
-                    exit main
-                end if
+                    if (i==1 .and. j==1) vartype = element_vartype  !type of first element
+                    !in the row
+                    if (vartype/=element_vartype) then
+                        !not all variables are the same type
+                        is_matrix = .false.
+                        exit main
+                    end if
+                end do
             else
                 is_matrix = .false.
                 exit main
@@ -1813,11 +1794,10 @@
     if (is_matrix) then
         if (present(var_type)) var_type = vartype
         if (present(n_sets))   n_sets   = nr
-        if (present(set_size)) set_size = nc
     else
         if (present(var_type)) var_type = json_unknown
         if (present(n_sets))   n_sets   = 0
-        if (present(set_size)) set_size = 0
+        if (present(mx_set_size)) mx_set_size = 0
     end if
 
     end subroutine json_matrix_info
@@ -1835,25 +1815,24 @@
 !      variable is not found.
 
     subroutine json_matrix_info_by_path(json,p,path,is_matrix,found,&
-                                        var_type,n_sets,set_size,name,matrix_column_size,matrix_vec)
+                                        var_type,n_sets,mx_set_size,is_uniform,name)
 
     implicit none
 
     class(json_core),intent(inout)      :: json
-    type(json_value),pointer            :: p         !! a JSON linked list
-    character(kind=CK,len=*),intent(in) :: path      !! path to the variable
-    logical(LK),intent(out)             :: is_matrix !! true if it is a valid matrix
-    logical(LK),intent(out),optional    :: found     !! true if it was found
-    integer(IK),intent(out),optional    :: var_type  !! variable type of data in
-                                                     !! the matrix (if all elements have
-                                                     !! the same type)
-    integer(IK),intent(out),optional    :: n_sets    !! number of data sets (i.e., matrix
-                                                     !! rows if using row-major order)
-    integer(IK),intent(out),optional    :: set_size  !! size of each data set (i.e., matrix
-                                                     !! cols if using row-major order)
+    type(json_value),pointer            :: p           !! a JSON linked list
+    character(kind=CK,len=*),intent(in) :: path        !! path to the variable
+    logical(LK),intent(out)             :: is_matrix   !! true if it is a valid matrix
+    logical(LK),intent(out),optional    :: found       !! true if it was found
+    integer(IK),intent(out),optional    :: var_type    !! variable type of data in
+                                                       !! the matrix (if all elements have
+                                                       !! the same type)
+    integer(IK),intent(out),optional    :: n_sets      !! number of data sets (i.e., matrix
+                                                       !! rows if using row-major order)
+    integer(IK),intent(out),optional    :: mx_set_size !! size of each data set (i.e., matrix
+                                                       !! cols if using row-major order)
+    logical(LK),intent(out),optional :: is_uniform     !! If the matrix is regular/dense or ragged
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
-    integer(IK),dimension(:,:),allocatable,intent(inout),optional :: matrix_column_size   !! # of columns in (matrix,row)
-    real(RK),dimension(:,:,:),allocatable,intent(inout),optional :: matrix_vec      !! # of columns in (matrix,row)
 
     type(json_value),pointer :: p_var
     logical(LK) :: ok
@@ -1873,13 +1852,14 @@
     if (.not. ok) then
         if (present(var_type)) var_type = json_unknown
         if (present(n_sets))   n_sets   = 0
-        if (present(set_size)) set_size = 0
+        if (present(mx_set_size)) mx_set_size = 0
         if (present(name))     name     = CK_''
+        if (present(is_uniform)) is_uniform = .false.
     else
 
         !get info about the variable:
 #if defined __GFORTRAN__
-        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,matrix_column_size=matrix_column_size,matrix_vec=matrix_vec)
+        call json%matrix_info(p_var,is_matrix,var_type,n_sets,mx_set_size,is_uniform)
         if (present(name)) then !workaround for gfortran bug
             if (allocated(p_var%name)) then
                 p_name = p_var%name
@@ -1889,7 +1869,7 @@
             end if
         end if
 #else
-        call json%matrix_info(p_var,is_matrix,var_type,n_sets,set_size,name,matrix_column_size,matrix_vec)
+        call json%matrix_info(p_var,is_matrix,var_type,n_sets,mx_set_size,is_uniform,name)
 #endif
         if (json%exception_thrown .and. present(found)) then
             found = .false.
@@ -1905,25 +1885,26 @@
 !  Alternate version of [[json_matrix_info_by_path]] where "path" is kind=CDK.
 
     subroutine wrap_json_matrix_info_by_path(json,p,path,is_matrix,found,&
-                                             var_type,n_sets,set_size,name)
+                                             var_type,n_sets,mx_set_size,is_uniform,name)
 
     implicit none
 
     class(json_core),intent(inout)       :: json
-    type(json_value),pointer             :: p          !! a JSON linked list
-    character(kind=CDK,len=*),intent(in) :: path       !! path to the variable
-    logical(LK),intent(out)              :: is_matrix  !! true if it is a valid matrix
-    logical(LK),intent(out),optional     :: found      !! true if it was found
-    integer(IK),intent(out),optional     :: var_type   !! variable type of data in
-                                                       !! the matrix (if all elements have
-                                                       !! the same type)
-    integer(IK),intent(out),optional     :: n_sets     !! number of data sets (i.e., matrix
-                                                       !! rows if using row-major order)
-    integer(IK),intent(out),optional     :: set_size   !! size of each data set (i.e., matrix
-                                                       !! cols if using row-major order)
+    type(json_value),pointer             :: p           !! a JSON linked list
+    character(kind=CDK,len=*),intent(in) :: path        !! path to the variable
+    logical(LK),intent(out)              :: is_matrix   !! true if it is a valid matrix
+    logical(LK),intent(out),optional     :: found       !! true if it was found
+    integer(IK),intent(out),optional     :: var_type    !! variable type of data in
+                                                        !! the matrix (if all elements have
+                                                        !! the same type)
+    integer(IK),intent(out),optional     :: n_sets      !! number of data sets (i.e., matrix
+                                                        !! rows if using row-major order)
+    integer(IK),intent(out),optional     :: mx_set_size !! size of each data set (i.e., matrix
+                                                        !! cols if using row-major order)
+    logical(LK),intent(out)              :: is_uniform  !! true if it is dense/uniform matrix
     character(kind=CK,len=:),allocatable,intent(out),optional :: name !! variable name
 
-    call json%matrix_info(p,to_unicode(path),is_matrix,found,var_type,n_sets,set_size,name)
+    call json%matrix_info(p,to_unicode(path),is_matrix,found,var_type,n_sets,mx_set_size,is_uniform,name)
 
     end subroutine wrap_json_matrix_info_by_path
 !*****************************************************************************************

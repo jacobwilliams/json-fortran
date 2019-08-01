@@ -1,14 +1,16 @@
 !*****************************************************************************************
 !>
-! Module for the fourtieth unit test.
+! Module for the forty-third unit test.
+! Check ability to read and write (and query) ragged edge matrices
 !
 !# HISTORY
 !  * Ian Porter : 8/14/2018
+!  * Izaak Beekman : 7/17/2019
 
 module jf_test_43_mod
 
-    use json_module
-    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit, wp => real64
+    use json_module, wp => json_RK, IK => json_IK, LK => json_LK
+    use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
 
@@ -23,17 +25,15 @@ contains
 
     subroutine test_43(error_cnt)
 
-    !! Github issue example: https://github.com/josephalevin/fson/issues/156
-    !!
-    !! Read a matrix
+    !! Read a ragged edge matrix
 
     implicit none
 
     integer,intent(out) :: error_cnt
-    real(wp), dimension(:,:),allocatable :: dd
-    real(wp), dimension(:,:,:),allocatable :: ddd
-    integer, dimension(:),allocatable :: dd_size
-    integer, dimension(:,:),allocatable :: ddd_size
+    real(wp),    dimension(:,:),allocatable :: dd
+    integer(IK), dimension(:,:),allocatable :: imtx
+    logical,     dimension(:,:),allocatable :: lmtx
+    integer, dimension(:),allocatable :: dd_size, imtx_size, lmtx_size
     type(json_file) :: json
     logical :: found, file_exists
 
@@ -79,32 +79,39 @@ contains
         write(error_unit,'(A)') 'extract data...'
 
         write(error_unit,'(A)') '--------------------------'
-! TODO: Implement this
-!        call json%get('fooList', dd, found, dd_size)
-!        if (json%failed()) then
-!            call json%print_error_message(error_unit)
-!            error_cnt = error_cnt + 1
-!        end if
-!        if (found) write(error_unit,'(A,I5)') 'dd = ',dd
-        call json%get('fooList3x', ddd, found, ddd_size)
-        if (json%failed()) then
-            call json%print_error_message(error_unit)
-            error_cnt = error_cnt + 1
-        end if
-        if (found) write(error_unit,'(A,es13.6)') 'ddd = ',ddd
+       call json%get('ragged_matrix', dd, found, dd_size)
+       if (json%failed()) then
+           call json%print_error_message(error_unit)
+           error_cnt = error_cnt + 1
+       end if
+       if (found) write(error_unit,'(A,es7.5)') 'dd = ',dd
 
-        write(error_unit,'(A)') ''
+       ! call json%get('integer_matrix', imtx, found, imtx_size)
+       ! if (json%failed()) then
+       !     call json%print_error_message(error_unit)
+       !     error_cnt = error_cnt + 1
+       ! end if
+       ! if (found) write(error_unit,'(A,I5)') 'imtx = ',imtx
 
-    end if
+       ! call json%get('logical_matrix', lmtx, found, lmtx_size)
+       ! if (json%failed()) then
+       !     call json%print_error_message(error_unit)
+       !     error_cnt = error_cnt + 1
+       ! end if
+       ! if (found) write(error_unit,*) 'lmtx = ',lmtx
 
-    ! clean up
-    call json%destroy()
-    if (json%failed()) then
-        call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1
-    end if
+       write(error_unit,'(A)') ''
 
-  end subroutine test_43
+   end if
+
+   ! clean up
+   call json%destroy()
+   if (json%failed()) then
+       call json%print_error_message(error_unit)
+       error_cnt = error_cnt + 1
+   end if
+
+end subroutine test_43
 
 end module jf_test_43_mod
 !*****************************************************************************************
@@ -113,7 +120,7 @@ end module jf_test_43_mod
 !*****************************************************************************************
 program jf_test_43
 
-    !! Thirty sixth unit test.
+    !! Forty third unit test.
 
     use jf_test_43_mod , only: test_43
     implicit none
