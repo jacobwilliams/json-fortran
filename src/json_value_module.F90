@@ -305,18 +305,23 @@
                                  MAYBEWRAP(json_value_add_null), &
                                  MAYBEWRAP(json_value_add_integer), &
                                  MAYBEWRAP(json_value_add_integer_vec), &
+                                 MAYBEWRAP(json_value_add_integer_matrix), &
 #ifndef REAL32
                                  MAYBEWRAP(json_value_add_real32), &
                                  MAYBEWRAP(json_value_add_real32_vec), &
+                                 MAYBEWRAP(json_value_add_real32_matrix), &
 #endif
                                  MAYBEWRAP(json_value_add_real), &
                                  MAYBEWRAP(json_value_add_real_vec), &
+                                 MAYBEWRAP(json_value_add_real_matrix), &
 #ifdef REAL128
                                  MAYBEWRAP(json_value_add_real64), &
                                  MAYBEWRAP(json_value_add_real64_vec), &
+                                 MAYBEWRAP(json_value_add_real64_matrix), &
 #endif
                                  MAYBEWRAP(json_value_add_logical), &
                                  MAYBEWRAP(json_value_add_logical_vec), &
+                                 MAYBEWRAP(json_value_add_logical_matrix), &
                                  MAYBEWRAP(json_value_add_string), &
                                  MAYBEWRAP(json_value_add_string_vec)
 #ifdef USE_UCS4
@@ -330,18 +335,23 @@
         procedure,private :: MAYBEWRAP(json_value_add_integer)
         procedure,private :: MAYBEWRAP(json_value_add_null)
         procedure,private :: MAYBEWRAP(json_value_add_integer_vec)
+        procedure,private :: MAYBEWRAP(json_value_add_integer_matrix)
 #ifndef REAL32
         procedure,private :: MAYBEWRAP(json_value_add_real32)
         procedure,private :: MAYBEWRAP(json_value_add_real32_vec)
+        procedure,private :: MAYBEWRAP(json_value_add_real32_matrix)
 #endif
         procedure,private :: MAYBEWRAP(json_value_add_real)
         procedure,private :: MAYBEWRAP(json_value_add_real_vec)
+        procedure,private :: MAYBEWRAP(json_value_add_real_matrix)
 #ifdef REAL128
         procedure,private :: MAYBEWRAP(json_value_add_real64)
         procedure,private :: MAYBEWRAP(json_value_add_real64_vec)
+        procedure,private :: MAYBEWRAP(json_value_add_real64_matrix)
 #endif
         procedure,private :: MAYBEWRAP(json_value_add_logical)
         procedure,private :: MAYBEWRAP(json_value_add_logical_vec)
+        procedure,private :: MAYBEWRAP(json_value_add_logical_matrix)
         procedure,private :: MAYBEWRAP(json_value_add_string)
         procedure,private :: MAYBEWRAP(json_value_add_string_vec)
 #ifdef USE_UCS4
@@ -436,14 +446,19 @@
                                          MAYBEWRAP(json_add_logical_by_path),&
                                          MAYBEWRAP(json_add_string_by_path),&
                                          MAYBEWRAP(json_add_integer_vec_by_path),&
+                                         MAYBEWRAP(json_add_integer_matrix_by_path),&
 #ifndef REAL32
                                          MAYBEWRAP(json_add_real32_vec_by_path),&
+                                         MAYBEWRAP(json_add_real32_matrix_by_path),&
 #endif
                                          MAYBEWRAP(json_add_real_vec_by_path),&
+                                         MAYBEWRAP(json_add_real_matrix_by_path),&
 #ifdef REAL128
                                          MAYBEWRAP(json_add_real64_vec_by_path),&
+                                         MAYBEWRAP(json_add_real64_matrix_by_path),&
 #endif
                                          MAYBEWRAP(json_add_logical_vec_by_path),&
+                                         MAYBEWRAP(json_add_logical_matrix_by_path),&
                                          MAYBEWRAP(json_add_string_vec_by_path)
 #ifdef USE_UCS4
         generic,public :: add_by_path => json_add_string_by_path_value_ascii,&
@@ -463,14 +478,19 @@
         procedure :: MAYBEWRAP(json_add_logical_by_path)
         procedure :: MAYBEWRAP(json_add_string_by_path)
         procedure :: MAYBEWRAP(json_add_integer_vec_by_path)
+        procedure :: MAYBEWRAP(json_add_integer_matrix_by_path)
 #ifndef REAL32
         procedure :: MAYBEWRAP(json_add_real32_vec_by_path)
+        procedure :: MAYBEWRAP(json_add_real32_matrix_by_path)
 #endif
         procedure :: MAYBEWRAP(json_add_real_vec_by_path)
+        procedure :: MAYBEWRAP(json_add_real_matrix_by_path)
 #ifdef REAL128
         procedure :: MAYBEWRAP(json_add_real64_vec_by_path)
+        procedure :: MAYBEWRAP(json_add_real64_matrix_by_path)
 #endif
         procedure :: MAYBEWRAP(json_add_logical_vec_by_path)
+        procedure :: MAYBEWRAP(json_add_logical_matrix_by_path)
         procedure :: MAYBEWRAP(json_add_string_vec_by_path)
 #ifdef USE_UCS4
         procedure :: json_add_string_by_path_value_ascii
@@ -501,40 +521,50 @@
         !      path.  The path version is split up into unicode and non-unicode versions.
 
         generic,public :: get => &
-                                       MAYBEWRAP(json_get_by_path),             &
-            json_get_integer,          MAYBEWRAP(json_get_integer_by_path),     &
-            json_get_integer_vec,      MAYBEWRAP(json_get_integer_vec_by_path), &
+                                          MAYBEWRAP(json_get_by_path),                     &
+            json_get_integer,             MAYBEWRAP(json_get_integer_by_path),             &
+            json_get_integer_vec,         MAYBEWRAP(json_get_integer_vec_by_path),         &
+            json_get_integer_matrix,      MAYBEWRAP(json_get_integer_matrix_by_path),      &
 #ifndef REAL32
-            json_get_real32,           MAYBEWRAP(json_get_real32_by_path),      &
-            json_get_real32_vec,       MAYBEWRAP(json_get_real32_vec_by_path),  &
+            json_get_real32,              MAYBEWRAP(json_get_real32_by_path),              &
+            json_get_real32_vec,          MAYBEWRAP(json_get_real32_vec_by_path),          &
+            json_get_real32_matrix,       MAYBEWRAP(json_get_real32_matrix_by_path),       &
 #endif
-            json_get_real,             MAYBEWRAP(json_get_real_by_path),        &
-            json_get_real_vec,         MAYBEWRAP(json_get_real_vec_by_path),    &
+            json_get_real,                MAYBEWRAP(json_get_real_by_path),                &
+            json_get_real_vec,            MAYBEWRAP(json_get_real_vec_by_path),            &
+            json_get_real_matrix,         MAYBEWRAP(json_get_real_matrix_by_path),         &
 #ifdef REAL128
-            json_get_real64,           MAYBEWRAP(json_get_real64_by_path),      &
-            json_get_real64_vec,       MAYBEWRAP(json_get_real64_vec_by_path),  &
+            json_get_real64,              MAYBEWRAP(json_get_real64_by_path),              &
+            json_get_real64_vec,          MAYBEWRAP(json_get_real64_vec_by_path),          &
+            json_get_real64_matrix,       MAYBEWRAP(json_get_real64_matrix_by_path),       &
 #endif
-            json_get_logical,          MAYBEWRAP(json_get_logical_by_path),     &
-            json_get_logical_vec,      MAYBEWRAP(json_get_logical_vec_by_path), &
-            json_get_string,           MAYBEWRAP(json_get_string_by_path),      &
-            json_get_string_vec,       MAYBEWRAP(json_get_string_vec_by_path),  &
-            json_get_alloc_string_vec, MAYBEWRAP(json_get_alloc_string_vec_by_path),&
-            json_get_array,            MAYBEWRAP(json_get_array_by_path)
+            json_get_logical,             MAYBEWRAP(json_get_logical_by_path),             &
+            json_get_logical_vec,         MAYBEWRAP(json_get_logical_vec_by_path),         &
+            json_get_logical_matrix,      MAYBEWRAP(json_get_logical_matrix_by_path),      &
+            json_get_string,              MAYBEWRAP(json_get_string_by_path),              &
+            json_get_string_vec,          MAYBEWRAP(json_get_string_vec_by_path),          &
+            json_get_alloc_string_matrix, MAYBEWRAP(json_get_alloc_string_matrix_by_path), &
+            json_get_array,               MAYBEWRAP(json_get_array_by_path)
 
         procedure,private :: json_get_integer
         procedure,private :: json_get_integer_vec
+        procedure,private :: json_get_integer_matrix
 #ifndef REAL32
         procedure,private :: json_get_real32
         procedure,private :: json_get_real32_vec
+        procedure,private :: json_get_real32_matrix
 #endif
         procedure,private :: json_get_real
         procedure,private :: json_get_real_vec
+        procedure,private :: json_get_real_matrix
 #ifdef REAL128
         procedure,private :: json_get_real64
         procedure,private :: json_get_real64_vec
+        procedure,private :: json_get_real64_matrix
 #endif
         procedure,private :: json_get_logical
         procedure,private :: json_get_logical_vec
+        procedure,private :: json_get_logical_matrix
         procedure,private :: json_get_string
         procedure,private :: json_get_string_vec
         procedure,private :: json_get_alloc_string_vec
@@ -542,18 +572,23 @@
         procedure,private :: MAYBEWRAP(json_get_by_path)
         procedure,private :: MAYBEWRAP(json_get_integer_by_path)
         procedure,private :: MAYBEWRAP(json_get_integer_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_integer_matrix_by_path)
 #ifndef REAL32
         procedure,private :: MAYBEWRAP(json_get_real32_by_path)
         procedure,private :: MAYBEWRAP(json_get_real32_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_real32_matrix_by_path)
 #endif
         procedure,private :: MAYBEWRAP(json_get_real_by_path)
         procedure,private :: MAYBEWRAP(json_get_real_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_real_matrix_by_path)
 #ifdef REAL128
         procedure,private :: MAYBEWRAP(json_get_real64_by_path)
         procedure,private :: MAYBEWRAP(json_get_real64_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_real64_matrix_by_path)
 #endif
         procedure,private :: MAYBEWRAP(json_get_logical_by_path)
         procedure,private :: MAYBEWRAP(json_get_logical_vec_by_path)
+        procedure,private :: MAYBEWRAP(json_get_logical_matrix_by_path)
         procedure,private :: MAYBEWRAP(json_get_string_by_path)
         procedure,private :: MAYBEWRAP(json_get_string_vec_by_path)
         procedure,private :: MAYBEWRAP(json_get_array_by_path)
@@ -4213,6 +4248,70 @@
 
 !*****************************************************************************************
 !>
+!  Wrapper to [[json_add_integer_vec_by_path]] for adding an integer matrix by path.
+
+    subroutine json_add_integer_matrix_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer              :: me           !! the JSON structure
+    character(kind=CK,len=*)  ,intent(in) :: path         !! the path to the variable
+    integer(IK),dimension(:,:),intent(in) :: value        !! the matrix to add
+    logical(LK),intent(out)   ,optional   :: found        !! if the variable was found
+    logical(LK),intent(out)   ,optional   :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p   !! pointer to path (which may exist)
+    type(json_value),pointer :: var !! new variable that is created
+    integer(IK) :: i    !! counters
+    character(kind=CK,len=:),allocatable :: name !! the variable name
+    logical(LK) :: p_found  !! if the path was successfully found (or created)
+
+    if ( .not. json%exception_thrown ) then
+
+        !get a pointer to the variable
+        !(creating it if necessary)
+        call json%create(me,path,p,found=p_found)
+        if (p_found) then
+            call json%info(p,name=name)             ! want to keep the existing name
+            call json%create_array(var,name)        ! create a new array variable
+            call json%replace(p,var,destroy=.true.) ! replace p with this array (destroy p)
+            !populate each element of the array:
+            do i=1,size(value,dim=2)
+                call json%add(var, CK_'', value(:,i))
+            end do
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_integer_matrix_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_integer_matrix_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_integer_matrix_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer              :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in)  :: path         !! the path to the variable
+    integer(IK),dimension(:,:),intent(in) :: value        !! the vector to add
+    logical(LK),intent(out),optional      :: found        !! if the variable was found
+    logical(LK),intent(out),optional      :: was_created  !! if the variable had to be created
+
+    call json%json_add_integer_matrix_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_integer_matrix_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
 !  Wrapper to [[json_add_logical_by_path]] for adding a logical vector by path.
 
     subroutine json_add_logical_vec_by_path(json,me,path,value,found,was_created)
@@ -4273,6 +4372,70 @@
     call json%json_add_logical_vec_by_path(me,to_unicode(path),value,found,was_created)
 
     end subroutine wrap_json_add_logical_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_logical_by_path]] for adding a logical matrix by path.
+
+    subroutine json_add_logical_matrix_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer              :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in)   :: path         !! the path to the variable
+    logical(LK),dimension(:,:),intent(in) :: value        !! the matrix to add
+    logical(LK),intent(out),optional      :: found        !! if the variable was found
+    logical(LK),intent(out),optional      :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p   !! pointer to path (which may exist)
+    type(json_value),pointer :: var !! new variable that is created
+    integer(IK) :: i    !! counter
+    character(kind=CK,len=:),allocatable :: name !! the variable name
+    logical(LK) :: p_found  !! if the path was successfully found (or created)
+
+    if ( .not. json%exception_thrown ) then
+
+        !get a pointer to the variable
+        !(creating it if necessary)
+        call json%create(me,path,p,found=p_found)
+        if (p_found) then
+            call json%info(p,name=name)             ! want to keep the existing name
+            call json%create_array(var,name)        ! create a new array variable
+            call json%replace(p,var,destroy=.true.) ! replace p with this array (destroy p)
+            !populate each element of the array:
+            do i=1,size(value,dim=2)
+                call json%add(var, CK_'', value(:,i))
+            end do
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_logical_matrix_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_logical_matrix_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_logical_matrix_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer              :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in)  :: path         !! the path to the variable
+    logical(LK),dimension(:,:),intent(in) :: value        !! the matrix to add
+    logical(LK),intent(out),optional      :: found        !! if the variable was found
+    logical(LK),intent(out),optional      :: was_created  !! if the variable had to be created
+
+    call json%json_add_logical_matrix_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_logical_matrix_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -4339,6 +4502,70 @@
     end subroutine wrap_json_add_real_vec_by_path
 !*****************************************************************************************
 
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_real_by_path]] for adding a real matrix by path.
+
+    subroutine json_add_real_matrix_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    real(RK),dimension(:,:),intent(in)  :: value        !! the matrix to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p   !! pointer to path (which may exist)
+    type(json_value),pointer :: var !! new variable that is created
+    integer(IK) :: i    !! counter
+    character(kind=CK,len=:),allocatable :: name !! the variable name
+    logical(LK) :: p_found  !! if the path was successfully found (or created)
+
+    if ( .not. json%exception_thrown ) then
+
+        !get a pointer to the variable
+        !(creating it if necessary)
+        call json%create(me,path,p,found=p_found)
+        if (p_found) then
+            call json%info(p,name=name)             ! want to keep the existing name
+            call json%create_array(var,name)        ! create a new array variable
+            call json%replace(p,var,destroy=.true.) ! replace p with this array (destroy p)
+            !populate each element of the array:
+            do i=1,size(value)
+                call json%add(var, CK_'', value(i))
+            end do
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_real_matrix_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_real_matrix_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_real_matrix_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    real(RK),dimension(:,:),intent(in)   :: value        !! the matrix to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_real_matrix_by_path(me,to_unicode(path),value,found,was_created)
+
+    end subroutine wrap_json_add_real_matrix_by_path
+!*****************************************************************************************
+
 #ifndef REAL32
 !*****************************************************************************************
 !>
@@ -4379,47 +4606,87 @@
 
     end subroutine wrap_json_add_real32_vec_by_path
 !*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_real_by_path]] for adding a real matrix by path.
+
+    subroutine json_add_real32_matrix_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)         :: json
+    type(json_value),pointer               :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in)    :: path         !! the path to the variable
+    real(real32),dimension(:,:),intent(in) :: value        !! the matrix to add
+    logical(LK),intent(out),optional       :: found        !! if the variable was found
+    logical(LK),intent(out),optional       :: was_created  !! if the variable had to be created
+
+    call json%add_by_path(me,path,real(value,RK),found,was_created)
+
+    end subroutine json_add_real32_matrix_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_real32_matrix_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_real32_matrix_by_path(json,me,path,value,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)         :: json
+    type(json_value),pointer               :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in)   :: path         !! the path to the variable
+    real(real32),dimension(:,:),intent(in) :: value        !! the matrix to add
+    logical(LK),intent(out),optional       :: found        !! if the variable was found
+    logical(LK),intent(out),optional       :: was_created  !! if the variable had to be created
+
+    call json%add_by_path(me,to_unicode(path),real(value,RK),found,was_created)
+
+    end subroutine wrap_json_add_real32_matrix_by_path
+!*****************************************************************************************
 #endif
 
 #ifdef REAL128
 !*****************************************************************************************
 !>
-!  Wrapper to [[json_add_real_by_path]] for adding a real vector by path.
+!  Wrapper to [[json_add_real_by_path]] for adding a real matrix by path.
 
-    subroutine json_add_real64_vec_by_path(json,me,path,value,found,was_created)
+    subroutine json_add_real64_matrix_by_path(json,me,path,value,found,was_created)
 
     implicit none
 
-    class(json_core),intent(inout)       :: json
-    type(json_value),pointer             :: me           !! the JSON structure
-    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
-    real(real64),dimension(:),intent(in) :: value        !! the vector to add
-    logical(LK),intent(out),optional     :: found        !! if the variable was found
-    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+    class(json_core),intent(inout)         :: json
+    type(json_value),pointer               :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in)    :: path         !! the path to the variable
+    real(real64),dimension(:,:),intent(in) :: value        !! the matrix to add
+    logical(LK),intent(out),optional       :: found        !! if the variable was found
+    logical(LK),intent(out),optional       :: was_created  !! if the variable had to be created
 
     call json%add_by_path(me,path,real(value,RK),found,was_created)
 
-    end subroutine json_add_real64_vec_by_path
+    end subroutine json_add_real64_matrix_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
 !>
-!  Wrapper for [[json_add_real64_vec_by_path]] where "path" is kind=CDK).
+!  Wrapper for [[json_add_real64_matrix_by_path]] where "path" is kind=CDK).
 
-    subroutine wrap_json_add_real64_vec_by_path(json,me,path,value,found,was_created)
+    subroutine wrap_json_add_real64_matrix_by_path(json,me,path,value,found,was_created)
 
     implicit none
 
-    class(json_core),intent(inout)       :: json
-    type(json_value),pointer             :: me           !! the JSON structure
-    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
-    real(real64),dimension(:),intent(in) :: value        !! the vector to add
-    logical(LK),intent(out),optional     :: found        !! if the variable was found
-    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+    class(json_core),intent(inout)         :: json
+    type(json_value),pointer               :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in)   :: path         !! the path to the variable
+    real(real64),dimension(:,:),intent(in) :: value        !! the matrix to add
+    logical(LK),intent(out),optional       :: found        !! if the variable was found
+    logical(LK),intent(out),optional       :: was_created  !! if the variable had to be created
 
     call json%add_by_path(me,to_unicode(path),real(value,RK),found,was_created)
 
-    end subroutine wrap_json_add_real64_vec_by_path
+    end subroutine wrap_json_add_real64_matrix_by_path
 !*****************************************************************************************
 #endif
 
@@ -4698,6 +4965,59 @@
     end subroutine wrap_json_value_add_real_vec
 !*****************************************************************************************
 
+!*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 7/30/2019
+!
+!  Add a real matrix child to the [[json_value]] variable.
+!
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
+
+    subroutine json_value_add_real_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: p
+    character(kind=CK,len=*),intent(in) :: name
+    real(RK),dimension(:,:),intent(in)  :: val
+
+    type(json_value),pointer :: var
+    integer(IK) :: i !! counter
+
+    !create the variable as an array:
+    call json%create_array(var,name)
+
+    !populate the array:
+    do i=1,size(val,dim=2)
+        call json%add(var, CK_'', val(:,i))
+    end do
+
+    !add it:
+    call json%add(p, var)
+
+    end subroutine json_value_add_real_matrix
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_real_matrix]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_real_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CDK,len=*),intent(in) :: name
+    real(RK),dimension(:,:),intent(in)   :: val
+
+    call json%add(p, to_unicode(name), val)
+
+    end subroutine wrap_json_value_add_real_matrix
+!*****************************************************************************************
+
 #ifndef REAL32
 !*****************************************************************************************
 !>
@@ -4769,6 +5089,42 @@
     call json%add(p, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_real32_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_real_matrix]] where `val` is `real32`.
+
+    subroutine json_value_add_real32_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CK,len=*),intent(in)  :: name
+    real(real32),dimension(:,:),intent(in) :: val
+
+    call json%add(p,name,real(val,RK))
+
+    end subroutine json_value_add_real32_matrix
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_real32_matrix]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_real32_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)         :: json
+    type(json_value),pointer               :: p
+    character(kind=CDK,len=*),intent(in)   :: name
+    real(real32),dimension(:,:),intent(in) :: val
+
+    call json%add(p, to_unicode(name), val)
+
+    end subroutine wrap_json_value_add_real32_matrix
 !*****************************************************************************************
 #endif
 
@@ -4843,6 +5199,42 @@
     call json%add(p, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_real64_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_real_matrix]] where `val` is `real64`.
+
+    subroutine json_value_add_real64_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: p
+    character(kind=CK,len=*),intent(in)  :: name
+    real(real64),dimension(:),intent(in) :: val
+
+    call json%add(p, name, real(val,RK))
+
+    end subroutine json_value_add_real64_matrix
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_real64_matrix]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_real64_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)         :: json
+    type(json_value),pointer               :: p
+    character(kind=CDK,len=*),intent(in)   :: name
+    real(real64),dimension(:,:),intent(in) :: val
+
+    call json%add(p, to_unicode(name), val)
+
+    end subroutine wrap_json_value_add_real64_matrix
 !*****************************************************************************************
 #endif
 
@@ -4993,6 +5385,59 @@
 !> author: Jacob Williams
 !  date: 1/20/2014
 !
+!  Add a integer matrix child to the [[json_value]] variable.
+!
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
+
+    subroutine json_value_add_integer_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer              :: p
+    character(kind=CK,len=*),intent(in)   :: name   !! name of the variable
+    integer(IK),dimension(:,:),intent(in) :: val    !! value
+
+    type(json_value),pointer :: var
+    integer(IK) :: i    !! counter
+
+    !create a variable as an array:
+    call json%create_array(var,name)
+
+    !populate the array:
+    do i=1,size(val, dim=2)
+        call json%add(var, CK_'', val(:,i))
+    end do
+
+    !add it:
+    call json%add(p, var)
+
+    end subroutine json_value_add_integer_matrix
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_integer_matrix]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_integer_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer              :: p
+    character(kind=CDK,len=*),intent(in)  :: name   !! name of the variable
+    integer(IK),dimension(:,:),intent(in) :: val    !! value
+
+    call json%add(p, to_unicode(name), val)
+
+    end subroutine wrap_json_value_add_integer_matrix
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 1/20/2014
+!
 !  Add a logical value child to the [[json_value]] variable.
 !
 !@note This routine is part of the public API that can be
@@ -5087,6 +5532,59 @@
     call json%add(p, to_unicode(name), val)
 
     end subroutine wrap_json_value_add_logical_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 7/28/2019
+!
+!  Add a logical matrix child to the [[json_value]] variable.
+!
+!@note This routine is part of the public API that can be
+!      used to build a JSON structure using [[json_value]] pointers.
+
+    subroutine json_value_add_logical_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer              :: p
+    character(kind=CK,len=*),intent(in)   :: name  !! name of the matrix
+    logical(LK),dimension(:,:),intent(in) :: val   !! value
+
+    type(json_value),pointer :: var
+    integer(IK) :: i    !! counter
+
+    !create the variable as an array:
+    call json%create_array(var,name)
+
+    !populate the array:
+    do i=1,size(val,dim=2)
+        call json%add(var, CK_'', val(:,i))
+    end do
+
+    !add it:
+    call json%add(p, var)
+
+    end subroutine json_value_add_logical_matrix
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_value_add_logical_matrix]] where `name` is kind=CDK.
+
+    subroutine wrap_json_value_add_logical_matrix(json, p, name, val)
+
+    implicit none
+
+    class(json_core),intent(inout)        :: json
+    type(json_value),pointer              :: p
+    character(kind=CDK,len=*),intent(in)  :: name   !! name of the variable
+    logical(LK),dimension(:,:),intent(in) :: val    !! value
+
+    call json%add(p, to_unicode(name), val)
+
+    end subroutine wrap_json_value_add_logical_matrix
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -8253,6 +8751,120 @@
     call json%get(me,path=to_unicode(path),vec=vec,found=found)
 
     end subroutine wrap_json_get_integer_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Izaak Beekman
+!  date: 7/31/2019
+!
+!  Get an integer matrix from a [[json_value]].
+
+    subroutine json_get_integer_matrix(json, me, matrix)
+
+    implicit none
+
+    class(json_core),intent(inout)                   :: json
+    type(json_value),pointer                         :: me
+    integer(IK),dimension(:),allocatable,intent(out) :: matrix
+
+    logical(LK) :: initialized
+
+    if ( json%exception_thrown ) return
+
+    ! check for 0-length arrays first:
+    select case (me%var_type)
+    case (json_array)
+        if (json%count(me)==0) then
+            allocate(matrix(0))
+            return
+        end if
+    end select
+
+    initialized = .false.
+
+    !the callback function is called for each element of the array:
+    call json%get(me, array_callback=get_int_from_array)
+
+    if (json%exception_thrown .and. allocated(matrix)) deallocate(matrix)
+
+    contains
+
+        subroutine get_int_from_array(json, element, i, count)
+
+        !! callback function for integer
+
+        implicit none
+
+        class(json_core),intent(inout)      :: json
+        type(json_value),pointer,intent(in) :: element
+        integer(IK),intent(in)              :: i        !! index
+        integer(IK),intent(in)              :: count    !! size of array
+
+        !size the output array:
+        if (.not. initialized) then
+            allocate(matrix(count))
+            initialized = .true.
+        end if
+
+        !populate the elements:
+        call json%get(element, value=matrix(i))
+
+        end subroutine get_int_from_array
+
+    end subroutine json_get_integer_matrix
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Get an integer matrix from a [[json_value]], given the path string.
+
+    subroutine json_get_integer_matrix_by_path(json, me, path, matrix, found)
+
+    implicit none
+
+    class(json_core),intent(inout)                   :: json
+    type(json_value),pointer,intent(in)              :: me
+    character(kind=CK,len=*),intent(in)              :: path
+    integer(IK),dimension(:),allocatable,intent(out) :: matrix
+    logical(LK),intent(out),optional                 :: found
+
+    type(json_value),pointer :: p
+
+    call json%get(me, path, p, found)
+
+    if (present(found)) then
+        if (.not. found) return
+    else
+        if (json%exception_thrown) return
+    end if
+
+    call json%get(p, matrix)
+
+    if (present(found) .and. json%exception_thrown) then
+        call json%clear_exceptions()
+        found = .false.
+    end if
+
+    end subroutine json_get_integer_matrix_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Alternate version of [[json_get_integer_matrix_by_path]], where "path" is kind=CDK
+
+    subroutine wrap_json_get_integer_matrix_by_path(json, me, path, matrix, found)
+
+    implicit none
+
+    class(json_core),intent(inout)                   :: json
+    type(json_value),pointer                         :: me
+    character(kind=CDK,len=*),intent(in)             :: path
+    integer(IK),dimension(:),allocatable,intent(out) :: matrix
+    logical(LK),intent(out),optional                 :: found
+
+    call json%get(me,path=to_unicode(path),matrix=matrix,found=found)
+
+    end subroutine wrap_json_get_integer_matrix_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
