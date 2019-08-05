@@ -8763,9 +8763,9 @@
 
     implicit none
 
-    class(json_core),intent(inout)                   :: json
-    type(json_value),pointer                         :: me
-    integer(IK),dimension(:),allocatable,intent(out) :: matrix
+    class(json_core),intent(inout)                     :: json
+    type(json_value),pointer                           :: me
+    integer(IK),dimension(:,:),allocatable,intent(out) :: matrix
 
     logical(LK) :: initialized
 
@@ -8775,10 +8775,12 @@
     select case (me%var_type)
     case (json_array)
         if (json%count(me)==0) then
-            allocate(matrix(0))
+            allocate(matrix(0,0))
             return
         end if
     end select
+
+    call json_matrix_info(json,me,is_matrix,var_type,n_sets,mx_set_size,is_uniform,name)
 
     initialized = .false.
 
@@ -8802,12 +8804,12 @@
 
         !size the output array:
         if (.not. initialized) then
-            allocate(matrix(count))
+            allocate(matrix(count,count))
             initialized = .true.
         end if
 
         !populate the elements:
-        call json%get(element, value=matrix(i))
+        call json%get(element, value=matrix(i,j))
 
         end subroutine get_int_from_array
 
@@ -8822,11 +8824,11 @@
 
     implicit none
 
-    class(json_core),intent(inout)                   :: json
-    type(json_value),pointer,intent(in)              :: me
-    character(kind=CK,len=*),intent(in)              :: path
-    integer(IK),dimension(:),allocatable,intent(out) :: matrix
-    logical(LK),intent(out),optional                 :: found
+    class(json_core),intent(inout)                     :: json
+    type(json_value),pointer,intent(in)                :: me
+    character(kind=CK,len=*),intent(in)                :: path
+    integer(IK),dimension(:,:),allocatable,intent(out) :: matrix
+    logical(LK),intent(out),optional                   :: found
 
     type(json_value),pointer :: p
 
@@ -8856,11 +8858,11 @@
 
     implicit none
 
-    class(json_core),intent(inout)                   :: json
-    type(json_value),pointer                         :: me
-    character(kind=CDK,len=*),intent(in)             :: path
-    integer(IK),dimension(:),allocatable,intent(out) :: matrix
-    logical(LK),intent(out),optional                 :: found
+    class(json_core),intent(inout)                     :: json
+    type(json_value),pointer                           :: me
+    character(kind=CDK,len=*),intent(in)               :: path
+    integer(IK),dimension(:,:),allocatable,intent(out) :: matrix
+    logical(LK),intent(out),optional                   :: found
 
     call json%get(me,path=to_unicode(path),matrix=matrix,found=found)
 
