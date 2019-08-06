@@ -543,7 +543,6 @@
             json_get_logical_matrix,      MAYBEWRAP(json_get_logical_matrix_by_path),      &
             json_get_string,              MAYBEWRAP(json_get_string_by_path),              &
             json_get_string_vec,          MAYBEWRAP(json_get_string_vec_by_path),          &
-            json_get_alloc_string_matrix, MAYBEWRAP(json_get_alloc_string_matrix_by_path), &
             json_get_array,               MAYBEWRAP(json_get_array_by_path)
 
         procedure,private :: json_get_integer
