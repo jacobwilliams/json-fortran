@@ -74,7 +74,7 @@ endif()
 # Get version (semantic versioning)
 # C.F. semver.org
 #----------------------------------
-file ( STRINGS "${CMAKE_SOURCE_DIR}/.VERSION" VERSION )
+file ( STRINGS "${PROJECT_SOURCE_DIR}/.VERSION" VERSION )
 string( REPLACE "." ";" VERSION_LIST ${VERSION} )
 list(GET VERSION_LIST 0 VERSION_MAJOR)
 list(GET VERSION_LIST 1 VERSION_MINOR)
@@ -92,13 +92,13 @@ set ( JF_LIB_SRCS  src/json_kinds.F90
                    src/json_file_module.F90
                    src/json_module.F90 )
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
-set ( JF_TEST_UCS4_SUPPORT_SRC "${CMAKE_SOURCE_DIR}/src/tests/introspection/test_iso_10646_support.f90")
+set ( JF_TEST_UCS4_SUPPORT_SRC "${PROJECT_SOURCE_DIR}/src/tests/introspection/test_iso_10646_support.f90")
 
 #-----------------------------------------
 # Collect all the mod files into their own
 # directory to ease installation issues
 #-----------------------------------------
-set ( MODULE_DIR "${CMAKE_BINARY_DIR}/include" )
+set ( MODULE_DIR "${PROJECT_BINARY_DIR}/include" )
 
 #-------------------------------------
 # Define where our files get installed
@@ -109,7 +109,7 @@ set ( USE_GNU_INSTALL_CONVENTION FALSE
 
 # Set the package name to be specific to the compiler used, so that
 # versions compiled with different compilers can be installed in parallel
-string ( TOLOWER ${CMAKE_PROJECT_NAME}-${CMAKE_Fortran_COMPILER_ID} PACKAGE_NAME )
+string ( TOLOWER ${PROJECT_NAME}-${CMAKE_Fortran_COMPILER_ID} PACKAGE_NAME )
 set ( PACKAGE_VERSION "${PACKAGE_NAME}-${VERSION}" )
 
 if (USE_GNU_INSTALL_CONVENTION)
@@ -153,7 +153,7 @@ set ( ENABLE_UNICODE FALSE CACHE BOOL
   "Enable unicode/UCS4 support" )
 if ( ENABLE_UNICODE )
   try_run( UCS4_TEST_RUNS UCS4_TEST_COMPILES
-    ${CMAKE_BINARY_DIR}/bin ${JF_TEST_UCS4_SUPPORT_SRC} )
+    ${PROJECT_BINARY_DIR}/bin ${JF_TEST_UCS4_SUPPORT_SRC} )
   if (UCS4_TEST_RUNS EQUAL 0)
     add_definitions (-DUSE_UCS4)
   else ()
@@ -166,7 +166,7 @@ endif ()
 # Build a shared and static library by default
 #---------------------------------------------
 
-set ( LIB_NAME ${CMAKE_PROJECT_NAME} )
+set ( LIB_NAME ${PROJECT_NAME} )
 add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
 add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
 
@@ -184,7 +184,7 @@ set_target_properties ( ${LIB_NAME}-static
   PREFIX lib
   endif()
   VERSION ${VERSION}
-  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+  ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
   Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
 set_target_properties ( ${LIB_NAME}
   PROPERTIES
@@ -194,8 +194,8 @@ set_target_properties ( ${LIB_NAME}
   endif()
   SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR}
   VERSION ${VERSION}
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-  Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR} )
+  LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+  Fortran_MODULE_DIRECTORY ${PROJECT_BINARY_DIR} )
 
 #-------------------------------------
 # Build the documentation with FORD
@@ -205,12 +205,12 @@ set ( SKIP_DOC_GEN FALSE CACHE BOOL
 if ( NOT SKIP_DOC_GEN )
   find_program ( FORD ford )
   if ( FORD ) # Found
-    file ( COPY "${CMAKE_SOURCE_DIR}/media" DESTINATION "${CMAKE_BINARY_DIR}/" )
-    file ( GLOB_RECURSE PAGES_FILES "${CMAKE_SOURCE_DIR}/pages/*.*")
-    set ( DOC_DIR "${CMAKE_BINARY_DIR}/doc" )
-    set ( PAGES_DIR "${CMAKE_SOURCE_DIR}/pages" )
-    set ( PROJ_DIR "${CMAKE_SOURCE_DIR}/src" )
-    set ( FORD_PROJECT_FILE "${CMAKE_SOURCE_DIR}/json-fortran.md" )
+    file ( COPY "${PROJECT_SOURCE_DIR}/media" DESTINATION "${PROJECT_BINARY_DIR}/" )
+    file ( GLOB_RECURSE PAGES_FILES "${PROJECT_SOURCE_DIR}/pages/*.*")
+    set ( DOC_DIR "${PROJECT_BINARY_DIR}/doc" )
+    set ( PAGES_DIR "${PROJECT_SOURCE_DIR}/pages" )
+    set ( PROJ_DIR "${PROJECT_SOURCE_DIR}/src" )
+    set ( FORD_PROJECT_FILE "${PROJECT_SOURCE_DIR}/json-fortran.md" )
     if ( ENABLE_UNICODE )
       set ( MACRO_FLAG "-m USE_UCS4" )
     else ()
@@ -222,7 +222,7 @@ if ( NOT SKIP_DOC_GEN )
     else ()
       set ( FPP "gfortran -E\n" ) # default to gfortran -E for gfortran and unsupported compilers
     endif ()
-    file ( WRITE "${CMAKE_BINARY_DIR}/.PREPROCESSOR" "${FPP}" )
+    file ( WRITE "${PROJECT_BINARY_DIR}/.PREPROCESSOR" "${FPP}" )
     # Dynamically generate the FORD outputs list
     message ( STATUS "Dynamically computing FORD output information..." )
     if ( NOT (DEFINED FORD_OUTPUTS_CACHED) )
@@ -244,16 +244,16 @@ if ( NOT SKIP_DOC_GEN )
     endif ()
     message ( STATUS "Done dynamically computing FORD outputs." )
 
-    foreach ( DOC_SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} ${CMAKE_SOURCE_DIR}/README.md
-	${CMAKE_SOURCE_DIR}/CHANGELOG.md ${CMAKE_SOURCE_DIR}/.github/CONTRIBUTING.md
-	${CMAKE_SOURCE_DIR}/LICENSE ${CMAKE_SOURCE_DIR}/json-fortran.md ${PAGES_FILES} )
+    foreach ( DOC_SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} ${PROJECT_SOURCE_DIR}/README.md
+	${PROJECT_SOURCE_DIR}/CHANGELOG.md ${PROJECT_SOURCE_DIR}/.github/CONTRIBUTING.md
+	${PROJECT_SOURCE_DIR}/LICENSE ${PROJECT_SOURCE_DIR}/json-fortran.md ${PAGES_FILES} )
       list ( APPEND FORD_DEPENDS "${DOC_SRC_FILE}" )
     endforeach ()
     add_custom_command ( OUTPUT ${FORD_OUTPUTS_CACHED}
-      COMMAND "${FORD}" --debug ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${CMAKE_SOURCE_DIR}/pages" "${FORD_PROJECT_FILE}"
+      COMMAND "${FORD}" --debug ${MACRO_FLAG} -d "${PROJ_DIR}" -o "${DOC_DIR}" -p "${PROJECT_SOURCE_DIR}/pages" "${FORD_PROJECT_FILE}"
       MAIN_DEPENDENCY "${FORD_PROJECT_FILE}"
       DEPENDS ${FORD_DEPENDS}
-      COMMENT "Building HTML documentation for ${CMAKE_PROJECT_NAME} using FORD" )
+      COMMENT "Building HTML documentation for ${PROJECT_NAME} using FORD" )
     add_custom_target ( documentation ALL
       DEPENDS ${FORD_OUTPUTS_CACHED} )
     set ( INSTALL_API_DOCUMENTATION TRUE
@@ -290,7 +290,7 @@ if ( ENABLE_TESTS )
 
   find_program ( JSONLINT jsonlint )
 
-  set ( DATA_DIR "${CMAKE_SOURCE_DIR}/files" )
+  set ( DATA_DIR "${PROJECT_SOURCE_DIR}/files" )
 
   set_directory_properties ( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
     "${FORD_CLEAN_OUTPUTS}" )
@@ -323,13 +323,13 @@ if ( ENABLE_TESTS )
   endif ()
 
   add_test(NAME jf-cleanup-fixture
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/files")
+    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${PROJECT_BINARY_DIR}/files")
   set_tests_properties(jf-cleanup-fixture
     PROPERTIES FIXTURES_SETUP JF)
   add_test(NAME jf-setup-fixture
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${DATA_DIR}" "${CMAKE_BINARY_DIR}/files")
+    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${DATA_DIR}" "${PROJECT_BINARY_DIR}/files")
   set_tests_properties(jf-setup-fixture
     PROPERTIES FIXTURES_SETUP JF
     DEPENDS jf-cleanup-fixture)
@@ -338,7 +338,7 @@ if ( ENABLE_TESTS )
   foreach ( UNIT_TEST ${JF_TEST_SRCS} )
     get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
     if(MSVC_IDE)
-      link_directories(${CMAKE_BINARY_DIR}/lib)
+      link_directories(${PROJECT_BINARY_DIR}/lib)
     endif()
     add_executable ( ${TEST} EXCLUDE_FROM_ALL ${UNIT_TEST} )
     target_link_libraries ( ${TEST} ${LIB_NAME} )
@@ -346,9 +346,9 @@ if ( ENABLE_TESTS )
     add_dependencies ( build_tests ${TEST} )
     set_target_properties ( ${TEST}
       PROPERTIES
-      RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+      RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin )
     add_test( NAME ${TEST}
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+      WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/bin
       COMMAND ./${TEST})
     set_tests_properties( ${TEST}
       PROPERTIES FIXTURES_REQUIRED JF)
@@ -375,7 +375,7 @@ if ( ENABLE_TESTS )
     foreach ( JSON_FILE ${EXPECTED_OUTPUTS} )
       get_filename_component ( TESTNAME ${JSON_FILE} NAME )
       add_test ( NAME validate-output-${TESTNAME}
-	      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/files"
+	      WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/files"
 	      COMMAND ${JSONLINT} "--allow=nonescape-characters" ${TESTNAME} )
       set_property ( TEST validate-output-${TESTNAME}
 	      APPEND
@@ -392,7 +392,7 @@ if ( ENABLE_TESTS )
   foreach ( JSON_FILE ${EXPECTED_OUTPUTS} )
     get_filename_component (OUTPUT ${JSON_FILE} NAME )
     add_test ( NAME regression-${OUTPUT}
-	    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/files"
+	    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/files"
 	    COMMAND ${CMAKE_COMMAND} -E compare_files ${JSON_FORTRAN_COMPARE_FLAG} ${OUTPUT} expected-outputs/${OUTPUT} )
     set_property ( TEST regression-${OUTPUT}
 	    APPEND
@@ -429,11 +429,11 @@ install(
 # Add portable unistall command to makefile
 #------------------------------------------
 # Adapted from the CMake Wiki FAQ
-configure_file ( "${CMAKE_SOURCE_DIR}/cmake/uninstall.cmake.in" "${CMAKE_BINARY_DIR}/uninstall.cmake"
+configure_file ( "${PROJECT_SOURCE_DIR}/cmake/uninstall.cmake.in" "${PROJECT_BINARY_DIR}/uninstall.cmake"
     @ONLY)
 
 add_custom_target ( uninstall
-    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/uninstall.cmake" )
+    COMMAND ${CMAKE_COMMAND} -P "${PROJECT_BINARY_DIR}/uninstall.cmake" )
 
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
@@ -441,7 +441,7 @@ add_custom_target ( uninstall
 install ( EXPORT ${PACKAGE_NAME}-targets DESTINATION "${EXPORT_INSTALL_DIR}" )
 
 include ( CMakePackageConfigHelpers ) # Standard CMake module
-write_basic_package_version_file( "${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
+write_basic_package_version_file( "${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
   VERSION ${VERSION}
   COMPATIBILITY SameMajorVersion )
 
@@ -450,15 +450,15 @@ include ( cmake/FCompilerConsistencyCheck.cmake )
 
 # install package config file
 configure_package_config_file (
-  "${CMAKE_SOURCE_DIR}/cmake/pkg/${CMAKE_PROJECT_NAME}-config.cmake.in"
-  "${CMAKE_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake"
+  "${PROJECT_SOURCE_DIR}/cmake/pkg/${PROJECT_NAME}-config.cmake.in"
+  "${PROJECT_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake"
   INSTALL_DESTINATION "${EXPORT_INSTALL_DIR}"
   PATH_VARS EXPORT_INSTALL_DIR INSTALL_MOD_DIR )
 
 # Install the config and version files so that we can find this project with others
 install ( FILES
-  "${CMAKE_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake"
-  "${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
+  "${PROJECT_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake"
+  "${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
   DESTINATION "${EXPORT_INSTALL_DIR}" )
 
 #----------------------------------------------
@@ -468,8 +468,8 @@ export ( TARGETS ${LIB_NAME} ${LIB_NAME}-static FILE ${PACKAGE_NAME}-targets.cma
 
 # build tree package config file, NOT installed
 configure_file (
-  "${CMAKE_SOURCE_DIR}/cmake/${CMAKE_PROJECT_NAME}-config.cmake.in"
-  "${CMAKE_BINARY_DIR}/${PACKAGE_NAME}-config.cmake"
+  "${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}-config.cmake.in"
+  "${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config.cmake"
   @ONLY )
 
 set ( ENABLE_BUILD_TREE_EXPORT FALSE CACHE BOOL
