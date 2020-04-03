@@ -11211,8 +11211,6 @@
                     ! it is an integer:
                     ival = json%string_to_int(tmp)
 
-                    ! strict_integer_type_checking ... new option...
-
                     if (json%exception_thrown .and. .not. json%strict_integer_type_checking) then
                         ! if it couldn't be converted to an integer,
                         ! then try to convert it to a real value and see if that works
