@@ -278,6 +278,14 @@
                                               !! `ieee_quiet_nan` for NaN values. If false,
                                               !! `ieee_signaling_nan` will be used.
 
+        logical(LK) :: strict_integer_type_checking = .true.
+                            !! * If false, when parsing JSON, if an integer numeric value
+                            !!   cannot be converted to an integer (`integer(IK)`),
+                            !!   then an attempt is then make to convert it
+                            !!   to a real (`real(RK)`).
+                            !! * If true [default], an exception will be raised if an integer
+                            !!   value cannot be read when parsing JSON.
+
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
         integer :: filesize = 0 !! the file size when when `use_unformatted_stream=True`
@@ -1123,6 +1131,10 @@
 
     if (present(use_quiet_nan)) then
         me%use_quiet_nan = use_quiet_nan
+    end if
+
+    if (present(strict_integer_type_checking)) then
+        me%strict_integer_type_checking = strict_integer_type_checking
     end if
 
     !Set the format for real numbers:
@@ -6772,6 +6784,7 @@
     logical(LK)              :: created     !! if `create` is true, then this will be
                                             !! true if the leaf object had to be created
     integer(IK)              :: j           !! counter of children when creating object
+    logical(LK)              :: status_ok   !! integer to string conversion flag
 
     nullify(p)
 
@@ -6877,7 +6890,13 @@
                     exit
                 end if
                 array = .false.
-                child_i = json%string_to_int(path(child_i:i-1))
+                call string_to_integer(path(child_i:i-1),child_i,status_ok)
+                if (.not. status_ok) then
+                    call json%throw_exception('Error in json_get_by_path_default:'//&
+                                              ' Could not convert array index to integer: '//&
+                                              trim(path(child_i:i-1)),found)
+                    exit
+                end if
 
                 nullify(tmp)
                 if (create) then
@@ -7991,8 +8010,8 @@
         if (.not. status_ok) then
             ival = 0
             call json%throw_exception('Error in string_to_int: '//&
-                                      'string cannot be converted to an integer: '//&
-                                      trim(str))
+                                    'string cannot be converted to an integer: '//&
+                                    trim(str))
         end if
 
     else
@@ -11128,6 +11147,8 @@
     type(json_value),pointer            :: value
 
     character(kind=CK,len=:),allocatable :: tmp !! temp string
+    character(kind=CK,len=:),allocatable :: saved_err_message !! temp error message for
+                                                              !! string to int conversion
     character(kind=CK,len=1) :: c           !! character returned by [[pop_char]]
     logical(LK)              :: eof         !! end of file flag
     real(RK)                 :: rval        !! real value
@@ -11187,9 +11208,33 @@
 
                 !string to value:
                 if (is_integer) then
+                    ! it is an integer:
                     ival = json%string_to_int(tmp)
-                    call json%to_integer(value,ival)
+
+                    ! strict_integer_type_checking ... new option...
+
+                    if (json%exception_thrown .and. .not. json%strict_integer_type_checking) then
+                        ! if it couldn't be converted to an integer,
+                        ! then try to convert it to a real value and see if that works
+
+                        saved_err_message = json%err_message  ! keep the original error message
+                        call json%clear_exceptions()          ! clear exceptions
+                        rval = json%string_to_dble(tmp)
+                        if (json%exception_thrown) then
+                            ! restore original error message and continue
+                            json%err_message = saved_err_message
+                            call json%to_integer(value,ival) ! just so we have something
+                        else
+                            ! in this case, we return a real
+                            call json%to_real(value,rval)
+                        end if
+
+                    else
+                        call json%to_integer(value,ival)
+                    end if
+
                 else
+                    ! it is a real:
                     rval = json%string_to_dble(tmp)
                     call json%to_real(value,rval)
                 end if
