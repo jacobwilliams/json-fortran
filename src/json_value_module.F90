@@ -8080,12 +8080,12 @@
             !type conversions
             select case(me%var_type)
             case (json_real)
-                value = int(me%dbl_value)
+                value = int(me%dbl_value, IK)
             case (json_logical)
                 if (me%log_value) then
-                    value = 1
+                    value = 1_IK
                 else
-                    value = 0
+                    value = 0_IK
                 end if
             case (json_string)
                 call string_to_integer(me%str_value,value,status_ok)
@@ -8310,7 +8310,7 @@
             !type conversions
             select case (me%var_type)
             case (json_integer)
-                value = me%int_value
+                value = real(me%int_value, RK)
             case (json_logical)
                 if (me%log_value) then
                     value = 1.0_RK
