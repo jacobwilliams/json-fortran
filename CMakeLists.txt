@@ -385,7 +385,7 @@ if ( ENABLE_TESTS )
   endif ()
 
   # Check output for differences
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.14)
+  if(CMAKE_VERSION VERSION_GREATER 3.13.5)
     set( JSON_FORTRAN_COMPARE_FLAG "--ignore-eol")
   endif()
 
