@@ -72,7 +72,7 @@ git rebase upstream/master
 ```
 - Create a branch in your fork with a descriptive name that also includes the [issue number](https://github.com/jacobwilliams/json-fortran/issues), if applicable. For example, after forking the repo, you can run something like `git checkout -b Unicode-support-issue-35` before starting work on [issue #35 : Unicode support](https://github.com/jacobwilliams/json-fortran/issues/35)
 - When you're content with your changes, your commits are clean, self contained, with concise descriptive messages, and your changes compile and pass the tests, submit a pull request. We will review your changes, and may ask for certain modifications to be made.
-- Pull requests are tested by our [travis-ci](https://travis-ci.org/jacobwilliams/json-fortran) continuous integration system, and any errors uncovered will need to be fixed before the pull request can be merged into master.
+- Pull requests are tested by our [travis-ci](https://travis-ci.com/jacobwilliams/json-fortran) continuous integration system, and any errors uncovered will need to be fixed before the pull request can be merged into master.
 - The JSON-Fortran library and associated documentation is released under a BSD style [license](https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE).  By submitting a pull request, you are agreeing to release your code under the same license.  Note that code with GPL or other "copyleft" style licenses will not be accepted.
 
 [top](#contributing-to-json-fortran)
