@@ -30,10 +30,10 @@ contains
     integer :: i !! counter
     integer(IK),dimension(:),allocatable :: ilen
     character(kind=CK,len=:),allocatable :: str
-    logical(LK) :: is_matrix
+    logical(LK) :: is_matrix, is_uniform
     integer(IK) :: var_type
     integer(IK) :: n_sets
-    integer(IK) :: set_size
+    integer(IK) :: mx_set_size
     character(kind=CK,len=:),allocatable :: name
 
     error_cnt = 0
@@ -95,42 +95,44 @@ contains
             ! valid matrix:
             str = CK_'{"matrix":[[1,2,3,4],[5,6,7,8],[9,10,11,12]]}'
         case(2)
-            ! not valid (wrong number of elements)
-            str = CK_'{"matrix":[[1,2,3],[5,6,7,8],[9,10,11,12]]}'
-        case(3)
             ! not valid (not same types)
             str = CK_'{"matrix":[["a",2,3,4],[5,6,7,8],[9,10,11,12]]}'
+        case(3)
+            ! not valid (wrong number of elements)
+            str = CK_'{"matrix":[[1,2,3],[5,6,7,8],[9,10,11,12]]}'
         end select
 
         call json%initialize()
         call json%deserialize(p,str)
 
         call json%matrix_info(p,is_matrix,var_type,&
-                                n_sets,set_size,name)
+                                n_sets,mx_set_size,is_uniform,name)
         call json%initialize()
 
         ! without found:
         call json%matrix_info(p,'path.not.there',is_matrix,&
                                var_type=var_type,n_sets=n_sets,&
-                               set_size=set_size,name=name)
+                               mx_set_size=mx_set_size,is_uniform=is_uniform,&
+                               name=name)
         call json%initialize()
 
         call json%matrix_info(p,'matrix',is_matrix,&
                                var_type=var_type,n_sets=n_sets,&
-                               set_size=set_size,name=name)
+                               mx_set_size=mx_set_size,is_uniform=is_uniform,&
+                               name=name)
         call json%initialize()
 
         ! with found:
         call json%matrix_info(p,'path.not.there',is_matrix,&
                                var_type=var_type,n_sets=n_sets,&
-                               set_size=set_size,name=name,&
-                               found=found)
+                               mx_set_size=mx_set_size,name=name,&
+                               is_uniform=is_uniform,found=found)
         call json%initialize()
 
         call json%matrix_info(p,'matrix',is_matrix,&
                                var_type=var_type,n_sets=n_sets,&
-                               set_size=set_size,name=name,&
-                               found=found)
+                               mx_set_size=mx_set_size,name=name,&
+                               is_uniform=is_uniform,found=found)
         call json%initialize()
 
         call json%destroy(p)

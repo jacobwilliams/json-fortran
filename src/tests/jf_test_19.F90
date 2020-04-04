@@ -25,8 +25,8 @@ contains
 
     type(json_core) :: json
     type(json_value),pointer :: p,p_matrix
-    logical(lk) :: is_matrix,found
-    integer(ik) :: var_type,n_sets,set_size
+    logical(lk) :: is_matrix,found,is_uniform
+    integer(ik) :: var_type,n_sets,mx_set_size
     character(kind=CK,len=:),allocatable :: name
 
     !>
@@ -37,8 +37,15 @@ contains
         '        [1,2,3,4],'//&
         '        [1,2,3,4],'//&
         '        [1,2,3,4]'//&
-        '    ]'//&
+        '    ],'//&
+        '    "ragged": ['//&
+        '        [1.0, 2.0],'//&
+        '        [1.0, 2.0, 3.0],'//&
+        '        [1.0],'//&
+        '    ],'//&
         '}'
+
+    is_uniform = .false.
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -58,7 +65,8 @@ contains
 
     !get some info:
     call json%get(p,ck_'matrix',p_matrix)
-    call json%matrix_info(p_matrix,is_matrix,var_type,n_sets,set_size,name)
+    call json%matrix_info(p_matrix,is_matrix,var_type,n_sets,mx_set_size,&
+        is_uniform,name)
 
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -67,7 +75,8 @@ contains
         if (is_matrix .and. &
             var_type==json_integer .and. &
             n_sets==3 .and. &
-            set_size==4 .and. &
+            mx_set_size==4 .and. &
+            is_uniform .and. &
             name=='matrix') then
             write(error_unit,'(A)') '...success'
         else
@@ -75,7 +84,8 @@ contains
             write(error_unit,*) 'is_matrix:',is_matrix
             write(error_unit,*) 'var_type :',var_type
             write(error_unit,*) 'n_sets   :',n_sets
-            write(error_unit,*) 'set_size :',set_size
+            write(error_unit,*) 'mx_set_size :',mx_set_size
+            write(error_unit,*) 'is_uniform :',is_uniform
             write(error_unit,*) 'name     :'//name
             error_cnt = error_cnt + 1
         end if
@@ -83,7 +93,8 @@ contains
 
     !now test with a variable that is NOT a matrix:
     call json%get(p,ck_'matrix(1)',p_matrix)
-    call json%matrix_info(p_matrix,is_matrix,var_type,n_sets,set_size,name)
+    call json%matrix_info(p_matrix,is_matrix,var_type,n_sets,mx_set_size,&
+        is_uniform,name)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
@@ -99,7 +110,8 @@ contains
     ! now, test by path:
     call json%matrix_info(p,ck_'matrix',is_matrix,&
                             var_type=var_type,n_sets=n_sets,&
-                            set_size=set_size,name=name)
+                            mx_set_size=mx_set_size,&
+                            is_uniform=is_uniform,name=name)
 
     if (json%failed()) then
         call json%print_error_message(error_unit)
@@ -108,7 +120,8 @@ contains
         if (is_matrix .and. &
             var_type==json_integer .and. &
             n_sets==3 .and. &
-            set_size==4 .and. &
+            mx_set_size==4 .and. &
+            is_uniform .and. &
             name=='matrix') then
             write(error_unit,'(A)') '...success'
         else
@@ -116,7 +129,8 @@ contains
             write(error_unit,*) 'is_matrix:',is_matrix
             write(error_unit,*) 'var_type :',var_type
             write(error_unit,*) 'n_sets   :',n_sets
-            write(error_unit,*) 'set_size :',set_size
+            write(error_unit,*) 'mx_set_size :',mx_set_size
+            write(error_unit,*) 'is_uniform :',is_uniform
             write(error_unit,*) 'name     :'//name
             error_cnt = error_cnt + 1
         end if
@@ -125,14 +139,16 @@ contains
     !also test with "found" input:
     call json%matrix_info(p,ck_'matrix',is_matrix,found=found,&
                             var_type=var_type,n_sets=n_sets,&
-                            set_size=set_size,name=name)
+                            mx_set_size=mx_set_size,&
+                            is_uniform=is_uniform,name=name)
     if (found) then
         write(error_unit,'(A)') '...success'
 
         !test again with CDK path (for unicode wrapper)
         call json%matrix_info(p,CDK_'matrix',is_matrix,found=found,&
                                 var_type=var_type,n_sets=n_sets,&
-                                set_size=set_size,name=name)
+                                mx_set_size=mx_set_size,&
+                                is_uniform=is_uniform,name=name)
 
 
     else
@@ -143,11 +159,90 @@ contains
     !now test with a variable that is NOT a matrix:
     call json%matrix_info(p,ck_'matrix(1)',is_matrix,found=found,&
                             var_type=var_type,n_sets=n_sets,&
-                            set_size=set_size,name=name)
+                            mx_set_size=mx_set_size,&
+                            is_uniform=is_uniform,name=name)
     if (.not. is_matrix) then
         write(error_unit,'(A)') '...success'
     else
         write(error_unit,'(A)') 'Error: this should not be a matrix:'
+        error_cnt = error_cnt + 1
+    end if
+
+    !now test with a ragged edge matrix
+    nullify(p_matrix)
+    call json%get(p,ck_'ragged',p_matrix)
+    call json%matrix_info(p_matrix,is_matrix,var_type,n_sets,mx_set_size,&
+        is_uniform,name)
+
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        if (is_matrix .and. &
+            var_type==json_real .and. &
+            n_sets==3 .and. &
+            mx_set_size==3 .and. &
+            (.not. is_uniform) .and. &
+            name=='ragged') then
+            write(error_unit,'(A)') '...success'
+        else
+            write(error_unit,'(A)') 'Error getting matrix info:'
+            write(error_unit,*) 'is_matrix:',is_matrix
+            write(error_unit,*) 'var_type :',var_type
+            write(error_unit,*) 'n_sets   :',n_sets
+            write(error_unit,*) 'mx_set_size :',mx_set_size
+            write(error_unit,*) 'is_uniform :',is_uniform
+            write(error_unit,*) 'name     :'//name
+            error_cnt = error_cnt + 1
+        end if
+    end if
+
+    ! now, test by path:
+    call json%matrix_info(p,ck_'ragged',is_matrix,&
+                            var_type=var_type,n_sets=n_sets,&
+                            mx_set_size=mx_set_size,&
+                            is_uniform=is_uniform,name=name)
+
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    else
+        if (is_matrix .and. &
+            var_type==json_real .and. &
+            n_sets==3 .and. &
+            mx_set_size==3 .and. &
+            (.not. is_uniform) .and. &
+            name=='ragged') then
+            write(error_unit,'(A)') '...success'
+        else
+            write(error_unit,'(A)') 'Error getting matrix info by path:'
+            write(error_unit,*) 'is_matrix:',is_matrix
+            write(error_unit,*) 'var_type :',var_type
+            write(error_unit,*) 'n_sets   :',n_sets
+            write(error_unit,*) 'mx_set_size :',mx_set_size
+            write(error_unit,*) 'is_uniform :',is_uniform
+            write(error_unit,*) 'name     :'//name
+            error_cnt = error_cnt + 1
+        end if
+    end if
+
+    !also test with "found" input:
+    call json%matrix_info(p,ck_'ragged',is_matrix,found=found,&
+                            var_type=var_type,n_sets=n_sets,&
+                            mx_set_size=mx_set_size,&
+                            is_uniform=is_uniform,name=name)
+    if (found) then
+        write(error_unit,'(A)') '...success'
+
+        !test again with CDK path (for unicode wrapper)
+        call json%matrix_info(p,CDK_'ragged',is_matrix,found=found,&
+                                var_type=var_type,n_sets=n_sets,&
+                                mx_set_size=mx_set_size,&
+                                is_uniform=is_uniform,name=name)
+
+
+    else
+        write(error_unit,*) 'error calling json_matrix_info_by_path with found input'
         error_cnt = error_cnt + 1
     end if
 
