@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.0.0 (2020-04-04)](#800-2020-04-04)
     - [7.1.0 (2019-06-23)](#710-2019-06-23)
     - [7.0.0 (2019-01-26)](#700-2019-01-26)
     - [6.11.0 (2019-01-19)](#611-2019-01-19)
@@ -36,16 +37,42 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.1.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.0.0...HEAD)
+
+### [8.0.0](https://github.com/jacobwilliams/json-fortran/tree/8.0.0) (2020-04-04)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/7.1.0...8.0.0)
+or [Download v8.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/8.0.0)
 
 **Enhancements:**
 
-- Allow linking to JSON-Fortran from GFortran programs using
-  [OpenCoarrays](https://github.com/sourceryinstitute/OpenCoarrays#readme)
-  as the coarray runtime implementation. Use the
-  `-DJSON_FORTRAN_USE_OpenCoarrays:BOOL=ON` option to cmake to enable
-  this. (NOTE: The fact that this is required may be a bug in
-  GFortran.)
+- Cleanup of the API for reading and writing JSON. The main methods are now called `print`, `load`, `serialize` and `deserialize`. Note that the previous ones are still present for backward compatibility.  [\#397](https://github.com/jacobwilliams/json-fortran/issues/397) [\#409](https://github.com/jacobwilliams/json-fortran/pull/409) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a finalizer to the `json_file` type [\#199](https://github.com/jacobwilliams/json-fortran/issues/199) [\#406](https://github.com/jacobwilliams/json-fortran/pull/406) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added new optional arguments (`null_to_real_mode`, `non_normal_mode`, `use_quiet_nan`) to the `initialize` routines to handle NaN and Infinity. [\#395](https://github.com/jacobwilliams/json-fortran/issues/395)
+- Added a new optional argument (`strict_integer_type_checking`) to the initialize routines. If enabled, when parsing an integer value, if the parsing fails (e.g., the integer is outside the range of the integer kind), it will then attempt to convert it to a real. [\#444](https://github.com/jacobwilliams/json-fortran/issues/444) [\#446](https://github.com/jacobwilliams/json-fortran/pull/446) ([jacobwilliams](https://github.com/jacobwilliams))
+- `json_info` will now check for exceptions and raise one if the pointer is not associated [\#424](https://github.com/jacobwilliams/json-fortran/issues/424) [\#425](https://github.com/jacobwilliams/json-fortran/pull/425) ([jacobwilliams](https://github.com/jacobwilliams))
+- Allow the parser to work with some nonstandard real value representations (leading `+`, no leading digit before decimal, `D/d` format). [\#417](https://github.com/jacobwilliams/json-fortran/issues/417) [\#418](https://github.com/jacobwilliams/json-fortran/pull/418) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a character string to `json_file` assignment operator [\#410](https://github.com/jacobwilliams/json-fortran/issues/410) [\#411](https://github.com/jacobwilliams/json-fortran/pull/411) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added a `json_print_to_console` method to `json_core` to match the one in `json_file` [\#408](https://github.com/jacobwilliams/json-fortran/issues/408)
+- The output array is now deallocated if an exception occurs in a `json_get_*_vec` routine [\#416](https://github.com/jacobwilliams/json-fortran/issues/416) [\#419](https://github.com/jacobwilliams/json-fortran/pull/419) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Bug fixes:**
+
+- Fixed a crash in `json_file_check_for_errors` if the `error_msg` was not present. [\#420](https://github.com/jacobwilliams/json-fortran/issues/420)
+- Fixed a potential issue with real to integer conversion when the library is compiled with a non-default integer kind. [\#449](https://github.com/jacobwilliams/json-fortran/issues/449) [\#450](https://github.com/jacobwilliams/json-fortran/pull/450) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed a dangling pointer in unit test 10. [\#422](https://github.com/jacobwilliams/json-fortran/issues/422) [\#423](https://github.com/jacobwilliams/json-fortran/pull/423) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**CMake updates:**
+
+- Updated CMake to enable building JSON-Fortran as a subdirectory of another project [\#445](https://github.com/jacobwilliams/json-fortran/issues/445) [\#443](https://github.com/jacobwilliams/json-fortran/pull/443) ([rouson](https://github.com/rouson))
+- Updated CMake for compatibility with older versions < 3.7.  [\#442](https://github.com/jacobwilliams/json-fortran/issues/442) [\#451](https://github.com/jacobwilliams/json-fortran/pull/451) [jacobwilliams](https://github.com/jacobwilliams))
+- Allow linking to JSON-Fortran from GFortran programs using [OpenCoarrays](https://github.com/sourceryinstitute/OpenCoarrays#readme) as the coarray runtime implementation. Use the `-DJSON_FORTRAN_USE_OpenCoarrays:BOOL=ON` option to CMake to enable this. (NOTE: The fact that this is required may be a bug in GFortran.)
+
+**CI updates:**
+
+- Updated the CI system to Travis-CI.com [\#447](https://github.com/jacobwilliams/json-fortran/issues/447) [\#448](https://github.com/jacobwilliams/json-fortran/pull/448) ([jacobwilliams](https://github.com/jacobwilliams))
+- Migrate test setup/teardown to fixtures [\#413](https://github.com/jacobwilliams/json-fortran/issues/413) [\#421](https://github.com/jacobwilliams/json-fortran/pull/421) ([zbeekman](https://github.com/zbeekman))
+- Expanded compiler tests on Travis-CI [\#414](https://github.com/jacobwilliams/json-fortran/pull/414) [\#180](https://github.com/jacobwilliams/json-fortran/issues/180) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [7.1.0](https://github.com/jacobwilliams/json-fortran/tree/7.1.0) (2019-06-23)
 
