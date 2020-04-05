@@ -104,3 +104,12 @@ logical(LK),intent(in),optional :: use_quiet_nan
   !!   `ieee_quiet_nan` for NaN values.
   !! * If false,
   !!   `ieee_signaling_nan` will be used.
+logical(LK),intent(in),optional :: strict_integer_type_checking
+  !! * If false, when parsing JSON, if an integer numeric value
+  !!   cannot be converted to an integer (`integer(IK)`),
+  !!   then an attempt is then make to convert it
+  !!   to a real (`real(RK)`).
+  !! * If true, an exception will be raised if the integer
+  !!   value cannot be read.
+  !!
+  !! (default is true)

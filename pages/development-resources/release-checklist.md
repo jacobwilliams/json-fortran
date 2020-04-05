@@ -60,7 +60,7 @@ remain accurate.
      1. Note: for some reason, using GitHub to tag a project means that the tag doesn't show up when you `git describe` the project. Tagging from the command line makes `git describe` work as expected.
  1. [deploy.sh](deploy.sh.html) will publish the documentation for the
     latest tag from
-    [Travis-CI](https://travis-ci.org/jacobwilliams/json-fortran) to
+    [Travis-CI](https://travis-ci.com/jacobwilliams/json-fortran) to
     https://jacobwilliams.github.io/json-fortran/*new_ver*/ if all
     goes according to plan
  1. Push tags and master to GitHub: `git push --tags origin master`

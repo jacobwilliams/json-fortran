@@ -21,7 +21,7 @@ A Fortran 2008 JSON API
 
 Status
 ------
-[![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.org/jacobwilliams/json-fortran)
+[![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.com/github/jacobwilliams/json-fortran)
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Codecov](https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobwilliams/json-fortran)
 
@@ -121,7 +121,7 @@ cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 7.1.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 8.0.0 REQUIRED )
 include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
@@ -167,7 +167,7 @@ Miscellaneous
 
 * JSON-Fortran is a fork and extensive upgrade of the Fortran 95 [FSON](https://github.com/josephalevin/fson) code. The reason for the split was to be able to incorporate object-oriented and other nice features of the Fortran 2003 and 2008 standards.  Many thanks to the original authors of FSON.
 * For more information about JSON, see: <http://www.json.org/>
-* [json-fortran on Travis CI](https://travis-ci.org/jacobwilliams/json-fortran)
+* [json-fortran on Travis CI](https://travis-ci.com/jacobwilliams/json-fortran)
 * [json-fortran on Codecov.IO](https://codecov.io/gh/jacobwilliams/json-fortran)
 
 [top](#json-fortran)
