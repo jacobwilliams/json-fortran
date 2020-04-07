@@ -9476,7 +9476,7 @@
 !      higher-level routines are provided (see `get` methods), so
 !      this routine does not have to be used for those cases.
 
-    subroutine json_get_array(json, me, array_callback)
+    recursive subroutine json_get_array(json, me, array_callback)
 
     implicit none
 
@@ -9581,7 +9581,7 @@
 !  This routine calls the user-supplied array_callback subroutine
 !  for each element in the array (specified by the path).
 
-    subroutine json_get_array_by_path(json, me, path, array_callback, found)
+    recursive subroutine json_get_array_by_path(json, me, path, array_callback, found)
 
     implicit none
 
@@ -9626,7 +9626,7 @@
 !>
 !  Alternate version of [[json_get_array_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_array_by_path(json, me, path, array_callback, found)
+    recursive subroutine wrap_json_get_array_by_path(json, me, path, array_callback, found)
 
     implicit none
 
