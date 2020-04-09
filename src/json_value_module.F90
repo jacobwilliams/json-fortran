@@ -7757,8 +7757,8 @@
     integer(IK)              :: n_children     !! number of children for parent
     logical(LK)              :: use_brackets   !! to use '[]' characters for arrays
     logical(LK)              :: parent_is_root !! if the parent is the root
-    character(CK)            :: array_start    !! for `path_mode=1`, the character to start arrays
-    character(CK)            :: array_end      !! for `path_mode=1`, the character to end arrays
+    character(kind=CK,len=1) :: array_start    !! for `path_mode=1`, the character to start arrays
+    character(kind=CK,len=1) :: array_end      !! for `path_mode=1`, the character to end arrays
     logical                  :: consecutive_arrays      !! check for array of array case
     integer(IK)              :: parents_parent_var_type !! `var_type` for parent's parent
 
@@ -7955,7 +7955,7 @@
         !! prepend the string to the path
         implicit none
         character(kind=CK,len=*),intent(in) :: str  !! string to prepend to `path`
-        character(kind=CK,len=*),intent(in),optional :: path_sep
+        character(kind=CK,len=1),intent(in),optional :: path_sep
             !! path separator (default is '.').
             !! (ignored if `json%path_mode/=1`)
 
