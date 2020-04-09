@@ -22,7 +22,6 @@ contains
 
     integer,intent(out) :: error_cnt !! error counter
 
-    ! character(kind=CK,len=*),parameter :: str = CK_'{ "x": [0, [1,2,[3,3,[4,4]]], [4,5,6] ] }'
     character(kind=CK,len=*),parameter :: str = CK_'{ "x": [[1], [1,2,3,[4]]] }'
 
     type(json_core) :: json
