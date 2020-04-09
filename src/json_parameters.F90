@@ -35,7 +35,7 @@
                                                  !! (see [[json_file_variable_info]] and [[json_info]]).
     integer(IK),parameter :: json_real      = 6  !! Real number JSON data type (`real(RK)`)
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
-    integer(IK),parameter :: json_string    = 7  !! String JSON data type (`character(CK)`)
+    integer(IK),parameter :: json_string    = 7  !! String JSON data type (`character(kind=CK)`)
                                                  !! (see [[json_file_variable_info]] and [[json_info]])
     integer(IK),parameter :: json_double    = json_real  !! Equivalent to `json_real` for
                                                          !! backward compatibility.
