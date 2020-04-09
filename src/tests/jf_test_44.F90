@@ -84,8 +84,7 @@ contains
             call json%get(element, callback)
         else if (var_type == json_integer) then
             call json%get(element,ival)
-            !write(output_unit,'(A,1X,I2)') trim(path)//' = ', ival   ! see Issue #452
-            write(output_unit,'(I2,A,I2)') i,' : ', ival
+            write(output_unit,'(A,1X,I2)') trim(path)//' = ', ival
         end if
 
     end subroutine callback

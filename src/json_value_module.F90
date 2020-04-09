@@ -7745,17 +7745,22 @@
                                                               !! (otherwise use `json%path_separator`)
                                                               !! (only used if `path_mode=1`)
 
-    type(json_value),pointer                   :: tmp            !! for traversing the structure
-    type(json_value),pointer                   :: element        !! for traversing the structure
-    integer(IK)                                :: var_type       !! JSON variable type flag
-    character(kind=CK,len=:),allocatable       :: name           !! variable name
-    character(kind=CK,len=:),allocatable       :: parent_name    !! variable's parent name
-    character(kind=CK,len=max_integer_str_len) :: istr           !! for integer to string conversion
-                                                                 !! (array indices)
-    integer(IK)                                :: i              !! counter
-    integer(IK)                                :: n_children     !! number of children for parent
-    logical(LK)                                :: use_brackets   !! to use '[]' characters for arrays
-    logical(LK)                                :: parent_is_root !! if the parent is the root
+    character(kind=CK,len=:),allocatable       :: name         !! variable name
+    character(kind=CK,len=:),allocatable       :: parent_name  !! variable's parent name
+    character(kind=CK,len=max_integer_str_len) :: istr         !! for integer to string conversion
+                                                               !! (array indices)
+    type(json_value),pointer :: tmp            !! for traversing the structure
+    type(json_value),pointer :: element        !! for traversing the structure
+    integer(IK)              :: var_type       !! JSON variable type flag
+    integer(IK)              :: tmp_var_type   !! JSON variable type flag
+    integer(IK)              :: i              !! counter
+    integer(IK)              :: n_children     !! number of children for parent
+    logical(LK)              :: use_brackets   !! to use '[]' characters for arrays
+    logical(LK)              :: parent_is_root !! if the parent is the root
+    character(CK)            :: array_start    !! for `path_mode=1`, the character to start arrays
+    character(CK)            :: array_end      !! for `path_mode=1`, the character to end arrays
+    logical                  :: consecutive_arrays      !! check for array of array case
+    integer(IK)              :: parents_parent_var_type !! `var_type` for parent's parent
 
     !optional input:
     if (present(use_alt_array_tokens)) then
@@ -7763,6 +7768,19 @@
     else
         use_brackets = .true.
     end if
+
+    if (json%path_mode==1_IK) then
+        if (use_brackets) then
+            array_start = start_array
+            array_end   = end_array
+        else
+            array_start = start_array_alt
+            array_end   = end_array_alt
+        end if
+    end if
+
+    ! initialize:
+    consecutive_arrays = .false.
 
     if (associated(p)) then
 
@@ -7786,6 +7804,13 @@
                                n_children=n_children,name=parent_name)
                 if (json%path_mode==2_IK) then
                     parent_name = encode_rfc6901(parent_name)
+                end if
+                if (associated(tmp%parent%parent)) then
+                    call json%info(tmp%parent%parent,var_type=parents_parent_var_type)
+                    consecutive_arrays = parents_parent_var_type == json_array .and. &
+                                         var_type == json_array
+                else
+                    consecutive_arrays = .false.
                 end if
 
                 select case (var_type)
@@ -7816,36 +7841,52 @@
                         ! example: `$['key'][1]`
                         ! [note: this uses 1-based indices]
                         call integer_to_string(i,int_fmt,istr)
-                        call add_to_path(start_array//single_quote//parent_name//&
-                                         single_quote//end_array//&
-                                         start_array//trim(adjustl(istr))//end_array,CK_'')
+                        if (consecutive_arrays) then
+                            call add_to_path(start_array//trim(adjustl(istr))//end_array,CK_'')
+                        else
+                            call add_to_path(start_array//single_quote//parent_name//&
+                                             single_quote//end_array//&
+                                             start_array//trim(adjustl(istr))//end_array,CK_'')
+                        end if
                     case(2_IK)
                         ! rfc6901
+                        ! Example: '/key/0'
                         call integer_to_string(i-1_IK,int_fmt,istr) ! 0-based index
-                        call add_to_path(parent_name//slash//trim(adjustl(istr)))
+                        if (consecutive_arrays) then
+                            call add_to_path(trim(adjustl(istr)))
+                        else
+                            call add_to_path(parent_name//slash//trim(adjustl(istr)))
+                        end if
                     case(1_IK)
                         ! default
+                        ! Example: `key[1]`
                         call integer_to_string(i,int_fmt,istr)
-                        if (use_brackets) then
-                            call add_to_path(parent_name//start_array//&
-                                             trim(adjustl(istr))//end_array,path_sep)
+                        if (consecutive_arrays) then
+                            call add_to_path(array_start//trim(adjustl(istr))//array_end,path_sep)
                         else
-                            call add_to_path(parent_name//start_array_alt//&
-                                             trim(adjustl(istr))//end_array_alt,path_sep)
+                            call add_to_path(parent_name//array_start//&
+                                             trim(adjustl(istr))//array_end,path_sep)
                         end if
                     end select
-                    tmp => tmp%parent  ! already added parent name
+
+                    if (.not. consecutive_arrays) tmp => tmp%parent  ! already added parent name
 
                 case (json_object)
 
-                    !process parent on the next pass
-                    select case(json%path_mode)
-                    case(3_IK)
-                        call add_to_path(start_array//single_quote//name//&
-                                         single_quote//end_array,CK_'')
-                    case default
-                        call add_to_path(name,path_sep)
-                    end select
+                    if (.not. consecutive_arrays) then
+                        ! idea is not to print the array name if
+                        ! it was already printed with the array
+
+                        !process parent on the next pass
+                        select case(json%path_mode)
+                        case(3_IK)
+                            call add_to_path(start_array//single_quote//name//&
+                                            single_quote//end_array,CK_'')
+                        case default
+                            call add_to_path(name,path_sep)
+                        end select
+
+                    end if
 
                 case default
 
@@ -7938,12 +7979,20 @@
             if (.not. allocated(path)) then
                 path = str
             else
-                if (present(path_sep)) then
-                    ! use user specified:
-                    path = str//path_sep//path
+                ! shouldn't add the path_sep for cases like x[1][2]
+                ! [if current is an array element, and the previous was
+                ! also an array element] so check for that here:
+                if (.not. ( str(len(str):len(str))==array_end .and. &
+                            path(1:1)==array_start )) then
+                    if (present(path_sep)) then
+                        ! use user specified:
+                        path = str//path_sep//path
+                    else
+                        ! use the default:
+                        path = str//json%path_separator//path
+                    end if
                 else
-                    ! use the default:
-                    path = str//json%path_separator//path
+                    path = str//path
                 end if
             end if
         end select
