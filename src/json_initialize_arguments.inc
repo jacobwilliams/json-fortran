@@ -32,13 +32,13 @@ logical(LK),intent(in),optional :: unescape_strings
   !! string is returned from [[json_get_string]]
   !! and similar routines. If true [default],
   !! then the string is returned unescaped.
-character(kind=CK,len=1),intent(in),optional :: comment_char
-  !! If present, this character is used
+character(kind=CK,len=*),intent(in),optional :: comment_char
+  !! If present, these characters are used
   !! to denote comments in the JSON file,
   !! which will be ignored if present.
-  !! Example: `!` or `#`. Setting this
+  !! Example: `!`, `#`, or `/!#`. Setting this
   !! to a blank string disables the
-  !! ignoring of comments. (Default is `!`).
+  !! ignoring of comments. (Default is `/!#`).
 integer(IK),intent(in),optional :: path_mode
   !! How the path strings are interpreted in the
   !! `get_by_path` routines:
