@@ -8061,8 +8061,8 @@
         if (.not. status_ok) then
             ival = 0
             call json%throw_exception('Error in string_to_int: '//&
-                                    'string cannot be converted to an integer: '//&
-                                    trim(str))
+                                      'string cannot be converted to an integer: '//&
+                                      trim(str))
         end if
 
     else
@@ -8160,7 +8160,7 @@
 !>
 !  Get an integer value from a [[json_value]], given the path string.
 
-    subroutine json_get_integer_by_path(json, me, path, value, found)
+    subroutine json_get_integer_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8169,34 +8169,12 @@
     character(kind=CK,len=*),intent(in) :: path
     integer(IK),intent(out)             :: value
     logical(LK),intent(out),optional    :: found
+    integer(IK),intent(in),optional     :: default !! default value if not found
 
-    type(json_value),pointer :: p
+    integer(IK),parameter :: default_if_not_specified = 0_IK
+    character(kind=CK,len=*),parameter :: routine = CK_'json_get_integer_by_path'
 
-    value = 0
-    if ( json%exception_thrown ) then
-       if ( present(found) ) found = .false.
-       return
-    end if
-
-    nullify(p)
-
-    call json%get(me=me, path=path, p=p)
-
-    if (.not. associated(p)) then
-        call json%throw_exception('Error in json_get_integer_by_path:'//&
-            ' Unable to resolve path: '// trim(path),found)
-    else
-        call json%get(p,value)
-        nullify(p)
-    end if
-    if ( json%exception_thrown ) then
-        if ( present(found) ) then
-            found = .false.
-            call json%clear_exceptions()
-        end if
-    else
-        if ( present(found) ) found = .true.
-    end if
+#include "json_get_scalar_by_path.inc"
 
     end subroutine json_get_integer_by_path
 !*****************************************************************************************
@@ -8205,7 +8183,7 @@
 !>
 !  Alternate version of [[json_get_integer_by_path]], where "path" is kind=CDK.
 
-    subroutine wrap_json_get_integer_by_path(json, me, path, value, found)
+    subroutine wrap_json_get_integer_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8214,8 +8192,9 @@
     character(kind=CDK,len=*),intent(in) :: path
     integer(IK),intent(out)              :: value
     logical(LK),intent(out),optional     :: found
+    integer(IK),intent(in),optional      :: default !! default value if not found
 
-    call json%get(me, to_unicode(path), value, found)
+    call json%get(me, to_unicode(path), value, found, default)
 
     end subroutine wrap_json_get_integer_by_path
 !*****************************************************************************************
@@ -8283,9 +8262,24 @@
 
 !*****************************************************************************************
 !>
+!  If `found` is present, set it it false.
+
+    subroutine flag_not_found(found)
+
+    implicit none
+
+    logical(LK),intent(out),optional :: found
+
+    if (present(found)) found = .false.
+
+    end subroutine flag_not_found
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
 !  Get an integer vector from a [[json_value]], given the path string.
 
-    subroutine json_get_integer_vec_by_path(json, me, path, vec, found)
+    subroutine json_get_integer_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -8294,23 +8288,11 @@
     character(kind=CK,len=*),intent(in)              :: path
     integer(IK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
+    integer(IK),dimension(:),intent(in),optional     :: default !! default value if not found
 
-    type(json_value),pointer :: p
+    character(kind=CK,len=*),parameter :: routine = CK_'json_get_integer_vec_by_path'
 
-    call json%get(me, path, p, found)
-
-    if (present(found)) then
-        if (.not. found) return
-    else
-        if (json%exception_thrown) return
-    end if
-
-    call json%get(p, vec)
-
-    if (present(found) .and. json%exception_thrown) then
-        call json%clear_exceptions()
-        found = .false.
-    end if
+#include "json_get_vec_by_path.inc"
 
     end subroutine json_get_integer_vec_by_path
 !*****************************************************************************************
@@ -8319,7 +8301,7 @@
 !>
 !  Alternate version of [[json_get_integer_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_integer_vec_by_path(json, me, path, vec, found)
+    subroutine wrap_json_get_integer_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -8328,8 +8310,9 @@
     character(kind=CDK,len=*),intent(in)             :: path
     integer(IK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
+    integer(IK),dimension(:),intent(in),optional     :: default !! default value if not found
 
-    call json%get(me,path=to_unicode(path),vec=vec,found=found)
+    call json%get(me,path=to_unicode(path),vec=vec,found=found,default=default)
 
     end subroutine wrap_json_get_integer_vec_by_path
 !*****************************************************************************************
@@ -8407,7 +8390,7 @@
 !>
 !  Get a real value from a [[json_value]], given the path.
 
-    subroutine json_get_real_by_path(json, me, path, value, found)
+    subroutine json_get_real_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8416,39 +8399,12 @@
     character(kind=CK,len=*),intent(in) :: path
     real(RK),intent(out)                :: value
     logical(LK),intent(out),optional    :: found
+    real(RK),intent(in),optional        :: default !! default value if not found
 
-    type(json_value),pointer :: p
+    real(RK),parameter :: default_if_not_specified = 0.0_RK
+    character(kind=CK,len=*),parameter :: routine = CK_'json_get_real_by_path'
 
-    value = 0.0_RK
-    if ( json%exception_thrown ) then
-        if ( present(found) ) found = .false.
-        return
-    end if
-
-    nullify(p)
-
-    call json%get(me=me, path=path, p=p)
-
-    if (.not. associated(p)) then
-
-        call json%throw_exception('Error in json_get_real_by_path:'//&
-                             ' Unable to resolve path: '//trim(path),found)
-
-    else
-
-        call json%get(p,value)
-        nullify(p)
-
-    end if
-
-    if (json%exception_thrown) then
-        if (present(found)) then
-            found = .false.
-            call json%clear_exceptions()
-        end if
-    else
-        if (present(found)) found = .true.
-    end if
+#include "json_get_scalar_by_path.inc"
 
     end subroutine json_get_real_by_path
 !*****************************************************************************************
@@ -8457,7 +8413,7 @@
 !>
 !  Alternate version of [[json_get_real_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_real_by_path(json, me, path, value, found)
+    subroutine wrap_json_get_real_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8466,8 +8422,9 @@
     character(kind=CDK,len=*),intent(in) :: path
     real(RK),intent(out)                 :: value
     logical(LK),intent(out),optional     :: found
+    real(RK),intent(in),optional         :: default !! default value if not found
 
-    call json%get(me,to_unicode(path),value,found)
+    call json%get(me,to_unicode(path),value,found,default)
 
     end subroutine wrap_json_get_real_by_path
 !*****************************************************************************************
@@ -8537,7 +8494,7 @@
 !>
 !  Get a real vector from a [[json_value]], given the path.
 
-    subroutine json_get_real_vec_by_path(json, me, path, vec, found)
+    subroutine json_get_real_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -8546,23 +8503,11 @@
     character(kind=CK,len=*),intent(in)           :: path
     real(RK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional              :: found
+    real(RK),dimension(:),intent(in),optional     :: default !! default value if not found
 
-    type(json_value),pointer :: p
+    character(kind=CK,len=*),parameter :: routine = CK_'json_get_real_vec_by_path'
 
-    call json%get(me, path, p, found)
-
-    if (present(found)) then
-        if (.not. found) return
-    else
-        if (json%exception_thrown) return
-    end if
-
-    call json%get(p, vec)
-
-    if (present(found) .and. json%exception_thrown) then
-        call json%clear_exceptions()
-        found = .false.
-    end if
+#include "json_get_vec_by_path.inc"
 
     end subroutine json_get_real_vec_by_path
 !*****************************************************************************************
@@ -8571,7 +8516,7 @@
 !>
 !  Alternate version of [[json_get_real_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_real_vec_by_path(json, me, path, vec, found)
+    subroutine wrap_json_get_real_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -8580,8 +8525,9 @@
     character(kind=CDK,len=*),intent(in)          :: path
     real(RK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional              :: found
+    real(RK),dimension(:),intent(in),optional     :: default !! default value if not found
 
-    call json%get(me, to_unicode(path), vec, found)
+    call json%get(me, to_unicode(path), vec, found, default)
 
     end subroutine wrap_json_get_real_vec_by_path
 !*****************************************************************************************
@@ -8611,7 +8557,7 @@
 !>
 !  Alternate version of [[json_get_real_by_path]] where value=real32.
 
-    subroutine json_get_real32_by_path(json, me, path, value, found)
+    subroutine json_get_real32_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8620,10 +8566,18 @@
     character(kind=CK,len=*),intent(in) :: path
     real(real32),intent(out)            :: value
     logical(LK),intent(out),optional    :: found
+    real(real32),intent(in),optional    :: default !! default value if not found
 
     real(RK) :: tmp
+    real(RK) :: tmp_default
 
-    call json%get(me, path, tmp, found)
+    if (present(default)) then
+        tmp_default = real(default,RK)
+        call json%get(me, path, tmp, found, tmp_default)
+    else
+        call json%get(me, path, tmp, found)
+    end if
+
     value = real(tmp,RK)
 
     end subroutine json_get_real32_by_path
@@ -8633,7 +8587,7 @@
 !>
 !  Alternate version of [[json_get_real32_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_real32_by_path(json, me, path, value, found)
+    subroutine wrap_json_get_real32_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8642,8 +8596,9 @@
     character(kind=CDK,len=*),intent(in) :: path
     real(real32),intent(out)             :: value
     logical(LK),intent(out),optional     :: found
+    real(real32),intent(in),optional     :: default !! default value if not found
 
-    call json%get(me,to_unicode(path),value,found)
+    call json%get(me,to_unicode(path),value,found,default)
 
     end subroutine wrap_json_get_real32_by_path
 !*****************************************************************************************
@@ -8672,7 +8627,7 @@
 !>
 !  Alternate version of [[json_get_real_vec_by_path]] where `vec` is `real32`.
 
-    subroutine json_get_real32_vec_by_path(json, me, path, vec, found)
+    subroutine json_get_real32_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -8681,10 +8636,18 @@
     character(kind=CK,len=*),intent(in)               :: path
     real(real32),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                  :: found
+    real(real32),dimension(:),intent(in),optional     :: default !! default value if not found
 
     real(RK),dimension(:),allocatable :: tmp
+    real(RK),dimension(:),allocatable :: tmp_default
 
-    call json%get(me, path, tmp, found)
+    if (present(default)) then
+        tmp_default = real(default,RK)
+        call json%get(me, path, tmp, found, tmp_default)
+    else
+        call json%get(me, path, tmp, found)
+    end if
+
     if (allocated(tmp)) vec = real(tmp,RK)
 
     end subroutine json_get_real32_vec_by_path
@@ -8694,7 +8657,7 @@
 !>
 !  Alternate version of [[json_get_real32_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_real32_vec_by_path(json, me, path, vec, found)
+    subroutine wrap_json_get_real32_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -8703,8 +8666,9 @@
     character(kind=CDK,len=*),intent(in)              :: path
     real(real32),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                  :: found
+    real(real32),dimension(:),intent(in),optional     :: default !! default value if not found
 
-    call json%get(me, to_unicode(path), vec, found)
+    call json%get(me, to_unicode(path), vec, found, default)
 
     end subroutine wrap_json_get_real32_vec_by_path
 !*****************************************************************************************
@@ -8735,7 +8699,7 @@
 !>
 !  Alternate version of [[json_get_real_by_path]] where `value` is `real64`.
 
-    subroutine json_get_real64_by_path(json, me, path, value, found)
+    subroutine json_get_real64_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8744,10 +8708,11 @@
     character(kind=CK,len=*),intent(in) :: path
     real(real64),intent(out)            :: value
     logical(LK),intent(out),optional    :: found
+    real(real64),intent(in),optional    :: default !! default value if not found
 
     real(RK) :: tmp
 
-    call json%get(me, path, tmp, found)
+    call json%get(me, path, tmp, found, default)
     value = real(tmp,RK)
 
     end subroutine json_get_real64_by_path
@@ -8757,7 +8722,7 @@
 !>
 !  Alternate version of [[json_get_real64_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_real64_by_path(json, me, path, value, found)
+    subroutine wrap_json_get_real64_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8766,8 +8731,9 @@
     character(kind=CDK,len=*),intent(in) :: path
     real(real64),intent(out)             :: value
     logical(LK),intent(out),optional     :: found
+    real(real64),intent(in),optional     :: default !! default value if not found
 
-    call json%get(me,to_unicode(path),value,found)
+    call json%get(me,to_unicode(path),value,found, default)
 
     end subroutine wrap_json_get_real64_by_path
 !*****************************************************************************************
@@ -8796,7 +8762,7 @@
 !>
 !  Alternate version of [[json_get_real_vec_by_path]] where `vec` is `real64`.
 
-    subroutine json_get_real64_vec_by_path(json, me, path, vec, found)
+    subroutine json_get_real64_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -8805,10 +8771,11 @@
     character(kind=CK,len=*),intent(in)               :: path
     real(real64),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                  :: found
+    real(real64),dimension(:),intent(in),optional     :: default !! default value if not found
 
     real(RK),dimension(:),allocatable :: tmp
 
-    call json%get(me, path, tmp, found)
+    call json%get(me, path, tmp, found, default)
     if (allocated(tmp)) vec = real(tmp,RK)
 
     end subroutine json_get_real64_vec_by_path
@@ -8818,7 +8785,7 @@
 !>
 !  Alternate version of [[json_get_real64_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_real64_vec_by_path(json, me, path, vec, found)
+    subroutine wrap_json_get_real64_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -8827,8 +8794,9 @@
     character(kind=CDK,len=*),intent(in)              :: path
     real(real64),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                  :: found
+    real(real64),dimension(:),intent(in),optional     :: default !! default value if not found
 
-    call json%get(me, to_unicode(path), vec, found)
+    call json%get(me, to_unicode(path), vec, found, default)
 
     end subroutine wrap_json_get_real64_vec_by_path
 !*****************************************************************************************
@@ -8887,7 +8855,7 @@
 !>
 !  Get a logical value from a [[json_value]], given the path.
 
-    subroutine json_get_logical_by_path(json, me, path, value, found)
+    subroutine json_get_logical_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8896,39 +8864,12 @@
     character(kind=CK,len=*),intent(in) :: path
     logical(LK),intent(out)             :: value
     logical(LK),intent(out),optional    :: found
+    logical(LK),intent(in),optional     :: default !! default value if not found
 
-    type(json_value),pointer :: p
+    logical(LK),parameter :: default_if_not_specified = .false.
+    character(kind=CK,len=*),parameter :: routine = CK_'json_get_logical_by_path'
 
-    value = .false.
-    if ( json%exception_thrown) then
-        if ( present(found) ) found = .false.
-        return
-    end if
-
-    nullify(p)
-
-    call json%get(me=me, path=path, p=p)
-
-    if (.not. associated(p)) then
-
-        call json%throw_exception('Error in json_get_logical_by_path:'//&
-                             ' Unable to resolve path: '//trim(path),found)
-
-    else
-
-        call json%get(p,value)
-        nullify(p)
-
-    end if
-
-    if (json%exception_thrown) then
-        if (present(found)) then
-            found = .false.
-            call json%clear_exceptions()
-        end if
-    else
-        if (present(found)) found = .true.
-    end if
+#include "json_get_scalar_by_path.inc"
 
     end subroutine json_get_logical_by_path
 !*****************************************************************************************
@@ -8937,7 +8878,7 @@
 !>
 !  Alternate version of [[json_get_logical_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_logical_by_path(json, me, path, value, found)
+    subroutine wrap_json_get_logical_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -8946,8 +8887,9 @@
     character(kind=CDK,len=*),intent(in) :: path
     logical(LK),intent(out)              :: value
     logical(LK),intent(out),optional     :: found
+    logical(LK),intent(in),optional      :: default !! default value if not found
 
-    call json%get(me,to_unicode(path),value,found)
+    call json%get(me,to_unicode(path),value,found,default)
 
     end subroutine wrap_json_get_logical_by_path
 !*****************************************************************************************
@@ -9017,7 +8959,7 @@
 !>
 !  Get a logical vector from a [[json_value]], given the path.
 
-    subroutine json_get_logical_vec_by_path(json, me, path, vec, found)
+    subroutine json_get_logical_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -9026,23 +8968,11 @@
     character(kind=CK,len=*),intent(in)              :: path
     logical(LK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
+    logical(LK),dimension(:),intent(in),optional     :: default
 
-    type(json_value),pointer :: p
+    character(kind=CK,len=*),parameter :: routine = CK_'json_get_logical_vec_by_path'
 
-    call json%get(me, path, p, found)
-
-    if (present(found)) then
-        if (.not. found) return
-    else
-        if (json%exception_thrown) return
-    end if
-
-    call json%get(p, vec)
-
-    if (present(found) .and. json%exception_thrown) then
-        call json%clear_exceptions()
-        found = .false.
-    end if
+#include "json_get_vec_by_path.inc"
 
     end subroutine json_get_logical_vec_by_path
 !*****************************************************************************************
@@ -9051,7 +8981,7 @@
 !>
 !  Alternate version of [[json_get_logical_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_logical_vec_by_path(json, me, path, vec, found)
+    subroutine wrap_json_get_logical_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -9060,8 +8990,9 @@
     character(kind=CDK,len=*),intent(in)             :: path
     logical(LK),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                 :: found
+    logical(LK),dimension(:),intent(in),optional     :: default
 
-    call json%get(me,to_unicode(path),vec,found)
+    call json%get(me,to_unicode(path),vec,found,default)
 
     end subroutine wrap_json_get_logical_vec_by_path
 !*****************************************************************************************
@@ -9166,7 +9097,7 @@
 !>
 !  Get a character string from a [[json_value]], given the path.
 
-    subroutine json_get_string_by_path(json, me, path, value, found)
+    subroutine json_get_string_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -9175,41 +9106,12 @@
     character(kind=CK,len=*),intent(in)              :: path
     character(kind=CK,len=:),allocatable,intent(out) :: value
     logical(LK),intent(out),optional                 :: found
+    character(kind=CK,len=*),intent(in),optional     :: default
 
-    type(json_value),pointer :: p
+    character(kind=CK,len=*),parameter :: default_if_not_specified = CK_''
+    character(kind=CK,len=*),parameter :: routine = CK_'json_get_string_by_path'
 
-    value = CK_''
-    if ( json%exception_thrown ) then
-        if ( present(found) ) found = .false.
-        return
-    end if
-
-    nullify(p)
-
-    call json%get(me=me, path=path, p=p)
-
-    if (.not. associated(p)) then
-        call json%throw_exception('Error in json_get_string_by_path:'//&
-                                  ' Unable to resolve path: '//trim(path),found)
-
-    else
-
-        call json%get(p,value)
-        nullify(p)
-
-    end if
-
-    if (allocated(value) .and. .not. json%exception_thrown) then
-        if (present(found)) found = .true.
-    else
-        if (present(found)) then
-            found = .false.
-            call json%clear_exceptions()
-        end if
-    end if
-
-    !cleanup:
-    if (associated(p)) nullify(p)
+#include "json_get_scalar_by_path.inc"
 
     end subroutine json_get_string_by_path
 !*****************************************************************************************
@@ -9218,7 +9120,7 @@
 !>
 !  Alternate version of [[json_get_string_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_string_by_path(json, me, path, value, found)
+    subroutine wrap_json_get_string_by_path(json, me, path, value, found, default)
 
     implicit none
 
@@ -9227,8 +9129,9 @@
     character(kind=CDK,len=*),intent(in)             :: path
     character(kind=CK,len=:),allocatable,intent(out) :: value
     logical(LK),intent(out),optional                 :: found
+    character(kind=CK,len=*),intent(in),optional     :: default
 
-    call json%get(me,to_unicode(path),value,found)
+    call json%get(me,to_unicode(path),value,found,default)
 
     end subroutine wrap_json_get_string_by_path
 !*****************************************************************************************
