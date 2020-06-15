@@ -216,11 +216,12 @@
                                                    !! then the string is returned unescaped.
 
         logical(LK) :: allow_comments = .true.  !! if true, any comments will be ignored when
-                                                !! parsing a file. The comment token is defined
+                                                !! parsing a file. The comment tokens are defined
                                                 !! by the `comment_char` character variable.
-        character(kind=CK,len=1) :: comment_char = CK_'!'  !! comment token when
-                                                           !! `allow_comments` is true.
-                                                           !! Examples: '`!`' or '`#`'.
+        character(kind=CK,len=:),allocatable :: comment_char !! comment tokens when
+                                                             !! `allow_comments` is true.
+                                                             !! Examples: '`!`' or '`#`'.
+                                                             !! Default is `CK_'/!#'`.
 
         integer(IK) :: path_mode = 1_IK  !! How the path strings are interpreted in the
                                          !! `get_by_path` routines:
@@ -878,6 +879,7 @@
         procedure        :: json_value_print
         procedure        :: string_to_int
         procedure        :: string_to_dble
+        procedure        :: prepare_parser => json_prepare_parser
         procedure        :: parse_end => json_parse_end
         procedure        :: parse_value
         procedure        :: parse_number
@@ -1081,7 +1083,7 @@
     ! [an empty string disables comments]
     if (present(comment_char)) then
         me%allow_comments = comment_char/=CK_''
-        me%comment_char = comment_char
+        me%comment_char = trim(adjustl(comment_char))
     end if
 
     ! path separator:
@@ -9692,6 +9694,26 @@
 
 !*****************************************************************************************
 !>
+!  Internal routine to be called before parsing JSON.
+!  Currently, all this does it allocate the `comment_char` if none was specified.
+
+    subroutine json_prepare_parser(json)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+
+    if (json%allow_comments .and. .not. allocated(json%comment_char)) then
+        ! comments are enabled, but user hasn't set the comment char,
+        ! so in this case use the default:
+        json%comment_char = CK_'/!#'
+    end if
+
+    end subroutine json_prepare_parser
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
 !  Parse the JSON file and populate the [[json_value]] tree.
 !
 !### Inputs
@@ -9735,6 +9757,7 @@
 
     ! clear any exceptions and initialize:
     call json%initialize()
+    call json%prepare_parser()
 
     if ( present(unit) ) then
 
@@ -9845,6 +9868,7 @@
 
     ! clear any exceptions and initialize:
     call json%initialize()
+    call json%prepare_parser()
 
     ! create the value and associate the pointer
     call json_value_create(p)
@@ -11435,7 +11459,7 @@
 
             end if
 
-            if (ignore_comments .and. (parsing_comment .or. c == json%comment_char) ) then
+            if (ignore_comments .and. (parsing_comment .or. scan(c,json%comment_char,kind=IK)>0_IK) ) then
 
                 ! skipping the comment
                 parsing_comment = .true.
