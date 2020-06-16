@@ -7754,7 +7754,6 @@
     type(json_value),pointer :: tmp            !! for traversing the structure
     type(json_value),pointer :: element        !! for traversing the structure
     integer(IK)              :: var_type       !! JSON variable type flag
-    integer(IK)              :: tmp_var_type   !! JSON variable type flag
     integer(IK)              :: i              !! counter
     integer(IK)              :: n_children     !! number of children for parent
     logical(LK)              :: use_brackets   !! to use '[]' characters for arrays
@@ -9209,7 +9208,7 @@
 !>
 !  Get a string vector from a [[json_value(type)]], given the path.
 
-    subroutine json_get_string_vec_by_path(json, me, path, vec, found)
+    subroutine json_get_string_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -9218,23 +9217,11 @@
     character(kind=CK,len=*),intent(in)                           :: path
     character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                              :: found
+    character(kind=CK,len=*),dimension(:),intent(in),optional     :: default
 
-    type(json_value),pointer :: p
+    character(kind=CK,len=*),parameter :: routine = CK_'json_get_string_vec_by_path'
 
-    call json%get(me, path, p, found)
-
-    if (present(found)) then
-        if (.not. found) return
-    else
-        if (json%exception_thrown) return
-    end if
-
-    call json%get(p, vec)
-
-    if (present(found) .and. json%exception_thrown) then
-        call json%clear_exceptions()
-        found = .false.
-    end if
+#include "json_get_vec_by_path.inc"
 
     end subroutine json_get_string_vec_by_path
 !*****************************************************************************************
@@ -9243,7 +9230,7 @@
 !>
 !  Alternate version of [[json_get_string_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_string_vec_by_path(json, me, path, vec, found)
+    subroutine wrap_json_get_string_vec_by_path(json, me, path, vec, found, default)
 
     implicit none
 
@@ -9252,8 +9239,9 @@
     character(kind=CDK,len=*),intent(in)                          :: path
     character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec
     logical(LK),intent(out),optional                              :: found
+    character(kind=CK,len=*),dimension(:),intent(in),optional     :: default
 
-    call json%get(me,to_unicode(path),vec,found)
+    call json%get(me,to_unicode(path),vec,found,default)
 
     end subroutine wrap_json_get_string_vec_by_path
 !*****************************************************************************************
