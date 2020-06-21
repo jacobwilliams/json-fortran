@@ -30,6 +30,7 @@ contains
     logical(LK) :: found
     integer(IK) :: ival
     real(RK) :: rval
+    real :: r32val
     logical(LK) :: lval
     character(kind=CK,len=:),allocatable :: cval
     character(kind=CK,len=1),dimension(:),allocatable :: cvec
@@ -56,6 +57,12 @@ contains
     call json%get(p, CK_'not_there', ival, found, default=99_IK)
     if (json%failed() .or. found .or. ival /= 99_IK) then
         write(error_unit,'(A)') 'Error using json_get_integer_by_path default'
+        error_cnt = error_cnt + 1
+    end if
+
+    call json%get(p, CK_'not_there', r32val, found, default=99.0)  ! real32
+    if (json%failed() .or. found .or. r32val-99.0>0.0) then
+        write(error_unit,'(A)') 'Error using json_get_real_by_path default'
         error_cnt = error_cnt + 1
     end if
 
