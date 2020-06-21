@@ -1835,7 +1835,7 @@
 !
 !  Get a string vector from a JSON file.
 
-    subroutine json_file_get_string_vec(me, path, vec, found)
+    subroutine json_file_get_string_vec(me, path, vec, found, default)
 
     implicit none
 
@@ -1843,8 +1843,9 @@
     character(kind=CK,len=*),intent(in)                           :: path  !! the path to the variable
     character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec   !! value vector
     logical(LK),intent(out),optional                              :: found !! if it was really found
+    character(kind=CK,len=*),dimension(:),intent(in),optional     :: default
 
-    call me%core%get(me%p, path, vec, found)
+    call me%core%get(me%p, path, vec, found, default)
 
     end subroutine json_file_get_string_vec
 !*****************************************************************************************
@@ -1853,7 +1854,7 @@
 !>
 !  Alternate version of [[json_file_get_string_vec]], where "path" is kind=CDK.
 
-    subroutine wrap_json_file_get_string_vec(me, path, vec, found)
+    subroutine wrap_json_file_get_string_vec(me, path, vec, found, default)
 
     implicit none
 
@@ -1861,8 +1862,9 @@
     character(kind=CDK,len=*),intent(in)                          :: path  !! the path to the variable
     character(kind=CK,len=*),dimension(:),allocatable,intent(out) :: vec   !! value vector
     logical(LK),intent(out),optional                              :: found !! if it was really found
+    character(kind=CK,len=*),dimension(:),intent(in),optional     :: default
 
-    call me%get(to_unicode(path), vec, found)
+    call me%get(to_unicode(path), vec, found, default)
 
     end subroutine wrap_json_file_get_string_vec
 !*****************************************************************************************
