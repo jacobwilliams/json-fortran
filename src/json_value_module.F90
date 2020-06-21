@@ -8052,20 +8052,14 @@
 
     logical(LK) :: status_ok !! error flag for [[string_to_integer]]
 
-    if (.not. json%exception_thrown) then
+    ! call the core routine:
+    call string_to_integer(str,ival,status_ok)
 
-        ! call the core routine:
-        call string_to_integer(str,ival,status_ok)
-
-        if (.not. status_ok) then
-            ival = 0
-            call json%throw_exception('Error in string_to_int: '//&
-                                      'string cannot be converted to an integer: '//&
-                                      trim(str))
-        end if
-
-    else
+    if (.not. status_ok) then
         ival = 0
+        call json%throw_exception('Error in string_to_int: '//&
+                                    'string cannot be converted to an integer: '//&
+                                    trim(str))
     end if
 
     end function string_to_int
@@ -8085,19 +8079,13 @@
 
     logical(LK) :: status_ok  !! error flag for [[string_to_real]]
 
-    if (.not. json%exception_thrown) then
+    call string_to_real(str,json%use_quiet_nan,rval,status_ok)
 
-        call string_to_real(str,json%use_quiet_nan,rval,status_ok)
-
-        if (.not. status_ok) then    !if there was an error
-            rval = 0.0_RK
-            call json%throw_exception('Error in string_to_dble: '//&
-                                      'string cannot be converted to a real: '//&
-                                      trim(str))
-        end if
-
-    else
+    if (.not. status_ok) then    !if there was an error
         rval = 0.0_RK
+        call json%throw_exception('Error in string_to_dble: '//&
+                                  'string cannot be converted to a real: '//&
+                                  trim(str))
     end if
 
     end function string_to_dble
