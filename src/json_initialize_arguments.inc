@@ -28,26 +28,25 @@ logical(LK),intent(in),optional :: no_whitespace
   !! done without adding any non-significant
   !! spaces or linebreaks (default is false)
 logical(LK),intent(in),optional :: unescape_strings
-  !! * If false, then the raw escaped
-  !!   string is returned from [[json_get_string]]
-  !!   and similar routines.
-  !! * If true [default], then the string
-  !!   is returned unescaped.
-character(kind=CK,len=1),intent(in),optional :: comment_char
-  !! If present, this character is used
+  !! If false, then the raw escaped
+  !! string is returned from [[json_get_string]]
+  !! and similar routines. If true [default],
+  !! then the string is returned unescaped.
+character(kind=CK,len=*),intent(in),optional :: comment_char
+  !! If present, these characters are used
   !! to denote comments in the JSON file,
   !! which will be ignored if present.
-  !! Example: `!` or `#`. Setting this
+  !! Example: `!`, `#`, or `/!#`. Setting this
   !! to a blank string disables the
-  !! ignoring of comments. (Default is `!`).
+  !! ignoring of comments. (Default is `/!#`).
 integer(IK),intent(in),optional :: path_mode
   !! How the path strings are interpreted in the
   !! `get_by_path` routines:
   !!
-  !! * 1 -- Default mode (see [[json_get_by_path_default]])
-  !! * 2 -- as RFC 6901 "JSON Pointer" paths
+  !! * 1 : Default mode (see [[json_get_by_path_default]])
+  !! * 2 : as RFC 6901 "JSON Pointer" paths
   !!   (see [[json_get_by_path_rfc6901]])
-  !! * 3 -- JSONPath "bracket-notation"
+  !! * 3 : JSONPath "bracket-notation"
   !!   see [[json_get_by_path_jsonpath_bracket]])
 character(kind=CK,len=1),intent(in),optional :: path_separator
   !! The `path` separator to use
