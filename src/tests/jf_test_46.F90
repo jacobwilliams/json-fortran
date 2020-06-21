@@ -72,7 +72,7 @@ contains
     end if
 
     call json%get(p, CK_'not_there', r32vec, found, default=r32vec_default)  ! real32 vec
-    if (json%failed() .or. found .or. any(r32vec-r32vec_default>.0)) then
+    if (json%failed() .or. found .or. any(r32vec-r32vec_default>0.0)) then
         write(error_unit,'(A)') 'Error using json_get_real32_by_path default'
         error_cnt = error_cnt + 1
     end if
