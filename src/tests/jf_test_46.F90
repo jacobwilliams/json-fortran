@@ -243,7 +243,8 @@ contains
     end if
 
     ! now, we try them when an exception is active:
-    call json_f%get(CK_'not_there', ival) ! this will raise an exception
+    call json_f%destroy()
+    json_f = json_file(CK_'{"x": 1.0e.2.1}') ! this will raise an exception
     call json_f%get(CK_'not_there', rval, found, default=99.0_RK)
     call json_f%get(CK_'not_there', cvec, found, default=[CK_'1'])
     call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default)
