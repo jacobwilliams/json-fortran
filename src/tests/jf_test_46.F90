@@ -144,7 +144,15 @@ contains
         error_cnt = error_cnt + 1
     end if
 
+    ! now, we try them when an exception is active:
+    call json%get(p, CK_'not_there', ival) ! this will raise an exception
+    call json%get(p, CK_'not_there', rval, found, default=99.0_RK)
+    call json%get(p, CK_'not_there', cvec, found, default=[CK_'1'])
+    call json%get(p, CK_'not_there', cvec2, ilen, found, default=cvec_default)
+    call json%get(p, CK_'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
+
     call json%destroy(p)
+    call json%destroy()
 
     !---------------------------------
     ! now, json_file routines:
@@ -233,6 +241,13 @@ contains
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
+
+    ! now, we try them when an exception is active:
+    call json_f%get(CK_'not_there', ival) ! this will raise an exception
+    call json_f%get(CK_'not_there', rval, found, default=99.0_RK)
+    call json_f%get(CK_'not_there', cvec, found, default=[CK_'1'])
+    call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default)
+    call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
 
     if (error_cnt==0) then
         write(error_unit,'(A)') 'Success!'
