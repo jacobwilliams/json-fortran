@@ -9353,8 +9353,12 @@
 !@note An alternative to using this routine is to use [[json_get_array]] with
 !      a callback function that gets the string from each element and populates
 !      a user-defined string type.
+!
+!@note If the `default` argument is used, and `default_ilen` is not present,
+!      then `ilen` will just be returned as the length of the `default` dummy
+!      argument (all elements with the same length).
 
-    subroutine json_get_alloc_string_vec_by_path(json, me, path, vec, ilen, found)
+    subroutine json_get_alloc_string_vec_by_path(json,me,path,vec,ilen,found,default,default_ilen)
 
     implicit none
 
@@ -9366,23 +9370,13 @@
                                                              !! of each character
                                                              !! string in the array
     logical(LK),intent(out),optional :: found
+    character(kind=CK,len=*),dimension(:),intent(in),optional :: default
+    integer(IK),dimension(:),intent(in),optional :: default_ilen !! the actual
+                                                                 !! length of `default`
 
-    type(json_value),pointer :: p
+    character(kind=CK,len=*),parameter :: routine = CK_'json_get_alloc_string_vec_by_path'
 
-    call json%get(me, path, p, found)
-
-    if (present(found)) then
-        if (.not. found) return
-    else
-        if (json%exception_thrown) return
-    end if
-
-    call json%get(p, vec, ilen)
-
-    if (present(found) .and. json%exception_thrown) then
-        call json%clear_exceptions()
-        found = .false.
-    end if
+#include "json_get_vec_by_path_alloc.inc"
 
     end subroutine json_get_alloc_string_vec_by_path
 !*****************************************************************************************
@@ -9391,7 +9385,7 @@
 !>
 !  Alternate version of [[json_get_alloc_string_vec_by_path]], where "path" is kind=CDK
 
-    subroutine wrap_json_get_alloc_string_vec_by_path(json,me,path,vec,ilen,found)
+    subroutine wrap_json_get_alloc_string_vec_by_path(json,me,path,vec,ilen,found,default,default_ilen)
 
     implicit none
 
@@ -9403,8 +9397,11 @@
                                                              !! of each character
                                                              !! string in the array
     logical(LK),intent(out),optional :: found
+    character(kind=CK,len=*),dimension(:),intent(in),optional :: default
+    integer(IK),dimension(:),intent(in),optional :: default_ilen !! the actual
+                                                                 !! length of `default`
 
-    call json%get(me,to_unicode(path),vec,ilen,found)
+    call json%get(me,to_unicode(path),vec,ilen,found,default,default_ilen)
 
     end subroutine wrap_json_get_alloc_string_vec_by_path
 !*****************************************************************************************

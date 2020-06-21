@@ -1876,7 +1876,7 @@
 !  Get an (allocatable length) string vector from a JSON file.
 !  This is just a wrapper for [[json_get_alloc_string_vec_by_path]].
 
-    subroutine json_file_get_alloc_string_vec(me, path, vec, ilen, found)
+    subroutine json_file_get_alloc_string_vec(me, path, vec, ilen, found, default, default_ilen)
 
     implicit none
 
@@ -1887,8 +1887,11 @@
                                                              !! of each character
                                                              !! string in the array
     logical(LK),intent(out),optional :: found
+    character(kind=CK,len=*),dimension(:),intent(in),optional :: default
+    integer(IK),dimension(:),intent(in),optional :: default_ilen !! the actual
+                                                                 !! length of `default`
 
-    call me%core%get(me%p, path, vec, ilen, found)
+    call me%core%get(me%p, path, vec, ilen, found, default, default_ilen)
 
     end subroutine json_file_get_alloc_string_vec
 !*****************************************************************************************
@@ -1898,7 +1901,7 @@
 !  Alternate version of [[json_file_get_alloc_string_vec]], where "path" is kind=CDK.
 !  This is just a wrapper for [[wrap_json_get_alloc_string_vec_by_path]].
 
-    subroutine wrap_json_file_get_alloc_string_vec(me, path, vec, ilen, found)
+    subroutine wrap_json_file_get_alloc_string_vec(me, path, vec, ilen, found, default, default_ilen)
 
     implicit none
 
@@ -1909,8 +1912,11 @@
                                                              !! of each character
                                                              !! string in the array
     logical(LK),intent(out),optional :: found
+    character(kind=CK,len=*),dimension(:),intent(in),optional :: default
+    integer(IK),dimension(:),intent(in),optional :: default_ilen !! the actual
+                                                                 !! length of `default`
 
-    call me%get(to_unicode(path), vec, ilen, found)
+    call me%get(to_unicode(path), vec, ilen, found, default, default_ilen)
 
     end subroutine wrap_json_file_get_alloc_string_vec
 !*****************************************************************************************

@@ -34,8 +34,11 @@ contains
     logical(LK) :: lval
     character(kind=CK,len=:),allocatable :: cval
     character(kind=CK,len=1),dimension(:),allocatable :: cvec
+    character(kind=CK,len=:),dimension(:),allocatable :: cvec2
+    integer(IK),dimension(:),allocatable :: ilen
 
     character(kind=CK,len=1),dimension(1) :: cvec_default = [CK_'1']
+    integer(IK),dimension(1) :: ilen_default = [1]
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -89,6 +92,16 @@ contains
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
+    call json%get(p, CK_'not_there', cvec2, ilen, found, default=cvec_default)
+    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+        write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
+        error_cnt = error_cnt + 1
+    end if
+    call json%get(p, CK_'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
+    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+        write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
+        error_cnt = error_cnt + 1
+    end if
 
     ! default:
     call json%get(p, 'not_there', ival, found, default=99_IK)
@@ -118,6 +131,16 @@ contains
     call json%get(p, 'not_there', cvec, found, default=[CK_'1'])
     if (json%failed() .or. found .or. all(cvec /= [CK_'1'])) then
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
+        error_cnt = error_cnt + 1
+    end if
+    call json%get(p, 'not_there', cvec2, ilen, found, default=cvec_default)
+    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+        write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
+        error_cnt = error_cnt + 1
+    end if
+    call json%get(p, 'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
+    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+        write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
 
@@ -159,6 +182,16 @@ contains
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
+    call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default)
+    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+        write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
+        error_cnt = error_cnt + 1
+    end if
+    call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
+    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+        write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
+        error_cnt = error_cnt + 1
+    end if
 
     ! default:
     call json_f%get('not_there', ival, found, default=99_IK)
@@ -188,6 +221,16 @@ contains
     call json_f%get('not_there', cvec, found, default=cvec_default)
     if (json%failed() .or. found .or. all(cvec /= cvec_default)) then
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
+        error_cnt = error_cnt + 1
+    end if
+    call json_f%get('not_there', cvec2, ilen, found, default=cvec_default)
+    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+        write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
+        error_cnt = error_cnt + 1
+    end if
+    call json_f%get('not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
+    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+        write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
 
