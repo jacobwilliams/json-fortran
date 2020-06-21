@@ -31,14 +31,16 @@ contains
     integer(IK) :: ival
     real(RK) :: rval
     real :: r32val
+    real,dimension(:),allocatable :: r32vec
     logical(LK) :: lval
     character(kind=CK,len=:),allocatable :: cval
     character(kind=CK,len=1),dimension(:),allocatable :: cvec
     character(kind=CK,len=:),dimension(:),allocatable :: cvec2
     integer(IK),dimension(:),allocatable :: ilen
 
-    character(kind=CK,len=1),dimension(1) :: cvec_default = [CK_'1']
-    integer(IK),dimension(1) :: ilen_default = [1]
+    character(kind=CK,len=1),dimension(1),parameter :: cvec_default = [CK_'1']
+    integer(IK),dimension(1),parameter :: ilen_default = [1]
+    real,dimension(1),parameter :: r32vec_default = [99.0]
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -65,7 +67,13 @@ contains
 
     call json%get(p, CK_'not_there', r32val, found, default=99.0)  ! real32
     if (json%failed() .or. found .or. r32val-99.0>0.0) then
-        write(error_unit,'(A)') 'Error using json_get_real_by_path default'
+        write(error_unit,'(A)') 'Error using json_get_real32_by_path default'
+        error_cnt = error_cnt + 1
+    end if
+
+    call json%get(p, CK_'not_there', r32vec, found, default=r32vec_default)  ! real32 vec
+    if (json%failed() .or. found .or. any(r32vec-r32vec_default>.0)) then
+        write(error_unit,'(A)') 'Error using json_get_real32_by_path default'
         error_cnt = error_cnt + 1
     end if
 
@@ -88,17 +96,17 @@ contains
     end if
 
     call json%get(p, CK_'not_there', cvec, found, default=cvec_default)
-    if (json%failed() .or. found .or. all(cvec /= cvec_default)) then
+    if (json%failed() .or. found .or. any(cvec /= cvec_default)) then
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json%get(p, CK_'not_there', cvec2, ilen, found, default=cvec_default)
-    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json%get(p, CK_'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
-    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
@@ -129,17 +137,17 @@ contains
     end if
 
     call json%get(p, 'not_there', cvec, found, default=[CK_'1'])
-    if (json%failed() .or. found .or. all(cvec /= [CK_'1'])) then
+    if (json%failed() .or. found .or. any(cvec /= [CK_'1'])) then
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json%get(p, 'not_there', cvec2, ilen, found, default=cvec_default)
-    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json%get(p, 'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
-    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
@@ -186,17 +194,17 @@ contains
     end if
 
     call json_f%get(CK_'not_there', cvec, found, default=cvec_default)
-    if (json%failed() .or. found .or. all(cvec /= cvec_default)) then
+    if (json%failed() .or. found .or. any(cvec /= cvec_default)) then
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default)
-    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
-    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
@@ -227,17 +235,17 @@ contains
     end if
 
     call json_f%get('not_there', cvec, found, default=cvec_default)
-    if (json%failed() .or. found .or. all(cvec /= cvec_default)) then
+    if (json%failed() .or. found .or. any(cvec /= cvec_default)) then
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json_f%get('not_there', cvec2, ilen, found, default=cvec_default)
-    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json_f%get('not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
-    if (json%failed() .or. found .or. all(cvec2 /= cvec_default) .or. all(ilen/=1_IK)) then
+    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
