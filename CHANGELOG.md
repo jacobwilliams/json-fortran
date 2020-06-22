@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.1.0 (2020-06-21)](#800-2020-06-21)
     - [8.0.0 (2020-04-04)](#800-2020-04-04)
     - [7.1.0 (2019-06-23)](#710-2019-06-23)
     - [7.0.0 (2019-01-26)](#700-2019-01-26)
@@ -37,7 +38,25 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.0.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.1.0...HEAD)
+
+### [8.1.0](https://github.com/jacobwilliams/json-fortran/tree/8.1.0) (2020-06-21)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.0.0...8.1.0)
+or [Download v8.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/8.1.0)
+
+**Enhancements:**
+
+- Added a `json_file = string` assignment operator [\#463](https://github.com/jacobwilliams/json-fortran/issues/463) [\#464](https://github.com/jacobwilliams/json-fortran/pull/464) [\#465](https://github.com/jacobwilliams/json-fortran/pull/465) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added support for multiple comment characters. The default is now to recognize any of `#!/` as comment lines. [\#456](https://github.com/jacobwilliams/json-fortran/issues/456) [\#461](https://github.com/jacobwilliams/json-fortran/pull/461) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added `recursive` attribute to `json_get_array` [\#291](https://github.com/jacobwilliams/json-fortran/issues/291) [\#453](https://github.com/jacobwilliams/json-fortran/pull/453) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added optional "default" argument to `json_get_*_by_path` routines [\#208](https://github.com/jacobwilliams/json-fortran/issues/208) [\#462](https://github.com/jacobwilliams/json-fortran/pull/462) ([jacobwilliams](https://github.com/jacobwilliams))
+- Updated readme to document the cmake build instructions [\#455](https://github.com/jacobwilliams/json-fortran/issues/455) ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Bug fixes:**
+
+- Fixed bug in `json_get_path` [\#452](https://github.com/jacobwilliams/json-fortran/issues/452) [\#454](https://github.com/jacobwilliams/json-fortran/pull/454) ([jacobwilliams](https://github.com/jacobwilliams))
+
 
 ### [8.0.0](https://github.com/jacobwilliams/json-fortran/tree/8.0.0) (2020-04-04)
 
