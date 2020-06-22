@@ -245,9 +245,11 @@
         procedure,pass(me) :: MAYBEWRAP(json_file_valid_path_op)
 
         generic,public :: assignment(=) => assign_json_file,&
-                                           assign_json_file_to_string
+                                           assign_json_file_to_string,&
+                                           assign_string_to_json_file
         procedure :: assign_json_file
         procedure,pass(me) :: assign_json_file_to_string
+        procedure :: assign_string_to_json_file
 
         ! ***************************************************
         ! private routines
@@ -1182,6 +1184,26 @@
     end if
 
     end subroutine assign_json_file_to_string
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Assignment operator for [[json_core(type)]] = character.
+!  This is just a wrapper for the [[json_file_load_from_string]] routine.
+
+    subroutine assign_string_to_json_file(me,str)
+
+    implicit none
+
+    class(json_file),intent(inout) :: me
+    character(kind=CK,len=*),intent(in) :: str
+
+    if (associated(me%p)) call me%destroy()
+    if (me%core%failed()) call me%core%clear_exceptions()
+    call me%deserialize(str)
+
+    end subroutine assign_string_to_json_file
 !*****************************************************************************************
 
 !*****************************************************************************************
