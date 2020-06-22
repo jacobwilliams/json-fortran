@@ -170,93 +170,112 @@ contains
 
     ! unicode:
     call json_f%get(CK_'not_there', ival, found, default=99_IK)
-    if (json%failed() .or. found .or. ival /= 99_IK) then
+    if (json_f%failed() .or. found .or. ival /= 99_IK) then
         write(error_unit,'(A)') 'Error using json_get_integer_by_path default'
         error_cnt = error_cnt + 1
     end if
 
     call json_f%get(CK_'not_there', rval, found, default=99.0_RK)
-    if (json%failed() .or. found .or. rval-99.0_RK>0.0_RK) then
+    if (json_f%failed() .or. found .or. rval-99.0_RK>0.0_RK) then
         write(error_unit,'(A)') 'Error using json_get_real_by_path default'
         error_cnt = error_cnt + 1
     end if
 
     call json_f%get(CK_'not_there', lval, found, default=.true.)
-    if (json%failed() .or. found .or. lval .neqv. .true.) then
+    if (json_f%failed() .or. found .or. lval .neqv. .true.) then
         write(error_unit,'(A)') 'Error using json_get_logical_by_path default'
         error_cnt = error_cnt + 1
     end if
 
     call json_f%get(CK_'not_there', cval, found, default=CK_'default')
-    if (json%failed() .or. found .or. cval /= CK_'default') then
+    if (json_f%failed() .or. found .or. cval /= CK_'default') then
         write(error_unit,'(A)') 'Error using json_get_string_by_path default'
         error_cnt = error_cnt + 1
     end if
 
     call json_f%get(CK_'not_there', cvec, found, default=cvec_default)
-    if (json%failed() .or. found .or. any(cvec /= cvec_default)) then
+    if (json_f%failed() .or. found .or. any(cvec /= cvec_default)) then
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default)
-    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
+    if (json_f%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
-    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
+    if (json_f%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
 
     ! default:
     call json_f%get('not_there', ival, found, default=99_IK)
-    if (json%failed() .or. found .or. ival /= 99_IK) then
+    if (json_f%failed() .or. found .or. ival /= 99_IK) then
         write(error_unit,'(A)') 'Error using json_get_integer_by_path default'
         error_cnt = error_cnt + 1
     end if
 
     call json_f%get('not_there', rval, found, default=99.0_RK)
-    if (json%failed() .or. found .or. rval-99.0_RK>0.0_RK) then
+    if (json_f%failed() .or. found .or. rval-99.0_RK>0.0_RK) then
         write(error_unit,'(A)') 'Error using json_get_real_by_path default'
         error_cnt = error_cnt + 1
     end if
 
     call json_f%get('not_there', lval, found, default=.true.)
-    if (json%failed() .or. found .or. lval .neqv. .true.) then
+    if (json_f%failed() .or. found .or. lval .neqv. .true.) then
         write(error_unit,'(A)') 'Error using json_get_logical_by_path default'
         error_cnt = error_cnt + 1
     end if
 
     call json_f%get('not_there', cval, found, default=CK_'default')
-    if (json%failed() .or. found .or. cval /= CK_'default') then
+    if (json_f%failed() .or. found .or. cval /= CK_'default') then
         write(error_unit,'(A)') 'Error using json_get_string_by_path default'
         error_cnt = error_cnt + 1
     end if
 
     call json_f%get('not_there', cvec, found, default=cvec_default)
-    if (json%failed() .or. found .or. any(cvec /= cvec_default)) then
+    if (json_f%failed() .or. found .or. any(cvec /= cvec_default)) then
         write(error_unit,'(A)') 'Error using json_get_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json_f%get('not_there', cvec2, ilen, found, default=cvec_default)
-    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
+    if (json_f%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
     call json_f%get('not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
-    if (json%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
+    if (json_f%failed() .or. found .or. any(cvec2 /= cvec_default) .or. any(ilen/=1_IK)) then
         write(error_unit,'(A)') 'Error using json_get_alloc_string_vec_by_path default'
         error_cnt = error_cnt + 1
     end if
 
-    ! now, we try them when an exception is active:
     call json_f%destroy()
-    json_f = json_file(CK_'{"x": 1.0e.2.1}') ! this will raise an exception
+
+    json_f = str   ! this should succeed
+    if (json_f%failed()) then
+        write(error_unit,'(A)') 'Error in json_file = string assignment operator'
+        error_cnt = error_cnt + 1
+    end if
+
+    ! now, we try them when an exception is active:
+    json_f = CK_'{"x": 1.0e.2.1}'  ! this will raise an exception
+    if (.not. json_f%failed()) then
+        write(error_unit,'(A)') 'Error in json_file = string assignment operator : '//&
+                                'should have raised an exception'
+        error_cnt = error_cnt + 1
+    end if
+
     call json_f%get(CK_'not_there', rval, found, default=99.0_RK)
     call json_f%get(CK_'not_there', cvec, found, default=[CK_'1'])
     call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default)
     call json_f%get(CK_'not_there', cvec2, ilen, found, default=cvec_default, default_ilen=ilen_default)
+
+    json_f = str   ! now, try again after a failure
+    if (json_f%failed()) then
+        write(error_unit,'(A)') 'Error in json_file = string assignment operator'
+        error_cnt = error_cnt + 1
+    end if
 
     if (error_cnt==0) then
         write(error_unit,'(A)') 'Success!'
