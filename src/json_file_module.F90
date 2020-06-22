@@ -1167,7 +1167,7 @@
     type(json_core) :: core_copy !! a copy of `core` from `me`
 
     if (me%core%failed() .or. .not. associated(me%p)) then
-        str = ''
+        str = CK_''
     else
 
         ! This is sort of a hack. Since `me` has to have `intent(in)`
@@ -1179,7 +1179,7 @@
         core_copy = me%core ! copy the parser settings
 
         call core_copy%serialize(me%p,str)
-        if (me%core%failed()) str = ''
+        if (me%core%failed()) str = CK_''
 
     end if
 
