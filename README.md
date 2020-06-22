@@ -111,7 +111,8 @@ trivial. To get started with the CMake based build, set the
 environment variable `FC` to point to your Fortran compiler, and
 create a build directory. Then `(cmake-gui|ccmake|cmake)
 /path/to/json-fortran-root` to configure, `make` to build and `make
-install` to optionally install. As long as the project is built with
+install` to optionally install. You can also use `make check` to build and run the unit tests.
+As long as the project is built with
 CMake, other CMake projects can find it and link against it. For example,
 if you have a second copy of the JSON-Fortran project tree, and want to build the unit tests
 linking against those compiled/installed by the first copy:
