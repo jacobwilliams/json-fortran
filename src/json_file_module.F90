@@ -246,10 +246,10 @@
 
         generic,public :: assignment(=) => assign_json_file,&
                                            assign_json_file_to_string,&
-                                           assign_string_to_json_file
+                                           MAYBEWRAP(assign_string_to_json_file)
         procedure :: assign_json_file
         procedure,pass(me) :: assign_json_file_to_string
-        procedure :: assign_string_to_json_file
+        procedure :: MAYBEWRAP(assign_string_to_json_file)
 
         ! ***************************************************
         ! private routines
@@ -1204,6 +1204,23 @@
     call me%deserialize(str)
 
     end subroutine assign_string_to_json_file
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[assign_string_to_json_file]], where "str" is kind=CDK.
+
+    subroutine wrap_assign_string_to_json_file(me,str)
+
+    implicit none
+
+    class(json_file),intent(inout) :: me
+    character(kind=CDK,len=*),intent(in) :: str
+
+    call me%assign_string_to_json_file(to_unicode(str))
+
+    end subroutine wrap_assign_string_to_json_file
 !*****************************************************************************************
 
 !*****************************************************************************************

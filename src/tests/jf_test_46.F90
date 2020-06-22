@@ -259,7 +259,7 @@ contains
     end if
 
     ! now, we try them when an exception is active:
-    json_f = CK_'{"x": 1.0e.2.1}'  ! this will raise an exception
+    json_f = '{"x": 1.0e.2.1}'  ! this will raise an exception
     if (.not. json_f%failed()) then
         write(error_unit,'(A)') 'Error in json_file = string assignment operator : '//&
                                 'should have raised an exception'
