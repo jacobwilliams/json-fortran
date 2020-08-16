@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.2.0 (2020-08-16)](#800-2020-08-16)
     - [8.1.0 (2020-06-21)](#800-2020-06-21)
     - [8.0.0 (2020-04-04)](#800-2020-04-04)
     - [7.1.0 (2019-06-23)](#710-2019-06-23)
@@ -38,7 +39,16 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.1.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.0...HEAD)
+
+### [8.2.0](https://github.com/jacobwilliams/json-fortran/tree/8.2.0) (2020-08-16)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.1.0...8.2.0)
+or [Download v8.2.0](https://github.com/jacobwilliams/json-fortran/releases/tag/8.2.0)
+
+**Enhancements:**
+
+- Updated the `compress_vectors` option so that now vectors of mixed integers and reals are also compressed. [\#470](https://github.com/jacobwilliams/json-fortran/issues/470) [\#471](https://github.com/jacobwilliams/json-fortran/pull/471) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [8.1.0](https://github.com/jacobwilliams/json-fortran/tree/8.1.0) (2020-06-21)
 
