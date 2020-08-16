@@ -901,6 +901,7 @@
         procedure        :: to_object
         procedure        :: to_array
         procedure,nopass :: json_value_clone_func
+        procedure        :: is_vector => json_is_vector
 
     end type json_core
     !*********************************************************
@@ -6036,8 +6037,6 @@
     logical(LK) :: write_file    !! if we are writing to a file
     logical(LK) :: write_string  !! if we are writing to a string
     logical(LK) :: is_array      !! if this is an element in an array
-    integer(IK) :: var_type      !! for getting the variable type of children
-    integer(IK) :: var_type_prev !! for getting the variable type of children
     logical(LK) :: is_vector     !! if all elements of a vector
                                  !! are scalars of the same type
     character(kind=CK,len=:),allocatable :: str_escaped !! escaped version of
@@ -6173,42 +6172,16 @@
 
             count = json%count(p)
 
-            if (json%compress_vectors) then
-                ! check to see if every child is the same type,
-                ! and a scalar:
-                is_vector = .true.
-                var_type_prev = -1   ! an invalid value
-                nullify(element)
-                element => p%children
-                do i = 1, count
-                    if (.not. associated(element)) then
-                        call json%throw_exception('Error in json_value_print: '//&
-                                                  'Malformed JSON linked list')
-                        return
-                    end if
-                    ! check variable type of all the children.
-                    ! They must all be the same, and a scalar.
-                    call json%info(element,var_type=var_type)
-                    if (var_type==json_object .or. &
-                        var_type==json_array .or. &
-                        (i>1 .and. var_type/=var_type_prev)) then
-                        is_vector = .false.
-                        exit
-                    end if
-                    var_type_prev = var_type
-                    ! get the next child the list:
-                    element => element%next
-                end do
-            else
-                is_vector = .false.
-            end if
-
-            if (count==0) then    !special case for empty array
+            if (count==0) then    ! special case for empty array
 
                 s = s_indent//start_array//end_array
                 call write_it( comma=print_comma )
 
             else
+
+                ! if every child is the same type & a scalar:
+                is_vector = json%is_vector(p)
+                if (json%failed()) return
 
                 s = s_indent//start_array
                 call write_it( advance=(.not. is_vector) )
@@ -6410,6 +6383,65 @@
         end subroutine write_it
 
     end subroutine json_value_print
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns true if all the children are the same type (and a scalar).
+!  Note that integers and reals are considered the same type for this purpose.
+!  This routine is used for the `compress_vectors` option.
+
+    function json_is_vector(json, p) result(is_vector)
+
+    implicit none
+
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p
+    logical(LK)                    :: is_vector  !! if all elements of a vector
+                                                 !! are scalars of the same type
+
+    integer(IK) :: var_type_prev !! for getting the variable type of children
+    integer(IK) :: var_type !! for getting the variable type of children
+    type(json_value),pointer :: element !! for getting children
+    integer(IK) :: i !! counter
+    integer(IK) :: count !! number of children
+
+    integer(IK),parameter :: json_invalid = -1_IK  !! to initialize the flag. an invalid value
+    integer(IK),parameter :: json_numeric = -2_IK  !! indicates `json_integer` or `json_real`
+
+    if (json%compress_vectors) then
+        ! check to see if every child is the same type,
+        ! and a scalar:
+        is_vector = .true.
+        var_type_prev = json_invalid
+        count = json%count(p)
+        element => p%children
+        do i = 1_IK, count
+            if (.not. associated(element)) then
+                call json%throw_exception('Error in json_is_vector: '//&
+                                          'Malformed JSON linked list')
+                return
+            end if
+            ! check variable type of all the children.
+            ! They must all be the same, and a scalar.
+            call json%info(element,var_type=var_type)
+            ! special check for numeric values:
+            if (var_type==json_integer .or. var_type==json_real) var_type = json_numeric
+            if (var_type==json_object .or. &
+                var_type==json_array .or. &
+                (i>1_IK .and. var_type/=var_type_prev)) then
+                is_vector = .false.
+                exit
+            end if
+            var_type_prev = var_type
+            ! get the next child the list:
+            element => element%next
+        end do
+    else
+        is_vector = .false.
+    end if
+
+    end function json_is_vector
 !*****************************************************************************************
 
 !*****************************************************************************************

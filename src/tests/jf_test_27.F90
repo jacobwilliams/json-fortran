@@ -27,7 +27,8 @@ contains
     type(json_file) :: f
 
     character(kind=CK,len=*),parameter :: json_str = &
-            '{"int_vec": [1,2,3], "int": 1, "object": {"int_vec": [1,2,3]},'//&
+            '{"int_vec": [1,2,3], "int": 1, "numeric_vec": [1, 2.0, 3, 4.0e1], '//&
+            '"object": {"int_vec": [1,2,3]},'//&
             '"vec": [[1,2],[3,4]], "vec_of_objects": [{"a":1},{"bvec":[1,2,3]}]}'
 
     error_cnt = 0
