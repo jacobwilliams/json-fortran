@@ -809,7 +809,7 @@
 !
 !  Returns lowercase version of the `CK` string.
 
-    pure elemental function lowercase_string(str) result(s_lower)
+    pure function lowercase_string(str) result(s_lower)
 
     implicit none
 

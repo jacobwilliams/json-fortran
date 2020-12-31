@@ -52,7 +52,7 @@
                                                                     !! [[json_get_by_path_default]]
     character(kind=CK,len=*),parameter :: end_array_alt   = CK_')'  !! alternate end of JSON array for
                                                                     !! [[json_get_by_path_default]]
-    character(kind=CK,len=*),parameter :: root            = CK_'$'  !! root for [[json_get_by_path_default]]
+    character(kind=CK,len=*),parameter :: root            = achar(36, kind=CK)  !! (`$`) root for [[json_get_by_path_default]]
     character(kind=CK,len=*),parameter :: this            = CK_'@'  !! 'this' for [[json_get_by_path_default]]
     character(kind=CK,len=*),parameter :: dot             = CK_'.'  !! path separator for [[json_get_by_path_default]]
     character(kind=CK,len=*),parameter :: tilde           = CK_'~'  !! RFC 6901 escape character
