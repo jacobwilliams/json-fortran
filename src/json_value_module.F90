@@ -2340,6 +2340,7 @@
 !
 !### History
 !  * Jacob Williams : 12/28/2014 : added destroy optional argument.
+!  * Jacob Williams : 12/04/2020 : bug fix.
 
     subroutine json_value_remove(json,p,destroy)
 
@@ -2374,9 +2375,7 @@
             if (associated(p%next)) then
 
                 !there are later items in the list:
-
                 next => p%next
-                nullify(p%next)
 
                 if (associated(p%previous)) then
                     !there are earlier items in the list
@@ -2403,6 +2402,11 @@
                 end if
 
             end if
+
+            ! nullify all pointers to original structure:
+            nullify(p%next)
+            nullify(p%previous)
+            nullify(p%parent)
 
             parent%n_children = parent%n_children - 1
 

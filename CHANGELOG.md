@@ -4,8 +4,9 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
-    - [8.2.0 (2020-08-16)](#800-2020-08-16)
-    - [8.1.0 (2020-06-21)](#800-2020-06-21)
+    - [8.2.1 (2021-01-02)](#821-2021-01-02)
+    - [8.2.0 (2020-08-16)](#820-2020-08-16)
+    - [8.1.0 (2020-06-21)](#810-2020-06-21)
     - [8.0.0 (2020-04-04)](#800-2020-04-04)
     - [7.1.0 (2019-06-23)](#710-2019-06-23)
     - [7.0.0 (2019-01-26)](#700-2019-01-26)
@@ -39,7 +40,22 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.1...HEAD)
+
+### [8.2.1](https://github.com/jacobwilliams/json-fortran/tree/8.2.1) (2020-01-02)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.0...8.2.1)
+or [Download v8.2.1](https://github.com/jacobwilliams/json-fortran/releases/tag/8.2.1)
+
+**Enhancements:**
+
+- Fixed a couple compiler warnings when using the latest Intel Fortran compiler. [\#477](https://github.com/jacobwilliams/json-fortran/issues/480) ([jacobwilliams](https://github.com/jacobwilliams))
+- replaced `-std15` with `-std18` for the Intel compiler in the FoBiS build file.
+- Updated the Visual Studio test project with some missing test cases. ([jacobwilliams](https://github.com/jacobwilliams))
+
+**Bug fixes:**
+
+- Bug fix in `json_value_remove`: the parent and previous pointers should also be nullified when removing from an array. [\#477](https://github.com/jacobwilliams/json-fortran/issues/477)   [\#479](https://github.com/jacobwilliams/json-fortran/pull/479) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [8.2.0](https://github.com/jacobwilliams/json-fortran/tree/8.2.0) (2020-08-16)
 
