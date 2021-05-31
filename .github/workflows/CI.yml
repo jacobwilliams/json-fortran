@@ -59,36 +59,36 @@ jobs:
     - name: Compile_with_cmake
       if: matrix.gcc_v == 7
       run: |
-        - GFORTRAN=gfortran-${{ matrix.gcc_v }}
-        - GCOV=gcov-${{ matrix.gcc_v }}
+        GFORTRAN=gfortran-${{ matrix.gcc_v }}
+        GCOV=gcov-${{ matrix.gcc_v }}
         # CMake build with unit tests, no documentation, with coverage analysis
         # No unicode so that coverage combined with the build script will cover unicode
         # and non-unicode code paths
-        - mkdir cmake-build
-        - cd cmake-build
-        - cmake ..
-        - make -j 4 check
+        mkdir cmake-build
+        cd cmake-build
+        cmake ..
+        make -j 4 check
 
     - name: Compile_with_build
       if: matrix.gcc_v == 8
       run: |
-        - GFORTRAN=gfortran-${{ matrix.gcc_v }}
-        - GCOV=gcov-${{ matrix.gcc_v }}
+        GFORTRAN=gfortran-${{ matrix.gcc_v }}
+        GCOV=gcov-${{ matrix.gcc_v }}
         # build with build.sh, run unit tests
-        - ./build.sh --skip-documentation
-        - ./build.sh --skip-documentation --enable-unicode
-        - CODE_COVERAGE="no"
-        - DEPLOY_DOCUMENTATION="no"
+        ./build.sh --skip-documentation
+        ./build.sh --skip-documentation --enable-unicode
+        CODE_COVERAGE="no"
+        DEPLOY_DOCUMENTATION="no"
 
-    - name: Compile_with_build
+    - name: Compile_with_build_mkdocs
       if: matrix.gcc_v == 9
       run: |
         # build with build.sh, make documentation, run unit tests
         # and perform coverage analysis
-        - ./build.sh --coverage --skip-documentation
-        - ./build.sh --coverage --enable-unicode"
-        - CODE_COVERAGE="yes"
-        - DEPLOY_DOCUMENTATION="yes"
+        ./build.sh --coverage --skip-documentation
+        ./build.sh --coverage --enable-unicode"
+        CODE_COVERAGE="yes"
+        DEPLOY_DOCUMENTATION="yes"
 
 
     # - name: Run tests
