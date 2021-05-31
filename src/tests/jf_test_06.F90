@@ -120,7 +120,6 @@ program jf_test_6
     use jf_test_6_mod , only: test_6
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_6(n_errors)
     if (n_errors /= 0) stop 1
 

@@ -31,6 +31,7 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
+
     type(json_value),pointer :: p,inp
     type(json_file) :: json
     type(json_core) :: core  !! factory for manipulating `json_value` pointers
@@ -172,7 +173,6 @@ program jf_test_4
     use jf_test_4_mod , only: test_4
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_4(n_errors)
     if (n_errors /= 0) stop 1
 end program jf_test_4

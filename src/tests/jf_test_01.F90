@@ -27,10 +27,11 @@ contains
 
     implicit none
 
+    integer,intent(out) :: error_cnt
+
     type(json_file) :: json       !! the JSON structure read from the file
     type(json_value),pointer :: p !! a pointer for low-level manipulations
     type(json_core) :: core       !! factory for manipulating `json_value` pointers
-    integer,intent(out) :: error_cnt
     integer(IK) :: ival
     character(kind=json_CK,len=:),allocatable :: cval
     real(wp) :: rval
@@ -508,7 +509,6 @@ program jf_test_1
     use jf_test_1_mod , only: test_1
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_1(n_errors)
     if (n_errors /= 0) stop 1
 

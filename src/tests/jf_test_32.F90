@@ -21,6 +21,7 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
+
     integer :: i !! counter
     integer :: j !! counter
     type(json_core) :: json
@@ -118,7 +119,6 @@ program jf_test_32
     use jf_test_32_mod , only: test_32
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_32(n_errors)
     if (n_errors /= 0) stop 1
 

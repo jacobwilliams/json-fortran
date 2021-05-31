@@ -20,14 +20,14 @@ contains
 
     implicit none
 
-    type(json_file) :: json          !! the JSON structure read from the file
     integer,intent(out) :: error_cnt !! error counter
 
     character(kind=CK,len=*),parameter :: str = CK_'{'//&
-             CK_'"bad_reals": [1.0, null, "NaN", "+Infinity", "-Infinity", 4.0],'//&
-             CK_'"nonstandard_json": [.1e1, .1D1, .1d+1, +.1d1, +.1D1, +1.0, +1.0d0, +1.0D0]'//&
-             CK_'}'
+            CK_'"bad_reals": [1.0, null, "NaN", "+Infinity", "-Infinity", 4.0],'//&
+            CK_'"nonstandard_json": [.1e1, .1D1, .1d+1, +.1d1, +.1D1, +1.0, +1.0d0, +1.0D0]'//&
+            CK_'}'
 
+    type(json_file) :: json !! the JSON structure read from the file
     real(rk),dimension(:),allocatable :: bad_reals
     logical(lk) :: found
 
@@ -129,7 +129,6 @@ program jf_test_42
     use jf_test_42_mod , only: test_42
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_42(n_errors)
     if (n_errors /= 0) stop 1
 

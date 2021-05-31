@@ -29,6 +29,7 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
+
     integer(IK) :: vv
     integer(IK),dimension(:),allocatable :: vvv
     real(wp) :: d
@@ -117,7 +118,6 @@ program jf_test_5
     use jf_test_5_mod , only: test_5
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_5(n_errors)
     if (n_errors /= 0) stop 1
 

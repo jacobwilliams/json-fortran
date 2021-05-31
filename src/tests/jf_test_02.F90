@@ -416,7 +416,6 @@ program jf_test_2
     use jf_test_2_mod , only: test_2
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_2(n_errors)
     if (n_errors /= 0) stop 1
 

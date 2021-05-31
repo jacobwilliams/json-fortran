@@ -157,7 +157,6 @@ program jf_test_25
     use jf_test_25_mod , only: test_25
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_25(n_errors)
     if (n_errors /= 0) stop 1
 
