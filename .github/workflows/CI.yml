@@ -1,0 +1,110 @@
+name: CI
+
+on: [push]
+
+env:
+  CI: "ON"
+
+jobs:
+
+  Build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        gcc_v: [7,8,9] # Version of GFortran we want to use.
+        python-version: [3.7]
+    env:
+      FC: gfortran-${{ matrix.gcc_v }}
+      GCC_V: ${{ matrix.gcc_v }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Setup cmake
+      if: contains( matrix.gcc_v, 7 )
+      uses: jwlawson/actions-setup-cmake@v1.8
+      with:
+        cmake-version: '3.19.x'
+
+    - name: Install Python
+      uses: actions/setup-python@v1 # Use pip to install latest CMake, & FORD/Jin2For, etc.
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Setup Graphviz
+      uses: ts-graphviz/setup-graphviz@v1
+
+    - name: Install Python dependencies
+      if: contains( matrix.os, 'ubuntu')
+      run: |
+        python -m pip install --upgrade pip
+        pip install ford FoBiS.py pygooglechart
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Install GFortran Linux
+      if: contains( matrix.os, 'ubuntu')
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install -y gcc-${GCC_V} gfortran-${GCC_V}
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_V} 100 \
+        --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${GCC_V} \
+        --slave /usr/bingcov gcov /usr/bin/gcov-${GCC_V}
+
+    - name: Compile_with_cmake
+      if: matrix.gcc_v == 7
+      run: |
+        - GFORTRAN=gfortran-${{ matrix.gcc_v }}
+        - GCOV=gcov-${{ matrix.gcc_v }}
+        # CMake build with unit tests, no documentation, with coverage analysis
+        # No unicode so that coverage combined with the build script will cover unicode
+        # and non-unicode code paths
+        - mkdir cmake-build
+        - cd cmake-build
+        - cmake ..
+        - make -j 4 check
+
+    - name: Compile_with_build
+      if: matrix.gcc_v == 8
+      run: |
+        - GFORTRAN=gfortran-${{ matrix.gcc_v }}
+        - GCOV=gcov-${{ matrix.gcc_v }}
+        # build with build.sh, run unit tests
+        - ./build.sh --skip-documentation
+        - ./build.sh --skip-documentation --enable-unicode
+        - CODE_COVERAGE="no"
+        - DEPLOY_DOCUMENTATION="no"
+
+    - name: Compile_with_build
+      if: matrix.gcc_v == 9
+      run: |
+        # build with build.sh, make documentation, run unit tests
+        # and perform coverage analysis
+        - ./build.sh --coverage --skip-documentation
+        - ./build.sh --coverage --enable-unicode"
+        - CODE_COVERAGE="yes"
+        - DEPLOY_DOCUMENTATION="yes"
+
+
+    # - name: Run tests
+    #   run: |
+    #     ./bin/slsqp_test
+    #     ./bin/slsqp_test_2
+    #     ./bin/slsqp_test_3
+    #     ./bin/slsqp_test_71
+    #     ./bin/slsqp_test_stopping_criterion
+
+    # - name: Build documentation
+    #   run: ford ./json-fortran.md
+
+    # - name: Deploy Documentation
+    #   if: github.ref == 'refs/heads/master'
+    #   uses: JamesIves/github-pages-deploy-action@4.1.0
+    #   with:
+    #     branch: gh-pages # The branch the action should deploy to.
+    #     folder: doc  # The folder the action should deploy.
