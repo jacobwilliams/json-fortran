@@ -15,6 +15,7 @@ jobs:
         os: [ubuntu-latest]
         gcc_v: [7,8,9,10] # Version of GFortran we want to use.
         python-version: [3.7]
+        use-cmake: [0,1]
     env:
       FC: gfortran-${{matrix.gcc_v}}
       GCC_V: ${{matrix.gcc_v}}
@@ -72,6 +73,7 @@ jobs:
     #     DEPLOY_DOCUMENTATION="yes"
 
     - name: Compile_with_build
+      if: use-cmake == 0
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
@@ -82,7 +84,7 @@ jobs:
         DEPLOY_DOCUMENTATION="no"
 
     - name: Compile_with_cmake
-      if: matrix.gcc_v == 9
+      if: matrix.gcc_v == 9 && use-cmake == 1
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
