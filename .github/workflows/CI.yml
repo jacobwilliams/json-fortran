@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        gcc_v: [7,8,9] # Version of GFortran we want to use.
+        gcc_v: [9] # Version of GFortran we want to use.
         python-version: [3.6]
     env:
       FC: gfortran-${{matrix.gcc_v}}
@@ -26,7 +26,7 @@ jobs:
         submodules: recursive
 
     - name: Setup cmake
-      if: contains( matrix.gcc_v, 7 )
+      if: contains( matrix.gcc_v, 9 )
       uses: jwlawson/actions-setup-cmake@v1.8
       with:
         cmake-version: '3.19.x'
@@ -54,7 +54,7 @@ jobs:
         --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_V}
 
     - name: Compile_with_build_mkdocs
-      if: matrix.gcc_v == 7
+      if: matrix.gcc_v == 9
       run: |
         # GFORTRAN=gfortran-${{matrix.gcc_v}}
         # GCOV=gcov-${{matrix.gcc_v}}
@@ -68,16 +68,16 @@ jobs:
         CODE_COVERAGE="yes"
         DEPLOY_DOCUMENTATION="yes"
 
-    - name: Compile_with_build
-      if: matrix.gcc_v == 8
-      run: |
-        GFORTRAN=gfortran-${{matrix.gcc_v}}
-        GCOV=gcov-${{matrix.gcc_v}}
-        # build with build.sh, run unit tests
-        ./build.sh --skip-documentation
-        ./build.sh --skip-documentation --enable-unicode
-        CODE_COVERAGE="no"
-        DEPLOY_DOCUMENTATION="no"
+    # - name: Compile_with_build
+    #   if: matrix.gcc_v == 9
+    #   run: |
+    #     GFORTRAN=gfortran-${{matrix.gcc_v}}
+    #     GCOV=gcov-${{matrix.gcc_v}}
+    #     # build with build.sh, run unit tests
+    #     ./build.sh --skip-documentation
+    #     ./build.sh --skip-documentation --enable-unicode
+    #     CODE_COVERAGE="no"
+    #     DEPLOY_DOCUMENTATION="no"
 
     - name: Compile_with_cmake
       if: matrix.gcc_v == 9
