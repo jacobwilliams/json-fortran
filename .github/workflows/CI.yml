@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        gcc_v: [9] # Version of GFortran we want to use.
-        python-version: [3.6]
+        gcc_v: [8,9,10] # Version of GFortran we want to use.
+        python-version: [3.7]
     env:
       FC: gfortran-${{matrix.gcc_v}}
       GCC_V: ${{matrix.gcc_v}}
@@ -53,31 +53,30 @@ jobs:
         --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${GCC_V} \
         --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_V}
 
-    - name: Compile_with_build_mkdocs
-      if: matrix.gcc_v == 9
-      run: |
-        # GFORTRAN=gfortran-${{matrix.gcc_v}}
-        # GCOV=gcov-${{matrix.gcc_v}}
-        # alias gcov=$GCOV
-        gfortran --version
-        gcov --version
-        # build with build.sh, make documentation, run unit tests
-        # and perform coverage analysis
-        ./build.sh --coverage --skip-documentation
-        ./build.sh --coverage --enable-unicode"
-        CODE_COVERAGE="yes"
-        DEPLOY_DOCUMENTATION="yes"
-
-    # - name: Compile_with_build
+    # - name: Compile_with_build_mkdocs
     #   if: matrix.gcc_v == 9
     #   run: |
-    #     GFORTRAN=gfortran-${{matrix.gcc_v}}
-    #     GCOV=gcov-${{matrix.gcc_v}}
-    #     # build with build.sh, run unit tests
-    #     ./build.sh --skip-documentation
-    #     ./build.sh --skip-documentation --enable-unicode
-    #     CODE_COVERAGE="no"
-    #     DEPLOY_DOCUMENTATION="no"
+    #     # GFORTRAN=gfortran-${{matrix.gcc_v}}
+    #     # GCOV=gcov-${{matrix.gcc_v}}
+    #     # alias gcov=$GCOV
+    #     gfortran --version
+    #     gcov --version
+    #     # build with build.sh, make documentation, run unit tests
+    #     # and perform coverage analysis
+    #     ./build.sh --coverage --skip-documentation
+    #     ./build.sh --coverage --enable-unicode"
+    #     CODE_COVERAGE="yes"
+    #     DEPLOY_DOCUMENTATION="yes"
+
+    - name: Compile_with_build
+      run: |
+        GFORTRAN=gfortran-${{matrix.gcc_v}}
+        GCOV=gcov-${{matrix.gcc_v}}
+        # build with build.sh, run unit tests
+        ./build.sh --skip-documentation
+        ./build.sh --skip-documentation --enable-unicode
+        CODE_COVERAGE="no"
+        DEPLOY_DOCUMENTATION="no"
 
     - name: Compile_with_cmake
       if: matrix.gcc_v == 9
