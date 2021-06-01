@@ -21,6 +21,7 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
+
     type(json_file) :: json
     type(json_core) :: json_c
     integer :: i
