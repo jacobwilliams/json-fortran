@@ -2,9 +2,6 @@ name: CI
 
 on: [push]
 
-env:
-  CI: "ON"
-
 jobs:
 
   Build:
@@ -20,6 +17,11 @@ jobs:
       GCC_V: ${{matrix.gcc_v}}
 
     steps:
+
+    - name: Set vars
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
     - name: Checkout code
       uses: actions/checkout@v2
       with:
@@ -92,20 +94,40 @@ jobs:
         cmake ..
         make -j 4 check
 
-    # - name: Run tests
-    #   run: |
-    #     ./bin/slsqp_test
-    #     ./bin/slsqp_test_2
-    #     ./bin/slsqp_test_3
-    #     ./bin/slsqp_test_71
-    #     ./bin/slsqp_test_stopping_criterion
+    - name: Deploy Documentation for master
+      if: github.ref == 'refs/heads/master' && $DEPLOY_DOCUMENTATION == 'yes'
+      uses: JamesIves/github-pages-deploy-action@4.1.3
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: doc  # The folder the action should deploy.
+        clean: true
+        clean-exclude: |
+          prev
 
-    # - name: Build documentation
-    #   run: ford ./json-fortran.md
+    - name: Rebuild documentation for tagged release
+      env:
+        TAGNAME: ${{ steps.vars.outputs.tag }}
+      if: $DEPLOY_DOCUMENTATION == 'yes' && startsWith(github.ref, 'refs/tags/')
+      run: |
+        echo ${TAGNAME}
+        rm -rf doc
+        sed "2 s/^/version: ${TAGNAME}\n/" json-fortran.md > json-fortran.tagged.md
+        ford --debug json-fortran.tagged.md
 
-    # - name: Deploy Documentation
-    #   if: github.ref == 'refs/heads/master'
-    #   uses: JamesIves/github-pages-deploy-action@4.1.0
-    #   with:
-    #     branch: gh-pages # The branch the action should deploy to.
-    #     folder: doc  # The folder the action should deploy.
+    - name: Deploy documentation for tagged release
+      env:
+        TAGNAME: ${{ steps.vars.outputs.tag }}
+      if: $DEPLOY_DOCUMENTATION == 'yes' && startsWith(github.ref, 'refs/tags/')
+      uses: JamesIves/github-pages-deploy-action@4.1.3
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: doc  # The folder the action should deploy.
+        target-folder: prev/$TAGNAME  # deploy to a version-specific folder
+
+    - name: Upload coverage
+      if: $CODE_COVERAGE == 'yes'
+      run: |
+        rm json_*.F90-*unicode.gcov || true
+        mv json_*.F90.gcov src/
+        mv jf_test*.[fF]90.gcov src/tests/
+        bash <(curl -s https://codecov.io/bash) -v -X $GCOV
