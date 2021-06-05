@@ -390,7 +390,7 @@ if [[ $JF_SKIP_DOCS != [yY]* ]]; then
     echo "$FPP" > .PREPROCESSOR # Override via include in project file, until FORD gets CLI for this
     ford --debug "${MACRO_FLAG[@]}" -p "$PAGESDIR" "$FORDMD"
     else
-    echo "FORD not found! Install using: sudo pip install ford"
+    echo "FORD not found! Install using: pip install ford"
     fi
 else
     echo "Skip building documentation since \$JF_SKIP_DOCS has been set to ${JF_SKIP_DOCS}."

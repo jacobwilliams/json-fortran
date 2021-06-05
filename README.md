@@ -21,7 +21,7 @@ A Fortran 2008 JSON API
 
 Status
 ------
-[![Build Status](https://img.shields.io/travis/jacobwilliams/json-fortran/master.svg?style=plastic)](https://travis-ci.com/github/jacobwilliams/json-fortran)
+![Build Status](https://github.com/jacobwilliams/json-fortran/actions/workflows/CI.yml/badge.svg)
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Codecov](https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobwilliams/json-fortran)
 
@@ -168,7 +168,6 @@ Miscellaneous
 
 * JSON-Fortran is a fork and extensive upgrade of the Fortran 95 [FSON](https://github.com/josephalevin/fson) code. The reason for the split was to be able to incorporate object-oriented and other nice features of the Fortran 2003 and 2008 standards.  Many thanks to the original authors of FSON.
 * For more information about JSON, see: <http://www.json.org/>
-* [json-fortran on Travis CI](https://travis-ci.com/jacobwilliams/json-fortran)
 * [json-fortran on Codecov.IO](https://codecov.io/gh/jacobwilliams/json-fortran)
 
 [top](#json-fortran)

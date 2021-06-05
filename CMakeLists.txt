@@ -267,7 +267,7 @@ if ( NOT SKIP_DOC_GEN )
     endif ()
   else () # Not found
     message ( WARNING
-      "FORD not found! Please set the CMake cache variable FORD to point to the installed FORD executable, and reconfigure or disable building the documentation. FORD can be installed from PYPI with `sudo pip install FORD` or from <https://github.com/cmacmackin/ford> If you do not wish to install FORD and build the JSON-Fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
+      "FORD not found! Please set the CMake cache variable FORD to point to the installed FORD executable, and reconfigure or disable building the documentation. FORD can be installed from PYPI with `pip install ford` or from <https://github.com/Fortran-FOSS-Programmers/ford> If you do not wish to install FORD and build the JSON-Fortran documentation, then please set the CMake cache variable SKIP_DOC_GEN to TRUE." )
   endif ()
 endif ()
 

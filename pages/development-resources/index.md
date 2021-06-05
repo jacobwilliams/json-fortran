@@ -31,8 +31,7 @@ scripts used in building and testing JSON-Fortran, as well as
 deploying documentation and managing test coverage information.
 
 - [`build.sh`](build.sh.html)
-- [`deploy.sh`](deploy.sh.html)
-- [`.travis.yml`](travis.yml.html)
+- [`CI.yml`](CI.yml.html)
 - [`codecov.yml`](codecov.yml.html)
 - [`gccr.pl`](gccr.pl.html)
 
