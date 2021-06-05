@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.2.2 (2021-06-05)](#822-2021-06-05)
     - [8.2.1 (2021-01-02)](#821-2021-01-02)
     - [8.2.0 (2020-08-16)](#820-2020-08-16)
     - [8.1.0 (2020-06-21)](#810-2020-06-21)
@@ -40,7 +41,22 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.1...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.2...HEAD)
+
+### [8.2.2](https://github.com/jacobwilliams/json-fortran/tree/8.2.2) (2020-01-02)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.1...8.2.2)
+or [Download v8.2.2](https://github.com/jacobwilliams/json-fortran/releases/tag/8.2.2)
+
+**Enhancements:**
+
+- Added support for the Fortran Package Manger. [\#483](https://github.com/jacobwilliams/json-fortran/issues/483) ([jacobwilliams](https://github.com/jacobwilliams))
+- Updated CI to use GitHub Actions, including auto-deployment of documentation. [\#476](https://github.com/jacobwilliams/json-fortran/issues/476) [\#484](https://github.com/jacobwilliams/json-fortran/pull/484) ([jacobwilliams](https://github.com/jacobwilliams))  
+- Eliminated some compiler warnings about real conversions.
+
+**Bug fixes:**
+
+- Fixed a bug in test case 47.
 
 ### [8.2.1](https://github.com/jacobwilliams/json-fortran/tree/8.2.1) (2020-01-02)
 
