@@ -37,11 +37,11 @@
 !    one module (json_module.f90).
 !    Various Fortran 2003/2008 features are now used
 !    (e.g., allocatable strings, newunit, generic, class, and abstract interface).
-!  * Development continues at: [Github](http://github.com/jacobwilliams/json-fortran)
+!  * Development continues at: [Github](https://github.com/jacobwilliams/json-fortran)
 !
 !### See also
-!  * [json-fortran development site](http://github.com/jacobwilliams/json-fortran)
-!  * [json-fortran online documentation](http://jacobwilliams.github.io/json-fortran)
+!  * [json-fortran development site](https://github.com/jacobwilliams/json-fortran)
+!  * [json-fortran online documentation](https://jacobwilliams.github.io/json-fortran)
 !  * [JSON website](http://www.json.org/)
 !  * [JSON validator](http://jsonlint.com/)
 !

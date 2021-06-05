@@ -50,7 +50,7 @@ License
 The JSON-Fortran source code and related files and documentation are
 distributed under a permissive free software license (BSD-style).  See
 the
-[LICENSE](http://jacobwilliams.github.io/json-fortran/page/development-resources/LICENSE.html)
+[LICENSE](https://jacobwilliams.github.io/json-fortran/page/development-resources/LICENSE.html)
 file for more details.
 
 Official Releases
@@ -60,13 +60,13 @@ The **current stable release** is **{!.VERSION!}** and can be [downloaded
 on GitHub](https://github.com/jacobwilliams/json-fortran/releases/latest)
 or installed with [Homebrew](http://brew.sh) on MacOS. The
 documentation for the current version, **{!.VERSION!}**, can be
-found [here](http://jacobwilliams.github.io/json-fortran/prev/{!.VERSION!}/index.html)[^1], and a
+found [here](https://jacobwilliams.github.io/json-fortran/prev/{!.VERSION!}/index.html)[^1], and a
 list of changes from the previous version are
-[here](http://jacobwilliams.github.io/json-fortran/page/releases/index.html#change-log).
+[here](https://jacobwilliams.github.io/json-fortran/page/releases/index.html#change-log).
 
 A list of all past releases, links to their documentation, and the
 change log can be found on the
-[releases page](http://jacobwilliams.github.io/json-fortran/page/releases/index.html).
+[releases page](https://jacobwilliams.github.io/json-fortran/page/releases/index.html).
 
 Miscellaneous
 -------------
@@ -82,4 +82,4 @@ Miscellaneous
 [^1]:
     Documentation for a particular release does not contain links
     back to *general* documentation; use the browser's back button to
-    navigate back to <http://jacobwilliams.github.io/json-fortran/>
+    navigate back to <https://jacobwilliams.github.io/json-fortran/>

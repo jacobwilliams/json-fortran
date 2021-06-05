@@ -13,7 +13,7 @@ of the `master` branch, please head back to the
 
 **Documentation:**
 [{!.VERSION!}](
-https://jacobwilliams.github.io/json-fortran/{!.VERSION!}/index.html)
+https://jacobwilliams.github.io/json-fortran/prev/{!.VERSION!}/index.html)
 
 **Download:**
 <https://github.com/jacobwilliams/json-fortran/releases/latest>
@@ -131,7 +131,7 @@ the [main project page](|url|/index.html) for convenient navigation.
 # Development Version
 
 Documentation for the latest development version may be found at
-<https://jacobwilliams.github.io/json-fortran/{!.VERSION!}/index.html>
+<https://jacobwilliams.github.io/json-fortran/prev/{!.VERSION!}/index.html>
 or generated locally using the
 [build.sh](|url|/page/development-resources/build.sh.html) build
 script.

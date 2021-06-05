@@ -4,7 +4,7 @@ title: Other Docs
 
 The latest stable release is
 [**{!.VERSION!}**](
-http://jacobwilliams.github.io/json-fortran/{!.VERSION!}/index.html).[^1]
+https://jacobwilliams.github.io/json-fortran/prev/{!.VERSION!}/index.html).[^1]
 
 # Past Releases
 
