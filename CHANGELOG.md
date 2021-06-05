@@ -43,7 +43,7 @@
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.2...HEAD)
 
-### [8.2.2](https://github.com/jacobwilliams/json-fortran/tree/8.2.2) (2020-01-02)
+### [8.2.2](https://github.com/jacobwilliams/json-fortran/tree/8.2.2) (2020-06-05)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.1...8.2.2)
 or [Download v8.2.2](https://github.com/jacobwilliams/json-fortran/releases/tag/8.2.2)
