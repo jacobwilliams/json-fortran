@@ -1,6 +1,6 @@
 ---
 project: JSON-Fortran
-summary: ![JSON-Fortran](|media|/json-fortran-logo-500px.png)<br>
+summary: ![JSON-Fortran](|media|/json-fortran-logo-250px.png)<br>
          JSON-Fortran -- A Fortran 2008 JSON API
 author: Jacob Williams
 src_dir: ./src
