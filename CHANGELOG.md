@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.2.3 (2021-06-05)](#823-2021-06-05)
     - [8.2.2 (2021-06-05)](#822-2021-06-05)
     - [8.2.1 (2021-01-02)](#821-2021-01-02)
     - [8.2.0 (2020-08-16)](#820-2020-08-16)
@@ -41,7 +42,16 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.2...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.3...HEAD)
+
+### [8.2.3](https://github.com/jacobwilliams/json-fortran/tree/8.2.3) (2020-06-05)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.2...8.2.3)
+or [Download v8.2.3](https://github.com/jacobwilliams/json-fortran/releases/tag/8.2.3)
+
+**Enhancements:**
+
+- No code changes. Only documentation updates.
 
 ### [8.2.2](https://github.com/jacobwilliams/json-fortran/tree/8.2.2) (2020-06-05)
 
