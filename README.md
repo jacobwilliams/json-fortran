@@ -135,6 +135,8 @@ foreach ( UNIT_TEST ${JF_TEST_SRCS} )
 endforeach()
 ```
 
+* A [Fortran Package Manager](https://github.com/fortran-lang/fpm) file is also included, so that JSON-Fortran can be compiled with FPM.
+
 [top](#json-fortran)
 
 Documentation
