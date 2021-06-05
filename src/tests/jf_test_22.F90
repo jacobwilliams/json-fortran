@@ -23,8 +23,9 @@ contains
 
     implicit none
 
-    type(json_file) :: json          !! the JSON structure read from the file
     integer,intent(out) :: error_cnt !! error counter
+
+    type(json_file) :: json          !! the JSON structure read from the file
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -88,7 +89,6 @@ program jf_test_22
     use jf_test_22_mod , only: test_22
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_22(n_errors)
     if (n_errors /= 0) stop 1
 

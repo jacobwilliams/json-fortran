@@ -29,6 +29,7 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
+
     character(kind=json_CK,len=:),allocatable :: cval
     type(json_file) :: json    !the JSON structure read from the file:
 # ifdef USE_UCS4
@@ -286,7 +287,6 @@ program jf_test_11
     use jf_test_11_mod , only: test_11
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_11(n_errors)
     if (n_errors /= 0) stop 1
 

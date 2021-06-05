@@ -91,7 +91,6 @@ program jf_test_43
     use jf_test_43_mod , only: test_43
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_43(n_errors)
     if (n_errors /= 0) stop 1
 

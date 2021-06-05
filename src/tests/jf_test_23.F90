@@ -24,10 +24,11 @@ contains
 
     implicit none
 
+    integer,intent(out) :: error_cnt
+
     type(json_file) :: json       !! the JSON structure read from the file
     type(json_value),pointer :: p
     type(json_core) :: core
-    integer,intent(out) :: error_cnt
     character(kind=json_CK,len=:),allocatable :: cval
     character(kind=json_CK,len=:),allocatable :: key
     character(kind=json_CK,len=:),allocatable :: path
@@ -301,7 +302,6 @@ program jf_test_23
     use jf_test_23_mod , only: test_23
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_23(n_errors)
     if (n_errors /= 0) stop 1
 

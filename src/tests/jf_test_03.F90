@@ -27,6 +27,7 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
+
     integer(IK) :: ival
     character(kind=json_CK,len=:),allocatable :: cval
     real(wp) :: rval
@@ -151,7 +152,6 @@ program jf_test_3
     use jf_test_3_mod , only: test_3
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_3(n_errors)
     if (n_errors /= 0) stop 1
 

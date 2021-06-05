@@ -349,7 +349,6 @@ program jf_test_10
     use jf_test_10_mod , only: test_10
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_10(n_errors)
     if (n_errors /= 0) stop 1
 

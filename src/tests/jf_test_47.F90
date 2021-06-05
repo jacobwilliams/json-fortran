@@ -52,6 +52,8 @@ contains
     write(error_unit,'(A)') '================================='
     write(error_unit,'(A)') ''
 
+    error_cnt = 0
+
     call json%deserialize(inp, STR)
     call json%check_for_errors(status_ok, errtxt)
     if (.not. status_ok) then
@@ -137,7 +139,6 @@ program jf_test_47
     use jf_test_47_mod , only: test_47
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_47(n_errors)
     if (n_errors /= 0) stop 1
 

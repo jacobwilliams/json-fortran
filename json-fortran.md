@@ -59,7 +59,7 @@ The **current stable release** is **{!.VERSION!}** and can be [downloaded
 on GitHub](https://github.com/jacobwilliams/json-fortran/releases/latest)
 or installed with [Homebrew](http://brew.sh) on MacOS. The
 documentation for the current version, **{!.VERSION!}**, can be
-found [here](http://jacobwilliams.github.io/json-fortran/{!.VERSION!}/index.html)[^1], and a
+found [here](http://jacobwilliams.github.io/json-fortran/prev/{!.VERSION!}/index.html)[^1], and a
 list of changes from the previous version are
 [here](http://jacobwilliams.github.io/json-fortran/page/releases/index.html#change-log).
 

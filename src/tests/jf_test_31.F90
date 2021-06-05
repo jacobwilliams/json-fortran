@@ -21,6 +21,7 @@ contains
     implicit none
 
     integer,intent(out) :: error_cnt
+
     type(json_file) :: json
     integer(IK) :: ival
     real(RK)    :: rval
@@ -103,7 +104,6 @@ program jf_test_31
     use jf_test_31_mod , only: test_31
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_31(n_errors)
     if (n_errors /= 0) stop 1
 

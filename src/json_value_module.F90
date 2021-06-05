@@ -8571,7 +8571,7 @@
     real(RK) :: tmp
 
     call json%get(me, tmp)
-    value = real(tmp,RK)
+    value = real(tmp,real32)
 
     end subroutine json_get_real32
 !*****************************************************************************************
@@ -8601,7 +8601,7 @@
         call json%get(me, path, tmp, found)
     end if
 
-    value = real(tmp,RK)
+    value = real(tmp,real32)
 
     end subroutine json_get_real32_by_path
 !*****************************************************************************************
@@ -8641,7 +8641,7 @@
     real(RK),dimension(:),allocatable :: tmp
 
     call json%get(me, tmp)
-    if (allocated(tmp)) vec = real(tmp,RK)
+    if (allocated(tmp)) vec = real(tmp,real32)
 
     end subroutine json_get_real32_vec
 !*****************************************************************************************
@@ -8671,7 +8671,7 @@
         call json%get(me, path, tmp, found)
     end if
 
-    if (allocated(tmp)) vec = real(tmp,RK)
+    if (allocated(tmp)) vec = real(tmp,real32)
 
     end subroutine json_get_real32_vec_by_path
 !*****************************************************************************************
@@ -8713,7 +8713,7 @@
     real(RK) :: tmp
 
     call json%get(me, tmp)
-    value = real(tmp,RK)
+    value = real(tmp,real64)
 
     end subroutine json_get_real64
 !*****************************************************************************************
@@ -8736,7 +8736,7 @@
     real(RK) :: tmp
 
     call json%get(me, path, tmp, found, default)
-    value = real(tmp,RK)
+    value = real(tmp,real64)
 
     end subroutine json_get_real64_by_path
 !*****************************************************************************************
@@ -8776,7 +8776,7 @@
     real(RK),dimension(:),allocatable :: tmp
 
     call json%get(me, tmp)
-    if (allocated(tmp)) vec = real(tmp,RK)
+    if (allocated(tmp)) vec = real(tmp,real64)
 
     end subroutine json_get_real64_vec
 !*****************************************************************************************
@@ -8799,7 +8799,7 @@
     real(RK),dimension(:),allocatable :: tmp
 
     call json%get(me, path, tmp, found, default)
-    if (allocated(tmp)) vec = real(tmp,RK)
+    if (allocated(tmp)) vec = real(tmp,real64)
 
     end subroutine json_get_real64_vec_by_path
 !*****************************************************************************************

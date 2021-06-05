@@ -28,7 +28,7 @@ contains
     type(json_core) :: json
     type(json_value),pointer :: p,p2,p3
     type(json_file) :: file1, file2
-    logical(LK) :: found,status_ok
+    logical(LK) :: status_ok
     integer(IK) :: var_type,i,n_children
     real(wp) :: d
     logical(LK) :: tf

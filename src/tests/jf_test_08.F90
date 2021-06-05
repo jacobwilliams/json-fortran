@@ -138,7 +138,6 @@ program jf_test_8
     use jf_test_8_mod , only: test_8
     implicit none
     integer :: n_errors
-    n_errors = 0
     call test_8(n_errors)
     if (n_errors /= 0) stop 1
 
