@@ -6,5 +6,5 @@ used to perform continuous integration testing for JSON-Fortran, and
 trigger automatic documentation deployment.
 
 ```yml
-{!.github/workflows/.CI.yml!}
+{!.github/workflows/CI.yml!}
 ```
