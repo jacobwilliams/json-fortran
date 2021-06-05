@@ -58,18 +58,6 @@ jobs:
         --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${GCC_V} \
         --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_V}
 
-    - name: Compile_with_build_mkdocs
-      if: matrix.gcc_v == 7
-      run: |
-        GFORTRAN=gfortran-${{matrix.gcc_v}}
-        GCOV=gcov-${{matrix.gcc_v}}
-        # build with build.sh, make documentation, run unit tests
-        # and perform coverage analysis
-        ./build.sh --coverage --skip-documentation
-        ./build.sh --coverage --enable-unicode
-        CODE_COVERAGE="yes"
-        DEPLOY_DOCUMENTATION="yes"
-
     - name: Compile_with_build
       if: matrix.gcc_v != 7
       run: |
@@ -78,24 +66,32 @@ jobs:
         # build with build.sh, run unit tests
         ./build.sh --skip-documentation
         ./build.sh --skip-documentation --enable-unicode
-        CODE_COVERAGE="no"
-        DEPLOY_DOCUMENTATION="no"
 
     - name: Compile_with_cmake
+      # CMake build with unit tests, no documentation, with coverage analysis
+      # No unicode so that coverage combined with the build script will cover unicode
+      # and non-unicode code paths
       if: matrix.gcc_v == 9
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
-        # CMake build with unit tests, no documentation, with coverage analysis
-        # No unicode so that coverage combined with the build script will cover unicode
-        # and non-unicode code paths
         mkdir cmake-build
         cd cmake-build
         cmake ..
         make -j 4 check
 
+    - name: Compile_with_build_mkdocs
+      # build with build.sh, make documentation, run unit tests
+      # and perform coverage analysis - used for doc deployment
+      if: matrix.gcc_v == 7
+      run: |
+        GFORTRAN=gfortran-${{matrix.gcc_v}}
+        GCOV=gcov-${{matrix.gcc_v}}
+        ./build.sh --coverage --skip-documentation
+        ./build.sh --coverage --enable-unicode
+
     - name: Deploy Documentation for master
-      if: github.ref == 'refs/heads/master' && $DEPLOY_DOCUMENTATION == 'yes'
+      if: matrix.gcc_v == 7 && github.ref == 'refs/heads/master'
       uses: JamesIves/github-pages-deploy-action@4.1.3
       with:
         branch: gh-pages # The branch the action should deploy to.
@@ -107,7 +103,7 @@ jobs:
     - name: Rebuild documentation for tagged release
       env:
         TAGNAME: ${{ steps.vars.outputs.tag }}
-      if: $DEPLOY_DOCUMENTATION == 'yes' && startsWith(github.ref, 'refs/tags/')
+      if: matrix.gcc_v == 7 && startsWith(github.ref, 'refs/tags/')
       run: |
         echo ${TAGNAME}
         rm -rf doc
@@ -117,7 +113,7 @@ jobs:
     - name: Deploy documentation for tagged release
       env:
         TAGNAME: ${{ steps.vars.outputs.tag }}
-      if: $DEPLOY_DOCUMENTATION == 'yes' && startsWith(github.ref, 'refs/tags/')
+      if: matrix.gcc_v == 7 && startsWith(github.ref, 'refs/tags/')
       uses: JamesIves/github-pages-deploy-action@4.1.3
       with:
         branch: gh-pages # The branch the action should deploy to.
@@ -125,7 +121,7 @@ jobs:
         target-folder: prev/$TAGNAME  # deploy to a version-specific folder
 
     - name: Upload coverage
-      if: $CODE_COVERAGE == 'yes'
+      if: matrix.gcc_v == 7
       run: |
         rm json_*.F90-*unicode.gcov || true
         mv json_*.F90.gcov src/
