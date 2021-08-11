@@ -1321,7 +1321,7 @@
 !@note If new data is added to the [[json_value]] type,
 !      then this would need to be updated.
 
-    recursive subroutine json_value_clone_func(from,to,parent,previous,next,children,tail)
+    recursive subroutine json_value_clone_func(from,to,parent,previous,tail)
 
     implicit none
 
@@ -1330,8 +1330,6 @@
                                                   !! must not already be associated)
     type(json_value),pointer,optional :: parent   !! to%parent
     type(json_value),pointer,optional :: previous !! to%previous
-    type(json_value),pointer,optional :: next     !! to%next
-    type(json_value),pointer,optional :: children !! to%children
     logical,optional                  :: tail     !! if "to" is the tail of
                                                   !! its parent's children
 
@@ -1352,12 +1350,9 @@
         to%var_type   = from%var_type
         to%n_children = from%n_children
 
-        !allocate and associate the pointers as necessary:
-
-        if (present(parent))      to%parent      => parent
-        if (present(previous))    to%previous    => previous
-        if (present(next))        to%next        => next
-        if (present(children))    to%children    => children
+        ! allocate and associate the pointers as necessary:
+        if (present(parent))   to%parent   => parent
+        if (present(previous)) to%previous => previous
         if (present(tail)) then
             if (tail .and. associated(to%parent)) to%parent%tail => to
         end if
@@ -1365,20 +1360,18 @@
         if (associated(from%next) .and. associated(to%parent)) then
             ! we only clone the next entry in an array
             ! if the parent has also been cloned
-            allocate(to%next)
-            call json_value_clone_func(from%next,&
-                                       to%next,&
-                                       previous=to,&
-                                       parent=to%parent,&
-                                       tail=(.not. associated(from%next%next)))
+            call json_value_clone_func(from     = from%next,&
+                                       to       = to%next,&
+                                       previous = to,&
+                                       parent   = to%parent,&
+                                       tail     = (.not. associated(from%next%next)))
         end if
 
         if (associated(from%children)) then
-            allocate(to%children)
-            call json_value_clone_func(from%children,&
-                                       to%children,&
-                                       parent=to,&
-                                       tail=(.not. associated(from%children%next)))
+            call json_value_clone_func(from   = from%children,&
+                                       to     = to%children,&
+                                       parent = to,&
+                                       tail   = (.not. associated(from%children%next)))
         end if
 
     end if
