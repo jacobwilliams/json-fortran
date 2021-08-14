@@ -1,8 +1,7 @@
 ![JSON-Fortran](/media/json-fortran-logo-2.png)
 ============
 
-[![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)
-A Modern Fortran JSON API
+JSON-Fortran: A Modern Fortran JSON API
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
 **Table of Contents**
@@ -21,7 +20,7 @@ A Modern Fortran JSON API
 
 Status
 ------
-![Build Status](https://github.com/jacobwilliams/json-fortran/actions/workflows/CI.yml/badge.svg)
+[![Build Status](https://github.com/jacobwilliams/json-fortran/actions/workflows/CI.yml/badge.svg)](https://github.com/jacobwilliams/json-fortran/actions)
 [![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Codecov](https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobwilliams/json-fortran)
 
