@@ -2,7 +2,7 @@
 !> author: Jacob Williams
 !  license: BSD
 !
-!  A Fortran 2008 JSON (JavaScript Object Notation) API.
+!  A Modern Fortran JSON (JavaScript Object Notation) API.
 !
 !  This module provides access to [[json_value_module]] and
 !  [[json_file_module]]. For normal JSON-Fortran use, using this module
