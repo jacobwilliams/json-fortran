@@ -1,8 +1,8 @@
-JSON-Fortran
+![JSON-Fortran](/media/json-fortran-logo-2.png)
 ============
 
 [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)
-A Fortran 2008 JSON API
+A Modern Fortran JSON API
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc/generate-toc again -->
 **Table of Contents**
@@ -34,7 +34,7 @@ for a list of changes since the latest release.
 Brief description
 ---------------
 
-A user-friendly, thread-safe, and object-oriented API for reading and writing [JSON](http://json.org) files, written in modern Fortran.
+JSON-Fortran is a user-friendly, thread-safe, and object-oriented API for reading and writing [JSON](http://json.org) files, written in modern Fortran.
 
 [top](#json-fortran)
 
