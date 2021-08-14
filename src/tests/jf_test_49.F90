@@ -26,7 +26,7 @@ contains
     integer :: i !! counter
 
     integer,parameter :: n_repeat = 1000 !! number of time to repeat the test
-    character(kind=CK,len=*),parameter :: json_string = CK_'{"Substance":[]}' !! string to deserialize
+    character(kind=CK,len=*),parameter :: str = CK_'{"Substance":[]}' !! string to deserialize
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -37,7 +37,7 @@ contains
     error_cnt = 0
 
     do i = 1, n_repeat
-        call json%deserialize(json_string)
+        call json%deserialize(str)
         if (json%failed()) then
             call json%print_error_message(error_unit)
             error_cnt = error_cnt + 1
