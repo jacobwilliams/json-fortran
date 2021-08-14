@@ -37,7 +37,7 @@ contains
     call json%initialize()
     if (json%failed()) then
         call json%print_error_message(error_unit)
-        error_cnt = error_cnt + 1    
+        error_cnt = error_cnt + 1
     end if
 
     write(error_unit,'(A)') 'open file'
@@ -71,7 +71,7 @@ contains
         write(error_unit,'(A)') 'Success'
     else
         write(error_unit,'(A)') 'Failed'
-    end if 
+    end if
 
     write(error_unit,'(A)') ''
 
