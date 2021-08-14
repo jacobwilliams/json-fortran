@@ -34,7 +34,7 @@ for a list of changes since the latest release.
 Brief description
 ---------------
 
-A user-friendly, thread-safe, and object-oriented API for reading and writing [JSON](http://json.org) files, written in modern Fortran.
+JSON-Fortran is a user-friendly, thread-safe, and object-oriented API for reading and writing [JSON](http://json.org) files, written in modern Fortran.
 
 [top](#json-fortran)
 
