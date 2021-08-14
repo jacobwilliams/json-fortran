@@ -1,4 +1,4 @@
-JSON-Fortran
+![JSON-Fortran](/media/json-fortran-logo-2.png)
 ============
 
 [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases/latest)
