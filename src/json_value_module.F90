@@ -1321,7 +1321,7 @@
 !@note If new data is added to the [[json_value]] type,
 !      then this would need to be updated.
 
-    recursive subroutine json_value_clone_func(from,to,parent,previous,next,children,tail)
+    recursive subroutine json_value_clone_func(from,to,parent,previous,tail)
 
     implicit none
 
@@ -1330,8 +1330,6 @@
                                                   !! must not already be associated)
     type(json_value),pointer,optional :: parent   !! to%parent
     type(json_value),pointer,optional :: previous !! to%previous
-    type(json_value),pointer,optional :: next     !! to%next
-    type(json_value),pointer,optional :: children !! to%children
     logical,optional                  :: tail     !! if "to" is the tail of
                                                   !! its parent's children
 
@@ -1352,12 +1350,9 @@
         to%var_type   = from%var_type
         to%n_children = from%n_children
 
-        !allocate and associate the pointers as necessary:
-
-        if (present(parent))      to%parent      => parent
-        if (present(previous))    to%previous    => previous
-        if (present(next))        to%next        => next
-        if (present(children))    to%children    => children
+        ! allocate and associate the pointers as necessary:
+        if (present(parent))   to%parent   => parent
+        if (present(previous)) to%previous => previous
         if (present(tail)) then
             if (tail .and. associated(to%parent)) to%parent%tail => to
         end if
@@ -1365,20 +1360,18 @@
         if (associated(from%next) .and. associated(to%parent)) then
             ! we only clone the next entry in an array
             ! if the parent has also been cloned
-            allocate(to%next)
-            call json_value_clone_func(from%next,&
-                                       to%next,&
-                                       previous=to,&
-                                       parent=to%parent,&
-                                       tail=(.not. associated(from%next%next)))
+            call json_value_clone_func(from     = from%next,&
+                                       to       = to%next,&
+                                       previous = to,&
+                                       parent   = to%parent,&
+                                       tail     = (.not. associated(from%next%next)))
         end if
 
         if (associated(from%children)) then
-            allocate(to%children)
-            call json_value_clone_func(from%children,&
-                                       to%children,&
-                                       parent=to,&
-                                       tail=(.not. associated(from%children%next)))
+            call json_value_clone_func(from   = from%children,&
+                                       to     = to%children,&
+                                       parent = to,&
+                                       tail   = (.not. associated(from%children%next)))
         end if
 
     end if
@@ -8148,8 +8141,13 @@
         value = me%int_value
     else
         if (json%strict_type_checking) then
-            call json%throw_exception('Error in json_get_integer:'//&
-                 ' Unable to resolve value to integer: '//me%name)
+            if (allocated(me%name)) then
+                call json%throw_exception('Error in json_get_integer:'//&
+                    ' Unable to resolve value to integer: '//me%name)
+            else
+                call json%throw_exception('Error in json_get_integer:'//&
+                    ' Unable to resolve value to integer')
+            end if
         else
             !type conversions
             select case(me%var_type)
@@ -8165,13 +8163,24 @@
                 call string_to_integer(me%str_value,value,status_ok)
                 if (.not. status_ok) then
                     value = 0_IK
-                    call json%throw_exception('Error in json_get_integer:'//&
-                         ' Unable to convert string value to integer: me.'//&
-                         me%name//' = '//trim(me%str_value))
+                    if (allocated(me%name)) then
+                        call json%throw_exception('Error in json_get_integer:'//&
+                            ' Unable to convert string value to integer: '//&
+                            me%name//' = '//trim(me%str_value))
+                    else
+                        call json%throw_exception('Error in json_get_integer:'//&
+                            ' Unable to convert string value to integer: '//&
+                            trim(me%str_value))
+                    end if
                 end if
             case default
-                call json%throw_exception('Error in json_get_integer:'//&
-                     ' Unable to resolve value to integer: '//me%name)
+                if (allocated(me%name)) then
+                    call json%throw_exception('Error in json_get_integer:'//&
+                        ' Unable to resolve value to integer: '//me%name)
+                else
+                    call json%throw_exception('Error in json_get_integer:'//&
+                        ' Unable to resolve value to integer')
+                end if
             end select
         end if
     end if
@@ -8361,8 +8370,13 @@
         value = me%dbl_value
     else
         if (json%strict_type_checking) then
-            call json%throw_exception('Error in json_get_real:'//&
-                                      ' Unable to resolve value to real: '//me%name)
+            if (allocated(me%name)) then
+                call json%throw_exception('Error in json_get_real:'//&
+                                          ' Unable to resolve value to real: '//me%name)
+            else
+                call json%throw_exception('Error in json_get_real:'//&
+                                          ' Unable to resolve value to real')
+            end if
         else
             !type conversions
             select case (me%var_type)
@@ -8378,9 +8392,15 @@
                 call string_to_real(me%str_value,json%use_quiet_nan,value,status_ok)
                 if (.not. status_ok) then
                     value = 0.0_RK
-                    call json%throw_exception('Error in json_get_real:'//&
-                         ' Unable to convert string value to real: me.'//&
-                         me%name//' = '//trim(me%str_value))
+                    if (allocated(me%name)) then
+                        call json%throw_exception('Error in json_get_real:'//&
+                            ' Unable to convert string value to real: '//&
+                            me%name//' = '//trim(me%str_value))
+                    else
+                        call json%throw_exception('Error in json_get_real:'//&
+                            ' Unable to convert string value to real: '//&
+                            trim(me%str_value))
+                    end if
                 end if
             case (json_null)
                 if (ieee_support_nan(value) .and. json%null_to_real_mode/=1_IK) then
@@ -8395,13 +8415,22 @@
                         value = 0.0_RK
                     end select
                 else
-                    call json%throw_exception('Error in json_get_real:'//&
-                                              ' Cannot convert null to NaN: '//me%name)
+                    if (allocated(me%name)) then
+                        call json%throw_exception('Error in json_get_real:'//&
+                                                ' Cannot convert null to NaN: '//me%name)
+                    else
+                        call json%throw_exception('Error in json_get_real:'//&
+                                                ' Cannot convert null to NaN')
+                    end if
                 end if
             case default
-
-                call json%throw_exception('Error in json_get_real:'//&
-                                          ' Unable to resolve value to real: '//me%name)
+                if (allocated(me%name)) then
+                    call json%throw_exception('Error in json_get_real:'//&
+                                            ' Unable to resolve value to real: '//me%name)
+                else
+                    call json%throw_exception('Error in json_get_real:'//&
+                                            ' Unable to resolve value to real')
+                end if
             end select
         end if
     end if
@@ -8851,9 +8880,14 @@
         value = me%log_value
     else
         if (json%strict_type_checking) then
-            call json%throw_exception('Error in json_get_logical: '//&
-                                      'Unable to resolve value to logical: '//&
-                                      me%name)
+            if (allocated(me%name)) then
+                call json%throw_exception('Error in json_get_logical: '//&
+                                          'Unable to resolve value to logical: '//&
+                                          me%name)
+            else
+                call json%throw_exception('Error in json_get_logical: '//&
+                                          'Unable to resolve value to logical')
+            end if
         else
             !type conversions
             select case (me%var_type)
@@ -8864,9 +8898,14 @@
             case (json_string)
                 value = (me%str_value == true_str)
             case default
-                call json%throw_exception('Error in json_get_logical: '//&
-                                          'Unable to resolve value to logical: '//&
-                                          me%name)
+                if (allocated(me%name)) then
+                    call json%throw_exception('Error in json_get_logical: '//&
+                                              'Unable to resolve value to logical: '//&
+                                              me%name)
+                else
+                    call json%throw_exception('Error in json_get_logical: '//&
+                                              'Unable to resolve value to logical')
+                end if
             end select
         end if
     end if
@@ -9053,8 +9092,13 @@
         else
 
             if (json%strict_type_checking) then
-                call json%throw_exception('Error in json_get_string:'//&
-                                          ' Unable to resolve value to string: '//me%name)
+                if (allocated(me%name)) then
+                    call json%throw_exception('Error in json_get_string:'//&
+                                              ' Unable to resolve value to string: '//me%name)
+                else
+                    call json%throw_exception('Error in json_get_string:'//&
+                                              ' Unable to resolve value to string')
+                end if
             else
 
                 select case (me%var_type)
@@ -9101,11 +9145,14 @@
                     value = null_str
 
                 case default
-
-                    call json%throw_exception('Error in json_get_string: '//&
-                                              'Unable to resolve value to characters: '//&
-                                              me%name)
-
+                    if (allocated(me%name)) then
+                        call json%throw_exception('Error in json_get_string: '//&
+                                                  'Unable to resolve value to characters: '//&
+                                                  me%name)
+                    else
+                        call json%throw_exception('Error in json_get_string: '//&
+                                                  'Unable to resolve value to characters')
+                    end if
                 end select
 
             end if
