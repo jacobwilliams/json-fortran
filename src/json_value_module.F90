@@ -10127,7 +10127,7 @@
 
         ! pop the next non whitespace character off the file
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                           skip_comments=json%allow_comments, popped=c)
 
         if (eof) then
             return
@@ -10151,7 +10151,10 @@
 
                 ! end an empty array
                 call json%push_char(c)
-                nullify(value)
+                if (associated(value)) then
+                    deallocate(value)
+                    nullify(value)
+                end if
 
             case (quotation_mark)
 
@@ -10990,17 +10993,17 @@
             exit
         end if
 
-        ! parse value will disassociate an empty array value
+        ! parse value will deallocate an empty array value
         if (associated(element)) call json%add(array, element)
 
         ! popped the next character
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                           skip_comments=json%allow_comments, popped=c)
 
         if (eof) then
             ! The file ended before array was finished:
             call json%throw_exception('Error in parse_array: '//&
-                                 'End of file encountered when parsing an array.')
+                                      'End of file encountered when parsing an array.')
             exit
         else if (delimiter == c) then
             ! parse the next element
