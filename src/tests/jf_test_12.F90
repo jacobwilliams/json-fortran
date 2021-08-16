@@ -52,9 +52,9 @@ contains
     write(error_unit,'(A)') ''
 
     ! populate the raw array
-    forall (i=1_IK:imx,j=1_IK:jmx,k=1_IK:kmx) ! could use size(... , dim=...) instead of constants
+    do concurrent (i=1_IK:imx, j=1_IK:jmx, k=1_IK:kmx) ! could use size(... , dim=...) instead of constants
        raw_array(i,j,k) = i + (j-1_IK)*imx + (k-1_IK)*imx*jmx
-    end forall
+    end do
 
     call json%create_object(root,file)
     call check_errors()
