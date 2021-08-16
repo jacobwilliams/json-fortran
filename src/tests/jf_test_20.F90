@@ -183,6 +183,7 @@ contains
 
     ! cleanup:
     call json%destroy(p)
+    call json%destroy(root)
 
     ! now, just a test of the edge case:
     ! (where p doesn't have a parent)

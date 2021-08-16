@@ -117,6 +117,8 @@ contains
 
     end if
 
+    call json%destroy(inp)
+
     write(error_unit,'(A)') ''
     if (error_cnt==0) then
         write(error_unit,'(A)') 'Success!'

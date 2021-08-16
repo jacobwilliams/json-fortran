@@ -14,10 +14,6 @@ module jf_test_12_mod
     private
     public :: test_12
 
-    character(len=*),parameter :: dir = '../files/'         !! Path to write JSON file to
-    character(len=*),parameter :: file = 'test12.json'      !! Filename to write
-    real(wp), parameter        :: TOL = 100*epsilon(1.0_wp) !! Tolerance for real comparisons
-
 contains
 
     subroutine test_12(error_cnt)
@@ -27,6 +23,8 @@ contains
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
     integer(IK),parameter :: imx = 5, jmx = 3, kmx = 4 !! dimensions for raw work array of primitive type
+    character(len=*),parameter :: file = '../files/test12.json'  !! Filename to write
+    real(wp), parameter        :: TOL = 100*epsilon(1.0_wp) !! Tolerance for real comparisons
 
     type(json_core)                        :: json              !! factory for manipulating `json_value` pointers
     integer(IK),dimension(3)               :: shape             !! shape of work array
@@ -58,7 +56,7 @@ contains
        raw_array(i,j,k) = i + (j-1_IK)*imx + (k-1_IK)*imx*jmx
     end forall
 
-    call json%create_object(root,dir//file)
+    call json%create_object(root,file)
     call check_errors()
 
     call json%create_object(meta_array,'array data')
@@ -172,7 +170,7 @@ contains
    !  call my_file%get(tmp_json_ptr)
    !  call check_file_errors(associated(tmp_json_ptr,root))
 
-    open(file=dir//file,newunit=lun,form='formatted',action='write')
+    open(file=file,newunit=lun,form='formatted',action='write')
     call my_file%print(lun)
     call check_file_errors()
     close(lun)
