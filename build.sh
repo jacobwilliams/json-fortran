@@ -61,8 +61,8 @@
 #                                         fortran documentation using FORD
 #
 #  REQUIRES
-#    FoBiS.py : https://github.com/szaghi/FoBiS      [version 1.2.5 or later required]
-#    FORD     : https://github.com/cmacmackin/ford   [version 4.0.0 or later]
+#    FoBiS.py : https://github.com/szaghi/FoBiS                    [version 1.2.5 or later required]
+#    FORD     : https://github.com/Fortran-FOSS-Programmers/ford   [version 4.0.0 or later]
 #
 #  AUTHOR
 #    Jacob Williams : 12/27/2014

@@ -98,6 +98,6 @@ git rebase upstream/master
 - Please adhere to the code indentation and formatting as it currently exists, aligning common elements vertically, etc. Tab characters are not allowed. Indentations should be done with *4* space characters.
 - *Do NOT* allow your editor to make a bunch of indentation or white space changes, that will introduce non-substantive changes on lines that you have not actually edited.
 - The coding style is modern free-form Fortran, consistent with the Fortran 2008 standard.  Note that the two supported compilers (ifort and gfortran) do not currently include the entire Fortran 2008 standard. Therefore, only those language features supported by Gfortran 4.9 and Intel 13.1.0 are currently allowed.  This also means that previous versions of these compilers are not supported, and major changes to the code to support earlier compilers (or Fortran 95) will not be accepted.  At some point in the future (when compiler support has improved), all Fortran 2008 features will be allowed.
-- All subroutines and functions *must* be properly documented.  This includes useful inline comments as well as comment blocks using the [FORD](https://github.com/cmacmackin/ford/wiki/Writing-Documentation) syntax.
+- All subroutines and functions *must* be properly documented.  This includes useful inline comments as well as comment blocks using the [FORD](https://github.com/Fortran-FOSS-Programmers/ford/wiki/Writing-Documentation) syntax.
 
 [top](#contributing-to-json-fortran)
