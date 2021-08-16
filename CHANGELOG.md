@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.2.4 (2021-08-15)](#824-2021-08-15)
     - [8.2.3 (2021-06-05)](#823-2021-06-05)
     - [8.2.2 (2021-06-05)](#822-2021-06-05)
     - [8.2.1 (2021-01-02)](#821-2021-01-02)
@@ -42,7 +43,23 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.3...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.4...HEAD)
+
+### [8.2.4](https://github.com/jacobwilliams/json-fortran/tree/8.2.4) (2021-08-15)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.3...8.2.4)
+or [Download v8.2.4](https://github.com/jacobwilliams/json-fortran/releases/tag/8.2.4)
+
+**Enhancements:**
+
+- Documentation updates. [\#492](https://github.com/jacobwilliams/json-fortran/pull/492) ([jacobwilliams](https://github.com/jacobwilliams))
+- Added `MultiProcessorCompilation="true"` to the Visual Studio project file.
+
+**Bug Fixes:**
+
+- Fixed a memory leak when deserializing an empty list. [\#488](https://github.com/jacobwilliams/json-fortran/issues/488) [\#493](https://github.com/jacobwilliams/json-fortran/pull/493) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed a memory leak when cloning a JSON pointer. [\#489](https://github.com/jacobwilliams/json-fortran/issues/489) [\#490](https://github.com/jacobwilliams/json-fortran/pull/490) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed a bug where some error messages would attempt to print unallocated `name` values. [\#491](https://github.com/jacobwilliams/json-fortran/issues/491)
 
 ### [8.2.3](https://github.com/jacobwilliams/json-fortran/tree/8.2.3) (2020-06-05)
 
@@ -61,7 +78,7 @@ or [Download v8.2.2](https://github.com/jacobwilliams/json-fortran/releases/tag/
 **Enhancements:**
 
 - Added support for the Fortran Package Manger. [\#483](https://github.com/jacobwilliams/json-fortran/issues/483) ([jacobwilliams](https://github.com/jacobwilliams))
-- Updated CI to use GitHub Actions, including auto-deployment of documentation. [\#476](https://github.com/jacobwilliams/json-fortran/issues/476) [\#484](https://github.com/jacobwilliams/json-fortran/pull/484) ([jacobwilliams](https://github.com/jacobwilliams))  
+- Updated CI to use GitHub Actions, including auto-deployment of documentation. [\#476](https://github.com/jacobwilliams/json-fortran/issues/476) [\#484](https://github.com/jacobwilliams/json-fortran/pull/484) ([jacobwilliams](https://github.com/jacobwilliams))
 - Eliminated some compiler warnings about real conversions.
 
 **Bug fixes:**
