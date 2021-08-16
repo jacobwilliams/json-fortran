@@ -18,11 +18,11 @@ remain accurate.
             `.VERSION` then edit the URL manually to view the
             changes.
 		 1. Run the
-            [`github_changelog_generator`](https://github.com/skywinder/github-changelog-generator)
+            [`github_changelog_generator`](https://github.com/github-changelog-generator/github-changelog-generator)
             as follows, and compare the output to the
             [unreleased](|url|/page/releases/index.html#unreleased)
             section of the `CHANGELOG.md`:
-			`github_changelog_generator -o Unreleased.md
+			`github_changelog_generator --user jacobwilliams --project json-fortran -o Unreleased.md
             --unreleased-only --bugs-label "**Fixed issues:**"
             --enhancement-label "**Enhancements:**" --issues-label
             "**Fixed issues:**"` and make sure that you have a
