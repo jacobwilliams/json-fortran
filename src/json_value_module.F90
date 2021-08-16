@@ -10895,7 +10895,7 @@
                             skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
-                                 ' Unexpected end of file while parsing start of object.')
+                                      ' Unexpected end of file while parsing start of object.')
             return
         else if (end_object == c) then
             ! end of an empty object
@@ -10922,8 +10922,9 @@
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
                             skip_comments=json%allow_comments, popped=c)
         if (eof) then
+            call json%destroy(pair)
             call json%throw_exception('Error in parse_object:'//&
-                                 ' Unexpected end of file while parsing object member.')
+                                      ' Unexpected end of file while parsing object member.')
             return
         else if (colon_char == c) then
             ! parse the value
@@ -10935,6 +10936,7 @@
                 call json%add(parent, pair)
             end if
         else
+            call json%destroy(pair)
             call json%throw_exception('Error in parse_object:'//&
                                       ' Expecting : and then a value: '//c)
             return
@@ -10945,7 +10947,7 @@
                             skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object: '//&
-                                 'End of file encountered when parsing an object')
+                                      'End of file encountered when parsing an object')
             return
         else if (delimiter == c) then
             ! read the next member
