@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.2.5 (2021-08-17)](#825-2021-08-17)
     - [8.2.4 (2021-08-15)](#824-2021-08-15)
     - [8.2.3 (2021-06-05)](#823-2021-06-05)
     - [8.2.2 (2021-06-05)](#822-2021-06-05)
@@ -43,7 +44,23 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.4...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.5...HEAD)
+
+### [8.2.5](https://github.com/jacobwilliams/json-fortran/tree/8.2.5) (2021-08-17)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.2.4...8.2.5)
+or [Download v8.2.5](https://github.com/jacobwilliams/json-fortran/releases/tag/8.2.5)
+
+**Enhancements:**
+
+- Enabled some extra warnings in the Visual Studio Debug project
+- Removed obsolete `forall` construct from unit test 12
+
+**Bug Fixes:**
+
+- Fixed a potential uninitialized variable issue in `get_current_line_from_file_stream`
+- Fixed a memory leak when parsing an invalid JSON
+- Fixed various memory issues in the unit tests [\#495](https://github.com/jacobwilliams/json-fortran/pull/495) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [8.2.4](https://github.com/jacobwilliams/json-fortran/tree/8.2.4) (2021-08-15)
 
