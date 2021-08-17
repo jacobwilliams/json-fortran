@@ -23,7 +23,7 @@ contains
     integer,intent(out) :: error_cnt
 
     type(json_core) :: json
-    type(json_value),pointer :: p_root,p_array
+    type(json_value),pointer :: p_root,p_array,p_element
     logical(LK) :: is_valid  !! True if the structure is valid.
     character(kind=CK,len=:),allocatable :: error_msg !! error message from `validate`
     integer :: i !! counter
@@ -47,12 +47,11 @@ contains
             call json%add(p_root,p_array)
             call json%add(p_root,p_array)  ! this creates a malformed JSON structure
         elseif (i==2) then
-            call json%create_array(p_array, '')
-            call json%create_object(p_root, 'object')
-            call json%add(p_root,'int',1_IK)
-            call json%add(p_array,p_root)
-            call json%add(p_array,p_root)  ! this creates a malformed JSON structure
-            ! note: below we will destroy p_root, which is the duplicate array element
+            call json%create_array(p_root, '')
+            call json%create_object(p_element, 'object')
+            call json%add(p_element,'int',1_IK)
+            call json%add(p_root,p_element)
+            call json%add(p_root,p_element)  ! this creates a malformed JSON structure
         end if
 
         ! test initialize_json_core:

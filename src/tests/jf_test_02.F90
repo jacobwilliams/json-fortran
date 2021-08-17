@@ -335,6 +335,11 @@ contains
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1
     end if
+    call json%destroy(p_clone)
+    if (json%failed()) then
+        call json%print_error_message(error_unit)
+        error_cnt = error_cnt + 1
+    end if
 
     write(error_unit,'(A)') ''
 

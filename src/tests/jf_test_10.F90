@@ -322,6 +322,7 @@ contains
     write(error_unit,'(A)') 'json_create_string ...'; call json%destroy(p); call json%create_string (p,'foo','bar')
     write(error_unit,'(A)') 'json_create_null   ...'; call json%destroy(p); call json%create_null   (p,'foo')
     write(error_unit,'(A)') 'json_create_object ...'; call json%destroy(p); call json%create_object (p,'foo')
+    call json%destroy(p)
     if (json%failed()) then
         call json%print_error_message(error_unit)
         error_cnt = error_cnt + 1

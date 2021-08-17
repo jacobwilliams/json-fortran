@@ -141,6 +141,7 @@ contains
     call json%initialize(trailing_spaces_significant=.true.)
     call json%create_integer(p,1_IK,CK_'a')
     call json%rename(p,CK_'b  ')
+    call json%destroy(p)
 
     end subroutine test_34
 

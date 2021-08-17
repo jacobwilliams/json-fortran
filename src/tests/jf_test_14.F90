@@ -113,6 +113,8 @@ contains
         error_cnt = error_cnt + 1
     end if
 
+    if (allocated(new_name)) deallocate(new_name)
+
     end subroutine test_14
 
     subroutine rename(json,p,finished)  !! change all "name" variable values to "Fred"

@@ -52,6 +52,8 @@ contains
         error_cnt = error_cnt + 1
     end if
 
+    call json%destroy(p)
+
     if (error_cnt==0) then
         write(error_unit,'(A)') 'Success!'
     else
