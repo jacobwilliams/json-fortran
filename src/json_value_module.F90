@@ -290,8 +290,8 @@
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
         integer :: filesize = 0 !! the file size when when `use_unformatted_stream=True`
-        character(kind=CK,len=:),allocatable :: chunk   !! a chunk read from a stream file
-                                                        !! when `use_unformatted_stream=True`
+        character(kind=CK),dimension(:),allocatable :: chunk !! a chunk read from a stream file
+                                                             !! when `use_unformatted_stream=True`
 
         contains
 
@@ -1045,7 +1045,9 @@
     if (use_unformatted_stream) then
         me%filesize = 0
         me%ichunk   = 0
-        me%chunk    = repeat(space, stream_chunk_size) ! default chunk size
+        if (allocated(me%chunk)) deallocate(me%chunk)
+        allocate(me%chunk(stream_chunk_size)) ! default chunk size
+        me%chunk = space
     end if
 
 #ifdef USE_UCS4
@@ -11365,23 +11367,25 @@
                         if (json%ichunk<1) then
                             ! read in a chunk:
                             json%ichunk = 0
-                            if (json%filesize<json%ipos+len(json%chunk)-1) then
+                            if (json%filesize<json%ipos+size(json%chunk)-1) then
                                 ! for the last chunk, we resize
                                 ! it to the correct size:
-                                json%chunk = repeat(space, json%filesize-json%ipos+1)
+                                deallocate(json%chunk)
+                                allocate(json%chunk(json%filesize-json%ipos+1))
+                                json%chunk = space
                             end if
                             read(unit=unit,pos=json%ipos,iostat=ios) json%chunk
                         else
                             ios = 0
                         end if
                         json%ichunk = json%ichunk + 1
-                        if (json%ichunk>len(json%chunk)) then
+                        if (json%ichunk>size(json%chunk)) then
                             ! check this just in case
                             ios = IOSTAT_END
                         else
                             ! get the next character from the chunk:
-                            c = json%chunk(json%ichunk:json%ichunk)
-                            if (json%ichunk==len(json%chunk)) then
+                            c = json%chunk(json%ichunk)
+                            if (json%ichunk==size(json%chunk)) then
                                 json%ichunk = 0 ! reset for next chunk
                             end if
                         end if
