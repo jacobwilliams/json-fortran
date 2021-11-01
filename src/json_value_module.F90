@@ -11215,9 +11215,8 @@
             call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., c=c)
 
             select case (c)
-            case(CK_'-',CK_'+')    !note: allowing a '+' as the first character here.
 
-                if (is_integer .and. (.not. first)) is_integer = .false.
+            case(CK_'0':CK_'9')    !valid characters for numbers
 
                 !add it to the string:
                 !tmp = tmp // c   !...original
@@ -11235,7 +11234,9 @@
                 tmp(ip:ip) = c
                 ip = ip + 1
 
-            case(CK_'0':CK_'9')    !valid characters for numbers
+            case(CK_'-',CK_'+')    !note: allowing a '+' as the first character here.
+
+                if (is_integer .and. (.not. first)) is_integer = .false.
 
                 !add it to the string:
                 !tmp = tmp // c   !...original
