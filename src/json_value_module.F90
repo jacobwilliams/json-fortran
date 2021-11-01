@@ -3407,7 +3407,7 @@
 
         if (associated(p)) then
 
-            call json%info(p,var_type=var_type)
+            var_type = p%var_type
 
             select case (var_type)
             case(json_object, json_array)
@@ -8108,7 +8108,7 @@
 
     logical(LK) :: status_ok  !! error flag for [[string_to_real]]
 
-    call string_to_real(str,json%use_quiet_nan,rval,status_ok)
+    call string_to_real(str,json%use_quiet_nan,rval,status_ok,json%real_fmt)
 
     if (.not. status_ok) then    !if there was an error
         rval = 0.0_RK
@@ -8389,7 +8389,7 @@
                     value = 0.0_RK
                 end if
             case (json_string)
-                call string_to_real(me%str_value,json%use_quiet_nan,value,status_ok)
+                call string_to_real(me%str_value,json%use_quiet_nan,value,status_ok,json%real_fmt)
                 if (.not. status_ok) then
                     value = 0.0_RK
                     if (allocated(me%name)) then
@@ -9881,7 +9881,7 @@
 
     ! pop the next non whitespace character off the file
     call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                        skip_comments=json%allow_comments, popped=c)
+                        skip_comments=json%allow_comments, c=c)
 
     if (.not. eof) then
         call json%throw_exception('Error in json_parse_end:'//&
@@ -10130,7 +10130,7 @@
 
         ! pop the next non whitespace character off the file
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                           skip_comments=json%allow_comments, popped=c)
+                           skip_comments=json%allow_comments, c=c)
 
         if (eof) then
             return
@@ -10895,7 +10895,7 @@
 
         ! pair name
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                            skip_comments=json%allow_comments, c=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
                                       ' Unexpected end of file while parsing start of object.')
@@ -10923,7 +10923,7 @@
 
         ! pair value
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                            skip_comments=json%allow_comments, c=c)
         if (eof) then
             call json%destroy(pair)
             call json%throw_exception('Error in parse_object:'//&
@@ -10947,7 +10947,7 @@
 
         ! another possible pair
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                            skip_comments=json%allow_comments, c=c)
         if (eof) then
             call json%throw_exception('Error in parse_object: '//&
                                       'End of file encountered when parsing an object')
@@ -11003,7 +11003,7 @@
 
         ! popped the next character
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                           skip_comments=json%allow_comments, popped=c)
+                           skip_comments=json%allow_comments, c=c)
 
         if (eof) then
             ! The file ended before array was finished:
@@ -11069,7 +11069,7 @@
         do
 
             !get the next character from the file:
-            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., popped=c)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., c=c)
 
             if (eof) then
 
@@ -11149,7 +11149,7 @@
         length = len_trim(chars)
 
         do i = 1, length
-            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., popped=c)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., c=c)
             if (eof) then
                 call json%throw_exception('Error in parse_for_chars:'//&
                                      ' Unexpected end of file while parsing.')
@@ -11210,7 +11210,7 @@
         do
 
             !get the next character:
-            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., popped=c)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., c=c)
 
             select case (c)
             case(CK_'-',CK_'+')    !note: allowing a '+' as the first character here.
@@ -11303,7 +11303,7 @@
 !@note This routine ignores non-printing ASCII characters
 !      (`iachar<=31`) that are in strings.
 
-    subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,popped)
+    subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,c)
 
     implicit none
 
@@ -11316,15 +11316,15 @@
     logical(LK),intent(in),optional      :: skip_comments !! to ignore comment lines [default False]
     logical(LK),intent(out)              :: eof           !! true if the end of the file has
                                                           !! been reached.
-    character(kind=CK,len=1),intent(out) :: popped        !! the popped character returned
+    character(kind=CK,len=1),intent(out) :: c             !! the popped character returned
 
-    integer(IK)              :: ios             !! `iostat` flag
-    integer(IK)              :: str_len         !! length of `str`
-    character(kind=CK,len=1) :: c               !! a character read from the file (or string)
-    logical(LK)              :: ignore          !! if whitespace is to be ignored
-    logical(LK)              :: ignore_comments !! if comment lines are to be ignored
-    logical(LK)              :: parsing_comment !! if we are in the process
-                                                !! of parsing a comment line
+    integer(IK) :: ios             !! `iostat` flag
+    integer(IK) :: str_len         !! length of `str`
+    logical(LK) :: ignore          !! if whitespace is to be ignored
+    logical(LK) :: ignore_comments !! if comment lines are to be ignored
+    logical(LK) :: parsing_comment !! if we are in the process
+                                   !! of parsing a comment line
+    integer(IK) :: ic              !! `iachar(c)`
 
     if (.not. json%exception_thrown) then
 
@@ -11412,7 +11412,7 @@
                     ! no character to return
                     json%char_count = 0
                     eof = .true.
-                    popped = space ! just to set a value
+                    c = space ! just to set a value
                     exit
 
                 else if (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
@@ -11426,29 +11426,24 @@
 
             end if
 
-            if (ignore_comments .and. (parsing_comment .or. scan(c,json%comment_char,kind=IK)>0_IK) ) then
-
-                ! skipping the comment
-                parsing_comment = .true.
-                cycle
-
-            else if (any(c == control_chars)) then
-
-                ! non printing ascii characters
-                cycle
-
-            else if (ignore .and. c == space) then
-
-                ! ignoring whitespace
-                cycle
-
-            else
-
-                ! return the character
-                popped = c
-                exit
-
+            if (ignore) then ! ignoring whitespace
+                 if (c == space) cycle
             end if
+
+            if (ignore_comments) then
+                if (parsing_comment) cycle ! still in the comment
+                if (scan(c,json%comment_char,kind=IK)>0_IK) then
+                    ! start of comment, skipping it
+                    parsing_comment = .true.
+                    cycle
+                end if
+            end if
+
+            ic = iachar(c,kind=IK)
+            if ( (ic>=1 .and. ic<=31) .or. (ic==127)) cycle   ! skip non printing ascii characters
+
+            ! return the character c
+            exit
 
         end do
 
@@ -11489,12 +11484,12 @@
 
             json%pushed_index = json%pushed_index + 1
 
-            if (json%pushed_index>0 .and. json%pushed_index<=len(json%pushed_char)) then
+            if (json%pushed_index>0 .and. json%pushed_index<=pushed_char_size) then
                 json%pushed_char(json%pushed_index:json%pushed_index) = c
             else
                 call integer_to_string(json%pushed_index,int_fmt,istr)
                 call json%throw_exception('Error in push_char: '//&
-                                          'invalid valid of pushed_index: '//trim(istr))
+                                            'invalid value of pushed_index: '//trim(istr))
             end if
 
         end if
