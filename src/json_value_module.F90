@@ -11154,12 +11154,12 @@
             call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., c=c)
             if (eof) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected end of file while parsing.')
+                                          ' Unexpected end of file while parsing.')
                 return
             else if (c /= chars(i:i)) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected character: "'//c//'" (expecting "'//&
-                                     chars(i:i)//'")')
+                                          ' Unexpected character: "'//c//'" (expecting "'//&
+                                          chars(i:i)//'")')
                 return
             end if
         end do
@@ -11200,10 +11200,13 @@
     integer(IK)              :: ip          !! index to put next character
                                             !! [to speed up by reducing the number
                                             !! of character string reallocations]
+    integer(IK)              :: ltmp        !! length of `tmp`
 
     if (.not. json%exception_thrown) then
 
-        tmp = blank_chunk
+        ! can use the max number size here (it will be expanded if necessary)
+        tmp = repeat(space,max_numeric_str_len)
+        ltmp = max_numeric_str_len
         ip = 1
         first = .true.
         is_integer = .true.  !assume it may be an integer, unless otherwise determined
@@ -11219,8 +11222,10 @@
             case(CK_'0':CK_'9')    !valid characters for numbers
 
                 !add it to the string:
-                !tmp = tmp // c   !...original
-                if (ip>len(tmp)) tmp = tmp // blank_chunk
+                if (ip>ltmp) then
+                    tmp = tmp // blank_chunk
+                    ltmp = len(tmp)
+                end if
                 tmp(ip:ip) = c
                 ip = ip + 1
 
@@ -11229,8 +11234,10 @@
                 if (is_integer) is_integer = .false.
 
                 !add it to the string:
-                !tmp = tmp // c   !...original
-                if (ip>len(tmp)) tmp = tmp // blank_chunk
+                if (ip>ltmp) then
+                    tmp = tmp // blank_chunk
+                    ltmp = len(tmp)
+                end if
                 tmp(ip:ip) = c
                 ip = ip + 1
 
@@ -11239,8 +11246,10 @@
                 if (is_integer .and. (.not. first)) is_integer = .false.
 
                 !add it to the string:
-                !tmp = tmp // c   !...original
-                if (ip>len(tmp)) tmp = tmp // blank_chunk
+                if (ip>ltmp) then
+                    tmp = tmp // blank_chunk
+                    ltmp = len(tmp)
+                end if
                 tmp(ip:ip) = c
                 ip = ip + 1
 
@@ -11288,9 +11297,6 @@
 
         end do
 
-        !cleanup:
-        if (allocated(tmp)) deallocate(tmp)
-
     end if
 
     end subroutine parse_number
@@ -11322,12 +11328,11 @@
     character(kind=CK,len=1),intent(out) :: c             !! the popped character returned
 
     integer(IK) :: ios             !! `iostat` flag
-    integer(IK) :: str_len         !! length of `str`
     logical(LK) :: ignore          !! if whitespace is to be ignored
     logical(LK) :: ignore_comments !! if comment lines are to be ignored
     logical(LK) :: parsing_comment !! if we are in the process
                                    !! of parsing a comment line
-    integer(IK) :: ic              !! `iachar(c)`
+    integer(IK) :: tmp             !! local copy of `iachar(c)`
 
     if (.not. json%exception_thrown) then
 
@@ -11399,8 +11404,7 @@
 
                 else    !read from the string
 
-                    str_len = len(str)   !length of the string
-                    if (json%ipos<=str_len) then
+                    if (json%ipos<=len(str)) then
                         c = str(json%ipos:json%ipos)
                         ios = 0
                     else
@@ -11444,14 +11448,17 @@
                 end if
             end if
 
-            ic = iachar(c,kind=IK)
-            if ( (ic>=1 .and. ic<=31) .or. (ic==127)) cycle   ! skip non printing ascii characters
+            tmp = iachar(c,kind=IK)
+            ! skip non printing ascii characters [these are the control_chars]
+            if ( (tmp>=1 .and. tmp<=31) .or. (tmp==127)) cycle
 
             ! return the character c
             exit
 
         end do
 
+    else
+        c = space
     end if
 
     end subroutine pop_char
