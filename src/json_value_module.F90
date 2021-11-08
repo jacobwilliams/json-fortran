@@ -8110,7 +8110,11 @@
 
     logical(LK) :: status_ok  !! error flag for [[string_to_real]]
 
+#ifdef C_STR2REAL
+    call string_to_real_c(str,json%use_quiet_nan,rval,status_ok)
+#else
     call string_to_real(str,json%use_quiet_nan,rval,status_ok)
+#endif
 
     if (.not. status_ok) then    !if there was an error
         rval = 0.0_RK
@@ -8391,7 +8395,11 @@
                     value = 0.0_RK
                 end if
             case (json_string)
+#ifdef C_STR2REAL
+                call string_to_real_c(me%str_value,json%use_quiet_nan,value,status_ok)
+#else
                 call string_to_real(me%str_value,json%use_quiet_nan,value,status_ok)
+#endif
                 if (.not. status_ok) then
                     value = 0.0_RK
                     if (allocated(me%name)) then

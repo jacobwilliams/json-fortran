@@ -64,6 +64,9 @@
     public :: real_to_string
     public :: string_to_integer
     public :: string_to_real
+#ifdef C_STR2REAL
+    public :: string_to_real_c
+#endif
     public :: valid_json_hex
     public :: to_unicode
     public :: escape_string
@@ -234,6 +237,7 @@
     integer(IK) :: ierr  !! read iostat error code
 
     read(str,fmt=*,iostat=ierr) rval
+
     status_ok = (ierr==0)
     if (.not. status_ok) then
         rval = 0.0_RK
@@ -252,6 +256,135 @@
 
     end subroutine string_to_real
 !*****************************************************************************************
+
+#ifdef C_STR2REAL
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 11/05/2021
+!
+!  Convert a string into a `real(RK)`.
+!  This version uses `strtof`, `strtod`, or `strtold` from C.
+!  It will fall back to using `read(fmt=*)` if any errors.
+!
+!# History
+!  * Jacob Williams : 11/05/2021 : created by modification of [[string_to_real]].
+
+    subroutine string_to_real_c(str,use_quiet_nan,rval,status_ok)
+
+    use iso_c_binding, only: c_double, c_float, c_long_double, &
+                             c_char, c_ptr, c_null_ptr, c_long, &
+                             c_null_char
+
+    implicit none
+
+    character(kind=CK,len=*),intent(in) :: str           !! the string to convert to a real
+    logical(LK),intent(in)              :: use_quiet_nan !! if true, return NaN's as `ieee_quiet_nan`.
+                                                         !! otherwise, use `ieee_signaling_nan`.
+    real(RK),intent(out)                :: rval          !! `str` converted to a real value
+    logical(LK),intent(out)             :: status_ok     !! true if there were no errors
+
+    integer(IK) :: ierr  !! read iostat error code
+    type(c_ptr) :: endptr !! pointer arg to `strtof`, etc.
+
+    interface
+        function strtof( str, endptr ) result(d) bind(C, name="strtof" )
+            !! <stdlib.h> :: float strtof(const char *str, char **endptr)
+            import
+            character(kind=c_char,len=1),dimension(*),intent(in) :: str
+            type(c_ptr), intent(inout) :: endptr
+            real(c_float) :: d
+        end function strtof
+        function strtod( str, endptr ) result(d) bind(C, name="strtod" )
+            !! <stdlib.h> :: double strtod(const char *str, char **endptr)
+            import
+            character(kind=c_char,len=1),dimension(*),intent(in) :: str
+            type(c_ptr), intent(inout) :: endptr
+            real(c_double) :: d
+        end function strtod
+        function strtold( str, endptr ) result(d) bind(C, name="strtold" )
+            !! <stdlib.h> :: long double strtold(const char *str, char **endptr)
+            import
+            character(kind=c_char,len=1),dimension(*),intent(in) :: str
+            type(c_ptr), intent(inout) :: endptr
+            real(c_long_double) :: d
+        end function strtold
+    end interface
+
+#ifdef USE_UCS4
+    ! if using unicode, don't try to call the C routines
+    ! [not sure they will work? need to test this... what if c_char /= CK?]
+    call string_to_real(str,use_quiet_nan,rval,status_ok)
+    return
+#endif
+
+    endptr = c_null_ptr ! indicates it is not used
+
+#ifdef REAL32
+
+    ! single precision
+
+    if (RK == c_float) then
+        rval = strtof( str//C_NULL_CHAR, endptr )
+        if (rval==0.0_RK) then
+            read(str,fmt=*,iostat=ierr) rval  ! not efficient - might really be 0.0
+        else
+            ierr = 0
+        end if
+    else
+        read(str,fmt=*,iostat=ierr) rval
+    end if
+
+#elif REAL128
+
+    ! quad precision
+
+    if (RK == c_long_double) then
+        rval = strtold( str//C_NULL_CHAR, endptr )
+        if (rval==0.0_RK) then
+            read(str,fmt=*,iostat=ierr) rval  ! not efficient - might really be 0.0
+        else
+            ierr = 0
+        end if
+    else
+        read(str,fmt=*,iostat=ierr) rval
+    end if
+
+#else
+
+    ! double precision
+
+    if (RK == c_double) then
+        rval = strtod( str//C_NULL_CHAR, endptr )
+        if (rval==0.0_RK) then
+            read(str,fmt=*,iostat=ierr) rval  ! not efficient - might really be 0.0
+        else
+            ierr = 0
+        end if
+    else
+        read(str,fmt=*,iostat=ierr) rval
+    end if
+
+#endif
+
+    status_ok = (ierr==0)
+    if (.not. status_ok) then
+        rval = 0.0_RK
+    else
+        if (ieee_support_nan(rval)) then
+            if (ieee_is_nan(rval)) then
+                ! make sure to return the correct NaN
+                if (use_quiet_nan) then
+                    rval = ieee_value(rval,ieee_quiet_nan)
+                else
+                    rval = ieee_value(rval,ieee_signaling_nan)
+                end if
+            end if
+        end if
+    end if
+
+    end subroutine string_to_real_c
+!*****************************************************************************************
+#endif
 
 !*****************************************************************************************
 !> author: Izaak Beekman
