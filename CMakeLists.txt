@@ -177,6 +177,14 @@ if(JSON_FORTRAN_USE_OpenCoarrays)
     PRIVATE OpenCoarrays::caf_mpi_static)
 endif()
 
+target_include_directories(${LIB_NAME}
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:${INSTALL_MOD_DIR}>)
+target_include_directories(${LIB_NAME}-static
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:${INSTALL_MOD_DIR}>)
 set_target_properties ( ${LIB_NAME}-static
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
@@ -438,7 +446,9 @@ add_custom_target ( uninstall
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
 #-----------------------------------------------------
-install ( EXPORT ${PACKAGE_NAME}-targets DESTINATION "${EXPORT_INSTALL_DIR}" )
+install ( EXPORT ${PACKAGE_NAME}-targets
+  NAMESPACE ${PACKAGE_NAME}::
+  DESTINATION "${EXPORT_INSTALL_DIR}" )
 
 include ( CMakePackageConfigHelpers ) # Standard CMake module
 write_basic_package_version_file( "${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
