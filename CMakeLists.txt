@@ -179,11 +179,11 @@ endif()
 
 target_include_directories(${LIB_NAME}
   PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${MODULE_DIR}>
   $<INSTALL_INTERFACE:${INSTALL_MOD_DIR}>)
 target_include_directories(${LIB_NAME}-static
   PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${MODULE_DIR}>
   $<INSTALL_INTERFACE:${INSTALL_MOD_DIR}>)
 set_target_properties ( ${LIB_NAME}-static
   PROPERTIES
