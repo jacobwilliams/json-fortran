@@ -122,15 +122,14 @@ enable_language ( Fortran )
 project ( jf_test NONE )
 
 find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 8.2.5 REQUIRED )
-include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
 foreach ( UNIT_TEST ${JF_TEST_SRCS} )
   get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
   add_executable ( ${TEST} ${UNIT_TEST} )
-  target_link_libraries ( ${TEST} jsonfortran-static )
+  target_link_libraries ( ${TEST} jsonfortran::jsonfortran-static )
   # or for linking against the dynamic/shared library:
-  # target_link_libraries ( ${TEST} jsonfortran ) # instead
+  # target_link_libraries ( ${TEST} jsonfortran::jsonfortran ) # instead
 endforeach()
 ```
 
