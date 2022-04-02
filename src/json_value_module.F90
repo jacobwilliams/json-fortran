@@ -7987,7 +7987,7 @@
         !! prepend the string to the path
         implicit none
         character(kind=CK,len=*),intent(in) :: str  !! string to prepend to `path`
-        character(kind=CK,len=1),intent(in),optional :: path_sep
+        character(kind=CK,len=*),intent(in),optional :: path_sep
             !! path separator (default is '.').
             !! (ignored if `json%path_mode/=1`)
 

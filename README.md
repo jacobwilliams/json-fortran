@@ -42,6 +42,7 @@ Download
 
 [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
 [![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg?style=plastic)](https://formulae.brew.sh/formula/json-fortran)
+[![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/json-fortran?style=plastic)](https://github.com/conda-forge/json-fortran-feedstock)
 
 Download the official versioned releases
 [here](https://github.com/jacobwilliams/json-fortran/releases/latest).
@@ -66,6 +67,21 @@ _Please note_, if you wish to support usage of JSON-Fortran with
 multiple Fortran compilers, please follow the CMake installation
 instructions below, as the homebrew installation is only intended to
 support a single Fortran compiler. Cheers!
+
+__NEWS:__ As of January 20, 2022,
+[json-fortran](https://github.com/jacobwilliams/json-fortran) can be
+downloaded and installed via the [conda](https://docs.conda.io/en/latest/)
+package manager on Mac OS X and Linux. Once a conda-distribution, like
+[miniforge](https://github.com/conda-forge/miniforge), is installed
+the [json-fortran package](https://anaconda.org/conda-forge/json-fortran)
+can be installed.
+
+```bash
+conda install json-fortran
+```
+
+_Note:_ Packages on conda-forge are build with GCC 9.4 which is upwards
+compatible with newer GCC versions, but not with other Fortran compilers.
 
 [top](#json-fortran)
 
@@ -122,15 +138,14 @@ enable_language ( Fortran )
 project ( jf_test NONE )
 
 find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 8.2.5 REQUIRED )
-include_directories ( "${jsonfortran_INCLUDE_DIRS}" )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
 foreach ( UNIT_TEST ${JF_TEST_SRCS} )
   get_filename_component ( TEST ${UNIT_TEST} NAME_WE )
   add_executable ( ${TEST} ${UNIT_TEST} )
-  target_link_libraries ( ${TEST} jsonfortran-static )
+  target_link_libraries ( ${TEST} jsonfortran::jsonfortran-static )
   # or for linking against the dynamic/shared library:
-  # target_link_libraries ( ${TEST} jsonfortran ) # instead
+  # target_link_libraries ( ${TEST} jsonfortran::jsonfortran ) # instead
 endforeach()
 ```
 
