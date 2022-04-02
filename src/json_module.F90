@@ -73,7 +73,7 @@
 
     implicit none
 
-    character(kind=json_CK,len=*),protected :: json_fortran_version = '8.2.5'
+    character(kind=json_CK,len=5),protected :: json_fortran_version = '8.2.5'
         !! JSON-Fortran version.
         !!
         !!@note This string should match the one in the `.VERSION` file (which is used
