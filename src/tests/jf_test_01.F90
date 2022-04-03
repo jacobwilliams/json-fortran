@@ -57,7 +57,7 @@ contains
     write(error_unit,'(A)') '================================='
     write(error_unit,'(A)') ''
 
-    write(error_unit,'(A)') 'JSON-Fortran version: '//json_fortran_version
+    write(error_unit,'(A)') 'JSON-Fortran version: '//json_fortran_version()
 
     ! parse the json file:
     write(error_unit,'(A)') ''
