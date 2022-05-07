@@ -62,7 +62,6 @@ or [Download v8.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 
 **Bug Fixes:**
 
-- Fixed a memory leak with parsing invalid JSON. Also fixed some unit test memory issues [\#494](https://github.com/jacobwilliams/json-fortran/issues/494)  ([jacobwilliams](https://github.com/jacobwilliams))
 - Fixed a minor standards violation [\#510](https://github.com/jacobwilliams/json-fortran/issues/510) [\#511](https://github.com/jacobwilliams/json-fortran/pull/511) ([jacobwilliams](https://github.com/jacobwilliams))
 - Minor changes to work around issues with nvfortran compiler [\#496](https://github.com/jacobwilliams/json-fortran/pull/496) ([vyu16](https://github.com/vyu16))
 
@@ -79,8 +78,7 @@ or [Download v8.2.5](https://github.com/jacobwilliams/json-fortran/releases/tag/
 **Bug Fixes:**
 
 - Fixed a potential uninitialized variable issue in `get_current_line_from_file_stream`
-- Fixed a memory leak when parsing an invalid JSON
-- Fixed various memory issues in the unit tests [\#495](https://github.com/jacobwilliams/json-fortran/pull/495) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixed a memory leak when parsing an invalid JSON. Fixed various memory issues in the unit tests [\#494](https://github.com/jacobwilliams/json-fortran/issues/494) [\#495](https://github.com/jacobwilliams/json-fortran/pull/495) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [8.2.4](https://github.com/jacobwilliams/json-fortran/tree/8.2.4) (2021-08-15)
 
