@@ -21,8 +21,10 @@ JSON-Fortran: A Modern Fortran JSON API
 Status
 ------
 [![Build Status](https://github.com/jacobwilliams/json-fortran/actions/workflows/CI.yml/badge.svg)](https://github.com/jacobwilliams/json-fortran/actions)
-[![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png?style=plastic)](https://github.com/jacobwilliams/json-fortran/issues)
+[![GitHub issues](https://img.shields.io/github/issues/jacobwilliams/json-fortran.png)](https://github.com/jacobwilliams/json-fortran/issues)
 [![Codecov](https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobwilliams/json-fortran)
+[![last-commit](https://img.shields.io/github/last-commit/jacobwilliams/json-fortran)](https://github.com/jacobwilliams/json-fortran/commits/master)
+
 
 Take a look at the
 [CHANGELOG](https://github.com/jacobwilliams/json-fortran/blob/master/CHANGELOG.md#unreleased)
@@ -40,9 +42,9 @@ JSON-Fortran is a user-friendly, thread-safe, and object-oriented API for readin
 Download
 --------------------
 
-[![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg?style=plastic)](https://github.com/jacobwilliams/json-fortran/releases)
-[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg?style=plastic)](https://formulae.brew.sh/formula/json-fortran)
-[![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/json-fortran?style=plastic)](https://github.com/conda-forge/json-fortran-feedstock)
+[![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg)](https://github.com/jacobwilliams/json-fortran/releases)
+[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg)](https://formulae.brew.sh/formula/json-fortran)
+[![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/json-fortran)](https://github.com/conda-forge/json-fortran-feedstock)
 
 Download the official versioned releases
 [here](https://github.com/jacobwilliams/json-fortran/releases/latest).
