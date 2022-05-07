@@ -73,13 +73,32 @@
 
     implicit none
 
-    character(kind=json_CK,len=5),protected :: json_fortran_version = '8.2.5'
+    character(kind=json_CK,len=*),parameter,private :: version = '8.3.0'
         !! JSON-Fortran version.
         !!
         !!@note This string should match the one in the `.VERSION` file (which is used
-        !! for the documentation generation.)
+        !!      for the documentation generation.)
 
     public
 
+    contains
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Returns the JSON-Fortran version string.
+
+    function json_fortran_version() result(ver)
+
+    implicit none
+
+    character(len=:),allocatable :: ver  !! JSON-Fortran version string
+
+    ver = version
+
+    end function json_fortran_version
+!*****************************************************************************************
+
+!*****************************************************************************************
     end module json_module
 !*****************************************************************************************
