@@ -1,5 +1,4 @@
-![JSON-Fortran](/media/json-fortran-logo-2.png)
-============
+<h1 id="json-fortran"><img alt="JSON-Fortran" src="/media/json-fortran-logo-2.png" title="JSON-Fortran logo"></h1>
 
 JSON-Fortran: A Modern Fortran JSON API
 
