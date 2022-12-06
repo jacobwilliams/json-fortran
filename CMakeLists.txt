@@ -170,6 +170,11 @@ set ( LIB_NAME ${PROJECT_NAME} )
 add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
 add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
 
+# add an alias so that including json-fortran is agnostic
+# of find_package or being directly compiled through add_subdirectory
+add_library ( ${PACKAGE_NAME}::${LIB_NAME}        ALIAS ${LIB_NAME} )
+add_library ( ${PACKAGE_NAME}::${LIB_NAME}-static ALIAS ${LIB_NAME}-static )
+
 if(JSON_FORTRAN_USE_OpenCoarrays)
   target_link_libraries(${LIB_NAME}
     PRIVATE OpenCoarrays::caf_mpi_static)
