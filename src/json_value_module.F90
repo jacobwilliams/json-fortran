@@ -1107,7 +1107,7 @@
         me%escape_solidus = escape_solidus
     end if
 
-    ! how to handle null to read conversions:
+    ! how to handle null to real conversions:
     if (present(null_to_real_mode)) then
         select case (null_to_real_mode)
         case(1_IK:3_IK)
