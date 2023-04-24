@@ -4,7 +4,7 @@ install ( EXPORT ${PACKAGE_NAME}-targets
 
 include ( CMakePackageConfigHelpers ) # Standard CMake module
 write_basic_package_version_file( "${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
-  VERSION ${VERSION}
+  VERSION ${PROJECT_VERSION}
   COMPATIBILITY SameMajorVersion )
 
 # provides COMPILER_CONSISTENCY_CHECK

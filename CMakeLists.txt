@@ -9,7 +9,7 @@
 # this software. The contributing author, Izaak Beekman, retains all
 # rights permitted by the terms of the JSON-Fortran license.
 
-cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.0 FATAL_ERROR )
 
 # Use MSVS folders to organize projects on windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -34,7 +34,11 @@ include ( "cmake/checkOutOfSource.cmake" )
 #---------------------
 # Declare project name
 #---------------------
-project ( jsonfortran NONE )
+project (
+    jsonfortran 
+    VERSION 8.3.0
+    LANGUAGES Fortran
+)
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
   option(JSON_FORTRAN_USE_OpenCoarrays
@@ -70,16 +74,6 @@ elseif(${JSON_INT_KIND} MATCHES "INT64")
   add_definitions(-DINT64)
 endif()
 
-#----------------------------------
-# Get version (semantic versioning)
-# C.F. semver.org
-#----------------------------------
-file ( STRINGS "${PROJECT_SOURCE_DIR}/.VERSION" VERSION )
-string( REPLACE "." ";" VERSION_LIST ${VERSION} )
-list(GET VERSION_LIST 0 VERSION_MAJOR)
-list(GET VERSION_LIST 1 VERSION_MINOR)
-list(GET VERSION_LIST 2 VERSION_PATCH)
-set(PROJECT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 message ( STATUS "CMake build configuration for JSON-Fortran ${PROJECT_VERSION}" )
 
 #-------------------------------------
@@ -196,7 +190,7 @@ set_target_properties ( ${LIB_NAME}-static
   if(NOT MSVC_IDE)
   PREFIX lib
   endif()
-  VERSION ${VERSION}
+  VERSION ${PROJECT_VERSION}
   ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
   Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
 set_target_properties ( ${LIB_NAME}
@@ -205,8 +199,8 @@ set_target_properties ( ${LIB_NAME}
   if(NOT MSVC_IDE)
   PREFIX lib
   endif()
-  SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR}
-  VERSION ${VERSION}
+  SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+  VERSION ${PROJECT_VERSION}
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
   Fortran_MODULE_DIRECTORY ${PROJECT_BINARY_DIR} )
 
