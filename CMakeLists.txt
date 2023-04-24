@@ -40,6 +40,9 @@ project (
     LANGUAGES Fortran
 )
 
+# write the version file
+configure_file(${CMAKE_SOURCE_DIR}/.VERSION.in ${CMAKE_SOURCE_DIR}/.VERSION)
+
 if(CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
   option(JSON_FORTRAN_USE_OpenCoarrays
     "Build JSON-Fortran with support for linking against OpenCoarray programs" OFF)
