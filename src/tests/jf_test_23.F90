@@ -12,7 +12,7 @@ module jf_test_23_mod
     private
     public :: test_23
 
-    character(len=*),parameter :: dir = '../files/inputs/'    !! working directory
+    character(len=*),parameter :: dir = 'files/inputs/'    !! working directory
     character(len=*),parameter :: filename1 = 'test1.json'    !! file to read
 
 contains

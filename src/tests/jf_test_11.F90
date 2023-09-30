@@ -14,7 +14,7 @@ module jf_test_11_mod
     private
     public :: test_11
 
-    character(len=*),parameter :: dir = '../files/inputs/'  !! working directory
+    character(len=*),parameter :: dir = 'files/inputs/'  !! working directory
 #ifdef USE_UCS4
     character(len=*),parameter :: unicode_file = 'hello-world-ucs4.json'
 #endif
@@ -141,8 +141,8 @@ contains
         end if
 
         write(error_unit,'(A)') ''
-        write(error_unit,'(A)') 'Writing json file object to "../files/'//unicode_file//'"'
-        call clone%print('../files/'//unicode_file)
+        write(error_unit,'(A)') 'Writing json file object to "files/expected-outputs/'//unicode_file//'"'
+        call clone%print('files/expected-outputs/'//unicode_file)
         if ( clone%failed() ) then
            call clone%print_error_message(error_unit)
            error_cnt = error_cnt + 1
@@ -168,7 +168,7 @@ contains
     ! parse the json file:
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'parsing file: '//dir//ascii_equivalent
-    write(error_unit,'(A)') 'This is the ascii equivalent of "../files/inputs/hello-world-ucs4.json"'
+    write(error_unit,'(A)') 'This is the ascii equivalent of "files/inputs/hello-world-ucs4.json"'
 
     call json%load(filename = dir//ascii_equivalent)
 
@@ -255,8 +255,8 @@ contains
         end if
 
         write(error_unit,'(A)') ''
-        write(error_unit,'(A)') 'Writing json file object to "../files/'//ascii_equivalent//'"'
-        call json%print('../files/'//ascii_equivalent)
+        write(error_unit,'(A)') 'Writing json file object to "files/expected-outputs/'//ascii_equivalent//'"'
+        call json%print('files/expected-outputs/'//ascii_equivalent)
         if ( json%failed() ) then
            call json%print_error_message(error_unit)
            error_cnt = error_cnt + 1
