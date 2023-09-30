@@ -14,7 +14,7 @@ module jf_test_14_mod
     private
     public :: test_14
 
-    character(len=*),parameter :: dir = '../files/inputs/'  !! working directory
+    character(len=*),parameter :: dir = 'files/inputs/'  !! working directory
     character(len=*),parameter :: filename1 = 'test1.json'  !! the file to read
     integer :: icount = 0  !! a count of the number of "name" variables found
     character(len=:),allocatable :: new_name  !! name to change to

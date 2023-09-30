@@ -23,7 +23,7 @@ contains
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
     integer(IK),parameter :: imx = 5, jmx = 3, kmx = 4 !! dimensions for raw work array of primitive type
-    character(len=*),parameter :: file = '../files/test12.json'  !! Filename to write
+    character(len=*),parameter :: file = 'files/expected-outputs/test12.json'  !! Filename to write
     real(wp), parameter        :: TOL = 100*epsilon(1.0_wp) !! Tolerance for real comparisons
 
     type(json_core)                        :: json              !! factory for manipulating `json_value` pointers

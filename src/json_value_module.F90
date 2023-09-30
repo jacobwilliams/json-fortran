@@ -1289,7 +1289,7 @@
 !     implicit none
 !     type(json_core) :: json
 !     type(json_value),pointer :: j1, j2
-!     call json%load('../files/inputs/test1.json',j1)
+!     call json%load('files/inputs/test1.json',j1)
 !     call json%clone(j1,j2) !now have two independent copies
 !     call json%destroy(j1)  !destroys j1, but j2 remains
 !     call json%print(j2,'j2.json')

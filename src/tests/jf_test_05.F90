@@ -15,7 +15,7 @@ module jf_test_5_mod
     private
     public :: test_5
 
-    character(len=*),parameter :: dir = '../files/inputs/'   !! working directory
+    character(len=*),parameter :: dir = 'files/inputs/'   !! working directory
     character(len=*),parameter :: filename5 = 'test5.json'
 
 contains

@@ -15,7 +15,7 @@ module jf_test_2_mod
     private
     public :: test_2
 
-    character(len=*),parameter :: dir = '../files/'    !! working directory
+    character(len=*),parameter :: dir = 'files/expected-outputs/'    !! working directory
     character(len=*),parameter :: filename2 = 'test2.json'
 
 contains

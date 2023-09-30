@@ -30,7 +30,7 @@ module jf_test_9_mod
     !small file that contains unicode characters:
     !character(len=*),parameter :: filename = 'hello-world-ucs4.json'  !!!! test !!!!
 
-    character(len=*),parameter :: dir = '../files/inputs/' !working directory
+    character(len=*),parameter :: dir = 'files/inputs/' !working directory
 
 contains
 

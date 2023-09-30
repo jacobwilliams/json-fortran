@@ -15,7 +15,7 @@ module jf_test_1_mod
     private
     public :: test_1
 
-    character(len=*),parameter :: dir = '../files/inputs/'    !! working directory
+    character(len=*),parameter :: dir = 'files/inputs/'    !! working directory
     character(len=*),parameter :: filename1 = 'test1.json'    !! file to read
     logical :: namelist_style !! for printing JSON variable paths
 
