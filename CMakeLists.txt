@@ -167,8 +167,16 @@ endif ()
 #---------------------------------------------
 
 set ( LIB_NAME ${PROJECT_NAME} )
-add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
-add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
+if(CMAKE_Fortran_COMPILER_ID STREQUAL IntelLLVM)
+    add_library ( ${LIB_NAME}-obj    OBJECT ${JF_LIB_SRCS} )
+    set_property(TARGET ${LIB_NAME}-obj PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+    add_library ( ${LIB_NAME}        SHARED $<TARGET_OBJECTS:${LIB_NAME}-obj> )
+    add_library ( ${LIB_NAME}-static STATIC $<TARGET_OBJECTS:${LIB_NAME}-obj> )
+else()
+    add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
+    add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
+endif()
 
 if(JSON_FORTRAN_USE_OpenCoarrays)
   target_link_libraries(${LIB_NAME}
@@ -185,15 +193,26 @@ target_include_directories(${LIB_NAME}-static
   PUBLIC
   $<BUILD_INTERFACE:${MODULE_DIR}>
   $<INSTALL_INTERFACE:${INSTALL_MOD_DIR}>)
-set_target_properties ( ${LIB_NAME}-static
-  PROPERTIES
-  OUTPUT_NAME ${LIB_NAME}
-  if(NOT MSVC_IDE)
-  PREFIX lib
-  endif()
-  VERSION ${VERSION}
-  ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
-  Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
+if(CMAKE_Fortran_COMPILER_ID STREQUAL IntelLLVM)
+    set_target_properties ( ${LIB_NAME}-static
+      PROPERTIES
+      if(NOT MSVC_IDE)
+      PREFIX lib
+      endif()
+      VERSION ${VERSION}
+      ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+      Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
+else()
+    set_target_properties ( ${LIB_NAME}-static
+      PROPERTIES
+      OUTPUT_NAME ${LIB_NAME}
+      if(NOT MSVC_IDE)
+      PREFIX lib
+      endif()
+      VERSION ${VERSION}
+      ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+      Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
+endif()
 set_target_properties ( ${LIB_NAME}
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
