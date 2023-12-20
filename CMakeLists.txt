@@ -9,7 +9,11 @@
 # this software. The contributing author, Izaak Beekman, retains all
 # rights permitted by the terms of the JSON-Fortran license.
 
-cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.18 FATAL_ERROR )
+
+option (JSONFORTRAN_ENABLE_DOC_GENERATION "Enable doc generation" OFF)
+option (JSONFORTRAN_ENABLE_TESTS "Enable tests" OFF)
+option (JSONFORTRAN_STATIC_LIBRARY_ONLY "Generate only static library" ON)
 
 # Use MSVS folders to organize projects on windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -174,8 +178,12 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL IntelLLVM)
     add_library ( ${LIB_NAME}        SHARED $<TARGET_OBJECTS:${LIB_NAME}-obj> )
     add_library ( ${LIB_NAME}-static STATIC $<TARGET_OBJECTS:${LIB_NAME}-obj> )
 else()
-    add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
+  if (JSONFORTRAN_STATIC_LIBRARY_ONLY)
+    add_library ( ${LIB_NAME}        STATIC ${JF_LIB_SRCS} )
     add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
+  else()
+    add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
+  endif()
 endif()
 
 if(JSON_FORTRAN_USE_OpenCoarrays)
@@ -227,6 +235,10 @@ set_target_properties ( ${LIB_NAME}
 #-------------------------------------
 # Build the documentation with FORD
 #-------------------------------------
+if (JSONFORTRAN_ENABLE_DOC_GENERATION)
+  set(SKIP_DOC_GEN FALSE)
+endif ()
+
 set ( SKIP_DOC_GEN FALSE CACHE BOOL
   "Disable building the API documentation with FORD" )
 if ( NOT SKIP_DOC_GEN )
@@ -301,6 +313,9 @@ endif ()
 #--------------------------
 # Handle test related stuff
 #--------------------------
+if (JSONFORTRAN_ENABLE_TESTS)
+  set (ENABLE_TESTS FALSE)
+endif ()
 set ( ENABLE_TESTS TRUE CACHE BOOL
   "Enable the JSON-Fortran tests." )
 
