@@ -236,11 +236,11 @@ set_target_properties ( ${LIB_NAME}
 # Build the documentation with FORD
 #-------------------------------------
 if (JSONFORTRAN_ENABLE_DOC_GENERATION)
-  set(SKIP_DOC_GEN FALSE)
+  set(SKIP_DOC_GEN FALSE CACHE BOOL "Disable building the API documentation with FORD")
+else ()
+  set(SKIP_DOC_GEN TRUE CACHE BOOL "Disable building the API documentation with FORD" )
 endif ()
 
-set ( SKIP_DOC_GEN FALSE CACHE BOOL
-  "Disable building the API documentation with FORD" )
 if ( NOT SKIP_DOC_GEN )
   find_program ( FORD ford )
   if ( FORD ) # Found
@@ -314,10 +314,10 @@ endif ()
 # Handle test related stuff
 #--------------------------
 if (JSONFORTRAN_ENABLE_TESTS)
-  set (ENABLE_TESTS FALSE)
+  set ( ENABLE_TESTS TRUE CACHE BOOL "Enable the JSON-Fortran tests." )
+else ()
+  set ( ENABLE_TESTS FALSE CACHE BOOL "Enable the JSON-Fortran tests." )
 endif ()
-set ( ENABLE_TESTS TRUE CACHE BOOL
-  "Enable the JSON-Fortran tests." )
 
 #---------------------------------------------------------------------
 # Add some tests to ensure that the software is performing as expected
