@@ -1,3 +1,5 @@
+<!-- -*- mode: jinja2 -*- -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -10,82 +12,57 @@
 
     <title>json_value_create_real32 &ndash; JSON-Fortran</title>
 
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
       <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
-         <script src="../js/jquery-2.1.3.min.js"></script>
-         <script src="../js/svg-pan-zoom.min.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
   </head>
 
   <body>
 
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
           <a class="navbar-brand" href="../index.html">JSON-Fortran </a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-              <li><a href='../page/index.html'>Other Docs</a></li>
-            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
-              <a href="#" class="dropdown-toggle"
-                 data-toggle="dropdown" role="button"
-                 aria-haspopup="true"
-                 aria-expanded="false">
-                 Contents <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                    <li><a href="../lists/files.html">Source Files</a></li>
-                  <li><a href="../lists/modules.html">Modules</a></li>
-                  <li><a href="../lists/procedures.html">Procedures</a></li>
-                  <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
-                  <li><a href="../lists/types.html">Derived Types</a></li>
-              </ul>
-            </li>
-                <li class="visible-xs hidden-sm visible-lg">
-                  <a href="../lists/files.html">Source Files</a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Other Docs</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/modules.html">Modules</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/procedures.html">Procedures</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/absint.html">Abstract Interfaces</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/types.html">Derived Types</a>
-              </li>
-          </ul>
-            <form action="../search.html" class="navbar-form navbar-right" role="search">
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
               </div>
-              <!--
-                  <button type="submit" class="btn btn-default">Submit</button>
-                  -->
-            </form>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
 
     <div class="container">
   <div class="row">
@@ -93,33 +70,37 @@
       <small>Subroutine</small>
       
     </h1>
-      <div class="row" id="info-bar">
-    <div class="col-lg-12">
-      <div class="well well-sm">
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
         <ul class="list-inline" style="margin-bottom:0px;display:inline">
 
-          <li id="statements"><i class="fa fa-list-ol"></i>
-            <a data-toggle="tooltip"
-               data-placement="bottom" data-html="true"
-               title=" 0.1% of total for procedures.">8 statements</a>
-          </li>
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip"
+                 data-bs-placement="bottom" data-html="true"
+                 title=" 0.1% of total for procedures.">8 statements</a>
+            </li>
 
-            <li id="source-file">
+            <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
               <a href="../src/json_value_module.F90"> Source File</a>
             </li>
         </ul>
-        <ol class="breadcrumb in-well text-right">
-              <li><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
-              <li><a href='../module/json_value_module.html'>json_value_module</a></li>
-          <li class="active">json_value_create_real32</li>
-        </ol>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_value_module.html'>json_value_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_value_create_real32</li>
+          </ol>
+        </nav>
       </div>
     </div>
   </div>
   <script>
     $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-bs-toggle="tooltip"]').tooltip()
     })
   </script>
 
@@ -148,8 +129,9 @@
   
   
   
-    <div class="panel panel-primary">
-      <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
       <div class="list-group">
         <a class="list-group-item" href="../proc/json_value_create_real32.html#src">json_value_create_real32</a>
       </div>
@@ -165,8 +147,11 @@
 </h2>
     
 
-    <p>Alternate version of <a href="../proc/json_value_create_real.html">json_value_create_real</a> where val=real32.</p>
-<p></p><div class="alert alert-info" role="alert"><h4>Note</h4><p>The value is converted into a <code>real(RK)</code> variable internally.</p></div>
+    <p>Alternate version of <a href="json_value_create_real.html">json_value_create_real</a> where val=real32.</p>
+<div class="alert alert-info">
+<p class="alert-title h4">Note</p>
+<p>The value is converted into a <code>real(RK)</code> variable internally.</p>
+</div>
 
     <h3>Type Bound</h3>
     <p><a href='../type/json_core.html'>json_core</a></p>
@@ -175,16 +160,16 @@
         <table class="table table-striped varlist">
     <thead>
       <tr>
-        <th>Type</th>
-<th>Intent</th><th>Optional</th>        <th>Attributes</th>
-        <th></th>
-        <th>Name</th>
-        <th></th>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
     </thead>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-json~68"></span>
+              <span class="anchor" id="variable-json~190"></span>
               class(<a href='../type/json_core.html'>json_core</a>),
             </td>
 <td>intent(inout)</td>
@@ -199,7 +184,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-p~78"></span>
+              <span class="anchor" id="variable-p~124"></span>
               type(<a href='../type/json_value.html'>json_value</a>),
             </td>
 <td></td>
@@ -214,7 +199,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-val~66"></span>
+              <span class="anchor" id="variable-val~43"></span>
               real(kind=real32),
             </td>
 <td>intent(in)</td>
@@ -229,7 +214,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-name~72"></span>
+              <span class="anchor" id="variable-name~62"></span>
               character(kind=CK, len=*),
             </td>
 <td>intent(in)</td>
@@ -246,53 +231,132 @@
   </table>
 
     <br>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-  <h3 class="panel-title">Calls</h3>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
   <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: proc~~json_value_create_real32~~CallsGraph Pages: 1 -->
-<svg id="procjson_value_create_real32CallsGraph" width="432pt" height="32pt"
- viewBox="0.00 0.00 432.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~json_value_create_real32~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg id="procjson_value_create_real32CallsGraph" width="641pt" height="34pt"
+ viewBox="0.00 0.00 641.00 33.57" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_value_create_real32~~CallsGraph" class="graph" transform="scale(2.2 2.2) rotate(0) translate(4 70)">
 <title>proc~~json_value_create_real32~~CallsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 428,-28 428,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 1409,-70 1409,4 -4,4"/>
 <!-- proc~json_value_create_real32 -->
 <g id="proc~~json_value_create_real32~~CallsGraph_node1" class="node">
 <title>proc~json_value_create_real32</title>
-<polygon fill="none" stroke="black" points="316,-24 0,-24 0,0 316,0 316,-24"/>
-<text text-anchor="middle" x="158" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_value_module::json_core%json_value_create_real32</text>
+<polygon fill="none" stroke="black" points="316,-45 0,-45 0,-21 316,-21 316,-45"/>
+<text text-anchor="middle" x="158" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_value_module::json_core%json_value_create_real32</text>
 </g>
-<!-- create_real -->
+<!-- none~create_real~2 -->
 <g id="proc~~json_value_create_real32~~CallsGraph_node2" class="node">
-<title>create_real</title>
-<polygon fill="#777777" stroke="#777777" points="424,-24 352,-24 352,0 424,0 424,-24"/>
-<text text-anchor="middle" x="388" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">create_real</text>
+<title>none~create_real~2</title>
+<g id="a_proc~~json_value_create_real32~~CallsGraph_node2"><a xlink:href="../type/json_core.html#boundprocedure-create_real~2" xlink:title="json_value_module::json_core%create_real">
+<polygon fill="#a7506f" stroke="#a7506f" points="593,-45 352,-45 352,-21 593,-21 593,-45"/>
+<text text-anchor="middle" x="472.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%create_real</text>
+</a>
 </g>
-<!-- proc~json_value_create_real32&#45;&gt;create_real -->
+</g>
+<!-- proc~json_value_create_real32&#45;&gt;none~create_real~2 -->
 <g id="proc~~json_value_create_real32~~CallsGraph_edge1" class="edge">
-<title>proc~json_value_create_real32&#45;&gt;create_real</title>
-<path fill="none" stroke="#255000" d="M316.11,-12C325.23,-12 333.91,-12 341.88,-12"/>
-<polygon fill="#255000" stroke="#255000" points="341.92,-15.5 351.92,-12 341.92,-8.5 341.92,-15.5"/>
+<title>proc~json_value_create_real32&#45;&gt;none~create_real~2</title>
+<path fill="none" stroke="#255000" d="M316.17,-26.25C324.7,-26.25 333.23,-26.28 341.66,-26.34"/>
+<polygon fill="#255000" stroke="#255000" points="341.85,-29.84 351.88,-26.42 341.91,-22.84 341.85,-29.84"/>
+</g>
+<!-- none~create_real~2&#45;&gt;proc~json_value_create_real32 -->
+<g id="proc~~json_value_create_real32~~CallsGraph_edge2" class="edge">
+<title>none~create_real~2&#45;&gt;proc~json_value_create_real32</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M351.88,-39.58C343.47,-39.66 334.9,-39.71 326.29,-39.74"/>
+<polygon fill="#255000" stroke="#255000" points="326.16,-36.24 316.17,-39.75 326.17,-43.24 326.16,-36.24"/>
+</g>
+<!-- proc~wrap_json_value_create_real32 -->
+<g id="proc~~json_value_create_real32~~CallsGraph_node3" class="node">
+<title>proc~wrap_json_value_create_real32</title>
+<g id="a_proc~~json_value_create_real32~~CallsGraph_node3"><a xlink:href="../proc/wrap_json_value_create_real32.html" xlink:title="json_value_module::json_core%wrap_json_value_create_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="977,-45 629,-45 629,-21 977,-21 977,-45"/>
+<text text-anchor="middle" x="803" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%wrap_json_value_create_real32</text>
+</a>
+</g>
+</g>
+<!-- none~create_real~2&#45;&gt;proc~wrap_json_value_create_real32 -->
+<g id="proc~~json_value_create_real32~~CallsGraph_edge3" class="edge">
+<title>none~create_real~2&#45;&gt;proc~wrap_json_value_create_real32</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M593.03,-26.48C601.46,-26.39 610.07,-26.33 618.75,-26.29"/>
+<polygon fill="#255000" stroke="#255000" points="618.98,-29.79 628.97,-26.26 618.96,-22.79 618.98,-29.79"/>
+</g>
+<!-- proc~wrap_json_value_create_real32&#45;&gt;none~create_real~2 -->
+<g id="proc~~json_value_create_real32~~CallsGraph_edge5" class="edge">
+<title>proc~wrap_json_value_create_real32&#45;&gt;none~create_real~2</title>
+<path fill="none" stroke="#255000" d="M628.97,-39.74C620.34,-39.72 611.75,-39.68 603.28,-39.62"/>
+<polygon fill="#255000" stroke="#255000" points="603.06,-36.11 593.03,-39.52 602.99,-43.11 603.06,-36.11"/>
+</g>
+<!-- interface~to_unicode -->
+<g id="proc~~json_value_create_real32~~CallsGraph_node4" class="node">
+<title>interface~to_unicode</title>
+<g id="a_proc~~json_value_create_real32~~CallsGraph_node4"><a xlink:href="../interface/to_unicode.html" xlink:title="json_string_utilities::to_unicode">
+<polygon fill="#a7506f" stroke="#a7506f" points="1192,-45 1013,-45 1013,-21 1192,-21 1192,-45"/>
+<text text-anchor="middle" x="1102.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_unicode</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_json_value_create_real32&#45;&gt;interface~to_unicode -->
+<g id="proc~~json_value_create_real32~~CallsGraph_edge4" class="edge">
+<title>proc~wrap_json_value_create_real32&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#255000" d="M977.06,-33C985.78,-33 994.39,-33 1002.76,-33"/>
+<polygon fill="#255000" stroke="#255000" points="1002.84,-36.5 1012.84,-33 1002.84,-29.5 1002.84,-36.5"/>
+</g>
+<!-- proc~to_uni -->
+<g id="proc~~json_value_create_real32~~CallsGraph_node5" class="node">
+<title>proc~to_uni</title>
+<g id="a_proc~~json_value_create_real32~~CallsGraph_node5"><a xlink:href="../proc/to_uni.html" xlink:title="json_string_utilities::to_uni">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1393,-66 1240,-66 1240,-42 1393,-42 1393,-66"/>
+<text text-anchor="middle" x="1316.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni</text>
+</a>
+</g>
+</g>
+<!-- interface~to_unicode&#45;&gt;proc~to_uni -->
+<g id="proc~~json_value_create_real32~~CallsGraph_edge6" class="edge">
+<title>interface~to_unicode&#45;&gt;proc~to_uni</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M1192.18,-41.78C1204.59,-43.01 1217.32,-44.28 1229.68,-45.5"/>
+<polygon fill="#255000" stroke="#255000" points="1229.66,-49.01 1239.95,-46.52 1230.35,-42.05 1229.66,-49.01"/>
+</g>
+<!-- proc~to_uni_vec -->
+<g id="proc~~json_value_create_real32~~CallsGraph_node6" class="node">
+<title>proc~to_uni_vec</title>
+<g id="a_proc~~json_value_create_real32~~CallsGraph_node6"><a xlink:href="../proc/to_uni_vec.html" xlink:title="json_string_utilities::to_uni_vec">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1405,-24 1228,-24 1228,0 1405,0 1405,-24"/>
+<text text-anchor="middle" x="1316.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni_vec</text>
+</a>
+</g>
+</g>
+<!-- interface~to_unicode&#45;&gt;proc~to_uni_vec -->
+<g id="proc~~json_value_create_real32~~CallsGraph_edge7" class="edge">
+<title>interface~to_unicode&#45;&gt;proc~to_uni_vec</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M1192.18,-24.22C1200.66,-23.38 1209.29,-22.52 1217.85,-21.67"/>
+<polygon fill="#255000" stroke="#255000" points="1218.25,-25.15 1227.86,-20.68 1217.56,-18.18 1218.25,-25.15"/>
 </g>
 </g>
 </svg>
-</div>        <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
-          <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+</div>                <script>
+                  var panprocjson_value_create_real32CallsGraph = svgPanZoom('#procjson_value_create_real32CallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
                   <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-              <div class="modal-body">
+                <div class="modal-body">
 <p>Nodes of different colours represent the following: </p>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -300,11 +364,11 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="597pt" height="32pt"
- viewBox="0.00 0.00 596.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1.16 1.16) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 592.5,-28 592.5,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node">
 <title>Subroutine</title>
@@ -323,23 +387,240 @@
 <polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
 <text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
-<!-- Unknown Procedure Type -->
+<!-- Type Bound Procedure -->
 <g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
 <title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="388.5,-24 243.5,-24 243.5,0 388.5,0 388.5,-24"/>
-<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
-<g id="node5" class="node">
+<g id="node6" class="node">
 <title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="465,-24 407,-24 407,0 465,0 465,-24"/>
-<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
-<g id="node6" class="node">
+<g id="node7" class="node">
 <title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="588.5,-24 483.5,-24 483.5,0 588.5,0 588.5,-24"/>
-<text text-anchor="middle" x="536" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~json_value_create_real32~~CalledByGraph Pages: 1 -->
+<svg id="procjson_value_create_real32CalledByGraph" width="641pt" height="74pt"
+ viewBox="0.00 0.00 641.00 73.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_value_create_real32~~CalledByGraph" class="graph" transform="scale(2.14 2.14) rotate(0) translate(4 154)">
+<title>proc~~json_value_create_real32~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-154 1369,-154 1369,4 -4,4"/>
+<!-- proc~json_value_create_real32 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_node1" class="node">
+<title>proc~json_value_create_real32</title>
+<polygon fill="none" stroke="black" points="695,-150 379,-150 379,-126 695,-126 695,-150"/>
+<text text-anchor="middle" x="537" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_value_module::json_core%json_value_create_real32</text>
+</g>
+<!-- none~create_real~2 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_node2" class="node">
+<title>none~create_real~2</title>
+<g id="a_proc~~json_value_create_real32~~CalledByGraph_node2"><a xlink:href="../type/json_core.html#boundprocedure-create_real~2" xlink:title="json_value_module::json_core%create_real">
+<polygon fill="#a7506f" stroke="#a7506f" points="981,-108 740,-108 740,-84 981,-84 981,-108"/>
+<text text-anchor="middle" x="860.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%create_real</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_create_real32&#45;&gt;none~create_real~2 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_edge4" class="edge">
+<title>proc~json_value_create_real32&#45;&gt;none~create_real~2</title>
+<path fill="none" stroke="#255000" d="M577.25,-125.96C610.9,-119.93 660.65,-113.67 704,-108 712.35,-106.91 720.95,-105.77 729.61,-104.64"/>
+<polygon fill="#255000" stroke="#255000" points="730.35,-108.07 739.81,-103.31 729.44,-101.13 730.35,-108.07"/>
+</g>
+<!-- none~create_real~2&#45;&gt;proc~json_value_create_real32 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_edge1" class="edge">
+<title>none~create_real~2&#45;&gt;proc~json_value_create_real32</title>
+<path fill="none" stroke="#255000" d="M823.69,-108.04C794.33,-113.81 751.43,-119.76 705.45,-125.8"/>
+<polygon fill="#255000" stroke="#255000" points="704.74,-122.37 695.28,-127.14 705.65,-129.31 704.74,-122.37"/>
+</g>
+<!-- proc~wrap_json_value_create_real32 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_node6" class="node">
+<title>proc~wrap_json_value_create_real32</title>
+<g id="a_proc~~json_value_create_real32~~CalledByGraph_node6"><a xlink:href="../proc/wrap_json_value_create_real32.html" xlink:title="json_value_module::json_core%wrap_json_value_create_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="1365,-108 1017,-108 1017,-84 1365,-84 1365,-108"/>
+<text text-anchor="middle" x="1191" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%wrap_json_value_create_real32</text>
+</a>
+</g>
+</g>
+<!-- none~create_real~2&#45;&gt;proc~wrap_json_value_create_real32 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_edge8" class="edge">
+<title>none~create_real~2&#45;&gt;proc~wrap_json_value_create_real32</title>
+<path fill="none" stroke="#127025" stroke-opacity="0.019608" d="M981.03,-89.48C989.46,-89.39 998.07,-89.33 1006.75,-89.29"/>
+<polygon fill="#127025" fill-opacity="0.019608" stroke="#127025" stroke-opacity="0.019608" points="1006.98,-92.79 1016.97,-89.26 1006.96,-85.79 1006.98,-92.79"/>
+</g>
+<!-- proc~json_add_real_by_path -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_node3" class="node">
+<title>proc~json_add_real_by_path</title>
+<g id="a_proc~~json_value_create_real32~~CalledByGraph_node3"><a xlink:href="../proc/json_add_real_by_path.html" xlink:title="json_value_module::json_core%json_add_real_by_path">
+<polygon fill="#d9534f" stroke="#d9534f" points="688,-108 386,-108 386,-84 688,-84 688,-108"/>
+<text text-anchor="middle" x="537" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_add_real_by_path</text>
+</a>
+</g>
+</g>
+<!-- proc~json_add_real_by_path&#45;&gt;none~create_real~2 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_edge2" class="edge">
+<title>proc~json_add_real_by_path&#45;&gt;none~create_real~2</title>
+<path fill="none" stroke="#255000" d="M688.4,-96C702.07,-96 715.84,-96 729.32,-96"/>
+<polygon fill="#255000" stroke="#255000" points="729.56,-99.5 739.56,-96 729.56,-92.5 729.56,-99.5"/>
+</g>
+<!-- proc~json_value_add_real -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_node4" class="node">
+<title>proc~json_value_add_real</title>
+<g id="a_proc~~json_value_create_real32~~CalledByGraph_node4"><a xlink:href="../proc/json_value_add_real.html" xlink:title="json_value_module::json_core%json_value_add_real">
+<polygon fill="#d9534f" stroke="#d9534f" points="681.5,-66 392.5,-66 392.5,-42 681.5,-42 681.5,-66"/>
+<text text-anchor="middle" x="537" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_add_real</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_add_real&#45;&gt;none~create_real~2 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_edge3" class="edge">
+<title>proc~json_value_add_real&#45;&gt;none~create_real~2</title>
+<path fill="none" stroke="#255000" d="M634.14,-66.02C657.04,-68.92 681.39,-72.04 704,-75 722.55,-77.43 742.33,-80.06 761.35,-82.62"/>
+<polygon fill="#255000" stroke="#255000" points="761.15,-86.12 771.52,-83.99 762.08,-79.18 761.15,-86.12"/>
+</g>
+<!-- proc~wrap_json_value_create_real -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_node5" class="node">
+<title>proc~wrap_json_value_create_real</title>
+<g id="a_proc~~json_value_create_real32~~CalledByGraph_node5"><a xlink:href="../proc/wrap_json_value_create_real.html" xlink:title="json_value_module::json_core%wrap_json_value_create_real">
+<polygon fill="#d9534f" stroke="#d9534f" points="704,-24 370,-24 370,0 704,0 704,-24"/>
+<text text-anchor="middle" x="537" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%wrap_json_value_create_real</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_json_value_create_real&#45;&gt;none~create_real~2 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_edge5" class="edge">
+<title>proc~wrap_json_value_create_real&#45;&gt;none~create_real~2</title>
+<path fill="none" stroke="#255000" d="M661.52,-24.01C675.94,-26.48 690.37,-29.44 704,-33 747.68,-44.4 795.46,-65.09 826.37,-79.64"/>
+<polygon fill="#255000" stroke="#255000" points="824.86,-82.8 835.39,-83.94 827.87,-76.48 824.86,-82.8"/>
+</g>
+<!-- proc~wrap_json_value_create_real32&#45;&gt;none~create_real~2 -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_edge6" class="edge">
+<title>proc~wrap_json_value_create_real32&#45;&gt;none~create_real~2</title>
+<path fill="none" stroke="#255000" d="M1016.97,-102.74C1008.34,-102.72 999.75,-102.68 991.28,-102.62"/>
+<polygon fill="#255000" stroke="#255000" points="991.06,-99.11 981.03,-102.52 990.99,-106.11 991.06,-99.11"/>
+</g>
+<!-- proc~wrap_json_add_real_by_path -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_node7" class="node">
+<title>proc~wrap_json_add_real_by_path</title>
+<g id="a_proc~~json_value_create_real32~~CalledByGraph_node7"><a xlink:href="../proc/wrap_json_add_real_by_path.html" xlink:title="json_value_module::json_core%wrap_json_add_real_by_path">
+<polygon fill="#d9534f" stroke="#d9534f" points="334,-108 0,-108 0,-84 334,-84 334,-108"/>
+<text text-anchor="middle" x="167" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%wrap_json_add_real_by_path</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_json_add_real_by_path&#45;&gt;proc~json_add_real_by_path -->
+<g id="proc~~json_value_create_real32~~CalledByGraph_edge7" class="edge">
+<title>proc~wrap_json_add_real_by_path&#45;&gt;proc~json_add_real_by_path</title>
+<path fill="none" stroke="#255000" d="M334.24,-96C348.11,-96 362.11,-96 375.94,-96"/>
+<polygon fill="#255000" stroke="#255000" points="375.97,-99.5 385.97,-96 375.97,-92.5 375.97,-99.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocjson_value_create_real32CalledByGraph = svgPanZoom('#procjson_value_create_real32CalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1.16 1.16) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -359,61 +640,30 @@ large graphs.</div>
     </div>
     <br>
 
-    <section class="visible-xs visible-sm hidden-md">
-        <h3>Contents</h3>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-    <div class="panel panel-primary">
-      <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
-      <div class="list-group">
-        <a class="list-group-item" href="../proc/json_value_create_real32.html#src">json_value_create_real32</a>
-      </div>
-    </div>
-
-
-    </section>
-    <br class="visible-xs visible-sm hidden-md">
-
 
     
     
 
     
     
+
 
 
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_value_create_real32</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">val</span><span class="p">,</span><span class="n">name</span><span class="p">)</span><span class="w"></span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_value_create_real32</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">val</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
 
 <span class="w">    </span><span class="k">implicit none</span>
 
-<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">      </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span><span class="w"></span>
-<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w">            </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span><span class="w"></span>
-<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">real32</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">             </span><span class="kd">::</span><span class="w"> </span><span class="n">val</span><span class="w"></span>
-<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">name</span><span class="w"></span>
+<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">      </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w">            </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">real32</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">             </span><span class="kd">::</span><span class="w"> </span><span class="n">val</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">name</span>
 
-<span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">create_real</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="kt">real</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="n">RK</span><span class="p">),</span><span class="n">name</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">create_real</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="kt">real</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="n">RK</span><span class="p">),</span><span class="n">name</span><span class="p">)</span>
 
-<span class="w">    </span><span class="k">end subroutine </span><span class="n">json_value_create_real32</span><span class="w"></span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">json_value_create_real32</span>
 </pre></div>
 
     </section>
@@ -426,32 +676,27 @@ large graphs.</div>
     </div> <!-- /container -->
     <footer>
       <div class="container">
-        <div class="row">
-          <div class="col-xs-6 col-md-6"><p>JSON-Fortran was developed by Jacob Williams<br>&copy; 2023 
+        <div class="row justify-content-between">
+          <div class="col"><p>JSON-Fortran was developed by Jacob Williams<br>&copy; 2024 
 </p>
           </div>
-          <div class="col-xs-6 col-md-6">
-            <p class="text-right">
+          <div class="col">
+            <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-10-01 00:01              </p>
+ on 2024-01-05 14:59              </p>
           </div>
         </div>
         <br>
       </div> <!-- /container -->
     </footer>
 
-    <!-- Bootstrap core JavaScript
-         ================================================== -->
-         <!-- Placed at the end of the document so the pages load faster -->
-    <!--
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        -->
-        <script src="../js/bootstrap.min.js"></script>
-        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-        <script src="../js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
 
-        <!-- MathJax JavaScript
+    <!-- MathJax JavaScript
              ================================================== -->
              <!-- Placed at the end of the document so the pages load faster -->
         <script type="text/x-mathjax-config">

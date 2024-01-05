@@ -1,3 +1,5 @@
+<!-- -*- mode: jinja2 -*- -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -10,82 +12,57 @@
 
     <title>json_file_update_string &ndash; JSON-Fortran</title>
 
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
       <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
-         <script src="../js/jquery-2.1.3.min.js"></script>
-         <script src="../js/svg-pan-zoom.min.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
   </head>
 
   <body>
 
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
           <a class="navbar-brand" href="../index.html">JSON-Fortran </a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-              <li><a href='../page/index.html'>Other Docs</a></li>
-            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
-              <a href="#" class="dropdown-toggle"
-                 data-toggle="dropdown" role="button"
-                 aria-haspopup="true"
-                 aria-expanded="false">
-                 Contents <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                    <li><a href="../lists/files.html">Source Files</a></li>
-                  <li><a href="../lists/modules.html">Modules</a></li>
-                  <li><a href="../lists/procedures.html">Procedures</a></li>
-                  <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
-                  <li><a href="../lists/types.html">Derived Types</a></li>
-              </ul>
-            </li>
-                <li class="visible-xs hidden-sm visible-lg">
-                  <a href="../lists/files.html">Source Files</a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Other Docs</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/modules.html">Modules</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/procedures.html">Procedures</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/absint.html">Abstract Interfaces</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/types.html">Derived Types</a>
-              </li>
-          </ul>
-            <form action="../search.html" class="navbar-form navbar-right" role="search">
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
               </div>
-              <!--
-                  <button type="submit" class="btn btn-default">Submit</button>
-                  -->
-            </form>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
 
     <div class="container">
   <div class="row">
@@ -93,35 +70,39 @@
       <small>Subroutine</small>
       
     </h1>
-      <div class="row" id="info-bar">
-    <div class="col-lg-12">
-      <div class="well well-sm">
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
         <ul class="list-inline" style="margin-bottom:0px;display:inline">
-            <li id="meta-author"><i class="fa fa-pencil"></i> Jacob Williams</li>
-            <li id="meta-date"><i class="fa fa-calendar-o"></i> 1/10/2015</li>
+            <li class="list-inline-item" id="meta-author"><i class="fa fa-pencil"></i> Jacob Williams</li>
+            <li class="list-inline-item" id="meta-date"><i class="fa fa-calendar-o"></i> 1/10/2015</li>
 
-          <li id="statements"><i class="fa fa-list-ol"></i>
-            <a data-toggle="tooltip"
-               data-placement="bottom" data-html="true"
-               title=" 0.1% of total for procedures.">10 statements</a>
-          </li>
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip"
+                 data-bs-placement="bottom" data-html="true"
+                 title=" 0.1% of total for procedures.">10 statements</a>
+            </li>
 
-            <li id="source-file">
+            <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
               <a href="../src/json_file_module.F90"> Source File</a>
             </li>
         </ul>
-        <ol class="breadcrumb in-well text-right">
-              <li><a href='../sourcefile/json_file_module.f90.html'>json_file_module.F90</a></li>
-              <li><a href='../module/json_file_module.html'>json_file_module</a></li>
-          <li class="active">json_file_update_string</li>
-        </ol>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_file_module.f90.html'>json_file_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_file_module.html'>json_file_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_file_update_string</li>
+          </ol>
+        </nav>
       </div>
     </div>
   </div>
   <script>
     $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-bs-toggle="tooltip"]').tooltip()
     })
   </script>
 
@@ -150,8 +131,9 @@
   
   
   
-    <div class="panel panel-primary">
-      <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
       <div class="list-group">
         <a class="list-group-item" href="../proc/json_file_update_string.html#src">json_file_update_string</a>
       </div>
@@ -172,7 +154,7 @@
   If it is not present, then create it and set its value.</p>
 <h3 id="see-also">See also</h3>
 <ul>
-<li><a href="../proc/json_update_string.html">json_update_string</a></li>
+<li><a href="json_update_string.html">json_update_string</a></li>
 </ul>
 
     <h3>Type Bound</h3>
@@ -182,16 +164,16 @@
         <table class="table table-striped varlist">
     <thead>
       <tr>
-        <th>Type</th>
-<th>Intent</th><th>Optional</th>        <th>Attributes</th>
-        <th></th>
-        <th>Name</th>
-        <th></th>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
     </thead>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-me~157"></span>
+              <span class="anchor" id="variable-me~169"></span>
               class(<a href='../type/json_file.html'>json_file</a>),
             </td>
 <td>intent(inout)</td>
@@ -206,7 +188,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-path~157"></span>
+              <span class="anchor" id="variable-path~159"></span>
               character(kind=CK, len=*),
             </td>
 <td>intent(in)</td>
@@ -221,7 +203,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-val~77"></span>
+              <span class="anchor" id="variable-val~81"></span>
               character(kind=CK, len=*),
             </td>
 <td>intent(in)</td>
@@ -236,7 +218,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-found~155"></span>
+              <span class="anchor" id="variable-found~161"></span>
               logical(kind=LK),
             </td>
 <td>intent(out)</td>
@@ -251,7 +233,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-trim_str~29"></span>
+              <span class="anchor" id="variable-trim_str~32"></span>
               logical(kind=LK),
             </td>
 <td>intent(in),</td>
@@ -266,7 +248,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-adjustl_str~29"></span>
+              <span class="anchor" id="variable-adjustl_str~32"></span>
               logical(kind=LK),
             </td>
 <td>intent(in),</td>
@@ -284,38 +266,239 @@
   </table>
 
     <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~json_file_update_string~~CallsGraph Pages: 1 -->
+<svg id="procjson_file_update_stringCallsGraph" width="641pt" height="44pt"
+ viewBox="0.00 0.00 641.00 44.19" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_file_update_string~~CallsGraph" class="graph" transform="scale(2.15 2.15) rotate(0) translate(4 91)">
+<title>proc~~json_file_update_string~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-91 1374,-91 1374,4 -4,4"/>
+<!-- proc~json_file_update_string -->
+<g id="proc~~json_file_update_string~~CallsGraph_node1" class="node">
+<title>proc~json_file_update_string</title>
+<polygon fill="none" stroke="black" points="284,-45 0,-45 0,-21 284,-21 284,-45"/>
+<text text-anchor="middle" x="142" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_file_module::json_file%json_file_update_string</text>
+</g>
+<!-- none~update~2 -->
+<g id="proc~~json_file_update_string~~CallsGraph_node2" class="node">
+<title>none~update~2</title>
+<g id="a_proc~~json_file_update_string~~CallsGraph_node2"><a xlink:href="../type/json_core.html#boundprocedure-update~2" xlink:title="json_value_module::json_core%update">
+<polygon fill="#a7506f" stroke="#a7506f" points="549.5,-66 329.5,-66 329.5,-42 549.5,-42 549.5,-66"/>
+<text text-anchor="middle" x="439.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%update</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_update_string&#45;&gt;none~update~2 -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge1" class="edge">
+<title>proc~json_file_update_string&#45;&gt;none~update~2</title>
+<path fill="none" stroke="#255000" d="M284.26,-43.04C295.97,-43.87 307.73,-44.71 319.25,-45.53"/>
+<polygon fill="#255000" stroke="#255000" points="319.08,-49.02 329.3,-46.24 319.57,-42.04 319.08,-49.02"/>
+</g>
+<!-- proc~json_failed -->
+<g id="proc~~json_file_update_string~~CallsGraph_node3" class="node">
+<title>proc~json_failed</title>
+<g id="a_proc~~json_file_update_string~~CallsGraph_node3"><a xlink:href="../proc/json_failed.html" xlink:title="json_value_module::json_core%json_failed">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="559,-24 320,-24 320,0 559,0 559,-24"/>
+<text text-anchor="middle" x="439.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_failed</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_update_string&#45;&gt;proc~json_failed -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge2" class="edge">
+<title>proc~json_file_update_string&#45;&gt;proc~json_failed</title>
+<path fill="none" stroke="#255000" d="M284.26,-22.96C292.7,-22.36 301.17,-21.76 309.55,-21.16"/>
+<polygon fill="#255000" stroke="#255000" points="310.01,-24.64 319.73,-20.44 309.51,-17.66 310.01,-24.64"/>
+</g>
+<!-- proc~json_update_string_name_ascii -->
+<g id="proc~~json_file_update_string~~CallsGraph_node4" class="node">
+<title>proc~json_update_string_name_ascii</title>
+<g id="a_proc~~json_file_update_string~~CallsGraph_node4"><a xlink:href="../proc/json_update_string_name_ascii.html" xlink:title="json_value_module::json_core%json_update_string_name_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="942,-87 595,-87 595,-63 942,-63 942,-87"/>
+<text text-anchor="middle" x="768.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_update_string_name_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~update~2&#45;&gt;proc~json_update_string_name_ascii -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge3" class="edge">
+<title>none~update~2&#45;&gt;proc~json_update_string_name_ascii</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M549.84,-54.61C587.26,-56.53 628.95,-59.24 665.75,-62.16"/>
+<polygon fill="#255000" stroke="#255000" points="665.74,-65.67 675.99,-62.99 666.3,-58.7 665.74,-65.67"/>
+</g>
+<!-- proc~json_update_string_val_ascii -->
+<g id="proc~~json_file_update_string~~CallsGraph_node5" class="node">
+<title>proc~json_update_string_val_ascii</title>
+<g id="a_proc~~json_file_update_string~~CallsGraph_node5"><a xlink:href="../proc/json_update_string_val_ascii.html" xlink:title="json_value_module::json_core%json_update_string_val_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="934.5,-45 602.5,-45 602.5,-21 934.5,-21 934.5,-45"/>
+<text text-anchor="middle" x="768.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_update_string_val_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~update~2&#45;&gt;proc~json_update_string_val_ascii -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge4" class="edge">
+<title>none~update~2&#45;&gt;proc~json_update_string_val_ascii</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M532.02,-41.99C550.94,-40.43 571.46,-38.91 592.24,-37.52"/>
+<polygon fill="#255000" stroke="#255000" points="592.7,-41 602.45,-36.85 592.24,-34.01 592.7,-41"/>
+</g>
+<!-- proc~json_update_string_name_ascii&#45;&gt;none~update~2 -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge6" class="edge">
+<title>proc~json_update_string_name_ascii&#45;&gt;none~update~2</title>
+<path fill="none" stroke="#255000" d="M594.97,-70.66C576.99,-69.47 559.16,-68.18 542.35,-66.84"/>
+<polygon fill="#255000" stroke="#255000" points="542.27,-63.33 532.02,-66.01 541.71,-70.3 542.27,-63.33"/>
+</g>
+<!-- interface~to_unicode -->
+<g id="proc~~json_file_update_string~~CallsGraph_node6" class="node">
+<title>interface~to_unicode</title>
+<g id="a_proc~~json_file_update_string~~CallsGraph_node6"><a xlink:href="../interface/to_unicode.html" xlink:title="json_string_utilities::to_unicode">
+<polygon fill="#a7506f" stroke="#a7506f" points="1157,-66 978,-66 978,-42 1157,-42 1157,-66"/>
+<text text-anchor="middle" x="1067.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_unicode</text>
+</a>
+</g>
+</g>
+<!-- proc~json_update_string_name_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge5" class="edge">
+<title>proc~json_update_string_name_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#255000" d="M939.25,-63C948.99,-62.31 958.59,-61.63 967.91,-60.97"/>
+<polygon fill="#255000" stroke="#255000" points="968.16,-64.46 977.89,-60.27 967.67,-57.48 968.16,-64.46"/>
+</g>
+<!-- proc~json_update_string_val_ascii&#45;&gt;none~update~2 -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge8" class="edge">
+<title>proc~json_update_string_val_ascii&#45;&gt;none~update~2</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M675.99,-45.01C640.04,-47.98 598.29,-50.79 560.01,-52.85"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="559.64,-49.37 549.84,-53.39 560.01,-56.36 559.64,-49.37"/>
+</g>
+<!-- proc~json_update_string_val_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge7" class="edge">
+<title>proc~json_update_string_val_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M934.5,-44.67C945.73,-45.46 956.84,-46.25 967.55,-47"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="967.47,-50.51 977.7,-47.72 967.97,-43.52 967.47,-50.51"/>
+</g>
+<!-- proc~to_uni -->
+<g id="proc~~json_file_update_string~~CallsGraph_node7" class="node">
+<title>proc~to_uni</title>
+<g id="a_proc~~json_file_update_string~~CallsGraph_node7"><a xlink:href="../proc/to_uni.html" xlink:title="json_string_utilities::to_uni">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1358,-87 1205,-87 1205,-63 1358,-63 1358,-87"/>
+<text text-anchor="middle" x="1281.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni</text>
+</a>
+</g>
+</g>
+<!-- interface~to_unicode&#45;&gt;proc~to_uni -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge9" class="edge">
+<title>interface~to_unicode&#45;&gt;proc~to_uni</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M1157.18,-62.78C1169.59,-64.01 1182.32,-65.28 1194.68,-66.5"/>
+<polygon fill="#255000" stroke="#255000" points="1194.66,-70.01 1204.95,-67.52 1195.35,-63.05 1194.66,-70.01"/>
+</g>
+<!-- proc~to_uni_vec -->
+<g id="proc~~json_file_update_string~~CallsGraph_node8" class="node">
+<title>proc~to_uni_vec</title>
+<g id="a_proc~~json_file_update_string~~CallsGraph_node8"><a xlink:href="../proc/to_uni_vec.html" xlink:title="json_string_utilities::to_uni_vec">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1370,-45 1193,-45 1193,-21 1370,-21 1370,-45"/>
+<text text-anchor="middle" x="1281.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni_vec</text>
+</a>
+</g>
+</g>
+<!-- interface~to_unicode&#45;&gt;proc~to_uni_vec -->
+<g id="proc~~json_file_update_string~~CallsGraph_edge10" class="edge">
+<title>interface~to_unicode&#45;&gt;proc~to_uni_vec</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M1157.18,-45.22C1165.66,-44.38 1174.29,-43.52 1182.85,-42.67"/>
+<polygon fill="#255000" stroke="#255000" points="1183.25,-46.15 1192.86,-41.68 1182.56,-39.18 1183.25,-46.15"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocjson_file_update_stringCallsGraph = svgPanZoom('#procjson_file_update_stringCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1.16 1.16) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
 
-    <section class="visible-xs visible-sm hidden-md">
-        <h3>Contents</h3>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-    <div class="panel panel-primary">
-      <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
-      <div class="list-group">
-        <a class="list-group-item" href="../proc/json_file_update_string.html#src">json_file_update_string</a>
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
-
-    </section>
-    <br class="visible-xs visible-sm hidden-md">
+    <br>
 
 
     
@@ -323,26 +506,27 @@
 
     
     
+
 
 
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_file_update_string</span><span class="p">(</span><span class="n">me</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">val</span><span class="p">,</span><span class="n">found</span><span class="p">,</span><span class="n">trim_str</span><span class="p">,</span><span class="n">adjustl_str</span><span class="p">)</span><span class="w"></span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_file_update_string</span><span class="p">(</span><span class="n">me</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">val</span><span class="p">,</span><span class="n">found</span><span class="p">,</span><span class="n">trim_str</span><span class="p">,</span><span class="n">adjustl_str</span><span class="p">)</span>
 
 <span class="w">    </span><span class="k">implicit none</span>
 
-<span class="k">    class</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">      </span><span class="kd">::</span><span class="w"> </span><span class="n">me</span><span class="w"></span>
-<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">path</span><span class="w"></span>
-<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">val</span><span class="w"></span>
-<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w">             </span><span class="kd">::</span><span class="w"> </span><span class="n">found</span><span class="w"></span>
+<span class="k">    class</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">      </span><span class="kd">::</span><span class="w"> </span><span class="n">me</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">path</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">val</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w">             </span><span class="kd">::</span><span class="w"> </span><span class="n">found</span>
 <span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span><span class="w">     </span><span class="kd">::</span><span class="w"> </span><span class="n">trim_str</span><span class="w">     </span><span class="c">!! if TRIM() should be called for the `val`</span>
 <span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span><span class="w">     </span><span class="kd">::</span><span class="w"> </span><span class="n">adjustl_str</span><span class="w">  </span><span class="c">!! if ADJUSTL() should be called for the `val`</span>
 <span class="w">                                                        </span><span class="c">!! (note that ADJUSTL is done before TRIM)</span>
 
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">me</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="n">failed</span><span class="p">())</span><span class="w"> </span><span class="k">call </span><span class="n">me</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="n">update</span><span class="p">(</span><span class="n">me</span><span class="p">%</span><span class="n">p</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">val</span><span class="p">,</span><span class="n">found</span><span class="p">,</span><span class="n">trim_str</span><span class="p">,</span><span class="n">adjustl_str</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">me</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="n">failed</span><span class="p">())</span><span class="w"> </span><span class="k">call </span><span class="n">me</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="n">update</span><span class="p">(</span><span class="n">me</span><span class="p">%</span><span class="n">p</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">val</span><span class="p">,</span><span class="n">found</span><span class="p">,</span><span class="n">trim_str</span><span class="p">,</span><span class="n">adjustl_str</span><span class="p">)</span>
 
-<span class="w">    </span><span class="k">end subroutine </span><span class="n">json_file_update_string</span><span class="w"></span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">json_file_update_string</span>
 </pre></div>
 
     </section>
@@ -355,32 +539,27 @@
     </div> <!-- /container -->
     <footer>
       <div class="container">
-        <div class="row">
-          <div class="col-xs-6 col-md-6"><p>JSON-Fortran was developed by Jacob Williams<br>&copy; 2023 
+        <div class="row justify-content-between">
+          <div class="col"><p>JSON-Fortran was developed by Jacob Williams<br>&copy; 2024 
 </p>
           </div>
-          <div class="col-xs-6 col-md-6">
-            <p class="text-right">
+          <div class="col">
+            <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-10-01 00:01              </p>
+ on 2024-01-05 14:59              </p>
           </div>
         </div>
         <br>
       </div> <!-- /container -->
     </footer>
 
-    <!-- Bootstrap core JavaScript
-         ================================================== -->
-         <!-- Placed at the end of the document so the pages load faster -->
-    <!--
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        -->
-        <script src="../js/bootstrap.min.js"></script>
-        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-        <script src="../js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
 
-        <!-- MathJax JavaScript
+    <!-- MathJax JavaScript
              ================================================== -->
              <!-- Placed at the end of the document so the pages load faster -->
         <script type="text/x-mathjax-config">

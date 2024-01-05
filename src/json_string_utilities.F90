@@ -484,9 +484,9 @@
 
     implicit none
 
-    character(kind=CK,len=:),allocatable,intent(inout) :: str           !! in: string as stored
-                                                                        !! in a [[json_value]].
-                                                                        !! out: decoded string.
+    character(kind=CK,len=:),allocatable,intent(inout) :: str           !! * in: string as stored
+                                                                        !!   in a [[json_value]].
+                                                                        !! * out: decoded string.
     character(kind=CK,len=:),allocatable,intent(out)   :: error_message !! will be allocated if
                                                                         !! there was an error
 
@@ -617,7 +617,7 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date:6/14/2014
+!  date: 6/14/2014
 !
 !  Returns true if the string is a valid 4-digit hex string.
 !

@@ -1,3 +1,5 @@
+<!-- -*- mode: jinja2 -*- -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -10,82 +12,57 @@
 
     <title>wrap_json_value_add_integer_vec &ndash; JSON-Fortran</title>
 
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
       <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
-         <script src="../js/jquery-2.1.3.min.js"></script>
-         <script src="../js/svg-pan-zoom.min.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
   </head>
 
   <body>
 
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
           <a class="navbar-brand" href="../index.html">JSON-Fortran </a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-              <li><a href='../page/index.html'>Other Docs</a></li>
-            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
-              <a href="#" class="dropdown-toggle"
-                 data-toggle="dropdown" role="button"
-                 aria-haspopup="true"
-                 aria-expanded="false">
-                 Contents <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                    <li><a href="../lists/files.html">Source Files</a></li>
-                  <li><a href="../lists/modules.html">Modules</a></li>
-                  <li><a href="../lists/procedures.html">Procedures</a></li>
-                  <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
-                  <li><a href="../lists/types.html">Derived Types</a></li>
-              </ul>
-            </li>
-                <li class="visible-xs hidden-sm visible-lg">
-                  <a href="../lists/files.html">Source Files</a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Other Docs</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/modules.html">Modules</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/procedures.html">Procedures</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/absint.html">Abstract Interfaces</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/types.html">Derived Types</a>
-              </li>
-          </ul>
-            <form action="../search.html" class="navbar-form navbar-right" role="search">
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
               </div>
-              <!--
-                  <button type="submit" class="btn btn-default">Submit</button>
-                  -->
-            </form>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
 
     <div class="container">
   <div class="row">
@@ -93,33 +70,37 @@
       <small>Subroutine</small>
       
     </h1>
-      <div class="row" id="info-bar">
-    <div class="col-lg-12">
-      <div class="well well-sm">
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
         <ul class="list-inline" style="margin-bottom:0px;display:inline">
 
-          <li id="statements"><i class="fa fa-list-ol"></i>
-            <a data-toggle="tooltip"
-               data-placement="bottom" data-html="true"
-               title=" 0.1% of total for procedures.">8 statements</a>
-          </li>
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip"
+                 data-bs-placement="bottom" data-html="true"
+                 title=" 0.1% of total for procedures.">8 statements</a>
+            </li>
 
-            <li id="source-file">
+            <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
               <a href="../src/json_value_module.F90"> Source File</a>
             </li>
         </ul>
-        <ol class="breadcrumb in-well text-right">
-              <li><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
-              <li><a href='../module/json_value_module.html'>json_value_module</a></li>
-          <li class="active">wrap_json_value_add_integer_vec</li>
-        </ol>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_value_module.html'>json_value_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">wrap_json_value_add_integer_vec</li>
+          </ol>
+        </nav>
       </div>
     </div>
   </div>
   <script>
     $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-bs-toggle="tooltip"]').tooltip()
     })
   </script>
 
@@ -148,8 +129,9 @@
   
   
   
-    <div class="panel panel-primary">
-      <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
       <div class="list-group">
         <a class="list-group-item" href="../proc/wrap_json_value_add_integer_vec.html#src">wrap_json_value_add_integer_vec</a>
       </div>
@@ -165,7 +147,7 @@
 </h2>
     
 
-    <p>Alternate version of <a href="../proc/json_value_add_integer_vec.html">json_value_add_integer_vec</a> where <code>name</code> is kind=CDK.</p>
+    <p>Alternate version of <a href="json_value_add_integer_vec.html">json_value_add_integer_vec</a> where <code>name</code> is kind=CDK.</p>
 
     <h3>Type Bound</h3>
     <p><a href='../type/json_core.html'>json_core</a></p>
@@ -174,16 +156,16 @@
         <table class="table table-striped varlist">
     <thead>
       <tr>
-        <th>Type</th>
-<th>Intent</th><th>Optional</th>        <th>Attributes</th>
-        <th></th>
-        <th>Name</th>
-        <th></th>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
     </thead>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-json~7"></span>
+              <span class="anchor" id="variable-json~85"></span>
               class(<a href='../type/json_core.html'>json_core</a>),
             </td>
 <td>intent(inout)</td>
@@ -198,7 +180,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-p~53"></span>
+              <span class="anchor" id="variable-p~59"></span>
               type(<a href='../type/json_value.html'>json_value</a>),
             </td>
 <td></td>
@@ -213,7 +195,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-name~26"></span>
+              <span class="anchor" id="variable-name~33"></span>
               character(kind=CDK, len=*),
             </td>
 <td>intent(in)</td>
@@ -228,7 +210,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-val~19"></span>
+              <span class="anchor" id="variable-val~24"></span>
               integer(kind=IK),
             </td>
 <td>intent(in),</td>
@@ -245,84 +227,195 @@
   </table>
 
     <br>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-  <h3 class="panel-title">Calls</h3>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
   <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: proc~~wrap_json_value_add_integer_vec~~CallsGraph Pages: 1 -->
-<svg id="procwrap_json_value_add_integer_vecCallsGraph" width="641pt" height="76pt"
- viewBox="0.00 0.00 641.00 76.21" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph" class="graph" transform="scale(1.25 1.25) rotate(0) translate(4 91)">
+<svg id="procwrap_json_value_add_integer_vecCallsGraph" width="641pt" height="88pt"
+ viewBox="0.00 0.00 641.00 88.11" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph" class="graph" transform="scale(2.28 2.28) rotate(0) translate(4 196.83)">
 <title>proc~~wrap_json_value_add_integer_vec~~CallsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-91 795,-91 795,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-196.83 1457,-196.83 1457,4 -4,4"/>
 <!-- proc~wrap_json_value_add_integer_vec -->
 <g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node1" class="node">
 <title>proc~wrap_json_value_add_integer_vec</title>
-<polygon fill="none" stroke="black" points="363,-66 0,-66 0,-42 363,-42 363,-66"/>
-<text text-anchor="middle" x="181.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_value_module::json_core%wrap_json_value_add_integer_vec</text>
-</g>
-<!-- add -->
-<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node2" class="node">
-<title>add</title>
-<polygon fill="#777777" stroke="#777777" points="515.5,-87 461.5,-87 461.5,-63 515.5,-63 515.5,-87"/>
-<text text-anchor="middle" x="488.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">add</text>
-</g>
-<!-- proc~wrap_json_value_add_integer_vec&#45;&gt;add -->
-<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge1" class="edge">
-<title>proc~wrap_json_value_add_integer_vec&#45;&gt;add</title>
-<path fill="none" stroke="#255000" d="M356.83,-66C392.63,-68.47 426.79,-70.82 451.2,-72.5"/>
-<polygon fill="#255000" stroke="#255000" points="451.15,-76.01 461.37,-73.2 451.63,-69.02 451.15,-76.01"/>
+<polygon fill="none" stroke="black" points="363,-149 0,-149 0,-125 363,-125 363,-149"/>
+<text text-anchor="middle" x="181.5" y="-134.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_value_module::json_core%wrap_json_value_add_integer_vec</text>
 </g>
 <!-- interface~to_unicode -->
-<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node3" class="node">
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node2" class="node">
 <title>interface~to_unicode</title>
-<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node3"><a xlink:href=".././interface/to_unicode.html" xlink:title="json_string_utilities::to_unicode">
-<polygon fill="#a7506f" stroke="#a7506f" points="578,-45 399,-45 399,-21 578,-21 578,-45"/>
-<text text-anchor="middle" x="488.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_unicode</text>
+<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node2"><a xlink:href="../interface/to_unicode.html" xlink:title="json_string_utilities::to_unicode">
+<polygon fill="#a7506f" stroke="#a7506f" points="1240,-108 1061,-108 1061,-84 1240,-84 1240,-108"/>
+<text text-anchor="middle" x="1150.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_unicode</text>
 </a>
 </g>
 </g>
 <!-- proc~wrap_json_value_add_integer_vec&#45;&gt;interface~to_unicode -->
-<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge2" class="edge">
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge1" class="edge">
 <title>proc~wrap_json_value_add_integer_vec&#45;&gt;interface~to_unicode</title>
-<path fill="none" stroke="#255000" d="M356.83,-42C367.63,-41.25 378.29,-40.52 388.58,-39.81"/>
-<polygon fill="#255000" stroke="#255000" points="389,-43.29 398.73,-39.11 388.52,-36.31 389,-43.29"/>
+<path fill="none" stroke="#255000" d="M242.58,-149.01C382.26,-174.7 738.76,-227.3 1025,-159 1061.35,-150.33 1099.11,-129.22 1123.37,-113.82"/>
+<polygon fill="#255000" stroke="#255000" points="1125.5,-116.62 1131.98,-108.24 1121.69,-110.75 1125.5,-116.62"/>
+</g>
+<!-- none~add~2 -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node3" class="node">
+<title>none~add~2</title>
+<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node3"><a xlink:href="../type/json_core.html#boundprocedure-add~2" xlink:title="json_value_module::json_core%add">
+<polygon fill="#a7506f" stroke="#a7506f" points="601,-108 399,-108 399,-84 601,-84 601,-108"/>
+<text text-anchor="middle" x="500" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%add</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_json_value_add_integer_vec&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge2" class="edge">
+<title>proc~wrap_json_value_add_integer_vec&#45;&gt;none~add~2</title>
+<path fill="none" stroke="#255000" d="M275.32,-124.98C313.16,-120.07 357.06,-114.39 395.9,-109.36"/>
+<polygon fill="#255000" stroke="#255000" points="396.71,-112.78 406.18,-108.02 395.81,-105.84 396.71,-112.78"/>
 </g>
 <!-- proc~to_uni -->
-<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node4" class="node">
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node8" class="node">
 <title>proc~to_uni</title>
-<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node4"><a xlink:href=".././proc/to_uni.html" xlink:title="json_string_utilities::to_uni">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="779,-66 626,-66 626,-42 779,-42 779,-66"/>
-<text text-anchor="middle" x="702.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni</text>
+<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node8"><a xlink:href="../proc/to_uni.html" xlink:title="json_string_utilities::to_uni">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1441,-129 1288,-129 1288,-105 1441,-105 1441,-129"/>
+<text text-anchor="middle" x="1364.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni</text>
 </a>
 </g>
 </g>
 <!-- interface~to_unicode&#45;&gt;proc~to_uni -->
 <g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge3" class="edge">
 <title>interface~to_unicode&#45;&gt;proc~to_uni</title>
-<path fill="none" stroke="#025525" stroke-dasharray="5,2" stroke-opacity="0.019608" d="M578.18,-41.78C590.59,-43.01 603.32,-44.28 615.68,-45.5"/>
-<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="615.66,-49.01 625.95,-46.52 616.35,-42.05 615.66,-49.01"/>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M1240.18,-104.78C1252.59,-106.01 1265.32,-107.28 1277.68,-108.5"/>
+<polygon fill="#255000" stroke="#255000" points="1277.66,-112.01 1287.95,-109.52 1278.35,-105.05 1277.66,-112.01"/>
 </g>
 <!-- proc~to_uni_vec -->
-<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node5" class="node">
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node9" class="node">
 <title>proc~to_uni_vec</title>
-<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node5"><a xlink:href=".././proc/to_uni_vec.html" xlink:title="json_string_utilities::to_uni_vec">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="791,-24 614,-24 614,0 791,0 791,-24"/>
-<text text-anchor="middle" x="702.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni_vec</text>
+<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node9"><a xlink:href="../proc/to_uni_vec.html" xlink:title="json_string_utilities::to_uni_vec">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1453,-87 1276,-87 1276,-63 1453,-63 1453,-87"/>
+<text text-anchor="middle" x="1364.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni_vec</text>
 </a>
 </g>
 </g>
 <!-- interface~to_unicode&#45;&gt;proc~to_uni_vec -->
 <g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge4" class="edge">
 <title>interface~to_unicode&#45;&gt;proc~to_uni_vec</title>
-<path fill="none" stroke="#025525" stroke-dasharray="5,2" stroke-opacity="0.019608" d="M578.18,-24.22C586.66,-23.38 595.29,-22.52 603.85,-21.67"/>
-<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="604.25,-25.15 613.86,-20.68 603.56,-18.18 604.25,-25.15"/>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M1240.18,-87.22C1248.66,-86.38 1257.29,-85.52 1265.85,-84.67"/>
+<polygon fill="#255000" stroke="#255000" points="1266.25,-88.15 1275.86,-83.68 1265.56,-81.18 1266.25,-88.15"/>
+</g>
+<!-- proc~json_value_add_string_name_ascii -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node4" class="node">
+<title>proc~json_value_add_string_name_ascii</title>
+<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node4"><a xlink:href="../proc/json_value_add_string_name_ascii.html" xlink:title="json_value_module::json_core%json_value_add_string_name_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="1013,-150 649,-150 649,-126 1013,-126 1013,-150"/>
+<text text-anchor="middle" x="831" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_add_string_name_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~json_value_add_string_name_ascii -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge5" class="edge">
+<title>none~add~2&#45;&gt;proc~json_value_add_string_name_ascii</title>
+<path fill="none" stroke="#025525" stroke-dasharray="5,2" stroke-opacity="0.019608" d="M601.19,-103.05C613.25,-104.76 625.39,-106.47 637,-108 681.94,-113.91 732.92,-119.41 771.2,-124.6"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="770.76,-128.07 781.15,-125.98 771.72,-121.14 770.76,-128.07"/>
+</g>
+<!-- proc~json_value_add_string_val_ascii -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node5" class="node">
+<title>proc~json_value_add_string_val_ascii</title>
+<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node5"><a xlink:href="../proc/json_value_add_string_val_ascii.html" xlink:title="json_value_module::json_core%json_value_add_string_val_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="1005.5,-108 656.5,-108 656.5,-84 1005.5,-84 1005.5,-108"/>
+<text text-anchor="middle" x="831" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_add_string_val_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~json_value_add_string_val_ascii -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge6" class="edge">
+<title>none~add~2&#45;&gt;proc~json_value_add_string_val_ascii</title>
+<path fill="none" stroke="#025525" stroke-dasharray="5,2" stroke-opacity="0.019608" d="M601.05,-89.73C615.47,-89.51 630.68,-89.36 646.12,-89.29"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="646.3,-92.79 656.29,-89.26 646.28,-85.79 646.3,-92.79"/>
+</g>
+<!-- proc~json_value_add_string_vec_name_ascii -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node6" class="node">
+<title>proc~json_value_add_string_vec_name_ascii</title>
+<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node6"><a xlink:href="../proc/json_value_add_string_vec_name_ascii.html" xlink:title="json_value_module::json_core%json_value_add_string_vec_name_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="1025,-66 637,-66 637,-42 1025,-42 1025,-66"/>
+<text text-anchor="middle" x="831" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_add_string_vec_name_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~json_value_add_string_vec_name_ascii -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge7" class="edge">
+<title>none~add~2&#45;&gt;proc~json_value_add_string_vec_name_ascii</title>
+<path fill="none" stroke="#025525" stroke-dasharray="5,2" stroke-opacity="0.019608" d="M530.93,-83.96C555.97,-78.05 592.98,-72.01 627.21,-67.32"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="627.81,-70.77 637.25,-65.97 626.87,-63.83 627.81,-70.77"/>
+</g>
+<!-- proc~json_value_add_string_vec_val_ascii -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_node7" class="node">
+<title>proc~json_value_add_string_vec_val_ascii</title>
+<g id="a_proc~~wrap_json_value_add_integer_vec~~CallsGraph_node7"><a xlink:href="../proc/json_value_add_string_vec_val_ascii.html" xlink:title="json_value_module::json_core%json_value_add_string_vec_val_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="1017.5,-24 644.5,-24 644.5,0 1017.5,0 1017.5,-24"/>
+<text text-anchor="middle" x="831" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_add_string_vec_val_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~json_value_add_string_vec_val_ascii -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge8" class="edge">
+<title>none~add~2&#45;&gt;proc~json_value_add_string_vec_val_ascii</title>
+<path fill="none" stroke="#025525" stroke-dasharray="5,2" stroke-opacity="0.019608" d="M512.51,-84C534,-67.74 582.25,-40.9 634.56,-24.89"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="635.75,-28.19 644.37,-22.03 633.79,-21.47 635.75,-28.19"/>
+</g>
+<!-- proc~json_value_add_string_name_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge9" class="edge">
+<title>proc~json_value_add_string_name_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#255000" d="M952.59,-125.98C976.61,-123.28 1001.63,-120.24 1025,-117 1040.41,-114.86 1056.84,-112.3 1072.54,-109.71"/>
+<polygon fill="#255000" stroke="#255000" points="1073.45,-113.1 1082.74,-108 1072.3,-106.2 1073.45,-113.1"/>
+</g>
+<!-- proc~json_value_add_string_name_ascii&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge10" class="edge">
+<title>proc~json_value_add_string_name_ascii&#45;&gt;none~add~2</title>
+<path fill="none" stroke="#255000" d="M648.91,-127.54C644.9,-127.03 640.93,-126.52 637,-126 604.55,-121.73 567.88,-116.02 540.81,-110.25"/>
+<polygon fill="#255000" stroke="#255000" points="541.45,-106.81 530.93,-108.04 539.92,-113.64 541.45,-106.81"/>
+</g>
+<!-- proc~json_value_add_string_val_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge11" class="edge">
+<title>proc~json_value_add_string_val_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="transparent" d="M1005.61,-96C1020.99,-96 1036.18,-96 1050.6,-96"/>
+<polygon fill="transparent" stroke="transparent" points="1050.95,-99.5 1060.95,-96 1050.95,-92.5 1050.95,-99.5"/>
+</g>
+<!-- proc~json_value_add_string_val_ascii&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge12" class="edge">
+<title>proc~json_value_add_string_val_ascii&#45;&gt;none~add~2</title>
+<path fill="none" stroke="transparent" d="M656.29,-102.74C640.93,-102.71 625.67,-102.6 611.06,-102.41"/>
+<polygon fill="transparent" stroke="transparent" points="611.1,-98.91 601.05,-102.27 611,-105.91 611.1,-98.91"/>
+</g>
+<!-- proc~json_value_add_string_vec_name_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge13" class="edge">
+<title>proc~json_value_add_string_vec_name_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#025500" d="M952.59,-66.02C976.61,-68.72 1001.63,-71.76 1025,-75 1040.41,-77.14 1056.84,-79.7 1072.54,-82.29"/>
+<polygon fill="#025500" stroke="#025500" points="1072.3,-85.8 1082.74,-84 1073.45,-78.9 1072.3,-85.8"/>
+</g>
+<!-- proc~json_value_add_string_vec_name_ascii&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge14" class="edge">
+<title>proc~json_value_add_string_vec_name_ascii&#45;&gt;none~add~2</title>
+<path fill="none" stroke="#025500" d="M781.15,-66.02C742.09,-71.61 685.96,-77.56 637,-84 628.66,-85.1 620.04,-86.29 611.37,-87.51"/>
+<polygon fill="#025500" stroke="#025500" points="610.61,-84.08 601.19,-88.95 611.58,-91.01 610.61,-84.08"/>
+</g>
+<!-- proc~json_value_add_string_vec_val_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge15" class="edge">
+<title>proc~json_value_add_string_vec_val_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M987.82,-24.02C1000.51,-26.49 1013.04,-29.45 1025,-33 1060.42,-43.51 1097.83,-63.86 1122.28,-78.59"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="1120.63,-81.69 1130.99,-83.93 1124.29,-75.72 1120.63,-81.69"/>
+</g>
+<!-- proc~json_value_add_string_vec_val_ascii&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_json_value_add_integer_vec~~CallsGraph_edge16" class="edge">
+<title>proc~json_value_add_string_vec_val_ascii&#45;&gt;none~add~2</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M740.95,-24.04C707.86,-27.54 670.29,-32.75 637,-42 604.51,-51.03 570.07,-67.06 543.97,-79.52"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="542.26,-76.46 534.75,-83.93 545.28,-82.78 542.26,-76.46"/>
 </g>
 </g>
 </svg>
@@ -330,17 +423,17 @@
                   var panprocwrap_json_value_add_integer_vecCallsGraph = svgPanZoom('#procwrap_json_value_add_integer_vecCallsGraph',
                     {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
                   );
-                </script>        <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
-          <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
                   <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-              <div class="modal-body">
+                <div class="modal-body">
 <p>Nodes of different colours represent the following: </p>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -348,11 +441,11 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="597pt" height="32pt"
- viewBox="0.00 0.00 596.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1.16 1.16) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 592.5,-28 592.5,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node">
 <title>Subroutine</title>
@@ -371,23 +464,29 @@
 <polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
 <text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
-<!-- Unknown Procedure Type -->
+<!-- Type Bound Procedure -->
 <g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
 <title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="388.5,-24 243.5,-24 243.5,0 388.5,0 388.5,-24"/>
-<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
-<g id="node5" class="node">
+<g id="node6" class="node">
 <title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="465,-24 407,-24 407,0 465,0 465,-24"/>
-<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
-<g id="node6" class="node">
+<g id="node7" class="node">
 <title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="588.5,-24 483.5,-24 483.5,0 588.5,0 588.5,-24"/>
-<text text-anchor="middle" x="536" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -407,61 +506,30 @@ large graphs.</div>
     </div>
     <br>
 
-    <section class="visible-xs visible-sm hidden-md">
-        <h3>Contents</h3>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-    <div class="panel panel-primary">
-      <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
-      <div class="list-group">
-        <a class="list-group-item" href="../proc/wrap_json_value_add_integer_vec.html#src">wrap_json_value_add_integer_vec</a>
-      </div>
-    </div>
-
-
-    </section>
-    <br class="visible-xs visible-sm hidden-md">
-
 
     
     
 
     
     
+
 
 
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">wrap_json_value_add_integer_vec</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"></span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">wrap_json_value_add_integer_vec</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">)</span>
 
 <span class="w">    </span><span class="k">implicit none</span>
 
-<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">       </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span><span class="w"></span>
-<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w">             </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span><span class="w"></span>
+<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">       </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w">             </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span>
 <span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">name</span><span class="w">   </span><span class="c">!! name of the variable</span>
 <span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">dimension</span><span class="p">(:),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">val</span><span class="w">    </span><span class="c">!! value</span>
 
-<span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">to_unicode</span><span class="p">(</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">to_unicode</span><span class="p">(</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="n">val</span><span class="p">)</span>
 
-<span class="w">    </span><span class="k">end subroutine </span><span class="n">wrap_json_value_add_integer_vec</span><span class="w"></span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">wrap_json_value_add_integer_vec</span>
 </pre></div>
 
     </section>
@@ -474,32 +542,27 @@ large graphs.</div>
     </div> <!-- /container -->
     <footer>
       <div class="container">
-        <div class="row">
-          <div class="col-xs-6 col-md-6"><p>JSON-Fortran was developed by Jacob Williams<br>&copy; 2023 
+        <div class="row justify-content-between">
+          <div class="col"><p>JSON-Fortran was developed by Jacob Williams<br>&copy; 2024 
 </p>
           </div>
-          <div class="col-xs-6 col-md-6">
-            <p class="text-right">
+          <div class="col">
+            <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-10-01 00:01              </p>
+ on 2024-01-05 14:59              </p>
           </div>
         </div>
         <br>
       </div> <!-- /container -->
     </footer>
 
-    <!-- Bootstrap core JavaScript
-         ================================================== -->
-         <!-- Placed at the end of the document so the pages load faster -->
-    <!--
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        -->
-        <script src="../js/bootstrap.min.js"></script>
-        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-        <script src="../js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
 
-        <!-- MathJax JavaScript
+    <!-- MathJax JavaScript
              ================================================== -->
              <!-- Placed at the end of the document so the pages load faster -->
         <script type="text/x-mathjax-config">

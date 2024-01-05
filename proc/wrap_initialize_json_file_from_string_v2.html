@@ -1,3 +1,5 @@
+<!-- -*- mode: jinja2 -*- -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -10,82 +12,57 @@
 
     <title>wrap_initialize_json_file_from_string_v2 &ndash; JSON-Fortran</title>
 
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
       <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
-         <script src="../js/jquery-2.1.3.min.js"></script>
-         <script src="../js/svg-pan-zoom.min.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
   </head>
 
   <body>
 
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
           <a class="navbar-brand" href="../index.html">JSON-Fortran </a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-              <li><a href='../page/index.html'>Other Docs</a></li>
-            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
-              <a href="#" class="dropdown-toggle"
-                 data-toggle="dropdown" role="button"
-                 aria-haspopup="true"
-                 aria-expanded="false">
-                 Contents <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                    <li><a href="../lists/files.html">Source Files</a></li>
-                  <li><a href="../lists/modules.html">Modules</a></li>
-                  <li><a href="../lists/procedures.html">Procedures</a></li>
-                  <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
-                  <li><a href="../lists/types.html">Derived Types</a></li>
-              </ul>
-            </li>
-                <li class="visible-xs hidden-sm visible-lg">
-                  <a href="../lists/files.html">Source Files</a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Other Docs</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
                 </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/modules.html">Modules</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/procedures.html">Procedures</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/absint.html">Abstract Interfaces</a>
-              </li>
-              <li class="visible-xs hidden-sm visible-lg">
-                <a href="../lists/types.html">Derived Types</a>
-              </li>
-          </ul>
-            <form action="../search.html" class="navbar-form navbar-right" role="search">
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
               </div>
-              <!--
-                  <button type="submit" class="btn btn-default">Submit</button>
-                  -->
-            </form>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
 
     <div class="container">
   <div class="row">
@@ -93,33 +70,37 @@
       <small>Function</small>
       
     </h1>
-      <div class="row" id="info-bar">
-    <div class="col-lg-12">
-      <div class="well well-sm">
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
         <ul class="list-inline" style="margin-bottom:0px;display:inline">
 
-          <li id="statements"><i class="fa fa-list-ol"></i>
-            <a data-toggle="tooltip"
-               data-placement="bottom" data-html="true"
-               title=" 0.1% of total for procedures.">7 statements</a>
-          </li>
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip"
+                 data-bs-placement="bottom" data-html="true"
+                 title=" 0.1% of total for procedures.">7 statements</a>
+            </li>
 
-            <li id="source-file">
+            <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
               <a href="../src/json_file_module.F90"> Source File</a>
             </li>
         </ul>
-        <ol class="breadcrumb in-well text-right">
-              <li><a href='../sourcefile/json_file_module.f90.html'>json_file_module.F90</a></li>
-              <li><a href='../module/json_file_module.html'>json_file_module</a></li>
-          <li class="active">wrap_initialize_json_file_from_string_v2</li>
-        </ol>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_file_module.f90.html'>json_file_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_file_module.html'>json_file_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">wrap_initialize_json_file_from_string_v2</li>
+          </ol>
+        </nav>
       </div>
     </div>
   </div>
   <script>
     $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-bs-toggle="tooltip"]').tooltip()
     })
   </script>
 
@@ -148,8 +129,9 @@
   
   
   
-    <div class="panel panel-primary">
-      <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
       <div class="list-group">
         <a class="list-group-item" href="../proc/wrap_initialize_json_file_from_string_v2.html#src">wrap_initialize_json_file_from_string_v2</a>
       </div>
@@ -165,23 +147,23 @@
 </h2>
     
 
-    <p>Alternate version of <a href="../proc/initialize_json_file_from_string_v2.html">initialize_json_file_from_string_v2</a>, where &ldquo;str&rdquo; is kind=CDK.</p>
+    <p>Alternate version of <a href="initialize_json_file_from_string_v2.html">initialize_json_file_from_string_v2</a>, where &ldquo;str&rdquo; is kind=CDK.</p>
 
 
     <h3>Arguments</h3>
         <table class="table table-striped varlist">
     <thead>
       <tr>
-        <th>Type</th>
-<th>Intent</th><th>Optional</th>        <th>Attributes</th>
-        <th></th>
-        <th>Name</th>
-        <th></th>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
     </thead>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-str~28"></span>
+              <span class="anchor" id="variable-str~21"></span>
               character(kind=CDK, len=*),
             </td>
 <td>intent(in)</td>
@@ -196,7 +178,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-json_core_object~3"></span>
+              <span class="anchor" id="variable-json_core_object~4"></span>
               type(<a href='../type/json_core.html'>json_core</a>),
             </td>
 <td>intent(in)</td>
@@ -220,99 +202,1143 @@
       </h3>
       
     <br>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-  <h3 class="panel-title">Calls</h3>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
   <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph Pages: 1 -->
-<svg id="procwrap_initialize_json_file_from_string_v2CallsGraph" width="641pt" height="86pt"
- viewBox="0.00 0.00 641.00 86.46" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph" class="graph" transform="scale(1.34 1.34) rotate(0) translate(4 112)">
+<svg id="procwrap_initialize_json_file_from_string_v2CallsGraph" width="641pt" height="200pt"
+ viewBox="0.00 0.00 641.00 200.42" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph" class="graph" transform="scale(6.56 6.56) rotate(0) translate(4 1311.68)">
 <title>proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 856,-112 856,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1311.68 4204,-1311.68 4204,4 -4,4"/>
 <!-- proc~wrap_initialize_json_file_from_string_v2 -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node1" class="node">
 <title>proc~wrap_initialize_json_file_from_string_v2</title>
-<polygon fill="none" stroke="black" points="317,-45 0,-45 0,-21 317,-21 317,-45"/>
-<text text-anchor="middle" x="158.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_file_module::wrap_initialize_json_file_from_string_v2</text>
+<polygon fill="none" stroke="black" points="317,-247.68 0,-247.68 0,-223.68 317,-223.68 317,-247.68"/>
+<text text-anchor="middle" x="158.5" y="-233.28" font-family="Helvetica,sans-Serif" font-size="10.50">json_file_module::wrap_initialize_json_file_from_string_v2</text>
 </g>
 <!-- interface~to_unicode -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node2" class="node">
 <title>interface~to_unicode</title>
-<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node2"><a xlink:href=".././interface/to_unicode.html" xlink:title="json_string_utilities::to_unicode">
-<polygon fill="#a7506f" stroke="#a7506f" points="585.5,-66 406.5,-66 406.5,-42 585.5,-42 585.5,-66"/>
-<text text-anchor="middle" x="496" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_unicode</text>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node2"><a xlink:href="../interface/to_unicode.html" xlink:title="json_string_utilities::to_unicode">
+<polygon fill="#a7506f" stroke="#a7506f" points="3987,-840.68 3808,-840.68 3808,-816.68 3987,-816.68 3987,-840.68"/>
+<text text-anchor="middle" x="3897.5" y="-826.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_unicode</text>
 </a>
 </g>
 </g>
 <!-- proc~wrap_initialize_json_file_from_string_v2&#45;&gt;interface~to_unicode -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge1" class="edge">
 <title>proc~wrap_initialize_json_file_from_string_v2&#45;&gt;interface~to_unicode</title>
-<path fill="none" stroke="#255000" d="M317.43,-42.89C344.31,-44.57 371.54,-46.27 396.33,-47.82"/>
-<polygon fill="#255000" stroke="#255000" points="396.23,-51.32 406.43,-48.46 396.66,-44.34 396.23,-51.32"/>
+<path fill="none" stroke="#255000" d="M182.01,-223.63C261.7,-182.14 538.86,-47.68 784,-47.68 784,-47.68 784,-47.68 3207.5,-47.68 3459.02,-47.68 3585.84,81.46 3772,-87.68 3881.68,-187.33 3894.74,-693.74 3896.29,-806.43"/>
+<polygon fill="#255000" stroke="#255000" points="3892.79,-806.66 3896.41,-816.62 3899.79,-806.57 3892.79,-806.66"/>
 </g>
 <!-- proc~initialize_json_file_from_string_v2 -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node3" class="node">
 <title>proc~initialize_json_file_from_string_v2</title>
-<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node3"><a xlink:href=".././proc/initialize_json_file_from_string_v2.html" xlink:title="json_file_module::initialize_json_file_from_string_v2">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="639,-24 353,-24 353,0 639,0 639,-24"/>
-<text text-anchor="middle" x="496" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file_module::initialize_json_file_from_string_v2</text>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node3"><a xlink:href="../proc/initialize_json_file_from_string_v2.html" xlink:title="json_file_module::initialize_json_file_from_string_v2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="639,-435.68 353,-435.68 353,-411.68 639,-411.68 639,-435.68"/>
+<text text-anchor="middle" x="496" y="-421.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file_module::initialize_json_file_from_string_v2</text>
 </a>
 </g>
 </g>
 <!-- proc~wrap_initialize_json_file_from_string_v2&#45;&gt;proc~initialize_json_file_from_string_v2 -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge2" class="edge">
 <title>proc~wrap_initialize_json_file_from_string_v2&#45;&gt;proc~initialize_json_file_from_string_v2</title>
-<path fill="none" stroke="#255000" d="M317.43,-23.11C325.82,-22.59 334.25,-22.06 342.63,-21.54"/>
-<polygon fill="#255000" stroke="#255000" points="343.06,-25.02 352.82,-20.9 342.62,-18.03 343.06,-25.02"/>
+<path fill="none" stroke="#255000" d="M181,-247.72C238.74,-280.08 397.34,-368.95 464.41,-406.54"/>
+<polygon fill="#255000" stroke="#255000" points="462.81,-409.65 473.25,-411.49 466.23,-403.55 462.81,-409.65"/>
 </g>
 <!-- proc~to_uni -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node5" class="node">
 <title>proc~to_uni</title>
-<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node5"><a xlink:href=".././proc/to_uni.html" xlink:title="json_string_utilities::to_uni">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="840,-108 687,-108 687,-84 840,-84 840,-108"/>
-<text text-anchor="middle" x="763.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni</text>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node5"><a xlink:href="../proc/to_uni.html" xlink:title="json_string_utilities::to_uni">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="4188,-861.68 4035,-861.68 4035,-837.68 4188,-837.68 4188,-861.68"/>
+<text text-anchor="middle" x="4111.5" y="-847.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni</text>
 </a>
 </g>
 </g>
 <!-- interface~to_unicode&#45;&gt;proc~to_uni -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge3" class="edge">
 <title>interface~to_unicode&#45;&gt;proc~to_uni</title>
-<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M573.08,-66.04C605.44,-71.15 643.32,-77.15 676.67,-82.42"/>
-<polygon fill="#255000" stroke="#255000" points="676.44,-85.93 686.87,-84.04 677.54,-79.02 676.44,-85.93"/>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M3987.18,-837.46C3999.59,-838.69 4012.32,-839.95 4024.68,-841.18"/>
+<polygon fill="#255000" stroke="#255000" points="4024.66,-844.69 4034.95,-842.19 4025.35,-837.72 4024.66,-844.69"/>
 </g>
 <!-- proc~to_uni_vec -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node6" class="node">
 <title>proc~to_uni_vec</title>
-<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node6"><a xlink:href=".././proc/to_uni_vec.html" xlink:title="json_string_utilities::to_uni_vec">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="852,-66 675,-66 675,-42 852,-42 852,-66"/>
-<text text-anchor="middle" x="763.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni_vec</text>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node6"><a xlink:href="../proc/to_uni_vec.html" xlink:title="json_string_utilities::to_uni_vec">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="4200,-819.68 4023,-819.68 4023,-795.68 4200,-795.68 4200,-819.68"/>
+<text text-anchor="middle" x="4111.5" y="-805.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::to_uni_vec</text>
 </a>
 </g>
 </g>
 <!-- interface~to_unicode&#45;&gt;proc~to_uni_vec -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge4" class="edge">
 <title>interface~to_unicode&#45;&gt;proc~to_uni_vec</title>
-<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M585.78,-54C611.06,-54 638.75,-54 664.55,-54"/>
-<polygon fill="#255000" stroke="#255000" points="664.71,-57.5 674.71,-54 664.71,-50.5 664.71,-57.5"/>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M3987.18,-819.89C3995.66,-819.05 4004.29,-818.2 4012.85,-817.35"/>
+<polygon fill="#255000" stroke="#255000" points="4013.25,-820.83 4022.86,-816.36 4012.56,-813.86 4013.25,-820.83"/>
 </g>
-<!-- deserialize -->
+<!-- none~deserialize~2 -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node4" class="node">
-<title>deserialize</title>
-<polygon fill="#777777" stroke="#777777" points="798.5,-24 728.5,-24 728.5,0 798.5,0 798.5,-24"/>
-<text text-anchor="middle" x="763.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deserialize</text>
+<title>none~deserialize~2</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node4"><a xlink:href="../type/json_file.html#boundprocedure-deserialize~2" xlink:title="json_file_module::json_file%deserialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="895,-603.68 675,-603.68 675,-579.68 895,-579.68 895,-603.68"/>
+<text text-anchor="middle" x="785" y="-589.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file_module::json_file%deserialize</text>
+</a>
 </g>
-<!-- proc~initialize_json_file_from_string_v2&#45;&gt;deserialize -->
+</g>
+<!-- proc~initialize_json_file_from_string_v2&#45;&gt;none~deserialize~2 -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge5" class="edge">
-<title>proc~initialize_json_file_from_string_v2&#45;&gt;deserialize</title>
-<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M639.08,-12C667.92,-12 696.17,-12 718.35,-12"/>
-<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="718.41,-15.5 728.41,-12 718.41,-8.5 718.41,-15.5"/>
+<title>proc~initialize_json_file_from_string_v2&#45;&gt;none~deserialize~2</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M517.64,-435.76C567.78,-465.11 696.16,-540.26 754.43,-574.37"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="752.76,-577.45 763.16,-579.48 756.3,-571.41 752.76,-577.45"/>
+</g>
+<!-- proc~json_file_load_from_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node7" class="node">
+<title>proc~json_file_load_from_string</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node7"><a xlink:href="../proc/json_file_load_from_string.html" xlink:title="json_file_module::json_file%json_file_load_from_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="1246.5,-582.68 946.5,-582.68 946.5,-558.68 1246.5,-558.68 1246.5,-582.68"/>
+<text text-anchor="middle" x="1096.5" y="-568.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file_module::json_file%json_file_load_from_string</text>
+</a>
+</g>
+</g>
+<!-- none~deserialize~2&#45;&gt;proc~json_file_load_from_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge6" class="edge">
+<title>none~deserialize~2&#45;&gt;proc~json_file_load_from_string</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M895.12,-584.27C908.49,-583.37 922.37,-582.42 936.29,-581.48"/>
+<polygon fill="#255000" stroke="#255000" points="936.69,-584.96 946.43,-580.79 936.21,-577.98 936.69,-584.96"/>
+</g>
+<!-- proc~wrap_json_file_load_from_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node8" class="node">
+<title>proc~wrap_json_file_load_from_string</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node8"><a xlink:href="../proc/wrap_json_file_load_from_string.html" xlink:title="json_file_module::json_file%wrap_json_file_load_from_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="1262,-624.68 931,-624.68 931,-600.68 1262,-600.68 1262,-624.68"/>
+<text text-anchor="middle" x="1096.5" y="-610.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file_module::json_file%wrap_json_file_load_from_string</text>
+</a>
+</g>
+</g>
+<!-- none~deserialize~2&#45;&gt;proc~wrap_json_file_load_from_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge7" class="edge">
+<title>none~deserialize~2&#45;&gt;proc~wrap_json_file_load_from_string</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M895.12,-592.6C928.87,-594.48 965.8,-597.04 998.66,-599.79"/>
+<polygon fill="#255000" stroke="#255000" points="998.46,-603.29 1008.72,-600.65 999.06,-596.32 998.46,-603.29"/>
+</g>
+<!-- none~deserialize -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node9" class="node">
+<title>none~deserialize</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node9"><a xlink:href="../type/json_core.html#boundprocedure-deserialize" xlink:title="json_value_module::json_core%deserialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="1538,-582.68 1298,-582.68 1298,-558.68 1538,-558.68 1538,-582.68"/>
+<text text-anchor="middle" x="1418" y="-568.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%deserialize</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_load_from_string&#45;&gt;none~deserialize -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge8" class="edge">
+<title>proc~json_file_load_from_string&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#255000" d="M1246.96,-570.68C1260.55,-570.68 1274.24,-570.68 1287.63,-570.68"/>
+<polygon fill="#255000" stroke="#255000" points="1287.81,-574.18 1297.81,-570.68 1287.81,-567.18 1287.81,-574.18"/>
+</g>
+<!-- proc~wrap_json_file_load_from_string&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge9" class="edge">
+<title>proc~wrap_json_file_load_from_string&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M1101.38,-624.74C1131.88,-717.03 1342.08,-1307.68 1726,-1307.68 1726,-1307.68 1726,-1307.68 3207.5,-1307.68 3470.7,-1307.68 3578.03,-1306.59 3772,-1128.68 3856.95,-1050.76 3885.62,-905.99 3893.72,-850.82"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="3897.21,-851.13 3895.11,-840.74 3890.28,-850.17 3897.21,-851.13"/>
+</g>
+<!-- proc~wrap_json_file_load_from_string&#45;&gt;none~deserialize~2 -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge10" class="edge">
+<title>proc~wrap_json_file_load_from_string&#45;&gt;none~deserialize~2</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M930.73,-608.23C914.29,-607.08 897.99,-605.83 882.6,-604.54"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="882.89,-601.05 872.62,-603.69 882.29,-608.02 882.89,-601.05"/>
+</g>
+<!-- proc~json_parse_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node10" class="node">
+<title>proc~json_parse_string</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node10"><a xlink:href="../proc/json_parse_string.html" xlink:title="json_value_module::json_core%json_parse_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="1864,-792.68 1590,-792.68 1590,-768.68 1864,-768.68 1864,-792.68"/>
+<text text-anchor="middle" x="1727" y="-778.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_parse_string</text>
+</a>
+</g>
+</g>
+<!-- none~deserialize&#45;&gt;proc~json_parse_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge11" class="edge">
+<title>none~deserialize&#45;&gt;proc~json_parse_string</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M1436.83,-582.87C1488.55,-618.25 1638.78,-721.01 1699.79,-762.75"/>
+<polygon fill="#255000" stroke="#255000" points="1697.89,-765.69 1708.12,-768.44 1701.84,-759.91 1697.89,-765.69"/>
+</g>
+<!-- proc~wrap_json_parse_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node11" class="node">
+<title>proc~wrap_json_parse_string</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node11"><a xlink:href="../proc/wrap_json_parse_string.html" xlink:title="json_value_module::json_core%wrap_json_parse_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="1880,-582.68 1574,-582.68 1574,-558.68 1880,-558.68 1880,-582.68"/>
+<text text-anchor="middle" x="1727" y="-568.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%wrap_json_parse_string</text>
+</a>
+</g>
+</g>
+<!-- none~deserialize&#45;&gt;proc~wrap_json_parse_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge12" class="edge">
+<title>none~deserialize&#45;&gt;proc~wrap_json_parse_string</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M1538.13,-564.08C1546.55,-564 1555.12,-563.96 1563.72,-563.94"/>
+<polygon fill="#255000" stroke="#255000" points="1563.83,-567.44 1573.83,-563.93 1563.82,-560.44 1563.83,-567.44"/>
+</g>
+<!-- none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node12" class="node">
+<title>none~throw_exception</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node12"><a xlink:href="../type/json_core.html#boundprocedure-throw_exception" xlink:title="json_value_module::json_core%throw_exception">
+<polygon fill="#a7506f" stroke="#a7506f" points="3340.5,-777.68 3072.5,-777.68 3072.5,-753.68 3340.5,-753.68 3340.5,-777.68"/>
+<text text-anchor="middle" x="3206.5" y="-763.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%throw_exception</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge13" class="edge">
+<title>proc~json_parse_string&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#255000" d="M1833.87,-768.64C1860.66,-765.65 1889.38,-762.5 1916,-759.68 2260.75,-723.14 2348.67,-704.1 2695,-719.68 2832.01,-725.84 2989.07,-741.25 3092.39,-752.55"/>
+<polygon fill="#255000" stroke="#255000" points="3092.21,-756.05 3102.53,-753.66 3092.97,-749.09 3092.21,-756.05"/>
+</g>
+<!-- proc~annotate_invalid_json -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node13" class="node">
+<title>proc~annotate_invalid_json</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node13"><a xlink:href="../proc/annotate_invalid_json.html" xlink:title="json_value_module::json_core%annotate_invalid_json">
+<polygon fill="#d9534f" stroke="#d9534f" points="2246.5,-196.68 1948.5,-196.68 1948.5,-172.68 2246.5,-172.68 2246.5,-196.68"/>
+<text text-anchor="middle" x="2097.5" y="-182.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%annotate_invalid_json</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;proc~annotate_invalid_json -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge14" class="edge">
+<title>proc~json_parse_string&#45;&gt;proc~annotate_invalid_json</title>
+<path fill="none" stroke="#255000" d="M1739.18,-768.47C1765.6,-739.31 1833.17,-662.68 1880,-591.68 1927.56,-519.57 2048.83,-279.72 2085.7,-206.25"/>
+<polygon fill="#255000" stroke="#255000" points="2088.98,-207.53 2090.33,-197.02 2082.72,-204.39 2088.98,-207.53"/>
+</g>
+<!-- proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node14" class="node">
+<title>proc~json_check_all_for_duplicate_keys</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node14"><a xlink:href="../proc/json_check_all_for_duplicate_keys.html" xlink:title="json_value_module::json_core%json_check_all_for_duplicate_keys">
+<polygon fill="#d9534f" stroke="#d9534f" points="2279,-1041.68 1916,-1041.68 1916,-1017.68 2279,-1017.68 2279,-1041.68"/>
+<text text-anchor="middle" x="2097.5" y="-1027.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_check_all_for_duplicate_keys</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge15" class="edge">
+<title>proc~json_parse_string&#45;&gt;proc~json_check_all_for_duplicate_keys</title>
+<path fill="none" stroke="#255000" d="M1735.44,-792.82C1757.89,-828.37 1828.8,-932.96 1916,-984.68 1940,-998.91 1968.36,-1008.66 1995.4,-1015.33"/>
+<polygon fill="#255000" stroke="#255000" points="1994.75,-1018.78 2005.29,-1017.65 1996.35,-1011.96 1994.75,-1018.78"/>
+</g>
+<!-- proc~json_initialize -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node15" class="node">
+<title>proc~json_initialize</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node15"><a xlink:href="../proc/json_initialize.html" xlink:title="json_value_module::json_core%json_initialize">
+<polygon fill="#d9534f" stroke="#d9534f" points="2631.5,-419.68 2378.5,-419.68 2378.5,-395.68 2631.5,-395.68 2631.5,-419.68"/>
+<text text-anchor="middle" x="2505" y="-405.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_initialize</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;proc~json_initialize -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge16" class="edge">
+<title>proc~json_parse_string&#45;&gt;proc~json_initialize</title>
+<path fill="none" stroke="#255000" d="M1742.16,-768.59C1804.48,-716.2 2062.49,-507.64 2315,-424.68 2331.9,-419.12 2350.08,-415.16 2368.25,-412.35"/>
+<polygon fill="#255000" stroke="#255000" points="2368.93,-415.79 2378.33,-410.91 2367.94,-408.86 2368.93,-415.79"/>
+</g>
+<!-- proc~json_parse_end -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node16" class="node">
+<title>proc~json_parse_end</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node16"><a xlink:href="../proc/json_parse_end.html" xlink:title="json_value_module::json_core%json_parse_end">
+<polygon fill="#d9534f" stroke="#d9534f" points="3012.5,-1203.68 2747.5,-1203.68 2747.5,-1179.68 3012.5,-1179.68 3012.5,-1203.68"/>
+<text text-anchor="middle" x="2880" y="-1189.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_parse_end</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;proc~json_parse_end -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge17" class="edge">
+<title>proc~json_parse_string&#45;&gt;proc~json_parse_end</title>
+<path fill="none" stroke="#255000" d="M1732.47,-792.94C1749.04,-836.43 1811.36,-984.24 1916,-1050.68 2176.27,-1215.92 2554.7,-1217.24 2750.66,-1204.37"/>
+<polygon fill="#255000" stroke="#255000" points="2750.98,-1207.85 2760.72,-1203.68 2750.5,-1200.87 2750.98,-1207.85"/>
+</g>
+<!-- proc~json_prepare_parser -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node17" class="node">
+<title>proc~json_prepare_parser</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node17"><a xlink:href="../proc/json_prepare_parser.html" xlink:title="json_value_module::json_core%json_prepare_parser">
+<polygon fill="#d9534f" stroke="#d9534f" points="2242.5,-1261.68 1952.5,-1261.68 1952.5,-1237.68 2242.5,-1237.68 2242.5,-1261.68"/>
+<text text-anchor="middle" x="2097.5" y="-1247.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_prepare_parser</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;proc~json_prepare_parser -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge18" class="edge">
+<title>proc~json_parse_string&#45;&gt;proc~json_prepare_parser</title>
+<path fill="none" stroke="#255000" d="M1728.98,-792.76C1734.42,-851.42 1766.4,-1108.47 1916,-1223.68 1924.27,-1230.04 1933.4,-1235.2 1943.04,-1239.36"/>
+<polygon fill="#255000" stroke="#255000" points="1941.83,-1242.65 1952.42,-1243.04 1944.39,-1236.13 1941.83,-1242.65"/>
+</g>
+<!-- proc~json_value_create -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node18" class="node">
+<title>proc~json_value_create</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node18"><a xlink:href="../proc/json_value_create.html" xlink:title="json_value_module::json_value_create">
+<polygon fill="#d9534f" stroke="#d9534f" points="2988.5,-1001.68 2771.5,-1001.68 2771.5,-977.68 2988.5,-977.68 2988.5,-1001.68"/>
+<text text-anchor="middle" x="2880" y="-987.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_value_create</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;proc~json_value_create -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge19" class="edge">
+<title>proc~json_parse_string&#45;&gt;proc~json_value_create</title>
+<path fill="none" stroke="#255000" d="M1760.19,-792.74C1847.78,-824.98 2098.39,-913.29 2315,-951.68 2467.55,-978.71 2646.42,-986.85 2761.15,-989.12"/>
+<polygon fill="#255000" stroke="#255000" points="2761.29,-992.62 2771.36,-989.31 2761.42,-985.63 2761.29,-992.62"/>
+</g>
+<!-- proc~parse_value -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node19" class="node">
+<title>proc~parse_value</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node19"><a xlink:href="../proc/parse_value.html" xlink:title="json_value_module::json_core%parse_value">
+<polygon fill="#d9534f" stroke="#d9534f" points="2221,-792.68 1974,-792.68 1974,-768.68 2221,-768.68 2221,-792.68"/>
+<text text-anchor="middle" x="2097.5" y="-778.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%parse_value</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;proc~parse_value -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge20" class="edge">
+<title>proc~json_parse_string&#45;&gt;proc~parse_value</title>
+<path fill="none" stroke="#255000" d="M1864.17,-780.68C1896.64,-780.68 1931.25,-780.68 1963.57,-780.68"/>
+<polygon fill="#255000" stroke="#255000" points="1963.97,-784.18 1973.97,-780.68 1963.97,-777.18 1963.97,-784.18"/>
+</g>
+<!-- proc~wrap_json_parse_string&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge21" class="edge">
+<title>proc~wrap_json_parse_string&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M1729.45,-558.41C1736.8,-502.19 1775.32,-267.32 1916,-163.68 2128.24,-7.31 2240.38,-85.68 2504,-85.68 2504,-85.68 2504,-85.68 3207.5,-85.68 3476.61,-85.68 3600.82,-97.03 3772,-304.68 3837.74,-384.42 3882.77,-717.13 3893.85,-806.5"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="3890.39,-807.09 3895.08,-816.59 3897.34,-806.24 3890.39,-807.09"/>
+</g>
+<!-- proc~wrap_json_parse_string&#45;&gt;none~deserialize -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge22" class="edge">
+<title>proc~wrap_json_parse_string&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M1573.83,-577.43C1565.31,-577.43 1556.78,-577.4 1548.36,-577.35"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="1548.16,-573.85 1538.13,-577.27 1548.11,-580.85 1548.16,-573.85"/>
+</g>
+<!-- proc~json_throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node24" class="node">
+<title>proc~json_throw_exception</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node24"><a xlink:href="../proc/json_throw_exception.html" xlink:title="json_value_module::json_core%json_throw_exception">
+<polygon fill="#d9534f" stroke="#d9534f" points="3725.5,-735.68 3430.5,-735.68 3430.5,-711.68 3725.5,-711.68 3725.5,-735.68"/>
+<text text-anchor="middle" x="3578" y="-721.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_throw_exception</text>
+</a>
+</g>
+</g>
+<!-- none~throw_exception&#45;&gt;proc~json_throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge23" class="edge">
+<title>none~throw_exception&#45;&gt;proc~json_throw_exception</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M3306.89,-753.67C3332.05,-750.68 3359.01,-747.52 3384,-744.68 3406.86,-742.07 3431.24,-739.37 3454.72,-736.79"/>
+<polygon fill="#255000" stroke="#255000" points="3455.16,-740.27 3464.72,-735.7 3454.4,-733.31 3455.16,-740.27"/>
+</g>
+<!-- proc~wrap_json_throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node38" class="node">
+<title>proc~wrap_json_throw_exception</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node38"><a xlink:href="../proc/wrap_json_throw_exception.html" xlink:title="json_value_module::json_core%wrap_json_throw_exception">
+<polygon fill="#d9534f" stroke="#d9534f" points="3741.5,-777.68 3414.5,-777.68 3414.5,-753.68 3741.5,-753.68 3741.5,-777.68"/>
+<text text-anchor="middle" x="3578" y="-763.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%wrap_json_throw_exception</text>
+</a>
+</g>
+</g>
+<!-- none~throw_exception&#45;&gt;proc~wrap_json_throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge24" class="edge">
+<title>none~throw_exception&#45;&gt;proc~wrap_json_throw_exception</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M3340.64,-759.17C3361.26,-758.97 3382.81,-758.89 3404.15,-758.94"/>
+<polygon fill="#255000" stroke="#255000" points="3404.26,-762.44 3414.27,-758.97 3404.28,-755.44 3404.26,-762.44"/>
+</g>
+<!-- proc~get_current_line_from_file_sequential -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node20" class="node">
+<title>proc~get_current_line_from_file_sequential</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node20"><a xlink:href="../proc/get_current_line_from_file_sequential.html" xlink:title="json_value_module::json_core%get_current_line_from_file_sequential">
+<polygon fill="#d9534f" stroke="#d9534f" points="2695,-175.68 2315,-175.68 2315,-151.68 2695,-151.68 2695,-175.68"/>
+<text text-anchor="middle" x="2505" y="-161.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%get_current_line_from_file_sequential</text>
+</a>
+</g>
+</g>
+<!-- proc~annotate_invalid_json&#45;&gt;proc~get_current_line_from_file_sequential -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge25" class="edge">
+<title>proc~annotate_invalid_json&#45;&gt;proc~get_current_line_from_file_sequential</title>
+<path fill="none" stroke="transparent" d="M2246.62,-177.01C2265.5,-176.03 2285.06,-175.01 2304.58,-174"/>
+<polygon fill="transparent" stroke="transparent" points="2304.98,-177.49 2314.78,-173.48 2304.62,-170.5 2304.98,-177.49"/>
+</g>
+<!-- proc~get_current_line_from_file_stream -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node21" class="node">
+<title>proc~get_current_line_from_file_stream</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node21"><a xlink:href="../proc/get_current_line_from_file_stream.html" xlink:title="json_value_module::json_core%get_current_line_from_file_stream">
+<polygon fill="#d9534f" stroke="#d9534f" points="2685.5,-217.68 2324.5,-217.68 2324.5,-193.68 2685.5,-193.68 2685.5,-217.68"/>
+<text text-anchor="middle" x="2505" y="-203.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%get_current_line_from_file_stream</text>
+</a>
+</g>
+</g>
+<!-- proc~annotate_invalid_json&#45;&gt;proc~get_current_line_from_file_stream -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge26" class="edge">
+<title>proc~annotate_invalid_json&#45;&gt;proc~get_current_line_from_file_stream</title>
+<path fill="none" stroke="transparent" d="M2246.62,-192.35C2268.59,-193.48 2291.49,-194.67 2314.17,-195.85"/>
+<polygon fill="transparent" stroke="transparent" points="2314.06,-199.34 2324.23,-196.37 2314.42,-192.35 2314.06,-199.34"/>
+</g>
+<!-- proc~integer_to_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node22" class="node">
+<title>proc~integer_to_string</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node22"><a xlink:href="../proc/integer_to_string.html" xlink:title="json_string_utilities::integer_to_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="3311.5,-327.68 3101.5,-327.68 3101.5,-303.68 3311.5,-303.68 3311.5,-327.68"/>
+<text text-anchor="middle" x="3206.5" y="-313.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::integer_to_string</text>
+</a>
+</g>
+</g>
+<!-- proc~annotate_invalid_json&#45;&gt;proc~integer_to_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge27" class="edge">
+<title>proc~annotate_invalid_json&#45;&gt;proc~integer_to_string</title>
+<path fill="none" stroke="transparent" d="M2146.27,-172.67C2189.88,-162.37 2256.31,-148.32 2315,-142.68 2483.11,-126.52 2528.36,-115.21 2695,-142.68 2880.66,-173.28 3089.61,-262.54 3170.73,-299.43"/>
+<polygon fill="transparent" stroke="transparent" points="3169.42,-302.68 3179.97,-303.66 3172.34,-296.32 3169.42,-302.68"/>
+</g>
+<!-- proc~json_traverse -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node25" class="node">
+<title>proc~json_traverse</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node25"><a xlink:href="../proc/json_traverse.html" xlink:title="json_value_module::json_core%json_traverse">
+<polygon fill="#d9534f" stroke="#d9534f" points="2631.5,-1060.68 2378.5,-1060.68 2378.5,-1036.68 2631.5,-1036.68 2631.5,-1060.68"/>
+<text text-anchor="middle" x="2505" y="-1046.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_traverse</text>
+</a>
+</g>
+</g>
+<!-- proc~json_check_all_for_duplicate_keys&#45;&gt;proc~json_traverse -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge28" class="edge">
+<title>proc~json_check_all_for_duplicate_keys&#45;&gt;proc~json_traverse</title>
+<path fill="none" stroke="transparent" d="M2279.02,-1038.13C2308.98,-1039.54 2339.61,-1040.97 2368.22,-1042.31"/>
+<polygon fill="transparent" stroke="transparent" points="2368.1,-1045.81 2378.26,-1042.78 2368.43,-1038.82 2368.1,-1045.81"/>
+</g>
+<!-- proc~json_initialize&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge29" class="edge">
+<title>proc~json_initialize&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#025563" d="M2631.56,-399.21C2652.94,-396.21 2674.76,-392.16 2695,-386.68 2711.9,-382.1 2713.87,-374.31 2731,-370.68 2795.78,-356.93 2979.98,-326.15 3029,-370.68 3090.8,-426.82 3007.53,-684.11 3065,-744.68 3065.79,-745.5 3066.59,-746.31 3067.41,-747.09"/>
+<polygon fill="#025563" stroke="#025563" points="3065.27,-749.86 3075.2,-753.54 3069.73,-744.47 3065.27,-749.86"/>
+</g>
+<!-- proc~json_initialize&#45;&gt;proc~integer_to_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge30" class="edge">
+<title>proc~json_initialize&#45;&gt;proc~integer_to_string</title>
+<path fill="none" stroke="#025563" d="M2631.62,-408.33C2653.77,-404.45 2675.85,-397.74 2695,-386.68 2718.4,-373.16 2707.18,-350.44 2731,-337.68 2791.06,-305.51 2971.26,-305.7 3091.49,-309.88"/>
+<polygon fill="#025563" stroke="#025563" points="3091.37,-313.38 3101.49,-310.24 3091.62,-306.38 3091.37,-313.38"/>
+</g>
+<!-- proc~json_clear_exceptions -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node23" class="node">
+<title>proc~json_clear_exceptions</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node23"><a xlink:href="../proc/json_clear_exceptions.html" xlink:title="json_value_module::json_core%json_clear_exceptions">
+<polygon fill="#d9534f" stroke="#d9534f" points="3029,-403.68 2731,-403.68 2731,-379.68 3029,-379.68 3029,-403.68"/>
+<text text-anchor="middle" x="2880" y="-389.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_clear_exceptions</text>
+</a>
+</g>
+</g>
+<!-- proc~json_initialize&#45;&gt;proc~json_clear_exceptions -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge31" class="edge">
+<title>proc~json_initialize&#45;&gt;proc~json_clear_exceptions</title>
+<path fill="none" stroke="#025563" d="M2631.5,-402.29C2660.11,-401.07 2690.87,-399.75 2720.65,-398.47"/>
+<polygon fill="#025563" stroke="#025563" points="2720.86,-401.96 2730.7,-398.04 2720.56,-394.97 2720.86,-401.96"/>
+</g>
+<!-- proc~json_parse_end&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge32" class="edge">
+<title>proc~json_parse_end&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M3012.66,-1183.37C3018.6,-1179.88 3024.11,-1175.69 3029,-1170.68 3077.27,-1121.19 3029.24,-920.84 3065,-861.68 3087.88,-823.82 3132.06,-797.41 3164.79,-782"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="3166.46,-785.09 3174.12,-777.76 3163.57,-778.71 3166.46,-785.09"/>
+</g>
+<!-- proc~pop_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node31" class="node">
+<title>proc~pop_char</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node31"><a xlink:href="../proc/pop_char.html" xlink:title="json_value_module::json_core%pop_char">
+<polygon fill="#d9534f" stroke="#d9534f" points="3322.5,-1161.68 3090.5,-1161.68 3090.5,-1137.68 3322.5,-1137.68 3322.5,-1161.68"/>
+<text text-anchor="middle" x="3206.5" y="-1147.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%pop_char</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_end&#45;&gt;proc~pop_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge33" class="edge">
+<title>proc~json_parse_end&#45;&gt;proc~pop_char</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M2973.99,-1179.64C3014.22,-1174.43 3061.43,-1168.32 3102.7,-1162.98"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="3103.31,-1166.43 3112.78,-1161.68 3102.41,-1159.49 3103.31,-1166.43"/>
+</g>
+<!-- proc~parse_value&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge34" class="edge">
+<title>proc~parse_value&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2221.2,-779.01C2427.48,-776.22 2842.66,-770.59 3062.07,-767.62"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="3062.42,-771.12 3072.37,-767.48 3062.33,-764.12 3062.42,-771.12"/>
+</g>
+<!-- proc~parse_array -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node26" class="node">
+<title>proc~parse_array</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node26"><a xlink:href="../proc/parse_array.html" xlink:title="json_value_module::json_core%parse_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="2628,-832.68 2382,-832.68 2382,-808.68 2628,-808.68 2628,-832.68"/>
+<text text-anchor="middle" x="2505" y="-818.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%parse_array</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~parse_array -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge35" class="edge">
+<title>proc~parse_value&#45;&gt;proc~parse_array</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2221.26,-786.53C2287.34,-792.19 2366.92,-800.3 2424.8,-807.38"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="2424.63,-810.89 2434.98,-808.64 2425.49,-803.94 2424.63,-810.89"/>
+</g>
+<!-- proc~parse_for_chars -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node27" class="node">
+<title>proc~parse_for_chars</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node27"><a xlink:href="../proc/parse_for_chars.html" xlink:title="json_value_module::json_core%parse_for_chars">
+<polygon fill="#d9534f" stroke="#d9534f" points="3013.5,-1161.68 2746.5,-1161.68 2746.5,-1137.68 3013.5,-1137.68 3013.5,-1161.68"/>
+<text text-anchor="middle" x="2880" y="-1147.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%parse_for_chars</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~parse_for_chars -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge36" class="edge">
+<title>proc~parse_value&#45;&gt;proc~parse_for_chars</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2109.31,-793.07C2138.35,-826.62 2219.87,-922.51 2279,-1008.68 2296.81,-1034.63 2288.83,-1052.18 2315,-1069.68 2381.99,-1114.46 2592.24,-1134.65 2736.22,-1143.4"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="2736.27,-1146.91 2746.46,-1144.01 2736.69,-1139.92 2736.27,-1146.91"/>
+</g>
+<!-- proc~parse_number -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node28" class="node">
+<title>proc~parse_number</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node28"><a xlink:href="../proc/parse_number.html" xlink:title="json_value_module::json_core%parse_number">
+<polygon fill="#d9534f" stroke="#d9534f" points="2634.5,-553.68 2375.5,-553.68 2375.5,-529.68 2634.5,-529.68 2634.5,-553.68"/>
+<text text-anchor="middle" x="2505" y="-539.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%parse_number</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~parse_number -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge37" class="edge">
+<title>proc~parse_value&#45;&gt;proc~parse_number</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2118.89,-768.66C2185.4,-729.46 2396.3,-605.15 2474.47,-559.08"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="2476.49,-561.95 2483.33,-553.86 2472.94,-555.92 2476.49,-561.95"/>
+</g>
+<!-- proc~parse_object -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node29" class="node">
+<title>proc~parse_object</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node29"><a xlink:href="../proc/parse_object.html" xlink:title="json_value_module::json_core%parse_object">
+<polygon fill="#d9534f" stroke="#d9534f" points="2630,-924.68 2380,-924.68 2380,-900.68 2630,-900.68 2630,-924.68"/>
+<text text-anchor="middle" x="2505" y="-910.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%parse_object</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~parse_object -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge38" class="edge">
+<title>proc~parse_value&#45;&gt;proc~parse_object</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2149.86,-792.72C2233.31,-816.92 2396.26,-870.18 2468.29,-897.02"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="2467.25,-900.36 2477.84,-900.63 2469.72,-893.82 2467.25,-900.36"/>
+</g>
+<!-- proc~parse_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node30" class="node">
+<title>proc~parse_string</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node30"><a xlink:href="../proc/parse_string.html" xlink:title="json_value_module::json_core%parse_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="3003.5,-1119.68 2756.5,-1119.68 2756.5,-1095.68 3003.5,-1095.68 3003.5,-1119.68"/>
+<text text-anchor="middle" x="2880" y="-1105.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%parse_string</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~parse_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge39" class="edge">
+<title>proc~parse_value&#45;&gt;proc~parse_string</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2109.8,-792.96C2139.83,-824.78 2225.44,-910.28 2315,-951.68 2471.34,-1023.94 2530.65,-976.16 2695,-1027.68 2749.92,-1044.89 2810.6,-1073.21 2846.72,-1091.13"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="2845.29,-1094.33 2855.8,-1095.67 2848.42,-1088.07 2845.29,-1094.33"/>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~pop_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge40" class="edge">
+<title>proc~parse_value&#45;&gt;proc~pop_char</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2110.83,-792.89C2142.9,-825.25 2229.78,-917.06 2279,-1008.68 2303.34,-1053.99 2278.34,-1082.59 2315,-1118.68 2429.9,-1231.79 2872.91,-1288.1 3029,-1247.68 3088.55,-1232.25 3149.4,-1191.92 3181.78,-1168.08"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="3184.23,-1170.62 3190.14,-1161.83 3180.03,-1165.02 3184.23,-1170.62"/>
+</g>
+<!-- proc~push_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node32" class="node">
+<title>proc~push_char</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node32"><a xlink:href="../proc/push_char.html" xlink:title="json_value_module::json_core%push_char">
+<polygon fill="#d9534f" stroke="#d9534f" points="2998.5,-445.68 2761.5,-445.68 2761.5,-421.68 2998.5,-421.68 2998.5,-445.68"/>
+<text text-anchor="middle" x="2880" y="-431.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%push_char</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~push_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge41" class="edge">
+<title>proc~parse_value&#45;&gt;proc~push_char</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2108.19,-768.56C2148.42,-718.34 2300.83,-528.73 2315,-520.68 2449.95,-443.96 2630.99,-428.56 2751.14,-428.16"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="2751.49,-431.66 2761.49,-428.16 2751.49,-424.66 2751.49,-431.66"/>
+</g>
+<!-- proc~to_array -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node33" class="node">
+<title>proc~to_array</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node33"><a xlink:href="../proc/to_array.html" xlink:title="json_value_module::json_core%to_array">
+<polygon fill="#d9534f" stroke="#d9534f" points="3319.5,-202.68 3093.5,-202.68 3093.5,-178.68 3319.5,-178.68 3319.5,-202.68"/>
+<text text-anchor="middle" x="3206.5" y="-188.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%to_array</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~to_array -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge42" class="edge">
+<title>proc~parse_value&#45;&gt;proc~to_array</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2099.77,-768.35C2106.89,-706.08 2147.79,-424.36 2315,-302.68 2452.43,-202.67 2551.36,-350.53 2695,-259.68 2720.64,-243.46 2704.66,-216.73 2731,-201.68 2865.6,-124.75 3058.65,-154.95 3151.53,-176.37"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="3150.74,-179.78 3161.28,-178.67 3152.35,-172.97 3150.74,-179.78"/>
+</g>
+<!-- proc~to_logical -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node34" class="node">
+<title>proc~to_logical</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node34"><a xlink:href="../proc/to_logical.html" xlink:title="json_value_module::json_core%to_logical">
+<polygon fill="#d9534f" stroke="#d9534f" points="3323,-145.68 3090,-145.68 3090,-121.68 3323,-121.68 3323,-145.68"/>
+<text text-anchor="middle" x="3206.5" y="-131.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%to_logical</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~to_logical -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge43" class="edge">
+<title>proc~parse_value&#45;&gt;proc~to_logical</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2099.21,-768.51C2103.71,-703.15 2134.39,-391.86 2315,-259.68 2383.4,-209.62 2625.65,-275.41 2695,-226.68 2726.24,-204.73 2699.17,-169.76 2731,-148.68 2786.14,-112.16 2958.63,-115.53 3079.66,-123.13"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="3079.54,-126.63 3089.74,-123.78 3079.99,-119.65 3079.54,-126.63"/>
+</g>
+<!-- proc~to_null -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node35" class="node">
+<title>proc~to_null</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node35"><a xlink:href="../proc/to_null.html" xlink:title="json_value_module::json_core%to_null">
+<polygon fill="#d9534f" stroke="#d9534f" points="2613.5,-752.68 2396.5,-752.68 2396.5,-728.68 2613.5,-728.68 2613.5,-752.68"/>
+<text text-anchor="middle" x="2505" y="-738.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%to_null</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~to_null -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge44" class="edge">
+<title>proc~parse_value&#45;&gt;proc~to_null</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2220.16,-768.68C2272.76,-763.49 2334.08,-757.44 2386.23,-752.29"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="2386.59,-755.78 2396.2,-751.31 2385.9,-748.81 2386.59,-755.78"/>
+</g>
+<!-- proc~to_object -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node36" class="node">
+<title>proc~to_object</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node36"><a xlink:href="../proc/to_object.html" xlink:title="json_value_module::json_core%to_object">
+<polygon fill="#d9534f" stroke="#d9534f" points="2620.5,-377.68 2389.5,-377.68 2389.5,-353.68 2620.5,-353.68 2620.5,-377.68"/>
+<text text-anchor="middle" x="2505" y="-363.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%to_object</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~to_object -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge45" class="edge">
+<title>proc~parse_value&#45;&gt;proc~to_object</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2100.91,-768.67C2112.66,-713.65 2169.35,-484.09 2315,-386.68 2334,-373.97 2356.56,-366.6 2379.35,-362.61"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="2380.12,-366.03 2389.47,-361.05 2379.06,-359.11 2380.12,-366.03"/>
+</g>
+<!-- proc~to_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node37" class="node">
+<title>proc~to_string</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node37"><a xlink:href="../proc/to_string.html" xlink:title="json_value_module::json_core%to_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="2619,-335.68 2391,-335.68 2391,-311.68 2619,-311.68 2619,-335.68"/>
+<text text-anchor="middle" x="2505" y="-321.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%to_string</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value&#45;&gt;proc~to_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge46" class="edge">
+<title>proc~parse_value&#45;&gt;proc~to_string</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M2100.27,-768.63C2109.58,-710.13 2158.48,-454.14 2315,-344.68 2334.18,-331.27 2357.22,-323.67 2380.52,-319.7"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="2381.14,-323.15 2390.51,-318.21 2380.11,-316.22 2381.14,-323.15"/>
+</g>
+<!-- proc~json_traverse&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge47" class="edge">
+<title>proc~json_traverse&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="transparent" d="M2631.57,-1055.95C2767.04,-1061.02 2971.14,-1059.72 3029,-1010.68 3080.97,-966.62 3026.29,-917.74 3065,-861.68 3090.51,-824.72 3135.26,-797.81 3167.4,-782.04"/>
+<polygon fill="transparent" stroke="transparent" points="3169,-785.16 3176.53,-777.7 3165.99,-778.84 3169,-785.16"/>
+</g>
+<!-- proc~parse_array&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge50" class="edge">
+<title>proc~parse_array&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#262550" d="M2628.24,-811.06C2749.21,-801.55 2934.32,-787 3062.15,-776.95"/>
+<polygon fill="#262550" stroke="#262550" points="3062.71,-780.41 3072.41,-776.14 3062.16,-773.44 3062.71,-780.41"/>
+</g>
+<!-- proc~parse_array&#45;&gt;proc~json_value_create -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge51" class="edge">
+<title>proc~parse_array&#45;&gt;proc~json_value_create</title>
+<path fill="none" stroke="#262550" d="M2553.04,-832.68C2592.8,-844.11 2650.25,-863.74 2695,-891.68 2713.67,-903.33 2712.62,-913.57 2731,-925.68 2762.54,-946.45 2801.93,-963.1 2832.15,-974.21"/>
+<polygon fill="#262550" stroke="#262550" points="2831.02,-977.52 2841.62,-977.62 2833.39,-970.94 2831.02,-977.52"/>
+</g>
+<!-- proc~parse_array&#45;&gt;proc~parse_value -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge52" class="edge">
+<title>proc~parse_array&#45;&gt;proc~parse_value</title>
+<path fill="none" stroke="#262550" d="M2381.88,-814.88C2315.6,-809.21 2235.58,-801.06 2177.5,-793.95"/>
+<polygon fill="#262550" stroke="#262550" points="2177.64,-790.44 2167.29,-792.68 2176.78,-797.38 2177.64,-790.44"/>
+</g>
+<!-- proc~parse_array&#45;&gt;proc~pop_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge53" class="edge">
+<title>proc~parse_array&#45;&gt;proc~pop_char</title>
+<path fill="none" stroke="#262550" d="M2560.2,-832.72C2687.27,-861.39 2996.11,-933.95 3029,-968.68 3079.12,-1021.6 3011.61,-1079.05 3065,-1128.68 3069.86,-1133.19 3075.25,-1136.99 3081.01,-1140.18"/>
+<polygon fill="#262550" stroke="#262550" points="3079.8,-1143.48 3090.33,-1144.69 3082.85,-1137.18 3079.8,-1143.48"/>
+</g>
+<!-- none~add~2 -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node39" class="node">
+<title>none~add~2</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node39"><a xlink:href="../type/json_core.html#boundprocedure-add~2" xlink:title="json_value_module::json_core%add">
+<polygon fill="#a7506f" stroke="#a7506f" points="3307.5,-894.68 3105.5,-894.68 3105.5,-870.68 3307.5,-870.68 3307.5,-894.68"/>
+<text text-anchor="middle" x="3206.5" y="-880.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%add</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_array&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge48" class="edge">
+<title>proc~parse_array&#45;&gt;none~add~2</title>
+<path fill="none" stroke="#262550" d="M2628.24,-831.51C2760.08,-843.2 2968.1,-861.63 3095.13,-872.89"/>
+<polygon fill="#262550" stroke="#262550" points="3095,-876.4 3105.27,-873.79 3095.61,-869.42 3095,-876.4"/>
+</g>
+<!-- none~destroy -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node40" class="node">
+<title>none~destroy</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node40"><a xlink:href="../type/json_core.html#boundprocedure-destroy" xlink:title="json_value_module::json_core%destroy">
+<polygon fill="#a7506f" stroke="#a7506f" points="2990.5,-693.68 2769.5,-693.68 2769.5,-669.68 2990.5,-669.68 2990.5,-693.68"/>
+<text text-anchor="middle" x="2880" y="-679.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%destroy</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_array&#45;&gt;none~destroy -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge49" class="edge">
+<title>proc~parse_array&#45;&gt;none~destroy</title>
+<path fill="none" stroke="#262550" d="M2549.23,-808.62C2587.83,-797.51 2645.71,-780.02 2695,-761.68 2748.04,-741.93 2807.87,-715.02 2844.51,-698"/>
+<polygon fill="#262550" stroke="#262550" points="2846.17,-701.09 2853.76,-693.68 2843.21,-694.74 2846.17,-701.09"/>
+</g>
+<!-- proc~parse_for_chars&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge54" class="edge">
+<title>proc~parse_for_chars&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#025553" d="M3013.55,-1140.68C3019.13,-1137.34 3024.34,-1133.37 3029,-1128.68 3113.38,-1043.71 3002.14,-963.59 3065,-861.68 3088.29,-823.92 3132.61,-797.42 3165.26,-781.97"/>
+<polygon fill="#025553" stroke="#025553" points="3166.92,-785.06 3174.56,-777.72 3164.01,-778.69 3166.92,-785.06"/>
+</g>
+<!-- proc~parse_for_chars&#45;&gt;proc~pop_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge55" class="edge">
+<title>proc~parse_for_chars&#45;&gt;proc~pop_char</title>
+<path fill="none" stroke="#025553" d="M3013.92,-1149.68C3035.83,-1149.68 3058.48,-1149.68 3080.19,-1149.68"/>
+<polygon fill="#025553" stroke="#025553" points="3080.44,-1153.18 3090.44,-1149.68 3080.44,-1146.18 3080.44,-1153.18"/>
+</g>
+<!-- proc~parse_number&#45;&gt;proc~json_clear_exceptions -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge56" class="edge">
+<title>proc~parse_number&#45;&gt;proc~json_clear_exceptions</title>
+<path fill="none" stroke="#025513" stroke-opacity="0.015686" d="M2525.04,-529.5C2571.05,-500.29 2687.67,-427.56 2731,-412.68 2738.25,-410.19 2745.79,-407.99 2753.47,-406.06"/>
+<polygon fill="#025513" fill-opacity="0.015686" stroke="#025513" stroke-opacity="0.015686" points="2754.33,-409.45 2763.26,-403.75 2752.72,-402.64 2754.33,-409.45"/>
+</g>
+<!-- proc~parse_number&#45;&gt;proc~pop_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge57" class="edge">
+<title>proc~parse_number&#45;&gt;proc~pop_char</title>
+<path fill="none" stroke="#025513" stroke-opacity="0.015686" d="M2521.68,-553.82C2557.74,-581.53 2649.71,-651.04 2731,-702.68 2859.15,-784.09 2943.39,-744.29 3029,-869.68 3094.53,-965.66 2983.24,-1046.08 3065,-1128.68 3069.9,-1133.62 3075.42,-1137.73 3081.37,-1141.13"/>
+<polygon fill="#025513" fill-opacity="0.015686" stroke="#025513" stroke-opacity="0.015686" points="3079.87,-1144.29 3090.38,-1145.62 3082.99,-1138.03 3079.87,-1144.29"/>
+</g>
+<!-- proc~parse_number&#45;&gt;proc~push_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge58" class="edge">
+<title>proc~parse_number&#45;&gt;proc~push_char</title>
+<path fill="none" stroke="#025513" stroke-opacity="0.015686" d="M2555.7,-529.62C2594.74,-519.15 2649.87,-502.15 2695,-479.68 2712.44,-470.99 2712.87,-461.79 2731,-454.68 2737.64,-452.07 2744.57,-449.78 2751.64,-447.77"/>
+<polygon fill="#025513" fill-opacity="0.015686" stroke="#025513" stroke-opacity="0.015686" points="2752.58,-451.14 2761.35,-445.2 2750.79,-444.37 2752.58,-451.14"/>
+</g>
+<!-- proc~string_to_dble -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node42" class="node">
+<title>proc~string_to_dble</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node42"><a xlink:href="../proc/string_to_dble.html" xlink:title="json_value_module::json_core%string_to_dble">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="3008,-571.68 2752,-571.68 2752,-547.68 3008,-547.68 3008,-571.68"/>
+<text text-anchor="middle" x="2880" y="-557.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%string_to_dble</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_number&#45;&gt;proc~string_to_dble -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge59" class="edge">
+<title>proc~parse_number&#45;&gt;proc~string_to_dble</title>
+<path fill="none" stroke="#025513" stroke-opacity="0.015686" d="M2634.63,-547.88C2669.14,-549.55 2706.58,-551.36 2741.55,-553.04"/>
+<polygon fill="#025513" fill-opacity="0.015686" stroke="#025513" stroke-opacity="0.015686" points="2741.67,-556.55 2751.83,-553.54 2742.01,-549.56 2741.67,-556.55"/>
+</g>
+<!-- proc~string_to_int -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node43" class="node">
+<title>proc~string_to_int</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node43"><a xlink:href="../proc/string_to_int.html" xlink:title="json_value_module::json_core%string_to_int">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="3003.5,-613.68 2756.5,-613.68 2756.5,-589.68 3003.5,-589.68 3003.5,-613.68"/>
+<text text-anchor="middle" x="2880" y="-599.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%string_to_int</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_number&#45;&gt;proc~string_to_int -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge60" class="edge">
+<title>proc~parse_number&#45;&gt;proc~string_to_int</title>
+<path fill="none" stroke="#025513" stroke-opacity="0.015686" d="M2572.37,-553.73C2617.13,-561.72 2677.54,-572.25 2731,-580.68 2747.03,-583.2 2764.06,-585.75 2780.64,-588.15"/>
+<polygon fill="#025513" fill-opacity="0.015686" stroke="#025513" stroke-opacity="0.015686" points="2780.49,-591.67 2790.89,-589.63 2781.49,-584.74 2780.49,-591.67"/>
+</g>
+<!-- proc~to_integer -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node44" class="node">
+<title>proc~to_integer</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node44"><a xlink:href="../proc/to_integer.html" xlink:title="json_value_module::json_core%to_integer">
+<polygon fill="#d9534f" stroke="#d9534f" points="2998,-529.68 2762,-529.68 2762,-505.68 2998,-505.68 2998,-529.68"/>
+<text text-anchor="middle" x="2880" y="-515.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%to_integer</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_number&#45;&gt;proc~to_integer -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge61" class="edge">
+<title>proc~parse_number&#45;&gt;proc~to_integer</title>
+<path fill="none" stroke="#025513" stroke-opacity="0.015686" d="M2634.63,-533.4C2672.53,-530.96 2713.97,-528.29 2751.78,-525.86"/>
+<polygon fill="#025513" fill-opacity="0.015686" stroke="#025513" stroke-opacity="0.015686" points="2752.07,-529.35 2761.83,-525.22 2751.62,-522.37 2752.07,-529.35"/>
+</g>
+<!-- proc~to_real -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node45" class="node">
+<title>proc~to_real</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node45"><a xlink:href="../proc/to_real.html" xlink:title="json_value_module::json_core%to_real">
+<polygon fill="#d9534f" stroke="#d9534f" points="2989,-487.68 2771,-487.68 2771,-463.68 2989,-463.68 2989,-487.68"/>
+<text text-anchor="middle" x="2880" y="-473.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%to_real</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_number&#45;&gt;proc~to_real -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge62" class="edge">
+<title>proc~parse_number&#45;&gt;proc~to_real</title>
+<path fill="none" stroke="#025513" stroke-opacity="0.015686" d="M2561.78,-529.61C2607.21,-520 2673.08,-506.57 2731,-496.68 2746.21,-494.08 2762.35,-491.55 2778.15,-489.21"/>
+<polygon fill="#025513" fill-opacity="0.015686" stroke="#025513" stroke-opacity="0.015686" points="2779.09,-492.61 2788.47,-487.69 2778.07,-485.68 2779.09,-492.61"/>
+</g>
+<!-- proc~parse_object&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge65" class="edge">
+<title>proc~parse_object&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#025521" stroke-opacity="0.015686" d="M2565.67,-900.63C2662.83,-880.96 2861.27,-840.52 3029,-804.68 3066.41,-796.68 3108.21,-787.46 3141.73,-779.99"/>
+<polygon fill="#025521" fill-opacity="0.015686" stroke="#025521" stroke-opacity="0.015686" points="3142.86,-783.32 3151.86,-777.73 3141.34,-776.49 3142.86,-783.32"/>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~json_value_create -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge66" class="edge">
+<title>proc~parse_object&#45;&gt;proc~json_value_create</title>
+<path fill="none" stroke="#025521" stroke-opacity="0.015686" d="M2555.89,-924.72C2601.39,-935.53 2670.53,-951.52 2731,-963.68 2752.09,-967.92 2774.94,-972.12 2796.24,-975.87"/>
+<polygon fill="#025521" fill-opacity="0.015686" stroke="#025521" stroke-opacity="0.015686" points="2795.77,-979.35 2806.22,-977.62 2796.98,-972.45 2795.77,-979.35"/>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~parse_value -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge69" class="edge">
+<title>proc~parse_object&#45;&gt;proc~parse_value</title>
+<path fill="none" stroke="#025521" stroke-opacity="0.015686" d="M2452.61,-900.62C2369.21,-876.44 2206.44,-823.24 2134.35,-796.39"/>
+<polygon fill="#025521" fill-opacity="0.015686" stroke="#025521" stroke-opacity="0.015686" points="2135.39,-793.04 2124.79,-792.78 2132.91,-799.59 2135.39,-793.04"/>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~parse_object -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge67" class="edge">
+<title>proc~parse_object&#45;&gt;proc~parse_object</title>
+<path fill="none" stroke="#025521" stroke-opacity="0.015686" d="M2443.16,-924.69C2421.57,-933.65 2442.18,-942.68 2505,-942.68 2553.1,-942.68 2576.45,-937.38 2575.07,-930.88"/>
+<polygon fill="#025521" fill-opacity="0.015686" stroke="#025521" stroke-opacity="0.015686" points="2576.93,-927.91 2566.84,-924.69 2572.72,-933.5 2576.93,-927.91"/>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~parse_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge68" class="edge">
+<title>proc~parse_object&#45;&gt;proc~parse_string</title>
+<path fill="none" stroke="#025521" stroke-opacity="0.015686" d="M2561.28,-924.7C2602.84,-936.3 2658.64,-957.69 2695,-994.68 2724.34,-1024.52 2698.36,-1055.49 2731,-1081.68 2736.01,-1085.69 2741.42,-1089.18 2747.11,-1092.2"/>
+<polygon fill="#025521" fill-opacity="0.015686" stroke="#025521" stroke-opacity="0.015686" points="2745.74,-1095.42 2756.27,-1096.57 2748.75,-1089.1 2745.74,-1095.42"/>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~pop_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge70" class="edge">
+<title>proc~parse_object&#45;&gt;proc~pop_char</title>
+<path fill="none" stroke="#025521" stroke-opacity="0.015686" d="M2543.03,-924.75C2586.59,-940.96 2657.69,-974.09 2695,-1027.68 2742.86,-1096.42 2666.36,-1159.4 2731,-1212.68 2833.21,-1296.91 2898.5,-1235.27 3029,-1212.68 3080.28,-1203.8 3136.39,-1181.42 3171.27,-1165.88"/>
+<polygon fill="#025521" fill-opacity="0.015686" stroke="#025521" stroke-opacity="0.015686" points="3172.85,-1169 3180.52,-1161.69 3169.97,-1162.62 3172.85,-1169"/>
+</g>
+<!-- proc~parse_object&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge63" class="edge">
+<title>proc~parse_object&#45;&gt;none~add~2</title>
+<path fill="none" stroke="#025521" stroke-opacity="0.015686" d="M2533.89,-924.69C2570.8,-940.6 2637.85,-969.58 2695,-994.68 2711.03,-1001.72 2713.87,-1007.04 2731,-1010.68 2860.56,-1038.17 2903.02,-1051.55 3029,-1010.68 3095.1,-989.23 3157.17,-932.71 3186.99,-902.46"/>
+<polygon fill="#025521" fill-opacity="0.015686" stroke="#025521" stroke-opacity="0.015686" points="3189.75,-904.64 3194.19,-895.02 3184.72,-899.77 3189.75,-904.64"/>
+</g>
+<!-- proc~parse_object&#45;&gt;none~destroy -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge64" class="edge">
+<title>proc~parse_object&#45;&gt;none~destroy</title>
+<path fill="none" stroke="#025521" stroke-opacity="0.015686" d="M2551.18,-900.67C2590.8,-889 2649.09,-869.05 2695,-841.68 2763.05,-801.11 2829.94,-734.35 2860.99,-701.37"/>
+<polygon fill="#025521" fill-opacity="0.015686" stroke="#025521" stroke-opacity="0.015686" points="2863.84,-703.45 2868.1,-693.75 2858.72,-698.68 2863.84,-703.45"/>
+</g>
+<!-- proc~parse_string&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge71" class="edge">
+<title>proc~parse_string&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#021425" stroke-opacity="0.019608" d="M2941.45,-1095.61C2972.08,-1086.42 3007.29,-1070.58 3029,-1043.68 3080.78,-979.51 3019.58,-930.5 3065,-861.68 3089.59,-824.42 3134.09,-797.7 3166.44,-782.06"/>
+<polygon fill="#021425" fill-opacity="0.019608" stroke="#021425" stroke-opacity="0.019608" points="3168.06,-785.17 3175.63,-777.75 3165.09,-778.83 3168.06,-785.17"/>
+</g>
+<!-- proc~parse_string&#45;&gt;proc~pop_char -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge72" class="edge">
+<title>proc~parse_string&#45;&gt;proc~pop_char</title>
+<path fill="none" stroke="#021425" stroke-opacity="0.019608" d="M2973.99,-1119.71C3014.22,-1124.92 3061.43,-1131.03 3102.7,-1136.37"/>
+<polygon fill="#021425" fill-opacity="0.019608" stroke="#021425" stroke-opacity="0.019608" points="3102.41,-1139.86 3112.78,-1137.68 3103.31,-1132.92 3102.41,-1139.86"/>
+</g>
+<!-- proc~unescape_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node46" class="node">
+<title>proc~unescape_string</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node46"><a xlink:href="../proc/unescape_string.html" xlink:title="json_string_utilities::unescape_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="3310.5,-1119.68 3102.5,-1119.68 3102.5,-1095.68 3310.5,-1095.68 3310.5,-1119.68"/>
+<text text-anchor="middle" x="3206.5" y="-1105.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::unescape_string</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_string&#45;&gt;proc~unescape_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge73" class="edge">
+<title>proc~parse_string&#45;&gt;proc~unescape_string</title>
+<path fill="none" stroke="#021425" stroke-opacity="0.019608" d="M3003.68,-1107.68C3032.74,-1107.68 3063.6,-1107.68 3092.22,-1107.68"/>
+<polygon fill="#021425" fill-opacity="0.019608" stroke="#021425" stroke-opacity="0.019608" points="3092.24,-1111.18 3102.24,-1107.68 3092.24,-1104.18 3092.24,-1111.18"/>
+</g>
+<!-- proc~push_char&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge74" class="edge">
+<title>proc~push_char&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#053255" d="M2998.77,-435.42C3010.05,-439.76 3020.45,-445.98 3029,-454.68 3120.03,-547.31 2974.31,-651.7 3065,-744.68 3065.82,-745.51 3066.65,-746.33 3067.51,-747.12"/>
+<polygon fill="#053255" stroke="#053255" points="3065.63,-750.1 3075.62,-753.63 3070.01,-744.64 3065.63,-750.1"/>
+</g>
+<!-- proc~push_char&#45;&gt;proc~integer_to_string -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge75" class="edge">
+<title>proc~push_char&#45;&gt;proc~integer_to_string</title>
+<path fill="none" stroke="#053255" d="M2995.49,-421.67C3006.95,-419.21 3018.29,-416.25 3029,-412.68 3086.31,-393.58 3146.65,-356.08 3179.83,-333.72"/>
+<polygon fill="#053255" stroke="#053255" points="3182.16,-336.37 3188.44,-327.84 3178.21,-330.58 3182.16,-336.37"/>
+</g>
+<!-- proc~destroy_json_data -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node41" class="node">
+<title>proc~destroy_json_data</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node41"><a xlink:href="../proc/destroy_json_data.html" xlink:title="json_value_module::destroy_json_data">
+<polygon fill="#d9534f" stroke="#d9534f" points="3686.5,-337.68 3469.5,-337.68 3469.5,-313.68 3686.5,-313.68 3686.5,-337.68"/>
+<text text-anchor="middle" x="3578" y="-323.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::destroy_json_data</text>
+</a>
+</g>
+</g>
+<!-- proc~to_array&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge76" class="edge">
+<title>proc~to_array&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#260255" d="M3270.11,-202.73C3294.68,-208.15 3322.95,-215.24 3348,-223.68 3420.43,-248.07 3501.25,-287 3544.87,-309.04"/>
+<polygon fill="#260255" stroke="#260255" points="3543.35,-312.19 3553.85,-313.6 3546.52,-305.95 3543.35,-312.19"/>
+</g>
+<!-- proc~to_logical&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge77" class="edge">
+<title>proc~to_logical&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#107025" stroke-opacity="0.019608" d="M3273.8,-145.69C3297.8,-151.31 3324.71,-159.15 3348,-169.68 3430.73,-207.06 3515.94,-274.11 3555.01,-306.76"/>
+<polygon fill="#107025" fill-opacity="0.019608" stroke="#107025" stroke-opacity="0.019608" points="3553.16,-309.78 3563.06,-313.56 3557.67,-304.43 3553.16,-309.78"/>
+</g>
+<!-- proc~to_null&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge78" class="edge">
+<title>proc~to_null&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#187025" stroke-opacity="0.019608" d="M2532.32,-728.58C2573.63,-710.22 2656.67,-675.87 2731,-660.68 2865.59,-633.17 3226.65,-687.05 3348,-622.68 3466.85,-559.63 3543.04,-404.85 3568,-347.51"/>
+<polygon fill="#187025" fill-opacity="0.019608" stroke="#187025" stroke-opacity="0.019608" points="3571.36,-348.55 3572.06,-337.98 3564.92,-345.81 3571.36,-348.55"/>
+</g>
+<!-- proc~to_object&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge79" class="edge">
+<title>proc~to_object&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#255024" stroke-opacity="0.003922" d="M2620.82,-366.26C2646.28,-362.81 2672.39,-356.29 2695,-344.68 2716.28,-333.75 2709.3,-314.73 2731,-304.68 2855.42,-247.02 3211.18,-285.46 3348,-294.68 3397.58,-298.02 3452.78,-305.38 3496.57,-312.09"/>
+<polygon fill="#255024" fill-opacity="0.003922" stroke="#255024" stroke-opacity="0.003922" points="3496.17,-315.57 3506.58,-313.65 3497.24,-308.66 3496.17,-315.57"/>
+</g>
+<!-- proc~to_string&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge80" class="edge">
+<title>proc~to_string&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#255016" stroke-opacity="0.003922" d="M2619,-320.19C2644.94,-316.16 2671.71,-309.24 2695,-297.68 2715.26,-287.61 2710.09,-270.34 2731,-261.68 2984.35,-156.74 3076.32,-224.43 3348,-261.68 3414.87,-270.84 3489.73,-294.41 3535.11,-310.24"/>
+<polygon fill="#255016" fill-opacity="0.003922" stroke="#255016" stroke-opacity="0.003922" points="3534.01,-313.56 3544.6,-313.59 3536.34,-306.96 3534.01,-313.56"/>
+</g>
+<!-- proc~wrap_json_throw_exception&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge81" class="edge">
+<title>proc~wrap_json_throw_exception&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#255080" d="M3721.86,-777.69C3738.85,-780.16 3755.87,-783.12 3772,-786.68 3801.17,-793.1 3833.08,-803.95 3857.29,-813"/>
+<polygon fill="#255080" stroke="#255080" points="3856.24,-816.35 3866.83,-816.63 3858.72,-809.81 3856.24,-816.35"/>
+</g>
+<!-- proc~wrap_json_throw_exception&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge82" class="edge">
+<title>proc~wrap_json_throw_exception&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#255080" d="M3414.27,-772.38C3393.12,-772.47 3371.58,-772.43 3350.78,-772.27"/>
+<polygon fill="#255080" stroke="#255080" points="3350.67,-768.77 3340.64,-772.19 3350.61,-775.77 3350.67,-768.77"/>
+</g>
+<!-- proc~json_value_add_string_name_ascii -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node48" class="node">
+<title>proc~json_value_add_string_name_ascii</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node48"><a xlink:href="../proc/json_value_add_string_name_ascii.html" xlink:title="json_value_module::json_core%json_value_add_string_name_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="3760,-861.68 3396,-861.68 3396,-837.68 3760,-837.68 3760,-861.68"/>
+<text text-anchor="middle" x="3578" y="-847.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_add_string_name_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~json_value_add_string_name_ascii -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge83" class="edge">
+<title>none~add~2&#45;&gt;proc~json_value_add_string_name_ascii</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M3280.5,-870.65C3311.1,-867.13 3348.26,-863.4 3385.77,-860.01"/>
+<polygon fill="#255000" stroke="#255000" points="3386.18,-863.49 3395.83,-859.11 3385.55,-856.51 3386.18,-863.49"/>
+</g>
+<!-- proc~json_value_add_string_val_ascii -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node49" class="node">
+<title>proc~json_value_add_string_val_ascii</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node49"><a xlink:href="../proc/json_value_add_string_val_ascii.html" xlink:title="json_value_module::json_core%json_value_add_string_val_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="3752.5,-819.68 3403.5,-819.68 3403.5,-795.68 3752.5,-795.68 3752.5,-819.68"/>
+<text text-anchor="middle" x="3578" y="-805.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_add_string_val_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~json_value_add_string_val_ascii -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge84" class="edge">
+<title>none~add~2&#45;&gt;proc~json_value_add_string_val_ascii</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M3225.25,-870.64C3256.74,-855.49 3324.68,-831.87 3384,-819.68 3387.08,-819.04 3390.19,-818.43 3393.32,-817.83"/>
+<polygon fill="#255000" stroke="#255000" points="3394.21,-821.23 3403.42,-815.99 3392.95,-814.34 3394.21,-821.23"/>
+</g>
+<!-- proc~json_value_add_string_vec_name_ascii -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node50" class="node">
+<title>proc~json_value_add_string_vec_name_ascii</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node50"><a xlink:href="../proc/json_value_add_string_vec_name_ascii.html" xlink:title="json_value_module::json_core%json_value_add_string_vec_name_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="3772,-945.68 3384,-945.68 3384,-921.68 3772,-921.68 3772,-945.68"/>
+<text text-anchor="middle" x="3578" y="-931.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_add_string_vec_name_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~json_value_add_string_vec_name_ascii -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge85" class="edge">
+<title>none~add~2&#45;&gt;proc~json_value_add_string_vec_name_ascii</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M3307.68,-892.06C3332.57,-895.98 3359.22,-900.23 3384,-903.68 3428.28,-909.84 3478.49,-915.26 3516.6,-920.3"/>
+<polygon fill="#255000" stroke="#255000" points="3516.13,-923.76 3526.51,-921.64 3517.07,-916.83 3516.13,-923.76"/>
+</g>
+<!-- proc~json_value_add_string_vec_val_ascii -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node51" class="node">
+<title>proc~json_value_add_string_vec_val_ascii</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node51"><a xlink:href="../proc/json_value_add_string_vec_val_ascii.html" xlink:title="json_value_module::json_core%json_value_add_string_vec_val_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="3764.5,-903.68 3391.5,-903.68 3391.5,-879.68 3764.5,-879.68 3764.5,-903.68"/>
+<text text-anchor="middle" x="3578" y="-889.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_add_string_vec_val_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~2&#45;&gt;proc~json_value_add_string_vec_val_ascii -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge86" class="edge">
+<title>none~add~2&#45;&gt;proc~json_value_add_string_vec_val_ascii</title>
+<path fill="none" stroke="#255000" stroke-dasharray="5,2" d="M3307.98,-879.04C3330.81,-879.21 3355.82,-879.6 3381.11,-880.17"/>
+<polygon fill="#255000" stroke="#255000" points="3381.12,-883.67 3391.19,-880.4 3381.28,-876.67 3381.12,-883.67"/>
+</g>
+<!-- proc~destroy_json_core -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node47" class="node">
+<title>proc~destroy_json_core</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node47"><a xlink:href="../proc/destroy_json_core.html" xlink:title="json_value_module::json_core%destroy_json_core">
+<polygon fill="#d9534f" stroke="#d9534f" points="3345,-735.68 3068,-735.68 3068,-711.68 3345,-711.68 3345,-735.68"/>
+<text text-anchor="middle" x="3206.5" y="-721.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%destroy_json_core</text>
+</a>
+</g>
+</g>
+<!-- none~destroy&#45;&gt;proc~destroy_json_core -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge87" class="edge">
+<title>none~destroy&#45;&gt;proc~destroy_json_core</title>
+<path fill="none" stroke="transparent" stroke-dasharray="5,2" d="M2973.99,-693.71C3014.22,-698.92 3061.43,-705.03 3102.7,-710.37"/>
+<polygon fill="transparent" stroke="transparent" points="3102.41,-713.86 3112.78,-711.68 3103.31,-706.92 3102.41,-713.86"/>
+</g>
+<!-- proc~json_value_destroy -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node52" class="node">
+<title>proc~json_value_destroy</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node52"><a xlink:href="../proc/json_value_destroy.html" xlink:title="json_value_module::json_core%json_value_destroy">
+<polygon fill="#d9534f" stroke="#d9534f" points="3348,-693.68 3065,-693.68 3065,-669.68 3348,-669.68 3348,-693.68"/>
+<text text-anchor="middle" x="3206.5" y="-679.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module::json_core%json_value_destroy</text>
+</a>
+</g>
+</g>
+<!-- none~destroy&#45;&gt;proc~json_value_destroy -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge88" class="edge">
+<title>none~destroy&#45;&gt;proc~json_value_destroy</title>
+<path fill="none" stroke="transparent" stroke-dasharray="5,2" d="M2990.86,-675.25C3011.42,-674.99 3033.23,-674.88 3054.77,-674.94"/>
+<polygon fill="transparent" stroke="transparent" points="3054.96,-678.44 3064.98,-674.98 3054.99,-671.44 3054.96,-678.44"/>
+</g>
+<!-- proc~string_to_dble&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge89" class="edge">
+<title>proc~string_to_dble&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#025563" d="M3008.31,-566.63C3015.82,-570.32 3022.82,-574.94 3029,-580.68 3083.71,-631.42 3010.48,-693.73 3065,-744.68 3066.13,-745.73 3067.28,-746.74 3068.46,-747.72"/>
+<polygon fill="#025563" stroke="#025563" points="3066.47,-750.6 3076.63,-753.63 3070.58,-744.93 3066.47,-750.6"/>
+</g>
+<!-- proc~string_to_real -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node54" class="node">
+<title>proc~string_to_real</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node54"><a xlink:href="../proc/string_to_real.html" xlink:title="json_string_utilities::string_to_real">
+<polygon fill="#d9534f" stroke="#d9534f" points="3302.5,-571.68 3110.5,-571.68 3110.5,-547.68 3302.5,-547.68 3302.5,-571.68"/>
+<text text-anchor="middle" x="3206.5" y="-557.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::string_to_real</text>
+</a>
+</g>
+</g>
+<!-- proc~string_to_dble&#45;&gt;proc~string_to_real -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge90" class="edge">
+<title>proc~string_to_dble&#45;&gt;proc~string_to_real</title>
+<path fill="none" stroke="#025563" d="M3008.32,-559.68C3038.74,-559.68 3070.87,-559.68 3100.17,-559.68"/>
+<polygon fill="#025563" stroke="#025563" points="3100.41,-563.18 3110.41,-559.68 3100.41,-556.18 3100.41,-563.18"/>
+</g>
+<!-- proc~string_to_int&#45;&gt;none~throw_exception -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge91" class="edge">
+<title>proc~string_to_int&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M2939.97,-613.78C2969.8,-622.5 3004.74,-637.02 3029,-660.68 3058.09,-689.03 3032.84,-719.87 3065,-744.68 3066.65,-745.95 3068.34,-747.16 3070.07,-748.31"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="3068.64,-751.53 3079.03,-753.59 3072.2,-745.5 3068.64,-751.53"/>
+</g>
+<!-- proc~string_to_integer -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node53" class="node">
+<title>proc~string_to_integer</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node53"><a xlink:href="../proc/string_to_integer.html" xlink:title="json_string_utilities::string_to_integer">
+<polygon fill="#d9534f" stroke="#d9534f" points="3311.5,-613.68 3101.5,-613.68 3101.5,-589.68 3311.5,-589.68 3311.5,-613.68"/>
+<text text-anchor="middle" x="3206.5" y="-599.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::string_to_integer</text>
+</a>
+</g>
+</g>
+<!-- proc~string_to_int&#45;&gt;proc~string_to_integer -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge92" class="edge">
+<title>proc~string_to_int&#45;&gt;proc~string_to_integer</title>
+<path fill="none" stroke="#025525" stroke-opacity="0.019608" d="M3003.68,-601.68C3032.37,-601.68 3062.82,-601.68 3091.14,-601.68"/>
+<polygon fill="#025525" fill-opacity="0.019608" stroke="#025525" stroke-opacity="0.019608" points="3091.46,-605.18 3101.46,-601.68 3091.46,-598.18 3091.46,-605.18"/>
+</g>
+<!-- proc~to_integer&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge93" class="edge">
+<title>proc~to_integer&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#063255" d="M2972.73,-505.62C2991.39,-502.9 3010.85,-499.87 3029,-496.68 3171.68,-471.6 3210.33,-474.79 3348,-429.68 3421.45,-405.61 3502.81,-365.1 3546.03,-342.4"/>
+<polygon fill="#063255" stroke="#063255" points="3547.7,-345.47 3554.91,-337.7 3544.43,-339.28 3547.7,-345.47"/>
+</g>
+<!-- proc~to_real&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge94" class="edge">
+<title>proc~to_real&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#127025" stroke-opacity="0.019608" d="M2974.77,-463.68C2992.81,-461 3011.53,-457.97 3029,-454.68 3211.24,-420.37 3424.36,-366.06 3522.49,-340.24"/>
+<polygon fill="#127025" fill-opacity="0.019608" stroke="#127025" stroke-opacity="0.019608" points="3523.41,-343.61 3532.18,-337.68 3521.62,-336.84 3523.41,-343.61"/>
+</g>
+<!-- proc~valid_json_hex -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node55" class="node">
+<title>proc~valid_json_hex</title>
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_node55"><a xlink:href="../proc/valid_json_hex.html" xlink:title="json_string_utilities::valid_json_hex">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="3676.5,-1119.68 3479.5,-1119.68 3479.5,-1095.68 3676.5,-1095.68 3676.5,-1119.68"/>
+<text text-anchor="middle" x="3578" y="-1105.28" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities::valid_json_hex</text>
+</a>
+</g>
+</g>
+<!-- proc~unescape_string&#45;&gt;proc~valid_json_hex -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge95" class="edge">
+<title>proc~unescape_string&#45;&gt;proc~valid_json_hex</title>
+<path fill="none" stroke="#255019" stroke-opacity="0.003922" d="M3310.92,-1107.68C3360.25,-1107.68 3419.26,-1107.68 3469.15,-1107.68"/>
+<polygon fill="#255019" fill-opacity="0.003922" stroke="#255019" stroke-opacity="0.003922" points="3469.33,-1111.18 3479.33,-1107.68 3469.33,-1104.18 3469.33,-1111.18"/>
+</g>
+<!-- proc~json_value_add_string_name_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge96" class="edge">
+<title>proc~json_value_add_string_name_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="transparent" d="M3760.01,-837.7C3772.96,-836.85 3785.7,-836 3797.89,-835.2"/>
+<polygon fill="transparent" stroke="transparent" points="3798.25,-838.68 3807.99,-834.53 3797.78,-831.7 3798.25,-838.68"/>
+</g>
+<!-- proc~json_value_add_string_name_ascii&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge97" class="edge">
+<title>proc~json_value_add_string_name_ascii&#45;&gt;none~add~2</title>
+<path fill="none" stroke="transparent" d="M3504.08,-861.69C3451.09,-867.78 3378.43,-874.52 3318.29,-879.03"/>
+<polygon fill="transparent" stroke="transparent" points="3317.7,-875.56 3307.98,-879.79 3318.21,-882.54 3317.7,-875.56"/>
+</g>
+<!-- proc~json_value_add_string_val_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge98" class="edge">
+<title>proc~json_value_add_string_val_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="transparent" d="M3752.61,-819.16C3767.99,-820.18 3783.18,-821.18 3797.6,-822.13"/>
+<polygon fill="transparent" stroke="transparent" points="3797.74,-825.65 3807.95,-822.82 3798.21,-818.67 3797.74,-825.65"/>
+</g>
+<!-- proc~json_value_add_string_val_ascii&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge99" class="edge">
+<title>proc~json_value_add_string_val_ascii&#45;&gt;none~add~2</title>
+<path fill="none" stroke="transparent" d="M3510.87,-819.69C3473.38,-823.87 3425.76,-829.1 3384,-837.68 3346.59,-845.36 3305.77,-857.59 3272.81,-867.57"/>
+<polygon fill="transparent" stroke="transparent" points="3271.4,-864.33 3262.84,-870.58 3273.43,-871.03 3271.4,-864.33"/>
+</g>
+<!-- proc~json_value_add_string_vec_name_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge100" class="edge">
+<title>proc~json_value_add_string_vec_name_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#025500" d="M3742.22,-921.66C3752.42,-919.15 3762.43,-916.18 3772,-912.68 3812.3,-897.92 3852.24,-867.42 3875.63,-847.51"/>
+<polygon fill="#025500" stroke="#025500" points="3877.93,-850.16 3883.19,-840.96 3873.34,-844.87 3877.93,-850.16"/>
+</g>
+<!-- proc~json_value_add_string_vec_name_ascii&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge101" class="edge">
+<title>proc~json_value_add_string_vec_name_ascii&#45;&gt;none~add~2</title>
+<path fill="none" stroke="#025500" d="M3384.25,-921.71C3384.17,-921.7 3384.08,-921.69 3384,-921.68 3336.79,-915.1 3282.8,-905.64 3247.1,-897.17"/>
+<polygon fill="#025500" stroke="#025500" points="3247.63,-893.7 3237.08,-894.7 3245.95,-900.49 3247.63,-893.7"/>
+</g>
+<!-- proc~json_value_add_string_vec_val_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge102" class="edge">
+<title>proc~json_value_add_string_vec_val_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#025516" stroke-opacity="0.035294" d="M3721.86,-879.66C3738.85,-877.19 3755.87,-874.23 3772,-870.68 3801.17,-864.25 3833.08,-853.41 3857.29,-844.35"/>
+<polygon fill="#025516" fill-opacity="0.035294" stroke="#025516" stroke-opacity="0.035294" points="3858.72,-847.55 3866.83,-840.72 3856.24,-841 3858.72,-847.55"/>
+</g>
+<!-- proc~json_value_add_string_vec_val_ascii&#45;&gt;none~add~2 -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge103" class="edge">
+<title>proc~json_value_add_string_vec_val_ascii&#45;&gt;none~add~2</title>
+<path fill="none" stroke="#025516" stroke-opacity="0.035294" d="M3391.19,-893.9C3366.2,-893.29 3341.23,-892.51 3318.11,-891.61"/>
+<polygon fill="#025516" fill-opacity="0.035294" stroke="#025516" stroke-opacity="0.035294" points="3318.11,-888.11 3307.98,-891.21 3317.83,-895.1 3318.11,-888.11"/>
+</g>
+<!-- proc~json_value_destroy&#45;&gt;none~destroy -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge104" class="edge">
+<title>proc~json_value_destroy&#45;&gt;none~destroy</title>
+<path fill="none" stroke="#016925" stroke-opacity="0.019608" d="M3064.98,-688.37C3043.66,-688.48 3021.83,-688.43 3001,-688.22"/>
+<polygon fill="#016925" fill-opacity="0.019608" stroke="#016925" stroke-opacity="0.019608" points="3000.9,-684.72 2990.86,-688.1 3000.82,-691.72 3000.9,-684.72"/>
+</g>
+<!-- proc~json_value_destroy&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~wrap_initialize_json_file_from_string_v2~~CallsGraph_edge105" class="edge">
+<title>proc~json_value_destroy&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#016925" stroke-opacity="0.019608" d="M3318.83,-669.65C3329.13,-666.04 3339.04,-661.46 3348,-655.68 3470.12,-576.79 3545.21,-407.53 3568.88,-347.41"/>
+<polygon fill="#016925" fill-opacity="0.019608" stroke="#016925" stroke-opacity="0.019608" points="3572.25,-348.39 3572.59,-337.81 3565.72,-345.87 3572.25,-348.39"/>
 </g>
 </g>
 </svg>
@@ -320,17 +1346,17 @@
                   var panprocwrap_initialize_json_file_from_string_v2CallsGraph = svgPanZoom('#procwrap_initialize_json_file_from_string_v2CallsGraph',
                     {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
                   );
-                </script>        <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
-          <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
                   <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-              <div class="modal-body">
+                <div class="modal-body">
 <p>Nodes of different colours represent the following: </p>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -338,11 +1364,11 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="597pt" height="32pt"
- viewBox="0.00 0.00 596.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1.16 1.16) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 592.5,-28 592.5,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node">
 <title>Subroutine</title>
@@ -361,23 +1387,29 @@
 <polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
 <text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
-<!-- Unknown Procedure Type -->
+<!-- Type Bound Procedure -->
 <g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
 <title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="388.5,-24 243.5,-24 243.5,0 388.5,0 388.5,-24"/>
-<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
-<g id="node5" class="node">
+<g id="node6" class="node">
 <title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="465,-24 407,-24 407,0 465,0 465,-24"/>
-<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
-<g id="node6" class="node">
+<g id="node7" class="node">
 <title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="588.5,-24 483.5,-24 483.5,0 588.5,0 588.5,-24"/>
-<text text-anchor="middle" x="536" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -395,11 +1427,11 @@ large graphs.</div>
         </div>
       </div>
     </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-  <h3 class="panel-title">Called by</h3>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
   <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -420,7 +1452,7 @@ large graphs.</div>
 <!-- interface~json_file -->
 <g id="proc~~wrap_initialize_json_file_from_string_v2~~CalledByGraph_node2" class="node">
 <title>interface~json_file</title>
-<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CalledByGraph_node2"><a xlink:href=".././interface/json_file.html" xlink:title="json_file_module::json_file">
+<g id="a_proc~~wrap_initialize_json_file_from_string_v2~~CalledByGraph_node2"><a xlink:href="../interface/json_file.html" xlink:title="json_file_module::json_file">
 <polygon fill="#a7506f" stroke="#a7506f" points="153,-24 0,-24 0,0 153,0 153,-24"/>
 <text text-anchor="middle" x="76.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file_module::json_file</text>
 </a>
@@ -434,17 +1466,17 @@ large graphs.</div>
 </g>
 </g>
 </svg>
-</div>        <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
-          <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
                   <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-              <div class="modal-body">
+                <div class="modal-body">
 <p>Nodes of different colours represent the following: </p>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -452,11 +1484,11 @@ large graphs.</div>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="597pt" height="32pt"
- viewBox="0.00 0.00 596.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1.16 1.16) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 592.5,-28 592.5,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node">
 <title>Subroutine</title>
@@ -475,23 +1507,29 @@ large graphs.</div>
 <polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
 <text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
-<!-- Unknown Procedure Type -->
+<!-- Type Bound Procedure -->
 <g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
 <title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="388.5,-24 243.5,-24 243.5,0 388.5,0 388.5,-24"/>
-<text text-anchor="middle" x="316" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
-<g id="node5" class="node">
+<g id="node6" class="node">
 <title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="465,-24 407,-24 407,0 465,0 465,-24"/>
-<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
-<g id="node6" class="node">
+<g id="node7" class="node">
 <title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="588.5,-24 483.5,-24 483.5,0 588.5,0 588.5,-24"/>
-<text text-anchor="middle" x="536" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -511,61 +1549,30 @@ large graphs.</div>
     </div>
     <br>
 
-    <section class="visible-xs visible-sm hidden-md">
-        <h3>Contents</h3>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-    <div class="panel panel-primary">
-      <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
-      <div class="list-group">
-        <a class="list-group-item" href="../proc/wrap_initialize_json_file_from_string_v2.html#src">wrap_initialize_json_file_from_string_v2</a>
-      </div>
-    </div>
-
-
-    </section>
-    <br class="visible-xs visible-sm hidden-md">
-
 
     
     
 
     
     
+
 
 
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="w">    </span><span class="k">function </span><span class="n">wrap_initialize_json_file_from_string_v2</span><span class="p">(</span><span class="n">str</span><span class="p">,</span><span class="n">json_core_object</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<span class="w">                                        </span><span class="k">result</span><span class="p">(</span><span class="n">file_object</span><span class="p">)</span><span class="w"></span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">function </span><span class="n">wrap_initialize_json_file_from_string_v2</span><span class="p">(</span><span class="n">str</span><span class="p">,</span><span class="n">json_core_object</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                        </span><span class="k">result</span><span class="p">(</span><span class="n">file_object</span><span class="p">)</span>
 
 <span class="w">    </span><span class="k">implicit none</span>
 
-<span class="k">    type</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span><span class="w">                      </span><span class="kd">::</span><span class="w"> </span><span class="n">file_object</span><span class="w"></span>
+<span class="k">    type</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span><span class="w">                      </span><span class="kd">::</span><span class="w"> </span><span class="n">file_object</span>
 <span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">str</span><span class="w">  </span><span class="c">!! string to load JSON data from</span>
-<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">           </span><span class="kd">::</span><span class="w"> </span><span class="n">json_core_object</span><span class="w"></span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">           </span><span class="kd">::</span><span class="w"> </span><span class="n">json_core_object</span>
 
-<span class="w">    </span><span class="n">file_object</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">initialize_json_file_from_string_v2</span><span class="p">(</span><span class="n">to_unicode</span><span class="p">(</span><span class="n">str</span><span class="p">),</span><span class="n">json_core_object</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">file_object</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">initialize_json_file_from_string_v2</span><span class="p">(</span><span class="n">to_unicode</span><span class="p">(</span><span class="n">str</span><span class="p">),</span><span class="n">json_core_object</span><span class="p">)</span>
 
-<span class="w">    </span><span class="k">end function </span><span class="n">wrap_initialize_json_file_from_string_v2</span><span class="w"></span>
+<span class="w">    </span><span class="k">end function </span><span class="n">wrap_initialize_json_file_from_string_v2</span>
 </pre></div>
 
     </section>
@@ -578,32 +1585,27 @@ large graphs.</div>
     </div> <!-- /container -->
     <footer>
       <div class="container">
-        <div class="row">
-          <div class="col-xs-6 col-md-6"><p>JSON-Fortran was developed by Jacob Williams<br>&copy; 2023 
+        <div class="row justify-content-between">
+          <div class="col"><p>JSON-Fortran was developed by Jacob Williams<br>&copy; 2024 
 </p>
           </div>
-          <div class="col-xs-6 col-md-6">
-            <p class="text-right">
+          <div class="col">
+            <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2023-10-01 00:01              </p>
+ on 2024-01-05 14:59              </p>
           </div>
         </div>
         <br>
       </div> <!-- /container -->
     </footer>
 
-    <!-- Bootstrap core JavaScript
-         ================================================== -->
-         <!-- Placed at the end of the document so the pages load faster -->
-    <!--
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        -->
-        <script src="../js/bootstrap.min.js"></script>
-        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-        <script src="../js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
 
-        <!-- MathJax JavaScript
+    <!-- MathJax JavaScript
              ================================================== -->
              <!-- Placed at the end of the document so the pages load faster -->
         <script type="text/x-mathjax-config">
