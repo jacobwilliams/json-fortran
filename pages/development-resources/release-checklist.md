@@ -15,7 +15,7 @@ remain accurate.
             last release](https://github.com/jacobwilliams/json-fortran/compare/{!.VERSION!}...HEAD),
             {!.VERSION!}. This will only be accurate if you have
             not yet updated the project version in cmake. If you *have* updated
-            the prouct version in cmake and run cmake (and therefore `.VERSION`) then edit the URL manually to view the
+            the product version in cmake and run cmake (and therefore `.VERSION`) then edit the URL manually to view the
             changes.
 		 1. Run the
             [`github_changelog_generator`](https://github.com/github-changelog-generator/github-changelog-generator)
