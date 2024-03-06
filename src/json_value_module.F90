@@ -8763,8 +8763,14 @@
     real(real64),intent(in),optional    :: default !! default value if not found
 
     real(RK) :: tmp
+    real(RK) :: tmp_default
 
-    call json%get(me, path, tmp, found, default)
+    if (present(default)) then
+        tmp_default = real(default, RK)
+        call json%get(me, path, tmp, found, tmp_default)
+    else
+        call json%get(me, path, tmp, found)
+    end if
     value = real(tmp,real64)
 
     end subroutine json_get_real64_by_path
@@ -8826,8 +8832,14 @@
     real(real64),dimension(:),intent(in),optional     :: default !! default value if not found
 
     real(RK),dimension(:),allocatable :: tmp
+    real(RK),dimension(:),allocatable :: tmp_default
 
-    call json%get(me, path, tmp, found, default)
+    if (present(default)) then
+        tmp_default = real(default, RK)
+        call json%get(me, path, tmp, found, tmp_default)
+    else
+        call json%get(me, path, tmp, found)
+    end if
     if (allocated(tmp)) vec = real(tmp,real64)
 
     end subroutine json_get_real64_vec_by_path
