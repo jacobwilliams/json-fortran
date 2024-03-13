@@ -290,8 +290,8 @@
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
         integer :: filesize = 0 !! the file size when when `use_unformatted_stream=True`
-        character(kind=CK,len=:),allocatable :: chunk   !! a chunk read from a stream file
-                                                        !! when `use_unformatted_stream=True`
+        character(kind=CK),dimension(:),allocatable :: chunk !! a chunk read from a stream file
+                                                             !! when `use_unformatted_stream=True`
 
         contains
 
@@ -1045,7 +1045,9 @@
     if (use_unformatted_stream) then
         me%filesize = 0
         me%ichunk   = 0
-        me%chunk    = repeat(space, stream_chunk_size) ! default chunk size
+        if (allocated(me%chunk)) deallocate(me%chunk)
+        allocate(me%chunk(stream_chunk_size)) ! default chunk size
+        me%chunk = space
     end if
 
 #ifdef USE_UCS4
@@ -3407,7 +3409,7 @@
 
         if (associated(p)) then
 
-            call json%info(p,var_type=var_type)
+            var_type = p%var_type
 
             select case (var_type)
             case(json_object, json_array)
@@ -8108,7 +8110,11 @@
 
     logical(LK) :: status_ok  !! error flag for [[string_to_real]]
 
+#ifdef C_STR2REAL
+    call string_to_real_c(str,json%use_quiet_nan,rval,status_ok)
+#else
     call string_to_real(str,json%use_quiet_nan,rval,status_ok)
+#endif
 
     if (.not. status_ok) then    !if there was an error
         rval = 0.0_RK
@@ -8389,7 +8395,11 @@
                     value = 0.0_RK
                 end if
             case (json_string)
+#ifdef C_STR2REAL
+                call string_to_real_c(me%str_value,json%use_quiet_nan,value,status_ok)
+#else
                 call string_to_real(me%str_value,json%use_quiet_nan,value,status_ok)
+#endif
                 if (.not. status_ok) then
                     value = 0.0_RK
                     if (allocated(me%name)) then
@@ -9893,7 +9903,7 @@
 
     ! pop the next non whitespace character off the file
     call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                        skip_comments=json%allow_comments, popped=c)
+                        skip_comments=json%allow_comments, c=c)
 
     if (.not. eof) then
         call json%throw_exception('Error in json_parse_end:'//&
@@ -10142,7 +10152,7 @@
 
         ! pop the next non whitespace character off the file
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                           skip_comments=json%allow_comments, popped=c)
+                           skip_comments=json%allow_comments, c=c)
 
         if (eof) then
             return
@@ -10907,7 +10917,7 @@
 
         ! pair name
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                            skip_comments=json%allow_comments, c=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
                                       ' Unexpected end of file while parsing start of object.')
@@ -10935,7 +10945,7 @@
 
         ! pair value
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                            skip_comments=json%allow_comments, c=c)
         if (eof) then
             call json%destroy(pair)
             call json%throw_exception('Error in parse_object:'//&
@@ -10959,7 +10969,7 @@
 
         ! another possible pair
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                            skip_comments=json%allow_comments, c=c)
         if (eof) then
             call json%throw_exception('Error in parse_object: '//&
                                       'End of file encountered when parsing an object')
@@ -11015,7 +11025,7 @@
 
         ! popped the next character
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                           skip_comments=json%allow_comments, popped=c)
+                           skip_comments=json%allow_comments, c=c)
 
         if (eof) then
             ! The file ended before array was finished:
@@ -11081,7 +11091,7 @@
         do
 
             !get the next character from the file:
-            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., popped=c)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., c=c)
 
             if (eof) then
 
@@ -11161,15 +11171,15 @@
         length = len_trim(chars)
 
         do i = 1, length
-            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., popped=c)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.false., c=c)
             if (eof) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected end of file while parsing.')
+                                          ' Unexpected end of file while parsing.')
                 return
             else if (c /= chars(i:i)) then
                 call json%throw_exception('Error in parse_for_chars:'//&
-                                     ' Unexpected character: "'//c//'" (expecting "'//&
-                                     chars(i:i)//'")')
+                                          ' Unexpected character: "'//c//'" (expecting "'//&
+                                          chars(i:i)//'")')
                 return
             end if
         end do
@@ -11210,10 +11220,13 @@
     integer(IK)              :: ip          !! index to put next character
                                             !! [to speed up by reducing the number
                                             !! of character string reallocations]
+    integer(IK)              :: ltmp        !! length of `tmp`
 
     if (.not. json%exception_thrown) then
 
-        tmp = blank_chunk
+        ! can use the max number size here (it will be expanded if necessary)
+        tmp = repeat(space,max_numeric_str_len)
+        ltmp = max_numeric_str_len
         ip = 1
         first = .true.
         is_integer = .true.  !assume it may be an integer, unless otherwise determined
@@ -11222,16 +11235,17 @@
         do
 
             !get the next character:
-            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., popped=c)
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., c=c)
 
             select case (c)
-            case(CK_'-',CK_'+')    !note: allowing a '+' as the first character here.
 
-                if (is_integer .and. (.not. first)) is_integer = .false.
+            case(CK_'0':CK_'9')    !valid characters for numbers
 
                 !add it to the string:
-                !tmp = tmp // c   !...original
-                if (ip>len(tmp)) tmp = tmp // blank_chunk
+                if (ip>ltmp) then
+                    tmp = tmp // blank_chunk
+                    ltmp = len(tmp)
+                end if
                 tmp(ip:ip) = c
                 ip = ip + 1
 
@@ -11240,16 +11254,22 @@
                 if (is_integer) is_integer = .false.
 
                 !add it to the string:
-                !tmp = tmp // c   !...original
-                if (ip>len(tmp)) tmp = tmp // blank_chunk
+                if (ip>ltmp) then
+                    tmp = tmp // blank_chunk
+                    ltmp = len(tmp)
+                end if
                 tmp(ip:ip) = c
                 ip = ip + 1
 
-            case(CK_'0':CK_'9')    !valid characters for numbers
+            case(CK_'-',CK_'+')    !note: allowing a '+' as the first character here.
+
+                if (is_integer .and. (.not. first)) is_integer = .false.
 
                 !add it to the string:
-                !tmp = tmp // c   !...original
-                if (ip>len(tmp)) tmp = tmp // blank_chunk
+                if (ip>ltmp) then
+                    tmp = tmp // blank_chunk
+                    ltmp = len(tmp)
+                end if
                 tmp(ip:ip) = c
                 ip = ip + 1
 
@@ -11297,9 +11317,6 @@
 
         end do
 
-        !cleanup:
-        if (allocated(tmp)) deallocate(tmp)
-
     end if
 
     end subroutine parse_number
@@ -11315,7 +11332,7 @@
 !@note This routine ignores non-printing ASCII characters
 !      (`iachar<=31`) that are in strings.
 
-    subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,popped)
+    subroutine pop_char(json,unit,str,skip_ws,skip_comments,eof,c)
 
     implicit none
 
@@ -11328,15 +11345,14 @@
     logical(LK),intent(in),optional      :: skip_comments !! to ignore comment lines [default False]
     logical(LK),intent(out)              :: eof           !! true if the end of the file has
                                                           !! been reached.
-    character(kind=CK,len=1),intent(out) :: popped        !! the popped character returned
+    character(kind=CK,len=1),intent(out) :: c             !! the popped character returned
 
-    integer(IK)              :: ios             !! `iostat` flag
-    integer(IK)              :: str_len         !! length of `str`
-    character(kind=CK,len=1) :: c               !! a character read from the file (or string)
-    logical(LK)              :: ignore          !! if whitespace is to be ignored
-    logical(LK)              :: ignore_comments !! if comment lines are to be ignored
-    logical(LK)              :: parsing_comment !! if we are in the process
-                                                !! of parsing a comment line
+    integer(IK) :: ios             !! `iostat` flag
+    logical(LK) :: ignore          !! if whitespace is to be ignored
+    logical(LK) :: ignore_comments !! if comment lines are to be ignored
+    logical(LK) :: parsing_comment !! if we are in the process
+                                   !! of parsing a comment line
+    integer(IK) :: tmp             !! local copy of `iachar(c)`
 
     if (.not. json%exception_thrown) then
 
@@ -11377,23 +11393,25 @@
                         if (json%ichunk<1) then
                             ! read in a chunk:
                             json%ichunk = 0
-                            if (json%filesize<json%ipos+len(json%chunk)-1) then
+                            if (json%filesize<json%ipos+size(json%chunk)-1) then
                                 ! for the last chunk, we resize
                                 ! it to the correct size:
-                                json%chunk = repeat(space, json%filesize-json%ipos+1)
+                                deallocate(json%chunk)
+                                allocate(json%chunk(json%filesize-json%ipos+1))
+                                json%chunk = space
                             end if
                             read(unit=unit,pos=json%ipos,iostat=ios) json%chunk
                         else
                             ios = 0
                         end if
                         json%ichunk = json%ichunk + 1
-                        if (json%ichunk>len(json%chunk)) then
+                        if (json%ichunk>size(json%chunk)) then
                             ! check this just in case
                             ios = IOSTAT_END
                         else
                             ! get the next character from the chunk:
-                            c = json%chunk(json%ichunk:json%ichunk)
-                            if (json%ichunk==len(json%chunk)) then
+                            c = json%chunk(json%ichunk)
+                            if (json%ichunk==size(json%chunk)) then
                                 json%ichunk = 0 ! reset for next chunk
                             end if
                         end if
@@ -11406,8 +11424,7 @@
 
                 else    !read from the string
 
-                    str_len = len(str)   !length of the string
-                    if (json%ipos<=str_len) then
+                    if (json%ipos<=len(str)) then
                         c = str(json%ipos:json%ipos)
                         ios = 0
                     else
@@ -11424,7 +11441,7 @@
                     ! no character to return
                     json%char_count = 0
                     eof = .true.
-                    popped = space ! just to set a value
+                    c = space ! just to set a value
                     exit
 
                 else if (IS_IOSTAT_EOR(ios) .or. c==newline) then    !end of record
@@ -11438,32 +11455,30 @@
 
             end if
 
-            if (ignore_comments .and. (parsing_comment .or. scan(c,json%comment_char,kind=IK)>0_IK) ) then
-
-                ! skipping the comment
-                parsing_comment = .true.
-                cycle
-
-            else if (any(c == control_chars)) then
-
-                ! non printing ascii characters
-                cycle
-
-            else if (ignore .and. c == space) then
-
-                ! ignoring whitespace
-                cycle
-
-            else
-
-                ! return the character
-                popped = c
-                exit
-
+            if (ignore) then ! ignoring whitespace
+                 if (c == space) cycle
             end if
+
+            if (ignore_comments) then
+                if (parsing_comment) cycle ! still in the comment
+                if (scan(c,json%comment_char,kind=IK)>0_IK) then
+                    ! start of comment, skipping it
+                    parsing_comment = .true.
+                    cycle
+                end if
+            end if
+
+            tmp = iachar(c,kind=IK)
+            ! skip non printing ascii characters [these are the control_chars]
+            if ( (tmp>=1 .and. tmp<=31) .or. (tmp==127)) cycle
+
+            ! return the character c
+            exit
 
         end do
 
+    else
+        c = space
     end if
 
     end subroutine pop_char
@@ -11501,12 +11516,12 @@
 
             json%pushed_index = json%pushed_index + 1
 
-            if (json%pushed_index>0 .and. json%pushed_index<=len(json%pushed_char)) then
+            if (json%pushed_index>0 .and. json%pushed_index<=pushed_char_size) then
                 json%pushed_char(json%pushed_index:json%pushed_index) = c
             else
                 call integer_to_string(json%pushed_index,int_fmt,istr)
                 call json%throw_exception('Error in push_char: '//&
-                                          'invalid valid of pushed_index: '//trim(istr))
+                                            'invalid value of pushed_index: '//trim(istr))
             end if
 
         end if
