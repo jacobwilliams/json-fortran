@@ -9553,12 +9553,7 @@
     type(json_value),pointer :: element  !! a child element
     integer(IK) :: i        !! counter
     integer(IK) :: icount   !! number of children
-
     logical(LK) :: finished !! can be used to stop the process
-
-    if (json%exception_thrown) return
-
-    !! recursive [[json_value]] traversal.
 
     if (json%exception_thrown) return
     call traverse_callback(json,p,finished) ! first call for this object
@@ -9567,11 +9562,8 @@
     !for arrays and objects, have to also call for all children:
     if (p%var_type==json_array .or. p%var_type==json_object) then
 
-        print *, loc(p), associated(p)
         icount = json%count(p) ! number of children
-        print *, icount
         if (icount>0) then
-            print *, icount, ">0"
             element => p%children   ! first one
             do i = 1, icount        ! call for each child
                 if (.not. associated(element)) then
@@ -9579,7 +9571,7 @@
                                               'Malformed JSON linked list')
                     return
                 end if
-                call json%traverse(element, traverse_callback)
+                call json%traverse(element, traverse_callback) ! this is json_traverse
                 if (finished .or. json%exception_thrown) exit
                 element => element%next
             end do
