@@ -9542,7 +9542,7 @@
 !  This routine calls the user-specified [[json_traverse_callback_func]]
 !  for each element of the structure.
 
-    subroutine json_traverse(json,p,traverse_callback)
+    recursive subroutine json_traverse(json,p,traverse_callback)
 
     implicit none
 
@@ -9550,50 +9550,43 @@
     type(json_value),pointer,intent(in)    :: p
     procedure(json_traverse_callback_func) :: traverse_callback
 
+    type(json_value),pointer :: element  !! a child element
+    integer(IK) :: i        !! counter
+    integer(IK) :: icount   !! number of children
+
     logical(LK) :: finished !! can be used to stop the process
 
-    if (.not. json%exception_thrown) call traverse(p)
+    if (json%exception_thrown) return
 
-    contains
+    !! recursive [[json_value]] traversal.
 
-        recursive subroutine traverse(p)
+    if (json%exception_thrown) return
+    call traverse_callback(json,p,finished) ! first call for this object
+    if (finished) return
 
-        !! recursive [[json_value]] traversal.
+    !for arrays and objects, have to also call for all children:
+    if (p%var_type==json_array .or. p%var_type==json_object) then
 
-        implicit none
-
-        type(json_value),pointer,intent(in) :: p
-
-        type(json_value),pointer :: element  !! a child element
-        integer(IK) :: i        !! counter
-        integer(IK) :: icount   !! number of children
-
-        if (json%exception_thrown) return
-        call traverse_callback(json,p,finished) ! first call for this object
-        if (finished) return
-
-        !for arrays and objects, have to also call for all children:
-        if (p%var_type==json_array .or. p%var_type==json_object) then
-
-            icount = json%count(p) ! number of children
-            if (icount>0) then
-                element => p%children   ! first one
-                do i = 1, icount        ! call for each child
-                    if (.not. associated(element)) then
-                        call json%throw_exception('Error in json_traverse: '//&
-                                                  'Malformed JSON linked list')
-                        return
-                    end if
-                    call traverse(element)
-                    if (finished .or. json%exception_thrown) exit
-                    element => element%next
-                end do
-            end if
-            nullify(element)
-
+        print *, loc(p), associated(p)
+        icount = json%count(p) ! number of children
+        print *, icount
+        if (icount>0) then
+            print *, icount, ">0"
+            element => p%children   ! first one
+            do i = 1, icount        ! call for each child
+                if (.not. associated(element)) then
+                    call json%throw_exception('Error in json_traverse: '//&
+                                              'Malformed JSON linked list')
+                    return
+                end if
+                call json%traverse(element, traverse_callback)
+                if (finished .or. json%exception_thrown) exit
+                element => element%next
+            end do
         end if
+        nullify(element)
 
-        end subroutine traverse
+    end if
 
     end subroutine json_traverse
 !*****************************************************************************************
