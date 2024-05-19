@@ -127,7 +127,7 @@
     ! Compute how many digits we need to read
     ndigits = 2*len_trim(str)
     if (ndigits/=0) then
-        ndigits_digits = floor(log10(real(ndigits)))+1
+        ndigits_digits = nint(log10(real(ndigits)))+1
         allocate(character(kind=CDK,len=ndigits_digits) :: digits)
         write(digits,'(I0)') ndigits !gfortran will have a runtime error with * edit descriptor here
         ! gfortran bug: '*' edit descriptor for ISO_10646 strings does bad stuff.
