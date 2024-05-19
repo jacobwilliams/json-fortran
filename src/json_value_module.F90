@@ -978,18 +978,54 @@
 !      [[initialize_json_core_in_file]], and [[initialize_json_file]]
 !      all have a similar interface.
 
-    function initialize_json_core(&
-#include "json_initialize_dummy_arguments.inc"
-                                 ) result(json_core_object)
+    function initialize_json_core(verbose,&
+                                  compact_reals,&
+                                  print_signs,&
+                                  real_format,&
+                                  spaces_per_tab,&
+                                  strict_type_checking,&
+                                  trailing_spaces_significant,&
+                                  case_sensitive_keys,&
+                                  no_whitespace,&
+                                  unescape_strings,&
+                                  comment_char,&
+                                  path_mode,&
+                                  path_separator,&
+                                  compress_vectors,&
+                                  allow_duplicate_keys,&
+                                  escape_solidus,&
+                                  stop_on_error,&
+                                  null_to_real_mode,&
+                                  non_normal_mode,&
+                                  use_quiet_nan, &
+                                  strict_integer_type_checking ) result(json_core_object)
 
     implicit none
 
     type(json_core) :: json_core_object
 #include "json_initialize_arguments.inc"
 
-    call json_core_object%initialize(&
-#include "json_initialize_dummy_arguments.inc"
-                                    )
+    call json_core_object%initialize(verbose,&
+                                     compact_reals,&
+                                     print_signs,&
+                                     real_format,&
+                                     spaces_per_tab,&
+                                     strict_type_checking,&
+                                     trailing_spaces_significant,&
+                                     case_sensitive_keys,&
+                                     no_whitespace,&
+                                     unescape_strings,&
+                                     comment_char,&
+                                     path_mode,&
+                                     path_separator,&
+                                     compress_vectors,&
+                                     allow_duplicate_keys,&
+                                     escape_solidus,&
+                                     stop_on_error,&
+                                     null_to_real_mode,&
+                                     non_normal_mode,&
+                                     use_quiet_nan, &
+                                     strict_integer_type_checking )
 
     end function initialize_json_core
 !*****************************************************************************************
@@ -1014,8 +1050,27 @@
 !      all have a similar interface.
 
     subroutine json_initialize(me,&
-#include "json_initialize_dummy_arguments.inc"
-                              )
+                               verbose,&
+                               compact_reals,&
+                               print_signs,&
+                               real_format,&
+                               spaces_per_tab,&
+                               strict_type_checking,&
+                               trailing_spaces_significant,&
+                               case_sensitive_keys,&
+                               no_whitespace,&
+                               unescape_strings,&
+                               comment_char,&
+                               path_mode,&
+                               path_separator,&
+                               compress_vectors,&
+                               allow_duplicate_keys,&
+                               escape_solidus,&
+                               stop_on_error,&
+                               null_to_real_mode,&
+                               non_normal_mode,&
+                               use_quiet_nan, &
+                               strict_integer_type_checking )
 
     implicit none
 

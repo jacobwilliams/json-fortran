@@ -1,6 +1,4 @@
 !  The argument list for the various `initialize` subroutines.
-!
-!  See also: json_initialize_dummy_arguments.inc
 
 logical(LK),intent(in),optional :: verbose
   !! mainly useful for debugging (default is false)
