@@ -141,111 +141,112 @@ trigger automatic documentation deployment.</p>
 
 <span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Set</span><span class="w"> </span><span class="n">vars</span>
 <span class="w">      </span><span class="nl">id</span><span class="p">:</span><span class="w"> </span><span class="n">vars</span>
-<span class="w">      </span><span class="nl">run</span><span class="p">:</span><span class="w"> </span><span class="n">echo</span><span class="w"> </span><span class="o">::</span><span class="n">set</span><span class="o">-</span><span class="n">output</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="n">tag</span><span class="o">::</span><span class="n">$</span><span class="p">{</span><span class="n">GITHUB_REF</span><span class="err">#</span><span class="n">refs</span><span class="cm">/*/}</span>
+<span class="w">      </span><span class="cp"># run: echo ::set-output name=tag::${GITHUB_REF#refs</span><span class="cm">/*/}   # this is depreciated: https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/</span>
+<span class="cm">      run: echo &quot;name=tag::${GITHUB_REF#refs/*/</span><span class="cp">}&quot; &gt;&gt; $GITHUB_OUTPUT</span>
 
-<span class="cm">    - name: Checkout code</span>
-<span class="cm">      uses: actions/checkout@v3</span>
-<span class="cm">      with:</span>
-<span class="cm">        submodules: recursive</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Checkout</span><span class="w"> </span><span class="n">code</span>
+<span class="w">      </span><span class="nl">uses</span><span class="p">:</span><span class="w"> </span><span class="n">actions</span><span class="o">/</span><span class="n">checkout</span><span class="p">@</span><span class="n">v4</span><span class="mf">.1.6</span>
+<span class="w">      </span><span class="nl">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nl">submodules</span><span class="p">:</span><span class="w"> </span><span class="n">recursive</span>
 
-<span class="cm">    - name: Setup cmake</span>
-<span class="cm">      if: contains( matrix.gcc_v, 9 )</span>
-<span class="cm">      uses: jwlawson/actions-setup-cmake@v1.13</span>
-<span class="cm">      with:</span>
-<span class="cm">        cmake-version: &#39;3.19.x&#39;</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Setup</span><span class="w"> </span><span class="n">cmake</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">contains</span><span class="p">(</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="w"> </span><span class="p">)</span>
+<span class="w">      </span><span class="nl">uses</span><span class="p">:</span><span class="w"> </span><span class="n">jwlawson</span><span class="o">/</span><span class="n">actions</span><span class="o">-</span><span class="n">setup</span><span class="o">-</span><span class="n">cmake</span><span class="p">@</span><span class="n">v2</span><span class="mf">.0.2</span>
+<span class="w">      </span><span class="nl">with</span><span class="p">:</span>
+<span class="w">        </span><span class="n">cmake</span><span class="o">-</span><span class="n">version</span><span class="o">:</span><span class="w"> </span><span class="err">&#39;</span><span class="mf">3.19</span><span class="p">.</span><span class="n">x</span><span class="err">&#39;</span>
 
-<span class="cm">    - name: Install Python</span>
-<span class="cm">      uses: actions/setup-python@v4 # Use pip to install latest CMake, &amp; FORD/Jin2For, etc.</span>
-<span class="cm">      with:</span>
-<span class="cm">        python-version: ${{ matrix.python-version }}</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Install</span><span class="w"> </span><span class="n">Python</span>
+<span class="w">      </span><span class="nl">uses</span><span class="p">:</span><span class="w"> </span><span class="n">actions</span><span class="o">/</span><span class="n">setup</span><span class="o">-</span><span class="n">python</span><span class="p">@</span><span class="n">v5</span><span class="mf">.1.0</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">Use</span><span class="w"> </span><span class="n">pip</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">install</span><span class="w"> </span><span class="n">latest</span><span class="w"> </span><span class="n">CMake</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">FORD</span><span class="o">/</span><span class="n">Jin2For</span><span class="p">,</span><span class="w"> </span><span class="n">etc</span><span class="p">.</span>
+<span class="w">      </span><span class="nl">with</span><span class="p">:</span>
+<span class="w">        </span><span class="n">python</span><span class="o">-</span><span class="n">version</span><span class="o">:</span><span class="w"> </span><span class="n">$</span><span class="p">{{</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">python</span><span class="o">-</span><span class="n">version</span><span class="w"> </span><span class="p">}}</span>
 
-<span class="cm">    - name: Setup Graphviz</span>
-<span class="cm">      uses: ts-graphviz/setup-graphviz@v1</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Setup</span><span class="w"> </span><span class="n">Graphviz</span>
+<span class="w">      </span><span class="nl">uses</span><span class="p">:</span><span class="w"> </span><span class="n">ts</span><span class="o">-</span><span class="n">graphviz</span><span class="o">/</span><span class="n">setup</span><span class="o">-</span><span class="n">graphviz</span><span class="p">@</span><span class="n">v2</span><span class="mf">.0.2</span>
 
-<span class="cm">    - name: Install Python dependencies</span>
-<span class="cm">      if: contains( matrix.os, &#39;ubuntu&#39;)</span>
-<span class="cm">      run: |</span>
-<span class="cm">        python -m pip install --upgrade pip</span>
-<span class="cm">        pip install ford FoBiS.py pygooglechart</span>
-<span class="cm">        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Install</span><span class="w"> </span><span class="n">Python</span><span class="w"> </span><span class="n">dependencies</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">contains</span><span class="p">(</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">os</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="n">ubuntu</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="w">      </span><span class="nl">run</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">        </span><span class="n">python</span><span class="w"> </span><span class="o">-</span><span class="n">m</span><span class="w"> </span><span class="n">pip</span><span class="w"> </span><span class="n">install</span><span class="w"> </span><span class="o">--</span><span class="n">upgrade</span><span class="w"> </span><span class="n">pip</span>
+<span class="w">        </span><span class="n">pip</span><span class="w"> </span><span class="n">install</span><span class="w"> </span><span class="n">ford</span><span class="w"> </span><span class="n">FoBiS</span><span class="p">.</span><span class="n">py</span><span class="w"> </span><span class="n">pygooglechart</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="o">-</span><span class="n">f</span><span class="w"> </span><span class="n">requirements</span><span class="p">.</span><span class="n">txt</span><span class="w"> </span><span class="p">];</span><span class="w"> </span><span class="n">then</span><span class="w"> </span><span class="n">pip</span><span class="w"> </span><span class="n">install</span><span class="w"> </span><span class="o">-</span><span class="n">r</span><span class="w"> </span><span class="n">requirements</span><span class="p">.</span><span class="n">txt</span><span class="p">;</span><span class="w"> </span><span class="n">fi</span>
 
-<span class="cm">    - name: Install GFortran Linux</span>
-<span class="cm">      if: contains( matrix.os, &#39;ubuntu&#39;)</span>
-<span class="cm">      run: |</span>
-<span class="cm">        sudo add-apt-repository ppa:ubuntu-toolchain-r/test</span>
-<span class="cm">        sudo apt-get update</span>
-<span class="cm">        sudo apt-get install -y gcc-${GCC_V} gfortran-${GCC_V}</span>
-<span class="cm">        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_V} 100 \</span>
-<span class="cm">        --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${GCC_V} \</span>
-<span class="cm">        --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_V}</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Install</span><span class="w"> </span><span class="n">GFortran</span><span class="w"> </span><span class="n">Linux</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">contains</span><span class="p">(</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">os</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="n">ubuntu</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="w">      </span><span class="nl">run</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">        </span><span class="n">sudo</span><span class="w"> </span><span class="n">add</span><span class="o">-</span><span class="n">apt</span><span class="o">-</span><span class="n">repository</span><span class="w"> </span><span class="n">ppa</span><span class="o">:</span><span class="n">ubuntu</span><span class="o">-</span><span class="n">toolchain</span><span class="o">-</span><span class="n">r</span><span class="o">/</span><span class="n">test</span>
+<span class="w">        </span><span class="n">sudo</span><span class="w"> </span><span class="n">apt</span><span class="o">-</span><span class="n">get</span><span class="w"> </span><span class="n">update</span>
+<span class="w">        </span><span class="n">sudo</span><span class="w"> </span><span class="n">apt</span><span class="o">-</span><span class="n">get</span><span class="w"> </span><span class="n">install</span><span class="w"> </span><span class="o">-</span><span class="n">y</span><span class="w"> </span><span class="n">gcc</span><span class="o">-</span><span class="n">$</span><span class="p">{</span><span class="n">GCC_V</span><span class="p">}</span><span class="w"> </span><span class="n">gfortran</span><span class="o">-</span><span class="n">$</span><span class="p">{</span><span class="n">GCC_V</span><span class="p">}</span>
+<span class="w">        </span><span class="n">sudo</span><span class="w"> </span><span class="n">update</span><span class="o">-</span><span class="n">alternatives</span><span class="w"> </span><span class="o">--</span><span class="n">install</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">gcc</span><span class="w"> </span><span class="n">gcc</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">gcc</span><span class="o">-</span><span class="n">$</span><span class="p">{</span><span class="n">GCC_V</span><span class="p">}</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span>\
+<span class="w">        </span><span class="o">--</span><span class="n">slave</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">gfortran</span><span class="w"> </span><span class="n">gfortran</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">gfortran</span><span class="o">-</span><span class="n">$</span><span class="p">{</span><span class="n">GCC_V</span><span class="p">}</span><span class="w"> </span>\
+<span class="w">        </span><span class="o">--</span><span class="n">slave</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">gcov</span><span class="w"> </span><span class="n">gcov</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">gcov</span><span class="o">-</span><span class="n">$</span><span class="p">{</span><span class="n">GCC_V</span><span class="p">}</span>
 
-<span class="cm">    - name: Compile_with_build</span>
-<span class="cm">      if: matrix.gcc_v != 7</span>
-<span class="cm">      run: |</span>
-<span class="cm">        GFORTRAN=gfortran-${{matrix.gcc_v}}</span>
-<span class="cm">        GCOV=gcov-${{matrix.gcc_v}}</span>
-<span class="cm">        # build with build.sh, run unit tests</span>
-<span class="cm">        ./build.sh --skip-documentation</span>
-<span class="cm">        ./build.sh --skip-documentation --enable-unicode</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Compile_with_build</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">7</span>
+<span class="w">      </span><span class="nl">run</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">        </span><span class="n">GFORTRAN</span><span class="o">=</span><span class="n">gfortran</span><span class="o">-</span><span class="n">$</span><span class="p">{{</span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="p">}}</span>
+<span class="w">        </span><span class="n">GCOV</span><span class="o">=</span><span class="n">gcov</span><span class="o">-</span><span class="n">$</span><span class="p">{{</span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="p">}}</span>
+<span class="w">        </span><span class="cp"># build with build.sh, run unit tests</span>
+<span class="w">        </span><span class="p">.</span><span class="o">/</span><span class="n">build</span><span class="p">.</span><span class="n">sh</span><span class="w"> </span><span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">documentation</span>
+<span class="w">        </span><span class="p">.</span><span class="o">/</span><span class="n">build</span><span class="p">.</span><span class="n">sh</span><span class="w"> </span><span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">documentation</span><span class="w"> </span><span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">unicode</span>
 
-<span class="cm">    - name: Compile_with_cmake</span>
-<span class="cm">      # CMake build with unit tests, no documentation, with coverage analysis</span>
-<span class="cm">      # No unicode so that coverage combined with the build script will cover unicode</span>
-<span class="cm">      # and non-unicode code paths</span>
-<span class="cm">      if: matrix.gcc_v == 9</span>
-<span class="cm">      run: |</span>
-<span class="cm">        GFORTRAN=gfortran-${{matrix.gcc_v}}</span>
-<span class="cm">        GCOV=gcov-${{matrix.gcc_v}}</span>
-<span class="cm">        mkdir cmake-build</span>
-<span class="cm">        cd cmake-build</span>
-<span class="cm">        cmake ..</span>
-<span class="cm">        make -j 4 check</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Compile_with_cmake</span>
+<span class="w">      </span><span class="cp"># CMake build with unit tests, no documentation, with coverage analysis</span>
+<span class="w">      </span><span class="cp"># No unicode so that coverage combined with the build script will cover unicode</span>
+<span class="w">      </span><span class="cp"># and non-unicode code paths</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">9</span>
+<span class="w">      </span><span class="nl">run</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">        </span><span class="n">GFORTRAN</span><span class="o">=</span><span class="n">gfortran</span><span class="o">-</span><span class="n">$</span><span class="p">{{</span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="p">}}</span>
+<span class="w">        </span><span class="n">GCOV</span><span class="o">=</span><span class="n">gcov</span><span class="o">-</span><span class="n">$</span><span class="p">{{</span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="p">}}</span>
+<span class="w">        </span><span class="n">mkdir</span><span class="w"> </span><span class="n">cmake</span><span class="o">-</span><span class="n">build</span>
+<span class="w">        </span><span class="n">cd</span><span class="w"> </span><span class="n">cmake</span><span class="o">-</span><span class="n">build</span>
+<span class="w">        </span><span class="n">cmake</span><span class="w"> </span><span class="p">..</span>
+<span class="w">        </span><span class="n">make</span><span class="w"> </span><span class="o">-</span><span class="n">j</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="n">check</span>
 
-<span class="cm">    - name: Compile_with_build_mkdocs</span>
-<span class="cm">      # build with build.sh, make documentation, run unit tests</span>
-<span class="cm">      # and perform coverage analysis - used for doc deployment</span>
-<span class="cm">      if: matrix.gcc_v == 7</span>
-<span class="cm">      run: |</span>
-<span class="cm">        GFORTRAN=gfortran-${{matrix.gcc_v}}</span>
-<span class="cm">        GCOV=gcov-${{matrix.gcc_v}}</span>
-<span class="cm">        ./build.sh --coverage --skip-documentation</span>
-<span class="cm">        ./build.sh --coverage --enable-unicode</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Compile_with_build_mkdocs</span>
+<span class="w">      </span><span class="cp"># build with build.sh, make documentation, run unit tests</span>
+<span class="w">      </span><span class="cp"># and perform coverage analysis - used for doc deployment</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">7</span>
+<span class="w">      </span><span class="nl">run</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">        </span><span class="n">GFORTRAN</span><span class="o">=</span><span class="n">gfortran</span><span class="o">-</span><span class="n">$</span><span class="p">{{</span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="p">}}</span>
+<span class="w">        </span><span class="n">GCOV</span><span class="o">=</span><span class="n">gcov</span><span class="o">-</span><span class="n">$</span><span class="p">{{</span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="p">}}</span>
+<span class="w">        </span><span class="p">.</span><span class="o">/</span><span class="n">build</span><span class="p">.</span><span class="n">sh</span><span class="w"> </span><span class="o">--</span><span class="n">coverage</span><span class="w"> </span><span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">documentation</span>
+<span class="w">        </span><span class="p">.</span><span class="o">/</span><span class="n">build</span><span class="p">.</span><span class="n">sh</span><span class="w"> </span><span class="o">--</span><span class="n">coverage</span><span class="w"> </span><span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">unicode</span>
 
-<span class="cm">    - name: Deploy Documentation for master</span>
-<span class="cm">      if: matrix.gcc_v == 7 &amp;&amp; github.ref == &#39;refs/heads/master&#39;</span>
-<span class="cm">      uses: JamesIves/github-pages-deploy-action@4.1.3</span>
-<span class="cm">      with:</span>
-<span class="cm">        branch: gh-pages # The branch the action should deploy to.</span>
-<span class="cm">        folder: doc  # The folder the action should deploy.</span>
-<span class="cm">        clean: true</span>
-<span class="cm">        clean-exclude: |</span>
-<span class="cm">          prev</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Deploy</span><span class="w"> </span><span class="n">Documentation</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">master</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">github</span><span class="p">.</span><span class="n">ref</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="err">&#39;</span><span class="n">refs</span><span class="o">/</span><span class="n">heads</span><span class="o">/</span><span class="n">master</span><span class="err">&#39;</span>
+<span class="w">      </span><span class="nl">uses</span><span class="p">:</span><span class="w"> </span><span class="n">JamesIves</span><span class="o">/</span><span class="n">github</span><span class="o">-</span><span class="n">pages</span><span class="o">-</span><span class="n">deploy</span><span class="o">-</span><span class="n">action</span><span class="mf">@4.1.3</span>
+<span class="w">      </span><span class="nl">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nl">branch</span><span class="p">:</span><span class="w"> </span><span class="n">gh</span><span class="o">-</span><span class="n">pages</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">branch</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">deploy</span><span class="w"> </span><span class="n">to</span><span class="p">.</span>
+<span class="w">        </span><span class="nl">folder</span><span class="p">:</span><span class="w"> </span><span class="n">doc</span><span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">deploy</span><span class="p">.</span>
+<span class="w">        </span><span class="nl">clean</span><span class="p">:</span><span class="w"> </span><span class="nb">true</span>
+<span class="w">        </span><span class="n">clean</span><span class="o">-</span><span class="n">exclude</span><span class="o">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">          </span><span class="n">prev</span>
 
-<span class="cm">    - name: Rebuild documentation for tagged release</span>
-<span class="cm">      env:</span>
-<span class="cm">        TAGNAME: ${{ steps.vars.outputs.tag }}</span>
-<span class="cm">      if: matrix.gcc_v == 7 &amp;&amp; startsWith(github.ref, &#39;refs/tags/&#39;)</span>
-<span class="cm">      run: |</span>
-<span class="cm">        echo ${TAGNAME}</span>
-<span class="cm">        rm -rf doc</span>
-<span class="cm">        sed &quot;2 s/^/version: ${TAGNAME}\n/&quot; json-fortran.md &gt; json-fortran.tagged.md</span>
-<span class="cm">        ford --debug json-fortran.tagged.md</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Rebuild</span><span class="w"> </span><span class="n">documentation</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">tagged</span><span class="w"> </span><span class="k">release</span>
+<span class="w">      </span><span class="nl">env</span><span class="p">:</span>
+<span class="w">        </span><span class="nl">TAGNAME</span><span class="p">:</span><span class="w"> </span><span class="n">$</span><span class="p">{{</span><span class="w"> </span><span class="n">steps</span><span class="p">.</span><span class="n">vars</span><span class="p">.</span><span class="n">outputs</span><span class="p">.</span><span class="n">tag</span><span class="w"> </span><span class="p">}}</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">startsWith</span><span class="p">(</span><span class="n">github</span><span class="p">.</span><span class="n">ref</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="n">refs</span><span class="o">/</span><span class="n">tags</span><span class="o">/</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="w">      </span><span class="nl">run</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">        </span><span class="n">echo</span><span class="w"> </span><span class="n">$</span><span class="p">{</span><span class="n">TAGNAME</span><span class="p">}</span>
+<span class="w">        </span><span class="n">rm</span><span class="w"> </span><span class="o">-</span><span class="n">rf</span><span class="w"> </span><span class="n">doc</span>
+<span class="w">        </span><span class="n">sed</span><span class="w"> </span><span class="s">&quot;2 s/^/version: ${TAGNAME}</span><span class="se">\n</span><span class="s">/&quot;</span><span class="w"> </span><span class="n">json</span><span class="o">-</span><span class="n">fortran</span><span class="p">.</span><span class="n">md</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">json</span><span class="o">-</span><span class="n">fortran</span><span class="p">.</span><span class="n">tagged</span><span class="p">.</span><span class="n">md</span>
+<span class="w">        </span><span class="n">ford</span><span class="w"> </span><span class="o">--</span><span class="n">debug</span><span class="w"> </span><span class="n">json</span><span class="o">-</span><span class="n">fortran</span><span class="p">.</span><span class="n">tagged</span><span class="p">.</span><span class="n">md</span>
 
-<span class="cm">    - name: Deploy documentation for tagged release</span>
-<span class="cm">      if: matrix.gcc_v == 7 &amp;&amp; startsWith(github.ref, &#39;refs/tags/&#39;)</span>
-<span class="cm">      uses: JamesIves/github-pages-deploy-action@v4.4.1</span>
-<span class="cm">      with:</span>
-<span class="cm">        branch: gh-pages # The branch the action should deploy to.</span>
-<span class="cm">        folder: doc  # The folder the action should deploy.</span>
-<span class="cm">        target-folder: prev/${{ steps.vars.outputs.tag }} # deploy to a version-specific folder</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Deploy</span><span class="w"> </span><span class="n">documentation</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">tagged</span><span class="w"> </span><span class="k">release</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">startsWith</span><span class="p">(</span><span class="n">github</span><span class="p">.</span><span class="n">ref</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="n">refs</span><span class="o">/</span><span class="n">tags</span><span class="o">/</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="w">      </span><span class="nl">uses</span><span class="p">:</span><span class="w"> </span><span class="n">JamesIves</span><span class="o">/</span><span class="n">github</span><span class="o">-</span><span class="n">pages</span><span class="o">-</span><span class="n">deploy</span><span class="o">-</span><span class="n">action</span><span class="p">@</span><span class="n">v4</span><span class="mf">.4.1</span>
+<span class="w">      </span><span class="nl">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nl">branch</span><span class="p">:</span><span class="w"> </span><span class="n">gh</span><span class="o">-</span><span class="n">pages</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">branch</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">deploy</span><span class="w"> </span><span class="n">to</span><span class="p">.</span>
+<span class="w">        </span><span class="nl">folder</span><span class="p">:</span><span class="w"> </span><span class="n">doc</span><span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">deploy</span><span class="p">.</span>
+<span class="w">        </span><span class="n">target</span><span class="o">-</span><span class="n">folder</span><span class="o">:</span><span class="w"> </span><span class="n">prev</span><span class="o">/</span><span class="n">$</span><span class="p">{{</span><span class="w"> </span><span class="n">steps</span><span class="p">.</span><span class="n">vars</span><span class="p">.</span><span class="n">outputs</span><span class="p">.</span><span class="n">tag</span><span class="w"> </span><span class="p">}}</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">deploy</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">version</span><span class="o">-</span><span class="n">specific</span><span class="w"> </span><span class="n">folder</span>
 
-<span class="cm">    - name: Upload coverage</span>
-<span class="cm">      if: matrix.gcc_v == 7</span>
-<span class="cm">      run: |</span>
-<span class="cm">        rm json_*.F90-*unicode.gcov || true</span>
-<span class="cm">        mv json_*.F90.gcov src/</span>
-<span class="cm">        mv jf_test*.[fF]90.gcov src/tests/</span>
-<span class="cm">        bash &lt;(curl -s https://codecov.io/bash) -v -X $GCOV</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">Upload</span><span class="w"> </span><span class="n">coverage</span>
+<span class="w">      </span><span class="nl">if</span><span class="p">:</span><span class="w"> </span><span class="n">matrix</span><span class="p">.</span><span class="n">gcc_v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">7</span>
+<span class="w">      </span><span class="nl">run</span><span class="p">:</span><span class="w"> </span><span class="o">|</span>
+<span class="w">        </span><span class="n">rm</span><span class="w"> </span><span class="n">json_</span><span class="o">*</span><span class="p">.</span><span class="n">F90</span><span class="o">-*</span><span class="n">unicode</span><span class="p">.</span><span class="n">gcov</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<span class="w">        </span><span class="n">mv</span><span class="w"> </span><span class="n">json_</span><span class="o">*</span><span class="p">.</span><span class="n">F90</span><span class="p">.</span><span class="n">gcov</span><span class="w"> </span><span class="n">src</span><span class="o">/</span>
+<span class="w">        </span><span class="n">mv</span><span class="w"> </span><span class="n">jf_test</span><span class="o">*</span><span class="p">.[</span><span class="n">fF</span><span class="p">]</span><span class="mf">90.</span><span class="n">gcov</span><span class="w"> </span><span class="n">src</span><span class="o">/</span><span class="n">tests</span><span class="o">/</span>
+<span class="w">        </span><span class="n">bash</span><span class="w"> </span><span class="o">&lt;</span><span class="p">(</span><span class="n">curl</span><span class="w"> </span><span class="o">-</span><span class="n">s</span><span class="w"> </span><span class="n">https</span><span class="o">:</span><span class="c1">//codecov.io/bash) -v -X $GCOV</span>
 </code></pre></div>
     </div>
   </div>
@@ -264,7 +265,7 @@ trigger automatic documentation deployment.</p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-05-19 14:21              </p>
+ on 2024-05-25 16:00              </p>
           </div>
         </div>
         <br>
