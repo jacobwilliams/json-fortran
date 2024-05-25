@@ -9,7 +9,11 @@
 # this software. The contributing author, Izaak Beekman, retains all
 # rights permitted by the terms of the JSON-Fortran license.
 
-cmake_minimum_required ( VERSION 3.5 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.18 FATAL_ERROR )
+
+option (JSONFORTRAN_ENABLE_DOC_GENERATION "Enable doc generation" OFF)
+option (JSONFORTRAN_ENABLE_TESTS "Enable tests" OFF)
+option (JSONFORTRAN_STATIC_LIBRARY_ONLY "Generate only static library" ON)
 
 # Use MSVS folders to organize projects on windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -164,8 +168,20 @@ endif ()
 #---------------------------------------------
 
 set ( LIB_NAME ${PROJECT_NAME} )
-add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
-add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
+if(CMAKE_Fortran_COMPILER_ID STREQUAL IntelLLVM)
+    add_library ( ${LIB_NAME}-obj    OBJECT ${JF_LIB_SRCS} )
+    set_property(TARGET ${LIB_NAME}-obj PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+    add_library ( ${LIB_NAME}        SHARED $<TARGET_OBJECTS:${LIB_NAME}-obj> )
+    add_library ( ${LIB_NAME}-static STATIC $<TARGET_OBJECTS:${LIB_NAME}-obj> )
+else()
+  if (JSONFORTRAN_STATIC_LIBRARY_ONLY)
+    add_library ( ${LIB_NAME}        STATIC ${JF_LIB_SRCS} )
+    add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
+  else()
+    add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
+  endif()
+endif()
 
 # add an alias so that including json-fortran is agnostic
 # of find_package or being directly compiled through add_subdirectory
@@ -187,15 +203,26 @@ target_include_directories(${LIB_NAME}-static
   PUBLIC
   $<BUILD_INTERFACE:${MODULE_DIR}>
   $<INSTALL_INTERFACE:${INSTALL_MOD_DIR}>)
-set_target_properties ( ${LIB_NAME}-static
-  PROPERTIES
-  OUTPUT_NAME ${LIB_NAME}
-  if(NOT MSVC_IDE)
-  PREFIX lib
-  endif()
-  VERSION ${PROJECT_VERSION}
-  ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
-  Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
+if(CMAKE_Fortran_COMPILER_ID STREQUAL IntelLLVM)
+    set_target_properties ( ${LIB_NAME}-static
+      PROPERTIES
+      if(NOT MSVC_IDE)
+      PREFIX lib
+      endif()
+      VERSION ${PROJECT_VERSION}
+      ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+      Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
+else()
+    set_target_properties ( ${LIB_NAME}-static
+      PROPERTIES
+      OUTPUT_NAME ${LIB_NAME}
+      if(NOT MSVC_IDE)
+      PREFIX lib
+      endif()
+      VERSION ${PROJECT_VERSION}
+      ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+      Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
+endif()
 set_target_properties ( ${LIB_NAME}
   PROPERTIES
   OUTPUT_NAME ${LIB_NAME}
@@ -210,8 +237,12 @@ set_target_properties ( ${LIB_NAME}
 #-------------------------------------
 # Build the documentation with FORD
 #-------------------------------------
-set ( SKIP_DOC_GEN FALSE CACHE BOOL
-  "Disable building the API documentation with FORD" )
+if (JSONFORTRAN_ENABLE_DOC_GENERATION)
+  set(SKIP_DOC_GEN FALSE CACHE BOOL "Disable building the API documentation with FORD")
+else ()
+  set(SKIP_DOC_GEN TRUE CACHE BOOL "Disable building the API documentation with FORD" )
+endif ()
+
 if ( NOT SKIP_DOC_GEN )
   find_program ( FORD ford )
   if ( FORD ) # Found
@@ -284,8 +315,11 @@ endif ()
 #--------------------------
 # Handle test related stuff
 #--------------------------
-set ( ENABLE_TESTS TRUE CACHE BOOL
-  "Enable the JSON-Fortran tests." )
+if (JSONFORTRAN_ENABLE_TESTS)
+  set ( ENABLE_TESTS TRUE CACHE BOOL "Enable the JSON-Fortran tests." )
+else ()
+  set ( ENABLE_TESTS FALSE CACHE BOOL "Enable the JSON-Fortran tests." )
+endif ()
 
 #---------------------------------------------------------------------
 # Add some tests to ensure that the software is performing as expected
