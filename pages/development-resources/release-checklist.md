@@ -52,7 +52,7 @@ remain accurate.
 	 1. Add `pages/releases/index.md` to the git index: `git add pages/releases/index.md`
  1. Update the version string in remaining files requiring manual edits:
      1. Edit the `.VERSION` file
-     1. Edit the CMake example on line 142 of `README.md`
+     1. Edit the CMake example on line 141 of `README.md`
      1. Edit the `json_fortran_version` string in `json_module.F90`
 	 1. Add these files to the git index: `git add .VERSION README.md ./src/json_module.F90`
  1. Commit the changes to the master branch: `git commit`

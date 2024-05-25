@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.4.0 (2024-03-06)](#840-2024-03-06)
     - [8.3.0 (2022-05-07)](#830-2022-05-07)
     - [8.2.5 (2021-08-17)](#825-2021-08-17)
     - [8.2.4 (2021-08-15)](#824-2021-08-15)
@@ -45,7 +46,22 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.3.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.4.0...HEAD)
+
+### [8.4.0](https://github.com/jacobwilliams/json-fortran/tree/8.4.0) (2024-03-06)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.3.0...8.4.0)
+or [Download v8.4.0](https://github.com/jacobwilliams/json-fortran/releases/tag/8.4.0)
+
+**Enhancements:**
+
+- Minor updates for readme and documentation  [\#521](https://github.com/jacobwilliams/json-fortran/pull/521) ([zmoon](https://github.com/zmoon))
+- Updates for unit tests [\#536](https://github.com/jacobwilliams/json-fortran/issues/536) [\#543](https://github.com/jacobwilliams/json-fortran/pull/543)   ([gha3mi](https://github.com/gha3mi), [jacobwilliams](https://github.com/jacobwilliams))
+
+**Bug Fixes:**
+
+- Fixed a bug where the library would not compile if using `REAL128` kind  [\#550](https://github.com/jacobwilliams/json-fortran/issues/550) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixes to GitHub Actions CI [\#535](https://github.com/jacobwilliams/json-fortran/pull/535) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [8.3.0](https://github.com/jacobwilliams/json-fortran/tree/8.3.0) (2022-05-07)
 
@@ -58,7 +74,6 @@ or [Download v8.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 - Updates to the CI [\#509](https://github.com/jacobwilliams/json-fortran/pull/509) [\#508](https://github.com/jacobwilliams/json-fortran/issues/508) ([jacobwilliams](https://github.com/jacobwilliams))
 - Add information on conda-forge distribution [\#506](https://github.com/jacobwilliams/json-fortran/pull/506) ([awvwgk](https://github.com/awvwgk))  [\#507](https://github.com/jacobwilliams/json-fortran/issues/507)
 - Updated CMake to export include directories with target [\#504](https://github.com/jacobwilliams/json-fortran/pull/504) [\#503](https://github.com/jacobwilliams/json-fortran/issues/503) ([awvwgk](https://github.com/awvwgk))
-
 
 **Bug Fixes:**
 

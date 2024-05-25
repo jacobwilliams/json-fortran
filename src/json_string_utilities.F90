@@ -127,7 +127,7 @@
     ! Compute how many digits we need to read
     ndigits = 2*len_trim(str)
     if (ndigits/=0) then
-        ndigits_digits = floor(log10(real(ndigits)))+1
+        ndigits_digits = nint(log10(real(ndigits)))+1
         allocate(character(kind=CDK,len=ndigits_digits) :: digits)
         write(digits,'(I0)') ndigits !gfortran will have a runtime error with * edit descriptor here
         ! gfortran bug: '*' edit descriptor for ISO_10646 strings does bad stuff.
@@ -484,9 +484,9 @@
 
     implicit none
 
-    character(kind=CK,len=:),allocatable,intent(inout) :: str           !! in: string as stored
-                                                                        !! in a [[json_value]].
-                                                                        !! out: decoded string.
+    character(kind=CK,len=:),allocatable,intent(inout) :: str           !! * in: string as stored
+                                                                        !!   in a [[json_value]].
+                                                                        !! * out: decoded string.
     character(kind=CK,len=:),allocatable,intent(out)   :: error_message !! will be allocated if
                                                                         !! there was an error
 
@@ -617,7 +617,7 @@
 
 !*****************************************************************************************
 !> author: Jacob Williams
-!  date:6/14/2014
+!  date: 6/14/2014
 !
 !  Returns true if the string is a valid 4-digit hex string.
 !
