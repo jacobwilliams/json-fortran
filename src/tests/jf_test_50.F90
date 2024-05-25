@@ -34,7 +34,7 @@ contains
     call json%initialize(compress_vectors = .true.) ! so it will print each col on one line
 
     call json%create_object(p,'')   !create the root
-    call json_value_add_real_vec_2d(json, p, 'Pcir', pcir, by_col=.true.)
+    call json_value_add_real_vec_2d(json, p, CK_'Pcir', pcir, by_col=.true.)
     call json%print(p)
 
     error_cnt = 0
@@ -48,7 +48,7 @@ contains
         class(json_core),intent(inout)      :: json
         type(json_value),pointer            :: p
         character(kind=CK,len=*),intent(in) :: name   !! name of the variable
-        real(wp),dimension(:,:),intent(in)    :: val    !! value
+        real(wp),dimension(:,:),intent(in)  :: val    !! value
         logical,intent(in) :: by_col !! if true, write by column. if false, write by row
 
         type(json_value),pointer :: var
