@@ -35,8 +35,8 @@ include ( "cmake/checkOutOfSource.cmake" )
 # Declare project name
 #---------------------
 project (
-    jsonfortran 
-    VERSION 8.3.0
+    jsonfortran
+    VERSION 8.4.0
     LANGUAGES Fortran
 )
 
