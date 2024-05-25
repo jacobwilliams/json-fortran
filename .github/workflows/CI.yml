@@ -23,7 +23,7 @@ jobs:
       run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4.1.6
       with:
         submodules: recursive
 
@@ -34,12 +34,12 @@ jobs:
         cmake-version: '3.19.x'
 
     - name: Install Python
-      uses: actions/setup-python@v4 # Use pip to install latest CMake, & FORD/Jin2For, etc.
+      uses: actions/setup-python@v5.1.0 # Use pip to install latest CMake, & FORD/Jin2For, etc.
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Setup Graphviz
-      uses: ts-graphviz/setup-graphviz@v1
+      uses: ts-graphviz/setup-graphviz@v2.0.2
 
     - name: Install Python dependencies
       if: contains( matrix.os, 'ubuntu')
