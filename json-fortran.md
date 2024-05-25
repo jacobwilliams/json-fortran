@@ -1,7 +1,6 @@
 ---
 project: JSON-Fortran
-summary: ![JSON-Fortran](|media|/json-fortran-logo-2.png)<br>
-         JSON-Fortran -- A Modern Fortran JSON API
+summary: JSON-Fortran -- A Modern Fortran JSON API
 author: Jacob Williams
 src_dir: ./src
 output_dir: ./doc
@@ -39,6 +38,8 @@ md_extensions: markdown.extensions.toc
 --------------------
 
 [TOC]
+
+![json-fortran](media/json-fortran-logo-2.png)
 
 Brief description
 -----------------
