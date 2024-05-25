@@ -20,7 +20,8 @@ jobs:
 
     - name: Set vars
       id: vars
-      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      # run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}   # this is depreciated: https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/
+      run: echo "name=tag::${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
       uses: actions/checkout@v4.1.6
@@ -29,7 +30,7 @@ jobs:
 
     - name: Setup cmake
       if: contains( matrix.gcc_v, 9 )
-      uses: jwlawson/actions-setup-cmake@v1.13
+      uses: jwlawson/actions-setup-cmake@v2.0.2
       with:
         cmake-version: '3.19.x'
 
