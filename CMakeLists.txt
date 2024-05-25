@@ -9,7 +9,7 @@
 # this software. The contributing author, Izaak Beekman, retains all
 # rights permitted by the terms of the JSON-Fortran license.
 
-cmake_minimum_required ( VERSION 3.0 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.5 FATAL_ERROR )
 
 # Use MSVS folders to organize projects on windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
