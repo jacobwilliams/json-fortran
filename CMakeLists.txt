@@ -9,7 +9,7 @@
 # this software. The contributing author, Izaak Beekman, retains all
 # rights permitted by the terms of the JSON-Fortran license.
 
-cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.5 FATAL_ERROR )
 
 # Use MSVS folders to organize projects on windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -34,7 +34,14 @@ include ( "cmake/checkOutOfSource.cmake" )
 #---------------------
 # Declare project name
 #---------------------
-project ( jsonfortran NONE )
+project (
+    jsonfortran
+    VERSION 8.4.0
+    LANGUAGES Fortran
+)
+
+# write the version file
+configure_file(${CMAKE_SOURCE_DIR}/.VERSION.in ${CMAKE_SOURCE_DIR}/.VERSION)
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
   option(JSON_FORTRAN_USE_OpenCoarrays
@@ -70,16 +77,6 @@ elseif(${JSON_INT_KIND} MATCHES "INT64")
   add_definitions(-DINT64)
 endif()
 
-#----------------------------------
-# Get version (semantic versioning)
-# C.F. semver.org
-#----------------------------------
-file ( STRINGS "${PROJECT_SOURCE_DIR}/.VERSION" VERSION )
-string( REPLACE "." ";" VERSION_LIST ${VERSION} )
-list(GET VERSION_LIST 0 VERSION_MAJOR)
-list(GET VERSION_LIST 1 VERSION_MINOR)
-list(GET VERSION_LIST 2 VERSION_PATCH)
-set(PROJECT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 message ( STATUS "CMake build configuration for JSON-Fortran ${PROJECT_VERSION}" )
 
 #-------------------------------------
@@ -170,6 +167,11 @@ set ( LIB_NAME ${PROJECT_NAME} )
 add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
 add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
 
+# add an alias so that including json-fortran is agnostic
+# of find_package or being directly compiled through add_subdirectory
+add_library ( ${PACKAGE_NAME}::${LIB_NAME}        ALIAS ${LIB_NAME} )
+add_library ( ${PACKAGE_NAME}::${LIB_NAME}-static ALIAS ${LIB_NAME}-static )
+
 if(JSON_FORTRAN_USE_OpenCoarrays)
   target_link_libraries(${LIB_NAME}
     PRIVATE OpenCoarrays::caf_mpi_static)
@@ -191,7 +193,7 @@ set_target_properties ( ${LIB_NAME}-static
   if(NOT MSVC_IDE)
   PREFIX lib
   endif()
-  VERSION ${VERSION}
+  VERSION ${PROJECT_VERSION}
   ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
   Fortran_MODULE_DIRECTORY ${MODULE_DIR} )
 set_target_properties ( ${LIB_NAME}
@@ -200,8 +202,8 @@ set_target_properties ( ${LIB_NAME}
   if(NOT MSVC_IDE)
   PREFIX lib
   endif()
-  SOVERSION ${VERSION_MAJOR}.${VERSION_MINOR}
-  VERSION ${VERSION}
+  SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+  VERSION ${PROJECT_VERSION}
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
   Fortran_MODULE_DIRECTORY ${PROJECT_BINARY_DIR} )
 
@@ -446,60 +448,6 @@ add_custom_target ( uninstall
 #-----------------------------------------------------
 # Publicize installed location to other CMake projects
 #-----------------------------------------------------
-install ( EXPORT ${PACKAGE_NAME}-targets
-  NAMESPACE ${PACKAGE_NAME}::
-  DESTINATION "${EXPORT_INSTALL_DIR}" )
-
-include ( CMakePackageConfigHelpers ) # Standard CMake module
-write_basic_package_version_file( "${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
-  VERSION ${VERSION}
-  COMPATIBILITY SameMajorVersion )
-
-# provides COMPILER_CONSISTENCY_CHECK
-include ( cmake/FCompilerConsistencyCheck.cmake )
-
-# install package config file
-configure_package_config_file (
-  "${PROJECT_SOURCE_DIR}/cmake/pkg/${PROJECT_NAME}-config.cmake.in"
-  "${PROJECT_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake"
-  INSTALL_DESTINATION "${EXPORT_INSTALL_DIR}"
-  PATH_VARS EXPORT_INSTALL_DIR INSTALL_MOD_DIR )
-
-# Install the config and version files so that we can find this project with others
-install ( FILES
-  "${PROJECT_BINARY_DIR}/pkg/${PACKAGE_NAME}-config.cmake"
-  "${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake"
-  DESTINATION "${EXPORT_INSTALL_DIR}" )
-
-#----------------------------------------------
-# Make build tree targets accessible for import
-#----------------------------------------------
-export ( TARGETS ${LIB_NAME} ${LIB_NAME}-static FILE ${PACKAGE_NAME}-targets.cmake )
-
-# build tree package config file, NOT installed
-configure_file (
-  "${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}-config.cmake.in"
-  "${PROJECT_BINARY_DIR}/${PACKAGE_NAME}-config.cmake"
-  @ONLY )
-
-set ( ENABLE_BUILD_TREE_EXPORT FALSE CACHE BOOL
-  "Add the ${PACKAGE_NAME} build tree to the CMake package registry?" )
-if ( ENABLE_BUILD_TREE_EXPORT )
-  export ( PACKAGE ${PACKAGE_NAME} )
-endif ()
-
-# pkg-config stuff
-configure_file(
-   "${CMAKE_CURRENT_SOURCE_DIR}/json-fortran.pc.cmake.in"
-   "${CMAKE_CURRENT_BINARY_DIR}/json-fortran.pc"
-   @ONLY
-)
-install(FILES
-   "${CMAKE_CURRENT_BINARY_DIR}/json-fortran.pc"
-   DESTINATION "${INSTALL_LIB_DIR}/pkgconfig"
-)
-
-if(MSVC_IDE)
-   INCLUDE_DIRECTORIES("src")
-   SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  add_subdirectory(packaging)
 endif()

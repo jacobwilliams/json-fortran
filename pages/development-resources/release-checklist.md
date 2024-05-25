@@ -14,8 +14,8 @@ remain accurate.
 	     1. Look at the latest [changes committed to GitHub since the
             last release](https://github.com/jacobwilliams/json-fortran/compare/{!.VERSION!}...HEAD),
             {!.VERSION!}. This will only be accurate if you have
-            not yet updated `.VERSION`. If you *have* updated
-            `.VERSION` then edit the URL manually to view the
+            not yet updated the project version in cmake. If you *have* updated
+            the product version in cmake and run cmake (and therefore `.VERSION`) then edit the URL manually to view the
             changes.
 		 1. Run the
             [`github_changelog_generator`](https://github.com/github-changelog-generator/github-changelog-generator)
@@ -51,7 +51,8 @@ remain accurate.
         string
 	 1. Add `pages/releases/index.md` to the git index: `git add pages/releases/index.md`
  1. Update the version string in remaining files requiring manual edits:
-     1. Edit the `.VERSION` file
+     1. Edit the product version in CMake
+     1. Run cmake to generate the `.VERSION` file  (or manually update this file if not running CMake)
      1. Edit the CMake example on line 141 of `README.md`
      1. Edit the `json_fortran_version` string in `json_module.F90`
 	 1. Add these files to the git index: `git add .VERSION README.md ./src/json_module.F90`
