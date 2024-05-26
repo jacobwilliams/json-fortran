@@ -12,7 +12,7 @@
 cmake_minimum_required ( VERSION 3.18 FATAL_ERROR )
 
 option (JSONFORTRAN_ENABLE_DOC_GENERATION "Enable doc generation" OFF)
-option (JSONFORTRAN_ENABLE_TESTS "Enable tests" On)
+option (JSONFORTRAN_ENABLE_TESTS "Enable tests" ON)
 option (JSONFORTRAN_STATIC_LIBRARY_ONLY "Generate only static library" OFF)
 
 # Use MSVS folders to organize projects on windows
