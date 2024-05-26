@@ -142,7 +142,7 @@ cmake_minimum_required ( VERSION 3.18 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 8.5.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 8.5.1 REQUIRED )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
 foreach ( UNIT_TEST ${JF_TEST_SRCS} )
