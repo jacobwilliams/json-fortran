@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.5.0 (2024-05-25)](#850-2024-05-25)
     - [8.4.0 (2024-03-06)](#840-2024-03-06)
     - [8.3.0 (2022-05-07)](#830-2022-05-07)
     - [8.2.5 (2021-08-17)](#825-2021-08-17)
@@ -46,7 +47,25 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.4.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.0...HEAD)
+
+### [8.5.0](https://github.com/jacobwilliams/json-fortran/tree/8.5.0) (2024-05-25)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.4.0...8.5.0)
+or [Download v8.5.0](https://github.com/jacobwilliams/json-fortran/releases/tag/8.5.0)
+
+**Enhancements:**
+
+- Various CMake updates:
+  - Only installing if json-fortran is the top level project. Added a library alias so that json fortran can be included with `find_package`, `fetch_content`, and `add_subdirectory` easily. [#526](https://github.com/jacobwilliams/json-fortran/issues/526) [#527](https://github.com/jacobwilliams/json-fortran/pull/527) , [#528](https://github.com/jacobwilliams/json-fortran/pull/528), [#529](https://github.com/jacobwilliams/json-fortran/pull/529) [#556](https://github.com/jacobwilliams/json-fortran/pull/556) ([K20shores](https://github.com/K20shores))
+  - Fixed compilation with Ninja and Intel OneAPI ifx compiler, and added some CMake options [#557](https://github.com/jacobwilliams/json-fortran/pull/557) ([lmdiazangulo](https://github.com/lmdiazangulo))
+  - Note that the CMake minimum version is now `3.18`.
+- Added a new unit test. [#546](https://github.com/jacobwilliams/json-fortran/issues/546) [#547](https://github.com/jacobwilliams/json-fortran/pull/547) ([jacobwilliams](https://github.com/jacobwilliams))
+- Various CI and Readme updates.
+
+**Bug Fixes:**
+
+- Fixed a bug when IEEE floating-point rounding mode was set to `IEEE_DOWN`. [#545](https://github.com/jacobwilliams/json-fortran/pull/545) ([amanotk](https://github.com/amanotk))
 
 ### [8.4.0](https://github.com/jacobwilliams/json-fortran/tree/8.4.0) (2024-03-06)
 
