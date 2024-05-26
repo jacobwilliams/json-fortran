@@ -84,6 +84,10 @@ conda install json-fortran
 _Note:_ Packages on conda-forge are build with GCC 9.4 which is upwards
 compatible with newer GCC versions, but not with other Fortran compilers.
 
+### Package status from Repology
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/json-fortran.svg)](https://repology.org/project/json-fortran/versions)
+
 [top](#json-fortran)
 
 Building the library
