@@ -12,8 +12,8 @@
 cmake_minimum_required ( VERSION 3.18 FATAL_ERROR )
 
 option (JSONFORTRAN_ENABLE_DOC_GENERATION "Enable doc generation" OFF)
-option (JSONFORTRAN_ENABLE_TESTS "Enable tests" OFF)
-option (JSONFORTRAN_STATIC_LIBRARY_ONLY "Generate only static library" ON)
+option (JSONFORTRAN_ENABLE_TESTS "Enable tests" ON)
+option (JSONFORTRAN_STATIC_LIBRARY_ONLY "Generate only static library" OFF)
 
 # Use MSVS folders to organize projects on windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -40,7 +40,7 @@ include ( "cmake/checkOutOfSource.cmake" )
 #---------------------
 project (
     jsonfortran
-    VERSION 8.5.0
+    VERSION 8.5.1
     LANGUAGES Fortran
 )
 
@@ -180,6 +180,7 @@ else()
     add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
   else()
     add_library ( ${LIB_NAME}        SHARED ${JF_LIB_SRCS} )
+    add_library ( ${LIB_NAME}-static STATIC ${JF_LIB_SRCS} )
   endif()
 endif()
 

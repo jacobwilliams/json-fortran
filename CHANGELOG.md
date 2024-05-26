@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.5.1 (2024-05-26)](#851-2024-05-26)
     - [8.5.0 (2024-05-25)](#850-2024-05-25)
     - [8.4.0 (2024-03-06)](#840-2024-03-06)
     - [8.3.0 (2022-05-07)](#830-2022-05-07)
@@ -47,7 +48,16 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.1...HEAD)
+
+### [8.5.1](https://github.com/jacobwilliams/json-fortran/tree/8.5.1) (2024-05-26)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.0...8.5.1)
+or [Download v8.5.1](https://github.com/jacobwilliams/json-fortran/releases/tag/8.5.1)
+
+**Bug Fixes:**
+
+* Fixed a bug when setting `JSONFORTRAN_STATIC_LIBRARY_ONLY` to False. Also restored some of the original CMake settings from 8.4.0. Specifically, the tests are enabled by default, and both the shared and static libraries are built by default. [#558](https://github.com/jacobwilliams/json-fortran/issues/558) [#559](https://github.com/jacobwilliams/json-fortran/pull/559) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [8.5.0](https://github.com/jacobwilliams/json-fortran/tree/8.5.0) (2024-05-25)
 
