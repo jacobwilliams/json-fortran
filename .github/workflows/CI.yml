@@ -32,7 +32,7 @@ jobs:
       if: contains( matrix.gcc_v, 9 )
       uses: jwlawson/actions-setup-cmake@v2.0.2
       with:
-        cmake-version: '3.19.x'
+        cmake-version: '3.28.x'
 
     - name: Install Python
       uses: actions/setup-python@v5.1.0 # Use pip to install latest CMake, & FORD/Jin2For, etc.
@@ -78,7 +78,7 @@ jobs:
         GCOV=gcov-${{matrix.gcc_v}}
         mkdir cmake-build
         cd cmake-build
-        cmake ..
+        cmake -D ENABLE_TESTS=ON ..
         make -j 4 check
 
     - name: Compile_with_build_mkdocs
