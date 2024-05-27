@@ -25,6 +25,9 @@ documentation from the documentation for official releases other than
 using the browser's back button. Feel free to bookmark this page, or
 the [main project page](|url|/index.html) for convenient navigation.
 
+* [8.5.2](https://jacobwilliams.github.io/json-fortran/prev/8.5.2/index.html)
+   ([FORD](https://github.com/Fortran-FOSS-Programmers/ford) generated documentation)
+    - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/8.5.2)
 * [8.5.1](https://jacobwilliams.github.io/json-fortran/prev/8.5.1/index.html)
    ([FORD](https://github.com/Fortran-FOSS-Programmers/ford) generated documentation)
     - [Download](https://github.com/jacobwilliams/json-fortran/releases/tag/8.5.1)

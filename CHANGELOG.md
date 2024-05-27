@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [8.5.2 (2024-05-27)](#852-2024-05-27)
     - [8.5.1 (2024-05-26)](#851-2024-05-26)
     - [8.5.0 (2024-05-25)](#850-2024-05-25)
     - [8.4.0 (2024-03-06)](#840-2024-03-06)
@@ -48,7 +49,16 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.1...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.2...HEAD)
+
+### [8.5.2](https://github.com/jacobwilliams/json-fortran/tree/8.5.2) (2024-05-27)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.1...8.5.2)
+or [Download v8.5.2](https://github.com/jacobwilliams/json-fortran/releases/tag/8.5.2)
+
+**Bug Fixes:**
+
+* Fixed a CMake bug where the package version was not set correctly, which caused the CMake configuration files to be saved to a folder with blank version name. [#560](https://github.com/jacobwilliams/json-fortran/pull/560) ([timfelle](https://github.com/timfelle))
 
 ### [8.5.1](https://github.com/jacobwilliams/json-fortran/tree/8.5.1) (2024-05-26)
 
