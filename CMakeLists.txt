@@ -111,7 +111,7 @@ set ( USE_GNU_INSTALL_CONVENTION FALSE
 # Set the package name to be specific to the compiler used, so that
 # versions compiled with different compilers can be installed in parallel
 string ( TOLOWER ${PROJECT_NAME}-${CMAKE_Fortran_COMPILER_ID} PACKAGE_NAME )
-set ( PACKAGE_VERSION "${PACKAGE_NAME}-${VERSION}" )
+set ( PACKAGE_VERSION "${PACKAGE_NAME}-${PROJECT_VERSION}" )
 
 if (USE_GNU_INSTALL_CONVENTION)
   include(GNUInstallDirs)
