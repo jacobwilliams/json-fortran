@@ -849,6 +849,7 @@
                                                       !! (if not present, a newunit
                                                       !! is used)
 
+    call me%destroy()
     call me%core%load(file=filename, p=me%p, unit=unit)
 
     end subroutine json_file_load
@@ -875,6 +876,7 @@
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
 
+    call me%destroy()
     call me%core%deserialize(me%p, str)
 
     end subroutine json_file_load_from_string
@@ -1997,7 +1999,7 @@
         destroy = .true. ! default
     end if
 
-    if (destroy) call me%core%destroy(me%p)
+    if (destroy) call me%destroy()
 
     me%p => p
 
