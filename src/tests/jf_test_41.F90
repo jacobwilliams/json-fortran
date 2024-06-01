@@ -57,7 +57,9 @@ contains
         write(error_unit,'(A)') ''
         write(error_unit,'(A)') 'copying to json_file...'
 
-        f = json_file(p)
+        !f = json_file(p) ! memory leak in gfortran?
+        call f%initialize()
+        call f%add(p)
 
         call f2%add(p2)
         nullify(p2) ! data is now in f
