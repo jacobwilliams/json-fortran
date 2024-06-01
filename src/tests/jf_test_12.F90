@@ -150,9 +150,10 @@ contains
     call json%get(me=root,path='array data.data',array_callback=get_3D_from_array)
     call check_errors(all(abs(fetched_array - reshape(raw_array,[size(raw_array)])) <= TOL))
 
-    my_file = json_file(root,verbose=.true.,real_format='G')
-
-    call json%destroy(root)
+    !my_file = json_file(root,verbose=.true.,real_format='G')  ! valgrind says this cases a memory leak
+    call my_file%initialize(verbose=.true.,real_format='G')    ! this doesn't have a memmory leak
+    call my_file%add(root)
+    nullify(root)
 
     call my_file%update('array data.description',CK_'vector data',found=existed)
     call check_file_errors(existed)
