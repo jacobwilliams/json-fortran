@@ -152,6 +152,8 @@ contains
 
     my_file = json_file(root,verbose=.true.,real_format='G')
 
+    call json%destroy(root)
+
     call my_file%update('array data.description',CK_'vector data',found=existed)
     call check_file_errors(existed)
 
