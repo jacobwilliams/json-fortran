@@ -42,6 +42,7 @@ contains
     call json%create_object(p,'')   !create the root
     call json_value_add_real_vec_2d(json, p, CK_'Pcir', pcir, by_col=.true.)
     call json%print(p)
+    call json%destroy(p)
 
     error_cnt = 0
 
