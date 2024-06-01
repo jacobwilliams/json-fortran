@@ -108,7 +108,9 @@ contains
 #endif
 
     ! test json_file interface
-    f = json_file(p)
+    !f = json_file(p) ! memory leak in gfortran?
+    call f%initialize()
+    call f%add(p)
     nullify(p) ! data is now in f
     call f%get('str_array', vec, ilen, found)
     if (.not. found) then

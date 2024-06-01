@@ -39,26 +39,34 @@ contains
     call json%initialize(no_whitespace=.true.)
 
     call json%deserialize(p, CK_'{"a": ["1", "2", "3"]}')
-    f = json_file(p,no_whitespace=.true.)
+    !f = json_file(p,no_whitespace=.true.) ! memory leak in gfortran?
+    call f%initialize(no_whitespace=.true.)
+    call f%add(p)
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     call json%deserialize(p, CK_'{"b": ["4", "5", "6"]}')
-    f = json_file(p,json)
+    !f = json_file(p,json) ! memory leak in gfortran?
+    call f%initialize(json)
+    call f%add(p)
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
-    f = json_file(CK_'{"x": [1,2,3]}',no_whitespace=.true.)
+    !f = json_file(CK_'{"x": [1,2,3]}',no_whitespace=.true.) ! memory leak in gfortran?
+    call f%initialize(no_whitespace=.true.)
+    call f%deserialize(CK_'{"x": [1,2,3]}')
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
-    f = json_file(CK_'{"y": [4,5,6]}',json)
+    !f = json_file(CK_'{"y": [4,5,6]}',json) ! memory leak in gfortran?
+    call f%initialize(json)
+    call f%deserialize(CK_'{"y": [4,5,6]}')
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
@@ -69,26 +77,34 @@ contains
     ! also test default character kind when unicode is enabled:
 
     call json%deserialize(p, CDK_'{"a": ["1", "2", "3"]}')
-    f = json_file(p,no_whitespace=.true.)
+    !f = json_file(p,no_whitespace=.true.) ! memory leak in gfortran?
+    call f%initialize(no_whitespace=.true.)
+    call f%add(p)
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
     call json%deserialize(p, CDK_'{"b": ["4", "5", "6"]}')
-    f = json_file(p,json)
+    !f = json_file(p,json) ! memory leak in gfortran?
+    call f%initialize(json)
+    call f%add(p)
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
-    f = json_file(CDK_'{"x": [1,2,3]}',no_whitespace=.true.)
+    !f = json_file(CDK_'{"x": [1,2,3]}',no_whitespace=.true.) ! memory leak in gfortran?
+    call f%initialize(no_whitespace=.true.)
+    call f%deserialize(CDK_'{"x": [1,2,3]}')
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()
     call f%destroy()
 
-    f = json_file(CDK_'{"y": [4,5,6]}',json)
+    !f = json_file(CDK_'{"y": [4,5,6]}',json) ! memory leak in gfortran?
+    call f%initialize(json)
+    call f%deserialize(CDK_'{"y": [4,5,6]}')
     call f%print(int(error_unit,IK))
     write(error_unit,'(A)') ''
     call check_for_error()

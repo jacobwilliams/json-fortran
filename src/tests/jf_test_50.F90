@@ -31,11 +31,18 @@ contains
     type(json_core) :: json
     type(json_value),pointer :: p
 
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '================================='
+    write(error_unit,'(A)') '   EXAMPLE 50'
+    write(error_unit,'(A)') '================================='
+    write(error_unit,'(A)') ''
+
     call json%initialize(compress_vectors = .true.) ! so it will print each col on one line
 
     call json%create_object(p,'')   !create the root
     call json_value_add_real_vec_2d(json, p, CK_'Pcir', pcir, by_col=.true.)
     call json%print(p)
+    call json%destroy(p)
 
     error_cnt = 0
 

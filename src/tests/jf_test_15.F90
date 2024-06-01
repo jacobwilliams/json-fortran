@@ -216,7 +216,9 @@ contains
 
         !****************************************
 
-        file1 = json_file(p2,json)  !constructor
+        !file1 = json_file(p2,json)  ! memory leak with gfortran?
+        call file1%initialize(json)
+        call file1%add(p2); nullify(p2)
         call file1%destroy(destroy_core=.true.)
 
         !****************************************
