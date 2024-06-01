@@ -31,6 +31,12 @@ contains
     type(json_core) :: json
     type(json_value),pointer :: p
 
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '================================='
+    write(error_unit,'(A)') '   EXAMPLE 50'
+    write(error_unit,'(A)') '================================='
+    write(error_unit,'(A)') ''
+
     call json%initialize(compress_vectors = .true.) ! so it will print each col on one line
 
     call json%create_object(p,'')   !create the root
