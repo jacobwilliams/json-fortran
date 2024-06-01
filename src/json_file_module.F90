@@ -569,7 +569,8 @@
 
     function initialize_json_file(p,&
 #include "json_initialize_dummy_arguments.inc"
-                                 ) result(file_object)
+                                  , nullify_pointer &
+                                  ) result(file_object)
 
     implicit none
 
@@ -578,6 +579,8 @@
                                             !! as a `json_file` object. This
                                             !! will be nullified.
 #include "json_initialize_arguments.inc"
+    logical(LK),intent(in),optional :: nullify_pointer !! if True, then `p` will be nullified
+                                                       !! if present. (default is True)
 
     call file_object%initialize(&
 #include "json_initialize_dummy_arguments.inc"
@@ -588,7 +591,11 @@
         ! we have to nullify it to avoid
         ! a dangling pointer when the file
         ! goes out of scope
-        nullify(p)
+        if (present(nullify_pointer)) then
+            if (nullify_pointer) nullify(p)
+        else
+            nullify(p)
+        end if
     end if
 
     end function initialize_json_file
