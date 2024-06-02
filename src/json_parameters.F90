@@ -99,9 +99,9 @@
     character(kind=CK,len=*),parameter :: false_str = CK_'false' !! JSON logical False string
 #endif
 
-    integer, private :: i_      !! just a counter for `control_chars` array
-    character(kind=CK,len=*),dimension(32),parameter :: control_chars = &
-        [(achar(i_,kind=CK),i_=1,31), achar(127,kind=CK)] !! Control characters, possibly in unicode
+    ! integer, private :: i_      !! just a counter for `control_chars` array
+    ! character(kind=CK,len=*),dimension(32),parameter :: control_chars = &
+    !     [(achar(i_,kind=CK),i_=1,31), achar(127,kind=CK)] !! Control characters, possibly in unicode
 
     !find out the precision of the floating point number system
     !and set safety factors
