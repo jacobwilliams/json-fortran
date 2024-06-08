@@ -74,6 +74,8 @@ jobs:
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
         sudo apt update && sudo apt install -y valgrind
+        fpm --version
+        gfortran --version
         fpm test "*" --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
 
     - name: Compile_with_cmake
