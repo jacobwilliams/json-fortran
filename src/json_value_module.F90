@@ -287,6 +287,9 @@
                             !! * If true [default], an exception will be raised if an integer
                             !!   value cannot be read when parsing JSON.
 
+        logical(LK) :: allow_trailing_comma = .true.
+                            !! Allow a single trailing comma in arrays and objects.
+
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
         integer :: filesize = 0 !! the file size when when `use_unformatted_stream=True`
@@ -1138,6 +1141,10 @@
 
     if (present(strict_integer_type_checking)) then
         me%strict_integer_type_checking = strict_integer_type_checking
+    end if
+
+    if (present(allow_trailing_comma)) then
+        me%allow_trailing_comma = allow_trailing_comma
     end if
 
     !Set the format for real numbers:
@@ -10154,7 +10161,7 @@
 
                 ! start object
                 call json%to_object(value)    !allocate class
-                call json%parse_object(unit, str, value)
+                call json%parse_object(unit, str, value, expecting_next_element=.false.)
 
             case (start_array)
 
@@ -10879,7 +10886,7 @@
 !>
 !  Core parsing routine.
 
-    recursive subroutine parse_object(json, unit, str, parent)
+    recursive subroutine parse_object(json, unit, str, parent, expecting_next_element)
 
     implicit none
 
@@ -10887,6 +10894,9 @@
     integer(IK),intent(in)              :: unit    !! file unit number (if parsing from a file)
     character(kind=CK,len=*),intent(in) :: str     !! JSON string (if parsing from a string)
     type(json_value),pointer            :: parent  !! the parsed object will be added as a child of this
+    logical(LK),intent(in) :: expecting_next_element !! if true, this object is preceeded by a comma, so
+                                                     !! we expect a valid object to exist. used to check
+                                                     !! for trailing delimiters.
 
     type(json_value),pointer :: pair  !! temp variable
     logical(LK)              :: eof   !! end of file flag
@@ -10907,13 +10917,18 @@
 
         ! pair name
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                           skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
                                       ' Unexpected end of file while parsing start of object.')
             return
         else if (end_object == c) then
             ! end of an empty object
+            if (expecting_next_element .and. .not. json%allow_trailing_comma) then
+                ! this is a dangling comma.
+                call json%throw_exception('Error in parse_object: '//&
+                                          'Dangling comma when parsing an object.')
+            end if
             return
         else if (quotation_mark == c) then
             call json_value_create(pair)
@@ -10935,7 +10950,7 @@
 
         ! pair value
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                           skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%destroy(pair)
             call json%throw_exception('Error in parse_object:'//&
@@ -10959,14 +10974,15 @@
 
         ! another possible pair
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, popped=c)
+                           skip_comments=json%allow_comments, popped=c)
         if (eof) then
             call json%throw_exception('Error in parse_object: '//&
                                       'End of file encountered when parsing an object')
             return
         else if (delimiter == c) then
             ! read the next member
-            call json%parse_object(unit = unit, str=str, parent = parent)
+            call json%parse_object(unit = unit, str=str, parent = parent, &
+                                   expecting_next_element=.true.)
         else if (end_object == c) then
             ! end of object
             return
@@ -10996,6 +11012,9 @@
     type(json_value),pointer :: element !! temp variable for array element
     logical(LK)              :: eof     !! end of file flag
     character(kind=CK,len=1) :: c       !! character returned by [[pop_char]]
+    logical(LK) :: expecting_next_element !! to check for trailing delimiters
+
+    expecting_next_element = .false.
 
     do
 
@@ -11011,7 +11030,10 @@
         end if
 
         ! parse value will deallocate an empty array value
-        if (associated(element)) call json%add(array, element)
+        if (associated(element)) then
+            expecting_next_element = .false.
+            call json%add(array, element)
+        end if
 
         ! popped the next character
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
@@ -11024,9 +11046,15 @@
             exit
         else if (delimiter == c) then
             ! parse the next element
+            expecting_next_element = .true.
             cycle
         else if (end_array == c) then
             ! end of array
+            if (expecting_next_element .and. .not. json%allow_trailing_comma) then
+                ! this is a dangling comma.
+                call json%throw_exception('Error in parse_array: '//&
+                                          'Dangling comma when parsing an array.')
+            end if
             exit
         else
             call json%throw_exception('Error in parse_array: '//&

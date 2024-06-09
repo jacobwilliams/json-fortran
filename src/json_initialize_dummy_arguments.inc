@@ -22,4 +22,5 @@ stop_on_error,&
 null_to_real_mode,&
 non_normal_mode,&
 use_quiet_nan, &
-strict_integer_type_checking &
+strict_integer_type_checking, &
+allow_trailing_comma &
