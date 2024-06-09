@@ -78,7 +78,7 @@ the [json-fortran package](https://anaconda.org/conda-forge/json-fortran)
 can be installed.
 
 ```bash
-conda install json-fortran
+conda install --channel conda-forge json-fortran
 ```
 
 _Note:_ Packages on conda-forge are build with GCC 9.4 which is upwards

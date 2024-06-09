@@ -112,3 +112,6 @@ logical(LK),intent(in),optional :: strict_integer_type_checking
   !!   value cannot be read.
   !!
   !! (default is true)
+logical(LK),intent(in),optional :: allow_trailing_comma
+  !! Allow a single trailing comma in arrays and objects.
+  !! (default is true)

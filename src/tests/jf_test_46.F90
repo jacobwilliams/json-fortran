@@ -166,7 +166,8 @@ contains
     ! now, json_file routines:
     !---------------------------------
 
-    json_f = json_file(str)
+    !json_f = json_file(str)  ! memory leak in gfortran?
+    call json_f%deserialize(str)
 
     ! unicode:
     call json_f%get(CK_'not_there', ival, found, default=99_IK)
