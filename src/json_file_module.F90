@@ -580,7 +580,12 @@
                                             !! will be nullified.
 #include "json_initialize_arguments.inc"
     logical(LK),intent(in),optional :: nullify_pointer !! if True, then `p` will be nullified
-                                                       !! if present. (default is True)
+                                                       !! if present. (default is True). Normally,
+                                                       !! this should be done, because the [[json_file]] will destroy
+                                                       !! the pointer when the class goes out of scope (causing `p` to be
+                                                       !! a dangling pointer). However, if the intent is to use `p` in
+                                                       !! a [[json_file]] and then call [[json_file:nullify]] and continue
+                                                       !! to use `p`, then this should be set to False.
 
     call file_object%initialize(&
 #include "json_initialize_dummy_arguments.inc"
