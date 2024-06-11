@@ -851,7 +851,7 @@
 !     end program main
 !```
 
-    subroutine json_file_load(me, filename, unit)
+    subroutine json_file_load(me, filename, unit, destroy_pointer)
 
     implicit none
 
@@ -860,8 +860,14 @@
     integer(IK),intent(in),optional      :: unit      !! the unit number to use
                                                       !! (if not present, a newunit
                                                       !! is used)
+    logical(LK),intent(in),optional :: destroy_pointer  !! destroy the pointer before
+                                                        !! loading (default is True)
 
-    call me%destroy()
+    if (present(destroy_pointer)) then
+        if (destroy_pointer) call me%destroy()
+    else ! by default it is destroyed
+        call me%destroy()
+    end if
     call me%core%load(file=filename, p=me%p, unit=unit)
 
     end subroutine json_file_load
@@ -881,14 +887,20 @@
 !     call f%deserialize('{ "name": "Leonidas" }')
 !```
 
-    subroutine json_file_load_from_string(me, str)
+    subroutine json_file_load_from_string(me, str, destroy_pointer)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
+    logical(LK),intent(in),optional :: destroy_pointer  !! destroy the pointer before
+                                                        !! loading (default is True)
 
-    call me%destroy()
+    if (present(destroy_pointer)) then
+        if (destroy_pointer) call me%destroy()
+    else ! by default it is destroyed
+        call me%destroy()
+    end if
     call me%core%deserialize(me%p, str)
 
     end subroutine json_file_load_from_string
