@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.0.0 (2024-06-11)](#860-2024-06-11)
     - [8.5.2 (2024-05-27)](#852-2024-05-27)
     - [8.5.1 (2024-05-26)](#851-2024-05-26)
     - [8.5.0 (2024-05-25)](#850-2024-05-25)
@@ -49,7 +50,25 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.2...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.0...HEAD)
+
+### [9.0.0](https://github.com/jacobwilliams/json-fortran/tree/9.0.0) (2024-06-11)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.2...9.0.0)
+or [Download v9.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.0)
+
+**Enhancements:**
+
+* By default, the JSON pointer in `json_file` is now destroyed before loading. This is to prevent a memory leak if the type is used later to load another file. [#561](https://github.com/jacobwilliams/json-fortran/issues/561) [#562](https://github.com/jacobwilliams/json-fortran/pull/562) ([jacobwilliams](https://github.com/jacobwilliams)) Also added a new option `destroy_pointer` to the `json_file` load routines, which can be set to False to get the old behavior (not to destroy it). [#561](https://github.com/jacobwilliams/json-fortran/issues/571) [#562](https://github.com/jacobwilliams/json-fortran/pull/572) ([jacobwilliams](https://github.com/jacobwilliams))
+* Added add a new `nullify_pointer` option to the `json_file` constructor (default is True) ([jacobwilliams](https://github.com/jacobwilliams))
+[#564](https://github.com/jacobwilliams/json-fortran/issues/564) [#566](https://github.com/jacobwilliams/json-fortran/pull/566)
+* Updates for the CI and unit tests. Now testing with FPM, and running all tests with valgrind to check for memory leaks.
+ [#563](https://github.com/jacobwilliams/json-fortran/issues/563)
+[#565](https://github.com/jacobwilliams/json-fortran/pull/565)
+[#568](https://github.com/jacobwilliams/json-fortran/pull/568)
+([jacobwilliams](https://github.com/jacobwilliams))
+* Added an optional `allow_trailing_comma` argument to the initialize routines (default is True). If set to False, this disallows extra trailing commas in arrays and objects. [#569](https://github.com/jacobwilliams/json-fortran/issues/569)
+[#570](https://github.com/jacobwilliams/json-fortran/pull/570) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [8.5.2](https://github.com/jacobwilliams/json-fortran/tree/8.5.2) (2024-05-27)
 
