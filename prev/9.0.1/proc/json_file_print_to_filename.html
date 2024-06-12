@@ -29,7 +29,7 @@
     <div class="container-fluid mb-sm-4 mb-xl-2">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="../index.html">JSON-Fortran </a>
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>9.0.1</small></a>
           <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
                   aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon">
@@ -152,8 +152,8 @@
 <h3 id="example">Example</h3>
 <p>Example loading a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> file, changing a value, and then printing
   result to a new file:</p>
-<div class="codehilite"><pre><span></span><code><span class="w">     </span><span class="k">type</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f</span>
-<span class="w">     </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">found</span>
+<div class="codehilite"><pre><span></span><code><span class="w">     </span><span class="k">type</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f</span><span class="w"></span>
+<span class="w">     </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">found</span><span class="w"></span>
 <span class="w">     </span><span class="k">call </span><span class="n">f</span><span class="p">%</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;my_file.json&#39;</span><span class="p">)</span><span class="w">       </span><span class="c">!open the original file</span>
 <span class="w">     </span><span class="k">call </span><span class="n">f</span><span class="p">%</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="n">found</span><span class="p">)</span><span class="w">  </span><span class="c">!change the value of a variable</span>
 <span class="w">     </span><span class="k">call </span><span class="n">f</span><span class="p">%</span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;my_file_2.json&#39;</span><span class="p">)</span><span class="w">    </span><span class="c">!save file as new name</span>
@@ -175,7 +175,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-me~16"></span>
+              <span class="anchor" id="variable-me~91"></span>
               class(<a href='../type/json_file.html'>json_file</a>),
             </td>
 <td>intent(inout)</td>
@@ -190,7 +190,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-filename~2"></span>
+              <span class="anchor" id="variable-filename~3"></span>
               character(kind=CDK, len=*),
             </td>
 <td>intent(in)</td>
@@ -220,16 +220,16 @@
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_file_print_to_filename</span><span class="p">(</span><span class="n">me</span><span class="p">,</span><span class="n">filename</span><span class="p">)</span>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_file_print_to_filename</span><span class="p">(</span><span class="n">me</span><span class="p">,</span><span class="n">filename</span><span class="p">)</span><span class="w"></span>
 
 <span class="w">    </span><span class="k">implicit none</span>
 
-<span class="k">    class</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">       </span><span class="kd">::</span><span class="w"> </span><span class="n">me</span>
+<span class="k">    class</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">       </span><span class="kd">::</span><span class="w"> </span><span class="n">me</span><span class="w"></span>
 <span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CDK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">filename</span><span class="w">  </span><span class="c">!! filename to print to</span>
 
-<span class="w">    </span><span class="k">call </span><span class="n">me</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="k">print</span><span class="p">(</span><span class="n">me</span><span class="p">%</span><span class="n">p</span><span class="p">,</span><span class="n">filename</span><span class="p">)</span>
+<span class="w">    </span><span class="k">call </span><span class="n">me</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="k">print</span><span class="p">(</span><span class="n">me</span><span class="p">%</span><span class="n">p</span><span class="p">,</span><span class="n">filename</span><span class="p">)</span><span class="w"></span>
 
-<span class="w">    </span><span class="k">end subroutine </span><span class="n">json_file_print_to_filename</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">json_file_print_to_filename</span><span class="w"></span>
 </pre></div>
 
     </section>
@@ -253,7 +253,7 @@
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-06-12 04:14              </p>
+ on 2024-06-12 00:54              </p>
           </div>
         </div>
         <br>
