@@ -3031,7 +3031,7 @@
 !
 !  Remove a variable from a JSON file.
 !
-!@note This is just a wrapper to [[remove_if_present]].
+!@note This is just a wrapper to [[json_core:remove_if_present]].
 
     subroutine json_file_remove(me,path)
 
