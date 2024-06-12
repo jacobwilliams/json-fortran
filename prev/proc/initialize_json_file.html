@@ -78,7 +78,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.4% of total for procedures.">31 statements</a>
+                 title=" 0.5% of total for procedures.">37 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -143,7 +143,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>private  function initialize_json_file(p, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking) result(file_object)  
+    <h2>private  function initialize_json_file(p, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking, allow_trailing_comma, nullify_pointer) result(file_object)  
 </h2>
     
 
@@ -579,6 +579,43 @@ all cases).</p>
 <p>(default is true)</p>
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-allow_trailing_comma~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>allow_trailing_comma</strong></td>
+            <td>
+                <p>Allow a single trailing comma in arrays and objects.
+(default is true)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nullify_pointer"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nullify_pointer</strong></td>
+            <td>
+                <p>if True, then <code>p</code> will be nullified
+if present. (default is True). Normally,
+this should be done, because the <a href="../type/json_file.html">json_file</a> will destroy
+the pointer when the class goes out of scope (causing <code>p</code> to be
+a dangling pointer). However, if the intent is to use <code>p</code> in
+a <a href="../type/json_file.html">json_file</a> and then call <a href="../type/json_file.html#boundprocedure-nullify">nullify</a> and continue
+to use <code>p</code>, then this should be set to False.</p>
+            </td>
+        </tr>
     </tbody>
   </table>
 
@@ -955,7 +992,8 @@ large graphs.</div>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">function </span><span class="n">initialize_json_file</span><span class="p">(</span><span class="n">p</span><span class="p">,&amp;</span>
 <span class="cp">#include &quot;json_initialize_dummy_arguments.inc&quot;</span>
-<span class="w">                                 </span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">file_object</span><span class="p">)</span>
+<span class="w">                                  </span><span class="p">,</span><span class="w"> </span><span class="n">nullify_pointer</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                  </span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">file_object</span><span class="p">)</span>
 
 <span class="w">    </span><span class="k">implicit none</span>
 
@@ -964,6 +1002,13 @@ large graphs.</div>
 <span class="w">                                            </span><span class="c">!! as a `json_file` object. This</span>
 <span class="w">                                            </span><span class="c">!! will be nullified.</span>
 <span class="cp">#include &quot;json_initialize_arguments.inc&quot;</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nullify_pointer</span><span class="w"> </span><span class="c">!! if True, then `p` will be nullified</span>
+<span class="w">                                                       </span><span class="c">!! if present. (default is True). Normally,</span>
+<span class="w">                                                       </span><span class="c">!! this should be done, because the [[json_file]] will destroy</span>
+<span class="w">                                                       </span><span class="c">!! the pointer when the class goes out of scope (causing `p` to be</span>
+<span class="w">                                                       </span><span class="c">!! a dangling pointer). However, if the intent is to use `p` in</span>
+<span class="w">                                                       </span><span class="c">!! a [[json_file]] and then call [[json_file:nullify]] and continue</span>
+<span class="w">                                                       </span><span class="c">!! to use `p`, then this should be set to False.</span>
 
 <span class="w">    </span><span class="k">call </span><span class="n">file_object</span><span class="p">%</span><span class="n">initialize</span><span class="p">(&amp;</span>
 <span class="cp">#include &quot;json_initialize_dummy_arguments.inc&quot;</span>
@@ -974,8 +1019,12 @@ large graphs.</div>
 <span class="w">        </span><span class="c">! we have to nullify it to avoid</span>
 <span class="w">        </span><span class="c">! a dangling pointer when the file</span>
 <span class="w">        </span><span class="c">! goes out of scope</span>
-<span class="w">        </span><span class="k">nullify</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-<span class="w">    </span><span class="k">end if</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">nullify_pointer</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">nullify_pointer</span><span class="p">)</span><span class="w"> </span><span class="k">nullify</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            nullify</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end if</span>
 
 <span class="k">    end function </span><span class="n">initialize_json_file</span>
 </pre></div>
@@ -1001,7 +1050,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-05-27 13:22              </p>
+ on 2024-06-12 02:55              </p>
           </div>
         </div>
         <br>

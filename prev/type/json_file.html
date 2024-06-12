@@ -78,7 +78,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p>27.1% of total for derived types.</p>Including implementation: 603 statements, 10.9% of total for derived types.">83 statements</a>
+                 title="<p>27.0% of total for derived types.</p>Including implementation: 622 statements, 11.2% of total for derived types.">83 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -498,7 +498,7 @@ factory used for this file.</p>
     <ul class="list-group">
           <li class="list-group-item">
                 <h3>
-    private  function <a href='../proc/initialize_json_file.html'>initialize_json_file</a>(p, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking) result(file_object)  
+    private  function <a href='../proc/initialize_json_file.html'>initialize_json_file</a>(p, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking, allow_trailing_comma, nullify_pointer) result(file_object)  
 
     </h3>
         <dl class="dl-horizontal">
@@ -891,6 +891,43 @@ all cases).</p><a href="../proc/initialize_json_file.html#variable-escape_solidu
 <p>(default is true)</p><a href="../proc/initialize_json_file.html#variable-strict_integer_type_checking~2" class="pull-right"><emph>Read more&hellip;</emph></a>
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-allow_trailing_comma~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>allow_trailing_comma</strong></td>
+            <td>
+<p>Allow a single trailing comma in arrays and objects.
+(default is true)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nullify_pointer"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nullify_pointer</strong></td>
+            <td>
+<p>if True, then <code>p</code> will be nullified
+if present. (default is True). Normally,
+this should be done, because the <a href="../type/json_file.html">json_file</a> will destroy
+the pointer when the class goes out of scope (causing <code>p</code> to be
+a dangling pointer). However, if the intent is to use <code>p</code> in
+a <a href="../type/json_file.html">json_file</a> and then call <a href="../type/json_file.html#boundprocedure-nullify">nullify</a> and continue
+to use <code>p</code>, then this should be set to False.</p>
+            </td>
+        </tr>
     </tbody>
   </table>
 
@@ -967,7 +1004,7 @@ as a <a href="../type/json_file.html">json_file</a> object.</p>
           </li>
           <li class="list-group-item">
                 <h3>
-    private  function <a href='../proc/initialize_json_file_from_string.html'>initialize_json_file_from_string</a>(str, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking) result(file_object)  
+    private  function <a href='../proc/initialize_json_file_from_string.html'>initialize_json_file_from_string</a>(str, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking, allow_trailing_comma) result(file_object)  
 
     </h3>
         <dl class="dl-horizontal">
@@ -1361,6 +1398,22 @@ all cases).</p><a href="../proc/initialize_json_file_from_string.html#variable-e
             <td><strong>strict_integer_type_checking</strong></td>
             <td>
 <p>(default is true)</p><a href="../proc/initialize_json_file_from_string.html#variable-strict_integer_type_checking~3" class="pull-right"><emph>Read more&hellip;</emph></a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-allow_trailing_comma~3"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>allow_trailing_comma</strong></td>
+            <td>
+<p>Allow a single trailing comma in arrays and objects.
+(default is true)</p>
             </td>
         </tr>
     </tbody>
@@ -3375,7 +3428,7 @@ This is just a wrapper for the <a href="../proc/json_file_load_from_string.html"
     <ul class="list-group">
         <li class="list-group-item">
                   <h3>
-    private  subroutine <a href='../proc/json_file_load_from_string.html'>json_file_load_from_string</a>(me, str)  
+    private  subroutine <a href='../proc/json_file_load_from_string.html'>json_file_load_from_string</a>(me, str, destroy_pointer)  
 </h3>
         <dl class="dl-horizontal">
         <dt>Author</dt><dd>Jacob Williams</dd>
@@ -3424,6 +3477,22 @@ This is just a wrapper for the <a href="../proc/json_file_load_from_string.html"
             <td><strong>str</strong></td>
             <td>
 <p>string to load <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data from</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>destroy_pointer</strong></td>
+            <td>
+<p>destroy the pointer before
+loading (default is True)</p>
             </td>
         </tr>
     </tbody>
@@ -5118,7 +5187,7 @@ length of <code>default</code></p>
     <ul class="list-group">
         <li class="list-group-item">
                   <h3>
-    private  subroutine <a href='../proc/initialize_json_core_in_file.html'>initialize_json_core_in_file</a>(me, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking)  
+    private  subroutine <a href='../proc/initialize_json_core_in_file.html'>initialize_json_core_in_file</a>(me, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking, allow_trailing_comma)  
 </h3>
     
 
@@ -5495,6 +5564,22 @@ all cases).</p><a href="../proc/initialize_json_core_in_file.html#variable-escap
             <td><strong>strict_integer_type_checking</strong></td>
             <td>
 <p>(default is true)</p><a href="../proc/initialize_json_core_in_file.html#variable-strict_integer_type_checking" class="pull-right"><emph>Read more&hellip;</emph></a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>allow_trailing_comma</strong></td>
+            <td>
+<p>Allow a single trailing comma in arrays and objects.
+(default is true)</p>
             </td>
         </tr>
     </tbody>
@@ -5573,7 +5658,7 @@ all cases).</p><a href="../proc/initialize_json_core_in_file.html#variable-escap
     <ul class="list-group">
         <li class="list-group-item">
                   <h3>
-    private  subroutine <a href='../proc/initialize_json_core_in_file.html'>initialize_json_core_in_file</a>(me, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking)  
+    private  subroutine <a href='../proc/initialize_json_core_in_file.html'>initialize_json_core_in_file</a>(me, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking, allow_trailing_comma)  
 </h3>
     
 
@@ -5950,6 +6035,22 @@ all cases).</p><a href="../proc/initialize_json_core_in_file.html#variable-escap
             <td><strong>strict_integer_type_checking</strong></td>
             <td>
 <p>(default is true)</p><a href="../proc/initialize_json_core_in_file.html#variable-strict_integer_type_checking" class="pull-right"><emph>Read more&hellip;</emph></a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>allow_trailing_comma</strong></td>
+            <td>
+<p>Allow a single trailing comma in arrays and objects.
+(default is true)</p>
             </td>
         </tr>
     </tbody>
@@ -8939,7 +9040,7 @@ The output val is an allocatable character string.</p>
     <ul class="list-group">
         <li class="list-group-item">
                   <h3>
-    private  subroutine <a href='../proc/json_file_load_from_string.html'>json_file_load_from_string</a>(me, str)  
+    private  subroutine <a href='../proc/json_file_load_from_string.html'>json_file_load_from_string</a>(me, str, destroy_pointer)  
 </h3>
         <dl class="dl-horizontal">
         <dt>Author</dt><dd>Jacob Williams</dd>
@@ -8988,6 +9089,22 @@ The output val is an allocatable character string.</p>
             <td><strong>str</strong></td>
             <td>
 <p>string to load <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data from</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>destroy_pointer</strong></td>
+            <td>
+<p>destroy the pointer before
+loading (default is True)</p>
             </td>
         </tr>
     </tbody>
@@ -10404,7 +10521,7 @@ cols if using row-major order)</p>
     <ul class="list-group">
         <li class="list-group-item">
                   <h3>
-    private  subroutine <a href='../proc/json_file_load.html'>json_file_load</a>(me, filename, unit)  
+    private  subroutine <a href='../proc/json_file_load.html'>json_file_load</a>(me, filename, unit, destroy_pointer)  
 </h3>
         <dl class="dl-horizontal">
         <dt>Author</dt><dd>Jacob Williams</dd>
@@ -10470,6 +10587,22 @@ cols if using row-major order)</p>
 <p>the unit number to use
 (if not present, a newunit
 is used)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>destroy_pointer</strong></td>
+            <td>
+<p>destroy the pointer before
+loading (default is True)</p>
             </td>
         </tr>
     </tbody>
@@ -10498,7 +10631,7 @@ is used)</p>
     <ul class="list-group">
         <li class="list-group-item">
                   <h3>
-    private  subroutine <a href='../proc/json_file_load.html'>json_file_load</a>(me, filename, unit)  
+    private  subroutine <a href='../proc/json_file_load.html'>json_file_load</a>(me, filename, unit, destroy_pointer)  
 </h3>
         <dl class="dl-horizontal">
         <dt>Author</dt><dd>Jacob Williams</dd>
@@ -10566,6 +10699,22 @@ is used)</p>
 is used)</p>
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>destroy_pointer</strong></td>
+            <td>
+<p>destroy the pointer before
+loading (default is True)</p>
+            </td>
+        </tr>
     </tbody>
   </table>
 
@@ -10592,7 +10741,7 @@ is used)</p>
     <ul class="list-group">
         <li class="list-group-item">
                   <h3>
-    private  subroutine <a href='../proc/json_file_load_from_string.html'>json_file_load_from_string</a>(me, str)  
+    private  subroutine <a href='../proc/json_file_load_from_string.html'>json_file_load_from_string</a>(me, str, destroy_pointer)  
 </h3>
         <dl class="dl-horizontal">
         <dt>Author</dt><dd>Jacob Williams</dd>
@@ -10641,6 +10790,22 @@ is used)</p>
             <td><strong>str</strong></td>
             <td>
 <p>string to load <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data from</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>destroy_pointer</strong></td>
+            <td>
+<p>destroy the pointer before
+loading (default is True)</p>
             </td>
         </tr>
     </tbody>
@@ -12843,7 +13008,7 @@ If it is not present, then create it and set its value.</p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2024-05-27 13:22              </p>
+ on 2024-06-12 02:55              </p>
           </div>
         </div>
         <br>
