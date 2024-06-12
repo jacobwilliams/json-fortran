@@ -4,7 +4,8 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
-    - [9.0.0 (2024-06-11)](#860-2024-06-11)
+    - [9.0.1 (2024-06-11)](#901-2024-06-11)
+    - [9.0.0 (2024-06-11)](#900-2024-06-11)
     - [8.5.2 (2024-05-27)](#852-2024-05-27)
     - [8.5.1 (2024-05-26)](#851-2024-05-26)
     - [8.5.0 (2024-05-25)](#850-2024-05-25)
@@ -50,7 +51,16 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.1...HEAD)
+
+### [9.0.1](https://github.com/jacobwilliams/json-fortran/tree/9.0.1) (2024-06-11)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.2...9.0.1)
+or [Download v9.0.1](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.1)
+
+**Enhancements:**
+
+* No code changes. Just an update to the CI to fix documentation deployment. [#573](https://github.com/jacobwilliams/json-fortran/issues/573) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [9.0.0](https://github.com/jacobwilliams/json-fortran/tree/9.0.0) (2024-06-11)
 
