@@ -5904,13 +5904,18 @@
 
     integer(IK) :: iloc  !! used to keep track of size of str
                          !! since it is being allocated in chunks.
+    character(kind=CK,len=:),allocatable :: tmp  !! temporary buffer for trimming `str`
 
     str = repeat(space, print_str_chunk_size)
     iloc = 0_IK
     call json%json_value_print(p, iunit=unit2str, str=str, iloc=iloc, indent=1_IK, colon=.true.)
 
     ! trim the string if necessary:
-    if (len(str)>iloc) str = str(1:iloc)
+    if (len(str)>iloc) then
+        allocate(character(kind=CK,len=iloc)::tmp)
+        tmp(1:iloc) = str
+        call move_alloc(tmp, str)
+    endif
 
     end subroutine json_value_to_string
 !*****************************************************************************************
@@ -6032,10 +6037,11 @@
     character(kind=CK,len=:),allocatable :: s_indent !! the string of spaces for
                                                      !! indenting (see `tab` and `spaces`)
     character(kind=CK,len=:),allocatable :: s !! the string appended to `str`
+    character(kind=CK,len=:),allocatable :: buf !! temporary buffer for extending `str`
     type(json_value),pointer :: element !! for getting children
     integer(IK) :: tab           !! number of `tabs` for indenting
     integer(IK) :: spaces        !! number of spaces for indenting
-    integer(IK) :: i             !! counter
+    integer(IK) :: i,j           !! counter
     integer(IK) :: count         !! number of children
     logical(LK) :: print_comma   !! if the comma will be printed after the value
     logical(LK) :: write_file    !! if we are writing to a file
@@ -6376,7 +6382,12 @@
             if (room_left < n) then
                 ! need to add another chunk to fit this string:
                 n_chunks_to_add = max(1_IK, ceiling( real(len(s)-room_left,RK) / real(chunk_size,RK), IK ) )
-                str = str // repeat(space, print_str_chunk_size*n_chunks_to_add)
+                allocate(character(kind=CK, len=len(str)+print_str_chunk_size*n_chunks_to_add)::buf)
+                buf(1:len(str)) = str
+                do j = len(str)+1, len(buf)
+                    buf(j:j) = space
+                enddo
+                call move_alloc(buf, str)
             end if
             ! append s to str:
             str(iloc+1:iloc+n) = s
