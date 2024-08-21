@@ -1,5 +1,5 @@
 install ( EXPORT ${PACKAGE_NAME}-targets
-  NAMESPACE ${PACKAGE_NAME}::
+  NAMESPACE ${PROJECT_NAME}::
   DESTINATION "${EXPORT_INSTALL_DIR}" )
 
 include ( CMakePackageConfigHelpers ) # Standard CMake module
