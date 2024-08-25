@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.0.2 (2024-08-25)](#902-2024-08-25)
     - [9.0.1 (2024-06-11)](#901-2024-06-11)
     - [9.0.0 (2024-06-11)](#900-2024-06-11)
     - [8.5.2 (2024-05-27)](#852-2024-05-27)
@@ -51,7 +52,17 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.1...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.2...HEAD)
+
+### [9.0.2](https://github.com/jacobwilliams/json-fortran/tree/9.0.2) (2024-08-25)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.1...9.0.2)
+or [Download v9.0.2](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.2)
+
+**Bug Fixes:**
+
+* Added workarounds for potential stack overflows on Windows using `ifort` compiler. [#577](https://github.com/jacobwilliams/json-fortran/pull/577) ([robertrueger](https://github.com/robertrueger))
+* Fixed CI documentation deployment. [#573](https://github.com/jacobwilliams/json-fortran/issues/573) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [9.0.1](https://github.com/jacobwilliams/json-fortran/tree/9.0.1) (2024-06-11)
 

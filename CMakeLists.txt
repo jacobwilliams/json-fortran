@@ -40,7 +40,7 @@ include ( "cmake/checkOutOfSource.cmake" )
 #---------------------
 project (
     jsonfortran
-    VERSION 9.0.1
+    VERSION 9.0.2
     LANGUAGES Fortran
 )
 
