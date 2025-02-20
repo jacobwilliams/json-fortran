@@ -6120,6 +6120,7 @@
 
                 s = s_indent//start_object
                 call write_it()
+                if (json%exception_thrown) return
 
                 !if an object is in an array, there is an extra tab:
                 if (is_array) then
@@ -6150,6 +6151,7 @@
                                           str_escaped//quotation_mark//colon_char//space
                             call write_it(advance=.false.)
                         end if
+                        if (json%exception_thrown) return
                     else
                         call json%throw_exception('Error in json_value_print:'//&
                                                   ' element%name not allocated')
@@ -6195,6 +6197,7 @@
 
                 s = s_indent//start_array
                 call write_it( advance=(.not. is_vector) )
+                if (json%exception_thrown) return
 
                 !if an array is in an array, there is an extra tab:
                 if (is_array) then
@@ -6223,7 +6226,6 @@
                                         need_comma=i<count, is_array_element=.true., &
                                         str=str, iloc=iloc)
                     end if
-                    if (json%exception_thrown) return
 
                     ! get the next child the list:
                     element => element%next
@@ -6311,6 +6313,8 @@
 
     end if
 
+    if (json%exception_thrown) return
+
     contains
 
         subroutine write_it(advance,comma,space_after_comma)
@@ -6329,6 +6333,7 @@
         integer(IK) :: n               !! length of actual string `s` appended to `str`
         integer(IK) :: room_left       !! number of characters left in `str`
         integer(IK) :: n_chunks_to_add !! number of chunks to add to `str` for appending `s`
+        integer(IK) :: istat           !! `iostat` code for `write` statement
 
         if (present(comma)) then
             add_comma = comma
@@ -6368,9 +6373,14 @@
         if (write_file) then
 
             if (add_line_break) then
-                write(iunit,fmt='(A)') s
+                write(iunit,fmt='(A)',iostat=istat) s
             else
-                write(iunit,fmt='(A)',advance='NO') s
+                write(iunit,fmt='(A)',advance='NO',iostat=istat) s
+            end if
+            if (istat/=0) then
+                call integer_to_string(iunit,int_fmt,tmp)
+                call json%throw_exception('Error in json_value_print: '//&
+                                          'could not write to file unit: '//trim(tmp))
             end if
 
         else    !write string
@@ -11577,6 +11587,8 @@
 
     character(kind=CK,len=:),allocatable :: error_msg  !! error message
     logical :: status_ok !! false if there were any errors thrown
+    integer(IK) :: istat !! for write error checking
+    character(kind=CK,len=max_integer_str_len) :: tmp !! for int to string conversions
 
     !get error message:
     call json%check_for_errors(status_ok, error_msg)
@@ -11584,9 +11596,15 @@
     !print it if there is one:
     if (.not. status_ok) then
         if (present(io_unit)) then
-            write(io_unit,'(A)') error_msg
+            write(io_unit,'(A)',iostat=istat) error_msg
+            if (istat/=0) then
+                ! in this case, just try to write to the error_unit
+                call integer_to_string(io_unit,int_fmt,tmp)
+                write(error_unit,'(A)',iostat=istat) 'Error writing to unit '//trim(tmp)
+                write(error_unit,'(A)',iostat=istat) error_msg
+            end if
         else
-            write(output_unit,'(A)') error_msg
+            write(output_unit,'(A)',iostat=istat) error_msg
         end if
         deallocate(error_msg)
         call json%clear_exceptions()
