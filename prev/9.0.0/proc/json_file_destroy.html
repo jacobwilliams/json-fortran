@@ -1,0 +1,788 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>json_file_destroy &ndash; JSON-Fortran</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+      <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>9.0.0</small></a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>json_file_destroy
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+            <li class="list-inline-item" id="meta-author"><i class="fa fa-pencil"></i> Jacob Williams</li>
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">9 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_file_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_file_module.f90.html'>json_file_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_file_module.html'>json_file_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_file_destroy</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(function () {
+    $('[data-bs-toggle="tooltip"]').tooltip()
+    })
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/json_file_destroy.html#src">json_file_destroy</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine json_file_destroy(me, destroy_core)  
+</h2>
+    
+
+    <p>Destroy the <a href="../type/json_value.html">json_value</a> data in a <a href="../type/json_file.html">json_file</a>.
+  This may be done when the variable is no longer needed,
+  or will be reused to open a different file.
+  Otherwise a memory leak will occur.</p>
+<p>Optionally, also destroy the <a href="../type/json_core.html">json_core</a> instance (this
+  is not necessary to prevent memory leaks, since a <a href="../type/json_core.html">json_core</a>
+  does not use pointers).</p>
+<h3 id="see-also">See also</h3>
+<ul>
+<li><a href="../proc/json_file_nullify.html">json_file_nullify</a></li>
+</ul>
+<h3 id="history">History</h3>
+<ul>
+<li>12/9/2013 : Created</li>
+<li>4/26/2016 : Added optional <code>destroy_core</code> argument</li>
+</ul>
+<div class="alert alert-info">
+<p class="alert-title h4">Note</p>
+<p>This routine will be called automatically when the variable
+      goes out of scope.</p>
+</div>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/json_file.html'>json_file</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~10"></span>
+              class(<a href='../type/json_file.html'>json_file</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-destroy_core"></span>
+              logical,
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>destroy_core</strong></td>
+            <td>
+                <p>to also destroy the <a href="../type/json_core.html">json_core</a>.
+default is to leave it as is.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.50.0 (0)
+ -->
+<!-- Title: proc~~json_file_destroy~~CallsGraph Pages: 1 -->
+<svg id="procjson_file_destroyCallsGraph" width="620pt" height="74pt"
+ viewBox="0.00 0.00 620.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_file_destroy~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>proc~~json_file_destroy~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 616,-70 616,4 -4,4"/>
+<!-- proc~json_file_destroy -->
+<g id="proc~~json_file_destroy~~CallsGraph_node1" class="node">
+<title>proc~json_file_destroy</title>
+<polygon fill="none" stroke="black" points="141,-24 0,-24 0,0 141,0 141,-24"/>
+<text text-anchor="middle" x="70.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_file%json_file_destroy</text>
+</g>
+<!-- none~destroy~3 -->
+<g id="proc~~json_file_destroy~~CallsGraph_node2" class="node">
+<title>none~destroy~3</title>
+<g id="a_proc~~json_file_destroy~~CallsGraph_node2"><a xlink:href="../type/json_core.html#boundprocedure-destroy~3" xlink:title="json_core%destroy">
+<polygon fill="#a7506f" stroke="#a7506f" points="280,-24 177,-24 177,0 280,0 280,-24"/>
+<text text-anchor="middle" x="228.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%destroy</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_destroy&#45;&gt;none~destroy~3 -->
+<g id="proc~~json_file_destroy~~CallsGraph_edge1" class="edge">
+<title>proc~json_file_destroy&#45;&gt;none~destroy~3</title>
+<path fill="none" stroke="#ff0000" d="M141.29,-12C149.82,-12 158.49,-12 166.88,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="166.94,-15.5 176.94,-12 166.94,-8.5 166.94,-15.5"/>
+</g>
+<!-- proc~destroy_json_core -->
+<g id="proc~~json_file_destroy~~CallsGraph_node3" class="node">
+<title>proc~destroy_json_core</title>
+<g id="a_proc~~json_file_destroy~~CallsGraph_node3"><a xlink:href="../proc/destroy_json_core.html" xlink:title="json_core%destroy_json_core">
+<polygon fill="#d9534f" stroke="#d9534f" points="474,-66 318,-66 318,-42 474,-42 474,-66"/>
+<text text-anchor="middle" x="396" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%destroy_json_core</text>
+</a>
+</g>
+</g>
+<!-- none~destroy~3&#45;&gt;proc~destroy_json_core -->
+<g id="proc~~json_file_destroy~~CallsGraph_edge2" class="edge">
+<title>none~destroy~3&#45;&gt;proc~destroy_json_core</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M276.93,-24.04C295.88,-28.85 317.89,-34.43 337.72,-39.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="337.01,-42.9 347.57,-41.96 338.74,-36.11 337.01,-42.9"/>
+</g>
+<!-- proc~json_value_destroy -->
+<g id="proc~~json_file_destroy~~CallsGraph_node4" class="node">
+<title>proc~json_value_destroy</title>
+<g id="a_proc~~json_file_destroy~~CallsGraph_node4"><a xlink:href="../proc/json_value_destroy.html" xlink:title="json_core%json_value_destroy">
+<polygon fill="#d9534f" stroke="#d9534f" points="476,-24 316,-24 316,0 476,0 476,-24"/>
+<text text-anchor="middle" x="396" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_destroy</text>
+</a>
+</g>
+</g>
+<!-- none~destroy~3&#45;&gt;proc~json_value_destroy -->
+<g id="proc~~json_file_destroy~~CallsGraph_edge3" class="edge">
+<title>none~destroy~3&#45;&gt;proc~json_value_destroy</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M280.05,-5.73C288.19,-5.47 296.81,-5.32 305.53,-5.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="305.8,-8.77 315.79,-5.26 305.79,-1.77 305.8,-8.77"/>
+</g>
+<!-- proc~json_value_destroy&#45;&gt;none~destroy~3 -->
+<g id="proc~~json_file_destroy~~CallsGraph_edge4" class="edge">
+<title>proc~json_value_destroy&#45;&gt;none~destroy~3</title>
+<path fill="none" stroke="#00ffff" d="M315.79,-18.74C307.15,-18.77 298.45,-18.7 290.08,-18.53"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="290.14,-15.03 280.05,-18.27 289.96,-22.03 290.14,-15.03"/>
+</g>
+<!-- proc~destroy_json_data -->
+<g id="proc~~json_file_destroy~~CallsGraph_node5" class="node">
+<title>proc~destroy_json_data</title>
+<g id="a_proc~~json_file_destroy~~CallsGraph_node5"><a xlink:href="../proc/destroy_json_data.html" xlink:title="destroy_json_data">
+<polygon fill="#d9534f" stroke="#d9534f" points="612,-24 512,-24 512,0 612,0 612,-24"/>
+<text text-anchor="middle" x="562" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">destroy_json_data</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_destroy&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~json_file_destroy~~CallsGraph_edge5" class="edge">
+<title>proc~json_value_destroy&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#00ffff" d="M476.12,-12C484.64,-12 493.21,-12 501.44,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="501.68,-15.5 511.68,-12 501.68,-8.5 501.68,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.50.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="29pt"
+ viewBox="0.00 0.00 641.00 29.32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.92 0.92) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 695.5,-28 695.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,0 64,0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,0 136,0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.5,-24 154.5,-24 154.5,0 209.5,0 209.5,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="350,-24 228,-24 228,0 350,0 350,-24"/>
+<text text-anchor="middle" x="289" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="504,-24 368,-24 368,0 504,0 504,-24"/>
+<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="576,-24 522,-24 522,0 576,0 576,-24"/>
+<text text-anchor="middle" x="549" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="691.5,-24 594.5,-24 594.5,0 691.5,0 691.5,-24"/>
+<text text-anchor="middle" x="643" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.50.0 (0)
+ -->
+<!-- Title: proc~~json_file_destroy~~CalledByGraph Pages: 1 -->
+<svg id="procjson_file_destroyCalledByGraph" width="641pt" height="198pt"
+ viewBox="0.00 0.00 641.00 198.14" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_file_destroy~~CalledByGraph" class="graph" transform="scale(0.66 0.66) rotate(0) translate(4 298)">
+<title>proc~~json_file_destroy~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-298 973,-298 973,4 -4,4"/>
+<!-- proc~json_file_destroy -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node1" class="node">
+<title>proc~json_file_destroy</title>
+<polygon fill="none" stroke="black" points="969,-108 828,-108 828,-84 969,-84 969,-108"/>
+<text text-anchor="middle" x="898.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_file%json_file_destroy</text>
+</g>
+<!-- proc~assign_string_to_json_file -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node2" class="node">
+<title>proc~assign_string_to_json_file</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node2"><a xlink:href="../proc/assign_string_to_json_file.html" xlink:title="json_file%assign_string_to_json_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="422,-147 238,-147 238,-123 422,-123 422,-147"/>
+<text text-anchor="middle" x="330" y="-132.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%assign_string_to_json_file</text>
+</a>
+</g>
+</g>
+<!-- proc~assign_string_to_json_file&#45;&gt;proc~json_file_destroy -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge1" class="edge">
+<title>proc~assign_string_to_json_file&#45;&gt;proc~json_file_destroy</title>
+<path fill="none" stroke="#ff0000" d="M422.3,-135.66C515.55,-135.34 664.34,-132.1 792,-117 806.1,-115.33 821.14,-112.8 835.3,-110.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="836.31,-113.44 845.44,-108.05 834.95,-106.57 836.31,-113.44"/>
+</g>
+<!-- none~deserialize -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node7" class="node">
+<title>none~deserialize</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node7"><a xlink:href="../type/json_file.html#boundprocedure-deserialize" xlink:title="json_file%deserialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="570,-189 458,-189 458,-165 570,-165 570,-189"/>
+<text text-anchor="middle" x="514" y="-174.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%deserialize</text>
+</a>
+</g>
+</g>
+<!-- proc~assign_string_to_json_file&#45;&gt;none~deserialize -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge8" class="edge">
+<title>proc~assign_string_to_json_file&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M383.15,-147.04C404.29,-151.91 428.86,-157.58 450.91,-162.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="450.31,-166.12 460.84,-164.96 451.88,-159.3 450.31,-166.12"/>
+</g>
+<!-- proc~finalize_json_file -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node3" class="node">
+<title>proc~finalize_json_file</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node3"><a xlink:href="../proc/finalize_json_file.html" xlink:title="finalize_json_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="744.5,-108 653.5,-108 653.5,-84 744.5,-84 744.5,-108"/>
+<text text-anchor="middle" x="699" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">finalize_json_file</text>
+</a>
+</g>
+</g>
+<!-- proc~finalize_json_file&#45;&gt;proc~json_file_destroy -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge2" class="edge">
+<title>proc~finalize_json_file&#45;&gt;proc~json_file_destroy</title>
+<path fill="none" stroke="#ff0000" d="M744.82,-96C766.32,-96 792.75,-96 817.54,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="817.68,-99.5 827.68,-96 817.68,-92.5 817.68,-99.5"/>
+</g>
+<!-- proc~json_file_add -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node4" class="node">
+<title>proc~json_file_add</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node4"><a xlink:href="../proc/json_file_add.html" xlink:title="json_file%json_file_add">
+<polygon fill="#d9534f" stroke="#d9534f" points="761,-66 637,-66 637,-42 761,-42 761,-66"/>
+<text text-anchor="middle" x="699" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_add</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_add&#45;&gt;proc~json_file_destroy -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge3" class="edge">
+<title>proc~json_file_add&#45;&gt;proc~json_file_destroy</title>
+<path fill="none" stroke="#ff0000" d="M756.6,-66.04C779.84,-70.98 806.92,-76.74 831.09,-81.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="830.39,-85.31 840.9,-83.96 831.84,-78.46 830.39,-85.31"/>
+</g>
+<!-- proc~json_file_load -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node5" class="node">
+<title>proc~json_file_load</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node5"><a xlink:href="../proc/json_file_load.html" xlink:title="json_file%json_file_load">
+<polygon fill="#d9534f" stroke="#d9534f" points="762,-24 636,-24 636,0 762,0 762,-24"/>
+<text text-anchor="middle" x="699" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_load</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_load&#45;&gt;proc~json_file_destroy -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge4" class="edge">
+<title>proc~json_file_load&#45;&gt;proc~json_file_destroy</title>
+<path fill="none" stroke="#ff0000" d="M762.18,-23.39C772.31,-26.04 782.57,-29.22 792,-33 821.28,-44.74 851.94,-63.94 872.61,-78.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="870.61,-80.94 880.82,-83.77 874.61,-75.19 870.61,-80.94"/>
+</g>
+<!-- proc~json_file_load_from_string -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node6" class="node">
+<title>proc~json_file_load_from_string</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node6"><a xlink:href="../proc/json_file_load_from_string.html" xlink:title="json_file%json_file_load_from_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="792,-189 606,-189 606,-165 792,-165 792,-189"/>
+<text text-anchor="middle" x="699" y="-174.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_load_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_load_from_string&#45;&gt;proc~json_file_destroy -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge5" class="edge">
+<title>proc~json_file_load_from_string&#45;&gt;proc~json_file_destroy</title>
+<path fill="none" stroke="#ff0000" d="M747.38,-164.94C761.89,-160.75 777.77,-155.67 792,-150 818.35,-139.5 846.92,-124.64 867.68,-113.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="869.61,-116.1 876.63,-108.17 866.19,-109.99 869.61,-116.1"/>
+</g>
+<!-- none~deserialize&#45;&gt;proc~json_file_load_from_string -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge7" class="edge">
+<title>none~deserialize&#45;&gt;proc~json_file_load_from_string</title>
+<path fill="none" stroke="#cc00ff" d="M570.4,-177C578.49,-177 587.03,-177 595.7,-177"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="595.92,-180.5 605.92,-177 595.92,-173.5 595.92,-180.5"/>
+</g>
+<!-- proc~wrap_assign_string_to_json_file -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node8" class="node">
+<title>proc~wrap_assign_string_to_json_file</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node8"><a xlink:href="../proc/wrap_assign_string_to_json_file.html" xlink:title="wrap_assign_string_to_json_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="183.5,-147 18.5,-147 18.5,-123 183.5,-123 183.5,-147"/>
+<text text-anchor="middle" x="101" y="-132.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_assign_string_to_json_file</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_assign_string_to_json_file&#45;&gt;proc~assign_string_to_json_file -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge6" class="edge">
+<title>proc~wrap_assign_string_to_json_file&#45;&gt;proc~assign_string_to_json_file</title>
+<path fill="none" stroke="#ff0000" d="M183.63,-135C197.88,-135 212.86,-135 227.57,-135"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="227.7,-138.5 237.7,-135 227.7,-131.5 227.7,-138.5"/>
+</g>
+<!-- proc~initialize_json_file_from_string -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node9" class="node">
+<title>proc~initialize_json_file_from_string</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node9"><a xlink:href="../proc/initialize_json_file_from_string.html" xlink:title="initialize_json_file_from_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="407.5,-273 252.5,-273 252.5,-249 407.5,-249 407.5,-273"/>
+<text text-anchor="middle" x="330" y="-258.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_json_file_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_json_file_from_string&#45;&gt;none~deserialize -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge9" class="edge">
+<title>proc~initialize_json_file_from_string&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M397.09,-248.88C405.63,-246.41 414.14,-243.47 422,-240 447.68,-228.65 473.68,-209.74 491.28,-195.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="493.7,-198.13 499.21,-189.08 489.26,-192.72 493.7,-198.13"/>
+</g>
+<!-- proc~initialize_json_file_from_string_v2 -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node10" class="node">
+<title>proc~initialize_json_file_from_string_v2</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node10"><a xlink:href="../proc/initialize_json_file_from_string_v2.html" xlink:title="initialize_json_file_from_string_v2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="416,-231 244,-231 244,-207 416,-207 416,-231"/>
+<text text-anchor="middle" x="330" y="-216.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_json_file_from_string_v2</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_json_file_from_string_v2&#45;&gt;none~deserialize -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge10" class="edge">
+<title>proc~initialize_json_file_from_string_v2&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M383.15,-206.96C404.29,-202.09 428.86,-196.42 450.91,-191.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="451.88,-194.7 460.84,-189.04 450.31,-187.88 451.88,-194.7"/>
+</g>
+<!-- proc~wrap_json_file_load_from_string -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node11" class="node">
+<title>proc~wrap_json_file_load_from_string</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node11"><a xlink:href="../proc/wrap_json_file_load_from_string.html" xlink:title="wrap_json_file_load_from_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="413.5,-189 246.5,-189 246.5,-165 413.5,-165 413.5,-189"/>
+<text text-anchor="middle" x="330" y="-174.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_json_file_load_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_json_file_load_from_string&#45;&gt;none~deserialize -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge11" class="edge">
+<title>proc~wrap_json_file_load_from_string&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M413.75,-177C425.06,-177 436.55,-177 447.5,-177"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.81,-180.5 457.81,-177 447.81,-173.5 447.81,-180.5"/>
+</g>
+<!-- interface~json_file -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node12" class="node">
+<title>interface~json_file</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node12"><a xlink:href="../interface/json_file.html" xlink:title="json_file">
+<polygon fill="#a7506f" stroke="#a7506f" points="128,-252 74,-252 74,-228 128,-228 128,-252"/>
+<text text-anchor="middle" x="101" y="-237.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file</text>
+</a>
+</g>
+</g>
+<!-- interface~json_file&#45;&gt;proc~initialize_json_file_from_string -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge13" class="edge">
+<title>interface~json_file&#45;&gt;proc~initialize_json_file_from_string</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M128.04,-242.41C155.9,-244.99 201.61,-249.22 242.4,-252.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="242.1,-256.48 252.38,-253.91 242.75,-249.51 242.1,-256.48"/>
+</g>
+<!-- interface~json_file&#45;&gt;proc~initialize_json_file_from_string_v2 -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge15" class="edge">
+<title>interface~json_file&#45;&gt;proc~initialize_json_file_from_string_v2</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M128.04,-237.59C153.91,-235.2 195.16,-231.38 233.58,-227.83"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="234.16,-231.29 243.8,-226.88 233.52,-224.32 234.16,-231.29"/>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node13" class="node">
+<title>proc~wrap_initialize_json_file_from_string</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node13"><a xlink:href="../proc/wrap_initialize_json_file_from_string.html" xlink:title="wrap_initialize_json_file_from_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="193,-294 9,-294 9,-270 193,-270 193,-294"/>
+<text text-anchor="middle" x="101" y="-279.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_initialize_json_file_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string&#45;&gt;proc~initialize_json_file_from_string -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge12" class="edge">
+<title>proc~wrap_initialize_json_file_from_string&#45;&gt;proc~initialize_json_file_from_string</title>
+<path fill="none" stroke="#ff0000" d="M193.02,-273.58C209.11,-272.09 225.83,-270.54 241.8,-269.07"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="242.55,-272.51 252.19,-268.11 241.91,-265.54 242.55,-272.51"/>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string_v2 -->
+<g id="proc~~json_file_destroy~~CalledByGraph_node14" class="node">
+<title>proc~wrap_initialize_json_file_from_string_v2</title>
+<g id="a_proc~~json_file_destroy~~CalledByGraph_node14"><a xlink:href="../proc/wrap_initialize_json_file_from_string_v2.html" xlink:title="wrap_initialize_json_file_from_string_v2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="202,-210 0,-210 0,-186 202,-186 202,-210"/>
+<text text-anchor="middle" x="101" y="-195.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_initialize_json_file_from_string_v2</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string_v2&#45;&gt;proc~initialize_json_file_from_string_v2 -->
+<g id="proc~~json_file_destroy~~CalledByGraph_edge14" class="edge">
+<title>proc~wrap_initialize_json_file_from_string_v2&#45;&gt;proc~initialize_json_file_from_string_v2</title>
+<path fill="none" stroke="#00ff00" d="M202.23,-207.27C212.76,-208.25 223.44,-209.23 233.91,-210.2"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="233.59,-213.69 243.87,-211.12 234.24,-206.72 233.59,-213.69"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocjson_file_destroyCalledByGraph = svgPanZoom('#procjson_file_destroyCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.50.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="29pt"
+ viewBox="0.00 0.00 641.00 29.32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.92 0.92) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 695.5,-28 695.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,0 64,0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,0 136,0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.5,-24 154.5,-24 154.5,0 209.5,0 209.5,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="350,-24 228,-24 228,0 350,0 350,-24"/>
+<text text-anchor="middle" x="289" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="504,-24 368,-24 368,0 504,0 504,-24"/>
+<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="576,-24 522,-24 522,0 576,0 576,-24"/>
+<text text-anchor="middle" x="549" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="691.5,-24 594.5,-24 594.5,0 691.5,0 691.5,-24"/>
+<text text-anchor="middle" x="643" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_file_destroy</span><span class="p">(</span><span class="n">me</span><span class="p">,</span><span class="n">destroy_core</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">implicit none</span>
+
+<span class="k">    class</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">me</span><span class="w"></span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">destroy_core</span><span class="w">  </span><span class="c">!! to also destroy the [[json_core(type)]].</span>
+<span class="w">                                                 </span><span class="c">!! default is to leave it as is.</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">me</span><span class="p">%</span><span class="n">p</span><span class="p">))</span><span class="w"> </span><span class="k">call </span><span class="n">me</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="n">destroy</span><span class="p">(</span><span class="n">me</span><span class="p">%</span><span class="n">p</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">destroy_core</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">destroy_core</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">me</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="k">end if</span>
+
+<span class="k">    end subroutine </span><span class="n">json_file_destroy</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2024 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2024-06-12 00:49              </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
+
+    <!-- MathJax JavaScript
+             ================================================== -->
+             <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({
+          TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+          jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+          extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+          });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+          <script src="../tipuesearch/tipuesearch_content.js"></script>
+          <script src="../tipuesearch/tipuesearch_set.js"></script>
+          <script src="../tipuesearch/tipuesearch.js"></script>
+
+  </body>
+</html>

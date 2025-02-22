@@ -1,0 +1,625 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>Coverage Analysis &ndash; JSON-Fortran</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+      <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../../index.html">JSON-Fortran </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../index.html">Other Docs</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>Coverage Analysis</h1>
+    <div class="container p-2 mb-4 bg-light border rounded-3">
+      <div class="row align-items-center justify-content-between">
+        <div class="col">
+          <ul class="list-inline" style="margin-bottom:0px; display:inline">
+          </ul>
+        </div>
+        <div class="col">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../index.html'>Other Docs</a></li>
+                <li class="breadcrumb-item"><a href='index.html'>Development Resources</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Coverage Analysis</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+      <div class="col-3">
+        <div class="card card-body bg-light" id="sidebar-toc">
+          <ul class="nav flex-column align-items">
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html">Other Docs</a>
+            </li>
+          </ul>
+          <hr>
+          <nav class="nav nav-pills flex-column">
+              <a class="nav-link" href="../README.html">Github README</a>
+              <a class="nav-link" href="index.html">Development Resources</a>
+                <nav class="nav nav-pills flex-column">
+                                <a class="nav-link" href="CI.html">CI.yml</a>
+              <a class="nav-link" href="CONTRIBUTING.html">Contributing Guidelines</a>
+              <a class="nav-link" href="LICENSE.html">JSON-Fortran License</a>
+              <a class="nav-link" href="build.html">build.sh</a>
+              <a class="nav-link" href="codecov.html">codecov.yml</a>
+              <a class="nav-link" href="gccr.html">gccr.pl</a>
+              <a class="nav-link active disabled" href="json_module.F90.html">Coverage Analysis</a>
+              <a class="nav-link" href="release-checklist.html">Release Checklist</a>
+
+                </nav>
+              <a class="nav-link" href="../releases/index.html">Official Releases</a>
+          </nav>
+        </div>
+      </div>
+
+    <div class="col-9" id='text'>
+      <div class="toc">
+<ul>
+<li><a href="#coverage-analysis">Coverage analysis</a><ul>
+<li><a href="#coverage-analysis-of-json_string_utilitiesf90">Coverage analysis of json_string_utilities.F90</a><ul>
+<li><a href="#unexecuted-procedures">Unexecuted procedures</a></li>
+<li><a href="#executed-procedures">Executed procedures</a></li>
+</ul>
+</li>
+<li><a href="#coverage-analysis-of-json_value_modulef90">Coverage analysis of json_value_module.F90</a><ul>
+<li><a href="#unexecuted-procedures_1">Unexecuted procedures</a></li>
+<li><a href="#executed-procedures_1">Executed procedures</a></li>
+</ul>
+</li>
+<li><a href="#coverage-analysis-of-json_file_modulef90">Coverage analysis of json_file_module.F90</a><ul>
+<li><a href="#unexecuted-procedures_2">Unexecuted procedures</a></li>
+<li><a href="#executed-procedures_2">Executed procedures</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="coverage-analysis">Coverage analysis</h1>
+<p><a href="https://codecov.io/gh/jacobwilliams/json-fortran"><img alt="Codecov" src="https://codecov.io/gh/jacobwilliams/json-fortran/branch/master/graph/badge.svg"></a></p>
+<p>The following report was automatically generated from
+<a href="https://gcc.gnu.org/onlinedocs/gcc/Gcov.html">gcov</a> output by the
+<a href="https://github.com/szaghi/FoBiS">FoBiS.py</a> Fortran build
+tool. <a href="gccr.pl.html">gccr.pl</a> was used to
+merge <a href="https://gcc.gnu.org/onlinedocs/gcc/Gcov.html">gcov</a> coverage
+reports, and can be obtained at <a href="https://github.com/eel3/gccr">https://github.com/eel3/gccr</a>. Any
+procedures surrounded by double square brackets below are internal
+procedures and do not have their own documentation page&ndash;documentation
+for these procedures is included in the documentation of the scope in
+which they are defined.</p>
+<p>If procedure coverage is at 100%, also have a look at the
+<a href="https://codecov.io/github/jacobwilliams/json-fortran/features/suggestions">Codecov.io coverage suggestions</a>.</p>
+<p><img alt="Codecov.io" src="https://codecov.io/github/jacobwilliams/json-fortran/branch.svg?branch=master"></p>
+<h3 id="coverage-analysis-of-json_string_utilitiesf90">Coverage analysis of <em>json_string_utilities.F90</em></h3>
+<table>
+<thead>
+<tr>
+<th>Metrics</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Number of executable lines</td>
+<td>337</td>
+<td></td>
+</tr>
+<tr>
+<td>Number of executed lines</td>
+<td>311</td>
+<td>92%</td>
+</tr>
+<tr>
+<td>Number of unexecuted lines</td>
+<td>26</td>
+<td>8%</td>
+</tr>
+<tr>
+<td>Average hits per executed line</td>
+<td>243573</td>
+<td></td>
+</tr>
+<tr>
+<td>Number of procedures</td>
+<td>14</td>
+<td></td>
+</tr>
+<tr>
+<td>Number of executed procedures</td>
+<td>12</td>
+<td>86%</td>
+</tr>
+<tr>
+<td>Number of unexecuted procedures</td>
+<td>2</td>
+<td>14%</td>
+</tr>
+<tr>
+<td>Average hits per executed procedure</td>
+<td>126995</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href=""><img alt="lines" src="http://www.google.com/chart?cht=p&amp;chs=300x150&amp;chd=s:4F&amp;chtt=Coverage%20of%20executable%20lines&amp;chdl=Executed%7cUnexecuted&amp;chco=65C1FF|FF9260&amp;chl=92%25%7c8%25"></a>
+<a href=""><img alt="procedures" src="http://www.google.com/chart?cht=p&amp;chs=300x150&amp;chd=s:0J&amp;chtt=Coverage%20of%20procedures&amp;chdl=Executed%7cUnexecuted&amp;chco=65C1FF|FF9260&amp;chl=86%25%7c14%25"></a></p>
+<h4 id="unexecuted-procedures">Unexecuted procedures</h4>
+<ul>
+<li><em>function</em> <strong><a href="../../proc/to_uni.html">to_uni</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_string_utilities.F90#L668">668</a></li>
+<li><em>function</em> <strong><a href="../../proc/to_uni_vec.html">to_uni_vec</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_string_utilities.F90#L687">687</a></li>
+</ul>
+<h4 id="executed-procedures">Executed procedures</h4>
+<ul>
+<li><em>subroutine</em> <strong><a href="../../proc/unescape_string.html">unescape_string</a></strong>: tested <strong>1210117</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/escape_string.html">escape_string</a></strong>: tested <strong>206118</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/string_to_integer.html">string_to_integer</a></strong>: tested <strong>75154</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/string_to_real.html">string_to_real</a></strong>: tested <strong>29931</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/integer_to_string.html">integer_to_string</a></strong>: tested <strong>764</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/replace_string.html">replace_string</a></strong>: tested <strong>560</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/valid_json_hex.html">valid_json_hex</a></strong>: tested <strong>471</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/real_to_string.html">real_to_string</a></strong>: tested <strong>281</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/compact_real_string.html">compact_real_string</a></strong>: tested <strong>268</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/decode_rfc6901.html">decode_rfc6901</a></strong>: tested <strong>120</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/encode_rfc6901.html">encode_rfc6901</a></strong>: tested <strong>96</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/lowercase_string.html">lowercase_string</a></strong>: tested <strong>64</strong> times</li>
+</ul>
+<hr>
+<p>Report generated by <a href="https://github.com/szaghi/FoBiS">FoBiS.py</a></p>
+<h3 id="coverage-analysis-of-json_value_modulef90">Coverage analysis of <em>json_value_module.F90</em></h3>
+<table>
+<thead>
+<tr>
+<th>Metrics</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Number of executable lines</td>
+<td>4044</td>
+<td></td>
+</tr>
+<tr>
+<td>Number of executed lines</td>
+<td>3506</td>
+<td>87%</td>
+</tr>
+<tr>
+<td>Number of unexecuted lines</td>
+<td>538</td>
+<td>13%</td>
+</tr>
+<tr>
+<td>Average hits per executed line</td>
+<td>2233911</td>
+<td></td>
+</tr>
+<tr>
+<td>Number of procedures</td>
+<td>156</td>
+<td></td>
+</tr>
+<tr>
+<td>Number of executed procedures</td>
+<td>150</td>
+<td>96%</td>
+</tr>
+<tr>
+<td>Number of unexecuted procedures</td>
+<td>6</td>
+<td>4%</td>
+</tr>
+<tr>
+<td>Average hits per executed procedure</td>
+<td>440063</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href=""><img alt="lines" src="http://www.google.com/chart?cht=p&amp;chs=300x150&amp;chd=s:1I&amp;chtt=Coverage%20of%20executable%20lines&amp;chdl=Executed%7cUnexecuted&amp;chco=65C1FF|FF9260&amp;chl=87%25%7c13%25"></a>
+<a href=""><img alt="procedures" src="http://www.google.com/chart?cht=p&amp;chs=300x150&amp;chd=s:7C&amp;chtt=Coverage%20of%20procedures&amp;chdl=Executed%7cUnexecuted&amp;chco=65C1FF|FF9260&amp;chl=96%25%7c4%25"></a></p>
+<h4 id="unexecuted-procedures_1">Unexecuted procedures</h4>
+<ul>
+<li><em>subroutine</em> <strong><a href="../../proc/get_current_line_from_file_sequential.html">get_current_line_from_file_sequential</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_value_module.F90#L10053">10053</a></li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_info_by_path.html">wrap_json_info_by_path</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_value_module.F90#L1677">1677</a></li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_matrix_info_by_path.html">wrap_json_matrix_info_by_path</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_value_module.F90#L1912">1912</a></li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_value_create_logical.html">wrap_json_value_create_logical</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_value_module.F90#L10293">10293</a></li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_value_get_child_by_name.html">wrap_json_value_get_child_by_name</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_value_module.F90#L5876">5876</a></li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_value_remove_if_present.html">wrap_json_value_remove_if_present</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_value_module.F90#L2998">2998</a></li>
+</ul>
+<h4 id="executed-procedures_1">Executed procedures</h4>
+<ul>
+<li><em>subroutine</em> <strong><a href="../../proc/pop_char.html">pop_char</a></strong>: tested <strong>57802621</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/destroy_json_data.html">destroy_json_data</a></strong>: tested <strong>2170912</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/parse_string.html">parse_string</a></strong>: tested <strong>1195115</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_create.html">json_value_create</a></strong>: tested <strong>989400</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_info.html">json_info</a></strong>: tested <strong>988247</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_member.html">json_value_add_member</a></strong>: tested <strong>986799</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/to_string.html">to_string</a></strong>: tested <strong>775339</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/wrap_json_valid_path.html">wrap_json_valid_path</a></strong>: tested <strong>223206</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/push_char.html">push_char</a></strong>: tested <strong>210976</strong> times</li>
+<li><em>subroutine</em> <strong><a>write_it</a></strong>: tested <strong>204936</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/parse_number.html">parse_number</a></strong>: tested <strong>104983</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/to_integer.html">to_integer</a></strong>: tested <strong>75205</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/string_to_int.html">string_to_int</a></strong>: tested <strong>75063</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/to_object.html">to_object</a></strong>: tested <strong>61319</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/to_array.html">to_array</a></strong>: tested <strong>31417</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/to_real.html">to_real</a></strong>: tested <strong>30086</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/string_to_dble.html">string_to_dble</a></strong>: tested <strong>29921</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/to_logical.html">to_logical</a></strong>: tested <strong>14971</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/parse_for_chars.html">parse_for_chars</a></strong>: tested <strong>14960</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/json_failed.html">json_failed</a></strong>: tested <strong>2740</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/json_count.html">json_count</a></strong>: tested <strong>2076</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_clear_exceptions.html">json_clear_exceptions</a></strong>: tested <strong>2049</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_initialize.html">json_initialize</a></strong>: tested <strong>1877</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/name_strings_equal.html">name_strings_equal</a></strong>: tested <strong>1567</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_prepare_parser.html">json_prepare_parser</a></strong>: tested <strong>1509</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_parse_end.html">json_parse_end</a></strong>: tested <strong>1509</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_parse_string.html">json_parse_string</a></strong>: tested <strong>1492</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/name_equal.html">name_equal</a></strong>: tested <strong>1409</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_get_path.html">wrap_json_get_path</a></strong>: tested <strong>612</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_get_child_by_name.html">json_value_get_child_by_name</a></strong>: tested <strong>556</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_rename.html">json_value_rename</a></strong>: tested <strong>545</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_get_child_by_index.html">json_value_get_child_by_index</a></strong>: tested <strong>443</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/json_is_vector.html">json_is_vector</a></strong>: tested <strong>365</strong> times</li>
+<li><em>subroutine</em> <strong><a>add_to_path</a></strong>: tested <strong>330</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_by_path_default.html">json_get_by_path_default</a></strong>: tested <strong>323</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_by_path.html">json_get_by_path</a></strong>: tested <strong>306</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_real.html">json_get_real</a></strong>: tested <strong>306</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_throw_exception.html">json_throw_exception</a></strong>: tested <strong>264</strong> times</li>
+<li><em>subroutine</em> <strong><a>get_real_from_array</a></strong>: tested <strong>229</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_to_string.html">json_value_to_string</a></strong>: tested <strong>211</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_string.html">json_get_string</a></strong>: tested <strong>198</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_check_children_for_duplicate_keys.html">json_check_children_for_duplicate_keys</a></strong>: tested <strong>191</strong> times</li>
+<li><em>subroutine</em> <strong><a>duplicate_key_func</a></strong>: tested <strong>191</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_path.html">json_get_path</a></strong>: tested <strong>188</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_create_real.html">json_value_create_real</a></strong>: tested <strong>159</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_get_child.html">json_value_get_child</a></strong>: tested <strong>150</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_real.html">json_value_add_real</a></strong>: tested <strong>148</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_create_integer.html">json_value_create_integer</a></strong>: tested <strong>140</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_integer.html">json_value_add_integer</a></strong>: tested <strong>127</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_integer.html">json_get_integer</a></strong>: tested <strong>117</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_print_to_unit.html">json_print_to_unit</a></strong>: tested <strong>89</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/to_null.html">to_null</a></strong>: tested <strong>84</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/destroy_json_core.html">destroy_json_core</a></strong>: tested <strong>70</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_create_string.html">json_value_create_string</a></strong>: tested <strong>70</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_get_string_by_path.html">wrap_json_get_string_by_path</a></strong>: tested <strong>63</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_traverse.html">json_traverse</a></strong>: tested <strong>62</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_remove.html">json_value_remove</a></strong>: tested <strong>56</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_string.html">json_value_add_string</a></strong>: tested <strong>56</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_create_by_path.html">json_create_by_path</a></strong>: tested <strong>54</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_integer_by_path.html">json_get_integer_by_path</a></strong>: tested <strong>54</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_insert_after.html">json_value_insert_after</a></strong>: tested <strong>52</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_create_array.html">json_value_create_array</a></strong>: tested <strong>52</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_check_all_for_duplicate_keys.html">json_check_all_for_duplicate_keys</a></strong>: tested <strong>51</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_replace.html">json_value_replace</a></strong>: tested <strong>47</strong> times</li>
+<li><em>subroutine</em> <strong><a>get_int_from_array</a></strong>: tested <strong>47</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/flag_not_found.html">flag_not_found</a></strong>: tested <strong>43</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_logical.html">json_get_logical</a></strong>: tested <strong>42</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_string_by_path.html">json_get_string_by_path</a></strong>: tested <strong>42</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_check_for_errors.html">json_check_for_errors</a></strong>: tested <strong>41</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_create_object.html">json_value_create_object</a></strong>: tested <strong>34</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_by_path_rfc6901.html">json_get_by_path_rfc6901</a></strong>: tested <strong>28</strong> times</li>
+<li><em>subroutine</em> <strong><a>get_logical_from_array</a></strong>: tested <strong>28</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_real_by_path.html">json_get_real_by_path</a></strong>: tested <strong>24</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_create_logical.html">json_value_create_logical</a></strong>: tested <strong>22</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_validate.html">json_value_validate</a></strong>: tested <strong>20</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_string_vec_by_path.html">json_get_string_vec_by_path</a></strong>: tested <strong>20</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_logical_by_path.html">json_get_logical_by_path</a></strong>: tested <strong>19</strong> times</li>
+<li><em>subroutine</em> <strong><a>get_chars_from_array</a></strong>: tested <strong>19</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_logical.html">json_value_add_logical</a></strong>: tested <strong>18</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_parse_file.html">json_parse_file</a></strong>: tested <strong>17</strong> times</li>
+<li><em>subroutine</em> <strong><a>get_string_lengths</a></strong>: tested <strong>16</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_matrix_info_by_path.html">json_matrix_info_by_path</a></strong>: tested <strong>16</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/json_value_is_child_of.html">json_value_is_child_of</a></strong>: tested <strong>16</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_real_vec.html">json_get_real_vec</a></strong>: tested <strong>16</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_matrix_info.html">json_matrix_info</a></strong>: tested <strong>15</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_real_vec.html">json_value_add_real_vec</a></strong>: tested <strong>15</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_real_vec_by_path.html">json_get_real_vec_by_path</a></strong>: tested <strong>15</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_alloc_string_vec_by_path.html">json_get_alloc_string_vec_by_path</a></strong>: tested <strong>15</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_integer_vec.html">json_get_integer_vec</a></strong>: tested <strong>14</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/convert.html">convert</a></strong>: tested <strong>13</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_get_alloc_string_vec_by_path.html">wrap_json_get_alloc_string_vec_by_path</a></strong>: tested <strong>13</strong> times</li>
+<li><em>subroutine</em> <strong><a>get_chars_from_array</a></strong>: tested <strong>12</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_string_info.html">json_string_info</a></strong>: tested <strong>11</strong> times</li>
+<li><em>subroutine</em> <strong><a>swap_pointers</a></strong>: tested <strong>11</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_update_string.html">json_update_string</a></strong>: tested <strong>11</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_clone.html">json_clone</a></strong>: tested <strong>10</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_string_by_path.html">json_add_string_by_path</a></strong>: tested <strong>10</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_integer_vec_by_path.html">json_get_integer_vec_by_path</a></strong>: tested <strong>10</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_real_by_path.html">json_add_real_by_path</a></strong>: tested <strong>9</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_rename_by_path.html">json_rename_by_path</a></strong>: tested <strong>9</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_by_path_jsonpath_bracket.html">json_get_by_path_jsonpath_bracket</a></strong>: tested <strong>9</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/annotate_invalid_json.html">annotate_invalid_json</a></strong>: tested <strong>9</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_swap.html">json_value_swap</a></strong>: tested <strong>8</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_update_real.html">json_update_real</a></strong>: tested <strong>7</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/json_valid_path.html">json_valid_path</a></strong>: tested <strong>7</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_info_by_path.html">json_info_by_path</a></strong>: tested <strong>6</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_string_vec_by_path.html">json_add_string_vec_by_path</a></strong>: tested <strong>6</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_print_to_console.html">json_print_to_console</a></strong>: tested <strong>6</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_print_error_message.html">json_print_error_message</a></strong>: tested <strong>6</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_real_vec_by_path.html">json_add_real_vec_by_path</a></strong>: tested <strong>5</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_string_vec.html">json_value_add_string_vec</a></strong>: tested <strong>5</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_print_to_filename.html">json_print_to_filename</a></strong>: tested <strong>5</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_logical_vec.html">json_get_logical_vec</a></strong>: tested <strong>5</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_string_vec.html">json_get_string_vec</a></strong>: tested <strong>5</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_reverse.html">json_value_reverse</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a>is_child_of_callback</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_member_by_path.html">json_add_member_by_path</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_integer_by_path.html">json_add_integer_by_path</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_logical_by_path.html">json_add_logical_by_path</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_logical_vec_by_path.html">json_get_logical_vec_by_path</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_alloc_string_vec.html">json_get_alloc_string_vec</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_remove_if_present.html">json_value_remove_if_present</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_update_logical.html">json_update_logical</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_update_real32.html">json_update_real32</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_update_integer.html">json_update_integer</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_add_string_vec_by_path.html">wrap_json_add_string_vec_by_path</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_integer_vec.html">json_value_add_integer_vec</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_parent.html">json_get_parent</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_real32_by_path.html">json_get_real32_by_path</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_real32_vec_by_path.html">json_get_real32_vec_by_path</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/get_current_line_from_file_stream.html">get_current_line_from_file_stream</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_insert_after_child_by_index.html">json_value_insert_after_child_by_index</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_real32_by_path.html">json_add_real32_by_path</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_integer_vec_by_path.html">json_add_integer_vec_by_path</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_logical_vec_by_path.html">json_add_logical_vec_by_path</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_real32_vec_by_path.html">json_add_real32_vec_by_path</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_logical_vec.html">json_value_add_logical_vec</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_create_null.html">json_value_create_null</a></strong>: tested <strong>2</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/initialize_json_core.html">initialize_json_core</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_string_vec_by_path_value_ascii.html">json_add_string_vec_by_path_value_ascii</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_add_string_vec_by_path_path_ascii.html">json_add_string_vec_by_path_path_ascii</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_real32.html">json_value_add_real32</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_real32_vec.html">json_value_add_real32_vec</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_add_null.html">json_value_add_null</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_next.html">json_get_next</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_previous.html">json_get_previous</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_tail.html">json_get_tail</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_real32.html">json_get_real32</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_get_real32_vec.html">json_get_real32_vec</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_value_create_real32.html">json_value_create_real32</a></strong>: tested <strong>1</strong> times</li>
+</ul>
+<hr>
+<p>Report generated by <a href="https://github.com/szaghi/FoBiS">FoBiS.py</a></p>
+<h3 id="coverage-analysis-of-json_file_modulef90">Coverage analysis of <em>json_file_module.F90</em></h3>
+<table>
+<thead>
+<tr>
+<th>Metrics</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Number of executable lines</td>
+<td>592</td>
+<td></td>
+</tr>
+<tr>
+<td>Number of executed lines</td>
+<td>532</td>
+<td>90%</td>
+</tr>
+<tr>
+<td>Number of unexecuted lines</td>
+<td>60</td>
+<td>10%</td>
+</tr>
+<tr>
+<td>Average hits per executed line</td>
+<td>99</td>
+<td></td>
+</tr>
+<tr>
+<td>Number of procedures</td>
+<td>65</td>
+<td></td>
+</tr>
+<tr>
+<td>Number of executed procedures</td>
+<td>59</td>
+<td>91%</td>
+</tr>
+<tr>
+<td>Number of unexecuted procedures</td>
+<td>6</td>
+<td>9%</td>
+</tr>
+<tr>
+<td>Average hits per executed procedure</td>
+<td>114</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a href=""><img alt="lines" src="http://www.google.com/chart?cht=p&amp;chs=300x150&amp;chd=s:3G&amp;chtt=Coverage%20of%20executable%20lines&amp;chdl=Executed%7cUnexecuted&amp;chco=65C1FF|FF9260&amp;chl=90%25%7c10%25"></a>
+<a href=""><img alt="procedures" src="http://www.google.com/chart?cht=p&amp;chs=300x150&amp;chd=s:4F&amp;chtt=Coverage%20of%20procedures&amp;chdl=Executed%7cUnexecuted&amp;chco=65C1FF|FF9260&amp;chl=91%25%7c9%25"></a></p>
+<h4 id="unexecuted-procedures_2">Unexecuted procedures</h4>
+<ul>
+<li><em>function</em> <strong><a href="../../proc/initialize_json_file.html">initialize_json_file</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_file_module.F90#L570">570</a></li>
+<li><em>function</em> <strong><a href="../../proc/initialize_json_file_from_string.html">initialize_json_file_from_string</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_file_module.F90#L651">651</a></li>
+<li><em>function</em> <strong><a href="../../proc/initialize_json_file_from_string_v2.html">initialize_json_file_from_string_v2</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_file_module.F90#L698">698</a></li>
+<li><em>function</em> <strong><a href="../../proc/initialize_json_file_v2.html">initialize_json_file_v2</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_file_module.F90#L616">616</a></li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_variable_matrix_info.html">json_file_variable_matrix_info</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_file_module.F90#L1082">1082</a></li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_assign_string_to_json_file.html">wrap_assign_string_to_json_file</a></strong>, line <a href="https://github.com/jacobwilliams/json-fortran/blob/master/src/json_file_module.F90#L1240">1240</a></li>
+</ul>
+<h4 id="executed-procedures_2">Executed procedures</h4>
+<ul>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_destroy.html">json_file_destroy</a></strong>: tested <strong>2744</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/json_file_failed.html">json_file_failed</a></strong>: tested <strong>1824</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_load_from_string.html">json_file_load_from_string</a></strong>: tested <strong>1435</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/initialize_json_core_in_file.html">initialize_json_core_in_file</a></strong>: tested <strong>254</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_print_to_string.html">json_file_print_to_string</a></strong>: tested <strong>209</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/finalize_json_file.html">finalize_json_file</a></strong>: tested <strong>39</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_string.html">json_file_get_string</a></strong>: tested <strong>35</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_print_to_unit.html">json_file_print_to_unit</a></strong>: tested <strong>27</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_integer.html">json_file_get_integer</a></strong>: tested <strong>25</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_load.html">json_file_load</a></strong>: tested <strong>15</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_real.html">json_file_get_real</a></strong>: tested <strong>15</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_logical.html">json_file_get_logical</a></strong>: tested <strong>14</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_object.html">json_file_get_object</a></strong>: tested <strong>10</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_real_vec.html">json_file_get_real_vec</a></strong>: tested <strong>10</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_alloc_string_vec.html">json_file_get_alloc_string_vec</a></strong>: tested <strong>8</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add.html">json_file_add</a></strong>: tested <strong>8</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_string_vec.html">json_file_add_string_vec</a></strong>: tested <strong>8</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_print_to_console.html">json_file_print_to_console</a></strong>: tested <strong>7</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_check_for_errors.html">json_file_check_for_errors</a></strong>: tested <strong>6</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_string_vec.html">json_file_get_string_vec</a></strong>: tested <strong>6</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_print_error_message.html">json_file_print_error_message</a></strong>: tested <strong>5</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_string.html">json_file_add_string</a></strong>: tested <strong>5</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/set_json_core_in_file.html">set_json_core_in_file</a></strong>: tested <strong>4</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/json_file_valid_path.html">json_file_valid_path</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_rename.html">json_file_rename</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_update_string.html">json_file_update_string</a></strong>: tested <strong>4</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/assign_string_to_json_file.html">assign_string_to_json_file</a></strong>: tested <strong>3</strong> times</li>
+<li><em>function</em> <strong><a href="../../proc/json_file_valid_path_op.html">json_file_valid_path_op</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_update_real.html">json_file_update_real</a></strong>: tested <strong>3</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_move_pointer.html">json_file_move_pointer</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_print_to_filename.html">json_file_print_to_filename</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_variable_info.html">json_file_variable_info</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_root.html">json_file_get_root</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/assign_json_file.html">assign_json_file</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_integer_vec.html">json_file_get_integer_vec</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_logical_vec.html">json_file_get_logical_vec</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_real.html">json_file_add_real</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_real_vec.html">json_file_add_real_vec</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_update_logical.html">json_file_update_logical</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_remove.html">json_file_remove</a></strong>: tested <strong>2</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_clear_exceptions.html">json_file_clear_exceptions</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/get_json_core_in_file.html">get_json_core_in_file</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_nullify.html">json_file_nullify</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/assign_json_file_to_string.html">assign_json_file_to_string</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_real32.html">json_file_get_real32</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_get_real32_vec.html">json_file_get_real32_vec</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_object.html">json_file_add_object</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_integer.html">json_file_add_integer</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_integer_vec.html">json_file_add_integer_vec</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_real32.html">json_file_add_real32</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_real32_vec.html">json_file_add_real32_vec</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_logical.html">json_file_add_logical</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_logical_vec.html">json_file_add_logical_vec</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/wrap_json_file_add_string_vec.html">wrap_json_file_add_string_vec</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_string_vec_path_ascii.html">json_file_add_string_vec_path_ascii</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_add_string_vec_vec_ascii.html">json_file_add_string_vec_vec_ascii</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_update_integer.html">json_file_update_integer</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_update_real32.html">json_file_update_real32</a></strong>: tested <strong>1</strong> times</li>
+<li><em>subroutine</em> <strong><a href="../../proc/json_file_traverse.html">json_file_traverse</a></strong>: tested <strong>1</strong> times</li>
+</ul>
+<hr>
+<p>Report generated by <a href="https://github.com/szaghi/FoBiS">FoBiS.py</a></p>
+    </div>
+  </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-02-22 16:43 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
+
+    <!-- MathJax JavaScript
+             ================================================== -->
+             <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({
+          TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+          jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+          extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+          });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+          <script src="../../tipuesearch/tipuesearch_content.js"></script>
+          <script src="../../tipuesearch/tipuesearch_set.js"></script>
+          <script src="../../tipuesearch/tipuesearch.js"></script>
+
+  </body>
+</html>
