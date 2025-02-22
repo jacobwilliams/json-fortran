@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.0.3 (2025-02-22)](#903-2025-02-22)
     - [9.0.2 (2024-08-25)](#902-2024-08-25)
     - [9.0.1 (2024-06-11)](#901-2024-06-11)
     - [9.0.0 (2024-06-11)](#900-2024-06-11)
@@ -52,7 +53,17 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.2...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.3...HEAD)
+
+### [9.0.3](https://github.com/jacobwilliams/json-fortran/tree/9.0.3) (2025-02-22)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.2...9.0.3)
+or [Download v9.0.3](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.3)
+
+**Changes:**
+
+* Added some checks to write statements to avoid potential crashes. [#581](https://github.com/jacobwilliams/json-fortran/issues/581) [#582](https://github.com/jacobwilliams/json-fortran/pull/582) ([jacobwilliams](https://github.com/jacobwilliams))
+* Attempting to reduce the size of the repo by pruning the documentation `gh-pages` history. [#583](https://github.com/jacobwilliams/json-fortran/issues/583) [#584](https://github.com/jacobwilliams/json-fortran/pull/584) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [9.0.2](https://github.com/jacobwilliams/json-fortran/tree/9.0.2) (2024-08-25)
 
