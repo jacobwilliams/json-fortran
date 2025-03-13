@@ -45,7 +45,7 @@ project (
 )
 
 # write the version file
-configure_file(${CMAKE_SOURCE_DIR}/.VERSION.in ${CMAKE_SOURCE_DIR}/.VERSION)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/.VERSION.in ${CMAKE_CURRENT_SOURCE_DIR}/.VERSION)
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
   option(JSON_FORTRAN_USE_OpenCoarrays
