@@ -11599,7 +11599,9 @@
             write(io_unit,'(A)',iostat=istat) error_msg
             if (istat/=0) then
                 ! in this case, just try to write to the error_unit
-                call integer_to_string(io_unit,int_fmt,tmp)
+                ! [convert to IK integer, we assume this will be ok since
+                !  normally these io units are default ints]
+                call integer_to_string(int(io_unit,IK),int_fmt,tmp)
                 write(error_unit,'(A)',iostat=istat) 'Error writing to unit '//trim(tmp)
                 write(error_unit,'(A)',iostat=istat) error_msg
             end if
