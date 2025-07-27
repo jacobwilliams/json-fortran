@@ -16,6 +16,16 @@ jobs:
       FC: gfortran-${{matrix.gcc_v}}
       GCC_V: ${{matrix.gcc_v}}
 
+      #
+      # GCC version
+      #
+      #   9 - CMake build with unit tests, no documentation, with coverage analysis. no unicode
+      #  10 - build.sh - no documentation, with and without unicode.
+      #  11 - FPM
+      #  12 - build.sh with documentation, unit tests and coverage analysis. doc deployment
+      #
+      # NOTE: coverage disabled for now
+
     steps:
 
     - name: Checkout code
@@ -55,7 +65,7 @@ jobs:
         --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_V}
 
     - name: Compile_with_build
-      if: matrix.gcc_v != 12 && matrix.gcc_v != 11
+      if: matrix.gcc_v == 10
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
@@ -141,8 +151,10 @@ jobs:
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
-        ./build.sh --coverage --skip-documentation
-        ./build.sh --coverage --enable-unicode
+        # ./build.sh --coverage --skip-documentation   # DISABLED FOR NOW
+        # ./build.sh --coverage --enable-unicode
+        ./build.sh --skip-documentation
+        ./build.sh --enable-unicode
 
     - name: Deploy Documentation for master
       if: matrix.gcc_v == 12 && github.ref == 'refs/heads/master'
@@ -173,10 +185,10 @@ jobs:
         target-folder: prev/${{github.ref_name}} # deploy to a version-specific folder
         single-commit: true
 
-    - name: Upload coverage
-      if: matrix.gcc_v == 12
-      run: |
-        rm json_*.F90-*unicode.gcov || true
-        mv json_*.F90.gcov src/
-        mv jf_test*.[fF]90.gcov src/tests/
-        bash <(curl -s https://codecov.io/bash) -v -X $GCOV
+    # - name: Upload coverage
+    #   if: matrix.gcc_v == 12
+    #   run: |
+    #     rm json_*.F90-*unicode.gcov || true
+    #     mv json_*.F90.gcov src/
+    #     mv jf_test*.[fF]90.gcov src/tests/
+    #     bash <(curl -s https://codecov.io/bash) -v -X $GCOV
