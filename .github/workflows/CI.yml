@@ -50,6 +50,11 @@ jobs:
     - name: Set current directory in env variable
       run: echo "MYDIR=$(pwd)" >> $GITHUB_ENV
 
+    - name: Set PYTHONPATH and PATH for later steps
+      run: |
+        echo "PYTHONPATH=$MYDIR/FoBiS/src/main/python:$PYTHONPATH" >> $GITHUB_ENV
+        echo "PATH=$MYDIR/FoBiS/src/main/python:$PATH" >> $GITHUB_ENV
+
     - name: Install Python dependencies
       if: contains( matrix.os, 'ubuntu')
       run: |
@@ -58,8 +63,6 @@ jobs:
         pip install ford pygooglechart fpm
         # just get the latest FoBiS from git:
         git clone https://github.com/szaghi/FoBiS.git
-        export PYTHONPATH="$MYDIR/FoBiS/src/main/python:$PYTHONPATH"
-        export PATH="$MYDIR/FoBiS/src/main/python:$PATH"
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Install GFortran Linux
