@@ -163,7 +163,10 @@ jobs:
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
-        ./build.sh --coverage --skip-documentation   # DISABLED FOR NOW
+        ./build.sh --coverage --skip-documentation
+        # delete old coverage files:
+        find . -name '*.gcda' -delete
+        find . -name '*.gcov' -delete
         ./build.sh --coverage --enable-unicode
 
     - name: Deploy Documentation for master
