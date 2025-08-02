@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.0.4 (2025-08-02)](#904-2025-08-02)
     - [9.0.3 (2025-02-22)](#903-2025-02-22)
     - [9.0.2 (2024-08-25)](#902-2024-08-25)
     - [9.0.1 (2024-06-11)](#901-2024-06-11)
@@ -53,7 +54,18 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.3...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.4...HEAD)
+
+### [9.0.4](https://github.com/jacobwilliams/json-fortran/tree/9.0.4) (2025-08-02)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.3...9.0.4)
+or [Download v9.0.4](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.4)
+
+**Changes:**
+
+* Configure `.VERSION.in` in `CMAKE_CURRENT_SOURCE_DIR` in main `CMakeLists.txt`. [#585](https://github.com/jacobwilliams/json-fortran/issues/585) [#586](https://github.com/jacobwilliams/json-fortran/pull/586) ([mcharlou](https://github.com/mcharlou))
+* Fixed error when using non-default ints. [#591](https://github.com/jacobwilliams/json-fortran/issues/591) [#592](https://github.com/jacobwilliams/json-fortran/pull/592) ([jacobwilliams](https://github.com/jacobwilliams))
+* Various CI updates. Now testing Gfortran 9, 10, 11, 12. Removed tests for Gfortran 7, 8.
 
 ### [9.0.3](https://github.com/jacobwilliams/json-fortran/tree/9.0.3) (2025-02-22)
 
