@@ -1,0 +1,504 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>json_check_for_errors &ndash; JSON-Fortran</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+      <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>9.0.3</small></a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>json_check_for_errors
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+            <li class="list-inline-item" id="meta-author"><i class="fa fa-pencil"></i> Jacob Williams</li>
+            <li class="list-inline-item" id="meta-date"><i class="fa fa-calendar-o"></i> 12/4/2013</li>
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for procedures.">14 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_value_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_value_module.html'>json_value_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_check_for_errors</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(function () {
+    $('[data-bs-toggle="tooltip"]').tooltip()
+    })
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/json_check_for_errors.html#src">json_check_for_errors</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine json_check_for_errors(json, status_ok, error_msg)  
+</h2>
+    
+
+    <p>Retrieve error code from the <a href="../type/json_core.html">json_core</a>.
+  This should be called after <code>parse</code> to check for errors.
+  If an error is thrown, before using the class again, <a href="../proc/json_initialize.html">json_initialize</a>
+  should be called to clean up before it is used again.</p>
+<h3 id="example">Example</h3>
+<div class="codehilite"><pre><span></span><code><span class="w">     </span><span class="k">type</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">     </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">status_ok</span>
+<span class="w">     </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">error_msg</span>
+<span class="w">     </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;myfile.json&#39;</span><span class="p">)</span>
+<span class="w">     </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">check_for_errors</span><span class="p">(</span><span class="n">status_ok</span><span class="p">,</span><span class="w"> </span><span class="n">error_msg</span><span class="p">)</span>
+<span class="w">     </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">status_ok</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">         write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Error: &#39;</span><span class="o">//</span><span class="n">error_msg</span>
+<span class="w">         </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">clear_exceptions</span><span class="p">()</span>
+<span class="w">         </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">     </span><span class="k">end if</span>
+</code></pre></div>
+
+<h3 id="see-also">See also</h3>
+<ul>
+<li><a href="../proc/json_failed.html">json_failed</a></li>
+<li><a href="../proc/json_throw_exception.html">json_throw_exception</a></li>
+</ul>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/json_core.html'>json_core</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~19"></span>
+              class(<a href='../type/json_core.html'>json_core</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-status_ok~3"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(out),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>status_ok</strong></td>
+            <td>
+                <p>true if there were no errors</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-error_msg"></span>
+              character(kind=CK, len=:),
+            </td>
+<td>intent(out),</td>
+              <td>optional,</td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>error_msg</strong></td>
+            <td>
+                <p>the error message.
+(not allocated if
+there were no errors)</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~json_check_for_errors~~CalledByGraph Pages: 1 -->
+<svg id="procjson_check_for_errorsCalledByGraph" width="641pt" height="106pt"
+ viewBox="0.00 0.00 641.00 106.07" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_check_for_errors~~CalledByGraph" class="graph" transform="scale(1.09 1.09) rotate(0) translate(4 112)">
+<title>proc~~json_check_for_errors~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 697,-112 697,4 -4,4"/>
+<!-- proc~json_check_for_errors -->
+<g id="proc~~json_check_for_errors~~CalledByGraph_node1" class="node">
+<title>proc~json_check_for_errors</title>
+<polygon fill="none" stroke="black" points="693,-66 505,-66 505,-42 693,-42 693,-66"/>
+<text text-anchor="middle" x="599" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_core%json_check_for_errors</text>
+</g>
+<!-- proc~json_file_check_for_errors -->
+<g id="proc~~json_check_for_errors~~CalledByGraph_node2" class="node">
+<title>proc~json_file_check_for_errors</title>
+<g id="a_proc~~json_check_for_errors~~CalledByGraph_node2"><a xlink:href="../proc/json_file_check_for_errors.html" xlink:title="json_file%json_file_check_for_errors">
+<polygon fill="#d9534f" stroke="#d9534f" points="466,-108 263,-108 263,-84 466,-84 466,-108"/>
+<text text-anchor="middle" x="364.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_check_for_errors</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_check_for_errors&#45;&gt;proc~json_check_for_errors -->
+<g id="proc~~json_check_for_errors~~CalledByGraph_edge1" class="edge">
+<title>proc~json_file_check_for_errors&#45;&gt;proc~json_check_for_errors</title>
+<path fill="none" stroke="#ff0000" d="M432.13,-83.96C459.97,-78.93 492.5,-73.06 521.33,-67.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="522.15,-71.26 531.37,-66.04 520.9,-64.37 522.15,-71.26"/>
+</g>
+<!-- proc~json_print_error_message -->
+<g id="proc~~json_check_for_errors~~CalledByGraph_node3" class="node">
+<title>proc~json_print_error_message</title>
+<g id="a_proc~~json_check_for_errors~~CalledByGraph_node3"><a xlink:href="../proc/json_print_error_message.html" xlink:title="json_core%json_print_error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="469,-66 260,-66 260,-42 469,-42 469,-66"/>
+<text text-anchor="middle" x="364.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_print_error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~json_print_error_message&#45;&gt;proc~json_check_for_errors -->
+<g id="proc~~json_check_for_errors~~CalledByGraph_edge2" class="edge">
+<title>proc~json_print_error_message&#45;&gt;proc~json_check_for_errors</title>
+<path fill="none" stroke="#ff0000" d="M469.17,-54C477.61,-54 486.13,-54 494.57,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.8,-57.5 504.8,-54 494.8,-50.5 494.8,-57.5"/>
+</g>
+<!-- proc~json_value_validate -->
+<g id="proc~~json_check_for_errors~~CalledByGraph_node4" class="node">
+<title>proc~json_value_validate</title>
+<g id="a_proc~~json_check_for_errors~~CalledByGraph_node4"><a xlink:href="../proc/json_value_validate.html" xlink:title="json_core%json_value_validate">
+<polygon fill="#d9534f" stroke="#d9534f" points="453,-24 276,-24 276,0 453,0 453,-24"/>
+<text text-anchor="middle" x="364.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_validate</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_validate&#45;&gt;proc~json_check_for_errors -->
+<g id="proc~~json_check_for_errors~~CalledByGraph_edge3" class="edge">
+<title>proc~json_value_validate&#45;&gt;proc~json_check_for_errors</title>
+<path fill="none" stroke="#ff0000" d="M432.13,-24.04C459.97,-29.07 492.5,-34.94 521.33,-40.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="520.9,-43.63 531.37,-41.96 522.15,-36.74 520.9,-43.63"/>
+</g>
+<!-- proc~json_file_print_error_message -->
+<g id="proc~~json_check_for_errors~~CalledByGraph_node5" class="node">
+<title>proc~json_file_print_error_message</title>
+<g id="a_proc~~json_check_for_errors~~CalledByGraph_node5"><a xlink:href="../proc/json_file_print_error_message.html" xlink:title="json_file%json_file_print_error_message">
+<polygon fill="#d9534f" stroke="#d9534f" points="224,-66 0,-66 0,-42 224,-42 224,-66"/>
+<text text-anchor="middle" x="112" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_print_error_message</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_print_error_message&#45;&gt;proc~json_print_error_message -->
+<g id="proc~~json_check_for_errors~~CalledByGraph_edge4" class="edge">
+<title>proc~json_file_print_error_message&#45;&gt;proc~json_print_error_message</title>
+<path fill="none" stroke="#00ff00" d="M224.33,-54C232.69,-54 241.14,-54 249.51,-54"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="249.69,-57.5 259.69,-54 249.69,-50.5 249.69,-57.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocjson_check_for_errorsCalledByGraph = svgPanZoom('#procjson_check_for_errorsCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1.16 1.16) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_check_for_errors</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">status_ok</span><span class="p">,</span><span class="n">error_msg</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">implicit none</span>
+
+<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">status_ok</span><span class="w"> </span><span class="c">!! true if there were no errors</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">error_msg</span><span class="w"> </span><span class="c">!! the error message.</span>
+<span class="w">                                                                           </span><span class="c">!! (not allocated if</span>
+<span class="w">                                                                           </span><span class="c">!! there were no errors)</span>
+
+<span class="cp">#if defined __GFORTRAN__</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tmp</span><span class="w">  </span><span class="c">!! workaround for gfortran bugs</span>
+<span class="cp">#endif</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">status_ok</span><span class="p">))</span><span class="w"> </span><span class="n">status_ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">error_msg</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! if an exception has been thrown,</span>
+<span class="w">            </span><span class="c">! then this will always be allocated</span>
+<span class="w">            </span><span class="c">! [see json_throw_exception]</span>
+<span class="cp">#if defined __GFORTRAN__</span>
+<span class="w">            </span><span class="n">tmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">err_message</span>
+<span class="w">            </span><span class="n">error_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tmp</span>
+<span class="cp">#else</span>
+<span class="w">            </span><span class="n">error_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">err_message</span>
+<span class="cp">#endif</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end if</span>
+
+<span class="k">    end subroutine </span><span class="n">json_check_for_errors</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-02-22 16:48 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
+
+    <!-- MathJax JavaScript
+             ================================================== -->
+             <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({
+          TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+          jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+          extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+          });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+          <script src="../tipuesearch/tipuesearch_content.js"></script>
+          <script src="../tipuesearch/tipuesearch_set.js"></script>
+          <script src="../tipuesearch/tipuesearch.js"></script>
+
+  </body>
+</html>
