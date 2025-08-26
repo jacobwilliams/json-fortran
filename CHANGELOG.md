@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.0.5 (2025-08-25)](#905-2025-08-25)
     - [9.0.4 (2025-08-02)](#904-2025-08-02)
     - [9.0.3 (2025-02-22)](#903-2025-02-22)
     - [9.0.2 (2024-08-25)](#902-2024-08-25)
@@ -54,7 +55,16 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.4...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.5...HEAD)
+
+### [9.0.5](https://github.com/jacobwilliams/json-fortran/tree/9.0.5) (2025-08-25)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.4...9.0.5)
+or [Download v9.0.5](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.5)
+
+**Changes:**
+
+* A minor change to work around a possible compiler bug in Gfortran 15.1. [#597](https://github.com/jacobwilliams/json-fortran/issues/597) [#598](https://github.com/jacobwilliams/json-fortran/pull/598) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [9.0.4](https://github.com/jacobwilliams/json-fortran/tree/9.0.4) (2025-08-02)
 
