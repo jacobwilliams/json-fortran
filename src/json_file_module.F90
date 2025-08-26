@@ -449,7 +449,7 @@
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp  !! workaround for gfortran bugs
     call me%core%check_for_errors(status_ok,tmp)
-    if (present(error_msg)) error_msg = tmp
+    if (present(error_msg)) call move_alloc(tmp, error_msg)
 #else
     call me%core%check_for_errors(status_ok,error_msg)
 #endif
