@@ -290,6 +290,19 @@
         logical(LK) :: allow_trailing_comma = .true.
                             !! Allow a single trailing comma in arrays and objects.
 
+        procedure(parser_func),pointer :: parse_value => parse_value_recursive
+                            !! The JSON parser function to use.
+                            !! If null, then the default parser is used.
+                            !! Can be wither `parse_value` (the recursive parser)
+                            !! or `parse_value_non_recursive` (the non-recursive parser).
+                            !! [defined by `parser_mode` input]
+        integer(IK) :: parser_initial_stack_size = 32_IK
+                            !! The initial stack size (in number of elements)
+                            !! to use when `parser_mode=2` (non-recursive parser).
+        integer(IK) :: parser_max_stack_size = 10000_IK
+                            !! The maximum stack size (in number of elements)
+                            !! to use when `parser_mode=2` (non-recursive parser).
+
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
         integer :: filesize = 0 !! the file size when when `use_unformatted_stream=True`
@@ -884,7 +897,6 @@
         procedure        :: string_to_dble
         procedure        :: prepare_parser => json_prepare_parser
         procedure        :: parse_end => json_parse_end
-        procedure        :: parse_value
         procedure        :: parse_number
         procedure        :: parse_string
         procedure        :: parse_for_chars
@@ -946,6 +958,15 @@
             type(json_value),pointer,intent(in) :: p
             logical(LK),intent(out)             :: finished  !! set true to stop traversing
         end subroutine json_traverse_callback_func
+
+        subroutine parser_func(json, unit, str, value)
+            !! JSON parser function interface
+            import :: json_value,json_core,IK,CK
+            class(json_core),intent(inout)      :: json
+            integer(IK),intent(in)              :: unit   !! file unit number
+            character(kind=CK,len=*),intent(in) :: str    !! string containing JSON data
+            type(json_value),pointer            :: value  !! JSON data that is extracted
+        end subroutine parser_func
 
     end interface
     public :: json_array_callback_func
@@ -1145,6 +1166,25 @@
 
     if (present(allow_trailing_comma)) then
         me%allow_trailing_comma = allow_trailing_comma
+    end if
+
+    if (present(parser_mode)) then
+        select case(parser_mode)
+        case(1_IK); me%parse_value => parse_value_recursive  ! recursive parser
+        case(2_IK); me%parse_value => parse_value_nonrecursive  ! non-recursive parser
+        case default
+            call integer_to_string(parser_mode,int_fmt,istr)
+            call me%throw_exception('Invalid parser_mode: '//istr)
+        end select
+    end if
+    if (present(parser_initial_stack_size)) then
+        me%parser_initial_stack_size = max(1_IK, abs(parser_initial_stack_size))
+    end if
+    if (present(parser_max_stack_size)) then
+        me%parser_max_stack_size = max(1_IK, abs(parser_max_stack_size))
+    end if
+    if (me%parser_max_stack_size < me%parser_initial_stack_size) then
+        call me%throw_exception('Error: parser_max_stack_size must be >= parser_initial_stack_size.')
     end if
 
     !Set the format for real numbers:
@@ -10141,8 +10181,9 @@
 !*****************************************************************************************
 !>
 !  Core parsing routine.
+!  This is the original recursive routine.
 
-    recursive subroutine parse_value(json, unit, str, value)
+    recursive subroutine parse_value_recursive(json, unit, str, value)
 
     implicit none
 
@@ -10253,7 +10294,7 @@
 
     end if
 
-    end subroutine parse_value
+    end subroutine parse_value_recursive
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -11091,9 +11132,9 @@
 !*****************************************************************************************
 !>
 !  Non-recursive, state-machine based JSON parser.
-!  This is an alternative to the recursive [[parse_value]], [[parse_object]],
-!  and [[parse_array]] routines.
-!  This routine uses an explicit stack and state machine to parse JSON without
+!
+!  This is an alternative to the original recursive [[parse_value_recursive]] routine.
+!  This one uses an explicit stack and state machine to parse JSON without
 !  recursion.
 !
 !@note This routine is currently experimental and disabled by default.
@@ -11134,9 +11175,6 @@
     integer(IK) :: stack_top       !! current stack depth
     integer(IK) :: stack_capacity  !! current stack allocation size
 
-    integer(IK),parameter :: INITIAL_STACK_SIZE = 32_IK !! initial stack size
-    integer(IK),parameter :: MAX_STACK_SIZE = 10000_IK  !! safety limit -- this should be an input TODO
-
     logical(LK)              :: eof
     character(kind=CK,len=1) :: c
     integer(IK)              :: current_state
@@ -11157,8 +11195,8 @@
     end if
 
     ! Allocate initial stack
-    allocate(stack(INITIAL_STACK_SIZE))
-    stack_capacity = INITIAL_STACK_SIZE
+    allocate(stack(json%parser_initial_stack_size))
+    stack_capacity = json%parser_initial_stack_size
     stack_top = 0
     done = .false.
     current_state = STATE_INITIAL
@@ -11227,7 +11265,7 @@
                 call pop_stack()
             case default
                 call json%throw_exception('Error in parse_value_nonrecursive: '//&
-                                         'Unexpected character: "'//c//'"')
+                                          'Unexpected character: "'//c//'"')
                 call pop_stack()
             end select
 
@@ -11362,8 +11400,8 @@
 
     contains
 
-        !> Push current context onto stack
         subroutine push_stack(return_state, context, pair, expect_elem)
+            !! Push current context onto stack
             integer(IK),intent(in) :: return_state
             type(json_value),pointer,intent(in) :: context
             type(json_value),pointer,intent(in) :: pair
@@ -11374,7 +11412,7 @@
             stack_top = stack_top + 1
 
             ! Check stack depth limit
-            if (stack_top > MAX_STACK_SIZE) then
+            if (stack_top > json%parser_max_stack_size) then
                 call json%throw_exception('Error: Maximum parse depth exceeded')
                 return
             end if
@@ -11395,8 +11433,8 @@
 
         end subroutine push_stack
 
-        !> Pop context from stack
         subroutine pop_stack()
+            !! Pop context from stack
             if (stack_top == 0) then
                 ! Finished parsing
                 done = .true.

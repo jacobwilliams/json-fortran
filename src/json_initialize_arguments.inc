@@ -115,3 +115,17 @@ logical(LK),intent(in),optional :: strict_integer_type_checking
 logical(LK),intent(in),optional :: allow_trailing_comma
   !! Allow a single trailing comma in arrays and objects.
   !! (default is true)
+integer(IK),intent(in),optional :: parser_mode
+  !! Which version of the JSON parser to use:
+  !!
+  !! * 1 : the original recursive version [default]
+  !! * 2 : a non-recursive version that uses an
+  !!   explicit stack to avoid deep recursion issues.
+integer(IK),intent(in),optional :: parser_initial_stack_size
+  !! The initial stack size (in number of elements)
+  !! to use when `parser_mode=2` (non-recursive parser).
+  !! (default is 32)
+integer(IK),intent(in),optional :: parser_max_stack_size
+  !! The maximum stack size (in number of elements)
+  !! to use when `parser_mode=2` (non-recursive parser).
+  !! (default is 10000)
