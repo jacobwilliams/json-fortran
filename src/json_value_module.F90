@@ -888,6 +888,8 @@
         procedure,public :: check_children_for_duplicate_keys &
                                 => json_check_children_for_duplicate_keys  !! Check a `json_value` object's
                                                                            !! children for duplicate keys
+        procedure,public :: equals              => json_value_equals       !! Check if two json_value structures
+                                                                            !! are equal
 
         !other private routines:
         procedure        :: name_equal
@@ -11980,5 +11982,200 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!>
+!  Compare two JSON structures for equality.
+!
+!  This function recursively traverses both structures and checks that they have:
+!  * The same variable types
+!  * The same values (for primitives)
+!  * The same number of children (for objects and arrays)
+!  * The same structure (recursively)
+!
+!### Example
+!
+!```fortran
+! type(json_core) :: json
+! type(json_value),pointer :: p1, p2
+! logical :: are_equal
+! call json%load(file='file1.json', p=p1)
+! call json%load(file='file2.json', p=p2)
+! are_equal = json%equals(p1, p2)
+! if (are_equal) then
+!     write(*,*) 'Files are identical'
+! else
+!     write(*,*) 'Files differ'
+! end if
+!```
+
+    recursive function json_value_equals(json, p1, p2) result(equals)
+
+    implicit none
+
+    class(json_core),intent(inout)   :: json
+    type(json_value),pointer         :: p1     !! first JSON structure
+    type(json_value),pointer         :: p2     !! second JSON structure
+    logical(LK)                      :: equals !! true if the structures are equal
+
+    integer(IK) :: n1, n2  !! number of children
+    type(json_value),pointer :: child1, child2  !! for iterating children
+
+    ! Initialize
+    equals = .false.
+
+    ! Check if both are null
+    if (.not. associated(p1) .and. .not. associated(p2)) then
+        equals = .true.
+        return
+    end if
+
+    ! Check if only one is null
+    if (.not. associated(p1) .or. .not. associated(p2)) then
+        equals = .false.
+        return
+    end if
+
+    ! Check if variable types match
+    if (p1%var_type /= p2%var_type) then
+        equals = .false.
+        return
+    end if
+
+    ! Compare based on type
+    select case (p1%var_type)
+
+    case (json_null)
+        ! Both are null, already validated by type check
+        equals = .true.
+
+    case (json_logical)
+        ! Compare logical values
+        if (allocated(p1%log_value) .and. allocated(p2%log_value)) then
+            equals = (p1%log_value .eqv. p2%log_value)
+        else if (.not. allocated(p1%log_value) .and. .not. allocated(p2%log_value)) then
+            equals = .true.
+        else
+            equals = .false.
+        end if
+
+    case (json_integer)
+        ! Compare integer values
+        if (allocated(p1%int_value) .and. allocated(p2%int_value)) then
+            equals = (p1%int_value == p2%int_value)
+        else if (.not. allocated(p1%int_value) .and. .not. allocated(p2%int_value)) then
+            equals = .true.
+        else
+            equals = .false.
+        end if
+
+    case (json_real)
+        ! Compare real values with tolerance
+        if (allocated(p1%dbl_value) .and. allocated(p2%dbl_value)) then
+            associate (r1 => p1%dbl_value, r2 => p2%dbl_value)
+                ! Handle special cases: NaN, Inf, -Inf
+                if (ieee_is_nan(r1) .and. ieee_is_nan(r2)) then
+                    equals = .true.
+                else if (ieee_is_nan(r1) .or. ieee_is_nan(r2)) then
+                    equals = .false.
+                else if (.not. ieee_is_finite(r1) .and. .not. ieee_is_finite(r2)) then
+                    ! Both infinite - check if same sign
+                    equals = (r1 == r2)
+                else if (ieee_is_finite(r1) .and. ieee_is_finite(r2)) then
+                    ! Both finite:
+                    equals = r1 == r2
+                else
+                    equals = .false.
+                end if
+            end associate
+        else if (.not. allocated(p1%dbl_value) .and. .not. allocated(p2%dbl_value)) then
+            equals = .true.
+        else
+            equals = .false.
+        end if
+
+    case (json_string)
+        ! Compare string values
+        if (allocated(p1%str_value) .and. allocated(p2%str_value)) then
+            equals = (p1%str_value == p2%str_value)
+        else if (.not. allocated(p1%str_value) .and. .not. allocated(p2%str_value)) then
+            equals = .true.
+        else
+            equals = .false.
+        end if
+
+    case (json_array)
+        ! Compare arrays: must have same number of elements in same order
+        n1 = json%count(p1)
+        n2 = json%count(p2)
+
+        if (n1 /= n2) then
+            equals = .false.
+            return
+        end if
+
+        ! Compare each element
+        child1 => p1%children
+        child2 => p2%children
+
+        do while (associated(child1) .and. associated(child2))
+            ! Recursively compare children
+            if (.not. json%equals(child1, child2)) then
+                equals = .false.
+                return
+            end if
+            child1 => child1%next
+            child2 => child2%next
+        end do
+
+        ! If we got here, all elements matched
+        equals = .true.
+
+    case (json_object)
+        ! Compare objects: must have same keys with same values
+        n1 = json%count(p1)
+        n2 = json%count(p2)
+
+        if (n1 /= n2) then
+            equals = .false.
+            return
+        end if
+
+        ! For each child in p1, find matching child in p2 by name
+        child1 => p1%children
+
+        do while (associated(child1))
+            ! Look for child with same name in p2
+            nullify(child2)
+            if (allocated(child1%name)) then
+                call json%get_child(p2, child1%name, child2)
+
+                if (.not. associated(child2)) then
+                    ! Key not found in p2
+                    equals = .false.
+                    return
+                end if
+
+                ! Recursively compare values
+                if (.not. json%equals(child1, child2)) then
+                    equals = .false.
+                    return
+                end if
+            end if
+
+            child1 => child1%next
+        end do
+
+        ! If we got here, all keys and values matched
+        equals = .true.
+
+    case default
+        ! Unknown type
+        equals = .false.
+    end select
+
+    end function json_value_equals
+!*****************************************************************************************
+
+!*****************************************************************************************
     end module json_value_module
 !*****************************************************************************************
+
