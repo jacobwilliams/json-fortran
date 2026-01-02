@@ -273,7 +273,7 @@
 
     use iso_c_binding, only: c_double, c_float, c_long_double, &
                              c_char, c_ptr, c_null_ptr, c_long, &
-                             c_null_char
+                             c_null_char, c_loc, c_associated
 
     implicit none
 
@@ -285,6 +285,9 @@
 
     integer(IK) :: ierr  !! read iostat error code
     type(c_ptr) :: endptr !! pointer arg to `strtof`, etc.
+    character(kind=c_char,len=:),allocatable,target :: c_str !! for null-terminated C string
+    type(c_ptr) :: str_start !! pointer to start of string for comparison
+    logical :: done !! if the string has been processed
 
     interface
         function strtof( str, endptr ) result(d) bind(C, name="strtof" )
@@ -317,21 +320,25 @@
     return
 #endif
 
-    endptr = c_null_ptr ! indicates it is not used
+    ! Create null-terminated C string
+    c_str = trim(str)//C_NULL_CHAR
+    str_start = c_loc(c_str)
+    endptr = c_null_ptr
+    done = .false.
 
 #ifdef REAL32
 
     ! single precision
 
     if (RK == c_float) then
-        rval = strtof( str//C_NULL_CHAR, endptr )
-        if (rval==0.0_RK) then
-            read(str,fmt=*,iostat=ierr) rval  ! not efficient - might really be 0.0
-        else
+        rval = strtof( c_str, endptr )
+        ! Check if conversion was successful:
+        ! endptr should not point to the start (no conversion) and should not be null
+        if (c_associated(endptr) .and. .not. c_associated(endptr, str_start)) then
             ierr = 0
+            status_ok = .true.
+            done = .true.
         end if
-    else
-        read(str,fmt=*,iostat=ierr) rval
     end if
 
 #elif REAL128
@@ -339,14 +346,13 @@
     ! quad precision
 
     if (RK == c_long_double) then
-        rval = strtold( str//C_NULL_CHAR, endptr )
-        if (rval==0.0_RK) then
-            read(str,fmt=*,iostat=ierr) rval  ! not efficient - might really be 0.0
-        else
+        rval = strtold( c_str, endptr )
+        ! Check if conversion was successful:
+        if (c_associated(endptr) .and. .not. c_associated(endptr, str_start)) then
             ierr = 0
+            status_ok = .true.
+            done = .true.
         end if
-    else
-        read(str,fmt=*,iostat=ierr) rval
     end if
 
 #else
@@ -354,19 +360,25 @@
     ! double precision
 
     if (RK == c_double) then
-        rval = strtod( str//C_NULL_CHAR, endptr )
-        if (rval==0.0_RK) then
-            read(str,fmt=*,iostat=ierr) rval  ! not efficient - might really be 0.0
-        else
+        rval = strtod( c_str, endptr )
+        ! Check if conversion was successful:
+        if (c_associated(endptr) .and. .not. c_associated(endptr, str_start)) then
             ierr = 0
+            status_ok = .true.
+            done = .true.
         end if
-    else
-        read(str,fmt=*,iostat=ierr) rval
     end if
 
 #endif
 
-    status_ok = (ierr==0)
+    if (allocated(c_str)) deallocate(c_str)
+
+    if (.not. done) then
+        ! the string was not processed, fallback to read:
+        read(str,fmt=*,iostat=ierr) rval
+        status_ok = (ierr==0)
+    end if
+
     if (.not. status_ok) then
         rval = 0.0_RK
     else
