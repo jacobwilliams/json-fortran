@@ -4,6 +4,16 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.0.5 (2025-08-25)](#905-2025-08-25)
+    - [9.0.4 (2025-08-02)](#904-2025-08-02)
+    - [9.0.3 (2025-02-22)](#903-2025-02-22)
+    - [9.0.2 (2024-08-25)](#902-2024-08-25)
+    - [9.0.1 (2024-06-11)](#901-2024-06-11)
+    - [9.0.0 (2024-06-11)](#900-2024-06-11)
+    - [8.5.2 (2024-05-27)](#852-2024-05-27)
+    - [8.5.1 (2024-05-26)](#851-2024-05-26)
+    - [8.5.0 (2024-05-25)](#850-2024-05-25)
+    - [8.4.0 (2024-03-06)](#840-2024-03-06)
     - [8.3.0 (2022-05-07)](#830-2022-05-07)
     - [8.2.5 (2021-08-17)](#825-2021-08-17)
     - [8.2.4 (2021-08-15)](#824-2021-08-15)
@@ -45,7 +55,125 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.3.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.5...HEAD)
+
+### [9.0.5](https://github.com/jacobwilliams/json-fortran/tree/9.0.5) (2025-08-25)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.4...9.0.5)
+or [Download v9.0.5](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.5)
+
+**Changes:**
+
+* A minor change to work around a possible compiler bug in Gfortran 15.1. [#597](https://github.com/jacobwilliams/json-fortran/issues/597) [#598](https://github.com/jacobwilliams/json-fortran/pull/598) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [9.0.4](https://github.com/jacobwilliams/json-fortran/tree/9.0.4) (2025-08-02)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.3...9.0.4)
+or [Download v9.0.4](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.4)
+
+**Changes:**
+
+* Configure `.VERSION.in` in `CMAKE_CURRENT_SOURCE_DIR` in main `CMakeLists.txt`. [#585](https://github.com/jacobwilliams/json-fortran/issues/585) [#586](https://github.com/jacobwilliams/json-fortran/pull/586) ([mcharlou](https://github.com/mcharlou))
+* Fixed error when using non-default ints. [#591](https://github.com/jacobwilliams/json-fortran/issues/591) [#592](https://github.com/jacobwilliams/json-fortran/pull/592) ([jacobwilliams](https://github.com/jacobwilliams))
+* Various CI updates. Now testing Gfortran 9, 10, 11, 12. Removed tests for Gfortran 7, 8.
+
+### [9.0.3](https://github.com/jacobwilliams/json-fortran/tree/9.0.3) (2025-02-22)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.2...9.0.3)
+or [Download v9.0.3](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.3)
+
+**Changes:**
+
+* Added some checks to write statements to avoid potential crashes. [#581](https://github.com/jacobwilliams/json-fortran/issues/581) [#582](https://github.com/jacobwilliams/json-fortran/pull/582) ([jacobwilliams](https://github.com/jacobwilliams))
+* Attempting to reduce the size of the repo by pruning the documentation `gh-pages` history. [#583](https://github.com/jacobwilliams/json-fortran/issues/583) [#584](https://github.com/jacobwilliams/json-fortran/pull/584) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [9.0.2](https://github.com/jacobwilliams/json-fortran/tree/9.0.2) (2024-08-25)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.1...9.0.2)
+or [Download v9.0.2](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.2)
+
+**Bug Fixes:**
+
+* Added workarounds for potential stack overflows on Windows using `ifort` compiler. [#577](https://github.com/jacobwilliams/json-fortran/pull/577) ([robertrueger](https://github.com/robertrueger))
+* Fixed CI documentation deployment. [#573](https://github.com/jacobwilliams/json-fortran/issues/573) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [9.0.1](https://github.com/jacobwilliams/json-fortran/tree/9.0.1) (2024-06-11)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.2...9.0.1)
+or [Download v9.0.1](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.1)
+
+**Enhancements:**
+
+* No code changes. Just an update to the CI to fix documentation deployment. [#573](https://github.com/jacobwilliams/json-fortran/issues/573) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [9.0.0](https://github.com/jacobwilliams/json-fortran/tree/9.0.0) (2024-06-11)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.2...9.0.0)
+or [Download v9.0.0](https://github.com/jacobwilliams/json-fortran/releases/tag/9.0.0)
+
+**Enhancements:**
+
+* By default, the JSON pointer in `json_file` is now destroyed before loading. This is to prevent a memory leak if the type is used later to load another file. [#561](https://github.com/jacobwilliams/json-fortran/issues/561) [#562](https://github.com/jacobwilliams/json-fortran/pull/562) ([jacobwilliams](https://github.com/jacobwilliams)) Also added a new option `destroy_pointer` to the `json_file` load routines, which can be set to False to get the old behavior (not to destroy it). [#561](https://github.com/jacobwilliams/json-fortran/issues/571) [#562](https://github.com/jacobwilliams/json-fortran/pull/572) ([jacobwilliams](https://github.com/jacobwilliams))
+* Added add a new `nullify_pointer` option to the `json_file` constructor (default is True) ([jacobwilliams](https://github.com/jacobwilliams))
+[#564](https://github.com/jacobwilliams/json-fortran/issues/564) [#566](https://github.com/jacobwilliams/json-fortran/pull/566)
+* Updates for the CI and unit tests. Now testing with FPM, and running all tests with valgrind to check for memory leaks.
+ [#563](https://github.com/jacobwilliams/json-fortran/issues/563)
+[#565](https://github.com/jacobwilliams/json-fortran/pull/565)
+[#568](https://github.com/jacobwilliams/json-fortran/pull/568)
+([jacobwilliams](https://github.com/jacobwilliams))
+* Added an optional `allow_trailing_comma` argument to the initialize routines (default is True). If set to False, this disallows extra trailing commas in arrays and objects. [#569](https://github.com/jacobwilliams/json-fortran/issues/569)
+[#570](https://github.com/jacobwilliams/json-fortran/pull/570) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [8.5.2](https://github.com/jacobwilliams/json-fortran/tree/8.5.2) (2024-05-27)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.1...8.5.2)
+or [Download v8.5.2](https://github.com/jacobwilliams/json-fortran/releases/tag/8.5.2)
+
+**Bug Fixes:**
+
+* Fixed a CMake bug where the package version was not set correctly, which caused the CMake configuration files to be saved to a folder with blank version name. [#560](https://github.com/jacobwilliams/json-fortran/pull/560) ([timfelle](https://github.com/timfelle))
+
+### [8.5.1](https://github.com/jacobwilliams/json-fortran/tree/8.5.1) (2024-05-26)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.5.0...8.5.1)
+or [Download v8.5.1](https://github.com/jacobwilliams/json-fortran/releases/tag/8.5.1)
+
+**Bug Fixes:**
+
+* Fixed a bug when setting `JSONFORTRAN_STATIC_LIBRARY_ONLY` to False. Also restored some of the original CMake settings from 8.4.0. Specifically, the tests are enabled by default, and both the shared and static libraries are built by default. [#558](https://github.com/jacobwilliams/json-fortran/issues/558) [#559](https://github.com/jacobwilliams/json-fortran/pull/559) ([jacobwilliams](https://github.com/jacobwilliams))
+
+### [8.5.0](https://github.com/jacobwilliams/json-fortran/tree/8.5.0) (2024-05-25)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.4.0...8.5.0)
+or [Download v8.5.0](https://github.com/jacobwilliams/json-fortran/releases/tag/8.5.0)
+
+**Enhancements:**
+
+- Various CMake updates:
+  - Only installing if json-fortran is the top level project. Added a library alias so that json fortran can be included with `find_package`, `fetch_content`, and `add_subdirectory` easily. [#526](https://github.com/jacobwilliams/json-fortran/issues/526) [#527](https://github.com/jacobwilliams/json-fortran/pull/527) , [#528](https://github.com/jacobwilliams/json-fortran/pull/528), [#529](https://github.com/jacobwilliams/json-fortran/pull/529) [#556](https://github.com/jacobwilliams/json-fortran/pull/556) ([K20shores](https://github.com/K20shores))
+  - Fixed compilation with Ninja and Intel OneAPI ifx compiler, and added some CMake options [#557](https://github.com/jacobwilliams/json-fortran/pull/557) ([lmdiazangulo](https://github.com/lmdiazangulo))
+  - Note that the CMake minimum version is now `3.18`.
+- Added a new unit test. [#546](https://github.com/jacobwilliams/json-fortran/issues/546) [#547](https://github.com/jacobwilliams/json-fortran/pull/547) ([jacobwilliams](https://github.com/jacobwilliams))
+- Various CI and Readme updates.
+
+**Bug Fixes:**
+
+- Fixed a bug when IEEE floating-point rounding mode was set to `IEEE_DOWN`. [#545](https://github.com/jacobwilliams/json-fortran/pull/545) ([amanotk](https://github.com/amanotk))
+
+### [8.4.0](https://github.com/jacobwilliams/json-fortran/tree/8.4.0) (2024-03-06)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/8.3.0...8.4.0)
+or [Download v8.4.0](https://github.com/jacobwilliams/json-fortran/releases/tag/8.4.0)
+
+**Enhancements:**
+
+- Minor updates for readme and documentation  [\#521](https://github.com/jacobwilliams/json-fortran/pull/521) ([zmoon](https://github.com/zmoon))
+- Updates for unit tests [\#536](https://github.com/jacobwilliams/json-fortran/issues/536) [\#543](https://github.com/jacobwilliams/json-fortran/pull/543)   ([gha3mi](https://github.com/gha3mi), [jacobwilliams](https://github.com/jacobwilliams))
+
+**Bug Fixes:**
+
+- Fixed a bug where the library would not compile if using `REAL128` kind  [\#550](https://github.com/jacobwilliams/json-fortran/issues/550) ([jacobwilliams](https://github.com/jacobwilliams))
+- Fixes to GitHub Actions CI [\#535](https://github.com/jacobwilliams/json-fortran/pull/535) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [8.3.0](https://github.com/jacobwilliams/json-fortran/tree/8.3.0) (2022-05-07)
 
@@ -58,7 +186,6 @@ or [Download v8.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/
 - Updates to the CI [\#509](https://github.com/jacobwilliams/json-fortran/pull/509) [\#508](https://github.com/jacobwilliams/json-fortran/issues/508) ([jacobwilliams](https://github.com/jacobwilliams))
 - Add information on conda-forge distribution [\#506](https://github.com/jacobwilliams/json-fortran/pull/506) ([awvwgk](https://github.com/awvwgk))  [\#507](https://github.com/jacobwilliams/json-fortran/issues/507)
 - Updated CMake to export include directories with target [\#504](https://github.com/jacobwilliams/json-fortran/pull/504) [\#503](https://github.com/jacobwilliams/json-fortran/issues/503) ([awvwgk](https://github.com/awvwgk))
-
 
 **Bug Fixes:**
 

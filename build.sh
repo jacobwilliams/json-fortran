@@ -325,7 +325,9 @@ if [[ $JF_SKIP_TESTS != [yY]* ]] ; then
         echo "======================================================"
         echo ""
         echo "Running ${TEST}"
-        "./${TEST}"
+        cd ..
+        "${BINDIR}${TEST}"
+        cd "$BINDIR"
     done)
     echo ""
     echo "======================================================"

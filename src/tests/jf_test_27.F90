@@ -60,7 +60,9 @@ contains
     call json%print(p,int(output_unit,IK))
 
     ! test json_file interface
-    f = json_file(p)
+    !f = json_file(p) ! memory leak in gfortran?
+    call f%initialize()
+    call f%add(p)
     nullify(p) ! data is now in f
     call f%initialize(compress_vectors=.true.)
     call f%print()

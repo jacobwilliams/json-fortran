@@ -12,7 +12,7 @@ module jf_test_48_mod
     private
     public :: test_48
 
-    character(len=*),parameter :: filename = '../files/inputs/big.json' !! large file to open
+    character(len=*),parameter :: filename = 'files/inputs/big.json' !! large file to open
 
 contains
 

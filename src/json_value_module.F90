@@ -287,6 +287,9 @@
                             !! * If true [default], an exception will be raised if an integer
                             !!   value cannot be read when parsing JSON.
 
+        logical(LK) :: allow_trailing_comma = .true.
+                            !! Allow a single trailing comma in arrays and objects.
+
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
         integer :: filesize = 0 !! the file size when when `use_unformatted_stream=True`
@@ -1109,7 +1112,7 @@
         me%escape_solidus = escape_solidus
     end if
 
-    ! how to handle null to read conversions:
+    ! how to handle null to real conversions:
     if (present(null_to_real_mode)) then
         select case (null_to_real_mode)
         case(1_IK:3_IK)
@@ -1140,6 +1143,10 @@
 
     if (present(strict_integer_type_checking)) then
         me%strict_integer_type_checking = strict_integer_type_checking
+    end if
+
+    if (present(allow_trailing_comma)) then
+        me%allow_trailing_comma = allow_trailing_comma
     end if
 
     !Set the format for real numbers:
@@ -1291,7 +1298,7 @@
 !     implicit none
 !     type(json_core) :: json
 !     type(json_value),pointer :: j1, j2
-!     call json%load('../files/inputs/test1.json',j1)
+!     call json%load('files/inputs/test1.json',j1)
 !     call json%clone(j1,j2) !now have two independent copies
 !     call json%destroy(j1)  !destroys j1, but j2 remains
 !     call json%print(j2,'j2.json')
@@ -5899,13 +5906,18 @@
 
     integer(IK) :: iloc  !! used to keep track of size of str
                          !! since it is being allocated in chunks.
+    character(kind=CK,len=:),allocatable :: tmp  !! temporary buffer for trimming `str`
 
     str = repeat(space, print_str_chunk_size)
     iloc = 0_IK
     call json%json_value_print(p, iunit=unit2str, str=str, iloc=iloc, indent=1_IK, colon=.true.)
 
     ! trim the string if necessary:
-    if (len(str)>iloc) str = str(1:iloc)
+    if (len(str)>iloc) then
+        allocate(character(kind=CK,len=iloc)::tmp)
+        tmp(1:iloc) = str
+        call move_alloc(tmp, str)
+    endif
 
     end subroutine json_value_to_string
 !*****************************************************************************************
@@ -6027,10 +6039,11 @@
     character(kind=CK,len=:),allocatable :: s_indent !! the string of spaces for
                                                      !! indenting (see `tab` and `spaces`)
     character(kind=CK,len=:),allocatable :: s !! the string appended to `str`
+    character(kind=CK,len=:),allocatable :: buf !! temporary buffer for extending `str`
     type(json_value),pointer :: element !! for getting children
     integer(IK) :: tab           !! number of `tabs` for indenting
     integer(IK) :: spaces        !! number of spaces for indenting
-    integer(IK) :: i             !! counter
+    integer(IK) :: i,j           !! counter
     integer(IK) :: count         !! number of children
     logical(LK) :: print_comma   !! if the comma will be printed after the value
     logical(LK) :: write_file    !! if we are writing to a file
@@ -6109,6 +6122,7 @@
 
                 s = s_indent//start_object
                 call write_it()
+                if (json%exception_thrown) return
 
                 !if an object is in an array, there is an extra tab:
                 if (is_array) then
@@ -6139,6 +6153,7 @@
                                           str_escaped//quotation_mark//colon_char//space
                             call write_it(advance=.false.)
                         end if
+                        if (json%exception_thrown) return
                     else
                         call json%throw_exception('Error in json_value_print:'//&
                                                   ' element%name not allocated')
@@ -6184,6 +6199,7 @@
 
                 s = s_indent//start_array
                 call write_it( advance=(.not. is_vector) )
+                if (json%exception_thrown) return
 
                 !if an array is in an array, there is an extra tab:
                 if (is_array) then
@@ -6212,7 +6228,6 @@
                                         need_comma=i<count, is_array_element=.true., &
                                         str=str, iloc=iloc)
                     end if
-                    if (json%exception_thrown) return
 
                     ! get the next child the list:
                     element => element%next
@@ -6300,6 +6315,8 @@
 
     end if
 
+    if (json%exception_thrown) return
+
     contains
 
         subroutine write_it(advance,comma,space_after_comma)
@@ -6318,6 +6335,7 @@
         integer(IK) :: n               !! length of actual string `s` appended to `str`
         integer(IK) :: room_left       !! number of characters left in `str`
         integer(IK) :: n_chunks_to_add !! number of chunks to add to `str` for appending `s`
+        integer(IK) :: istat           !! `iostat` code for `write` statement
 
         if (present(comma)) then
             add_comma = comma
@@ -6357,9 +6375,14 @@
         if (write_file) then
 
             if (add_line_break) then
-                write(iunit,fmt='(A)') s
+                write(iunit,fmt='(A)',iostat=istat) s
             else
-                write(iunit,fmt='(A)',advance='NO') s
+                write(iunit,fmt='(A)',advance='NO',iostat=istat) s
+            end if
+            if (istat/=0) then
+                call integer_to_string(iunit,int_fmt,tmp)
+                call json%throw_exception('Error in json_value_print: '//&
+                                          'could not write to file unit: '//trim(tmp))
             end if
 
         else    !write string
@@ -6371,7 +6394,12 @@
             if (room_left < n) then
                 ! need to add another chunk to fit this string:
                 n_chunks_to_add = max(1_IK, ceiling( real(len(s)-room_left,RK) / real(chunk_size,RK), IK ) )
-                str = str // repeat(space, print_str_chunk_size*n_chunks_to_add)
+                allocate(character(kind=CK, len=len(str)+print_str_chunk_size*n_chunks_to_add)::buf)
+                buf(1:len(str)) = str
+                do j = len(str)+1, len(buf)
+                    buf(j:j) = space
+                enddo
+                call move_alloc(buf, str)
             end if
             ! append s to str:
             str(iloc+1:iloc+n) = s
@@ -8773,8 +8801,14 @@
     real(real64),intent(in),optional    :: default !! default value if not found
 
     real(RK) :: tmp
+    real(RK) :: tmp_default
 
-    call json%get(me, path, tmp, found, default)
+    if (present(default)) then
+        tmp_default = real(default, RK)
+        call json%get(me, path, tmp, found, tmp_default)
+    else
+        call json%get(me, path, tmp, found)
+    end if
     value = real(tmp,real64)
 
     end subroutine json_get_real64_by_path
@@ -8836,8 +8870,14 @@
     real(real64),dimension(:),intent(in),optional     :: default !! default value if not found
 
     real(RK),dimension(:),allocatable :: tmp
+    real(RK),dimension(:),allocatable :: tmp_default
 
-    call json%get(me, path, tmp, found, default)
+    if (present(default)) then
+        tmp_default = real(default, RK)
+        call json%get(me, path, tmp, found, tmp_default)
+    else
+        call json%get(me, path, tmp, found)
+    end if
     if (allocated(tmp)) vec = real(tmp,real64)
 
     end subroutine json_get_real64_vec_by_path
@@ -10152,7 +10192,7 @@
 
                 ! start object
                 call json%to_object(value)    !allocate class
-                call json%parse_object(unit, str, value)
+                call json%parse_object(unit, str, value, expecting_next_element=.false.)
 
             case (start_array)
 
@@ -10877,7 +10917,7 @@
 !>
 !  Core parsing routine.
 
-    recursive subroutine parse_object(json, unit, str, parent)
+    recursive subroutine parse_object(json, unit, str, parent, expecting_next_element)
 
     implicit none
 
@@ -10885,6 +10925,9 @@
     integer(IK),intent(in)              :: unit    !! file unit number (if parsing from a file)
     character(kind=CK,len=*),intent(in) :: str     !! JSON string (if parsing from a string)
     type(json_value),pointer            :: parent  !! the parsed object will be added as a child of this
+    logical(LK),intent(in) :: expecting_next_element !! if true, this object is preceeded by a comma, so
+                                                     !! we expect a valid object to exist. used to check
+                                                     !! for trailing delimiters.
 
     type(json_value),pointer :: pair  !! temp variable
     logical(LK)              :: eof   !! end of file flag
@@ -10905,13 +10948,18 @@
 
         ! pair name
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, c=c)
+                           skip_comments=json%allow_comments, c=c)
         if (eof) then
             call json%throw_exception('Error in parse_object:'//&
                                       ' Unexpected end of file while parsing start of object.')
             return
         else if (end_object == c) then
             ! end of an empty object
+            if (expecting_next_element .and. .not. json%allow_trailing_comma) then
+                ! this is a dangling comma.
+                call json%throw_exception('Error in parse_object: '//&
+                                          'Dangling comma when parsing an object.')
+            end if
             return
         else if (quotation_mark == c) then
             call json_value_create(pair)
@@ -10933,7 +10981,7 @@
 
         ! pair value
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, c=c)
+                           skip_comments=json%allow_comments, c=c)
         if (eof) then
             call json%destroy(pair)
             call json%throw_exception('Error in parse_object:'//&
@@ -10957,14 +11005,15 @@
 
         ! another possible pair
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                            skip_comments=json%allow_comments, c=c)
+                           skip_comments=json%allow_comments, c=c)
         if (eof) then
             call json%throw_exception('Error in parse_object: '//&
                                       'End of file encountered when parsing an object')
             return
         else if (delimiter == c) then
             ! read the next member
-            call json%parse_object(unit = unit, str=str, parent = parent)
+            call json%parse_object(unit = unit, str=str, parent = parent, &
+                                   expecting_next_element=.true.)
         else if (end_object == c) then
             ! end of object
             return
@@ -10994,6 +11043,9 @@
     type(json_value),pointer :: element !! temp variable for array element
     logical(LK)              :: eof     !! end of file flag
     character(kind=CK,len=1) :: c       !! character returned by [[pop_char]]
+    logical(LK) :: expecting_next_element !! to check for trailing delimiters
+
+    expecting_next_element = .false.
 
     do
 
@@ -11009,7 +11061,10 @@
         end if
 
         ! parse value will deallocate an empty array value
-        if (associated(element)) call json%add(array, element)
+        if (associated(element)) then
+            expecting_next_element = .false.
+            call json%add(array, element)
+        end if
 
         ! popped the next character
         call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
@@ -11022,9 +11077,15 @@
             exit
         else if (delimiter == c) then
             ! parse the next element
+            expecting_next_element = .true.
             cycle
         else if (end_array == c) then
             ! end of array
+            if (expecting_next_element .and. .not. json%allow_trailing_comma) then
+                ! this is a dangling comma.
+                call json%throw_exception('Error in parse_array: '//&
+                                          'Dangling comma when parsing an array.')
+            end if
             exit
         else
             call json%throw_exception('Error in parse_array: '//&
@@ -11541,6 +11602,8 @@
 
     character(kind=CK,len=:),allocatable :: error_msg  !! error message
     logical :: status_ok !! false if there were any errors thrown
+    integer(IK) :: istat !! for write error checking
+    character(kind=CK,len=max_integer_str_len) :: tmp !! for int to string conversions
 
     !get error message:
     call json%check_for_errors(status_ok, error_msg)
@@ -11548,9 +11611,17 @@
     !print it if there is one:
     if (.not. status_ok) then
         if (present(io_unit)) then
-            write(io_unit,'(A)') error_msg
+            write(io_unit,'(A)',iostat=istat) error_msg
+            if (istat/=0) then
+                ! in this case, just try to write to the error_unit
+                ! [convert to IK integer, we assume this will be ok since
+                !  normally these io units are default ints]
+                call integer_to_string(int(io_unit,IK),int_fmt,tmp)
+                write(error_unit,'(A)',iostat=istat) 'Error writing to unit '//trim(tmp)
+                write(error_unit,'(A)',iostat=istat) error_msg
+            end if
         else
-            write(output_unit,'(A)') error_msg
+            write(output_unit,'(A)',iostat=istat) error_msg
         end if
         deallocate(error_msg)
         call json%clear_exceptions()

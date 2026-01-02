@@ -10,42 +10,61 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        gcc_v: [7,8,9,10] # Version of GFortran we want to use.
-        python-version: [3.9]
+        gcc_v: [12,10,11,9] # Version of GFortran we want to use.
+        python-version: [3.11]
     env:
       FC: gfortran-${{matrix.gcc_v}}
       GCC_V: ${{matrix.gcc_v}}
 
+      #
+      # GCC version
+      #
+      #  9 - build.sh with documentation, unit tests and coverage analysis. doc deployment
+      #  10 - build.sh - no documentation, with and without unicode.
+      #  11 - FPM
+      #  12 - CMake build with unit tests, no documentation, with coverage analysis. no unicode
+      #
+      # NOTE: coverage disabled for now
+
     steps:
 
-    - name: Set vars
-      id: vars
-      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4.2.2
       with:
         submodules: recursive
 
     - name: Setup cmake
-      if: contains( matrix.gcc_v, 9 )
-      uses: jwlawson/actions-setup-cmake@v1.8
+      if: contains( matrix.gcc_v, 12 )
+      uses: jwlawson/actions-setup-cmake@v2.0.2
       with:
-        cmake-version: '3.19.x'
+        cmake-version: '3.28.x'
 
     - name: Install Python
-      uses: actions/setup-python@v1 # Use pip to install latest CMake, & FORD/Jin2For, etc.
+      uses: actions/setup-python@v5.1.0 # Use pip to install latest CMake, & FORD/Jin2For, etc.
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Setup Graphviz
-      uses: ts-graphviz/setup-graphviz@v1
+      uses: ts-graphviz/setup-graphviz@v2.0.2
+
+    - name: Set current directory in env variable
+      run: echo "MYDIR=$(pwd)" >> $GITHUB_ENV
+
+    - name: Set PYTHONPATH and PATH for later steps
+      run: |
+        echo "PYTHONPATH=$MYDIR/FoBiS/src/main/python:$PYTHONPATH" >> $GITHUB_ENV
+        echo "PATH=$MYDIR/FoBiS/src/main/python:$PATH" >> $GITHUB_ENV
 
     - name: Install Python dependencies
       if: contains( matrix.os, 'ubuntu')
       run: |
         python -m pip install --upgrade pip
-        pip install ford FoBiS.py pygooglechart
+        #pip install ford FoBiS.py pygooglechart fpm
+        pip install ford pygooglechart fpm
+        # just get the latest FoBiS from git:
+        # git clone https://github.com/szaghi/FoBiS.git
+        # use a fork until there is a new release:
+        git clone https://github.com/jacobwilliams/FoBiS.git
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Install GFortran Linux
@@ -59,7 +78,7 @@ jobs:
         --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_V}
 
     - name: Compile_with_build
-      if: matrix.gcc_v != 7
+      if: matrix.gcc_v == 10
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
@@ -67,32 +86,93 @@ jobs:
         ./build.sh --skip-documentation
         ./build.sh --skip-documentation --enable-unicode
 
+    - name: Compile_with_FPM
+      if: matrix.gcc_v == 11
+      run: |
+        GFORTRAN=gfortran-${{matrix.gcc_v}}
+        GCOV=gcov-${{matrix.gcc_v}}
+        sudo apt update && sudo apt install -y valgrind
+        fpm test jf_test_01 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_02 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_03 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_04 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_05 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_06 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_07 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_08 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_09 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_10 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_11 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_12 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_13 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_14 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_15 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_16 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_17 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_18 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_19 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_20 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_21 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_22 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_23 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_24 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_25 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_26 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_27 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_28 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_29 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_30 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_31 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_32 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_33 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_34 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_35 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_36 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_37 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_38 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_39 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_40 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_41 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_42 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_43 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_44 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_45 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_46 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_47 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_48 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_49 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_50 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+        fpm test jf_test_51 --runner "valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1"
+
     - name: Compile_with_cmake
       # CMake build with unit tests, no documentation, with coverage analysis
       # No unicode so that coverage combined with the build script will cover unicode
       # and non-unicode code paths
-      if: matrix.gcc_v == 9
+      if: matrix.gcc_v == 12
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
         mkdir cmake-build
         cd cmake-build
-        cmake ..
+        cmake -D ENABLE_TESTS=ON ..
         make -j 4 check
 
     - name: Compile_with_build_mkdocs
       # build with build.sh, make documentation, run unit tests
       # and perform coverage analysis - used for doc deployment
-      if: matrix.gcc_v == 7
+      if: matrix.gcc_v == 9
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
         ./build.sh --coverage --skip-documentation
+        # delete old coverage files:
+        find . -name '*.gcda' -delete
+        find . -name '*.gcov' -delete
         ./build.sh --coverage --enable-unicode
 
     - name: Deploy Documentation for master
-      if: matrix.gcc_v == 7 && github.ref == 'refs/heads/master'
-      uses: JamesIves/github-pages-deploy-action@4.1.3
+      if: matrix.gcc_v == 9 && github.ref == 'refs/heads/master'
+      uses: JamesIves/github-pages-deploy-action@v4.7.3
       with:
         branch: gh-pages # The branch the action should deploy to.
         folder: doc  # The folder the action should deploy.
@@ -102,8 +182,8 @@ jobs:
 
     - name: Rebuild documentation for tagged release
       env:
-        TAGNAME: ${{ steps.vars.outputs.tag }}
-      if: matrix.gcc_v == 7 && startsWith(github.ref, 'refs/tags/')
+        TAGNAME: ${{github.ref_name}}
+      if: matrix.gcc_v == 9 && startsWith(github.ref, 'refs/tags/')
       run: |
         echo ${TAGNAME}
         rm -rf doc
@@ -111,15 +191,16 @@ jobs:
         ford --debug json-fortran.tagged.md
 
     - name: Deploy documentation for tagged release
-      if: matrix.gcc_v == 7 && startsWith(github.ref, 'refs/tags/')
-      uses: JamesIves/github-pages-deploy-action@4.1.3
+      if: matrix.gcc_v == 9 && startsWith(github.ref, 'refs/tags/')
+      uses: JamesIves/github-pages-deploy-action@v4.7.3
       with:
         branch: gh-pages # The branch the action should deploy to.
         folder: doc  # The folder the action should deploy.
-        target-folder: prev/${{ steps.vars.outputs.tag }} # deploy to a version-specific folder
+        target-folder: prev/${{github.ref_name}} # deploy to a version-specific folder
+        single-commit: true
 
     - name: Upload coverage
-      if: matrix.gcc_v == 7
+      if: matrix.gcc_v == 9
       run: |
         rm json_*.F90-*unicode.gcov || true
         mv json_*.F90.gcov src/

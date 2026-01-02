@@ -16,7 +16,7 @@ module jf_test_6_mod
     private
     public :: test_6
 
-    character(len=*),parameter :: dir = '../files/inputs/'   !! working directory
+    character(len=*),parameter :: dir = 'files/inputs/'   !! working directory
 
 contains
 

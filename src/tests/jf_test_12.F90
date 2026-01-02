@@ -23,7 +23,7 @@ contains
     integer,intent(out) :: error_cnt !! report number of errors to caller
 
     integer(IK),parameter :: imx = 5, jmx = 3, kmx = 4 !! dimensions for raw work array of primitive type
-    character(len=*),parameter :: file = '../files/test12.json'  !! Filename to write
+    character(len=*),parameter :: file = 'files/expected-outputs/test12.json'  !! Filename to write
     real(wp), parameter        :: TOL = 100*epsilon(1.0_wp) !! Tolerance for real comparisons
 
     type(json_core)                        :: json              !! factory for manipulating `json_value` pointers
@@ -150,7 +150,10 @@ contains
     call json%get(me=root,path='array data.data',array_callback=get_3D_from_array)
     call check_errors(all(abs(fetched_array - reshape(raw_array,[size(raw_array)])) <= TOL))
 
-    my_file = json_file(root,verbose=.true.,real_format='G')
+    !my_file = json_file(root,verbose=.true.,real_format='G')  ! valgrind says this cases a memory leak
+    call my_file%initialize(verbose=.true.,real_format='G')    ! this doesn't have a memmory leak
+    call my_file%add(root)
+    nullify(root)
 
     call my_file%update('array data.description',CK_'vector data',found=existed)
     call check_file_errors(existed)

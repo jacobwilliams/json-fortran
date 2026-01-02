@@ -1,5 +1,4 @@
-![JSON-Fortran](/media/json-fortran-logo-2.png)
-============
+<h1 id="json-fortran"><img alt="JSON-Fortran" src="/media/json-fortran-logo-2.png" title="JSON-Fortran logo"></h1>
 
 JSON-Fortran: A Modern Fortran JSON API
 
@@ -43,13 +42,15 @@ Download
 --------------------
 
 [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg)](https://github.com/jacobwilliams/json-fortran/releases)
-[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg)](https://formulae.brew.sh/formula/json-fortran)
-[![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/json-fortran)](https://github.com/conda-forge/json-fortran-feedstock)
 
 Download the official versioned releases
 [here](https://github.com/jacobwilliams/json-fortran/releases/latest).
 Or, get the latest development code from the master branch
 [here](https://github.com/jacobwilliams/json-fortran.git).
+
+### Homebrew
+
+[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg)](https://formulae.brew.sh/formula/json-fortran)
 
 __NEWS:__ As of June 7, 2015,
 [json-fortran](https://github.com/jacobwilliams/json-fortran) can be
@@ -70,6 +71,11 @@ multiple Fortran compilers, please follow the CMake installation
 instructions below, as the homebrew installation is only intended to
 support a single Fortran compiler. Cheers!
 
+### Conda
+
+[![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/json-fortran)](https://github.com/conda-forge/json-fortran-feedstock)
+[![Downloads](https://anaconda.org/conda-forge/json-fortran/badges/downloads.svg)](https://anaconda.org/conda-forge/json-fortran)
+
 __NEWS:__ As of January 20, 2022,
 [json-fortran](https://github.com/jacobwilliams/json-fortran) can be
 downloaded and installed via the [conda](https://docs.conda.io/en/latest/)
@@ -79,11 +85,15 @@ the [json-fortran package](https://anaconda.org/conda-forge/json-fortran)
 can be installed.
 
 ```bash
-conda install json-fortran
+conda install --channel conda-forge json-fortran
 ```
 
 _Note:_ Packages on conda-forge are build with GCC 9.4 which is upwards
 compatible with newer GCC versions, but not with other Fortran compilers.
+
+### Package status from Repology
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/json-fortran.svg)](https://repology.org/project/json-fortran/versions)
 
 [top](#json-fortran)
 
@@ -113,9 +123,9 @@ Currently, several ways are provided to build the JSON-fortran library
 
   The full set of modes are: `static-gnu`, `static-gnu-debug`, `static-intel`, `static-intel-debug`, `shared-gnu`, `shared-gnu-debug`, `shared-intel`, `shared-intel-debug`, `tests-gnu`, `tests-gnu-debug`, `tests-intel`, `tests-intel-debug`
 
-  To generate the documentation using [ford](https://github.com/Fortran-FOSS-Programmers/ford), run: ```FoBis.py rule --execute makedoc -f json-fortran.fobis```
+  To generate the documentation using [ford](https://github.com/Fortran-FOSS-Programmers/ford), run: ```FoBiS.py rule --execute makedoc -f json-fortran.fobis```
 
-  To run all the tests, run: ```FoBis.py rule --execute tests -f json-fortran.fobis```
+  To run all the tests, run: ```FoBiS.py rule --execute tests -f json-fortran.fobis```
 
 * A [Visual Studio](https://www.visualstudio.com) project is included for building the library (and unit tests) on Windows with the Intel Fortran Compiler.  The project has been tested with Visual Studio 2010 and 2013.
 
@@ -135,11 +145,11 @@ if you have a second copy of the JSON-Fortran project tree, and want to build th
 linking against those compiled/installed by the first copy:
 
 ```CMake
-cmake_minimum_required ( VERSION 2.8.8 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.18 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 8.3.0 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 9.0.5 REQUIRED )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
 foreach ( UNIT_TEST ${JF_TEST_SRCS} )

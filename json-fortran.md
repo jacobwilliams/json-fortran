@@ -1,7 +1,6 @@
 ---
 project: JSON-Fortran
-summary: ![JSON-Fortran](|media|/json-fortran-logo-2.png)<br>
-         JSON-Fortran -- A Modern Fortran JSON API
+summary: JSON-Fortran -- A Modern Fortran JSON API
 author: Jacob Williams
 src_dir: ./src
 output_dir: ./doc
@@ -29,8 +28,9 @@ coloured_edges: true
 extra_filetypes: .inc !
 print_creation_date: true
 creation_date: %Y-%m-%d %H:%M %z
-extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
-            ifcore:https://software.intel.com/en-us/fortran-compiler-developer-guide-and-reference-tracebackqq
+extra_mods: iso_fortran_env:https://fortranwiki.org/fortran/show/iso_fortran_env
+            ifcore:https://www.intel.com/content/www/us/en/docs/fortran-compiler/developer-guide-reference/2024-0/tracebackqq.html
+            ieee_arithmetic:https://fortranwiki.org/fortran/show/ieee_arithmetic
 md_extensions: markdown.extensions.toc
                markdown.extensions.smarty
 ---
@@ -38,6 +38,8 @@ md_extensions: markdown.extensions.toc
 --------------------
 
 [TOC]
+
+![json-fortran](media/json-fortran-logo-2.png)
 
 Brief description
 -----------------

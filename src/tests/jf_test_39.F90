@@ -44,7 +44,9 @@ contains
 
     do i = 1, size(tests)
 
-        json = json_file(trim(tests(i)),verbose=.true.,stop_on_error=.true.)
+        !json = json_file(trim(tests(i)),verbose=.true.,stop_on_error=.true.)  ! memory leak in gfortran?
+        call json%initialize(verbose=.true.,stop_on_error=.true.)
+        call json%deserialize(trim(tests(i)))
         call json%print(int(error_unit,IK))
         write(error_unit,'(A)') ''
         if (json%failed()) then
