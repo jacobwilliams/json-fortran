@@ -9833,7 +9833,7 @@
         end if
 
         ! close the file:
-        close(unit=iunit, iostat=istat)
+            close(unit=iunit, iostat=istat)
 
     else
 
@@ -11086,6 +11086,332 @@
     end do
 
     end subroutine parse_array
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Non-recursive, state-machine based JSON parser.
+!  This is an alternative to the recursive [[parse_value]], [[parse_object]],
+!  and [[parse_array]] routines.
+!  This routine uses an explicit stack and state machine to parse JSON without
+!  recursion.
+!
+!@note This routine is currently experimental and disabled by default.
+!      The recursive version remains the default parser.
+
+    subroutine parse_value_nonrecursive(json, unit, str, value)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    integer(IK),intent(in)              :: unit   !! file unit number
+    character(kind=CK,len=*),intent(in) :: str    !! string containing JSON data
+    type(json_value),pointer            :: value  !! JSON data that is extracted
+
+    ! Parser states
+    integer(IK),parameter :: STATE_INITIAL         = 1
+    integer(IK),parameter :: STATE_PARSE_VALUE     = 2
+    integer(IK),parameter :: STATE_OBJECT_START    = 3
+    integer(IK),parameter :: STATE_OBJECT_KEY      = 4
+    integer(IK),parameter :: STATE_OBJECT_COLON    = 5
+    integer(IK),parameter :: STATE_OBJECT_VALUE    = 6
+    integer(IK),parameter :: STATE_OBJECT_NEXT     = 7
+    integer(IK),parameter :: STATE_ARRAY_START     = 8
+    integer(IK),parameter :: STATE_ARRAY_VALUE     = 9
+    integer(IK),parameter :: STATE_ARRAY_NEXT      = 10
+    integer(IK),parameter :: STATE_DONE            = 11
+
+    type parse_stack_entry
+        !! Stack entry type for tracking parse context
+        integer(IK) :: state = 0_IK                        !! parser state
+        type(json_value),pointer :: context => null()      !! current object/array being parsed
+        type(json_value),pointer :: current_pair => null() !! current key-value pair (for objects)
+        logical(LK) :: expecting_element = .false.         !! for trailing comma detection
+    end type parse_stack_entry
+
+    ! Parser stack (local allocatable array, grows as needed)
+    type(parse_stack_entry),dimension(:),allocatable :: stack
+    integer(IK) :: stack_top       !! current stack depth
+    integer(IK) :: stack_capacity  !! current stack allocation size
+
+    integer(IK),parameter :: INITIAL_STACK_SIZE = 32_IK !! initial stack size
+    integer(IK),parameter :: MAX_STACK_SIZE = 10000_IK  !! safety limit -- this should be an input TODO
+
+    logical(LK)              :: eof
+    character(kind=CK,len=1) :: c
+    integer(IK)              :: current_state
+    type(json_value),pointer :: current_value
+    type(json_value),pointer :: current_pair
+    logical(LK)              :: expecting_element
+    logical(LK)              :: done
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: tmp
+#endif
+
+    ! Initialize
+    if (json%exception_thrown) return
+    if (.not. associated(value)) then
+        call json%throw_exception('Error in parse_value_nonrecursive: '//&
+                                  'value pointer not associated.')
+        return
+    end if
+
+    ! Allocate initial stack
+    allocate(stack(INITIAL_STACK_SIZE))
+    stack_capacity = INITIAL_STACK_SIZE
+    stack_top = 0
+    done = .false.
+    current_state = STATE_INITIAL
+    current_value => value
+    nullify(current_pair)
+    expecting_element = .false.
+
+    ! Main parsing loop
+    do while (.not. done .and. .not. json%exception_thrown)
+
+        select case (current_state)
+
+        case (STATE_INITIAL)
+            ! Read first character to determine value type
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                              skip_comments=json%allow_comments, popped=c)
+            if (eof) then
+                done = .true.
+                exit
+            end if
+
+            select case (c)
+            case (start_object)
+                call json%to_object(current_value)
+                current_state = STATE_OBJECT_START
+            case (start_array)
+                call json%to_array(current_value)
+                current_state = STATE_ARRAY_START
+            case (end_array)
+                ! Empty array element - destroy the element and signal via null
+                call json%push_char(c)
+                if (associated(current_value)) then
+                    call json%destroy(current_value)
+                    nullify(current_value)
+                end if
+                ! Update the stack to know element is null
+                if (stack_top > 0) then
+                    nullify(stack(stack_top)%current_pair)
+                end if
+                call pop_stack()
+            case (quotation_mark)
+                call json%to_string(current_value)
+#if defined __GFORTRAN__
+                call json%parse_string(unit,str,tmp)
+                current_value%str_value = tmp
+                if (allocated(tmp)) deallocate(tmp)
+#else
+                call json%parse_string(unit,str,current_value%str_value)
+#endif
+                call pop_stack()
+            case (CK_'t')
+                call json%parse_for_chars(unit, str, true_str(2:))
+                if (.not. json%exception_thrown) call json%to_logical(current_value,.true.)
+                call pop_stack()
+            case (CK_'f')
+                call json%parse_for_chars(unit, str, false_str(2:))
+                if (.not. json%exception_thrown) call json%to_logical(current_value,.false.)
+                call pop_stack()
+            case (CK_'n')
+                call json%parse_for_chars(unit, str, null_str(2:))
+                if (.not. json%exception_thrown) call json%to_null(current_value)
+                call pop_stack()
+            case (CK_'-', CK_'0': CK_'9', CK_'.', CK_'+')
+                call json%push_char(c)
+                call json%parse_number(unit, str, current_value)
+                call pop_stack()
+            case default
+                call json%throw_exception('Error in parse_value_nonrecursive: '//&
+                                         'Unexpected character: "'//c//'"')
+                call pop_stack()
+            end select
+
+        case (STATE_OBJECT_START)
+            ! Start parsing object members
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                              skip_comments=json%allow_comments, popped=c)
+            if (eof) then
+                call json%throw_exception('Error in parse_object:'//&
+                                          ' Unexpected end of file while parsing start of object.')
+                exit
+            else if (c == end_object) then
+                ! Empty object or end after trailing comma
+                if (expecting_element .and. .not. json%allow_trailing_comma) then
+                    call json%throw_exception('Error in parse_object: '//&
+                                              'Dangling comma when parsing an object.')
+                end if
+                call pop_stack()
+            else if (c == quotation_mark) then
+                ! Start of key
+                call json_value_create(current_pair)
+#if defined __GFORTRAN__
+                call json%parse_string(unit,str,tmp)
+                current_pair%name = tmp
+                if (allocated(tmp)) deallocate(tmp)
+#else
+                call json%parse_string(unit,str,current_pair%name)
+#endif
+                current_state = STATE_OBJECT_COLON
+            else
+                call json%throw_exception('Error in parse_object: Expecting string: "'//c//'"')
+                exit
+            end if
+
+        case (STATE_OBJECT_COLON)
+            ! Expect colon after object key
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                              skip_comments=json%allow_comments, popped=c)
+            if (eof) then
+                call json%throw_exception('Error in parse_object:'//&
+                                          ' Unexpected end of file while parsing object member.')
+                if (associated(current_pair)) call json%destroy(current_pair)
+                exit
+            else if (c == colon_char) then
+                current_state = STATE_OBJECT_VALUE
+            else
+                call json%throw_exception('Error in parse_object:'//&
+                                          ' Expecting : and then a value: '//c)
+                if (associated(current_pair)) call json%destroy(current_pair)
+                exit
+            end if
+
+        case (STATE_OBJECT_VALUE)
+            ! Parse value for current key - push context and parse recursively
+            call push_stack(STATE_OBJECT_NEXT, current_value, current_pair, .false.)
+            current_value => current_pair
+            current_state = STATE_INITIAL
+            expecting_element = .false.
+
+        case (STATE_OBJECT_NEXT)
+            ! After parsing object value, add the pair to parent and check for comma or end
+            if (associated(current_pair)) then
+                call json%add(current_value, current_pair)
+                nullify(current_pair)
+            end if
+
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                              skip_comments=json%allow_comments, popped=c)
+            if (eof) then
+                call json%throw_exception('Error in parse_object: '//&
+                                          'End of file encountered when parsing an object')
+                exit
+            else if (c == delimiter) then
+                expecting_element = .true.
+                current_state = STATE_OBJECT_START
+            else if (c == end_object) then
+                call pop_stack()
+            else
+                call json%throw_exception('Error in parse_object: Expecting end of object: '//c)
+                exit
+            end if
+
+        case (STATE_ARRAY_START)
+            ! Parse array elements
+            nullify(current_pair)
+            call json_value_create(current_pair)
+
+            ! Push state to return here after parsing element
+            call push_stack(STATE_ARRAY_NEXT, current_value, current_pair, expecting_element)
+            current_value => current_pair
+            current_state = STATE_INITIAL
+            expecting_element = .false.
+
+        case (STATE_ARRAY_NEXT)
+            ! After parsing array element, add to parent array
+            if (associated(current_pair)) then
+                ! current_pair is the element we just parsed, add to parent array
+                call json%add(current_value, current_pair)
+                nullify(current_pair)
+            end if
+
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                              skip_comments=json%allow_comments, popped=c)
+            if (eof) then
+                call json%throw_exception('Error in parse_array: '//&
+                                          'End of file encountered when parsing an array.')
+                exit
+            else if (c == delimiter) then
+                expecting_element = .true.
+                current_state = STATE_ARRAY_START
+            else if (c == end_array) then
+                if (expecting_element .and. .not. json%allow_trailing_comma) then
+                    call json%throw_exception('Error in parse_array: '//&
+                                              'Dangling comma when parsing an array.')
+                end if
+                call pop_stack()
+            else
+                call json%throw_exception('Error in parse_array: '//&
+                                          'Unexpected character encountered when parsing array.')
+                exit
+            end if
+
+        case default
+            call json%throw_exception('Error: Invalid parser state')
+            exit
+        end select
+
+    end do
+
+    ! Cleanup
+    if (allocated(stack)) deallocate(stack)
+
+    contains
+
+        !> Push current context onto stack
+        subroutine push_stack(return_state, context, pair, expect_elem)
+            integer(IK),intent(in) :: return_state
+            type(json_value),pointer,intent(in) :: context
+            type(json_value),pointer,intent(in) :: pair
+            logical(LK),intent(in) :: expect_elem
+
+            type(parse_stack_entry),dimension(:),allocatable :: new_stack
+
+            stack_top = stack_top + 1
+
+            ! Check stack depth limit
+            if (stack_top > MAX_STACK_SIZE) then
+                call json%throw_exception('Error: Maximum parse depth exceeded')
+                return
+            end if
+
+            ! Grow stack if needed
+            if (stack_top > stack_capacity) then
+                allocate(new_stack(stack_capacity * 2))
+                new_stack(1:stack_capacity) = stack(1:stack_capacity)
+                call move_alloc(new_stack, stack)
+                stack_capacity = stack_capacity * 2
+            end if
+
+            ! Save context
+            stack(stack_top)%state = return_state
+            stack(stack_top)%context => context
+            stack(stack_top)%current_pair => pair
+            stack(stack_top)%expecting_element = expect_elem
+
+        end subroutine push_stack
+
+        !> Pop context from stack
+        subroutine pop_stack()
+            if (stack_top == 0) then
+                ! Finished parsing
+                done = .true.
+                current_state = STATE_DONE
+            else
+                ! Restore context
+                current_state = stack(stack_top)%state
+                current_value => stack(stack_top)%context
+                current_pair => stack(stack_top)%current_pair
+                expecting_element = stack(stack_top)%expecting_element
+                stack_top = stack_top - 1
+            end if
+        end subroutine pop_stack
+
+    end subroutine parse_value_nonrecursive
 !*****************************************************************************************
 
 !*****************************************************************************************
