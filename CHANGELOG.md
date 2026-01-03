@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.1.0 (2026-01-02)](#910-2026-01-02)
     - [9.0.5 (2025-08-25)](#905-2025-08-25)
     - [9.0.4 (2025-08-02)](#904-2025-08-02)
     - [9.0.3 (2025-02-22)](#903-2025-02-22)
@@ -55,7 +56,19 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.5...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.1.0...HEAD)
+
+### [9.1.0](https://github.com/jacobwilliams/json-fortran/tree/9.1.0) (2026-01-02)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.0.5...9.1.0)
+or [Download v9.1.0](https://github.com/jacobwilliams/json-fortran/releases/tag/9.1.0)
+
+**Changes:**
+
+* Added a new JSON parser option (`parser_mode=2`). This is a non-recursive version of the parser. The original one is still the default. Also added `json_value_equals`, to compare two JSON structures. [#375](https://github.com/jacobwilliams/json-fortran/issues/375) [#605](https://github.com/jacobwilliams/json-fortran/pull/605) ([jacobwilliams](https://github.com/jacobwilliams))
+* Various updates for speed. Added a new `string_to_real_mode` option to specify the algorithm to use for string to real conversions. The original one (`string_to_real_mode=1`) is still the default. A new one (`string_to_real_mode=2`) uses C-library functions and may be faster in some cases. [#498](https://github.com/jacobwilliams/json-fortran/issues/498) [#499](https://github.com/jacobwilliams/json-fortran/pull/499) ([jacobwilliams](https://github.com/jacobwilliams))
+* Added a `close_unit_if_open` argument to `json_parse_file`. [#606](https://github.com/jacobwilliams/json-fortran/issues/606) [#607](https://github.com/jacobwilliams/json-fortran/pull/607) ([jacobwilliams](https://github.com/jacobwilliams))
+* Updated the Visual Studio solution file. Two of the tests were missing. Also added three missing `.inc` files to the solution.
 
 ### [9.0.5](https://github.com/jacobwilliams/json-fortran/tree/9.0.5) (2025-08-25)
 
