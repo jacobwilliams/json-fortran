@@ -292,8 +292,7 @@
 
         procedure(parser_func),pointer :: parse_value => parse_value_recursive
                             !! The JSON parser function to use.
-                            !! If null, then the default parser is used.
-                            !! Can be wither `parse_value` (the recursive parser)
+                            !! Can be either `parse_value` (the recursive parser)
                             !! or `parse_value_non_recursive` (the non-recursive parser).
                             !! [defined by `parser_mode` input]
         integer(IK) :: parser_initial_stack_size = 32_IK
