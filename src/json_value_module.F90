@@ -11291,10 +11291,7 @@
             case(CK_'0':CK_'9')    !valid characters for numbers
 
                 !add it to the string:
-                if (ip>ltmp) then
-                    tmp = tmp // blank_chunk
-                    ltmp = len(tmp)
-                end if
+                call expand_tmp()
                 tmp(ip:ip) = c
                 ip = ip + 1
 
@@ -11303,10 +11300,7 @@
                 if (is_integer) is_integer = .false.
 
                 !add it to the string:
-                if (ip>ltmp) then
-                    tmp = tmp // blank_chunk
-                    ltmp = len(tmp)
-                end if
+                call expand_tmp()
                 tmp(ip:ip) = c
                 ip = ip + 1
 
@@ -11315,10 +11309,7 @@
                 if (is_integer .and. (.not. first)) is_integer = .false.
 
                 !add it to the string:
-                if (ip>ltmp) then
-                    tmp = tmp // blank_chunk
-                    ltmp = len(tmp)
-                end if
+                call expand_tmp()
                 tmp(ip:ip) = c
                 ip = ip + 1
 
@@ -11367,6 +11358,15 @@
         end do
 
     end if
+
+    contains
+        subroutine expand_tmp()
+            !! expand the temporary string `tmp` if necessary.
+            if (ip>ltmp) then
+                tmp = tmp // blank_chunk
+                ltmp = len(tmp)
+            end if
+        end subroutine expand_tmp
 
     end subroutine parse_number
 !*****************************************************************************************
