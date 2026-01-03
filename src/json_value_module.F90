@@ -11290,28 +11290,17 @@
 
             case(CK_'0':CK_'9')    !valid characters for numbers
 
-                !add it to the string:
-                call expand_tmp()
-                tmp(ip:ip) = c
-                ip = ip + 1
+                call add_to_tmp(c)  !add it to the string
 
             case(CK_'.',CK_'E',CK_'e',CK_'D',CK_'d')    !can be present in real numbers
 
                 if (is_integer) is_integer = .false.
-
-                !add it to the string:
-                call expand_tmp()
-                tmp(ip:ip) = c
-                ip = ip + 1
+                call add_to_tmp(c)  !add it to the string
 
             case(CK_'-',CK_'+')    !note: allowing a '+' as the first character here.
 
                 if (is_integer .and. (.not. first)) is_integer = .false.
-
-                !add it to the string:
-                call expand_tmp()
-                tmp(ip:ip) = c
-                ip = ip + 1
+                call add_to_tmp(c)  !add it to the string
 
             case default
 
@@ -11360,13 +11349,16 @@
     end if
 
     contains
-        subroutine expand_tmp()
-            !! expand the temporary string `tmp` if necessary.
+        subroutine add_to_tmp(c)
+            !! add character `c` to `tmp`, expanding if necessary
+            character(kind=CK,len=1),intent(in) :: c
             if (ip>ltmp) then
                 tmp = tmp // blank_chunk
                 ltmp = len(tmp)
             end if
-        end subroutine expand_tmp
+            tmp(ip:ip) = c
+            ip = ip + 1
+        end subroutine add_to_tmp
 
     end subroutine parse_number
 !*****************************************************************************************
