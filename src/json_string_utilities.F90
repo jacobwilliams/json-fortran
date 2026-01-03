@@ -64,9 +64,7 @@
     public :: real_to_string
     public :: string_to_integer
     public :: string_to_real
-#ifdef C_STR2REAL
     public :: string_to_real_c
-#endif
     public :: valid_json_hex
     public :: to_unicode
     public :: escape_string
@@ -257,7 +255,6 @@
     end subroutine string_to_real
 !*****************************************************************************************
 
-#ifdef C_STR2REAL
 !*****************************************************************************************
 !> author: Jacob Williams
 !  date: 11/05/2021
@@ -396,7 +393,6 @@
 
     end subroutine string_to_real_c
 !*****************************************************************************************
-#endif
 
 !*****************************************************************************************
 !> author: Izaak Beekman

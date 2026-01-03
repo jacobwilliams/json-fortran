@@ -129,3 +129,13 @@ integer(IK),intent(in),optional :: parser_max_stack_size
   !! The maximum stack size (in number of elements)
   !! to use when `parser_mode=2` (non-recursive parser).
   !! (default is 10000)
+integer(IK),intent(in),optional :: string_to_real_mode
+  !! Which implementation to use for converting
+  !! strings to real values:
+  !!
+  !! * 1 : use the Fortran implementation [default]
+  !! * 2 : use C library routines to convert
+  !!   strings to real values. This may be faster
+  !!   than the Fortran implementation. If the
+  !!   conversion fails, it will fall back to
+  !!   the Fortran version.
