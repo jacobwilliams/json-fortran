@@ -290,6 +290,18 @@
         logical(LK) :: allow_trailing_comma = .true.
                             !! Allow a single trailing comma in arrays and objects.
 
+        procedure(parser_func),pointer :: parse_value => parse_value_recursive
+                            !! The JSON parser function to use.
+                            !! Can be either `parse_value` (the recursive parser)
+                            !! or `parse_value_non_recursive` (the non-recursive parser).
+                            !! [defined by `parser_mode` input]
+        integer(IK) :: parser_initial_stack_size = 32_IK
+                            !! The initial stack size (in number of elements)
+                            !! to use when `parser_mode=2` (non-recursive parser).
+        integer(IK) :: parser_max_stack_size = 10000_IK
+                            !! The maximum stack size (in number of elements)
+                            !! to use when `parser_mode=2` (non-recursive parser).
+
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
         integer :: filesize = 0 !! the file size when when `use_unformatted_stream=True`
@@ -875,6 +887,8 @@
         procedure,public :: check_children_for_duplicate_keys &
                                 => json_check_children_for_duplicate_keys  !! Check a `json_value` object's
                                                                            !! children for duplicate keys
+        procedure,public :: equals              => json_value_equals       !! Check if two json_value structures
+                                                                            !! are equal
 
         !other private routines:
         procedure        :: name_equal
@@ -884,7 +898,6 @@
         procedure        :: string_to_dble
         procedure        :: prepare_parser => json_prepare_parser
         procedure        :: parse_end => json_parse_end
-        procedure        :: parse_value
         procedure        :: parse_number
         procedure        :: parse_string
         procedure        :: parse_for_chars
@@ -946,6 +959,15 @@
             type(json_value),pointer,intent(in) :: p
             logical(LK),intent(out)             :: finished  !! set true to stop traversing
         end subroutine json_traverse_callback_func
+
+        subroutine parser_func(json, unit, str, value)
+            !! JSON parser function interface
+            import :: json_value,json_core,IK,CK
+            class(json_core),intent(inout)      :: json
+            integer(IK),intent(in)              :: unit   !! file unit number
+            character(kind=CK,len=*),intent(in) :: str    !! string containing JSON data
+            type(json_value),pointer            :: value  !! JSON data that is extracted
+        end subroutine parser_func
 
     end interface
     public :: json_array_callback_func
@@ -1147,6 +1169,25 @@
 
     if (present(allow_trailing_comma)) then
         me%allow_trailing_comma = allow_trailing_comma
+    end if
+
+    if (present(parser_mode)) then
+        select case(parser_mode)
+        case(1_IK); me%parse_value => parse_value_recursive  ! recursive parser
+        case(2_IK); me%parse_value => parse_value_nonrecursive  ! non-recursive parser
+        case default
+            call integer_to_string(parser_mode,int_fmt,istr)
+            call me%throw_exception('Invalid parser_mode: '//istr)
+        end select
+    end if
+    if (present(parser_initial_stack_size)) then
+        me%parser_initial_stack_size = max(1_IK, abs(parser_initial_stack_size))
+    end if
+    if (present(parser_max_stack_size)) then
+        me%parser_max_stack_size = max(1_IK, abs(parser_max_stack_size))
+    end if
+    if (me%parser_max_stack_size < me%parser_initial_stack_size) then
+        call me%throw_exception('Error: parser_max_stack_size must be >= parser_initial_stack_size.')
     end if
 
     !Set the format for real numbers:
@@ -10168,8 +10209,9 @@
 !*****************************************************************************************
 !>
 !  Core parsing routine.
+!  This is the original recursive routine.
 
-    recursive subroutine parse_value(json, unit, str, value)
+    recursive subroutine parse_value_recursive(json, unit, str, value)
 
     implicit none
 
@@ -10280,7 +10322,7 @@
 
     end if
 
-    end subroutine parse_value
+    end subroutine parse_value_recursive
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -11117,6 +11159,333 @@
 
 !*****************************************************************************************
 !>
+!  Non-recursive, state-machine based JSON parser.
+!
+!  This is an alternative to the original recursive [[parse_value_recursive]] routine.
+!  This one uses an explicit stack and state machine to parse JSON without
+!  recursion.
+!
+!@note This routine is currently experimental and disabled by default.
+!      The recursive version remains the default parser.
+
+    subroutine parse_value_nonrecursive(json, unit, str, value)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    integer(IK),intent(in)              :: unit   !! file unit number
+    character(kind=CK,len=*),intent(in) :: str    !! string containing JSON data
+    type(json_value),pointer            :: value  !! JSON data that is extracted
+
+    ! Parser states
+    integer(IK),parameter :: STATE_INITIAL         = 1
+    integer(IK),parameter :: STATE_PARSE_VALUE     = 2
+    integer(IK),parameter :: STATE_OBJECT_START    = 3
+    integer(IK),parameter :: STATE_OBJECT_KEY      = 4
+    integer(IK),parameter :: STATE_OBJECT_COLON    = 5
+    integer(IK),parameter :: STATE_OBJECT_VALUE    = 6
+    integer(IK),parameter :: STATE_OBJECT_NEXT     = 7
+    integer(IK),parameter :: STATE_ARRAY_START     = 8
+    integer(IK),parameter :: STATE_ARRAY_VALUE     = 9
+    integer(IK),parameter :: STATE_ARRAY_NEXT      = 10
+    integer(IK),parameter :: STATE_DONE            = 11
+
+    type parse_stack_entry
+        !! Stack entry type for tracking parse context
+        integer(IK) :: state = 0_IK                        !! parser state
+        type(json_value),pointer :: context => null()      !! current object/array being parsed
+        type(json_value),pointer :: current_pair => null() !! current key-value pair (for objects)
+        logical(LK) :: expecting_element = .false.         !! for trailing comma detection
+    end type parse_stack_entry
+
+    ! Parser stack (local allocatable array, grows as needed)
+    type(parse_stack_entry),dimension(:),allocatable :: stack
+    integer(IK) :: stack_top       !! current stack depth
+    integer(IK) :: stack_capacity  !! current stack allocation size
+
+    logical(LK)              :: eof
+    character(kind=CK,len=1) :: c
+    integer(IK)              :: current_state
+    type(json_value),pointer :: current_value
+    type(json_value),pointer :: current_pair
+    logical(LK)              :: expecting_element
+    logical(LK)              :: done
+#if defined __GFORTRAN__
+    character(kind=CK,len=:),allocatable :: tmp
+#endif
+
+    ! Initialize
+    if (json%exception_thrown) return
+    if (.not. associated(value)) then
+        call json%throw_exception('Error in parse_value_nonrecursive: '//&
+                                  'value pointer not associated.')
+        return
+    end if
+
+    ! Allocate initial stack
+    allocate(stack(json%parser_initial_stack_size))
+    stack_capacity = json%parser_initial_stack_size
+    stack_top = 0
+    done = .false.
+    current_state = STATE_INITIAL
+    current_value => value
+    nullify(current_pair)
+    expecting_element = .false.
+
+    ! Main parsing loop
+    do while (.not. done .and. .not. json%exception_thrown)
+
+        select case (current_state)
+
+        case (STATE_INITIAL)
+            ! Read first character to determine value type
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                               skip_comments=json%allow_comments, c=c)
+            if (eof) then
+                done = .true.
+                exit
+            end if
+
+            select case (c)
+            case (start_object)
+                call json%to_object(current_value)
+                current_state = STATE_OBJECT_START
+            case (start_array)
+                call json%to_array(current_value)
+                current_state = STATE_ARRAY_START
+            case (end_array)
+                ! Empty array element - destroy the element and signal via null
+                call json%push_char(c)
+                if (associated(current_value)) then
+                    call json%destroy(current_value)
+                    nullify(current_value)
+                end if
+                ! Update the stack to know element is null
+                if (stack_top > 0) then
+                    nullify(stack(stack_top)%current_pair)
+                end if
+                call pop_stack()
+            case (quotation_mark)
+                call json%to_string(current_value)
+#if defined __GFORTRAN__
+                ! write to a tmp variable because of
+                ! a bug in 4.9 gfortran compiler.
+                call json%parse_string(unit,str,tmp)
+                current_value%str_value = tmp
+                if (allocated(tmp)) deallocate(tmp)
+#else
+                call json%parse_string(unit,str,current_value%str_value)
+#endif
+                call pop_stack()
+            case (CK_'t') !true_str(1:1) gfortran bug work around
+                call json%parse_for_chars(unit, str, true_str(2:))
+                if (.not. json%exception_thrown) call json%to_logical(current_value,.true.)
+                call pop_stack()
+            case (CK_'f') !false_str(1:1) gfortran bug work around
+                call json%parse_for_chars(unit, str, false_str(2:))
+                if (.not. json%exception_thrown) call json%to_logical(current_value,.false.)
+                call pop_stack()
+            case (CK_'n')  !null_str(1:1) gfortran bug work around
+                call json%parse_for_chars(unit, str, null_str(2:))
+                if (.not. json%exception_thrown) call json%to_null(current_value)
+                call pop_stack()
+            case (CK_'-', CK_'0': CK_'9', CK_'.', CK_'+')
+                call json%push_char(c)
+                call json%parse_number(unit, str, current_value)
+                call pop_stack()
+            case default
+                call json%throw_exception('Error in parse_value_nonrecursive: '//&
+                                          'Unexpected character: "'//c//'"')
+                call pop_stack()
+            end select
+
+        case (STATE_OBJECT_START)
+            ! Start parsing object members
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                               skip_comments=json%allow_comments, c=c)
+            if (eof) then
+                call json%throw_exception('Error in parse_object:'//&
+                                          ' Unexpected end of file while parsing start of object.')
+                exit
+            else if (c == end_object) then
+                ! Empty object or end after trailing comma
+                if (expecting_element .and. .not. json%allow_trailing_comma) then
+                    call json%throw_exception('Error in parse_object: '//&
+                                              'Dangling comma when parsing an object.')
+                end if
+                call pop_stack()
+            else if (c == quotation_mark) then
+                ! Start of key
+                call json_value_create(current_pair)
+#if defined __GFORTRAN__
+                ! write to a tmp variable because of
+                ! a bug in 4.9 gfortran compiler.
+                call json%parse_string(unit,str,tmp)
+                current_pair%name = tmp
+                if (allocated(tmp)) deallocate(tmp)
+#else
+                call json%parse_string(unit,str,current_pair%name)
+#endif
+                current_state = STATE_OBJECT_COLON
+            else
+                call json%throw_exception('Error in parse_object: Expecting string: "'//c//'"')
+                exit
+            end if
+
+        case (STATE_OBJECT_COLON)
+            ! Expect colon after object key
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                               skip_comments=json%allow_comments, c=c)
+            if (eof) then
+                call json%throw_exception('Error in parse_object:'//&
+                                          ' Unexpected end of file while parsing object member.')
+                if (associated(current_pair)) call json%destroy(current_pair)
+                exit
+            else if (c == colon_char) then
+                current_state = STATE_OBJECT_VALUE
+            else
+                call json%throw_exception('Error in parse_object:'//&
+                                          ' Expecting : and then a value: '//c)
+                if (associated(current_pair)) call json%destroy(current_pair)
+                exit
+            end if
+
+        case (STATE_OBJECT_VALUE)
+            ! Parse value for current key - push context and parse recursively
+            call push_stack(STATE_OBJECT_NEXT, current_value, current_pair, .false.)
+            current_value => current_pair
+            current_state = STATE_INITIAL
+            expecting_element = .false.
+
+        case (STATE_OBJECT_NEXT)
+            ! After parsing object value, add the pair to parent and check for comma or end
+            if (associated(current_pair)) then
+                call json%add(current_value, current_pair)
+                nullify(current_pair)
+            end if
+
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                               skip_comments=json%allow_comments, c=c)
+            if (eof) then
+                call json%throw_exception('Error in parse_object: '//&
+                                          'End of file encountered when parsing an object')
+                exit
+            else if (c == delimiter) then
+                expecting_element = .true.
+                current_state = STATE_OBJECT_START
+            else if (c == end_object) then
+                call pop_stack()
+            else
+                call json%throw_exception('Error in parse_object: Expecting end of object: '//c)
+                exit
+            end if
+
+        case (STATE_ARRAY_START)
+            ! Parse array elements
+            nullify(current_pair)
+            call json_value_create(current_pair)
+
+            ! Push state to return here after parsing element
+            call push_stack(STATE_ARRAY_NEXT, current_value, current_pair, expecting_element)
+            current_value => current_pair
+            current_state = STATE_INITIAL
+            expecting_element = .false.
+
+        case (STATE_ARRAY_NEXT)
+            ! After parsing array element, add to parent array
+            if (associated(current_pair)) then
+                ! current_pair is the element we just parsed, add to parent array
+                call json%add(current_value, current_pair)
+                nullify(current_pair)
+            end if
+
+            call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
+                               skip_comments=json%allow_comments, c=c)
+            if (eof) then
+                call json%throw_exception('Error in parse_array: '//&
+                                          'End of file encountered when parsing an array.')
+                exit
+            else if (c == delimiter) then
+                expecting_element = .true.
+                current_state = STATE_ARRAY_START
+            else if (c == end_array) then
+                if (expecting_element .and. .not. json%allow_trailing_comma) then
+                    call json%throw_exception('Error in parse_array: '//&
+                                              'Dangling comma when parsing an array.')
+                end if
+                call pop_stack()
+            else
+                call json%throw_exception('Error in parse_array: '//&
+                                          'Unexpected character encountered when parsing array.')
+                exit
+            end if
+
+        case default
+            call json%throw_exception('Error: Invalid parser state')
+            exit
+        end select
+
+    end do
+
+    ! Cleanup
+    if (allocated(stack)) deallocate(stack)
+
+    contains
+
+        subroutine push_stack(return_state, context, pair, expect_elem)
+            !! Push current context onto stack
+            integer(IK),intent(in) :: return_state
+            type(json_value),pointer,intent(in) :: context
+            type(json_value),pointer,intent(in) :: pair
+            logical(LK),intent(in) :: expect_elem
+
+            type(parse_stack_entry),dimension(:),allocatable :: new_stack
+
+            stack_top = stack_top + 1
+
+            ! Check stack depth limit
+            if (stack_top > json%parser_max_stack_size) then
+                call json%throw_exception('Error: Maximum parse depth exceeded')
+                return
+            end if
+
+            ! Grow stack if needed
+            if (stack_top > stack_capacity) then
+                allocate(new_stack(stack_capacity * 2))
+                new_stack(1:stack_capacity) = stack(1:stack_capacity)
+                call move_alloc(new_stack, stack)
+                stack_capacity = stack_capacity * 2
+            end if
+
+            ! Save context
+            stack(stack_top)%state = return_state
+            stack(stack_top)%context => context
+            stack(stack_top)%current_pair => pair
+            stack(stack_top)%expecting_element = expect_elem
+
+        end subroutine push_stack
+
+        subroutine pop_stack()
+            !! Pop context from stack
+            if (stack_top == 0) then
+                ! Finished parsing
+                done = .true.
+                current_state = STATE_DONE
+            else
+                ! Restore context
+                current_state = stack(stack_top)%state
+                current_value => stack(stack_top)%context
+                current_pair => stack(stack_top)%current_pair
+                expecting_element = stack(stack_top)%expecting_element
+                stack_top = stack_top - 1
+            end if
+        end subroutine pop_stack
+
+    end subroutine parse_value_nonrecursive
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
 !  Parses a string while reading a JSON file.
 !
 !### History
@@ -11640,5 +12009,200 @@
 !*****************************************************************************************
 
 !*****************************************************************************************
+!>
+!  Compare two JSON structures for equality.
+!
+!  This function recursively traverses both structures and checks that they have:
+!  * The same variable types
+!  * The same values (for primitives)
+!  * The same number of children (for objects and arrays)
+!  * The same structure (recursively)
+!
+!### Example
+!
+!```fortran
+! type(json_core) :: json
+! type(json_value),pointer :: p1, p2
+! logical :: are_equal
+! call json%load(file='file1.json', p=p1)
+! call json%load(file='file2.json', p=p2)
+! are_equal = json%equals(p1, p2)
+! if (are_equal) then
+!     write(*,*) 'Files are identical'
+! else
+!     write(*,*) 'Files differ'
+! end if
+!```
+
+    recursive function json_value_equals(json, p1, p2) result(equals)
+
+    implicit none
+
+    class(json_core),intent(inout)   :: json
+    type(json_value),pointer         :: p1     !! first JSON structure
+    type(json_value),pointer         :: p2     !! second JSON structure
+    logical(LK)                      :: equals !! true if the structures are equal
+
+    integer(IK) :: n1, n2  !! number of children
+    type(json_value),pointer :: child1, child2  !! for iterating children
+
+    ! Initialize
+    equals = .false.
+
+    ! Check if both are null
+    if (.not. associated(p1) .and. .not. associated(p2)) then
+        equals = .true.
+        return
+    end if
+
+    ! Check if only one is null
+    if (.not. associated(p1) .or. .not. associated(p2)) then
+        equals = .false.
+        return
+    end if
+
+    ! Check if variable types match
+    if (p1%var_type /= p2%var_type) then
+        equals = .false.
+        return
+    end if
+
+    ! Compare based on type
+    select case (p1%var_type)
+
+    case (json_null)
+        ! Both are null, already validated by type check
+        equals = .true.
+
+    case (json_logical)
+        ! Compare logical values
+        if (allocated(p1%log_value) .and. allocated(p2%log_value)) then
+            equals = (p1%log_value .eqv. p2%log_value)
+        else if (.not. allocated(p1%log_value) .and. .not. allocated(p2%log_value)) then
+            equals = .true.
+        else
+            equals = .false.
+        end if
+
+    case (json_integer)
+        ! Compare integer values
+        if (allocated(p1%int_value) .and. allocated(p2%int_value)) then
+            equals = (p1%int_value == p2%int_value)
+        else if (.not. allocated(p1%int_value) .and. .not. allocated(p2%int_value)) then
+            equals = .true.
+        else
+            equals = .false.
+        end if
+
+    case (json_real)
+        ! Compare real values with tolerance
+        if (allocated(p1%dbl_value) .and. allocated(p2%dbl_value)) then
+            associate (r1 => p1%dbl_value, r2 => p2%dbl_value)
+                ! Handle special cases: NaN, Inf, -Inf
+                if (ieee_is_nan(r1) .and. ieee_is_nan(r2)) then
+                    equals = .true.
+                else if (ieee_is_nan(r1) .or. ieee_is_nan(r2)) then
+                    equals = .false.
+                else if (.not. ieee_is_finite(r1) .and. .not. ieee_is_finite(r2)) then
+                    ! Both infinite - check if same sign
+                    equals = (r1 == r2)
+                else if (ieee_is_finite(r1) .and. ieee_is_finite(r2)) then
+                    ! Both finite:
+                    equals = r1 == r2
+                else
+                    equals = .false.
+                end if
+            end associate
+        else if (.not. allocated(p1%dbl_value) .and. .not. allocated(p2%dbl_value)) then
+            equals = .true.
+        else
+            equals = .false.
+        end if
+
+    case (json_string)
+        ! Compare string values
+        if (allocated(p1%str_value) .and. allocated(p2%str_value)) then
+            equals = (p1%str_value == p2%str_value)
+        else if (.not. allocated(p1%str_value) .and. .not. allocated(p2%str_value)) then
+            equals = .true.
+        else
+            equals = .false.
+        end if
+
+    case (json_array)
+        ! Compare arrays: must have same number of elements in same order
+        n1 = json%count(p1)
+        n2 = json%count(p2)
+
+        if (n1 /= n2) then
+            equals = .false.
+            return
+        end if
+
+        ! Compare each element
+        child1 => p1%children
+        child2 => p2%children
+
+        do while (associated(child1) .and. associated(child2))
+            ! Recursively compare children
+            if (.not. json%equals(child1, child2)) then
+                equals = .false.
+                return
+            end if
+            child1 => child1%next
+            child2 => child2%next
+        end do
+
+        ! If we got here, all elements matched
+        equals = .true.
+
+    case (json_object)
+        ! Compare objects: must have same keys with same values
+        n1 = json%count(p1)
+        n2 = json%count(p2)
+
+        if (n1 /= n2) then
+            equals = .false.
+            return
+        end if
+
+        ! For each child in p1, find matching child in p2 by name
+        child1 => p1%children
+
+        do while (associated(child1))
+            ! Look for child with same name in p2
+            nullify(child2)
+            if (allocated(child1%name)) then
+                call json%get_child(p2, child1%name, child2)
+
+                if (.not. associated(child2)) then
+                    ! Key not found in p2
+                    equals = .false.
+                    return
+                end if
+
+                ! Recursively compare values
+                if (.not. json%equals(child1, child2)) then
+                    equals = .false.
+                    return
+                end if
+            end if
+
+            child1 => child1%next
+        end do
+
+        ! If we got here, all keys and values matched
+        equals = .true.
+
+    case default
+        ! Unknown type
+        equals = .false.
+    end select
+
+    end function json_value_equals
+!*****************************************************************************************
+
+!*****************************************************************************************
     end module json_value_module
 !*****************************************************************************************
+
