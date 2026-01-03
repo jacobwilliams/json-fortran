@@ -11268,6 +11268,8 @@
             case (quotation_mark)
                 call json%to_string(current_value)
 #if defined __GFORTRAN__
+                ! write to a tmp variable because of
+                ! a bug in 4.9 gfortran compiler.
                 call json%parse_string(unit,str,tmp)
                 current_value%str_value = tmp
                 if (allocated(tmp)) deallocate(tmp)
@@ -11275,15 +11277,15 @@
                 call json%parse_string(unit,str,current_value%str_value)
 #endif
                 call pop_stack()
-            case (CK_'t')
+            case (CK_'t') !true_str(1:1) gfortran bug work around
                 call json%parse_for_chars(unit, str, true_str(2:))
                 if (.not. json%exception_thrown) call json%to_logical(current_value,.true.)
                 call pop_stack()
-            case (CK_'f')
+            case (CK_'f') !false_str(1:1) gfortran bug work around
                 call json%parse_for_chars(unit, str, false_str(2:))
                 if (.not. json%exception_thrown) call json%to_logical(current_value,.false.)
                 call pop_stack()
-            case (CK_'n')
+            case (CK_'n')  !null_str(1:1) gfortran bug work around
                 call json%parse_for_chars(unit, str, null_str(2:))
                 if (.not. json%exception_thrown) call json%to_null(current_value)
                 call pop_stack()
@@ -11316,6 +11318,8 @@
                 ! Start of key
                 call json_value_create(current_pair)
 #if defined __GFORTRAN__
+                ! write to a tmp variable because of
+                ! a bug in 4.9 gfortran compiler.
                 call json%parse_string(unit,str,tmp)
                 current_pair%name = tmp
                 if (allocated(tmp)) deallocate(tmp)
