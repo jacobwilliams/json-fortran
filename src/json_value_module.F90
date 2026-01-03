@@ -9749,7 +9749,7 @@
 !@note When calling this routine, any exceptions thrown from previous
 !      calls will automatically be cleared.
 
-    subroutine json_parse_file(json, file, p, unit)
+    subroutine json_parse_file(json, file, p, unit, close_unit_if_open)
 
     implicit none
 
@@ -9757,12 +9757,21 @@
     character(kind=CDK,len=*),intent(in) :: file  !! JSON file name
     type(json_value),pointer             :: p     !! output structure
     integer(IK),intent(in),optional      :: unit  !! file unit number (/= 0)
+    logical(LK),intent(in),optional      :: close_unit_if_open !! if true, close unit if it was already open [defaults to true]
 
     integer(IK) :: iunit   !! file unit actually used
     integer(IK) :: istat   !! iostat flag
     logical(LK) :: is_open !! if the file is already open
     logical(LK) :: has_duplicate  !! if checking for duplicate keys
     character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
+    logical(LK) :: unit_was_open  !! track if unit was already open
+    logical(LK) :: close_if_open  !! local copy of `close_unit_if_open`
+
+    if (present(close_unit_if_open)) then
+        close_if_open = close_unit_if_open
+    else
+        close_if_open = .true.  ! default (original) behavior
+    end if
 
     ! clear any exceptions and initialize:
     call json%initialize()
@@ -9780,7 +9789,8 @@
         ! check to see if the file is already open
         ! if it is, then use it, otherwise open the file with the name given.
         inquire(unit=iunit, opened=is_open, iostat=istat)
-        if (istat==0 .and. .not. is_open) then
+        unit_was_open = (istat==0 .and. is_open)
+        if (.not. unit_was_open) then
            ! open the file
             open (  unit        = iunit, &
                     file        = file, &
@@ -9790,6 +9800,7 @@
                     access      = access_spec, &
                     iostat      = istat &
                     FILE_ENCODING )
+            close_if_open = .true.  ! we opened it, so we should close it later
         else
             ! if the file is already open, then we need to make sure
             ! that it is open with the correct form/access/etc...
@@ -9806,6 +9817,7 @@
                 access      = access_spec, &
                 iostat      = istat &
                 FILE_ENCODING )
+        close_if_open = .true.  ! we opened it, so we should close it later
 
     end if
 
@@ -9842,8 +9854,13 @@
             end if
         end if
 
-        ! close the file:
-        close(unit=iunit, iostat=istat)
+        ! close the file only if we opened it, or if user specified to close it
+        if (.not. unit_was_open .or. close_if_open) then
+            close(unit=iunit, iostat=istat)
+            if (istat /= 0 .and. .not. json%exception_thrown) then
+                call json%throw_exception('Error closing file')
+            end if
+        end if
 
     else
 
