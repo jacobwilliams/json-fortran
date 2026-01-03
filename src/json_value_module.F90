@@ -11241,7 +11241,7 @@
         case (STATE_INITIAL)
             ! Read first character to determine value type
             call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                              skip_comments=json%allow_comments, popped=c)
+                               skip_comments=json%allow_comments, c=c)
             if (eof) then
                 done = .true.
                 exit
@@ -11301,7 +11301,7 @@
         case (STATE_OBJECT_START)
             ! Start parsing object members
             call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                              skip_comments=json%allow_comments, popped=c)
+                               skip_comments=json%allow_comments, c=c)
             if (eof) then
                 call json%throw_exception('Error in parse_object:'//&
                                           ' Unexpected end of file while parsing start of object.')
@@ -11332,7 +11332,7 @@
         case (STATE_OBJECT_COLON)
             ! Expect colon after object key
             call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                              skip_comments=json%allow_comments, popped=c)
+                               skip_comments=json%allow_comments, c=c)
             if (eof) then
                 call json%throw_exception('Error in parse_object:'//&
                                           ' Unexpected end of file while parsing object member.')
@@ -11362,7 +11362,7 @@
             end if
 
             call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                              skip_comments=json%allow_comments, popped=c)
+                               skip_comments=json%allow_comments, c=c)
             if (eof) then
                 call json%throw_exception('Error in parse_object: '//&
                                           'End of file encountered when parsing an object')
@@ -11397,7 +11397,7 @@
             end if
 
             call json%pop_char(unit, str=str, eof=eof, skip_ws=.true., &
-                              skip_comments=json%allow_comments, popped=c)
+                               skip_comments=json%allow_comments, c=c)
             if (eof) then
                 call json%throw_exception('Error in parse_array: '//&
                                           'End of file encountered when parsing an array.')
