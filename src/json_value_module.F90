@@ -302,6 +302,10 @@
                             !! The maximum stack size (in number of elements)
                             !! to use when `parser_mode=2` (non-recursive parser).
 
+        procedure(string_to_real_func),nopass,pointer :: string_to_real => string_to_real
+                            !! Function to convert a string to a real value.
+                            !! This is set in [[json_initialize]].
+
         integer :: ichunk = 0 !! index in `chunk` for [[pop_char]]
                               !! when `use_unformatted_stream=True`
         integer :: filesize = 0 !! the file size when when `use_unformatted_stream=True`
@@ -963,11 +967,23 @@
         subroutine parser_func(json, unit, str, value)
             !! JSON parser function interface
             import :: json_value,json_core,IK,CK
+            implicit none
             class(json_core),intent(inout)      :: json
             integer(IK),intent(in)              :: unit   !! file unit number
             character(kind=CK,len=*),intent(in) :: str    !! string containing JSON data
             type(json_value),pointer            :: value  !! JSON data that is extracted
         end subroutine parser_func
+
+        subroutine string_to_real_func(str,use_quiet_nan,rval,status_ok)
+            !! Function to convert a string to a real value
+            import :: CK,RK,LK
+            implicit none
+            character(kind=CK,len=*),intent(in) :: str           !! the string to convert to a real
+            logical(LK),intent(in)              :: use_quiet_nan !! if true, return NaN's as `ieee_quiet_nan`.
+                                                                 !! otherwise, use `ieee_signaling_nan`.
+            real(RK),intent(out)                :: rval          !! `str` converted to a real value
+            logical(LK),intent(out)             :: status_ok     !! true if there were no errors
+        end subroutine string_to_real_func
 
     end interface
     public :: json_array_callback_func
@@ -1188,6 +1204,16 @@
     end if
     if (me%parser_max_stack_size < me%parser_initial_stack_size) then
         call me%throw_exception('Error: parser_max_stack_size must be >= parser_initial_stack_size.')
+    end if
+
+    if (present(string_to_real_mode)) then
+        select case (string_to_real_mode)
+        case(1_IK); me%string_to_real => string_to_real    ! original Fortran version
+        case(2_IK); me%string_to_real => string_to_real_c  ! using C library routines
+        case default
+            call integer_to_string(string_to_real_mode,int_fmt,istr)
+            call me%throw_exception('Invalid string_to_real_mode: '//istr)
+        end select
     end if
 
     !Set the format for real numbers:
@@ -8179,11 +8205,7 @@
 
     logical(LK) :: status_ok  !! error flag for [[string_to_real]]
 
-#ifdef C_STR2REAL
-    call string_to_real_c(str,json%use_quiet_nan,rval,status_ok)
-#else
-    call string_to_real(str,json%use_quiet_nan,rval,status_ok)
-#endif
+    call json%string_to_real(str,json%use_quiet_nan,rval,status_ok)
 
     if (.not. status_ok) then    !if there was an error
         rval = 0.0_RK
@@ -8464,11 +8486,7 @@
                     value = 0.0_RK
                 end if
             case (json_string)
-#ifdef C_STR2REAL
-                call string_to_real_c(me%str_value,json%use_quiet_nan,value,status_ok)
-#else
-                call string_to_real(me%str_value,json%use_quiet_nan,value,status_ok)
-#endif
+                call json%string_to_real(me%str_value,json%use_quiet_nan,value,status_ok)
                 if (.not. status_ok) then
                     value = 0.0_RK
                     if (allocated(me%name)) then

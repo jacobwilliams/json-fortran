@@ -26,4 +26,5 @@ strict_integer_type_checking, &
 allow_trailing_comma, &
 parser_mode, &
 parser_initial_stack_size, &
-parser_max_stack_size &
+parser_max_stack_size, &
+string_to_real_mode &
