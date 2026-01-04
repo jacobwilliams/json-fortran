@@ -921,6 +921,7 @@
         procedure        :: to_object
         procedure        :: to_array
         procedure,nopass :: json_value_clone_func
+        procedure,nopass :: json_value_clone_func_nonrecursive
         procedure        :: is_vector => json_is_vector
 
     end type json_core
@@ -1356,6 +1357,10 @@
 !  * The parent of `from` is not linked to `to`.
 !  * If `from` is an element of an array, then the previous and
 !    next entries are not cloned (only that element and it's children, if any).
+!  * The `use_nonrecursive` argument enables a non-recursive clone function,
+!    which may be useful for very large JSON structures that would
+!    otherwise cause a stack overflow with the recursive function on
+!    some systems.
 !
 !### Example
 !
@@ -1372,8 +1377,11 @@
 !     call json%destroy(j2)
 !    end program test
 !````
+!
+!### History
+!  * 1/4/2026 : added non-recursive clone function option.
 
-    subroutine json_clone(json,from,to)
+    subroutine json_clone(json,from,to,use_nonrecursive)
 
     implicit none
 
@@ -1381,9 +1389,25 @@
     type(json_value),pointer :: from  !! this is the structure to clone
     type(json_value),pointer :: to    !! the clone is put here
                                       !! (it must not already be associated)
+    logical(LK),intent(in),optional :: use_nonrecursive
+                                      !! if true, use the non-recursive
+                                      !! clone function [Default is False]
+
+    logical(LK) :: use_nonrec !! local copy of `use_nonrecursive`
+
+    !determine which clone function to use:
+    if (present(use_nonrecursive)) then
+        use_nonrec = use_nonrecursive
+    else
+        use_nonrec = .false.
+    end if
 
     !call the main function:
-    call json%json_value_clone_func(from,to)
+    if (use_nonrec) then
+        call json%json_value_clone_func_nonrecursive(from,to)
+    else
+        call json%json_value_clone_func(from,to)
+    end if
 
     end subroutine json_clone
 !*****************************************************************************************
@@ -1453,6 +1477,144 @@
     end if
 
     end subroutine json_value_clone_func
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Non-recursive deep copy function that clones a [[json_value]] structure.
+!  This is an alternative to [[json_value_clone_func]] that uses iteration
+!  instead of recursion.
+!
+!### See also
+!  * [[parse_value_nonrecursive]]
+!
+!@note If new data is added to the [[json_value]] type,
+!      then this would need to be updated.
+
+    subroutine json_value_clone_func_nonrecursive(from,to)
+
+    implicit none
+
+    type(json_value),pointer :: from  !! this is the structure to clone
+    type(json_value),pointer :: to    !! the clone is put here (it
+                                      !! must not already be associated)
+
+    type :: clone_task
+        !! Stack entry for tracking clone operations
+        type(json_value),pointer :: from => null() !! from node
+        type(json_value),pointer :: to => null() !! to node
+        type(json_value),pointer :: parent => null() !! parent node
+        type(json_value),pointer :: previous => null() !! previous node
+        logical :: is_tail = .false.  !! if `to` is the tail of its parent's children
+        logical :: is_allocated = .false.  !! if `to` has been allocated yet
+    end type clone_task
+
+    type(clone_task),dimension(:),allocatable :: stack  !! stack for tracking tasks
+    integer(IK) :: stack_size  !! current stack size
+    integer(IK) :: p  !! current stack pointer
+    type(clone_task) :: c  !! current task
+    type(json_value),pointer :: new  !! newly allocated node
+
+    integer(IK),parameter :: initial_stack_size = 256_IK  !! initial stack size
+
+    nullify(to)
+
+    if (.not. associated(from)) return
+
+    ! Initialize stack with a reasonable size
+    stack_size = initial_stack_size
+    allocate(stack(stack_size))
+    p = 0_IK
+
+    ! Push the initial task onto the stack
+    p = 1_IK
+    stack(p)%from => from
+    stack(p)%to => null()
+    stack(p)%is_allocated = .false.
+    stack(p)%parent => null()
+    stack(p)%previous => null()
+    stack(p)%is_tail = .false.
+
+    ! Process stack iteratively
+    do while (p > 0_IK)
+        ! Pop from stack
+        c = stack(p)
+        p = p - 1_IK
+
+        ! Allocate the to if not already done
+        if (.not. c%is_allocated) then
+            allocate(new)
+
+            ! Copy over the data variables
+            if (allocated(c%from%name)) new%name = c%from%name
+            if (allocated(c%from%dbl_value)) allocate(new%dbl_value,source=c%from%dbl_value)
+            if (allocated(c%from%log_value)) allocate(new%log_value,source=c%from%log_value)
+            if (allocated(c%from%str_value)) new%str_value = c%from%str_value
+            if (allocated(c%from%int_value)) allocate(new%int_value,source=c%from%int_value)
+            new%var_type   = c%from%var_type
+            new%n_children = c%from%n_children
+
+            ! Set up parent/previous/tail pointers
+            if (associated(c%parent)) new%parent => c%parent
+            if (associated(c%previous)) new%previous => c%previous
+            if (c%is_tail .and. associated(new%parent)) new%parent%tail => new
+
+            ! Link this node to the output structure
+            if (associated(c%previous)) then  ! This is a next sibling
+                c%previous%next => new
+            else if (associated(c%parent)) then  ! This is the first child
+                c%parent%children => new
+            else  ! This is the root node
+                to => new
+            end if
+
+            ! Push children onto stack (if any)
+            if (associated(c%from%children)) then
+                call resize_stack(stack, stack_size)
+                p = p + 1_IK
+                stack(p)%from => c%from%children
+                stack(p)%to => null()
+                stack(p)%previous => null()
+                stack(p)%parent => new
+                stack(p)%is_tail = (.not. associated(c%from%children%next))
+                stack(p)%is_allocated = .false.
+            end if
+
+            ! Push next sibling onto stack (if any and parent exists)
+            if (associated(c%from%next) .and. &
+                associated(c%parent)) then
+                call resize_stack(stack, stack_size)
+                p = p + 1_IK
+                stack(p)%from => c%from%next
+                stack(p)%to => null()
+                stack(p)%previous => new
+                stack(p)%parent => c%parent
+                stack(p)%is_tail = (.not. associated(c%from%next%next))
+                stack(p)%is_allocated = .false.
+            end if
+        end if
+    end do
+
+    deallocate(stack)  ! clean up
+
+    contains
+
+        subroutine resize_stack(stk, stk_size)
+            !! Resize the stack if needed.
+            type(clone_task),dimension(:),allocatable,intent(inout) :: stk
+            integer(IK),intent(inout) :: stk_size
+            type(clone_task),dimension(:),allocatable :: tmp
+            integer(IK) :: new_size
+            if (p + 1_IK > stack_size) then
+                new_size = stk_size * 2_IK
+                allocate(tmp(new_size))
+                tmp(1:stk_size) = stk
+                call move_alloc(tmp, stk)
+                stk_size = new_size
+            end if
+        end subroutine resize_stack
+
+    end subroutine json_value_clone_func_nonrecursive
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -12052,20 +12214,29 @@
 ! end if
 !```
 
-    recursive function json_value_equals(json, p1, p2) result(equals)
+    recursive function json_value_equals(json, p1, p2, verbose) result(equals)
 
     implicit none
 
     class(json_core),intent(inout)   :: json
-    type(json_value),pointer         :: p1     !! first JSON structure
-    type(json_value),pointer         :: p2     !! second JSON structure
-    logical(LK)                      :: equals !! true if the structures are equal
+    type(json_value),pointer         :: p1      !! first JSON structure
+    type(json_value),pointer         :: p2      !! second JSON structure
+    logical(LK)                      :: equals  !! true if the structures are equal
+    logical(LK),intent(in),optional  :: verbose !! if true, print debug info. [default is false]
 
     integer(IK) :: n1, n2  !! number of children
     type(json_value),pointer :: child1, child2  !! for iterating children
+    logical(LK) :: child_found  !! for get_child calls
+    logical(LK) :: debug  !! if `verbose` is set
 
     ! Initialize
     equals = .false.
+
+    if (present(verbose)) then
+        debug = verbose
+    else
+        debug = .false.
+    end if
 
     ! Check if both are null
     if (.not. associated(p1) .and. .not. associated(p2)) then
@@ -12075,12 +12246,15 @@
 
     ! Check if only one is null
     if (.not. associated(p1) .or. .not. associated(p2)) then
+        if (debug) write(error_unit,'(A)') 'One pointer is null, the other is not'
         equals = .false.
         return
     end if
 
     ! Check if variable types match
     if (p1%var_type /= p2%var_type) then
+        if (debug) write(error_unit,'(A,I0,A,I0)') 'Type mismatch: p1%var_type=', &
+            p1%var_type, ', p2%var_type=', p2%var_type
         equals = .false.
         return
     end if
@@ -12096,9 +12270,15 @@
         ! Compare logical values
         if (allocated(p1%log_value) .and. allocated(p2%log_value)) then
             equals = (p1%log_value .eqv. p2%log_value)
+            if (.not. equals .and. debug) then
+                write(error_unit,'(A)') 'Logical values differ'
+                write(error_unit,'(A,L1)') '  p1: ', p1%log_value
+                write(error_unit,'(A,L1)') '  p2: ', p2%log_value
+            end if
         else if (.not. allocated(p1%log_value) .and. .not. allocated(p2%log_value)) then
             equals = .true.
         else
+            if (debug) write(error_unit,'(A)') 'Logical allocation mismatch'
             equals = .false.
         end if
 
@@ -12106,9 +12286,15 @@
         ! Compare integer values
         if (allocated(p1%int_value) .and. allocated(p2%int_value)) then
             equals = (p1%int_value == p2%int_value)
+            if (.not. equals .and. debug) then
+                write(error_unit,'(A)') 'Integer values differ'
+                write(error_unit,'(A,I0)') '  p1: ', p1%int_value
+                write(error_unit,'(A,I0)') '  p2: ', p2%int_value
+            end if
         else if (.not. allocated(p1%int_value) .and. .not. allocated(p2%int_value)) then
             equals = .true.
         else
+            if (debug) write(error_unit,'(A)') 'Integer allocation mismatch'
             equals = .false.
         end if
 
@@ -12120,20 +12306,29 @@
                 if (ieee_is_nan(r1) .and. ieee_is_nan(r2)) then
                     equals = .true.
                 else if (ieee_is_nan(r1) .or. ieee_is_nan(r2)) then
+                    if (debug) write(error_unit,'(A)') 'One value is NaN, the other is not'
                     equals = .false.
                 else if (.not. ieee_is_finite(r1) .and. .not. ieee_is_finite(r2)) then
                     ! Both infinite - check if same sign
                     equals = (r1 == r2)
+                    if (debug .and. .not. equals) write(error_unit,'(A)') 'Both values are infinite but have different signs'
                 else if (ieee_is_finite(r1) .and. ieee_is_finite(r2)) then
                     ! Both finite:
                     equals = r1 == r2
+                    if (.not. equals .and. debug) then
+                        write(error_unit,'(A)') 'Real values differ'
+                        write(error_unit,'(A,F24.16)') '  p1: ', r1
+                        write(error_unit,'(A,F24.16)') '  p2: ', r2
+                    end if
                 else
+                    if (debug) write(error_unit,'(A)') 'One value is finite, the other is not'
                     equals = .false.
                 end if
             end associate
         else if (.not. allocated(p1%dbl_value) .and. .not. allocated(p2%dbl_value)) then
             equals = .true.
         else
+            if (debug) write(error_unit,'(A)') 'Real allocation mismatch'
             equals = .false.
         end if
 
@@ -12141,9 +12336,15 @@
         ! Compare string values
         if (allocated(p1%str_value) .and. allocated(p2%str_value)) then
             equals = (p1%str_value == p2%str_value)
+            if (.not. equals .and. debug) then
+                write(error_unit,'(A)') 'String values differ'
+                write(error_unit,'(A,A,A)') '  p1: "', p1%str_value, '"'
+                write(error_unit,'(A,A,A)') '  p2: "', p2%str_value, '"'
+            end if
         else if (.not. allocated(p1%str_value) .and. .not. allocated(p2%str_value)) then
             equals = .true.
         else
+            if (debug) write(error_unit,'(A)') 'String allocation mismatch'
             equals = .false.
         end if
 
@@ -12153,6 +12354,7 @@
         n2 = json%count(p2)
 
         if (n1 /= n2) then
+            if (debug) write(error_unit,'(A,I0,A,I0)') 'Array size mismatch: n1=', n1, ', n2=', n2
             equals = .false.
             return
         end if
@@ -12164,6 +12366,7 @@
         do while (associated(child1) .and. associated(child2))
             ! Recursively compare children
             if (.not. json%equals(child1, child2)) then
+                if (debug) write(error_unit,'(A)') 'Array element mismatch'
                 equals = .false.
                 return
             end if
@@ -12180,6 +12383,7 @@
         n2 = json%count(p2)
 
         if (n1 /= n2) then
+            if (debug) write(error_unit,'(A,I0,A,I0)') 'Object size mismatch: n1=', n1, ', n2=', n2
             equals = .false.
             return
         end if
@@ -12191,16 +12395,17 @@
             ! Look for child with same name in p2
             nullify(child2)
             if (allocated(child1%name)) then
-                call json%get_child(p2, child1%name, child2)
-
-                if (.not. associated(child2)) then
+                call json%get_child(p2, child1%name, child2, child_found)
+                if (.not. child_found) then
                     ! Key not found in p2
+                    if (debug) write(error_unit,'(A,A,A)') 'Key not found in p2: "', child1%name, '"'
                     equals = .false.
                     return
                 end if
 
                 ! Recursively compare values
                 if (.not. json%equals(child1, child2)) then
+                    if (debug) write(error_unit,'(A,A,A)') 'Value mismatch for key: "', child1%name, '"'
                     equals = .false.
                     return
                 end if
@@ -12214,6 +12419,7 @@
 
     case default
         ! Unknown type
+        if (debug) write(error_unit,'(A)') 'Unknown variable type encountered'
         equals = .false.
     end select
 
