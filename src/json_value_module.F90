@@ -1524,7 +1524,6 @@
     ! Initialize stack with a reasonable size
     stack_size = initial_stack_size
     allocate(stack(stack_size))
-    p = 0_IK
 
     ! Push the initial task onto the stack
     p = 1_IK
