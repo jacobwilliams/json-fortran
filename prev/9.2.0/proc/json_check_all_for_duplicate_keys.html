@@ -1,0 +1,912 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>json_check_all_for_duplicate_keys &ndash; JSON-Fortran</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>9.2.0</small></a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>json_check_all_for_duplicate_keys
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+            <li class="list-inline-item" id="meta-author"><i class="fa fa-pencil"></i> Jacob Williams</li>
+            <li class="list-inline-item" id="meta-date"><i class="fa fa-calendar-o"></i> 8/25/2017</li>
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.5% of total for procedures.">35 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_value_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_value_module.html'>json_value_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_check_all_for_duplicate_keys</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/json_check_all_for_duplicate_keys.html#src">json_check_all_for_duplicate_keys</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine json_check_all_for_duplicate_keys(json, p, has_duplicate, name, path)  
+</h2>
+    
+
+    <p>Checks a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> structure for duplicate child names.
+This one recursively traverses the entire structure
+(calling <a href="../proc/json_check_children_for_duplicate_keys.html">json_check_children_for_duplicate_keys</a>
+recursively for each element).</p>
+<div class="codehilite"><pre><span></span><code><span class="nv">it</span><span class="w"> </span><span class="nv">will</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">first</span><span class="w"> </span><span class="nv">one</span><span class="w"> </span><span class="nv">that</span><span class="w"> </span><span class="nv">it</span><span class="w"> </span><span class="nv">finds</span>.
+</code></pre></div>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/json_core.html'>json_core</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~112"></span>
+              class(<a href='../type/json_core.html'>json_core</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-p~92"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>p</strong></td>
+            <td>
+                <p>the object to search. If <code>p</code> is
+not a <code>json_object</code>, then <code>has_duplicate</code>
+will be false.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-has_duplicate~3"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>has_duplicate</strong></td>
+            <td>
+                <p>true if there is at least
+one duplicate <code>name</code> key anywhere
+in the structure.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-name~58"></span>
+              character(kind=CK, len=:),
+            </td>
+<td>intent(out),</td>
+              <td>optional,</td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>name</strong></td>
+            <td>
+                <p>the duplicate name
+(unallocated if no
+duplicates were found)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-path~131"></span>
+              character(kind=CK, len=:),
+            </td>
+<td>intent(out),</td>
+              <td>optional,</td>            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>path</strong></td>
+            <td>
+                <p>the full path to the
+duplicate name
+(unallocated if no
+duplicate was found)</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~json_check_all_for_duplicate_keys~~CallsGraph Pages: 1 -->
+<svg id="procjson_check_all_for_duplicate_keysCallsGraph" width="641pt" height="24pt"
+ viewBox="0.00 0.00 641.00 23.91" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_check_all_for_duplicate_keys~~CallsGraph" class="graph" transform="scale(0.75 0.75) rotate(0) translate(4 28)">
+<title>proc~~json_check_all_for_duplicate_keys~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 854,-28 854,4 -4,4"/>
+<!-- proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CallsGraph_node1" class="node">
+<title>proc~json_check_all_for_duplicate_keys</title>
+<polygon fill="none" stroke="black" points="253,-24 0,-24 0,0 253,0 253,-24"/>
+<text text-anchor="middle" x="126.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_core%json_check_all_for_duplicate_keys</text>
+</g>
+<!-- proc~json_traverse -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CallsGraph_node2" class="node">
+<title>proc~json_traverse</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CallsGraph_node2"><a xlink:href="../proc/json_traverse.html" xlink:title="json_core%json_traverse">
+<polygon fill="#d9534f" stroke="#d9534f" points="433,-24 289,-24 289,0 433,0 433,-24"/>
+<text text-anchor="middle" x="361" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_traverse</text>
+</a>
+</g>
+</g>
+<!-- proc~json_check_all_for_duplicate_keys&#45;&gt;proc~json_traverse -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CallsGraph_edge1" class="edge">
+<title>proc~json_check_all_for_duplicate_keys&#45;&gt;proc~json_traverse</title>
+<path fill="none" stroke="#ff0000" d="M253.28,-12C261.95,-12 270.55,-12 278.88,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="278.9,-15.5 288.9,-12 278.9,-8.5 278.9,-15.5"/>
+</g>
+<!-- none~throw_exception -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CallsGraph_node3" class="node">
+<title>none~throw_exception</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CallsGraph_node3"><a xlink:href="../type/json_core.html#boundprocedure-throw_exception" xlink:title="json_core%throw_exception">
+<polygon fill="#a7506f" stroke="#a7506f" points="628,-24 469,-24 469,0 628,0 628,-24"/>
+<text text-anchor="middle" x="548.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%throw_exception</text>
+</a>
+</g>
+</g>
+<!-- proc~json_traverse&#45;&gt;none~throw_exception -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CallsGraph_edge2" class="edge">
+<title>proc~json_traverse&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#ff0000" d="M433.19,-12C441.56,-12 450.18,-12 458.75,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="458.78,-15.5 468.78,-12 458.78,-8.5 458.78,-15.5"/>
+</g>
+<!-- proc~json_throw_exception -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CallsGraph_node4" class="node">
+<title>proc~json_throw_exception</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CallsGraph_node4"><a xlink:href="../proc/json_throw_exception.html" xlink:title="json_core%json_throw_exception">
+<polygon fill="#d9534f" stroke="#d9534f" points="850,-24 664,-24 664,0 850,0 850,-24"/>
+<text text-anchor="middle" x="757" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_throw_exception</text>
+</a>
+</g>
+</g>
+<!-- none~throw_exception&#45;&gt;proc~json_throw_exception -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CallsGraph_edge3" class="edge">
+<title>none~throw_exception&#45;&gt;proc~json_throw_exception</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M628.16,-12C636.51,-12 645.1,-12 653.67,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="653.72,-15.5 663.72,-12 653.72,-8.5 653.72,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocjson_check_all_for_duplicate_keysCallsGraph = svgPanZoom('#procjson_check_all_for_duplicate_keysCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~json_check_all_for_duplicate_keys~~CalledByGraph Pages: 1 -->
+<svg id="procjson_check_all_for_duplicate_keysCalledByGraph" width="641pt" height="66pt"
+ viewBox="0.00 0.00 641.00 66.19" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph" class="graph" transform="scale(0.42 0.42) rotate(0) translate(4 154)">
+<title>proc~~json_check_all_for_duplicate_keys~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-154 1526,-154 1526,4 -4,4"/>
+<!-- proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node1" class="node">
+<title>proc~json_check_all_for_duplicate_keys</title>
+<polygon fill="none" stroke="black" points="1522,-87 1269,-87 1269,-63 1522,-63 1522,-87"/>
+<text text-anchor="middle" x="1395.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_core%json_check_all_for_duplicate_keys</text>
+</g>
+<!-- proc~json_parse_file -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node2" class="node">
+<title>proc~json_parse_file</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node2"><a xlink:href="../proc/json_parse_file.html" xlink:title="json_core%json_parse_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="1220,-129 1069,-129 1069,-105 1220,-105 1220,-129"/>
+<text text-anchor="middle" x="1144.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_parse_file</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_file&#45;&gt;proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge1" class="edge">
+<title>proc~json_parse_file&#45;&gt;proc~json_check_all_for_duplicate_keys</title>
+<path fill="none" stroke="#ff0000" d="M1216.85,-104.96C1246.94,-99.89 1282.12,-93.96 1313.2,-88.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1313.86,-92.15 1323.14,-87.04 1312.69,-85.25 1313.86,-92.15"/>
+</g>
+<!-- proc~json_parse_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node3" class="node">
+<title>proc~json_parse_string</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node3"><a xlink:href="../proc/json_parse_string.html" xlink:title="json_core%json_parse_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="1227,-87 1062,-87 1062,-63 1227,-63 1227,-87"/>
+<text text-anchor="middle" x="1144.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_parse_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge2" class="edge">
+<title>proc~json_parse_string&#45;&gt;proc~json_check_all_for_duplicate_keys</title>
+<path fill="none" stroke="#ff0000" d="M1227.03,-75C1237.14,-75 1247.67,-75 1258.32,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1258.55,-78.5 1268.55,-75 1258.55,-71.5 1258.55,-78.5"/>
+</g>
+<!-- proc~json_value_validate -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node4" class="node">
+<title>proc~json_value_validate</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node4"><a xlink:href="../proc/json_value_validate.html" xlink:title="json_core%json_value_validate">
+<polygon fill="#d9534f" stroke="#d9534f" points="1233,-45 1056,-45 1056,-21 1233,-21 1233,-45"/>
+<text text-anchor="middle" x="1144.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_validate</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_validate&#45;&gt;proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge3" class="edge">
+<title>proc~json_value_validate&#45;&gt;proc~json_check_all_for_duplicate_keys</title>
+<path fill="none" stroke="#ff0000" d="M1216.85,-45.04C1246.94,-50.11 1282.12,-56.04 1313.2,-61.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1312.69,-64.75 1323.14,-62.96 1313.86,-57.85 1312.69,-64.75"/>
+</g>
+<!-- none~deserialize~2 -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node5" class="node">
+<title>none~deserialize~2</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node5"><a xlink:href="../type/json_core.html#boundprocedure-deserialize~2" xlink:title="json_core%deserialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="1020,-87 890,-87 890,-63 1020,-63 1020,-87"/>
+<text text-anchor="middle" x="955" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%deserialize</text>
+</a>
+</g>
+</g>
+<!-- none~deserialize~2&#45;&gt;proc~json_parse_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge5" class="edge">
+<title>none~deserialize~2&#45;&gt;proc~json_parse_string</title>
+<path fill="none" stroke="#00ff00" d="M1020,-75C1030.21,-75 1040.95,-75 1051.65,-75"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1051.88,-78.5 1061.88,-75 1051.88,-71.5 1051.88,-78.5"/>
+</g>
+<!-- none~load~2 -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node6" class="node">
+<title>none~load~2</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node6"><a xlink:href="../type/json_core.html#boundprocedure-load~2" xlink:title="json_core%load">
+<polygon fill="#a7506f" stroke="#a7506f" points="1003,-129 907,-129 907,-105 1003,-105 1003,-129"/>
+<text text-anchor="middle" x="955" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%load</text>
+</a>
+</g>
+</g>
+<!-- none~load~2&#45;&gt;proc~json_parse_file -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge4" class="edge">
+<title>none~load~2&#45;&gt;proc~json_parse_file</title>
+<path fill="none" stroke="#ff0000" d="M1003.31,-117C1020.14,-117 1039.64,-117 1058.65,-117"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1058.83,-120.5 1068.83,-117 1058.83,-113.5 1058.83,-120.5"/>
+</g>
+<!-- proc~json_file_load -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node7" class="node">
+<title>proc~json_file_load</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node7"><a xlink:href="../proc/json_file_load.html" xlink:title="json_file%json_file_load">
+<polygon fill="#d9534f" stroke="#d9534f" points="821.5,-129 683.5,-129 683.5,-105 821.5,-105 821.5,-129"/>
+<text text-anchor="middle" x="752.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_load</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_load&#45;&gt;none~load~2 -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge8" class="edge">
+<title>proc~json_file_load&#45;&gt;none~load~2</title>
+<path fill="none" stroke="#00ffff" d="M821.66,-117C846.09,-117 873.35,-117 896.76,-117"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="896.88,-120.5 906.88,-117 896.88,-113.5 896.88,-120.5"/>
+</g>
+<!-- proc~json_file_load_from_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node8" class="node">
+<title>proc~json_file_load_from_string</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node8"><a xlink:href="../proc/json_file_load_from_string.html" xlink:title="json_file%json_file_load_from_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="854,-87 651,-87 651,-63 854,-63 854,-87"/>
+<text text-anchor="middle" x="752.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_load_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_load_from_string&#45;&gt;none~deserialize~2 -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge6" class="edge">
+<title>proc~json_file_load_from_string&#45;&gt;none~deserialize~2</title>
+<path fill="none" stroke="#ff0000" d="M854.04,-75C862.73,-75 871.41,-75 879.82,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="879.94,-78.5 889.94,-75 879.94,-71.5 879.94,-78.5"/>
+</g>
+<!-- proc~wrap_json_parse_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node9" class="node">
+<title>proc~wrap_json_parse_string</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node9"><a xlink:href="../proc/wrap_json_parse_string.html" xlink:title="wrap_json_parse_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="820.5,-45 684.5,-45 684.5,-21 820.5,-21 820.5,-45"/>
+<text text-anchor="middle" x="752.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_json_parse_string</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_json_parse_string&#45;&gt;none~deserialize~2 -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge7" class="edge">
+<title>proc~wrap_json_parse_string&#45;&gt;none~deserialize~2</title>
+<path fill="none" stroke="#ff0000" d="M811.16,-45.04C825.18,-47.97 840.13,-51.09 854,-54 864.63,-56.23 875.91,-58.59 886.9,-60.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="886.38,-64.37 896.89,-63 887.82,-57.52 886.38,-64.37"/>
+</g>
+<!-- none~deserialize -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node10" class="node">
+<title>none~deserialize</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node10"><a xlink:href="../type/json_file.html#boundprocedure-deserialize" xlink:title="json_file%deserialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="615,-87 491,-87 491,-63 615,-63 615,-87"/>
+<text text-anchor="middle" x="553" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%deserialize</text>
+</a>
+</g>
+</g>
+<!-- none~deserialize&#45;&gt;proc~json_file_load_from_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge9" class="edge">
+<title>none~deserialize&#45;&gt;proc~json_file_load_from_string</title>
+<path fill="none" stroke="#00ff00" d="M615.14,-75C623.28,-75 631.82,-75 640.5,-75"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="640.72,-78.5 650.72,-75 640.72,-71.5 640.72,-78.5"/>
+</g>
+<!-- proc~assign_string_to_json_file -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node11" class="node">
+<title>proc~assign_string_to_json_file</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node11"><a xlink:href="../proc/assign_string_to_json_file.html" xlink:title="json_file%assign_string_to_json_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="455,-150 256,-150 256,-126 455,-126 455,-150"/>
+<text text-anchor="middle" x="355.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%assign_string_to_json_file</text>
+</a>
+</g>
+</g>
+<!-- proc~assign_string_to_json_file&#45;&gt;none~deserialize -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge10" class="edge">
+<title>proc~assign_string_to_json_file&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M421.89,-125.97C433.03,-123.38 444.42,-120.38 455,-117 476.73,-110.05 500.23,-99.95 518.66,-91.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="520.25,-94.51 527.8,-87.08 517.26,-88.18 520.25,-94.51"/>
+</g>
+<!-- proc~initialize_json_file_from_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node12" class="node">
+<title>proc~initialize_json_file_from_string</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node12"><a xlink:href="../proc/initialize_json_file_from_string.html" xlink:title="initialize_json_file_from_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="441,-108 270,-108 270,-84 441,-84 441,-108"/>
+<text text-anchor="middle" x="355.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_json_file_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_json_file_from_string&#45;&gt;none~deserialize -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge11" class="edge">
+<title>proc~initialize_json_file_from_string&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M441.11,-86.91C454.3,-85.49 467.82,-84.04 480.68,-82.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="481.26,-86.12 490.83,-81.57 480.51,-79.16 481.26,-86.12"/>
+</g>
+<!-- proc~initialize_json_file_from_string_v2 -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node13" class="node">
+<title>proc~initialize_json_file_from_string_v2</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node13"><a xlink:href="../proc/initialize_json_file_from_string_v2.html" xlink:title="initialize_json_file_from_string_v2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="450,-66 261,-66 261,-42 450,-42 450,-66"/>
+<text text-anchor="middle" x="355.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_json_file_from_string_v2</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_json_file_from_string_v2&#45;&gt;none~deserialize -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge12" class="edge">
+<title>proc~initialize_json_file_from_string_v2&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M450.24,-64.07C460.5,-65.17 470.81,-66.28 480.73,-67.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="480.59,-70.85 490.91,-68.44 481.34,-63.89 480.59,-70.85"/>
+</g>
+<!-- proc~wrap_json_file_load_from_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node14" class="node">
+<title>proc~wrap_json_file_load_from_string</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node14"><a xlink:href="../proc/wrap_json_file_load_from_string.html" xlink:title="wrap_json_file_load_from_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="446,-24 265,-24 265,0 446,0 446,-24"/>
+<text text-anchor="middle" x="355.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_json_file_load_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_json_file_load_from_string&#45;&gt;none~deserialize -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge13" class="edge">
+<title>proc~wrap_json_file_load_from_string&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M421.89,-24.03C433.03,-26.62 444.42,-29.62 455,-33 476.73,-39.95 500.23,-50.05 518.66,-58.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="517.26,-61.82 527.8,-62.92 520.25,-55.49 517.26,-61.82"/>
+</g>
+<!-- interface~json_file -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node15" class="node">
+<title>interface~json_file</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node15"><a xlink:href="../interface/json_file.html" xlink:title="json_file">
+<polygon fill="#a7506f" stroke="#a7506f" points="138,-66 82,-66 82,-42 138,-42 138,-66"/>
+<text text-anchor="middle" x="110" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file</text>
+</a>
+</g>
+</g>
+<!-- interface~json_file&#45;&gt;proc~initialize_json_file_from_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge16" class="edge">
+<title>interface~json_file&#45;&gt;proc~initialize_json_file_from_string</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M138.46,-58.74C171.38,-64.41 228,-74.18 275.01,-82.29"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="274.44,-85.74 284.89,-83.99 275.63,-78.84 274.44,-85.74"/>
+</g>
+<!-- interface~json_file&#45;&gt;proc~initialize_json_file_from_string_v2 -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge18" class="edge">
+<title>interface~json_file&#45;&gt;proc~initialize_json_file_from_string_v2</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M138.46,-54C165.86,-54 209.69,-54 250.73,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="250.81,-57.5 260.81,-54 250.81,-50.5 250.81,-57.5"/>
+</g>
+<!-- proc~wrap_assign_string_to_json_file -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node16" class="node">
+<title>proc~wrap_assign_string_to_json_file</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node16"><a xlink:href="../proc/wrap_assign_string_to_json_file.html" xlink:title="wrap_assign_string_to_json_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="199,-150 21,-150 21,-126 199,-126 199,-150"/>
+<text text-anchor="middle" x="110" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_assign_string_to_json_file</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_assign_string_to_json_file&#45;&gt;proc~assign_string_to_json_file -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge14" class="edge">
+<title>proc~wrap_assign_string_to_json_file&#45;&gt;proc~assign_string_to_json_file</title>
+<path fill="none" stroke="#ff0000" d="M199.25,-138C214.33,-138 230.14,-138 245.67,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="245.83,-141.5 255.83,-138 245.83,-134.5 245.83,-141.5"/>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node17" class="node">
+<title>proc~wrap_initialize_json_file_from_string</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node17"><a xlink:href="../proc/wrap_initialize_json_file_from_string.html" xlink:title="wrap_initialize_json_file_from_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="211,-108 9,-108 9,-84 211,-84 211,-108"/>
+<text text-anchor="middle" x="110" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_initialize_json_file_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string&#45;&gt;proc~initialize_json_file_from_string -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge15" class="edge">
+<title>proc~wrap_initialize_json_file_from_string&#45;&gt;proc~initialize_json_file_from_string</title>
+<path fill="none" stroke="#7fff00" d="M211.09,-96C227.13,-96 243.68,-96 259.59,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="259.93,-99.5 269.93,-96 259.93,-92.5 259.93,-99.5"/>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string_v2 -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node18" class="node">
+<title>proc~wrap_initialize_json_file_from_string_v2</title>
+<g id="a_proc~~json_check_all_for_duplicate_keys~~CalledByGraph_node18"><a xlink:href="../proc/wrap_initialize_json_file_from_string_v2.html" xlink:title="wrap_initialize_json_file_from_string_v2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="220,-24 0,-24 0,0 220,0 220,-24"/>
+<text text-anchor="middle" x="110" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_initialize_json_file_from_string_v2</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string_v2&#45;&gt;proc~initialize_json_file_from_string_v2 -->
+<g id="proc~~json_check_all_for_duplicate_keys~~CalledByGraph_edge17" class="edge">
+<title>proc~wrap_initialize_json_file_from_string_v2&#45;&gt;proc~initialize_json_file_from_string_v2</title>
+<path fill="none" stroke="#00ffff" d="M180.78,-24.04C210.07,-29.09 244.3,-34.99 274.6,-40.22"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="274.26,-43.71 284.71,-41.96 275.45,-36.81 274.26,-43.71"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocjson_check_all_for_duplicate_keysCalledByGraph = svgPanZoom('#procjson_check_all_for_duplicate_keysCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_check_all_for_duplicate_keys</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">has_duplicate</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">path</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">implicit none</span>
+
+<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span><span class="w">  </span><span class="c">!! the object to search. If `p` is</span>
+<span class="w">                                              </span><span class="c">!! not a `json_object`, then `has_duplicate`</span>
+<span class="w">                                              </span><span class="c">!! will be false.</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">has_duplicate</span><span class="w">  </span><span class="c">!! true if there is at least</span>
+<span class="w">                                              </span><span class="c">!! one duplicate `name` key anywhere</span>
+<span class="w">                                              </span><span class="c">!! in the structure.</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="c">!! the duplicate name</span>
+<span class="w">                                                                      </span><span class="c">!! (unallocated if no</span>
+<span class="w">                                                                      </span><span class="c">!! duplicates were found)</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="c">!! the full path to the</span>
+<span class="w">                                                                      </span><span class="c">!! duplicate name</span>
+<span class="w">                                                                      </span><span class="c">!! (unallocated if no</span>
+<span class="w">                                                                      </span><span class="c">!! duplicate was found)</span>
+
+<span class="w">    </span><span class="n">has_duplicate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        call </span><span class="n">json</span><span class="p">%</span><span class="n">traverse</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">duplicate_key_func</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end if</span>
+
+<span class="k">    contains</span>
+
+<span class="k">        subroutine </span><span class="n">duplicate_key_func</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">finished</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">!! Callback function to check each element</span>
+<span class="w">        </span><span class="c">!! for duplicate child names.</span>
+
+<span class="w">        </span><span class="k">implicit none</span>
+
+<span class="k">        class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">      </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w">             </span><span class="kd">::</span><span class="w"> </span><span class="n">finished</span>
+
+<span class="cp">#if defined __GFORTRAN__</span>
+
+<span class="w">        </span><span class="c">! this is a workaround for a gfortran bug (6 and 7),</span>
+
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tmp_name</span><span class="w"> </span><span class="c">!! temp variable for `name` string</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tmp_path</span><span class="w"> </span><span class="c">!! temp variable for `path` string</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">check_children_for_duplicate_keys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">has_duplicate</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">tmp_name</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="n">tmp_path</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">check_children_for_duplicate_keys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">has_duplicate</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">tmp_name</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">check_children_for_duplicate_keys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">has_duplicate</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="n">tmp_path</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">check_children_for_duplicate_keys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">has_duplicate</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">has_duplicate</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">name</span><span class="p">))</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tmp_name</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tmp_path</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="cp">#else</span>
+<span class="w">        </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">check_children_for_duplicate_keys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">has_duplicate</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">path</span><span class="p">)</span>
+<span class="cp">#endif</span>
+
+<span class="w">        </span><span class="n">finished</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">has_duplicate</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span>
+
+<span class="w">        </span><span class="k">end subroutine </span><span class="n">duplicate_key_func</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">json_check_all_for_duplicate_keys</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-01-05 20:15 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,1568 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>json_parameters &ndash; JSON-Fortran</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>9.1.0</small></a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>json_parameters
+      <small>Module</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+            <li class="list-inline-item" id="meta-author"><i class="fa fa-pencil"></i> Jacob Williams</li>
+            <li class="list-inline-item" id="meta-license"><i class="fa fa-legal"></i> BSD</li>
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.8% of total for modules and submodules.">60 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_parameters.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_parameters.f90.html'>json_parameters.F90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_parameters</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/json_parameters.html#variable-backslash">backslash</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-blank_chunk">blank_chunk</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-bspace">bspace</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-carriage_return">carriage_return</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-chunk_size">chunk_size</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-colon_char">colon_char</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-default_real_fmt">default_real_fmt</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-delimiter">delimiter</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-dot">dot</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-end_array">end_array</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-end_array_alt">end_array_alt</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-end_object">end_object</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-false_str">false_str</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-formfeed">formfeed</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-horizontal_tab">horizontal_tab</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-int_fmt~2">int_fmt</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_array">json_array</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_double">json_double</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_ext">json_ext</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_integer">json_integer</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_logical">json_logical</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_null">json_null</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_object">json_object</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_real">json_real</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_string">json_string</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-json_unknown">json_unknown</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-lower">lower</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-max_integer_str_len">max_integer_str_len</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-max_numeric_str_len">max_numeric_str_len</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-maxexp">maxexp</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-minexp">minexp</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-newline">newline</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-null_str">null_str</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-print_str_chunk_size">print_str_chunk_size</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-pushed_char_size">pushed_char_size</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-quotation_mark">quotation_mark</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-real_exponent_digits">real_exponent_digits</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-real_precision">real_precision</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-root">root</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-rp_addl_safety">rp_addl_safety</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-rp_safety_factor">rp_safety_factor</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-seq_chunk_size">seq_chunk_size</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-single_quote">single_quote</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-slash">slash</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-space">space</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-star">star</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-start_array">start_array</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-start_array_alt">start_array_alt</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-start_object">start_object</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-stream_chunk_size">stream_chunk_size</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-this">this</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-tilde">tilde</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-true_str">true_str</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-unit2str">unit2str</a>
+            <a class="list-group-item" href="../module/json_parameters.html#variable-upper">upper</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <p>Other parameters used by <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr>-Fortran.
+  This is a low-level module not meant to be used by a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr>-Fortran user.</p>
+<h3 id="license">License</h3>
+<ul>
+<li><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr>-Fortran is released under a BSD-style license.
+    See the <a href="https://github.com/jacobwilliams/json-fortran/blob/master/LICENSE">LICENSE</a>
+    file for details.</li>
+</ul>
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                  <li class="list-inline-item"><a href='json_kinds.html'>json_kinds</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~json_parameters~~UsesGraph Pages: 1 -->
+<svg id="modulejson_parametersUsesGraph" width="343pt" height="32pt"
+ viewBox="0.00 0.00 343.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~json_parameters~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>module~~json_parameters~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 339,-28 339,4 -4,4"/>
+<!-- module~json_parameters -->
+<g id="module~~json_parameters~~UsesGraph_node1" class="node">
+<title>module~json_parameters</title>
+<polygon fill="none" stroke="black" points="335,-24 233,-24 233,0 335,0 335,-24"/>
+<text text-anchor="middle" x="284" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_parameters</text>
+</g>
+<!-- module~json_kinds -->
+<g id="module~~json_parameters~~UsesGraph_node2" class="node">
+<title>module~json_kinds</title>
+<g id="a_module~~json_parameters~~UsesGraph_node2"><a xlink:href="../module/json_kinds.html" xlink:title="json_kinds">
+<polygon fill="#337ab7" stroke="#337ab7" points="197,-24 130,-24 130,0 197,0 197,-24"/>
+<text text-anchor="middle" x="163.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_kinds</text>
+</a>
+</g>
+</g>
+<!-- module~json_parameters&#45;&gt;module~json_kinds -->
+<g id="module~~json_parameters~~UsesGraph_edge1" class="edge">
+<title>module~json_parameters&#45;&gt;module~json_kinds</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M232.75,-12C224.32,-12 215.64,-12 207.42,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="207.3,-8.5 197.3,-12 207.3,-15.5 207.3,-8.5"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~json_parameters~~UsesGraph_node3" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~json_parameters~~UsesGraph_node3"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="94,-24 0,-24 0,0 94,0 94,-24"/>
+<text text-anchor="middle" x="47" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~json_kinds&#45;&gt;iso_fortran_env -->
+<g id="module~~json_parameters~~UsesGraph_edge2" class="edge">
+<title>module~json_kinds&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M130,-12C122.01,-12 113.23,-12 104.48,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="104.26,-8.5 94.26,-12 104.26,-15.5 104.26,-8.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+          <div class="card">
+      <h3 class="card-header card-title bg-light">Used by</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~json_parameters~~UsedByGraph Pages: 1 -->
+<svg id="modulejson_parametersUsedByGraph" width="641pt" height="101pt"
+ viewBox="0.00 0.00 641.00 101.33" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~json_parameters~~UsedByGraph" class="graph" transform="scale(0.97 0.97) rotate(0) translate(4 100.97)">
+<title>module~~json_parameters~~UsedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-100.97 660,-100.97 660,4 -4,4"/>
+<!-- module~json_parameters -->
+<g id="module~~json_parameters~~UsedByGraph_node1" class="node">
+<title>module~json_parameters</title>
+<polygon fill="none" stroke="black" points="102,-63 0,-63 0,-39 102,-39 102,-63"/>
+<text text-anchor="middle" x="51" y="-48.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_parameters</text>
+</g>
+<!-- module~json_file_module -->
+<g id="module~~json_parameters~~UsedByGraph_node2" class="node">
+<title>module~json_file_module</title>
+<g id="a_module~~json_parameters~~UsedByGraph_node2"><a xlink:href="../module/json_file_module.html" xlink:title="json_file_module">
+<polygon fill="#337ab7" stroke="#337ab7" points="540,-63 438,-63 438,-39 540,-39 540,-63"/>
+<text text-anchor="middle" x="489" y="-48.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file_module</text>
+</a>
+</g>
+</g>
+<!-- module~json_file_module&#45;&gt;module~json_parameters -->
+<g id="module~~json_parameters~~UsedByGraph_edge1" class="edge">
+<title>module~json_file_module&#45;&gt;module~json_parameters</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M343.5,-53C275.74,-57.52 263.23,-95.95 195.5,-91"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M193.5,-91C157.74,-88.39 118.63,-76.6 90.61,-66.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="91.78,-63.2 81.18,-63.01 89.35,-69.76 91.78,-63.2"/>
+</g>
+<!-- module~json_string_utilities -->
+<g id="module~~json_parameters~~UsedByGraph_node4" class="node">
+<title>module~json_string_utilities</title>
+<g id="a_module~~json_parameters~~UsedByGraph_node4"><a xlink:href="../module/json_string_utilities.html" xlink:title="json_string_utilities">
+<polygon fill="#337ab7" stroke="#337ab7" points="251,-63 138,-63 138,-39 251,-39 251,-63"/>
+<text text-anchor="middle" x="194.5" y="-48.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities</text>
+</a>
+</g>
+</g>
+<!-- module~json_file_module&#45;&gt;module~json_string_utilities -->
+<g id="module~~json_parameters~~UsedByGraph_edge6" class="edge">
+<title>module~json_file_module&#45;&gt;module~json_string_utilities</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M437.83,-50.42C410.5,-50.42 376.11,-50.96 345.5,-53"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M343.5,-53C316.56,-54.8 286.81,-54.78 261.09,-54.14"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="261.17,-50.64 251.08,-53.85 260.97,-57.64 261.17,-50.64"/>
+</g>
+<!-- module~json_value_module -->
+<g id="module~~json_parameters~~UsedByGraph_node5" class="node">
+<title>module~json_value_module</title>
+<g id="a_module~~json_parameters~~UsedByGraph_node5"><a xlink:href="../module/json_value_module.html" xlink:title="json_value_module">
+<polygon fill="#337ab7" stroke="#337ab7" points="402,-24 287,-24 287,0 402,0 402,-24"/>
+<text text-anchor="middle" x="344.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module</text>
+</a>
+</g>
+</g>
+<!-- module~json_file_module&#45;&gt;module~json_value_module -->
+<g id="module~~json_parameters~~UsedByGraph_edge8" class="edge">
+<title>module~json_file_module&#45;&gt;module~json_value_module</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M444.08,-38.98C430,-35.13 414.23,-30.81 399.51,-26.78"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="400.09,-23.31 389.52,-24.05 398.24,-30.06 400.09,-23.31"/>
+</g>
+<!-- module~json_module -->
+<g id="module~~json_parameters~~UsedByGraph_node3" class="node">
+<title>module~json_module</title>
+<g id="a_module~~json_parameters~~UsedByGraph_node3"><a xlink:href="../module/json_module.html" xlink:title="json_module">
+<polygon fill="#337ab7" stroke="#337ab7" points="656,-63 576,-63 576,-39 656,-39 656,-63"/>
+<text text-anchor="middle" x="616" y="-48.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
+</g>
+<!-- module~json_module&#45;&gt;module~json_parameters -->
+<g id="module~~json_parameters~~UsedByGraph_edge2" class="edge">
+<title>module~json_module&#45;&gt;module~json_parameters</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M577.97,-63.09C565.98,-66.54 552.54,-69.92 540,-72 388.72,-97.04 348.44,-102.17 195.5,-91"/>
+</g>
+<!-- module~json_module&#45;&gt;module~json_file_module -->
+<g id="module~~json_parameters~~UsedByGraph_edge5" class="edge">
+<title>module~json_module&#45;&gt;module~json_file_module</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M575.79,-51C567.66,-51 558.92,-51 550.23,-51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="550.1,-47.5 540.1,-51 550.1,-54.5 550.1,-47.5"/>
+</g>
+<!-- module~json_module&#45;&gt;module~json_value_module -->
+<g id="module~~json_parameters~~UsedByGraph_edge9" class="edge">
+<title>module~json_module&#45;&gt;module~json_value_module</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M577.16,-38.97C565.36,-35.61 552.23,-32.26 540,-30 497.94,-22.23 450.1,-17.75 412.4,-15.2"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="412.25,-11.68 402.04,-14.53 411.8,-18.67 412.25,-11.68"/>
+</g>
+<!-- module~json_string_utilities&#45;&gt;module~json_parameters -->
+<g id="module~~json_parameters~~UsedByGraph_edge3" class="edge">
+<title>module~json_string_utilities&#45;&gt;module~json_parameters</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M137.98,-51C129.61,-51 120.95,-51 112.48,-51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="112.29,-47.5 102.29,-51 112.29,-54.5 112.29,-47.5"/>
+</g>
+<!-- module~json_value_module&#45;&gt;module~json_parameters -->
+<g id="module~~json_parameters~~UsedByGraph_edge4" class="edge">
+<title>module~json_value_module&#45;&gt;module~json_parameters</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M286.95,-14.63C245.51,-17.12 188,-21.75 138,-30 127.54,-31.72 116.48,-34.04 105.89,-36.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="104.83,-33.17 95.93,-38.91 106.47,-39.97 104.83,-33.17"/>
+</g>
+<!-- module~json_value_module&#45;&gt;module~json_string_utilities -->
+<g id="module~~json_parameters~~UsedByGraph_edge7" class="edge">
+<title>module~json_value_module&#45;&gt;module~json_string_utilities</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M297.89,-24.02C283.12,-27.91 266.57,-32.27 251.15,-36.33"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="249.99,-33.02 241.22,-38.95 251.78,-39.79 249.99,-33.02"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulejson_parametersUsedByGraph = svgPanZoom('#modulejson_parametersUsedByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      <br>
+
+
+        <section>
+          <h2>Variables</h2>
+            <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-backslash"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>backslash</strong></td>
+<td> =</td>
+                <td>achar(92, kind=CK)</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> special character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-blank_chunk"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>blank_chunk</strong></td>
+<td> =</td>
+                <td>repeat(space, chunk_size)</td>
+            <td>
+                <p>a blank string</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bspace"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>bspace</strong></td>
+<td> =</td>
+                <td>achar(8, kind=CK)</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> special character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-carriage_return"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>carriage_return</strong></td>
+<td> =</td>
+                <td>achar(13, kind=CK)</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> special character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-chunk_size"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>chunk_size</strong></td>
+<td> =</td>
+                <td>256_IK</td>
+            <td>
+                <p>for allocatable strings: allocate chunks of this size</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-colon_char"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>colon_char</strong></td>
+<td> =</td>
+                <td>CK_&#39;:&#39;</td>
+            <td>
+                <p>colon character for <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr></p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-default_real_fmt"></span>
+              character(kind=CDK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>default_real_fmt</strong></td>
+<td> =</td>
+                <td>&#39;(ss,E27.17E4)&#39;</td>
+            <td>
+                <p>default real number format statement (for writing real values to strings and files).
+ Note that this can be overridden by calling <a href="../proc/json_initialize.html">json_initialize</a>.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-delimiter"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>delimiter</strong></td>
+<td> =</td>
+                <td>CK_&#39;,&#39;</td>
+            <td>
+                <p>delimiter for <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr></p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dot"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>dot</strong></td>
+<td> =</td>
+                <td>CK_&#39;.&#39;</td>
+            <td>
+                <p>path separator for <a href="../proc/json_get_by_path_default.html">json_get_by_path_default</a></p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-end_array"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>end_array</strong></td>
+<td> =</td>
+                <td>CK_&#39;]&#39;</td>
+            <td>
+                <p>end of a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> array</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-end_array_alt"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>end_array_alt</strong></td>
+<td> =</td>
+                <td>CK_&#39;)&#39;</td>
+            <td>
+                <p>alternate end of <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> array for
+<a href="../proc/json_get_by_path_default.html">json_get_by_path_default</a></p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-end_object"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>end_object</strong></td>
+<td> =</td>
+                <td>CK_&#39;}&#39;</td>
+            <td>
+                <p>end of a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> object</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-false_str"></span>
+              character(kind=CK, len=5),
+            </td>
+              <td>protected</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>false_str</strong></td>
+<td> =</td>
+                <td>CK_&#39;false&#39;</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> logical False string</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-formfeed"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>formfeed</strong></td>
+<td> =</td>
+                <td>achar(12, kind=CK)</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> special character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-horizontal_tab"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>horizontal_tab</strong></td>
+<td> =</td>
+                <td>achar(9, kind=CK)</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> special character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-int_fmt~2"></span>
+              character(kind=CDK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>int_fmt</strong></td>
+<td> =</td>
+                <td>&#39;(ss,I0)&#39;</td>
+            <td>
+                <p>minimum width format for integers</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_array"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_array</strong></td>
+<td> =</td>
+                <td>3</td>
+            <td>
+                <p>Array <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data type
+(see <a href="../proc/json_file_variable_info.html">json_file_variable_info</a> and <a href="../proc/json_info.html">json_info</a>)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_double"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_double</strong></td>
+<td> =</td>
+                <td>json_real</td>
+            <td>
+                <p>Equivalent to <code>json_real</code> for
+backward compatibility.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_ext"></span>
+              character(kind=CDK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_ext</strong></td>
+<td> =</td>
+                <td>&#39;.json&#39;</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> file extension</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_integer"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_integer</strong></td>
+<td> =</td>
+                <td>5</td>
+            <td>
+                <p>Integer <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data type (<code>integer(IK)</code>)
+(see <a href="../proc/json_file_variable_info.html">json_file_variable_info</a> and <a href="../proc/json_info.html">json_info</a>).</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_logical"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_logical</strong></td>
+<td> =</td>
+                <td>4</td>
+            <td>
+                <p>Logical <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data type (<code>logical(LK)</code>)
+(see <a href="../proc/json_file_variable_info.html">json_file_variable_info</a> and <a href="../proc/json_info.html">json_info</a>)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_null"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_null</strong></td>
+<td> =</td>
+                <td>1</td>
+            <td>
+                <p>Null <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data type
+(see <a href="../proc/json_file_variable_info.html">json_file_variable_info</a> and <a href="../proc/json_info.html">json_info</a>)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_object"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_object</strong></td>
+<td> =</td>
+                <td>2</td>
+            <td>
+                <p>Object <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data type
+(see <a href="../proc/json_file_variable_info.html">json_file_variable_info</a> and <a href="../proc/json_info.html">json_info</a>)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_real"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_real</strong></td>
+<td> =</td>
+                <td>6</td>
+            <td>
+                <p>Real number <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data type (<code>real(RK)</code>)
+(see <a href="../proc/json_file_variable_info.html">json_file_variable_info</a> and <a href="../proc/json_info.html">json_info</a>)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_string"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_string</strong></td>
+<td> =</td>
+                <td>7</td>
+            <td>
+                <p>String <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data type (<code>character(kind=CK)</code>)
+(see <a href="../proc/json_file_variable_info.html">json_file_variable_info</a> and <a href="../proc/json_info.html">json_info</a>)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json_unknown"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>json_unknown</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                <p>Unknown <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> data type
+(see <a href="../proc/json_file_variable_info.html">json_file_variable_info</a> and <a href="../proc/json_info.html">json_info</a>)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-lower"></span>
+              character(kind=CK, len=26),
+            </td>
+              <td>protected</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>lower</strong></td>
+<td> =</td>
+                <td>CK_&#39;abcdefghijklmnopqrstuvwxyz&#39;</td>
+            <td>
+                <p>lowercase characters</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max_integer_str_len"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>max_integer_str_len</strong></td>
+<td> =</td>
+                <td>256_IK</td>
+            <td>
+                <p>maximum string length of an integer.
+This is totally arbitrary (any way
+to get the compiler to tell us this?)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max_numeric_str_len"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>max_numeric_str_len</strong></td>
+<td> =</td>
+                <td>real_precision+real_exponent_digits+6_IK</td>
+            <td>
+                <p>6 = sign + leading 0 + decimal + &lsquo;E&rsquo; + exponent sign + 1 extra</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-maxexp"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>maxexp</strong></td>
+<td> =</td>
+                <td>maxexponent(1.0_RK)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-minexp"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>minexp</strong></td>
+<td> =</td>
+                <td>minexponent(1.0_RK)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-newline"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>newline</strong></td>
+<td> =</td>
+                <td>achar(10, kind=CK)</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> special character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-null_str"></span>
+              character(kind=CK, len=4),
+            </td>
+              <td>protected</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>null_str</strong></td>
+<td> =</td>
+                <td>CK_&#39;null&#39;</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> Null variable string</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-print_str_chunk_size"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>print_str_chunk_size</strong></td>
+<td> =</td>
+                <td>1000_IK</td>
+            <td>
+                <p>chunk size for writing <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> to a string</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pushed_char_size"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>pushed_char_size</strong></td>
+<td> =</td>
+                <td>10_IK</td>
+            <td>
+                <p>size for <code>pushed_char</code>
+array in <a href="../type/json_core.html">json_core</a></p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-quotation_mark"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>quotation_mark</strong></td>
+<td> =</td>
+                <td>CK_&#39;&#34;&#39;</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> special character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-real_exponent_digits"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>real_exponent_digits</strong></td>
+<td> =</td>
+                <td>floor(1_IK+log10(real(max(maxexp, abs(maxexp)), kind=RK)))</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-real_precision"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>real_precision</strong></td>
+<td> =</td>
+                <td>rp_safety_factor*precision(1.0_RK)+rp_addl_safety</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-root"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>root</strong></td>
+<td> =</td>
+                <td>achar(36, kind=CK)</td>
+            <td>
+                <p>(<code>$</code>) root for <a href="../proc/json_get_by_path_default.html">json_get_by_path_default</a></p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rp_addl_safety"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>rp_addl_safety</strong></td>
+<td> =</td>
+                <td>2_IK</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rp_safety_factor"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>rp_safety_factor</strong></td>
+<td> =</td>
+                <td>1_IK</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-seq_chunk_size"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>seq_chunk_size</strong></td>
+<td> =</td>
+                <td>256_IK</td>
+            <td>
+                <p>chunk size for reading sequential files</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-single_quote"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>single_quote</strong></td>
+<td> =</td>
+                <td>CK_&#34;&#39;&#34;</td>
+            <td>
+                <p>for JSONPath bracket-notation</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-slash"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>slash</strong></td>
+<td> =</td>
+                <td>achar(47, kind=CK)</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> special character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-space"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>space</strong></td>
+<td> =</td>
+                <td>CK_&#39; &#39;</td>
+            <td>
+                <p>space character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-star"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>star</strong></td>
+<td> =</td>
+                <td>CK_&#39;*&#39;</td>
+            <td>
+                <p>for invalid numbers and
+list-directed real output</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-start_array"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>start_array</strong></td>
+<td> =</td>
+                <td>CK_&#39;[&#39;</td>
+            <td>
+                <p>start of a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> array</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-start_array_alt"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>start_array_alt</strong></td>
+<td> =</td>
+                <td>CK_&#39;(&#39;</td>
+            <td>
+                <p>alternate start of <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> array for
+<a href="../proc/json_get_by_path_default.html">json_get_by_path_default</a></p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-start_object"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>start_object</strong></td>
+<td> =</td>
+                <td>CK_&#39;{&#39;</td>
+            <td>
+                <p>start of a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> object</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-stream_chunk_size"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>stream_chunk_size</strong></td>
+<td> =</td>
+                <td>256_IK</td>
+            <td>
+                <p>chunk size for reading stream files</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-this"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>this</strong></td>
+<td> =</td>
+                <td>CK_&#39;@&#39;</td>
+            <td>
+                <p>&lsquo;this&rsquo; for <a href="../proc/json_get_by_path_default.html">json_get_by_path_default</a></p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tilde"></span>
+              character(kind=CK, len=*),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>tilde</strong></td>
+<td> =</td>
+                <td>CK_&#39;~&#39;</td>
+            <td>
+                <p>RFC 6901 escape character</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-true_str"></span>
+              character(kind=CK, len=4),
+            </td>
+              <td>protected</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>true_str</strong></td>
+<td> =</td>
+                <td>CK_&#39;true&#39;</td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> logical True string</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-unit2str"></span>
+              integer(kind=IK),
+            </td>
+              <td>public,</td>
+            <td>
+parameter               
+            </td>
+            <td>::</td>
+            <td><strong>unit2str</strong></td>
+<td> =</td>
+                <td>-1_IK</td>
+            <td>
+                <p>unit number to cause stuff to be
+output to strings rather than files.
+See 9.5.6.12 in the F2003/08 standard</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-upper"></span>
+              character(kind=CK, len=26),
+            </td>
+              <td>protected</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>upper</strong></td>
+<td> =</td>
+                <td>CK_&#39;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</td>
+            <td>
+                <p>uppercase characters</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+        </section>
+        <br>
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-01-03 02:49 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>
