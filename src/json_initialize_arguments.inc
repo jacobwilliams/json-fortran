@@ -139,3 +139,18 @@ integer(IK),intent(in),optional :: string_to_real_mode
   !!   than the Fortran implementation. If the
   !!   conversion fails, it will fall back to
   !!   the Fortran version.
+integer(IK),intent(in),optional :: null_to_integer_mode
+  !! if `strict_type_checking=false`:
+  !!
+  !! * 1 : an exception will be raised if
+  !!   try to retrieve a `null` as an integer. [default]
+  !! * 2 : a `null` retrieved as an integer
+  !!   will return a 0.
+  !! * 3 : a `null` retrieved as an integer
+  !!   will return the value specified in
+  !!   `null_to_integer_value` (default is 0).
+integer(IK),intent(in),optional :: null_to_integer_value
+  !! The integer value to return when retrieving
+  !! a `null` as an integer and
+  !! `null_to_integer_mode=3`.
+  !! (default is 0).
