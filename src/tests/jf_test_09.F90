@@ -111,7 +111,6 @@ contains
     call f1%get(p1)
     call f2%get(p2)
     are_equal = json%equals(p1, p2)
-
     if (are_equal) then
         write(error_unit,'(A)') '  SUCCESS: Both parsers produced identical results!'
     else
@@ -127,6 +126,16 @@ contains
     call json%print_to_string(p1, json_str)
     call cpu_time(tend)
     write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time: ',tend-tstart,' sec'
+    !now, reparse the string to make sure we get the same structure back:
+    call json%deserialize(p2, json_str)
+    are_equal = json%equals(p1, p2, verbose = .true.)
+    if (are_equal) then
+        write(error_unit,'(A)') '  SUCCESS: serialized and deserialized structures are identical!'
+    else
+        write(error_unit,'(A)') '  ERROR: serialized and deserialized structures are different!'
+        error_cnt = error_cnt + 1
+    end if
+    write(error_unit,'(A)') ''
 
     !cleanup:
     call f1%destroy()
