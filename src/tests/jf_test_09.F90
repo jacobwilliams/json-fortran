@@ -48,7 +48,7 @@ contains
     type(json_file) :: f, f1, f2
     type(json_core) :: json
     real :: tstart, tend
-    character(len=:),allocatable :: str
+    character(len=:),allocatable :: str, json_str
     integer :: i !! counter
     logical :: are_equal
     type(json_value),pointer :: p1, p2
@@ -120,10 +120,19 @@ contains
     end if
     write(error_unit,'(A)') ''
 
+    !time serialize to string:
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '  Serializing JSON to string...'
+    call cpu_time(tstart)
+    call json%print_to_string(p1, json_str)
+    call cpu_time(tend)
+    write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time: ',tend-tstart,' sec'
+
     !cleanup:
     call f1%destroy()
     call f2%destroy()
     deallocate(str)
+    deallocate(json_str)
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
