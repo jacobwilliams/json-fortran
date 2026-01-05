@@ -127,6 +127,8 @@ contains
     call cpu_time(tend)
     write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time: ',tend-tstart,' sec'
     !now, reparse the string to make sure we get the same structure back:
+    call f2%destroy()  ! since we are about to reuse p2 pointer
+    nullify(p2)        !
     call json%deserialize(p2, json_str)
     are_equal = json%equals(p1, p2, verbose = .true.)
     if (are_equal) then
@@ -139,7 +141,8 @@ contains
 
     !cleanup:
     call f1%destroy()
-    call f2%destroy()
+    !call f2%destroy()  ! destroyed above
+    call json%destroy(p2)  ! since we allocated it above
     deallocate(str)
     deallocate(json_str)
 
