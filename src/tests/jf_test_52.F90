@@ -81,6 +81,9 @@ contains
         end if
         write(error_unit,'(A)') ''
 
+        call json%destroy(); nullify(p2)
+        call json_c%destroy(p1)
+
     end subroutine go
 
 end module jf_test_52_mod
