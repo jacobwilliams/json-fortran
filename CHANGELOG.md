@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.2.0 (2026-01-05)](#920-2026-01-05)
     - [9.1.0 (2026-01-02)](#910-2026-01-02)
     - [9.0.5 (2025-08-25)](#905-2025-08-25)
     - [9.0.4 (2025-08-02)](#904-2025-08-02)
@@ -56,7 +57,42 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.1.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.2.0...HEAD)
+
+### [9.2.0](https://github.com/jacobwilliams/json-fortran/tree/9.2.0) (2026-01-05)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.1.0...9.2.0)
+or [Download v9.2.0](https://github.com/jacobwilliams/json-fortran/releases/tag/9.2.0)
+
+**Changes:**
+
+* Added a non-recursive `clone` option (see the `use_nonrecursive` optional argument to `json_clone`). Also added an optional `verbose` argument to the `equals` function, for printing information about how the two structures differ. [#602](https://github.com/jacobwilliams/json-fortran/issues/602) [#610](https://github.com/jacobwilliams/json-fortran/pull/610) ([jacobwilliams](https://github.com/jacobwilliams))
+* Added `null_to_integer_mode` and `null_to_integer_value` options, which allow for controlling the results if attempting to return a `null` value as an integer.
+[#518](https://github.com/jacobwilliams/json-fortran/issues/518)
+[#611](https://github.com/jacobwilliams/json-fortran/pull/611)
+([jacobwilliams](https://github.com/jacobwilliams))
+* Speed up printing JSON to a string.
+[#501](https://github.com/jacobwilliams/json-fortran/issues/501)
+[#612](https://github.com/jacobwilliams/json-fortran/pull/612)
+([jacobwilliams](https://github.com/jacobwilliams))
+* Added some `iomsg` outputs for file open/close errors.
+[#596](https://github.com/jacobwilliams/json-fortran/issues/596)
+[#613](https://github.com/jacobwilliams/json-fortran/pull/613)
+([jacobwilliams](https://github.com/jacobwilliams))
+* Added `add_null_by_path` to `json_core` and `add_null` to `json_file`. Now, `null` values and vectors can more easily be added programmatically to JSON structures.
+[#327](https://github.com/jacobwilliams/json-fortran/issues/327)
+[#614](https://github.com/jacobwilliams/json-fortran/pull/614)
+([jacobwilliams](https://github.com/jacobwilliams))
+* Fixed some issues with the example Visual Studio solution for Visual Studio 2022. Removed a deprecated flag. Also increased the stack size to 3 MB, which was necessary for one of the tests to pass.
+[#600](https://github.com/jacobwilliams/json-fortran/issues/600)
+[#601](https://github.com/jacobwilliams/json-fortran/pull/601)
+[#602](https://github.com/jacobwilliams/json-fortran/issues/602)
+[#603](https://github.com/jacobwilliams/json-fortran/pull/603)
+([james-tullos](https://github.com/james-tullos))
+* Consolidate duplicated code for `json_add_*_by_path` routines
+[#615](https://github.com/jacobwilliams/json-fortran/issues/615)
+[#616](https://github.com/jacobwilliams/json-fortran/pull/616)
+([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [9.1.0](https://github.com/jacobwilliams/json-fortran/tree/9.1.0) (2026-01-02)
 
