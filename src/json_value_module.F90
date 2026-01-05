@@ -287,6 +287,21 @@
                             !! * If true [default], an exception will be raised if an integer
                             !!   value cannot be read when parsing JSON.
 
+        integer(IK) :: null_to_integer_mode = 1_IK
+                            !! if `strict_type_checking=false`:
+                            !!
+                            !! * 1 : an exception will be raised if
+                            !!   try to retrieve a `null` as an integer. [default]
+                            !! * 2 : a `null` retrieved as an integer
+                            !!   will return a 0.
+                            !! * 3 : a `null` retrieved as an integer
+                            !!   will return the value specified in
+                            !!   `null_to_integer_value` (default is 0).
+        integer(IK) :: null_to_integer_value = 0_IK
+                            !! if `null_to_integer_mode=3`, this value
+                            !! will be returned when retrieving a `null`
+                            !! as an integer.
+
         logical(LK) :: allow_trailing_comma = .true.
                             !! Allow a single trailing comma in arrays and objects.
 
@@ -1160,6 +1175,20 @@
             call integer_to_string(null_to_real_mode,int_fmt,istr)
             call me%throw_exception('Invalid null_to_real_mode: '//istr)
         end select
+    end if
+    ! how to handle null to integer conversions:
+    if (present(null_to_integer_mode)) then
+        select case (null_to_integer_mode)
+        case(1_IK:3_IK)
+            me%null_to_integer_mode = null_to_integer_mode
+        case default
+            me%null_to_integer_mode = 1_IK  ! just to have a valid value
+            call integer_to_string(null_to_integer_mode,int_fmt,istr)
+            call me%throw_exception('Invalid null_to_integer_mode: '//istr)
+        end select
+    end if
+    if (present(null_to_integer_value)) then
+        me%null_to_integer_value = null_to_integer_value
     end if
 
     ! how to handle NaN and Infinities:
@@ -8270,6 +8299,21 @@
                             trim(me%str_value))
                     end if
                 end if
+            case (json_null)
+                select case (json%null_to_integer_mode)
+                case (1_IK)  ! strict mode: throw exception
+                    if (allocated(me%name)) then
+                        call json%throw_exception('Error in json_get_integer:'//&
+                            ' Unable to resolve null value to integer: '//me%name)
+                    else
+                        call json%throw_exception('Error in json_get_integer:'//&
+                            ' Unable to resolve null value to integer')
+                    end if
+                case (2_IK)  ! return a 0 for null
+                    value = 0_IK
+                case (3_IK)  ! return user specified value for null
+                    value = json%null_to_integer_value
+                end select
             case default
                 if (allocated(me%name)) then
                     call json%throw_exception('Error in json_get_integer:'//&

@@ -23,6 +23,7 @@ contains
     integer,intent(out) :: error_cnt !! error counter
 
     character(kind=CK,len=*),parameter :: str = CK_'{'//&
+            CK_'"null": null,'//&
             CK_'"bad_reals": [1.0, null, "NaN", "+Infinity", "-Infinity", 4.0],'//&
             CK_'"nonstandard_json": [.1e1, .1D1, .1d+1, +.1d1, +.1D1, +1.0, +1.0d0, +1.0D0]'//&
             CK_'}'
@@ -30,6 +31,7 @@ contains
     type(json_file) :: json !! the JSON structure read from the file
     real(rk),dimension(:),allocatable :: bad_reals
     logical(lk) :: found
+    integer(ik) :: ival
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -51,8 +53,48 @@ contains
     write(error_unit,'(A)') 'printing...'
     call json%print(int(error_unit,IK))
 
-    call json%initialize(use_quiet_nan=.false., null_to_real_mode=2_IK) ! signaling nan
+    ! First, test null to int modes:
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') 'test null to int modes...'
+    call json%initialize(null_to_integer_mode=1_IK) ! strict mode
+    call json%get('null',ival)
+    if (json%failed()) then
+        write(error_unit,'(A)') 'null mode 1: success'
+        call json%clear_exceptions()
+    else
+        write(error_unit,'(A,i5)') 'null mode 1: failed', ival
+        error_cnt = error_cnt + 1
+    end if
+    call json%initialize(null_to_integer_mode=2_IK) ! return 0 for null
+    call json%get('null',ival)
+    if (json%failed()) then
+        write(error_unit,'(A)') 'ERROR GETTING NULL IN MODE 2'
+        call json%clear_exceptions()
+        error_cnt = error_cnt + 1
+    end if
+    if (ival == 0_ik) then
+        write(error_unit,'(A)') 'null mode 2: success'
+        call json%clear_exceptions()
+    else
+        write(error_unit,'(A,i5)') 'null mode 2: failed', ival
+        error_cnt = error_cnt + 1
+    end if
+    call json%initialize(null_to_integer_mode=3_IK, null_to_integer_value=-999_ik) ! return specified value for null
+    call json%get('null',ival)
+    if (json%failed()) then
+        write(error_unit,'(A)') 'ERROR GETTING NULL IN MODE 3'
+        call json%clear_exceptions()
+        error_cnt = error_cnt + 1
+    end if
+    if (ival == -999_ik) then
+        write(error_unit,'(A)') 'null mode 3: success'
+        call json%clear_exceptions()
+    else
+        write(error_unit,'(A,i5)') 'null mode 3: failed', ival
+        error_cnt = error_cnt + 1
+    end if
 
+    call json%initialize(use_quiet_nan=.false., null_to_real_mode=2_IK) ! signaling nan
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') 'get values as real [signaling nan]...'
     call json%get('bad_reals',bad_reals,found)
