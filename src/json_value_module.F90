@@ -494,6 +494,15 @@
                                          json_add_string_vec_by_path_value_ascii,&
                                          json_add_string_vec_by_path_path_ascii
 #endif
+
+        !>
+        !  Add null variable to a [[json_value]] linked list
+        !  by specifying their paths.
+        generic,public :: add_null_by_path => MAYBEWRAP(json_add_null_by_path),&
+                                              MAYBEWRAP(json_add_null_vec_by_path)
+        procedure :: MAYBEWRAP(json_add_null_by_path)
+        procedure :: MAYBEWRAP(json_add_null_vec_by_path)
+
         procedure :: MAYBEWRAP(json_add_member_by_path)
         procedure :: MAYBEWRAP(json_add_integer_by_path)
 #ifndef REAL32
@@ -4296,6 +4305,91 @@
 
 !*****************************************************************************************
 !>
+!  Add a null value to a [[json_value]], given the path.
+!
+!@warning If the path points to an existing variable in the structure,
+!         then this routine will destroy it and replace it with the
+!         new value.
+
+    subroutine json_add_null_by_path(json,me,path,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p
+    type(json_value),pointer :: tmp
+    character(kind=CK,len=:),allocatable :: name  !! variable name
+
+    if ( .not. json%exception_thrown ) then
+
+        nullify(p)
+
+        ! return a pointer to the path (possibly creating it)
+        ! If the variable had to be created, then
+        ! it will be a json_null variable.
+        call json%create(me,path,p,found,was_created)
+
+        if (.not. associated(p)) then
+
+            call json%throw_exception('Error in json_add_null_by_path:'//&
+                                      ' Unable to resolve path: '//trim(path),found)
+            if (present(found)) then
+                found = .false.
+                call json%clear_exceptions()
+            end if
+
+        else
+
+            !NOTE: a new object is created, and the old one
+            !      is replaced and destroyed. This is to
+            !      prevent memory leaks if the type is
+            !      being changed (for example, if an array
+            !      is being replaced with a scalar).
+
+            if (p%var_type==json_null) then
+                ! nothing to do
+            else
+                call json%info(p,name=name)
+                call json%create_null(tmp,name)
+                call json%replace(p,tmp,destroy=.true.)
+            end if
+
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_null_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_null_by_path]] where "path" is kind=CDK.
+
+    subroutine wrap_json_add_null_by_path(json,me,path,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me          !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path        !! the path to the variable
+    logical(LK),intent(out),optional     :: found       !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created !! if the variable had to be created
+
+    call json%json_add_null_by_path(me,to_unicode(path),found,was_created)
+
+    end subroutine wrap_json_add_null_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
 !  Add a string value to a [[json_value]], given the path.
 !
 !@warning If the path points to an existing variable in the structure,
@@ -4303,7 +4397,7 @@
 !         new value.
 
     subroutine json_add_string_by_path(json,me,path,value,found,&
-                                            was_created,trim_str,adjustl_str)
+                                       was_created,trim_str,adjustl_str)
 
     implicit none
 
@@ -4560,6 +4654,70 @@
     call json%json_add_logical_vec_by_path(me,to_unicode(path),value,found,was_created)
 
     end subroutine wrap_json_add_logical_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper to [[json_add_null_by_path]] for adding a null vector by path.
+
+    subroutine json_add_null_vec_by_path(json,me,path,n_values,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)      :: json
+    type(json_value),pointer            :: me           !! the JSON structure
+    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),intent(in)              :: n_values     !! number of nulls to add
+    logical(LK),intent(out),optional    :: found        !! if the variable was found
+    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+
+    type(json_value),pointer :: p   !! pointer to path (which may exist)
+    type(json_value),pointer :: var !! new variable that is created
+    integer(IK) :: i  !! counter
+    character(kind=CK,len=:),allocatable :: name !! the variable name
+    logical(LK) :: p_found  !! if the path was successfully found (or created)
+
+    if ( .not. json%exception_thrown ) then
+
+        !get a pointer to the variable
+        !(creating it if necessary)
+        call json%create(me,path,p,found=p_found)
+        if (p_found) then
+            call json%info(p,name=name)             ! want to keep the existing name
+            call json%create_array(var,name)        ! create a new array variable
+            call json%replace(p,var,destroy=.true.) ! replace p with this array (destroy p)
+            !populate each element of the array:
+            do i=1,n_values
+                call json%add(var, CK_'')
+            end do
+        end if
+
+    else
+        if ( present(found) )       found = .false.
+        if ( present(was_created) ) was_created = .false.
+    end if
+
+    end subroutine json_add_null_vec_by_path
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Wrapper for [[json_add_null_vec_by_path]] where "path" is kind=CDK).
+
+    subroutine wrap_json_add_null_vec_by_path(json,me,path,n_values,found,was_created)
+
+    implicit none
+
+    class(json_core),intent(inout)       :: json
+    type(json_value),pointer             :: me           !! the JSON structure
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),intent(in)               :: n_values     !! number of nulls to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call json%json_add_null_vec_by_path(me,to_unicode(path),n_values,found,was_created)
+
+    end subroutine wrap_json_add_null_vec_by_path
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -6878,7 +7036,7 @@
             else
                 call integer_to_string(json%path_mode,int_fmt,path_mode_str)
                 call json%throw_exception('Error in json_create_by_path: Unsupported path_mode: '//&
-                                            trim(path_mode_str))
+                                          trim(path_mode_str))
             end if
             if (present(found)) then
                 call json%clear_exceptions()

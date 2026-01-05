@@ -208,6 +208,14 @@
 #endif
 
         !>
+        !  Add a null variable to a [[json_file(type)]], by specifying the path.
+        !
+        generic,public :: add_null => MAYBEWRAP(json_file_add_null), &
+                                      MAYBEWRAP(json_file_add_null_vec)
+        procedure :: MAYBEWRAP(json_file_add_null)
+        procedure :: MAYBEWRAP(json_file_add_null_vec)
+
+        !>
         !  Update a scalar variable in a [[json_file(type)]],
         !  by specifying the path.
         !
@@ -2486,6 +2494,89 @@
     call me%json_file_add_logical_vec(to_unicode(path),vec,found,was_created)
 
     end subroutine wrap_json_file_add_logical_vec
+!*****************************************************************************************
+
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a null value to a JSON file.
+
+    subroutine json_file_add_null(me,path,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_null_by_path(me%p,path,found,was_created)
+
+    end subroutine json_file_add_null
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_null]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_null(me,path,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_null(to_unicode(path),found,was_created)
+
+    end subroutine wrap_json_file_add_null
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a null vector to a JSON file.
+
+    subroutine json_file_add_null_vec(me,path,n_values,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    integer(IK),intent(in)               :: n_values     !! number of nulls to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_null_by_path(me%p,path,n_values,found,was_created)
+
+    end subroutine json_file_add_null_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_null_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_null_vec(me,path,n_values,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),intent(in)               :: n_values     !! number of nulls to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_null_vec(to_unicode(path),n_values,found,was_created)
+
+    end subroutine wrap_json_file_add_null_vec
 !*****************************************************************************************
 
 !*****************************************************************************************
