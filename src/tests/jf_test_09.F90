@@ -6,7 +6,7 @@
 
 module jf_test_9_mod
 
-    use json_module
+    use json_module, CK => json_CK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -48,7 +48,7 @@ contains
     type(json_file) :: f, f1, f2
     type(json_core) :: json
     real :: tstart, tend
-    character(len=:),allocatable :: str
+    character(kind=CK, len=:),allocatable :: str, json_str
     integer :: i !! counter
     logical :: are_equal
     type(json_value),pointer :: p1, p2
@@ -111,7 +111,6 @@ contains
     call f1%get(p1)
     call f2%get(p2)
     are_equal = json%equals(p1, p2)
-
     if (are_equal) then
         write(error_unit,'(A)') '  SUCCESS: Both parsers produced identical results!'
     else
@@ -120,10 +119,32 @@ contains
     end if
     write(error_unit,'(A)') ''
 
+    !time serialize to string:
+    write(error_unit,'(A)') ''
+    write(error_unit,'(A)') '  Serializing JSON to string...'
+    call cpu_time(tstart)
+    call json%print_to_string(p1, json_str)
+    call cpu_time(tend)
+    write(error_unit,'(A,1X,F10.3,1X,A)') 'Elapsed time: ',tend-tstart,' sec'
+    !now, reparse the string to make sure we get the same structure back:
+    call f2%destroy()  ! since we are about to reuse p2 pointer
+    nullify(p2)        !
+    call json%deserialize(p2, json_str)
+    are_equal = json%equals(p1, p2, verbose = .true.)
+    if (are_equal) then
+        write(error_unit,'(A)') '  SUCCESS: serialized and deserialized structures are identical!'
+    else
+        write(error_unit,'(A)') '  ERROR: serialized and deserialized structures are different!'
+        error_cnt = error_cnt + 1
+    end if
+    write(error_unit,'(A)') ''
+
     !cleanup:
     call f1%destroy()
-    call f2%destroy()
+    !call f2%destroy()  ! destroyed above
+    call json%destroy(p2)  ! since we allocated it above
     deallocate(str)
+    deallocate(json_str)
 
     write(error_unit,'(A)') ''
     write(error_unit,'(A)') '================================='
@@ -170,7 +191,7 @@ contains
     implicit none
 
     character(len=*),intent(in) :: filename
-    character(len=:),allocatable,intent(out) :: str
+    character(kind=CK, len=:),allocatable,intent(out) :: str
 
     integer :: iunit,istat,filesize
 
@@ -184,7 +205,7 @@ contains
     if (istat==0) then
         inquire(file=filename, size=filesize)
         if (filesize>0) then
-            allocate( character(len=filesize) :: str )
+            allocate( character(kind=CK,len=filesize) :: str )
             read(iunit,pos=1,iostat=istat) str
             if (istat/=0) deallocate(str)
             close(iunit, iostat=istat)

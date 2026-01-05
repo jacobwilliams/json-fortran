@@ -135,7 +135,7 @@
 
     integer(IK),parameter :: stream_chunk_size = 256_IK !! chunk size for reading stream files
 
-    integer(IK),parameter :: print_str_chunk_size = 1000_IK !! chunk size for writing JSON to a string
+    integer(IK),parameter :: print_str_initial_buffer_size = 10000_IK !! initial buffer size for writing JSON to a string
 
     integer(IK),parameter :: pushed_char_size = 10_IK !! size for `pushed_char`
                                                       !! array in [[json_core(type)]]

@@ -6165,7 +6165,7 @@
                          !! since it is being allocated in chunks.
     character(kind=CK,len=:),allocatable :: tmp  !! temporary buffer for trimming `str`
 
-    str = repeat(space, print_str_chunk_size)
+    str = repeat(space, print_str_initial_buffer_size)
     iloc = 0_IK
     call json%json_value_print(p, iunit=unit2str, str=str, iloc=iloc, indent=1_IK, colon=.true.)
 
@@ -6591,7 +6591,6 @@
         logical(LK) :: add_space       !! if a space is to be added after the comma
         integer(IK) :: n               !! length of actual string `s` appended to `str`
         integer(IK) :: room_left       !! number of characters left in `str`
-        integer(IK) :: n_chunks_to_add !! number of chunks to add to `str` for appending `s`
         integer(IK) :: istat           !! `iostat` code for `write` statement
 
         if (present(comma)) then
@@ -6649,13 +6648,9 @@
             n = len(s)
             room_left = len(str)-iloc
             if (room_left < n) then
-                ! need to add another chunk to fit this string:
-                n_chunks_to_add = max(1_IK, ceiling( real(len(s)-room_left,RK) / real(chunk_size,RK), IK ) )
-                allocate(character(kind=CK, len=len(str)+print_str_chunk_size*n_chunks_to_add)::buf)
-                buf(1:len(str)) = str
-                do j = len(str)+1, len(buf)
-                    buf(j:j) = space
-                enddo
+                ! increase buffer size:
+                allocate(character(kind=CK, len=max(len(str)*2_IK, iloc+n))::buf)
+                buf(1:iloc) = str(1:iloc)
                 call move_alloc(buf, str)
             end if
             ! append s to str:
