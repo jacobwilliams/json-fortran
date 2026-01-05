@@ -12166,7 +12166,7 @@
             else
                 call integer_to_string(json%pushed_index,int_fmt,istr)
                 call json%throw_exception('Error in push_char: '//&
-                                            'invalid value of pushed_index: '//trim(istr))
+                                          'invalid value of pushed_index: '//trim(istr))
             end if
 
         end if
