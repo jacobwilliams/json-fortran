@@ -188,7 +188,7 @@ contains
     implicit none
 
     character(len=*),intent(in) :: filename
-    character(len=:),allocatable,intent(out) :: str
+    character(kind=CK, len=:),allocatable,intent(out) :: str
 
     integer :: iunit,istat,filesize
 
@@ -202,7 +202,7 @@ contains
     if (istat==0) then
         inquire(file=filename, size=filesize)
         if (filesize>0) then
-            allocate( character(len=filesize) :: str )
+            allocate( character(kind=CK,len=filesize) :: str )
             read(iunit,pos=1,iostat=istat) str
             if (istat/=0) deallocate(str)
             close(iunit, iostat=istat)
