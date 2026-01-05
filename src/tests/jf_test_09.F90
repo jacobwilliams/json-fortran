@@ -6,7 +6,7 @@
 
 module jf_test_9_mod
 
-    use json_module
+    use json_module, CK => json_CK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -48,7 +48,7 @@ contains
     type(json_file) :: f, f1, f2
     type(json_core) :: json
     real :: tstart, tend
-    character(len=:),allocatable :: str, json_str
+    character(kind=CK, len=:),allocatable :: str, json_str
     integer :: i !! counter
     logical :: are_equal
     type(json_value),pointer :: p1, p2
