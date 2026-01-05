@@ -6245,14 +6245,17 @@
 
     integer(IK) :: iunit  !! file unit for `open` statement
     integer(IK) :: istat  !! `iostat` code for `open` statement
+    character(len=iomsg_len) :: msg  !! `iomsg` for `open` statement
 
-    open(newunit=iunit,file=filename,status='REPLACE',iostat=istat FILE_ENCODING )
+    open(newunit=iunit,file=filename,status='REPLACE',&
+         iostat=istat,iomsg=msg FILE_ENCODING )
     if (istat==0) then
         call json%print(p,iunit)
         close(iunit,iostat=istat)
     else
-        call json%throw_exception('Error in json_print_to_filename: could not open file: '//&
-                              trim(filename))
+        call json%throw_exception('Error in json_print_to_filename: '//&
+                                  'could not open file: '//&
+                                  trim(filename)//' : '//trim(msg))
     end if
 
     end subroutine json_print_to_filename
@@ -10025,6 +10028,7 @@
     character(kind=CK,len=:),allocatable :: path !! path to any duplicate key
     logical(LK) :: unit_was_open  !! track if unit was already open
     logical(LK) :: close_if_open  !! local copy of `close_unit_if_open`
+    character(len=iomsg_len) :: msg  !! `iomsg` for `open` statement
 
     if (present(close_unit_if_open)) then
         close_if_open = close_unit_if_open
@@ -10057,6 +10061,7 @@
                     action      = 'READ', &
                     form        = form_spec, &
                     access      = access_spec, &
+                    iomsg       = msg, &
                     iostat      = istat &
                     FILE_ENCODING )
             close_if_open = .true.  ! we opened it, so we should close it later
@@ -10074,6 +10079,7 @@
                 action      = 'READ', &
                 form        = form_spec, &
                 access      = access_spec, &
+                iomsg       = msg, &
                 iostat      = istat &
                 FILE_ENCODING )
         close_if_open = .true.  ! we opened it, so we should close it later
@@ -10115,15 +10121,16 @@
 
         ! close the file only if we opened it, or if user specified to close it
         if (.not. unit_was_open .or. close_if_open) then
-            close(unit=iunit, iostat=istat)
+            close(unit=iunit, iostat=istat, iomsg=msg)
             if (istat /= 0 .and. .not. json%exception_thrown) then
-                call json%throw_exception('Error closing file')
+                call json%throw_exception('Error closing file : '//trim(msg))
             end if
         end if
 
     else
 
-        call json%throw_exception('Error in json_parse_file: Error opening file: '//trim(file))
+        call json%throw_exception('Error in json_parse_file: Error opening file: '//&
+                                  trim(file)//' : '//trim(msg))
         nullify(p)
 
     end if
