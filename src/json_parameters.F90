@@ -140,5 +140,7 @@
     integer(IK),parameter :: pushed_char_size = 10_IK !! size for `pushed_char`
                                                       !! array in [[json_core(type)]]
 
+    integer(IK),parameter :: iomsg_len = 256_IK !! length of `iomsg` strings used in IO statements
+
     end module json_parameters
 !*****************************************************************************************
