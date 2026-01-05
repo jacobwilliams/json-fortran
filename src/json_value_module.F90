@@ -3970,57 +3970,17 @@
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer            :: me           !! the JSON structure
-    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
-    integer(IK),intent(in)              :: value        !! the value to add
-    logical(LK),intent(out),optional    :: found        !! if the variable was found
-    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+    integer(IK),intent(in) :: value !! the value to add
+    integer(IK),parameter :: json_type = json_integer !! type of the value to add
+#include "json_add_scalar_by_path.inc"
 
-    type(json_value),pointer :: p
-    type(json_value),pointer :: tmp
-    character(kind=CK,len=:),allocatable :: name  !! variable name
-
-    if ( .not. json%exception_thrown ) then
-
-        nullify(p)
-
-        ! return a pointer to the path (possibly creating it)
-        ! If the variable had to be created, then
-        ! it will be a json_null variable.
-        call json%create(me,path,p,found,was_created)
-
-        if (.not. associated(p)) then
-
-            call json%throw_exception('Error in json_add_integer_by_path:'//&
-                                      ' Unable to resolve path: '//trim(path),found)
-            if (present(found)) then
-                found = .false.
-                call json%clear_exceptions()
-            end if
-
-        else
-
-            !NOTE: a new object is created, and the old one
-            !      is replaced and destroyed. This is to
-            !      prevent memory leaks if the type is
-            !      being changed (for example, if an array
-            !      is being replaced with a scalar).
-
-            if (p%var_type==json_integer) then
-                p%int_value = value
-            else
-                call json%info(p,name=name)
-                call json%create_integer(tmp,value,name)
-                call json%replace(p,tmp,destroy=.true.)
-            end if
-
-        end if
-
-    else
-        if ( present(found) )       found = .false.
-        if ( present(was_created) ) was_created = .false.
-    end if
+    contains
+        subroutine assign()
+            p%int_value = value
+        end subroutine assign
+        subroutine create()
+            call json%create_integer(tmp,value,name)
+        end subroutine create
 
     end subroutine json_add_integer_by_path
 !*****************************************************************************************
@@ -4057,57 +4017,17 @@
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer            :: me           !! the JSON structure
-    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
-    real(RK),intent(in)                 :: value        !! the value to add
-    logical(LK),intent(out),optional    :: found        !! if the variable was found
-    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+    real(RK),intent(in) :: value !! the value to add
+    integer(IK),parameter :: json_type = json_real !! type of the value to add
+#include "json_add_scalar_by_path.inc"
 
-    type(json_value),pointer :: p
-    type(json_value),pointer :: tmp
-    character(kind=CK,len=:),allocatable :: name  !! variable name
-
-    if ( .not. json%exception_thrown ) then
-
-        nullify(p)
-
-        ! return a pointer to the path (possibly creating it)
-        ! If the variable had to be created, then
-        ! it will be a json_null variable.
-        call json%create(me,path,p,found,was_created)
-
-        if (.not. associated(p)) then
-
-            call json%throw_exception('Error in json_add_real_by_path:'//&
-                                      ' Unable to resolve path: '//trim(path),found)
-            if (present(found)) then
-                found = .false.
-                call json%clear_exceptions()
-            end if
-
-        else
-
-            !NOTE: a new object is created, and the old one
-            !      is replaced and destroyed. This is to
-            !      prevent memory leaks if the type is
-            !      being changed (for example, if an array
-            !      is being replaced with a scalar).
-
-            if (p%var_type==json_real) then
-                p%dbl_value = value
-            else
-                call json%info(p,name=name)
-                call json%create_real(tmp,value,name)
-                call json%replace(p,tmp,destroy=.true.)
-            end if
-
-        end if
-
-    else
-        if ( present(found) )       found = .false.
-        if ( present(was_created) ) was_created = .false.
-    end if
+    contains
+        subroutine assign()
+            p%dbl_value = value
+        end subroutine assign
+        subroutine create()
+            call json%create_real(tmp,value,name)
+        end subroutine create
 
     end subroutine json_add_real_by_path
 !*****************************************************************************************
@@ -4228,57 +4148,17 @@
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer            :: me           !! the JSON structure
-    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
-    logical(LK),intent(in)              :: value        !! the value to add
-    logical(LK),intent(out),optional    :: found        !! if the variable was found
-    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+    logical(LK),intent(in) :: value !! the value to add
+    integer(IK),parameter :: json_type = json_logical !! type of the value to add
+#include "json_add_scalar_by_path.inc"
 
-    type(json_value),pointer :: p
-    type(json_value),pointer :: tmp
-    character(kind=CK,len=:),allocatable :: name  !! variable name
-
-    if ( .not. json%exception_thrown ) then
-
-        nullify(p)
-
-        ! return a pointer to the path (possibly creating it)
-        ! If the variable had to be created, then
-        ! it will be a json_null variable.
-        call json%create(me,path,p,found,was_created)
-
-        if (.not. associated(p)) then
-
-            call json%throw_exception('Error in json_add_logical_by_path:'//&
-                                      ' Unable to resolve path: '//trim(path),found)
-            if (present(found)) then
-                found = .false.
-                call json%clear_exceptions()
-            end if
-
-        else
-
-            !NOTE: a new object is created, and the old one
-            !      is replaced and destroyed. This is to
-            !      prevent memory leaks if the type is
-            !      being changed (for example, if an array
-            !      is being replaced with a scalar).
-
-            if (p%var_type==json_logical) then
-                p%log_value = value
-            else
-                call json%info(p,name=name)
-                call json%create_logical(tmp,value,name)
-                call json%replace(p,tmp,destroy=.true.)
-            end if
-
-        end if
-
-    else
-        if ( present(found) )       found = .false.
-        if ( present(was_created) ) was_created = .false.
-    end if
+    contains
+        subroutine assign()
+            p%log_value = value
+        end subroutine assign
+        subroutine create()
+            call json%create_logical(tmp,value,name)
+        end subroutine create
 
     end subroutine json_add_logical_by_path
 !*****************************************************************************************
@@ -4315,56 +4195,16 @@
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer            :: me           !! the JSON structure
-    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
-    logical(LK),intent(out),optional    :: found        !! if the variable was found
-    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
+    integer(IK),parameter :: json_type = json_null !! type of the value to add
+#include "json_add_scalar_by_path.inc"
 
-    type(json_value),pointer :: p
-    type(json_value),pointer :: tmp
-    character(kind=CK,len=:),allocatable :: name  !! variable name
-
-    if ( .not. json%exception_thrown ) then
-
-        nullify(p)
-
-        ! return a pointer to the path (possibly creating it)
-        ! If the variable had to be created, then
-        ! it will be a json_null variable.
-        call json%create(me,path,p,found,was_created)
-
-        if (.not. associated(p)) then
-
-            call json%throw_exception('Error in json_add_null_by_path:'//&
-                                      ' Unable to resolve path: '//trim(path),found)
-            if (present(found)) then
-                found = .false.
-                call json%clear_exceptions()
-            end if
-
-        else
-
-            !NOTE: a new object is created, and the old one
-            !      is replaced and destroyed. This is to
-            !      prevent memory leaks if the type is
-            !      being changed (for example, if an array
-            !      is being replaced with a scalar).
-
-            if (p%var_type==json_null) then
-                ! nothing to do
-            else
-                call json%info(p,name=name)
-                call json%create_null(tmp,name)
-                call json%replace(p,tmp,destroy=.true.)
-            end if
-
-        end if
-
-    else
-        if ( present(found) )       found = .false.
-        if ( present(was_created) ) was_created = .false.
-    end if
+    contains
+        subroutine assign()
+            ! nothing to do
+        end subroutine assign
+        subroutine create()
+            call json%create_null(tmp,name)
+        end subroutine create
 
     end subroutine json_add_null_by_path
 !*****************************************************************************************
@@ -4401,59 +4241,19 @@
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer            :: me           !! the JSON structure
-    character(kind=CK,len=*),intent(in) :: path         !! the path to the variable
     character(kind=CK,len=*),intent(in) :: value        !! the value to add
-    logical(LK),intent(out),optional    :: found        !! if the variable was found
-    logical(LK),intent(out),optional    :: was_created  !! if the variable had to be created
-    logical(LK),intent(in),optional     :: trim_str     !! if TRIM() should be called for each element
-    logical(LK),intent(in),optional     :: adjustl_str  !! if ADJUSTL() should be called for each element
+    logical(LK),intent(in),optional     :: trim_str     !! if `trim()` should be called for each element
+    logical(LK),intent(in),optional     :: adjustl_str  !! if `adjustl()` should be called for each element
+    integer(IK),parameter :: json_type = json_string !! type of the value to add
+#include "json_add_scalar_by_path.inc"
 
-    type(json_value),pointer :: p
-    type(json_value),pointer :: tmp
-    character(kind=CK,len=:),allocatable :: name  !! variable name
-
-    if ( .not. json%exception_thrown ) then
-
-        nullify(p)
-
-        ! return a pointer to the path (possibly creating it)
-        ! If the variable had to be created, then
-        ! it will be a json_null variable.
-        call json%create(me,path,p,found,was_created)
-
-        if (.not. associated(p)) then
-
-            call json%throw_exception('Error in json_add_string_by_path:'//&
-                                      ' Unable to resolve path: '//trim(path),found)
-            if (present(found)) then
-                found = .false.
-                call json%clear_exceptions()
-            end if
-
-        else
-
-            !NOTE: a new object is created, and the old one
-            !      is replaced and destroyed. This is to
-            !      prevent memory leaks if the type is
-            !      being changed (for example, if an array
-            !      is being replaced with a scalar).
-
-            if (p%var_type==json_string) then
-                p%str_value = value
-            else
-                call json%info(p,name=name)
-                call json%create_string(tmp,value,name,trim_str,adjustl_str)
-                call json%replace(p,tmp,destroy=.true.)
-            end if
-
-        end if
-
-    else
-        if ( present(found) )       found = .false.
-        if ( present(was_created) ) was_created = .false.
-    end if
+    contains
+        subroutine assign()
+            p%str_value = value
+        end subroutine assign
+        subroutine create()
+            call json%create_string(tmp,value,name,trim_str,adjustl_str)
+        end subroutine create
 
     end subroutine json_add_string_by_path
 !*****************************************************************************************
