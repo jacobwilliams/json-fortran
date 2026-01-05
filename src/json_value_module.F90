@@ -6591,7 +6591,6 @@
         logical(LK) :: add_space       !! if a space is to be added after the comma
         integer(IK) :: n               !! length of actual string `s` appended to `str`
         integer(IK) :: room_left       !! number of characters left in `str`
-        integer(IK) :: n_chunks_to_add !! number of chunks to add to `str` for appending `s`
         integer(IK) :: istat           !! `iostat` code for `write` statement
 
         if (present(comma)) then
