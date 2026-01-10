@@ -13,7 +13,7 @@ project_download: https://github.com/jacobwilliams/json-fortran/releases/latest
 github: https://github.com/jacobwilliams
 website: http://degenerateconic.com
 twitter: https://twitter.com/degenerateconic
-preprocessor: {!.PREPROCESSOR!}
+preprocessor: gfortran -E
 predocmark_alt: >
 predocmark: <
 docmark_alt:
