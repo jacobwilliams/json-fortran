@@ -268,10 +268,12 @@
 
     subroutine string_to_real_c(str,use_quiet_nan,rval,status_ok)
 
-    use iso_c_binding, only: c_double, c_float, c_long_double, &
+    use iso_c_binding, only: c_double, c_float, &
                              c_char, c_ptr, c_null_ptr, c_long, &
                              c_null_char, c_loc, c_associated
-
+#ifdef REAL128
+    use iso_c_binding, only: c_long_double
+#endif
     implicit none
 
     character(kind=CK,len=*),intent(in) :: str           !! the string to convert to a real
@@ -301,13 +303,15 @@
             type(c_ptr), intent(inout) :: endptr
             real(c_double) :: d
         end function strtod
+#ifdef REAL128
         function strtold( str, endptr ) result(d) bind(C, name="strtold" )
             !! <stdlib.h> :: long double strtold(const char *str, char **endptr)
-            import
+            use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_long_double
             character(kind=c_char,len=1),dimension(*),intent(in) :: str
             type(c_ptr), intent(inout) :: endptr
             real(c_long_double) :: d
         end function strtold
+#endif
     end interface
 
 #ifdef USE_UCS4
