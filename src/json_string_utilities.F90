@@ -292,6 +292,7 @@
         function strtof( str, endptr ) result(d) bind(C, name="strtof" )
             !! <stdlib.h> :: float strtof(const char *str, char **endptr)
             import
+            implicit none
             character(kind=c_char,len=1),dimension(*),intent(in) :: str
             type(c_ptr), intent(inout) :: endptr
             real(c_float) :: d
@@ -299,6 +300,7 @@
         function strtod( str, endptr ) result(d) bind(C, name="strtod" )
             !! <stdlib.h> :: double strtod(const char *str, char **endptr)
             import
+            implicit none
             character(kind=c_char,len=1),dimension(*),intent(in) :: str
             type(c_ptr), intent(inout) :: endptr
             real(c_double) :: d
@@ -306,7 +308,8 @@
 #ifdef REAL128
         function strtold( str, endptr ) result(d) bind(C, name="strtold" )
             !! <stdlib.h> :: long double strtold(const char *str, char **endptr)
-            use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_long_double
+            import
+            implicit none
             character(kind=c_char,len=1),dimension(*),intent(in) :: str
             type(c_ptr), intent(inout) :: endptr
             real(c_long_double) :: d
