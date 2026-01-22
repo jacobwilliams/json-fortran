@@ -94,7 +94,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.8% of total for procedures.">65 statements</a>
+                 title=" 0.8% of total for procedures.">61 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -307,7 +307,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-str~5"></span>
+              <span class="anchor" id="variable-str~15"></span>
               character(kind=CK, len=*),
             </td>
 <td>intent(in)</td>
@@ -322,7 +322,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-use_quiet_nan~2"></span>
+              <span class="anchor" id="variable-use_quiet_nan~6"></span>
               logical(kind=LK),
             </td>
 <td>intent(in)</td>
@@ -353,7 +353,7 @@ otherwise, use <code>ieee_signaling_nan</code>.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-status_ok~3"></span>
+              <span class="anchor" id="variable-status_ok~4"></span>
               logical(kind=LK),
             </td>
 <td>intent(out)</td>
@@ -506,11 +506,13 @@ large graphs.</div>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">string_to_real_c</span><span class="p">(</span><span class="n">str</span><span class="p">,</span><span class="n">use_quiet_nan</span><span class="p">,</span><span class="n">rval</span><span class="p">,</span><span class="n">status_ok</span><span class="p">)</span>
 
-<span class="w">    </span><span class="k">use </span><span class="nb">iso_c_binding</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="kt">c_double</span><span class="p">,</span><span class="w"> </span><span class="kt">c_float</span><span class="p">,</span><span class="w"> </span><span class="kt">c_long_double</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">    </span><span class="k">use </span><span class="nb">iso_c_binding</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="kt">c_double</span><span class="p">,</span><span class="w"> </span><span class="kt">c_float</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                             </span><span class="kt">c_char</span><span class="p">,</span><span class="w"> </span><span class="kt">c_ptr</span><span class="p">,</span><span class="w"> </span><span class="nb">c_null_ptr</span><span class="p">,</span><span class="w"> </span><span class="kt">c_long</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                             </span><span class="nb">c_null_char</span><span class="p">,</span><span class="w"> </span><span class="nb">c_loc</span><span class="p">,</span><span class="w"> </span><span class="nb">c_associated</span>
-
-<span class="nb">    </span><span class="k">implicit none</span>
+<span class="cp">#ifdef REAL128</span>
+<span class="w">    </span><span class="k">use </span><span class="nb">iso_c_binding</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="kt">c_long_double</span>
+<span class="cp">#endif</span>
+<span class="w">    </span><span class="k">implicit none</span>
 
 <span class="k">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">str</span><span class="w">           </span><span class="c">!! the string to convert to a real</span>
 <span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">use_quiet_nan</span><span class="w"> </span><span class="c">!! if true, return NaN&#39;s as `ieee_quiet_nan`.</span>
@@ -528,6 +530,7 @@ large graphs.</div>
 <span class="k">        function </span><span class="n">strtof</span><span class="p">(</span><span class="w"> </span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">endptr</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="k">bind</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;strtof&quot;</span><span class="w"> </span><span class="p">)</span>
 <span class="w">            </span><span class="c">!! &lt;stdlib.h&gt; :: float strtof(const char *str, char **endptr)</span>
 <span class="w">            </span><span class="k">import</span>
+<span class="k">            implicit none</span>
 <span class="k">            </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="kt">c_char</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">str</span>
 <span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">endptr</span>
 <span class="w">            </span><span class="kt">real</span><span class="p">(</span><span class="kt">c_float</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">d</span>
@@ -535,17 +538,21 @@ large graphs.</div>
 <span class="w">        </span><span class="k">function </span><span class="n">strtod</span><span class="p">(</span><span class="w"> </span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">endptr</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="k">bind</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;strtod&quot;</span><span class="w"> </span><span class="p">)</span>
 <span class="w">            </span><span class="c">!! &lt;stdlib.h&gt; :: double strtod(const char *str, char **endptr)</span>
 <span class="w">            </span><span class="k">import</span>
+<span class="k">            implicit none</span>
 <span class="k">            </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="kt">c_char</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">str</span>
 <span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">endptr</span>
 <span class="w">            </span><span class="kt">real</span><span class="p">(</span><span class="kt">c_double</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">d</span>
 <span class="w">        </span><span class="k">end function </span><span class="n">strtod</span>
+<span class="cp">#ifdef REAL128</span>
 <span class="w">        </span><span class="k">function </span><span class="n">strtold</span><span class="p">(</span><span class="w"> </span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">endptr</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="k">bind</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;strtold&quot;</span><span class="w"> </span><span class="p">)</span>
 <span class="w">            </span><span class="c">!! &lt;stdlib.h&gt; :: long double strtold(const char *str, char **endptr)</span>
 <span class="w">            </span><span class="k">import</span>
+<span class="k">            implicit none</span>
 <span class="k">            </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="kt">c_char</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">str</span>
 <span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">endptr</span>
 <span class="w">            </span><span class="kt">real</span><span class="p">(</span><span class="kt">c_long_double</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">d</span>
 <span class="w">        </span><span class="k">end function </span><span class="n">strtold</span>
+<span class="cp">#endif</span>
 <span class="w">    </span><span class="k">end interface</span>
 
 <span class="cp">#ifdef USE_UCS4</span>
@@ -653,7 +660,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-01-05 20:13 +0000             </p>
+ on 2026-01-22 03:56 +0000             </p>
           </div>
         </div>
         <br>
