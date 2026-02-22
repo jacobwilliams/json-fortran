@@ -189,7 +189,7 @@ jobs:
       run: |
         echo ${TAGNAME}
         rm -rf doc
-        sed "2 s/^/version: ${TAGNAME}\n/" json-fortran.md > json-fortran.tagged.md
+        sed "2 s/^/version: ${TAGNAME}\n/" ford.md > json-fortran.tagged.md
         ford --debug json-fortran.tagged.md
 
     - name: Deploy documentation for tagged release
@@ -206,5 +206,5 @@ jobs:
       run: |
         rm json_*.F90-*unicode.gcov || true
         mv json_*.F90.gcov src/
-        mv jf_test*.[fF]90.gcov src/tests/
+        mv jf_test*.[fF]90.gcov test/
         bash <(curl -s https://codecov.io/bash) -v -X $GCOV

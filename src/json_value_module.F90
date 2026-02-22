@@ -2503,7 +2503,7 @@
 !      an object or array. It does not destroy the parent or
 !      previous elements.
 !
-!@Note There is some protection here to enable destruction of
+!@note There is some protection here to enable destruction of
 !      improperly-created linked lists. However, likely there
 !      are cases not handled. Use the [[json_value_validate]]
 !      method to validate a JSON structure that was manually

@@ -72,12 +72,12 @@
 #set -v
 set -o errexit
 
-FORDMD='json-fortran.md'        # FORD options file for building documentation
+FORDMD='ford.md'                # FORD options file for building documentation
 DOCDIR='./doc/'                 # build directory for documentation
 PAGESDIR='./pages/'             # Directory for FORD "pages"
 SRCDIR='./src/'                 # library source directory
-TESTDIR='./src/tests/'          # unit test source directory
-INTROSPECDIR='./src/tests/introspection/' # pre compile configuration tests directory
+TESTDIR='./test/'          # unit test source directory
+INTROSPECDIR='./test/introspection/' # pre compile configuration tests directory
 UCS4TESTCODE='test_iso_10646_support.f90'
 BINDIR='./bin/'                 # build directory for unit tests
 LIBDIR='./lib/'                 # build directory for library
