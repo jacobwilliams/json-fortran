@@ -57,11 +57,11 @@ contains
             call json%get_child(p_root, 1, p_child) ! get the first one
             do i = 1, count
                 call json%info(p_child, name=key) ! get the key name
-                write(output_unit,'(A,I0,A,A)') 'Key ', i, ': ', trim(key)
+                write(output_unit,'(A,I3,A,A)') 'Key ', i, ': ', trim(key)
                 if (key /= expected_keys(i)) then
                     error_cnt = error_cnt + 1
-                    write(error_unit,'(A,I0,A,A)') 'Error: expected key ', i, ' to be ', &
-                                                   trim(expected_keys(i)), ' but got ', trim(key)
+                    write(error_unit,'(A,I3,A)') '  Error: expected key ', i, ' to be "'// &
+                                                   trim(expected_keys(i))//'" but got "'//trim(key)//'"'
                 end if
                 ! get the next one (more efficient than calling get_child again)
                 if (i<count) call json%get_next(p_child, p_child)
