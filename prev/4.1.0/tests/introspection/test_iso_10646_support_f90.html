@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../../robodoc.css" type="text/css" />
+<title>./src/tests/introspection/test_iso_10646_support.f90</title>
+<!-- Source: ./src/tests/introspection/test_iso_10646_support.f90 -->
+<!-- Generated with ROBODoc Version 4.99.41 (May  3 2011) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">jsonfortran 4.1.0</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="../../toc_index.html#top">Table of Contents</a>
+<a class="menuitem" href="../../robo_sourcefiles.html#top">Sourcefiles</a>
+<a class="menuitem" href="../../masterindex.html#top">Index</a>
+<a class="menuitem" href="../../robo_interfaces.html#top">Interfaces</a>
+<a class="menuitem" href="../../robo_macros.html#top">Macros</a>
+<a class="menuitem" href="../../robo_classes.html#top">Classes</a>
+<a class="menuitem" href="../../robo_definitions.html#top">Parameters</a>
+<a class="menuitem" href="../../robo_functions.html#top">Functions</a>
+<a class="menuitem" href="../../robo_modules.html#top">Modules</a>
+<a class="menuitem" href="../../robo_unittests.html#top">Unittest</a>
+</div> <!-- navigation -->
+<div id="content">
+<hr />
+<a name="JSON2ftest5fiso5f106465fsupport"></a>
+<a name="robo46"></a><h2>JSON/test_iso_10646_support [ Unittest ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="../../robo_unittests.html#robo_top_of_doc">Unittest</a> ]</p>
+<p class="item_name">NAME</p>
+<p>    <strong>test_iso_10646_support</strong>
+</p>
+<p class="item_name">DESCRIPTION</p>
+<p>    This program is run when configuring the json-fortran build,
+    to determine whether or not ISO 10646/UCS4 characters are
+    supported by the compiler.
+</p>
+<p class="item_name">AUTHOR</p>
+<p>    Izaak Beekman
+</p>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number">17 </span>    <span class="keyword">program</span> <strong>test_iso_10646_support</strong>
+<span class="line_number">18 </span>
+<span class="line_number">19 </span>    <span class="keyword">use</span> iso_fortran_env <span class="sign">,</span><span class="keyword">only</span><span class="sign">:</span> output_unit<span class="sign">,</span> error_unit
+<span class="line_number">20 </span>
+<span class="line_number">21 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number">22 </span>
+<span class="line_number">23 </span>    <span class="keyword">integer</span><span class="sign">,</span> <span class="keyword">parameter</span> <span class="sign">:</span><span class="sign">:</span> UCS4_K <span class="sign">=</span> <span class="keyword">selected_char_kind</span><span class="sign">(</span><span class="squote">'ISO_10646'</span><span class="sign">)</span>
+<span class="line_number">24 </span>
+<span class="line_number">25 </span>    <span class="keyword">if</span> <span class="sign">(</span> UCS4_K <span class="sign">=</span><span class="sign">=</span> <span class="sign">-</span>1 <span class="sign">)</span> <span class="keyword">then</span> <span class="comment">!Not supported!</span>
+<span class="line_number">26 </span>        <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'Your compiler does not support ISO 10646/UCS4 characters!'</span>
+<span class="line_number">27 </span>        <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'JSON-Fortran must/will be configured to use the "DEFAULT"'</span>
+<span class="line_number">28 </span>        <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'character set. (Should be "ASCII" on a reasonable system.)'</span>
+<span class="line_number">29 </span>        <span class="keyword">stop</span> 2
+<span class="line_number">30 </span>    <span class="keyword">else</span>
+<span class="line_number">31 </span>        <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'Congratulations! Your compiler supports ISO 10646/UCS4!'</span>
+<span class="line_number">32 </span>        <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'JSON-Fortran may be configured to enable UCS4 support.'</span>
+<span class="line_number">33 </span>        <span class="keyword">write</span><span class="sign">(</span>output_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'UCS4_SUPPORTED'</span>
+<span class="line_number">34 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">35 </span>
+<span class="line_number">36 </span>    <span class="keyword">end</span> <span class="keyword">program</span> <strong>test_iso_10646_support</strong>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./src/tests/introspection/test_iso_10646_support.f90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.41 on Thu May 07 2015 02:37:19
+</p>
+</div> <!-- footer -->
+</body>
+</html>

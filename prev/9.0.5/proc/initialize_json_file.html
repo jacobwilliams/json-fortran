@@ -1,0 +1,1077 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>initialize_json_file &ndash; JSON-Fortran</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>9.0.5</small></a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>initialize_json_file
+      <small>Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+            <li class="list-inline-item" id="meta-author"><i class="fa fa-pencil"></i> Izaak Beekman</li>
+            <li class="list-inline-item" id="meta-date"><i class="fa fa-calendar-o"></i> 07/23/2015</li>
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.5% of total for procedures.">37 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_file_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_file_module.f90.html'>json_file_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_file_module.html'>json_file_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">initialize_json_file</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/initialize_json_file.html#src">initialize_json_file</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  function initialize_json_file(p, verbose, compact_reals, print_signs, real_format, spaces_per_tab, strict_type_checking, trailing_spaces_significant, case_sensitive_keys, no_whitespace, unescape_strings, comment_char, path_mode, path_separator, compress_vectors, allow_duplicate_keys, escape_solidus, stop_on_error, null_to_real_mode, non_normal_mode, use_quiet_nan, strict_integer_type_checking, allow_trailing_comma, nullify_pointer) result(file_object)  
+</h2>
+    
+
+    <p>Cast a <a href="../type/json_value.html">json_value</a> object as a <a href="../type/json_file.html">json_file</a> object.
+  It also calls the <code>initialize()</code> method.</p>
+<div class="alert alert-info">
+<p class="alert-title h4">Note</p>
+<p><a href="../proc/initialize_json_core.html">initialize_json_core</a>, <a href="../proc/json_initialize.html">json_initialize</a>,
+      <a href="../proc/initialize_json_core_in_file.html">initialize_json_core_in_file</a>, <a href="../proc/initialize_json_file.html">initialize_json_file</a>,
+      <a href="../proc/initialize_json_file_v2.html">initialize_json_file_v2</a>, <a href="../proc/initialize_json_file_from_string.html">initialize_json_file_from_string</a>,
+      and <a href="../proc/initialize_json_file_from_string_v2.html">initialize_json_file_from_string_v2</a>
+      all have a similar interface.</p>
+</div>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-p~2"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+<td></td>
+              <td>optional,</td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>p</strong></td>
+            <td>
+                <p><code>json_value</code> object to cast
+as a <code>json_file</code> object. This
+will be nullified.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-verbose~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>verbose</strong></td>
+            <td>
+                <p>mainly useful for debugging (default is false)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-compact_reals~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>compact_reals</strong></td>
+            <td>
+                <p>to compact the real number strings for output (default is true)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-print_signs~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>print_signs</strong></td>
+            <td>
+                <p>always print numeric sign (default is false)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-real_format~2"></span>
+              character(kind=CDK, len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>real_format</strong></td>
+            <td>
+                <p>Real number format: &lsquo;E&rsquo; [default], &lsquo;*&rsquo;, &lsquo;G&rsquo;, &lsquo;EN&rsquo;, or &lsquo;ES&rsquo;</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-spaces_per_tab~2"></span>
+              integer(kind=IK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>spaces_per_tab</strong></td>
+            <td>
+                <p>number of spaces per tab for indenting (default is 2)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-strict_type_checking~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>strict_type_checking</strong></td>
+            <td>
+                <p>if true, no integer, double, or logical type
+conversions are done for the <code>get</code> routines
+(default is false).</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-trailing_spaces_significant~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>trailing_spaces_significant</strong></td>
+            <td>
+                <p>for name and path comparisons, is trailing
+space to be considered significant.
+(default is false)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-case_sensitive_keys~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>case_sensitive_keys</strong></td>
+            <td>
+                <p>for name and path comparisons, are they
+case sensitive. (default is true)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-no_whitespace~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>no_whitespace</strong></td>
+            <td>
+                <p>if true, printing the <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> structure is
+done without adding any non-significant
+spaces or linebreaks (default is false)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-unescape_strings~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>unescape_strings</strong></td>
+            <td>
+                <p>If false, then the raw escaped
+string is returned from <a href="../proc/json_get_string.html">json_get_string</a>
+and similar routines. If true [default],
+then the string is returned unescaped.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-comment_char~2"></span>
+              character(kind=CK, len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>comment_char</strong></td>
+            <td>
+                <p>If present, these characters are used
+to denote comments in the <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> file,
+which will be ignored if present.
+Example: <code>!</code>, <code>#</code>, or <code>/!#</code>. Setting this
+to a blank string disables the
+ignoring of comments. (Default is <code>/!#</code>).</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-path_mode~2"></span>
+              integer(kind=IK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>path_mode</strong></td>
+            <td>
+                <p>How the path strings are interpreted in the
+<code>get_by_path</code> routines:</p>
+<ul>
+<li>1 : Default mode (see <a href="../proc/json_get_by_path_default.html">json_get_by_path_default</a>)</li>
+<li>2 : as RFC 6901 &ldquo;<abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> Pointer&rdquo; paths
+  (see <a href="../proc/json_get_by_path_rfc6901.html">json_get_by_path_rfc6901</a>)</li>
+<li>3 : JSONPath &ldquo;bracket-notation&rdquo;
+  see <a href="../proc/json_get_by_path_jsonpath_bracket.html">json_get_by_path_jsonpath_bracket</a>)</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-path_separator~2"></span>
+              character(kind=CK, len=1),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>path_separator</strong></td>
+            <td>
+                <p>The <code>path</code> separator to use
+in the &ldquo;default&rdquo; mode for
+the paths in the various
+<code>get_by_path</code> routines.
+Example: <code>.</code> [default] or <code>%</code>.
+Note: if <code>path_mode/=1</code>
+then this is ignored.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-compress_vectors~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>compress_vectors</strong></td>
+            <td>
+                <p>If true, then arrays of integers,
+nulls, doubles, and logicals are
+printed all on one line.
+[Note: <code>no_whitespace</code> will
+override this option if necessary].
+(Default is False).</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-allow_duplicate_keys~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>allow_duplicate_keys</strong></td>
+            <td>
+                <ul>
+<li>If True [default] then no special checks
+  are done to check for duplicate keys.</li>
+<li>If False, then after parsing, if any duplicate
+  keys are found, an error is thrown. A call to
+  <a href="../proc/json_value_validate.html">json_value_validate</a> will also check for
+  duplicates.</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-escape_solidus~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>escape_solidus</strong></td>
+            <td>
+                <ul>
+<li>If True then the solidus &ldquo;<code>/</code>&rdquo; is always escaped
+  &ldquo;<code>\/</code>&rdquo; when serializing <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr></li>
+<li>If False [default], then it is not escaped.</li>
+</ul>
+<p>Note that this option does not affect parsing
+(both escaped and unescaped are still valid in
+all cases).</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-stop_on_error~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>stop_on_error</strong></td>
+            <td>
+                <p>If an exception is raised, then immediately quit.
+(Default is False).</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-null_to_real_mode~2"></span>
+              integer(kind=IK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>null_to_real_mode</strong></td>
+            <td>
+                <p>if <code>strict_type_checking=false</code>:</p>
+<ul>
+<li>1 : an exception will be raised if
+  try to retrieve a <code>null</code> as a real.</li>
+<li>2 : a <code>null</code> retrieved as a real
+  will return a NaN. [default]</li>
+<li>3 : a <code>null</code> retrieved as a real
+  will return 0.0.</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-non_normal_mode~2"></span>
+              integer(kind=IK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>non_normal_mode</strong></td>
+            <td>
+                <p>How to serialize NaN, Infinity, and
+-Infinity real values:</p>
+<ul>
+<li>1 : as strings (e.g., &ldquo;NaN&rdquo;,
+  &ldquo;Infinity&rdquo;, &ldquo;-Infinity&rdquo;) [default]</li>
+<li>2 : as <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> <code>null</code> values</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-use_quiet_nan~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>use_quiet_nan</strong></td>
+            <td>
+                <ul>
+<li>If true [default], <code>null_to_real_mode=2</code>
+  and <a href="../proc/string_to_real.html">string_to_real</a> will use
+  <code>ieee_quiet_nan</code> for NaN values.</li>
+<li>If false,
+  <code>ieee_signaling_nan</code> will be used.</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-strict_integer_type_checking~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>strict_integer_type_checking</strong></td>
+            <td>
+                <ul>
+<li>If false, when parsing <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr>, if an integer numeric value
+  cannot be converted to an integer (<code>integer(IK)</code>),
+  then an attempt is then make to convert it
+  to a real (<code>real(RK)</code>).</li>
+<li>If true, an exception will be raised if the integer
+  value cannot be read.</li>
+</ul>
+<p>(default is true)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-allow_trailing_comma~2"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>allow_trailing_comma</strong></td>
+            <td>
+                <p>Allow a single trailing comma in arrays and objects.
+(default is true)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nullify_pointer"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nullify_pointer</strong></td>
+            <td>
+                <p>if True, then <code>p</code> will be nullified
+if present. (default is True). Normally,
+this should be done, because the <a href="../type/json_file.html">json_file</a> will destroy
+the pointer when the class goes out of scope (causing <code>p</code> to be
+a dangling pointer). However, if the intent is to use <code>p</code> in
+a <a href="../type/json_file.html">json_file</a> and then call <a href="../type/json_file.html#boundprocedure-nullify">nullify</a> and continue
+to use <code>p</code>, then this should be set to False.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-file_object"></span>
+          type(<a href='../type/json_file.html'>json_file</a>)
+        </small>
+      </h3>
+      
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_json_file~~CallsGraph Pages: 1 -->
+<svg id="procinitialize_json_fileCallsGraph" width="641pt" height="66pt"
+ viewBox="0.00 0.00 641.00 66.09" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_json_file~~CallsGraph" class="graph" transform="scale(0.57 0.57) rotate(0) translate(4 112)">
+<title>proc~~initialize_json_file~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 1121,-112 1121,4 -4,4"/>
+<!-- proc~initialize_json_file -->
+<g id="proc~~initialize_json_file~~CallsGraph_node1" class="node">
+<title>proc~initialize_json_file</title>
+<polygon fill="none" stroke="black" points="106,-45 0,-45 0,-21 106,-21 106,-45"/>
+<text text-anchor="middle" x="53" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_json_file</text>
+</g>
+<!-- none~initialize -->
+<g id="proc~~initialize_json_file~~CallsGraph_node2" class="node">
+<title>none~initialize</title>
+<g id="a_proc~~initialize_json_file~~CallsGraph_node2"><a xlink:href="../type/json_file.html#boundprocedure-initialize" xlink:title="json_file%initialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="252,-45 142,-45 142,-21 252,-21 252,-45"/>
+<text text-anchor="middle" x="197" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%initialize</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_json_file&#45;&gt;none~initialize -->
+<g id="proc~~initialize_json_file~~CallsGraph_edge1" class="edge">
+<title>proc~initialize_json_file&#45;&gt;none~initialize</title>
+<path fill="none" stroke="#ff0000" d="M106.07,-33C114.29,-33 122.87,-33 131.33,-33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="131.55,-36.5 141.55,-33 131.55,-29.5 131.55,-36.5"/>
+</g>
+<!-- proc~initialize_json_core_in_file -->
+<g id="proc~~initialize_json_file~~CallsGraph_node3" class="node">
+<title>proc~initialize_json_core_in_file</title>
+<g id="a_proc~~initialize_json_file~~CallsGraph_node3"><a xlink:href="../proc/initialize_json_core_in_file.html" xlink:title="json_file%initialize_json_core_in_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="490,-66 288,-66 288,-42 490,-42 490,-66"/>
+<text text-anchor="middle" x="389" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%initialize_json_core_in_file</text>
+</a>
+</g>
+</g>
+<!-- none~initialize&#45;&gt;proc~initialize_json_core_in_file -->
+<g id="proc~~initialize_json_file~~CallsGraph_edge2" class="edge">
+<title>none~initialize&#45;&gt;proc~initialize_json_core_in_file</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M252.19,-38.99C260.32,-39.89 268.94,-40.84 277.74,-41.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="277.41,-45.3 287.74,-42.92 278.18,-38.34 277.41,-45.3"/>
+</g>
+<!-- proc~set_json_core_in_file -->
+<g id="proc~~initialize_json_file~~CallsGraph_node4" class="node">
+<title>proc~set_json_core_in_file</title>
+<g id="a_proc~~initialize_json_file~~CallsGraph_node4"><a xlink:href="../proc/set_json_core_in_file.html" xlink:title="json_file%set_json_core_in_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="476,-24 302,-24 302,0 476,0 476,-24"/>
+<text text-anchor="middle" x="389" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%set_json_core_in_file</text>
+</a>
+</g>
+</g>
+<!-- none~initialize&#45;&gt;proc~set_json_core_in_file -->
+<g id="proc~~initialize_json_file~~CallsGraph_edge3" class="edge">
+<title>none~initialize&#45;&gt;proc~set_json_core_in_file</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M252.19,-27.01C264.52,-25.65 277.97,-24.16 291.47,-22.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="292.22,-26.11 301.78,-21.53 291.46,-19.15 292.22,-26.11"/>
+</g>
+<!-- proc~json_initialize -->
+<g id="proc~~initialize_json_file~~CallsGraph_node5" class="node">
+<title>proc~json_initialize</title>
+<g id="a_proc~~initialize_json_file~~CallsGraph_node5"><a xlink:href="../proc/json_initialize.html" xlink:title="json_core%json_initialize">
+<polygon fill="#d9534f" stroke="#d9534f" points="670,-66 526,-66 526,-42 670,-42 670,-66"/>
+<text text-anchor="middle" x="598" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_initialize</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_json_core_in_file&#45;&gt;proc~json_initialize -->
+<g id="proc~~initialize_json_file~~CallsGraph_edge4" class="edge">
+<title>proc~initialize_json_core_in_file&#45;&gt;proc~json_initialize</title>
+<path fill="none" stroke="#ff0000" d="M490.17,-54C498.75,-54 507.36,-54 515.77,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="515.91,-57.5 525.91,-54 515.91,-50.5 515.91,-57.5"/>
+</g>
+<!-- none~throw_exception -->
+<g id="proc~~initialize_json_file~~CallsGraph_node6" class="node">
+<title>none~throw_exception</title>
+<g id="a_proc~~initialize_json_file~~CallsGraph_node6"><a xlink:href="../type/json_core.html#boundprocedure-throw_exception" xlink:title="json_core%throw_exception">
+<polygon fill="#a7506f" stroke="#a7506f" points="880,-108 721,-108 721,-84 880,-84 880,-108"/>
+<text text-anchor="middle" x="800.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%throw_exception</text>
+</a>
+</g>
+</g>
+<!-- proc~json_initialize&#45;&gt;none~throw_exception -->
+<g id="proc~~initialize_json_file~~CallsGraph_edge5" class="edge">
+<title>proc~json_initialize&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#ff0000" d="M656.46,-66.04C680.05,-70.98 707.54,-76.74 732.08,-81.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="731.53,-85.34 742.04,-83.96 732.97,-78.49 731.53,-85.34"/>
+</g>
+<!-- proc~integer_to_string -->
+<g id="proc~~initialize_json_file~~CallsGraph_node7" class="node">
+<title>proc~integer_to_string</title>
+<g id="a_proc~~initialize_json_file~~CallsGraph_node7"><a xlink:href="../proc/integer_to_string.html" xlink:title="integer_to_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="851.5,-66 749.5,-66 749.5,-42 851.5,-42 851.5,-66"/>
+<text text-anchor="middle" x="800.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">integer_to_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_initialize&#45;&gt;proc~integer_to_string -->
+<g id="proc~~initialize_json_file~~CallsGraph_edge6" class="edge">
+<title>proc~json_initialize&#45;&gt;proc~integer_to_string</title>
+<path fill="none" stroke="#ff0000" d="M670.25,-54C692.8,-54 717.48,-54 739.18,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="739.25,-57.5 749.24,-54 739.24,-50.5 739.25,-57.5"/>
+</g>
+<!-- proc~json_clear_exceptions -->
+<g id="proc~~initialize_json_file~~CallsGraph_node8" class="node">
+<title>proc~json_clear_exceptions</title>
+<g id="a_proc~~initialize_json_file~~CallsGraph_node8"><a xlink:href="../proc/json_clear_exceptions.html" xlink:title="json_core%json_clear_exceptions">
+<polygon fill="#d9534f" stroke="#d9534f" points="895,-24 706,-24 706,0 895,0 895,-24"/>
+<text text-anchor="middle" x="800.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_clear_exceptions</text>
+</a>
+</g>
+</g>
+<!-- proc~json_initialize&#45;&gt;proc~json_clear_exceptions -->
+<g id="proc~~initialize_json_file~~CallsGraph_edge7" class="edge">
+<title>proc~json_initialize&#45;&gt;proc~json_clear_exceptions</title>
+<path fill="none" stroke="#ff0000" d="M656.46,-41.96C680.05,-37.02 707.54,-31.26 732.08,-26.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="732.97,-29.51 742.04,-24.04 731.53,-22.66 732.97,-29.51"/>
+</g>
+<!-- proc~json_throw_exception -->
+<g id="proc~~initialize_json_file~~CallsGraph_node9" class="node">
+<title>proc~json_throw_exception</title>
+<g id="a_proc~~initialize_json_file~~CallsGraph_node9"><a xlink:href="../proc/json_throw_exception.html" xlink:title="json_core%json_throw_exception">
+<polygon fill="#d9534f" stroke="#d9534f" points="1117,-108 931,-108 931,-84 1117,-84 1117,-108"/>
+<text text-anchor="middle" x="1024" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_throw_exception</text>
+</a>
+</g>
+</g>
+<!-- none~throw_exception&#45;&gt;proc~json_throw_exception -->
+<g id="proc~~initialize_json_file~~CallsGraph_edge8" class="edge">
+<title>none~throw_exception&#45;&gt;proc~json_throw_exception</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M880.22,-96C893.3,-96 907.03,-96 920.59,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="920.92,-99.5 930.92,-96 920.92,-92.5 920.92,-99.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocinitialize_json_fileCallsGraph = svgPanZoom('#procinitialize_json_fileCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~initialize_json_file~~CalledByGraph Pages: 1 -->
+<svg id="procinitialize_json_fileCalledByGraph" width="206pt" height="32pt"
+ viewBox="0.00 0.00 206.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~initialize_json_file~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~initialize_json_file~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 202,-28 202,4 -4,4"/>
+<!-- proc~initialize_json_file -->
+<g id="proc~~initialize_json_file~~CalledByGraph_node1" class="node">
+<title>proc~initialize_json_file</title>
+<polygon fill="none" stroke="black" points="198,-24 92,-24 92,0 198,0 198,-24"/>
+<text text-anchor="middle" x="145" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">initialize_json_file</text>
+</g>
+<!-- interface~json_file -->
+<g id="proc~~initialize_json_file~~CalledByGraph_node2" class="node">
+<title>interface~json_file</title>
+<g id="a_proc~~initialize_json_file~~CalledByGraph_node2"><a xlink:href="../interface/json_file.html" xlink:title="json_file">
+<polygon fill="#a7506f" stroke="#a7506f" points="56,-24 0,-24 0,0 56,0 56,-24"/>
+<text text-anchor="middle" x="28" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file</text>
+</a>
+</g>
+</g>
+<!-- interface~json_file&#45;&gt;proc~initialize_json_file -->
+<g id="proc~~initialize_json_file~~CalledByGraph_edge1" class="edge">
+<title>interface~json_file&#45;&gt;proc~initialize_json_file</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M56.25,-12C63.97,-12 72.71,-12 81.61,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="81.67,-15.5 91.67,-12 81.67,-8.5 81.67,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">function </span><span class="n">initialize_json_file</span><span class="p">(</span><span class="n">p</span><span class="p">,&amp;</span>
+<span class="cp">#include &quot;json_initialize_dummy_arguments.inc&quot;</span>
+<span class="w">                                  </span><span class="p">,</span><span class="w"> </span><span class="n">nullify_pointer</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                  </span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">file_object</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">implicit none</span>
+
+<span class="k">    type</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">file_object</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span><span class="w">  </span><span class="c">!! `json_value` object to cast</span>
+<span class="w">                                            </span><span class="c">!! as a `json_file` object. This</span>
+<span class="w">                                            </span><span class="c">!! will be nullified.</span>
+<span class="cp">#include &quot;json_initialize_arguments.inc&quot;</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nullify_pointer</span><span class="w"> </span><span class="c">!! if True, then `p` will be nullified</span>
+<span class="w">                                                       </span><span class="c">!! if present. (default is True). Normally,</span>
+<span class="w">                                                       </span><span class="c">!! this should be done, because the [[json_file]] will destroy</span>
+<span class="w">                                                       </span><span class="c">!! the pointer when the class goes out of scope (causing `p` to be</span>
+<span class="w">                                                       </span><span class="c">!! a dangling pointer). However, if the intent is to use `p` in</span>
+<span class="w">                                                       </span><span class="c">!! a [[json_file]] and then call [[json_file:nullify]] and continue</span>
+<span class="w">                                                       </span><span class="c">!! to use `p`, then this should be set to False.</span>
+
+<span class="w">    </span><span class="k">call </span><span class="n">file_object</span><span class="p">%</span><span class="n">initialize</span><span class="p">(&amp;</span>
+<span class="cp">#include &quot;json_initialize_dummy_arguments.inc&quot;</span>
+<span class="w">                               </span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">file_object</span><span class="p">%</span><span class="n">p</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">p</span>
+<span class="w">        </span><span class="c">! we have to nullify it to avoid</span>
+<span class="w">        </span><span class="c">! a dangling pointer when the file</span>
+<span class="w">        </span><span class="c">! goes out of scope</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">nullify_pointer</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">nullify_pointer</span><span class="p">)</span><span class="w"> </span><span class="k">nullify</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            nullify</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end if</span>
+
+<span class="k">    end function </span><span class="n">initialize_json_file</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 00:50 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

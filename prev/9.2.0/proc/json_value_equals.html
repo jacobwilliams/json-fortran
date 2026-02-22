@@ -1,0 +1,807 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>json_value_equals &ndash; JSON-Fortran</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>9.2.0</small></a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>json_value_equals
+      <small>Function</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 2.0% of total for procedures.">157 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_value_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_value_module.html'>json_value_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_value_equals</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/json_value_equals.html#src">json_value_equals</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private recursive function json_value_equals(json, p1, p2, verbose) result(equals)  
+</h2>
+    
+
+    <p>Compare two <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> structures for equality.</p>
+<p>This function recursively traverses both structures and checks that they have:
+  * The same variable types
+  * The same values (for primitives)
+  * The same number of children (for objects and arrays)
+  * The same structure (recursively)</p>
+<h3 id="example">Example</h3>
+<div class="codehilite"><pre><span></span><code><span class="w"> </span><span class="k">type</span><span class="p">(</span><span class="n">json_core</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w"> </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span>
+<span class="w"> </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">are_equal</span>
+<span class="w"> </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">load</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;file1.json&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
+<span class="w"> </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">load</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="s1">&#39;file2.json&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="o">=</span><span class="n">p2</span><span class="p">)</span>
+<span class="w"> </span><span class="n">are_equal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">equals</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">)</span>
+<span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">are_equal</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">     write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Files are identical&#39;</span>
+<span class="w"> </span><span class="k">else</span>
+<span class="k">     write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Files differ&#39;</span>
+<span class="w"> </span><span class="k">end if</span>
+</code></pre></div>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/json_core.html'>json_core</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~221"></span>
+              class(<a href='../type/json_core.html'>json_core</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-p1~4"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+<td></td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>p1</strong></td>
+            <td>
+                <p>first <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> structure</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-p2~4"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+<td></td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>p2</strong></td>
+            <td>
+                <p>second <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> structure</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-verbose~7"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>verbose</strong></td>
+            <td>
+                <p>if true, print debug info. [default is false]</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value
+        <small>
+          <span class="anchor" id="variable-equals~2"></span>
+          logical(kind=LK)
+        </small>
+      </h3>
+      <p>true if the structures are equal</p>
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~json_value_equals~~CallsGraph Pages: 1 -->
+<svg id="procjson_value_equalsCallsGraph" width="641pt" height="74pt"
+ viewBox="0.00 0.00 641.00 73.80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_value_equals~~CallsGraph" class="graph" transform="scale(0.54 0.54) rotate(0) translate(4 133)">
+<title>proc~~json_value_equals~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-133 1186,-133 1186,4 -4,4"/>
+<!-- proc~json_value_equals -->
+<g id="proc~~json_value_equals~~CallsGraph_node1" class="node">
+<title>proc~json_value_equals</title>
+<polygon fill="none" stroke="black" points="169,-87 0,-87 0,-63 169,-63 169,-87"/>
+<text text-anchor="middle" x="84.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_core%json_value_equals</text>
+</g>
+<!-- proc~json_value_equals&#45;&gt;proc~json_value_equals -->
+<g id="proc~~json_value_equals~~CallsGraph_edge2" class="edge">
+<title>proc~json_value_equals&#45;&gt;proc~json_value_equals</title>
+<path fill="none" stroke="#ff0000" d="M54.74,-87.01C44.34,-95.97 54.27,-105 84.5,-105 103.4,-105 114.36,-101.47 117.38,-96.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="120.68,-95.45 114.26,-87.01 114.02,-97.61 120.68,-95.45"/>
+</g>
+<!-- none~get_child -->
+<g id="proc~~json_value_equals~~CallsGraph_node2" class="node">
+<title>none~get_child</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node2"><a xlink:href="../type/json_core.html#boundprocedure-get_child" xlink:title="json_core%get_child">
+<polygon fill="#a7506f" stroke="#a7506f" points="326,-87 205,-87 205,-63 326,-63 326,-87"/>
+<text text-anchor="middle" x="265.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%get_child</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_equals&#45;&gt;none~get_child -->
+<g id="proc~~json_value_equals~~CallsGraph_edge1" class="edge">
+<title>proc~json_value_equals&#45;&gt;none~get_child</title>
+<path fill="none" stroke="#ff0000" d="M169.23,-75C177.77,-75 186.38,-75 194.75,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="194.81,-78.5 204.81,-75 194.81,-71.5 194.81,-78.5"/>
+</g>
+<!-- proc~json_value_get_child -->
+<g id="proc~~json_value_equals~~CallsGraph_node3" class="node">
+<title>proc~json_value_get_child</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node3"><a xlink:href="../proc/json_value_get_child.html" xlink:title="json_core%json_value_get_child">
+<polygon fill="#d9534f" stroke="#d9534f" points="571,-129 389,-129 389,-105 571,-105 571,-129"/>
+<text text-anchor="middle" x="480" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_get_child</text>
+</a>
+</g>
+</g>
+<!-- none~get_child&#45;&gt;proc~json_value_get_child -->
+<g id="proc~~json_value_equals~~CallsGraph_edge3" class="edge">
+<title>none~get_child&#45;&gt;proc~json_value_get_child</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M319.46,-87.03C333.29,-90.06 348.18,-93.24 362,-96 374.06,-98.41 386.84,-100.83 399.35,-103.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="398.85,-106.6 409.32,-104.95 400.11,-99.71 398.85,-106.6"/>
+</g>
+<!-- proc~json_value_get_child_by_index -->
+<g id="proc~~json_value_equals~~CallsGraph_node4" class="node">
+<title>proc~json_value_get_child_by_index</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node4"><a xlink:href="../proc/json_value_get_child_by_index.html" xlink:title="json_core%json_value_get_child_by_index">
+<polygon fill="#d9534f" stroke="#d9534f" points="597,-87 363,-87 363,-63 597,-63 597,-87"/>
+<text text-anchor="middle" x="480" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_get_child_by_index</text>
+</a>
+</g>
+</g>
+<!-- none~get_child&#45;&gt;proc~json_value_get_child_by_index -->
+<g id="proc~~json_value_equals~~CallsGraph_edge4" class="edge">
+<title>none~get_child&#45;&gt;proc~json_value_get_child_by_index</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M326.26,-75C334.73,-75 343.7,-75 352.87,-75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="352.89,-78.5 362.89,-75 352.89,-71.5 352.89,-78.5"/>
+</g>
+<!-- proc~json_value_get_child_by_name -->
+<g id="proc~~json_value_equals~~CallsGraph_node5" class="node">
+<title>proc~json_value_get_child_by_name</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node5"><a xlink:href="../proc/json_value_get_child_by_name.html" xlink:title="json_core%json_value_get_child_by_name">
+<polygon fill="#d9534f" stroke="#d9534f" points="598,-45 362,-45 362,-21 598,-21 598,-45"/>
+<text text-anchor="middle" x="480" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_get_child_by_name</text>
+</a>
+</g>
+</g>
+<!-- none~get_child&#45;&gt;proc~json_value_get_child_by_name -->
+<g id="proc~~json_value_equals~~CallsGraph_edge5" class="edge">
+<title>none~get_child&#45;&gt;proc~json_value_get_child_by_name</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M319.46,-62.97C333.29,-59.94 348.18,-56.76 362,-54 374.06,-51.59 386.84,-49.17 399.35,-46.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="400.11,-50.29 409.32,-45.05 398.85,-43.4 400.11,-50.29"/>
+</g>
+<!-- none~throw_exception -->
+<g id="proc~~json_value_equals~~CallsGraph_node6" class="node">
+<title>none~throw_exception</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node6"><a xlink:href="../type/json_core.html#boundprocedure-throw_exception" xlink:title="json_core%throw_exception">
+<polygon fill="#a7506f" stroke="#a7506f" points="808,-108 649,-108 649,-84 808,-84 808,-108"/>
+<text text-anchor="middle" x="728.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%throw_exception</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_get_child&#45;&gt;none~throw_exception -->
+<g id="proc~~json_value_equals~~CallsGraph_edge6" class="edge">
+<title>proc~json_value_get_child&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#ff0000" d="M571.04,-109.33C593.1,-107.45 616.7,-105.44 638.71,-103.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="639.03,-107.05 648.69,-102.71 638.43,-100.08 639.03,-107.05"/>
+</g>
+<!-- proc~json_value_get_child_by_index&#45;&gt;none~throw_exception -->
+<g id="proc~~json_value_equals~~CallsGraph_edge7" class="edge">
+<title>proc~json_value_get_child_by_index&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#00ff00" d="M597.03,-84.89C610.96,-86.07 625.02,-87.27 638.48,-88.42"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="638.39,-91.92 648.65,-89.28 638.98,-84.95 638.39,-91.92"/>
+</g>
+<!-- proc~json_clear_exceptions -->
+<g id="proc~~json_value_equals~~CallsGraph_node7" class="node">
+<title>proc~json_clear_exceptions</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node7"><a xlink:href="../proc/json_clear_exceptions.html" xlink:title="json_core%json_clear_exceptions">
+<polygon fill="#d9534f" stroke="#d9534f" points="823,-66 634,-66 634,-42 823,-42 823,-66"/>
+<text text-anchor="middle" x="728.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_clear_exceptions</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_get_child_by_index&#45;&gt;proc~json_clear_exceptions -->
+<g id="proc~~json_value_equals~~CallsGraph_edge8" class="edge">
+<title>proc~json_value_get_child_by_index&#45;&gt;proc~json_clear_exceptions</title>
+<path fill="none" stroke="#00ff00" d="M597.03,-65.11C606.01,-64.35 615.05,-63.58 623.94,-62.82"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="624.24,-66.31 633.91,-61.97 623.65,-59.33 624.24,-66.31"/>
+</g>
+<!-- proc~json_value_get_child_by_name&#45;&gt;none~throw_exception -->
+<g id="proc~~json_value_equals~~CallsGraph_edge9" class="edge">
+<title>proc~json_value_get_child_by_name&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#0000ff" d="M567.86,-45.06C578.16,-47.52 588.41,-50.47 598,-54 615.38,-60.4 616.76,-68.22 634,-75 639.79,-77.28 645.89,-79.34 652.07,-81.19"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="651.27,-84.6 661.84,-83.95 653.17,-77.87 651.27,-84.6"/>
+</g>
+<!-- proc~json_value_get_child_by_name&#45;&gt;proc~json_clear_exceptions -->
+<g id="proc~~json_value_equals~~CallsGraph_edge10" class="edge">
+<title>proc~json_value_get_child_by_name&#45;&gt;proc~json_clear_exceptions</title>
+<path fill="none" stroke="#0000ff" d="M598.11,-42.98C606.59,-43.7 615.11,-44.43 623.5,-45.14"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="623.41,-48.64 633.67,-46.01 624,-41.67 623.41,-48.64"/>
+</g>
+<!-- proc~name_equal -->
+<g id="proc~~json_value_equals~~CallsGraph_node8" class="node">
+<title>proc~name_equal</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node8"><a xlink:href="../proc/name_equal.html" xlink:title="json_core%name_equal">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="798,-24 659,-24 659,0 798,0 798,-24"/>
+<text text-anchor="middle" x="728.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%name_equal</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_get_child_by_name&#45;&gt;proc~name_equal -->
+<g id="proc~~json_value_equals~~CallsGraph_edge11" class="edge">
+<title>proc~json_value_get_child_by_name&#45;&gt;proc~name_equal</title>
+<path fill="none" stroke="#0000ff" d="M598.11,-23.02C615.13,-21.57 632.3,-20.11 648.33,-18.74"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="649.02,-22.2 658.69,-17.86 648.43,-15.22 649.02,-22.2"/>
+</g>
+<!-- proc~json_throw_exception -->
+<g id="proc~~json_value_equals~~CallsGraph_node9" class="node">
+<title>proc~json_throw_exception</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node9"><a xlink:href="../proc/json_throw_exception.html" xlink:title="json_core%json_throw_exception">
+<polygon fill="#d9534f" stroke="#d9534f" points="1045,-108 859,-108 859,-84 1045,-84 1045,-108"/>
+<text text-anchor="middle" x="952" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_throw_exception</text>
+</a>
+</g>
+</g>
+<!-- none~throw_exception&#45;&gt;proc~json_throw_exception -->
+<g id="proc~~json_value_equals~~CallsGraph_edge12" class="edge">
+<title>none~throw_exception&#45;&gt;proc~json_throw_exception</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M808.22,-96C821.3,-96 835.03,-96 848.59,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="848.92,-99.5 858.92,-96 848.92,-92.5 848.92,-99.5"/>
+</g>
+<!-- proc~name_strings_equal -->
+<g id="proc~~json_value_equals~~CallsGraph_node10" class="node">
+<title>proc~name_strings_equal</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node10"><a xlink:href="../proc/name_strings_equal.html" xlink:title="json_core%name_strings_equal">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1041.5,-24 862.5,-24 862.5,0 1041.5,0 1041.5,-24"/>
+<text text-anchor="middle" x="952" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%name_strings_equal</text>
+</a>
+</g>
+</g>
+<!-- proc~name_equal&#45;&gt;proc~name_strings_equal -->
+<g id="proc~~json_value_equals~~CallsGraph_edge13" class="edge">
+<title>proc~name_equal&#45;&gt;proc~name_strings_equal</title>
+<path fill="none" stroke="#0000ff" d="M798.07,-12C815.22,-12 833.96,-12 852.26,-12"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="852.36,-15.5 862.36,-12 852.36,-8.5 852.36,-15.5"/>
+</g>
+<!-- proc~lowercase_string -->
+<g id="proc~~json_value_equals~~CallsGraph_node11" class="node">
+<title>proc~lowercase_string</title>
+<g id="a_proc~~json_value_equals~~CallsGraph_node11"><a xlink:href="../proc/lowercase_string.html" xlink:title="lowercase_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1182,-24 1081,-24 1081,0 1182,0 1182,-24"/>
+<text text-anchor="middle" x="1131.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">lowercase_string</text>
+</a>
+</g>
+</g>
+<!-- proc~name_strings_equal&#45;&gt;proc~lowercase_string -->
+<g id="proc~~json_value_equals~~CallsGraph_edge14" class="edge">
+<title>proc~name_strings_equal&#45;&gt;proc~lowercase_string</title>
+<path fill="none" stroke="#00ffff" d="M1041.75,-12C1051.45,-12 1061.15,-12 1070.38,-12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1070.58,-15.5 1080.58,-12 1070.58,-8.5 1070.58,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocjson_value_equalsCallsGraph = svgPanZoom('#procjson_value_equalsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">recursive function </span><span class="n">json_value_equals</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">verbose</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">equals</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">implicit none</span>
+
+<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">   </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w">         </span><span class="kd">::</span><span class="w"> </span><span class="n">p1</span><span class="w">      </span><span class="c">!! first JSON structure</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w">         </span><span class="kd">::</span><span class="w"> </span><span class="n">p2</span><span class="w">      </span><span class="c">!! second JSON structure</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w">                      </span><span class="kd">::</span><span class="w"> </span><span class="n">equals</span><span class="w">  </span><span class="c">!! true if the structures are equal</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">verbose</span><span class="w"> </span><span class="c">!! if true, print debug info. [default is false]</span>
+
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n1</span><span class="p">,</span><span class="w"> </span><span class="n">n2</span><span class="w">  </span><span class="c">!! number of children</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">child1</span><span class="p">,</span><span class="w"> </span><span class="n">child2</span><span class="w">  </span><span class="c">!! for iterating children</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">child_found</span><span class="w">  </span><span class="c">!! for get_child calls</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">debug</span><span class="w">  </span><span class="c">!! if `verbose` is set</span>
+
+<span class="w">    </span><span class="c">! Initialize</span>
+<span class="w">    </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">verbose</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">verbose</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="k">        </span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">    </span><span class="k">end if</span>
+
+<span class="w">    </span><span class="c">! Check if both are null</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">p2</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="k">return</span>
+<span class="k">    end if</span>
+
+<span class="w">    </span><span class="c">! Check if only one is null</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">p2</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;One pointer is null, the other is not&#39;</span>
+<span class="w">        </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">return</span>
+<span class="k">    end if</span>
+
+<span class="w">    </span><span class="c">! Check if variable types match</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">var_type</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">var_type</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,I0,A,I0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Type mismatch: p1%var_type=&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">            </span><span class="n">p1</span><span class="p">%</span><span class="n">var_type</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;, p2%var_type=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">var_type</span>
+<span class="w">        </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">return</span>
+<span class="k">    end if</span>
+
+<span class="w">    </span><span class="c">! Compare based on type</span>
+<span class="w">    </span><span class="k">select case</span><span class="w"> </span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">var_type</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">json_null</span><span class="p">)</span>
+<span class="w">        </span><span class="c">! Both are null, already validated by type check</span>
+<span class="w">        </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">json_logical</span><span class="p">)</span>
+<span class="w">        </span><span class="c">! Compare logical values</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">log_value</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p2</span><span class="p">%</span><span class="n">log_value</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">log_value</span><span class="w"> </span><span class="p">.</span><span class="n">eqv</span><span class="p">.</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">log_value</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">equals</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Logical values differ&#39;</span>
+<span class="w">                </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,L1)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;  p1: &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">p1</span><span class="p">%</span><span class="n">log_value</span>
+<span class="w">                </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,L1)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;  p2: &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">log_value</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">log_value</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p2</span><span class="p">%</span><span class="n">log_value</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Logical allocation mismatch&#39;</span>
+<span class="w">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    case</span><span class="w"> </span><span class="p">(</span><span class="n">json_integer</span><span class="p">)</span>
+<span class="w">        </span><span class="c">! Compare integer values</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">int_value</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p2</span><span class="p">%</span><span class="n">int_value</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">int_value</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">int_value</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">equals</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Integer values differ&#39;</span>
+<span class="w">                </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,I0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;  p1: &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">p1</span><span class="p">%</span><span class="n">int_value</span>
+<span class="w">                </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,I0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;  p2: &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">int_value</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">int_value</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p2</span><span class="p">%</span><span class="n">int_value</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Integer allocation mismatch&#39;</span>
+<span class="w">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    case</span><span class="w"> </span><span class="p">(</span><span class="n">json_real</span><span class="p">)</span>
+<span class="w">        </span><span class="c">! Compare real values with tolerance</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">dbl_value</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p2</span><span class="p">%</span><span class="n">dbl_value</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            associate</span><span class="w"> </span><span class="p">(</span><span class="n">r1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">p1</span><span class="p">%</span><span class="n">dbl_value</span><span class="p">,</span><span class="w"> </span><span class="n">r2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">dbl_value</span><span class="p">)</span>
+<span class="w">                </span><span class="c">! Handle special cases: NaN, Inf, -Inf</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ieee_is_nan</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">ieee_is_nan</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">                </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">ieee_is_nan</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">ieee_is_nan</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;One value is NaN, the other is not&#39;</span>
+<span class="w">                    </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">                </span><span class="k">else if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">ieee_is_finite</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">ieee_is_finite</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                    </span><span class="c">! Both infinite - check if same sign</span>
+<span class="w">                    </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">r1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">r2</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">equals</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Both values are infinite but have different signs&#39;</span>
+<span class="w">                </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">ieee_is_finite</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">ieee_is_finite</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                    </span><span class="c">! Both finite:</span>
+<span class="w">                    </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">r2</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">equals</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                        write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Real values differ&#39;</span>
+<span class="w">                        </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,F24.16)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;  p1: &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">r1</span>
+<span class="w">                        </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,F24.16)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;  p2: &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">r2</span>
+<span class="w">                    </span><span class="k">end if</span>
+<span class="k">                else</span>
+<span class="k">                    if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;One value is finite, the other is not&#39;</span>
+<span class="w">                    </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end associate</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">dbl_value</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p2</span><span class="p">%</span><span class="n">dbl_value</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Real allocation mismatch&#39;</span>
+<span class="w">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    case</span><span class="w"> </span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
+<span class="w">        </span><span class="c">! Compare string values</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">str_value</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p2</span><span class="p">%</span><span class="n">str_value</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">str_value</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">str_value</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">equals</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;String values differ&#39;</span>
+<span class="w">                </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,A,A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;  p1: &quot;&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">p1</span><span class="p">%</span><span class="n">str_value</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&quot;&#39;</span>
+<span class="w">                </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,A,A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;  p2: &quot;&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">str_value</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&quot;&#39;</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p1</span><span class="p">%</span><span class="n">str_value</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">p2</span><span class="p">%</span><span class="n">str_value</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;String allocation mismatch&#39;</span>
+<span class="w">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    case</span><span class="w"> </span><span class="p">(</span><span class="n">json_array</span><span class="p">)</span>
+<span class="w">        </span><span class="c">! Compare arrays: must have same number of elements in same order</span>
+<span class="w">        </span><span class="n">n1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="nb">count</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">n2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="nb">count</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n1</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">n2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,I0,A,I0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Array size mismatch: n1=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;, n2=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n2</span>
+<span class="w">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! Compare each element</span>
+<span class="w">        </span><span class="n">child1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">p1</span><span class="p">%</span><span class="n">children</span>
+<span class="w">        </span><span class="n">child2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">p2</span><span class="p">%</span><span class="n">children</span>
+
+<span class="w">        </span><span class="k">do while</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">child1</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">child2</span><span class="p">))</span>
+<span class="w">            </span><span class="c">! Recursively compare children</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">equals</span><span class="p">(</span><span class="n">child1</span><span class="p">,</span><span class="w"> </span><span class="n">child2</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Array element mismatch&#39;</span>
+<span class="w">                </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            end if</span>
+<span class="k">            </span><span class="n">child1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">child1</span><span class="p">%</span><span class="n">next</span>
+<span class="w">            </span><span class="n">child2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">child2</span><span class="p">%</span><span class="n">next</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="w">        </span><span class="c">! If we got here, all elements matched</span>
+<span class="w">        </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">json_object</span><span class="p">)</span>
+<span class="w">        </span><span class="c">! Compare objects: must have same keys with same values</span>
+<span class="w">        </span><span class="n">n1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="nb">count</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">n2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="nb">count</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n1</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">n2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,I0,A,I0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Object size mismatch: n1=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;, n2=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n2</span>
+<span class="w">            </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! For each child in p1, find matching child in p2 by name</span>
+<span class="w">        </span><span class="n">child1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">p1</span><span class="p">%</span><span class="n">children</span>
+
+<span class="w">        </span><span class="k">do while</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">child1</span><span class="p">))</span>
+<span class="w">            </span><span class="c">! Look for child with same name in p2</span>
+<span class="w">            </span><span class="k">nullify</span><span class="p">(</span><span class="n">child2</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">child1</span><span class="p">%</span><span class="n">name</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">json</span><span class="p">%</span><span class="n">get_child</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">child1</span><span class="p">%</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">child2</span><span class="p">,</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                    </span><span class="c">! Key not found in p2</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,A,A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Key not found in p2: &quot;&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">child1</span><span class="p">%</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&quot;&#39;</span>
+<span class="w">                    </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">                    </span><span class="k">return</span>
+<span class="k">                end if</span>
+
+<span class="w">                </span><span class="c">! Recursively compare values</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">equals</span><span class="p">(</span><span class="n">child1</span><span class="p">,</span><span class="w"> </span><span class="n">child2</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A,A,A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Value mismatch for key: &quot;&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">child1</span><span class="p">%</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&quot;&#39;</span>
+<span class="w">                    </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">                    </span><span class="k">return</span>
+<span class="k">                end if</span>
+<span class="k">            end if</span>
+
+<span class="k">            </span><span class="n">child1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">child1</span><span class="p">%</span><span class="n">next</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="w">        </span><span class="c">! If we got here, all keys and values matched</span>
+<span class="w">        </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+
+<span class="w">    </span><span class="k">case </span><span class="n">default</span>
+<span class="w">        </span><span class="c">! Unknown type</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="k">write</span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Unknown variable type encountered&#39;</span>
+<span class="w">        </span><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">    </span><span class="k">end select</span>
+
+<span class="k">    end function </span><span class="n">json_value_equals</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-01-05 20:15 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

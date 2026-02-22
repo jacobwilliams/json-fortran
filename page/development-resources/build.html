@@ -1,0 +1,559 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>build.sh &ndash; JSON-Fortran</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../../css/brands.min.css" rel="stylesheet">
+    <link href="../../css/regular.min.css" rel="stylesheet">
+    <link href="../../css/solid.min.css" rel="stylesheet">
+    <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../../css/local.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../../index.html">JSON-Fortran </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../index.html">Other Docs</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>build.sh</h1>
+    <div class="container p-2 mb-4 bg-light border rounded-3">
+      <div class="row align-items-center justify-content-between">
+        <div class="col">
+          <ul class="list-inline" style="margin-bottom:0px; display:inline">
+          </ul>
+        </div>
+        <div class="col">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../index.html'>Other Docs</a></li>
+                <li class="breadcrumb-item"><a href='index.html'>Development Resources</a></li>
+              <li class="breadcrumb-item active" aria-current="page">build.sh</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+      <div class="col-3">
+        <div class="card card-body bg-light" id="sidebar-toc">
+          <ul class="nav flex-column align-items">
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html">Other Docs</a>
+            </li>
+          </ul>
+          <hr>
+          <nav class="nav nav-pills flex-column">
+              <a class="nav-link" href="../README.html">Github README</a>
+              <a class="nav-link" href="index.html">Development Resources</a>
+                <nav class="nav nav-pills flex-column">
+                                <a class="nav-link" href="CI.html">CI.yml</a>
+              <a class="nav-link" href="CONTRIBUTING.html">Contributing Guidelines</a>
+              <a class="nav-link" href="LICENSE.html">JSON-Fortran License</a>
+              <a class="nav-link active disabled" href="build.html">build.sh</a>
+              <a class="nav-link" href="codecov.html">codecov.yml</a>
+              <a class="nav-link" href="gccr.html">gccr.pl</a>
+              <a class="nav-link" href="json_module.F90.html">Coverage Analysis</a>
+              <a class="nav-link" href="release-checklist.html">Release Checklist</a>
+
+                </nav>
+              <a class="nav-link" href="../releases/index.html">Official Releases</a>
+          </nav>
+        </div>
+      </div>
+
+    <div class="col-9" id='text'>
+      <p>Below is the build script used to build <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr>-Fortran using
+<a href="https://github.com/szaghi/FoBiS">FoBiS.py</a>.</p>
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+
+<span class="c1">#</span>
+<span class="c1">#  NAME</span>
+<span class="c1">#    build.sh</span>
+<span class="c1">#</span>
+<span class="c1">#  DESCRIPTION</span>
+<span class="c1">#    Build the JSON-Fortran library and unit tests.</span>
+<span class="c1">#</span>
+<span class="c1">#  USAGE</span>
+<span class="c1">#    build.sh [--compiler {intel|gnu|&lt;other&gt;}] [--cflags &#39;&lt;custom compiler flags here&gt;&#39;]</span>
+<span class="c1">#             [--coverage [{yes|no}]] [--profile [{yes|no}]] [--skip-tests [{yes|no}]]</span>
+<span class="c1">#             [--skip-documentation [{yes|no}]] [--enable-unicode [{yes|no}]] [--help]</span>
+<span class="c1">#             [--clean] [--real-kind [{REAL32\REAL64\REAL128}]]</span>
+<span class="c1">#             [--int-kind [{INT8\INT16\INT32\INT64}]]</span>
+<span class="c1">#</span>
+<span class="c1">#    By default, if invoked without any flags, this build script will build the</span>
+<span class="c1">#    JSON-Fortran library using gfortran,</span>
+<span class="c1">#        without :</span>
+<span class="c1">#            unicode support</span>
+<span class="c1">#            coverage flags</span>
+<span class="c1">#            profiling flags</span>
+<span class="c1">#        with :</span>
+<span class="c1">#            unit tests enabled</span>
+<span class="c1">#            documentation (if FORD is installed)</span>
+<span class="c1">#            real(REAL64) kinds</span>
+<span class="c1">#            integer(INT32) kinds</span>
+<span class="c1">#</span>
+<span class="c1">#     More recent (right-most) flags will override preceding flags</span>
+<span class="c1">#     flags:</span>
+<span class="c1">#        --compiler : gnu or gfortran for gfortran, intel or ifort for intel compiler</span>
+<span class="c1">#                     A custom compiler may also be specified here, e.g. ftn</span>
+<span class="c1">#</span>
+<span class="c1">#        --cflags : Enter any additional/custom compiler flags here and make sure they are</span>
+<span class="c1">#                   properly quoted</span>
+<span class="c1">#</span>
+<span class="c1">#        --help : Print a usage message and exit.</span>
+<span class="c1">#</span>
+<span class="c1">#        --clean : Delete generated files and clean up after builds</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#        The following flags all (optionally) accept an argument, &quot;yes&quot; or &quot;no.&quot; If</span>
+<span class="c1">#        no argument is passed, &quot;yes&quot; will be assumed.</span>
+<span class="c1">#</span>
+<span class="c1">#        --enable-unicode [{yes|no}]: Request that the JSON-Fortran be built with (or</span>
+<span class="c1">#                                     without) unicode/UCS4 support. If your compiler</span>
+<span class="c1">#                                     does NOT support ISO 10646/UCS4 and it was</span>
+<span class="c1">#                                     requested, then a warning is printed and the</span>
+<span class="c1">#                                     library is built without UCS4 support.</span>
+<span class="c1">#</span>
+<span class="c1">#        --coverage [{yes|no}]: Compile the library and tests with code coverage enabled</span>
+<span class="c1">#                               or disabled.</span>
+<span class="c1">#</span>
+<span class="c1">#        --profile [{yes|no}]: Compile the library and tests with code profiling enabled</span>
+<span class="c1">#                              or disabled</span>
+<span class="c1">#</span>
+<span class="c1">#        --skip-tests [{yes|no}]: Skip (or don&#39;t skip) building and running the json-</span>
+<span class="c1">#                                 fortran unit tests</span>
+<span class="c1">#</span>
+<span class="c1">#        --skip-documentation [{yes|no}]: Skip (or don&#39;t skip) building the json-</span>
+<span class="c1">#                                         fortran documentation using FORD</span>
+<span class="c1">#</span>
+<span class="c1">#  REQUIRES</span>
+<span class="c1">#    FoBiS.py : https://github.com/szaghi/FoBiS                    [version 1.2.5 or later required]</span>
+<span class="c1">#    FORD     : https://github.com/Fortran-FOSS-Programmers/ford   [version 4.0.0 or later]</span>
+<span class="c1">#</span>
+<span class="c1">#  AUTHOR</span>
+<span class="c1">#    Jacob Williams : 12/27/2014</span>
+<span class="c1">#</span>
+
+<span class="c1">#set -x</span>
+<span class="c1">#set -v</span>
+<span class="nb">set</span><span class="w"> </span>-o<span class="w"> </span>errexit
+
+<span class="nv">FORDMD</span><span class="o">=</span><span class="s1">&#39;json-fortran.md&#39;</span><span class="w">        </span><span class="c1"># FORD options file for building documentation</span>
+<span class="nv">DOCDIR</span><span class="o">=</span><span class="s1">&#39;./doc/&#39;</span><span class="w">                 </span><span class="c1"># build directory for documentation</span>
+<span class="nv">PAGESDIR</span><span class="o">=</span><span class="s1">&#39;./pages/&#39;</span><span class="w">             </span><span class="c1"># Directory for FORD &quot;pages&quot;</span>
+<span class="nv">SRCDIR</span><span class="o">=</span><span class="s1">&#39;./src/&#39;</span><span class="w">                 </span><span class="c1"># library source directory</span>
+<span class="nv">TESTDIR</span><span class="o">=</span><span class="s1">&#39;./src/tests/&#39;</span><span class="w">          </span><span class="c1"># unit test source directory</span>
+<span class="nv">INTROSPECDIR</span><span class="o">=</span><span class="s1">&#39;./src/tests/introspection/&#39;</span><span class="w"> </span><span class="c1"># pre compile configuration tests directory</span>
+<span class="nv">UCS4TESTCODE</span><span class="o">=</span><span class="s1">&#39;test_iso_10646_support.f90&#39;</span>
+<span class="nv">BINDIR</span><span class="o">=</span><span class="s1">&#39;./bin/&#39;</span><span class="w">                 </span><span class="c1"># build directory for unit tests</span>
+<span class="nv">LIBDIR</span><span class="o">=</span><span class="s1">&#39;./lib/&#39;</span><span class="w">                 </span><span class="c1"># build directory for library</span>
+<span class="nv">MODCODE</span><span class="o">=</span><span class="s1">&#39;json_module.F90&#39;</span><span class="w">       </span><span class="c1"># json module file name</span>
+<span class="nv">LIBOUT</span><span class="o">=</span><span class="s1">&#39;libjsonfortran.a&#39;</span><span class="w">       </span><span class="c1"># name of json library</span>
+<span class="nv">FPP</span><span class="o">=</span><span class="s2">&quot;gfortran -E&quot;</span><span class="w">               </span><span class="c1"># default to gfortran -E pre-processing</span>
+
+<span class="c1"># The following warning might be triggered by ifort unless explicitly silenced:</span>
+<span class="c1"># warning #7601: F2008 standard does not allow an internal procedure to be an actual argument procedure name. (R1214.4).</span>
+<span class="c1"># In the context of F2008 this is an erroneous warning.</span>
+<span class="c1"># See https://prd1idz.cps.intel.com/en-us/forums/topic/486629</span>
+<span class="nv">INTELCOMPILERFLAGS</span><span class="o">=</span><span class="s1">&#39;-c -O2 -warn -stand f08 -diag-disable 7601 -diag-disable 4013 -diag-disable 5142 -traceback&#39;</span>
+<span class="c1">#INTELCOMPILERFLAGS=&#39;-c -O2 -warn -traceback -stand f08 -assume protect_parens -assume buffered_io -check all&#39;</span>
+
+<span class="nv">GNUCOMPILERFLAGS</span><span class="o">=</span><span class="s1">&#39;-c -O2 -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008 -fno-omit-frame-pointer&#39;</span>
+
+<span class="nv">FCOMPILER</span><span class="o">=</span><span class="s1">&#39;gnu&#39;</span><span class="w"> </span><span class="c1">#Set default compiler to gfortran</span>
+
+
+<span class="c1"># command line argument parsing</span>
+<span class="c1"># N.B.: Arguments appearing later in the list take precidence over those appearing earlier.</span>
+<span class="c1">#       e.g., &quot;./build.sh --compiler intel --coverage no --compiler gnu --coverage&quot; will</span>
+<span class="c1">#       perform the build with the GFORTRAN compiler, and coverage analysis</span>
+
+<span class="nv">script_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>basename<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># usage message</span>
+print_usage<span class="w"> </span><span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;\n\nUsage:\n&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">script_name</span><span class="si">}</span><span class="s2"> [--compiler {intel|gnu|&lt;other&gt;}] [--cflags &#39;&lt;custom compiler flags here&gt;&#39;]\n\</span>
+<span class="s2">         [--coverage [{yes|no}]] [--profile [{yes|no}]] [--skip-tests [{yes|no}]]\n\</span>
+<span class="s2">         [--skip-documentation [{yes|no}]] [--enable-unicode [{yes|no}]] [--help]&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;Any flags that take an optional yes or no argument will default to &#39;yes&#39; when no\n\</span>
+<span class="s2">argument is passed. Additionally, A custom compiler may be passed to the &#39;compiler&#39;\n\</span>
+<span class="s2">flag, but appropriate &#39;cflags&#39; should also be passed to the script.\n\n&quot;</span>
+<span class="o">}</span>
+
+
+<span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$#</span><span class="s2">&quot;</span><span class="w"> </span>-ge<span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="c1"># Get command line arguments while there are more left to process</span>
+
+<span class="w">    </span><span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="c1"># Command line args are key-value pairs or value-less keys</span>
+
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nv">$key</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="c1">#find known keys</span>
+<span class="w">    </span>--compiler<span class="o">)</span><span class="w"> </span><span class="c1">#pick the compiler. Defaults to gfortran, but intel or custom compilers can be used</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
+<span class="w">        </span>intel<span class="p">|</span>Intel<span class="p">|</span>INTEL<span class="p">|</span>ifort<span class="o">)</span>
+<span class="w">            </span><span class="nv">FCOMPILER</span><span class="o">=</span><span class="s1">&#39;Intel&#39;</span>
+<span class="w">            </span><span class="nv">FCOMPILERFLAGS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$INTELCOMPILERFLAGS</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nv">FPP</span><span class="o">=</span><span class="s2">&quot;fpp&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>gnu<span class="p">|</span>Gnu<span class="p">|</span>GNU<span class="p">|</span>gfortran<span class="p">|</span>Gfortran<span class="p">|</span>GFortran<span class="p">|</span>GFORTRAN<span class="o">)</span>
+<span class="w">            </span><span class="nv">FCOMPILER</span><span class="o">=</span><span class="s1">&#39;gnu&#39;</span>
+<span class="w">            </span><span class="nv">FCOMPILERFLAGS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$GNUCOMPILERFLAGS</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nv">FPP</span><span class="o">=</span><span class="s2">&quot;gfortran -E&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>*<span class="o">)</span>
+<span class="w">            </span><span class="nv">FCOMPILER</span><span class="o">=</span><span class="s2">&quot;custom&quot;</span>
+<span class="w">            </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Warning: Trying to build with unsupported compiler, </span><span class="nv">$2</span><span class="s2">.&quot;</span><span class="w"> </span><span class="m">1</span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">            </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Please ensure you set appropriate --cflags and (single) quote them&quot;</span><span class="w"> </span><span class="m">1</span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<span class="w">            </span><span class="nv">FC</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nv">FPP</span><span class="o">=</span><span class="s2">&quot;gfortran -E&quot;</span><span class="w"> </span><span class="c1"># try gfortran to preprocess as a default</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span><span class="k">esac</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--cflags<span class="o">)</span>
+<span class="w">        </span><span class="nv">FCOMPILERFLAGS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="c1"># no good way to check that the user didn&#39;t do something questionable</span>
+<span class="w">        </span><span class="nb">shift</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--real-kind<span class="o">)</span>
+<span class="w">        </span><span class="nv">REAL_KIND</span><span class="o">=</span><span class="s2">&quot;-D</span><span class="nv">$2</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="c1"># warning: not checking for valid input</span>
+<span class="w">        </span><span class="c1"># should be one of: REAL32, REAL64 [default], REAL128</span>
+<span class="w">        </span><span class="nb">shift</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--int-kind<span class="o">)</span>
+<span class="w">        </span><span class="nv">INT_KIND</span><span class="o">=</span><span class="s2">&quot;-D</span><span class="nv">$2</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="c1"># warning: not checking for valid input</span>
+<span class="w">        </span><span class="c1"># should be one of: INT8, INT16, INT32 [default], INT64</span>
+<span class="w">        </span><span class="nb">shift</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--enable-unicode<span class="o">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nv">$2</span><span class="w"> </span><span class="k">in</span>
+<span class="w">        </span>yes<span class="p">|</span>Yes<span class="p">|</span>YES<span class="o">)</span>
+<span class="w">            </span><span class="nv">TRY_UNICODE</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>no<span class="p">|</span>No<span class="p">|</span>NO<span class="o">)</span>
+<span class="w">            </span><span class="nv">TRY_UNICODE</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>*<span class="o">)</span>
+<span class="w">            </span><span class="nv">TRY_UNICODE</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="c1"># don&#39;t shift; $2 is next arg</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span><span class="k">esac</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--coverage<span class="o">)</span><span class="w"> </span><span class="c1"># enable coverage</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nv">$2</span><span class="w"> </span><span class="k">in</span>
+<span class="w">        </span>yes<span class="p">|</span>Yes<span class="p">|</span>YES<span class="o">)</span>
+<span class="w">            </span><span class="nv">CODE_COVERAGE</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>no<span class="p">|</span>No<span class="p">|</span>NO<span class="o">)</span>
+<span class="w">            </span><span class="nv">CODE_COVERAGE</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>*<span class="o">)</span>
+<span class="w">            </span><span class="nv">CODE_COVERAGE</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="c1"># don&#39;t shift because $2 is some other flag</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span><span class="k">esac</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--profile<span class="o">)</span><span class="w"> </span><span class="c1">#enable profiling</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nv">$2</span><span class="w"> </span><span class="k">in</span>
+<span class="w">        </span>yes<span class="p">|</span>Yes<span class="p">|</span>YES<span class="o">)</span>
+<span class="w">            </span><span class="nv">CODE_PROFILE</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>no<span class="p">|</span>No<span class="p">|</span>NO<span class="o">)</span>
+<span class="w">            </span><span class="nv">CODE_PROFILE</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>*<span class="o">)</span>
+<span class="w">            </span><span class="nv">CODE_PROFILE</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="c1"># don&#39;t shift because $2 is some other flag</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span><span class="k">esac</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--skip-tests<span class="o">)</span><span class="w"> </span><span class="c1"># skip tests</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nv">$2</span><span class="w"> </span><span class="k">in</span>
+<span class="w">        </span>yes<span class="p">|</span>Yes<span class="p">|</span>YES<span class="o">)</span>
+<span class="w">            </span><span class="nv">JF_SKIP_TESTS</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>no<span class="p">|</span>No<span class="p">|</span>NO<span class="o">)</span>
+<span class="w">            </span><span class="nv">JF_SKIP_TESTS</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>*<span class="o">)</span>
+<span class="w">            </span><span class="nv">JF_SKIP_TESTS</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span><span class="k">esac</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--skip-documentation<span class="o">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nv">$2</span><span class="w"> </span><span class="k">in</span>
+<span class="w">        </span>yes<span class="p">|</span>Yes<span class="p">|</span>YES<span class="o">)</span>
+<span class="w">            </span><span class="nv">JF_SKIP_DOCS</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>no<span class="p">|</span>No<span class="p">|</span>NO<span class="o">)</span>
+<span class="w">            </span><span class="nv">JF_SKIP_DOCS</span><span class="o">=</span><span class="s2">&quot;no&quot;</span>
+<span class="w">            </span><span class="nb">shift</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span>*<span class="o">)</span>
+<span class="w">            </span><span class="nv">JF_SKIP_DOCS</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+<span class="w">            </span><span class="p">;;</span>
+<span class="w">        </span><span class="k">esac</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--help<span class="o">)</span>
+<span class="w">        </span>print_usage
+<span class="w">        </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>--clean<span class="o">)</span>
+<span class="w">        </span>rm<span class="w"> </span>-r<span class="w"> </span>--<span class="w"> </span>src<span class="o">{</span>,/tests<span class="o">}</span>/*.o<span class="w"> </span><span class="nv">$DOCDIR</span>*<span class="w"> </span><span class="nv">$LIBDIR</span>*<span class="w"> </span><span class="nv">$BINDIR</span>*<span class="w"> </span>*.gcov*
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span>*<span class="o">)</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Unknown flag, \&quot;</span><span class="nv">$1</span><span class="s2">\&quot;, passed to </span><span class="si">${</span><span class="nv">script_name</span><span class="si">}</span><span class="s2">!&quot;</span><span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
+<span class="w">        </span>print_usage
+<span class="w">        </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="w">        </span><span class="p">;;</span>
+<span class="w">    </span><span class="k">esac</span>
+<span class="w">    </span><span class="nb">shift</span><span class="w"> </span><span class="c1"># look at next argument</span>
+<span class="k">done</span><span class="w"> </span><span class="c1"># with argument parsing loop</span>
+
+<span class="c1"># if no compiler selected, then we&#39;re defaulting to gnu, and need to check that the cflags are set</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FCOMPILER</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;gnu&#39;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FCOMPILERFLAGS</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">FCOMPILERFLAGS</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$GNUCOMPILERFLAGS</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$CODE_COVERAGE</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">[</span>yY<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Trying to compile with code coverage instrumentation.&quot;</span>
+<span class="w">    </span><span class="nv">COVERAGE</span><span class="o">=</span><span class="s2">&quot;-coverage&quot;</span>
+<span class="k">fi</span>
+
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$CODE_PROFILE</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">[</span>yY<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Trying to compile with code profiling instrumentation.&quot;</span>
+<span class="w">    </span><span class="nv">PROFILING</span><span class="o">=</span><span class="s2">&quot;-profile&quot;</span>
+<span class="k">fi</span>
+
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$FCOMPILER</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>custom<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Trying to compile with custom compiler, </span><span class="nv">$FC</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nv">CUSTOM</span><span class="o">=(</span><span class="s2">&quot;-fc&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FC</span><span class="s2">&quot;</span><span class="o">)</span>
+<span class="k">fi</span>
+
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$TRY_UNICODE</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">[</span>yY<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Trying to compile library with Unicode/UCS4 support&quot;</span>
+<span class="w">    </span>FoBiS.py<span class="w"> </span>build<span class="w"> </span>-ch<span class="w"> </span>-compiler<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FCOMPILER</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CUSTOM</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-cflags<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FCOMPILERFLAGS</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-dbld<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">BINDIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">INTROSPECDIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-dmod<span class="w"> </span>./<span class="w"> </span>-dobj<span class="w"> </span>./<span class="w"> </span>-t<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">UCS4TESTCODE</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">UCS4TESTCODE</span><span class="p">%.f90</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-colors
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">BINDIR</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">UCS4TESTCODE</span><span class="p">%.f90</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">DEFINES</span><span class="o">=</span><span class="s2">&quot;-DUSE_UCS4 -Wunused-function&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="k">fi</span>
+
+<span class="c1">#build the stand-alone library:</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Building library...&quot;</span>
+
+FoBiS.py<span class="w"> </span>build<span class="w"> </span>-ch<span class="w"> </span>-compiler<span class="w"> </span><span class="si">${</span><span class="nv">FCOMPILER</span><span class="si">}</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CUSTOM</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-cflags<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FCOMPILERFLAGS</span><span class="si">}</span><span class="s2"> </span><span class="si">${</span><span class="nv">DEFINES</span><span class="si">}</span><span class="s2"> </span><span class="si">${</span><span class="nv">REAL_KIND</span><span class="si">}</span><span class="s2"> </span><span class="si">${</span><span class="nv">INT_KIND</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="si">${</span><span class="nv">COVERAGE</span><span class="si">}</span><span class="w"> </span><span class="si">${</span><span class="nv">PROFILING</span><span class="si">}</span><span class="w"> </span>-dbld<span class="w"> </span><span class="si">${</span><span class="nv">LIBDIR</span><span class="si">}</span><span class="w"> </span>-s<span class="w"> </span><span class="si">${</span><span class="nv">SRCDIR</span><span class="si">}</span><span class="w"> </span>-dmod<span class="w"> </span>./<span class="w"> </span>-dobj<span class="w"> </span>./<span class="w"> </span>-t<span class="w"> </span><span class="si">${</span><span class="nv">MODCODE</span><span class="si">}</span><span class="w"> </span>-o<span class="w"> </span><span class="si">${</span><span class="nv">LIBOUT</span><span class="si">}</span><span class="w"> </span>-mklib<span class="w"> </span>static<span class="w"> </span>-colors
+
+<span class="c1">#build the unit tests (uses the above library):</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$JF_SKIP_TESTS</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="o">[</span>yY<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Building unit tests...&quot;</span>
+
+<span class="w">    </span><span class="c1"># FoBiS.py PR #45 work around</span>
+<span class="w">    </span><span class="o">[</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BINDIR</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>mkdir<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BINDIR</span><span class="s2">&quot;</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span>TEST<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TESTDIR</span><span class="p">%/</span><span class="si">}</span><span class="s2">&quot;</span>/jf_test_*.<span class="o">[</span>fF<span class="o">]</span><span class="m">90</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nv">THIS_TEST</span><span class="o">=</span><span class="si">${</span><span class="nv">TEST</span><span class="p">##*/</span><span class="si">}</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Build </span><span class="si">${</span><span class="nv">THIS_TEST</span><span class="p">%.[fF]90</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">    </span>FoBiS.py<span class="w"> </span>build<span class="w"> </span>-ch<span class="w"> </span>-compiler<span class="w"> </span><span class="si">${</span><span class="nv">FCOMPILER</span><span class="si">}</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CUSTOM</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-cflags<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FCOMPILERFLAGS</span><span class="si">}</span><span class="s2"> </span><span class="si">${</span><span class="nv">DEFINES</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="si">${</span><span class="nv">COVERAGE</span><span class="si">}</span><span class="w"> </span><span class="si">${</span><span class="nv">PROFILING</span><span class="si">}</span><span class="w"> </span>-dbld<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">BINDIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TESTDIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">LIBDIR</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-libs<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">LIBDIR</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">LIBOUT</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-dmod<span class="w"> </span>./<span class="w"> </span>-dobj<span class="w"> </span>./<span class="w"> </span>-t<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">THIS_TEST</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">THIS_TEST</span><span class="p">%.[fF]90</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-colors
+<span class="w">    </span><span class="k">done</span>
+<span class="k">else</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Skip building the unit tests since \$JF_SKIP_TESTS has been set to &#39;true&#39;.&quot;</span>
+<span class="k">fi</span>
+
+<span class="c1"># Run all the tests unless $JF_SKIP_TESTS</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$JF_SKIP_TESTS</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="o">[</span>yY<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Running tests...&quot;</span>
+<span class="w">    </span><span class="nv">OLD_IGNORES</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$GLOBIGNORE</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="c1"># run next commands in subshell to avoid `cd -`</span>
+<span class="w">    </span><span class="o">(</span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BINDIR</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nv">GLOBIGNORE</span><span class="o">=</span><span class="s1">&#39;*.*&#39;</span>
+<span class="w">    </span><span class="c1"># from: http://stackoverflow.com/questions/7992689/bash-how-to-loop-all-files-in-sorted-order</span>
+<span class="w">    </span>ls<span class="w"> </span>jf_test_*<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/^\([^0-9]*\)\([0-9]*\)/\1 \2/&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span>-k2,2n<span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39; &#39;</span><span class="w"> </span><span class="p">|</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>TEST<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">        </span><span class="c1"># It would be nice to run json output printed to stdout through jsonlint, however,</span>
+<span class="w">        </span><span class="c1"># some tests output more than one json structure and these need to be split</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;======================================================&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Running </span><span class="si">${</span><span class="nv">TEST</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nb">cd</span><span class="w"> </span>..
+<span class="w">        </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">BINDIR</span><span class="si">}${</span><span class="nv">TEST</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BINDIR</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">done</span><span class="o">)</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;======================================================&quot;</span>
+<span class="w">    </span><span class="nv">GLOBIGNORE</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$OLD_IGNORES</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$CODE_COVERAGE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>yY<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span>SRCFILE<span class="w"> </span><span class="k">in</span><span class="w"> </span>json_string_utilities.F90<span class="w"> </span>json_value_module.F90<span class="w"> </span>json_file_module.F90<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">            </span><span class="o">[</span><span class="w"> </span>-f<span class="w"> </span><span class="si">${</span><span class="nv">SRCDIR</span><span class="si">}${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov<span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span><span class="si">${</span><span class="nv">SRCDIR</span><span class="si">}${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov
+<span class="w">            </span>gcov<span class="w"> </span>-o<span class="w"> </span><span class="nv">$LIBDIR</span><span class="w"> </span><span class="si">${</span><span class="nv">SRCDIR</span><span class="si">}${</span><span class="nv">SRCFILE</span><span class="si">}</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$TRY_UNICODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>yY<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                </span><span class="c1"># gcov/gfortran bug work around</span>
+<span class="w">                </span>awk<span class="w"> </span>-F<span class="s1">&#39;:&#39;</span><span class="w"> </span><span class="s1">&#39;{line=&quot;&quot;; for(i=2;i&lt;=NF;i++){line=line&quot;:&quot;$i}; if (NR &gt; 1) print $1 prevline; prevline=line}; END{print &quot;        -&quot;prevline}&#39;</span><span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov<span class="w"> </span>&gt;<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov.fixed<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                </span>mv<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov<span class="o">{</span>.fixed,<span class="o">}</span>
+<span class="w">                </span><span class="c1"># rename so we can merge coverage info</span>
+<span class="w">                </span>mv<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>-unicode.gcov
+<span class="w">            </span><span class="k">else</span>
+<span class="w">                </span><span class="c1"># rename so we can merge coverage info</span>
+<span class="w">                </span>mv<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>-no-unicode.gcov
+<span class="w">            </span><span class="k">fi</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-f<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>-unicode.gcov<span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-f<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>-no-unicode.gcov<span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+
+<span class="w">                </span><span class="c1">############## for debugging</span>
+<span class="w">                </span><span class="c1">#echo &quot;&quot;</span>
+<span class="w">                </span><span class="c1">#echo &quot;-------------------&quot;</span>
+<span class="w">                </span><span class="c1">#echo &quot;no-unicode file&quot;</span>
+<span class="w">                </span><span class="c1">#echo &quot;-------------------&quot;</span>
+<span class="w">                </span><span class="c1">#cat ${SRCFILE}-no-unicode.gcov</span>
+<span class="w">                </span><span class="c1">#echo &quot;&quot;</span>
+<span class="w">                </span><span class="c1">#echo &quot;-------------------&quot;</span>
+<span class="w">                </span><span class="c1">#echo &quot;unicode file&quot;</span>
+<span class="w">                </span><span class="c1">#echo &quot;-------------------&quot;</span>
+<span class="w">                </span><span class="c1">#cat ${SRCFILE}-unicode.gcov</span>
+<span class="w">                </span><span class="c1">#echo &quot;&quot;</span>
+<span class="w">                </span><span class="c1">#./pages/development-resources/gccr.pl -n -c ${SRCFILE}-no-unicode.gcov no-unicode \</span>
+<span class="w">                </span><span class="c1">#                  ${SRCFILE}-unicode.gcov unicode</span>
+<span class="w">                </span><span class="c1">##############</span>
+
+<span class="w">                </span><span class="c1"># merge them</span>
+<span class="w">                </span>./pages/development-resources/gccr.pl<span class="w"> </span>-n<span class="w"> </span>-c<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>-no-unicode.gcov<span class="w"> </span>no-unicode<span class="w"> </span><span class="se">\</span>
+<span class="w">                                  </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>-unicode.gcov<span class="w"> </span>unicode<span class="w"> </span>&gt;<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov
+<span class="w">            </span><span class="k">else</span>
+<span class="w">                </span>cp<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>*-unicode.gcov<span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov
+<span class="w">            </span><span class="k">fi</span>
+<span class="w">        </span><span class="k">done</span>
+
+<span class="w">        </span>FoBiS.py<span class="w"> </span>rule<span class="w"> </span>-gcov_analyzer<span class="w"> </span>.
+<span class="w">        </span><span class="k">for</span><span class="w"> </span>SRCFILE<span class="w"> </span><span class="k">in</span><span class="w"> </span>json_string_utilities.F90<span class="w"> </span>json_value_module.F90<span class="w"> </span>json_file_module.F90<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">            </span>sed<span class="w"> </span>-i<span class="s2">&quot;bak&quot;</span><span class="w"> </span>-E<span class="w"> </span><span class="s1">&#39;s; \*\*([a-zA-Z]+[a-zA-Z0-9_]*)\*\*; \*\*[[\1]]\*\*;&#39;</span><span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov.md
+<span class="w">            </span>sed<span class="w"> </span>-i<span class="s2">&quot;bak&quot;</span><span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;s;, line ([0-9]+);, line [\1](https://github.com/jacobwilliams/json-fortran/blob/master/src/</span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span><span class="s2">#L\1);&quot;</span><span class="w"> </span><span class="si">${</span><span class="nv">SRCFILE</span><span class="si">}</span>.gcov.md
+<span class="w">        </span><span class="k">done</span>
+<span class="w">        </span>gcov<span class="w"> </span>-o<span class="w"> </span><span class="nv">$BINDIR</span><span class="w"> </span><span class="si">${</span><span class="nv">TESTDIR</span><span class="si">}</span>*.<span class="o">[</span>Ff<span class="o">]</span><span class="m">90</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="k">else</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Skip running the unit tests since \$JF_SKIP_TESTS has been set to </span><span class="si">${</span><span class="nv">JF_SKIP_TESTS</span><span class="si">}</span><span class="s2">.&quot;</span>
+<span class="k">fi</span>
+
+<span class="c1">#build the documentation with ford (if present):</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$JF_SKIP_DOCS</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="o">[</span>yY<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nb">hash</span><span class="w"> </span>ford<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Building documentation...&quot;</span>
+<span class="w">    </span><span class="o">[[</span><span class="w"> </span><span class="nv">$TRY_UNICODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>yY<span class="o">]</span>*<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">MACRO_FLAG</span><span class="o">=(</span><span class="s2">&quot;-m&quot;</span><span class="w"> </span><span class="s2">&quot;USE_UCS4&quot;</span><span class="o">)</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FPP</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>.PREPROCESSOR<span class="w"> </span><span class="c1"># Override via include in project file, until FORD gets CLI for this</span>
+<span class="w">    </span>ford<span class="w"> </span>--debug<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">MACRO_FLAG</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PAGESDIR</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FORDMD</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;FORD not found! Install using: pip install ford&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="k">else</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Skip building documentation since \$JF_SKIP_DOCS has been set to </span><span class="si">${</span><span class="nv">JF_SKIP_DOCS</span><span class="si">}</span><span class="s2">.&quot;</span>
+<span class="k">fi</span>
+</code></pre></div>
+    </div>
+  </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 18:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

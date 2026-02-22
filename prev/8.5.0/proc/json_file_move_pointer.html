@@ -1,0 +1,562 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>json_file_move_pointer &ndash; JSON-Fortran</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+      <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>8.5.0</small></a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>json_file_move_pointer
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+            <li class="list-inline-item" id="meta-author"><i class="fa fa-pencil"></i> Jacob Williams</li>
+            <li class="list-inline-item" id="meta-date"><i class="fa fa-calendar-o"></i> 12/5/2014</li>
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for procedures.">16 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_file_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_file_module.f90.html'>json_file_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_file_module.html'>json_file_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_file_move_pointer</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(function () {
+    $('[data-bs-toggle="tooltip"]').tooltip()
+    })
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/json_file_move_pointer.html#src">json_file_move_pointer</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine json_file_move_pointer(to, from)  
+</h2>
+    
+
+    <p>Move the <a href="../type/json_value.html">json_value</a> pointer from one <a href="../type/json_file.html">json_file</a> to another.
+  The &ldquo;from&rdquo; pointer is then nullified, but not destroyed.</p>
+<div class="alert alert-info">
+<p class="alert-title h4">Note</p>
+<p>If &ldquo;from%p&rdquo; is not associated, then an error is thrown.</p>
+</div>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/json_file.html'>json_file</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-to"></span>
+              class(<a href='../type/json_file.html'>json_file</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>to</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-from"></span>
+              class(<a href='../type/json_file.html'>json_file</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>from</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.50.0 (0)
+ -->
+<!-- Title: proc~~json_file_move_pointer~~CallsGraph Pages: 1 -->
+<svg id="procjson_file_move_pointerCallsGraph" width="641pt" height="104pt"
+ viewBox="0.00 0.00 641.00 103.58" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_file_move_pointer~~CallsGraph" class="graph" transform="scale(0.56 0.56) rotate(0) translate(4 182)">
+<title>proc~~json_file_move_pointer~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-182 1147,-182 1147,4 -4,4"/>
+<!-- proc~json_file_move_pointer -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node1" class="node">
+<title>proc~json_file_move_pointer</title>
+<polygon fill="none" stroke="black" points="171,-64 0,-64 0,-40 171,-40 171,-64"/>
+<text text-anchor="middle" x="85.5" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_file%json_file_move_pointer</text>
+</g>
+<!-- none~initialize -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node2" class="node">
+<title>none~initialize</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node2"><a xlink:href="../type/json_file.html#boundprocedure-initialize" xlink:title="json_file%initialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="321.5,-104 223.5,-104 223.5,-80 321.5,-80 321.5,-104"/>
+<text text-anchor="middle" x="272.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%initialize</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_move_pointer&#45;&gt;none~initialize -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge1" class="edge">
+<title>proc~json_file_move_pointer&#45;&gt;none~initialize</title>
+<path fill="none" stroke="#ff0000" d="M142.01,-64C164.54,-68.87 190.57,-74.5 213.36,-79.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="212.73,-82.87 223.24,-81.57 214.21,-76.03 212.73,-82.87"/>
+</g>
+<!-- none~throw_exception -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node3" class="node">
+<title>none~throw_exception</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node3"><a xlink:href="../type/json_core.html#boundprocedure-throw_exception" xlink:title="json_core%throw_exception">
+<polygon fill="#a7506f" stroke="#a7506f" points="921,-84 775,-84 775,-60 921,-60 921,-84"/>
+<text text-anchor="middle" x="848" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%throw_exception</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_move_pointer&#45;&gt;none~throw_exception -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge2" class="edge">
+<title>proc~json_file_move_pointer&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#ff0000" d="M171.16,-54.23C318.24,-58.09 619.11,-66.01 764.6,-69.83"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="764.71,-73.34 774.8,-70.1 764.9,-66.34 764.71,-73.34"/>
+</g>
+<!-- proc~json_file_failed -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node4" class="node">
+<title>proc~json_file_failed</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node4"><a xlink:href="../proc/json_file_failed.html" xlink:title="json_file%json_file_failed">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="338,-24 207,-24 207,0 338,0 338,-24"/>
+<text text-anchor="middle" x="272.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_failed</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_move_pointer&#45;&gt;proc~json_file_failed -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge3" class="edge">
+<title>proc~json_file_move_pointer&#45;&gt;proc~json_file_failed</title>
+<path fill="none" stroke="#ff0000" d="M142.01,-40C162.04,-35.67 184.84,-30.74 205.67,-26.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="206.68,-29.6 215.71,-24.06 205.2,-22.75 206.68,-29.6"/>
+</g>
+<!-- proc~initialize_json_core_in_file -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node5" class="node">
+<title>proc~initialize_json_core_in_file</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node5"><a xlink:href="../proc/initialize_json_core_in_file.html" xlink:title="json_file%initialize_json_core_in_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="558,-146 374,-146 374,-122 558,-122 558,-146"/>
+<text text-anchor="middle" x="466" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%initialize_json_core_in_file</text>
+</a>
+</g>
+</g>
+<!-- none~initialize&#45;&gt;proc~initialize_json_core_in_file -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge4" class="edge">
+<title>none~initialize&#45;&gt;proc~initialize_json_core_in_file</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M321.82,-102.6C345.59,-107.81 374.58,-114.17 400.24,-119.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="399.74,-123.27 410.26,-121.99 401.24,-116.43 399.74,-123.27"/>
+</g>
+<!-- proc~set_json_core_in_file -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node8" class="node">
+<title>proc~set_json_core_in_file</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node8"><a xlink:href="../proc/set_json_core_in_file.html" xlink:title="json_file%set_json_core_in_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="546.5,-104 385.5,-104 385.5,-80 546.5,-80 546.5,-104"/>
+<text text-anchor="middle" x="466" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%set_json_core_in_file</text>
+</a>
+</g>
+</g>
+<!-- none~initialize&#45;&gt;proc~set_json_core_in_file -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge5" class="edge">
+<title>none~initialize&#45;&gt;proc~set_json_core_in_file</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M321.82,-92C338.09,-92 356.8,-92 375.22,-92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="375.4,-95.5 385.4,-92 375.4,-88.5 375.4,-95.5"/>
+</g>
+<!-- proc~json_throw_exception -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node7" class="node">
+<title>proc~json_throw_exception</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node7"><a xlink:href="../proc/json_throw_exception.html" xlink:title="json_core%json_throw_exception">
+<polygon fill="#d9534f" stroke="#d9534f" points="1143,-84 971,-84 971,-60 1143,-60 1143,-84"/>
+<text text-anchor="middle" x="1057" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_throw_exception</text>
+</a>
+</g>
+</g>
+<!-- none~throw_exception&#45;&gt;proc~json_throw_exception -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge6" class="edge">
+<title>none~throw_exception&#45;&gt;proc~json_throw_exception</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M921.11,-72C933.94,-72 947.48,-72 960.84,-72"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="961,-75.5 971,-72 961,-68.5 961,-75.5"/>
+</g>
+<!-- proc~json_failed -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node6" class="node">
+<title>proc~json_failed</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node6"><a xlink:href="../proc/json_failed.html" xlink:title="json_core%json_failed">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="525.5,-24 406.5,-24 406.5,0 525.5,0 525.5,-24"/>
+<text text-anchor="middle" x="466" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_failed</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_failed&#45;&gt;proc~json_failed -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge7" class="edge">
+<title>proc~json_file_failed&#45;&gt;proc~json_failed</title>
+<path fill="none" stroke="#0000ff" d="M338.07,-12C356.75,-12 377.21,-12 396.15,-12"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="396.19,-15.5 406.19,-12 396.19,-8.5 396.19,-15.5"/>
+</g>
+<!-- proc~json_initialize -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node9" class="node">
+<title>proc~json_initialize</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node9"><a xlink:href="../proc/json_initialize.html" xlink:title="json_core%json_initialize">
+<polygon fill="#d9534f" stroke="#d9534f" points="725,-141 594,-141 594,-117 725,-117 725,-141"/>
+<text text-anchor="middle" x="659.5" y="-126.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_initialize</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_json_core_in_file&#45;&gt;proc~json_initialize -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge8" class="edge">
+<title>proc~initialize_json_core_in_file&#45;&gt;proc~json_initialize</title>
+<path fill="none" stroke="#ff0000" d="M558.26,-131.62C566.82,-131.39 575.43,-131.17 583.82,-130.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="584,-134.45 593.91,-130.69 583.82,-127.45 584,-134.45"/>
+</g>
+<!-- proc~json_initialize&#45;&gt;none~throw_exception -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge9" class="edge">
+<title>proc~json_initialize&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#ff0000" d="M700.05,-116.91C728.61,-108.18 767.36,-96.34 797.9,-87.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="798.96,-90.34 807.51,-84.07 796.92,-83.65 798.96,-90.34"/>
+</g>
+<!-- proc~integer_to_string -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node10" class="node">
+<title>proc~integer_to_string</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node10"><a xlink:href="../proc/integer_to_string.html" xlink:title="integer_to_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="894.5,-136 801.5,-136 801.5,-112 894.5,-112 894.5,-136"/>
+<text text-anchor="middle" x="848" y="-121.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">integer_to_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_initialize&#45;&gt;proc~integer_to_string -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge10" class="edge">
+<title>proc~json_initialize&#45;&gt;proc~integer_to_string</title>
+<path fill="none" stroke="#ff0000" d="M725.21,-127.27C746.72,-126.69 770.47,-126.05 791.24,-125.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="791.59,-128.99 801.49,-125.22 791.4,-121.99 791.59,-128.99"/>
+</g>
+<!-- proc~json_clear_exceptions -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_node11" class="node">
+<title>proc~json_clear_exceptions</title>
+<g id="a_proc~~json_file_move_pointer~~CallsGraph_node11"><a xlink:href="../proc/json_clear_exceptions.html" xlink:title="json_core%json_clear_exceptions">
+<polygon fill="#d9534f" stroke="#d9534f" points="935,-178 761,-178 761,-154 935,-154 935,-178"/>
+<text text-anchor="middle" x="848" y="-163.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_clear_exceptions</text>
+</a>
+</g>
+</g>
+<!-- proc~json_initialize&#45;&gt;proc~json_clear_exceptions -->
+<g id="proc~~json_file_move_pointer~~CallsGraph_edge11" class="edge">
+<title>proc~json_initialize&#45;&gt;proc~json_clear_exceptions</title>
+<path fill="none" stroke="#ff0000" d="M721.05,-141.01C738.73,-144.52 758.2,-148.38 776.45,-152"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="775.94,-155.47 786.43,-153.98 777.31,-148.61 775.94,-155.47"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocjson_file_move_pointerCallsGraph = svgPanZoom('#procjson_file_move_pointerCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.50.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="29pt"
+ viewBox="0.00 0.00 641.00 29.32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.92 0.92) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 695.5,-28 695.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,0 64,0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,0 136,0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.5,-24 154.5,-24 154.5,0 209.5,0 209.5,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="350,-24 228,-24 228,0 350,0 350,-24"/>
+<text text-anchor="middle" x="289" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="504,-24 368,-24 368,0 504,0 504,-24"/>
+<text text-anchor="middle" x="436" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="576,-24 522,-24 522,0 576,0 576,-24"/>
+<text text-anchor="middle" x="549" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="691.5,-24 594.5,-24 594.5,0 691.5,0 691.5,-24"/>
+<text text-anchor="middle" x="643" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_file_move_pointer</span><span class="p">(</span><span class="n">to</span><span class="p">,</span><span class="n">from</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">implicit none</span>
+
+<span class="k">    class</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">to</span><span class="w"></span>
+<span class="w">    </span><span class="k">class</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">from</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">from</span><span class="p">%</span><span class="n">p</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">from</span><span class="p">%</span><span class="n">failed</span><span class="p">())</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
+<span class="w">            </span><span class="c">!Don&#39;t get the data if the FROM file has an</span>
+<span class="w">            </span><span class="c">!active exception, since it may not be valid.</span>
+<span class="w">            </span><span class="k">call </span><span class="n">to</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_file_move_pointer: &#39;</span><span class="o">//</span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                                         </span><span class="s1">&#39;error exception in FROM file.&#39;</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            call </span><span class="n">to</span><span class="p">%</span><span class="n">initialize</span><span class="p">()</span><span class="w">  </span><span class="c">!initialize and clear any exceptions that may be present</span>
+<span class="w">            </span><span class="n">to</span><span class="p">%</span><span class="n">p</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">from</span><span class="p">%</span><span class="n">p</span><span class="w"></span>
+<span class="w">            </span><span class="k">nullify</span><span class="p">(</span><span class="n">from</span><span class="p">%</span><span class="n">p</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    else</span>
+<span class="k">        call </span><span class="n">to</span><span class="p">%</span><span class="n">core</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_file_move_pointer: &#39;</span><span class="o">//</span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                                     </span><span class="s1">&#39;pointer is not associated.&#39;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">end if</span>
+
+<span class="k">    end subroutine </span><span class="n">json_file_move_pointer</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2024 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2024-06-12 00:25              </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
+
+    <!-- MathJax JavaScript
+             ================================================== -->
+             <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({
+          TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+          jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+          extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+          });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+          <script src="../tipuesearch/tipuesearch_content.js"></script>
+          <script src="../tipuesearch/tipuesearch_set.js"></script>
+          <script src="../tipuesearch/tipuesearch.js"></script>
+
+  </body>
+</html>

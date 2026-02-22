@@ -1,0 +1,681 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>gccr.pl &ndash; JSON-Fortran</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../../css/brands.min.css" rel="stylesheet">
+    <link href="../../css/regular.min.css" rel="stylesheet">
+    <link href="../../css/solid.min.css" rel="stylesheet">
+    <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../../css/local.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../../index.html">JSON-Fortran </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../index.html">Other Docs</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>gccr.pl</h1>
+    <div class="container p-2 mb-4 bg-light border rounded-3">
+      <div class="row align-items-center justify-content-between">
+        <div class="col">
+          <ul class="list-inline" style="margin-bottom:0px; display:inline">
+          </ul>
+        </div>
+        <div class="col">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../index.html'>Other Docs</a></li>
+                <li class="breadcrumb-item"><a href='index.html'>Development Resources</a></li>
+              <li class="breadcrumb-item active" aria-current="page">gccr.pl</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+      <div class="col-3">
+        <div class="card card-body bg-light" id="sidebar-toc">
+          <ul class="nav flex-column align-items">
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html">Other Docs</a>
+            </li>
+          </ul>
+          <hr>
+          <nav class="nav nav-pills flex-column">
+              <a class="nav-link" href="../README.html">Github README</a>
+              <a class="nav-link" href="index.html">Development Resources</a>
+                <nav class="nav nav-pills flex-column">
+                                <a class="nav-link" href="CI.html">CI.yml</a>
+              <a class="nav-link" href="CONTRIBUTING.html">Contributing Guidelines</a>
+              <a class="nav-link" href="LICENSE.html">JSON-Fortran License</a>
+              <a class="nav-link" href="build.html">build.sh</a>
+              <a class="nav-link" href="codecov.html">codecov.yml</a>
+              <a class="nav-link active disabled" href="gccr.html">gccr.pl</a>
+              <a class="nav-link" href="json_module.F90.html">Coverage Analysis</a>
+              <a class="nav-link" href="release-checklist.html">Release Checklist</a>
+
+                </nav>
+              <a class="nav-link" href="../releases/index.html">Official Releases</a>
+          </nav>
+        </div>
+      </div>
+
+    <div class="col-9" id='text'>
+      <p>Below is the source code for <code>gccr.pl</code>, which was downloaded from
+<a href="https://github.com/eel3/gccr">https://github.com/eel3/gccr</a> on July 23, 2015. This script is used
+by the <a href="build.sh.html"><code>build.sh</code></a> script to merge the code coverage
+information for the <a href="json_module.F90.gcov.html">coverage report</a>.</p>
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env perl</span>
+<span class="c1"># -*- coding: utf-8; tab-width: 8 -*-</span>
+<span class="c1"># vim: fileencoding=UTF-8 shiftwidth=8 softtabstop=8 tabstop=8</span>
+
+<span class="c1">#</span>
+<span class="c1"># Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,</span>
+<span class="c1"># 2003, 2004, 2005  Free Software Foundation, Inc.</span>
+<span class="c1"># This file is free software; the Free Software Foundation</span>
+<span class="c1"># gives unlimited permission to copy and/or distribute it,</span>
+<span class="c1"># with or without modifications, as long as this notice is preserved.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY, to the extent permitted by law; without</span>
+<span class="c1"># even the implied warranty of MERCHANTABILITY or FITNESS FOR A</span>
+<span class="c1"># PARTICULAR PURPOSE.</span>
+<span class="c1">#</span>
+
+<span class="c1"># version 0.4.18 : eel3 : changed shebang, fixed indent, specified emacs/vim coding system.</span>
+<span class="c1"># version 0.4.17 : eel3 : fixed error occur when print the line matched /%[^%]/g</span>
+<span class="c1"># version 0.4.16 : eel3 : fixed parse error occur in line 10000 or later</span>
+<span class="c1"># version 0.4.15 : eel3 : avoided warnings caused by uninitialized variable</span>
+<span class="c1"># version 0.4.14 : eel3 : fixed line number indent size for over 99999 line</span>
+<span class="c1"># version 0.4.13 : eel3 : changed warning option</span>
+<span class="c1"># version 0.4.12 : eel3 : fixed problem that extra tab is output, and changed line number to be right-aligned</span>
+<span class="c1"># version 0.4.11 : Nick Groesz : fix potential divide by zero</span>
+<span class="c1"># version 0.4.10 : Nick Groesz : fixed summary in combined coverage, ignore function data, added copyright</span>
+<span class="c1"># version 0.4.9 : Nick Groesz : added combined reporting in print_summary(), changed usage text</span>
+<span class="c1"># version 0.4.8 : Nick Groesz : added -c option (combined coverage)</span>
+<span class="c1"># version 0.4.7 : Nick Groesz : fixed formatting, added comments</span>
+<span class="c1"># version 0.4.6 : Dickson Patton : fixed tagfile option, right justify counts</span>
+<span class="c1"># version 0.4.5 : Nick Groesz : list code generated with #define macros</span>
+<span class="c1"># version 0.4.4 : Dickson Patton : added tagfile option</span>
+<span class="c1"># version 0.4.3 : Nick Groesz : changed around internal data structures, start of version history</span>
+
+<span class="k">use</span><span class="w"> </span><span class="nn">strict</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="nn">warnings</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="nn">Getopt::Long</span><span class="p">;</span>
+
+<span class="c1"># prototypes</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">read_args</span><span class="p">();</span><span class="w">        </span><span class="c1"># read in command line arguments</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">process_files</span><span class="p">();</span><span class="w">        </span><span class="c1"># run through each file</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">parse_execution_data</span><span class="p">($$);</span><span class="w">   </span><span class="c1"># parse the data from each file</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">print_results</span><span class="p">();</span><span class="w">        </span><span class="c1"># print gcov data</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">print_summary</span><span class="p">();</span><span class="w">        </span><span class="c1"># print summary (similary to gcov&#39;s summary)</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">print_usage</span><span class="p">();</span><span class="w">      </span><span class="c1"># print gccr usage text</span>
+
+<span class="k">our</span><span class="w"> </span><span class="nv">$tool_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;gccr&#39;</span><span class="p">;</span><span class="w">            </span><span class="c1"># name of script</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">$version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;gccr (GCC) 0.4.18&#39;</span><span class="p">;</span><span class="w">     </span><span class="c1"># version of script</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">$copyright</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;Copyright (C) 2005 Free Software Foundation, Inc.</span>
+<span class="s">This is free software; see the source for copying conditions.  There is NO</span>
+<span class="s">warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span>
+<span class="s">&#39;</span><span class="p">;</span><span class="w">                      </span><span class="c1"># copyright notice</span>
+
+<span class="c1"># internal data</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">@files</span><span class="p">;</span><span class="w">         </span><span class="c1"># gcov file data</span>
+<span class="w">                </span><span class="c1">#</span>
+<span class="w">                </span><span class="c1"># File information:</span>
+<span class="w">                </span><span class="c1"># file_number -  ranges from 0 to NUMBER OF FILES SPECIFIED - 1</span>
+<span class="w">                </span><span class="c1"># $file[file_number]{&#39;tag&#39;} - user specified file tag</span>
+<span class="w">                </span><span class="c1"># $file[file_number]{&#39;name&#39;} - name of file to be read and parsed</span>
+<span class="w">                </span><span class="c1">#</span>
+<span class="w">                </span><span class="c1"># $file[file_number[{&#39;data&#39;} contains parsed gcov data</span>
+<span class="w">                </span><span class="c1">#</span>
+<span class="w">                </span><span class="c1"># Line information:</span>
+<span class="w">                </span><span class="c1"># line_number - corresponds to the line number of the GCOV file</span>
+<span class="w">                </span><span class="c1">#       and ranges from 1 to NUMBER OF LINES</span>
+<span class="w">                </span><span class="c1"># $data{&#39;line&#39;}[line_number]{&#39;type&#39;} - type of line</span>
+<span class="w">                </span><span class="c1">#                      Can be set to:</span>
+<span class="w">                </span><span class="c1">#                       no_ex -  non-executing code (gcov meta-data, header code, code that has been #ifdef&#39;d out)</span>
+<span class="w">                </span><span class="c1">#                       line -   an executable line of code</span>
+<span class="w">                </span><span class="c1">#                       branch - branch execution information</span>
+<span class="w">                </span><span class="c1">#                       call -   call execution information</span>
+<span class="w">                </span><span class="c1">#</span>
+<span class="w">                </span><span class="c1"># $data{&#39;line&#39;}[line_number]{&#39;count&#39;} -    number of times an executable line, branch, or call was executed</span>
+<span class="w">                </span><span class="c1"># $data{&#39;line&#39;}[line_number]{&#39;raw&#39;} -      raw data straight from gcov file</span>
+<span class="w">                </span><span class="c1">#                          this is only populated in the first file&#39;s data structure</span>
+<span class="w">                </span><span class="c1"># $data{&#39;line&#39;}[line_number]{&#39;line_num&#39;} - line number in original source code</span>
+<span class="w">                </span><span class="c1"># Execution information:</span>
+<span class="w">                </span><span class="c1"># $data{&#39;line_count&#39;} -     number of executable lines</span>
+<span class="w">                </span><span class="c1"># $data{&#39;execution_count&#39;} -    number of executed lines</span>
+
+<span class="k">our</span><span class="w"> </span><span class="nv">$file_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">        </span><span class="c1"># number of files read</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">$line_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">        </span><span class="c1"># number of lines in gcov data files (should be the same for each file)</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">$executable_total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="c1"># number of different executable lines across all files</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">$executed_total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">    </span><span class="c1"># number of different executable lines across all files that were executed</span>
+
+<span class="c1"># options</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">$opt_combined</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">$opt_help</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">      </span><span class="c1"># help option</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">$opt_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">       </span><span class="c1"># version option</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">@tag_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">();</span><span class="w">        </span><span class="c1"># tagfile(s) option</span>
+<span class="k">our</span><span class="w"> </span><span class="nv">$opt_nosummary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">     </span><span class="c1"># do not print summary</span>
+
+<span class="n">read_args</span><span class="p">();</span>
+<span class="n">process_files</span><span class="p">();</span>
+<span class="n">print_results</span><span class="p">();</span>
+<span class="k">unless</span><span class="p">(</span><span class="nv">$opt_nosummary</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">print_summary</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1"># Summary:  read command line arguments:</span>
+<span class="c1"># Parameters:   none</span>
+<span class="c1"># Return:   none</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">read_args</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">unless</span><span class="p">(</span><span class="w"> </span><span class="n">GetOptions</span><span class="p">(</span>
+<span class="w">        </span><span class="s">&#39;combined&#39;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">\</span><span class="nv">$opt_combined</span><span class="p">,</span>
+<span class="w">        </span><span class="s">&#39;help&#39;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">\</span><span class="nv">$opt_help</span><span class="p">,</span>
+<span class="w">        </span><span class="s">&#39;no-summary&#39;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">\</span><span class="nv">$opt_nosummary</span><span class="p">,</span>
+<span class="w">        </span><span class="s">&#39;tagfile|file=s&#39;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">\</span><span class="nv">@tag_files</span><span class="p">,</span>
+<span class="w">        </span><span class="s">&#39;version&#39;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">\</span><span class="nv">$opt_version</span><span class="p">,</span>
+<span class="w">              </span><span class="p">)</span>
+<span class="w">          </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="c1"># if GetOptions returns FALSE, then incorrect options were specified</span>
+<span class="w">        </span><span class="c1"># exit with error</span>
+<span class="w">        </span><span class="n">print_usage</span><span class="p">();</span>
+<span class="w">        </span><span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nv">$opt_help</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">print_usage</span><span class="p">();</span>
+<span class="w">        </span><span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nv">$opt_version</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;$version\n&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;$copyright\n&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1"># if any number of tag files were specified, then we read tagfiles instead of command line arugments</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nb">scalar</span><span class="p">(</span><span class="nv">@tag_files</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">@files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">read_tagfiles</span><span class="p">(</span><span class="nv">@tag_files</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1"># number of file arguments + number of tag arguments should equal an even number</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="nv">@ARGV</span><span class="w"> </span><span class="nv">%</span><span class="w"> </span><span class="nv">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">print</span><span class="p">(</span><span class="s">&quot;ERROR: file count does not match tag count\n&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">my</span><span class="w"> </span><span class="nv">$i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="p">(</span><span class="nv">$ARGV</span><span class="p">[</span><span class="nv">$i</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nb">push</span><span class="w"> </span><span class="nv">@files</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">name</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nv">$ARGV</span><span class="p">[</span><span class="nv">$i</span><span class="p">],</span><span class="w"> </span><span class="n">tag</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nv">$ARGV</span><span class="p">[</span><span class="nv">$i</span><span class="o">+</span><span class="mi">1</span><span class="p">]};</span>
+<span class="w">            </span><span class="nv">$i</span><span class="o">+=</span><span class="mi">2</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nv">$file_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">scalar</span><span class="p">(</span><span class="nv">@files</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nv">$file_count</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">print</span><span class="p">(</span><span class="s">&quot;ERROR: at least two files must be specified\n&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># Summary:  read tagfiles specifie dwith the -t option</span>
+<span class="c1"># Parameters:   array of names of tagfiles</span>
+<span class="c1"># Return:   array of name/tag hashes</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">read_tagfiles</span><span class="p">($)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">@tag_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">@_</span><span class="p">;</span>
+<span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">@files</span><span class="p">;</span>
+<span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">              </span><span class="c1"># count of --tagfile=___ options</span>
+<span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">              </span><span class="c1"># count of line in the current tagfile</span>
+
+<span class="w">    </span><span class="k">foreach</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$file</span><span class="p">(</span><span class="nv">@tag_files</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">$l</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="nb">open</span><span class="p">(</span><span class="n">TAGFILE</span><span class="p">,</span><span class="w"> </span><span class="nv">$file</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;ERROR: on open of tagfile $l, $file: ($!)\n&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="p">(</span><span class="sr">&lt;TAGFILE&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nv">$m</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="nb">chomp</span><span class="w"> </span><span class="nv">$_</span><span class="p">;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="sr"> /(^([^ ]+) *(.*)$)/</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nb">push</span><span class="w"> </span><span class="nv">@files</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">name</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nv">$2</span><span class="p">,</span><span class="w"> </span><span class="n">tag</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nv">$3</span><span class="p">};</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;ERROR: invalid file-tag pair on line $m of tagfile $l\n&quot;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="nb">close</span><span class="p">(</span><span class="n">TAGFILE</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="p">(</span><span class="nv">@files</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1"># Summary:  run through all the gcov files and call the parsing function</span>
+<span class="c1"># Parameters:   none</span>
+<span class="c1"># Return:   none</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">process_files</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1"># the first file is used to gather raw data</span>
+<span class="w">    </span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parse_execution_data</span><span class="p">(</span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;name&#39;</span><span class="p">},</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="k">my</span><span class="w"> </span><span class="nv">$i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nv">$i</span><span class="o">&lt;</span><span class="nv">$file_count</span><span class="p">;</span><span class="nv">$i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">$files</span><span class="p">[</span><span class="nv">$i</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parse_execution_data</span><span class="p">(</span><span class="nv">$files</span><span class="p">[</span><span class="nv">$i</span><span class="p">]{</span><span class="s">&#39;name&#39;</span><span class="p">},</span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># Summary:  parse the gcov file, populating the %data structure</span>
+<span class="c1"># Parameters:   name of file to parse | boolean indicating whether raw (original gcov) data should be saved</span>
+<span class="c1">#       save_raw is set to 1 on the first file parse and set to zero thereafter</span>
+<span class="c1"># Returns:  reference to data hash</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">parse_execution_data</span><span class="p">($$)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">my</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span><span class="nv">$save_raw</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">@_</span><span class="p">;</span>
+<span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">%data</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line_count&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">        </span><span class="c1"># number of executable lines in file</span>
+<span class="w">    </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;execution_count&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">       </span><span class="c1"># number of lines that were executed in file</span>
+
+<span class="w">    </span><span class="nb">stat</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="o">-</span><span class="n">r</span><span class="w"> </span><span class="n">_</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nb">die</span><span class="p">(</span><span class="s">&quot;ERROR: cannot read file: $file\n&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="o">-</span><span class="n">f</span><span class="w"> </span><span class="n">_</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nb">die</span><span class="p">(</span><span class="s">&quot;ERROR: not a plain file: $file\n&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nb">open</span><span class="p">(</span><span class="n">FILE_HANDLE</span><span class="p">,</span><span class="nv">$file</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">die</span><span class="p">(</span><span class="s">&quot;ERROR: cannot open file $file: $!&quot;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$file_line_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="sr">&lt;FILE_HANDLE&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">my</span><span class="w"> </span><span class="nv">$line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$_</span><span class="p">;</span>
+<span class="w">        </span><span class="nv">$file_line_num</span><span class="o">++</span><span class="p">;</span>
+
+<span class="w">        </span><span class="nb">chomp</span><span class="w"> </span><span class="nv">$line</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^\s+-:\s*(\d+):(.*)/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1"># line is gcov preamble or non-executing code</span>
+
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$line_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span>
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$2</span><span class="p">;</span>
+
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;type&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;no_ex&#39;</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;line_num&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$line_num</span><span class="p">;</span>
+
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="nv">$save_raw</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;raw&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$2</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^\s+#####:\s*(\d+):(.*)/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1"># line was not executed</span>
+
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$line_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span>
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$2</span><span class="p">;</span>
+
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;count&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;type&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;code&#39;</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;line_num&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$line_num</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line_count&#39;</span><span class="p">}</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="nv">$save_raw</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;raw&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$raw</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^\s*(\d+):\s*(\d+):(.*)/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1"># line was executed</span>
+
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span>
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$line_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$2</span><span class="p">;</span>
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$3</span><span class="p">;</span>
+
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;count&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$count</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;type&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;code&#39;</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;line_num&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$line_num</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line_count&#39;</span><span class="p">}</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;execution_count&#39;</span><span class="p">}</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="nv">$save_raw</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;raw&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$raw</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^branch\s+(\d+)/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1"># line contains branch execution information</span>
+
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$branch_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;num&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$branch_num</span><span class="p">;</span>
+
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^branch\s+\d+\s+never executed/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;count&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;type&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;branch&#39;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^branch\s+\d+\s+taken (\d+)%/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;count&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;type&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;branch&#39;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="nv">$save_raw</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;raw&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$line</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^call\s+(\d+)/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">            </span><span class="c1"># line contains call execution information</span>
+
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$call_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span>
+<span class="w">            </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;num&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$call_num</span><span class="p">;</span>
+
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^call\s+\d+\s+never executed/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;count&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;type&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;call&#39;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^call\s+\d+\s+returns (\d+)%/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;count&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$1</span><span class="p">;</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;type&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;call&#39;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="nv">$save_raw</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nv">$data</span><span class="p">{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$file_line_num</span><span class="p">]{</span><span class="s">&#39;raw&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$line</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$line</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^function/i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1"># function data is ignored</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1"># line could not be parsed</span>
+
+<span class="w">            </span><span class="k">print</span><span class="p">(</span><span class="s">&quot;ERROR: cannot parse line $file_line_num in file $file\n Is this a valid gcov file?\n&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nb">close</span><span class="p">(</span><span class="n">FILE_HANDLE</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1"># check to see if we should save an overall line count (common to all gcov files)</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nv">$save_raw</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">$line_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$file_line_num</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="p">(</span><span class="o">\</span><span class="nv">%data</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1"># Summary:  print interpolated gcov information</span>
+<span class="c1"># Parameters:   none</span>
+<span class="c1"># Return:   none</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">print_results</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$ftab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;        &#39;</span><span class="p">;</span>
+<span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$p_op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">$line_count</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">99999</span><span class="p">)</span><span class="w"> </span><span class="p">?</span><span class="w"> </span><span class="s">&#39;%5d&#39;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&#39;%13d&#39;</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="k">my</span><span class="w"> </span><span class="nv">$line_i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nv">$line_i</span><span class="o">&lt;=</span><span class="nv">$line_count</span><span class="p">;</span><span class="nv">$line_i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="k">my</span><span class="w"> </span><span class="nv">$raw_printed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">          </span><span class="c1"># boolean flag to print out the line slurped in from the gcov file</span>
+
+<span class="w">        </span><span class="k">my</span><span class="w"> </span><span class="nv">$count_sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">        </span><span class="c1"># sum of executions across all files for this one line- used for combined coverage reporting</span>
+
+<span class="w">        </span><span class="k">my</span><span class="w"> </span><span class="nv">$never_exec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">       </span><span class="c1"># boolean flag that is set to 0 when the current line is executed or executable</span>
+
+<span class="w">                          </span><span class="c1"># in any file. used in combined coverage reporting.</span>
+
+<span class="w">        </span><span class="k">my</span><span class="w"> </span><span class="nv">$first_code_line_executed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="c1"># boolean flag that indicates whether this is the first unique</span>
+<span class="w">                          </span><span class="c1"># executed line of code to be found among the gcov files</span>
+
+<span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="k">my</span><span class="w"> </span><span class="nv">$file_i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$file_i</span><span class="o">&lt;</span><span class="nv">$file_count</span><span class="p">;</span><span class="nv">$file_i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1"># Note that each file is cycled through for every line even if just the raw</span>
+<span class="w">            </span><span class="c1"># data from the first file that ends up being printed. This is because the same</span>
+<span class="w">            </span><span class="c1"># line may be non-executing in one file and executable in another file (because code</span>
+<span class="w">            </span><span class="c1"># may be ifdef&#39;d out).</span>
+
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="nv">$file_i</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;type&#39;</span><span class="p">};</span>
+
+<span class="w">            </span><span class="k">no</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="s">&#39;uninitialized&#39;</span><span class="p">;</span><span class="w">    </span><span class="c1"># XXX: remove warining for $type</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="nv">$type</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;no_ex&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1"># non-executing code</span>
+
+<span class="w">                </span><span class="k">unless</span><span class="p">(</span><span class="nv">$raw_printed</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nv">$opt_combined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nb">printf</span><span class="p">(</span><span class="s">&quot;$ftab-:$p_op:%s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="nv">$file_i</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;line_num&#39;</span><span class="p">},</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;raw&#39;</span><span class="p">});</span>
+<span class="w">                    </span><span class="nv">$raw_printed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+
+<span class="w">                </span><span class="c1"># nothing additional is printed for non-executing code</span>
+<span class="w">            </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$type</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;code&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1"># code that is executable</span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nv">$never_exec</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="c1"># this code is exectuable, so we indicate that in the never_exec flag</span>
+<span class="w">                    </span><span class="nv">$never_exec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">                    </span><span class="c1"># we only want the number of UNIQUE lines across files that are executable</span>
+<span class="w">                    </span><span class="c1"># in the executable_total flag, so this is only incremented once for all</span>
+<span class="w">                    </span><span class="c1"># identical lines across each file</span>
+<span class="w">                    </span><span class="nv">$executable_total</span><span class="o">++</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+
+<span class="w">                </span><span class="k">unless</span><span class="p">(</span><span class="nv">$raw_printed</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nv">$opt_combined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nb">printf</span><span class="p">(</span><span class="s">&quot;$ftab  $p_op:%s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;line_num&#39;</span><span class="p">},</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;raw&#39;</span><span class="p">});</span>
+<span class="w">                    </span><span class="nv">$raw_printed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+
+<span class="w">                </span><span class="k">my</span><span class="w"> </span><span class="nv">$count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="nv">$file_i</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;count&#39;</span><span class="p">};</span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nv">$opt_combined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nv">$count_sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nv">$count</span><span class="p">;</span>
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="nv">$first_code_line_executed</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$count</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="nv">$executed_total</span><span class="o">++</span><span class="p">;</span>
+<span class="w">                        </span><span class="nv">$first_code_line_executed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="nv">$count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">print</span><span class="w"> </span><span class="s">&#39;     ####&#39;</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">unless</span><span class="p">(</span><span class="nv">$first_code_line_executed</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                            </span><span class="c1"># update the unique count of code lines executed</span>
+<span class="w">                            </span><span class="c1"># across all gcov files</span>
+<span class="w">                            </span><span class="nv">$executed_total</span><span class="o">++</span><span class="p">;</span>
+<span class="w">                            </span><span class="nv">$first_code_line_executed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">                        </span><span class="p">}</span>
+
+<span class="w">                        </span><span class="k">my</span><span class="w"> </span><span class="nv">$padding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">9</span><span class="p">;</span>
+<span class="w">                        </span><span class="nv">$padding</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="nb">length</span><span class="p">(</span><span class="nv">$count</span><span class="p">);</span>
+<span class="w">                        </span><span class="nb">printf</span><span class="p">(</span><span class="s">&quot;%*s%d&quot;</span><span class="p">,</span><span class="nv">$padding</span><span class="p">,</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="nv">$count</span><span class="p">);</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                    </span><span class="nb">printf</span><span class="p">(</span><span class="s">&quot;:$p_op: &quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="nv">$file_i</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;line_num&#39;</span><span class="p">});</span>
+<span class="w">                    </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;$files[$file_i]{&#39;tag&#39;}\n&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$type</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;branch&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1"># branch information</span>
+<span class="w">                </span><span class="k">my</span><span class="w"> </span><span class="nv">$count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="nv">$file_i</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;count&#39;</span><span class="p">};</span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nv">$opt_combined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nv">$count_sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nv">$count</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="nv">$count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;branch $files[$file_i]{&#39;data&#39;}{&#39;line&#39;}[$line_i]{&#39;num&#39;} never executed:$files[$file_i]{&#39;tag&#39;}\n&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;branch $files[$file_i]{&#39;data&#39;}{&#39;line&#39;}[$line_i]{&#39;num&#39;} taken $count%:$files[$file_i]{&#39;tag&#39;}\n&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$type</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;call&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1"># call information</span>
+<span class="w">                </span><span class="k">my</span><span class="w"> </span><span class="nv">$count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="nv">$file_i</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;count&#39;</span><span class="p">};</span>
+
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nv">$opt_combined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nv">$count_sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nv">$count</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="nv">$count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;call $files[$file_i]{&#39;data&#39;}{&#39;line&#39;}[$line_i]{&#39;num&#39;} never executed:$files[$file_i]{&#39;tag&#39;}\n&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;call $files[$file_i]{&#39;data&#39;}{&#39;line&#39;}[$line_i]{&#39;num&#39;} returns $count%:$files[$file_i]{&#39;tag&#39;}\n&quot;</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="nv">$opt_combined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1"># if the combined coverage flag is set then no information is printed in the above for loop</span>
+<span class="w">            </span><span class="c1"># count information is summed into $count_sum and printed on a single line</span>
+
+<span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;type&#39;</span><span class="p">};</span>
+
+<span class="w">            </span><span class="k">no</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="s">&#39;uninitialized&#39;</span><span class="p">;</span><span class="w">    </span><span class="c1"># XXX: remove warining for $type</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="nv">$type</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;no_ex&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nv">$type</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;code&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1"># line is either non-executable or executable code</span>
+
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nv">$never_exec</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="c1"># code line is not executable in any file</span>
+
+<span class="w">                    </span><span class="nb">printf</span><span class="p">(</span><span class="s">&quot;$ftab-:$p_op:%s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;line_num&#39;</span><span class="p">},</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;raw&#39;</span><span class="p">});</span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">                    </span><span class="c1"># line is executable in at least one file</span>
+
+<span class="w">                    </span><span class="k">if</span><span class="p">(</span><span class="nv">$count_sum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">print</span><span class="w"> </span><span class="s">&#39;    #####&#39;</span><span class="p">;</span>
+<span class="w">                    </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="k">my</span><span class="w"> </span><span class="nv">$padding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">9</span><span class="p">;</span>
+<span class="w">                        </span><span class="nv">$padding</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="nb">length</span><span class="p">(</span><span class="nv">$count_sum</span><span class="p">);</span>
+<span class="w">                        </span><span class="nb">printf</span><span class="p">(</span><span class="s">&quot;%*s%d&quot;</span><span class="p">,</span><span class="nv">$padding</span><span class="p">,</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="nv">$count_sum</span><span class="p">);</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                    </span><span class="nb">printf</span><span class="p">(</span><span class="s">&quot;:$p_op:%s\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;line_num&#39;</span><span class="p">},</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="mi">0</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line&#39;</span><span class="p">}[</span><span class="nv">$line_i</span><span class="p">]{</span><span class="s">&#39;raw&#39;</span><span class="p">});</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$type</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;branch&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1"># branch information</span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nv">$count_sum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;branch $files[0]{&#39;data&#39;}{&#39;line&#39;}[$line_i]{&#39;num&#39;} never executed\n&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">my</span><span class="w"> </span><span class="nv">$percentage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$count_sum</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nv">$file_count</span><span class="p">;</span>
+<span class="w">                    </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;branch $files[0]{&#39;data&#39;}{&#39;line&#39;}[$line_i]{&#39;num&#39;} taken $percentage%\n&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span><span class="k">elsif</span><span class="p">(</span><span class="nv">$type</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;call&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1"># call information</span>
+
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nv">$count_sum</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;call $files[0]{&#39;data&#39;}{&#39;line&#39;}[$line_i]{&#39;num&#39;} never executed\n&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">my</span><span class="w"> </span><span class="nv">$percentage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$count_sum</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nv">$file_count</span><span class="p">;</span>
+<span class="w">                    </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;call $files[0]{&#39;data&#39;}{&#39;line&#39;}[$line_i]{&#39;num&#39;} returns $percentage%\n&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># Summary:  prints the line execution percentages for each file and a percentage for all files combined</span>
+<span class="c1"># Parameters:   none</span>
+<span class="c1"># Return:   none</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">print_summary</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="k">my</span><span class="w"> </span><span class="nv">$file_i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$file_i</span><span class="o">&lt;</span><span class="nv">$file_count</span><span class="p">;</span><span class="nv">$file_i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">my</span><span class="w"> </span><span class="nv">$file_line_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$files</span><span class="p">[</span><span class="nv">$file_i</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;line_count&#39;</span><span class="p">};</span>
+<span class="w">        </span><span class="k">my</span><span class="w"> </span><span class="nv">$percentage</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="nv">$file_line_count</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nv">$percentage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">$files</span><span class="p">[</span><span class="nv">$file_i</span><span class="p">]{</span><span class="s">&#39;data&#39;</span><span class="p">}{</span><span class="s">&#39;execution_count&#39;</span><span class="p">}</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nv">$file_line_count</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nv">$percentage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="nv">$percentage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;%.2f&#39;</span><span class="p">,</span><span class="nv">$percentage</span><span class="p">);</span>
+<span class="w">        </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;$percentage% of $file_line_count lines executed on target $files[$file_i]{&#39;tag&#39;}\n&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$overall_percentage</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nv">$executable_total</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">$overall_percentage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">$executed_total</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nv">$executable_total</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nv">$overall_percentage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nv">$overall_percentage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;%.2f&#39;</span><span class="p">,</span><span class="nv">$overall_percentage</span><span class="p">);</span>
+<span class="w">    </span><span class="k">print</span><span class="w"> </span><span class="s">&quot;$overall_percentage% of $executable_total lines executed across all files\n&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1"># Summary:  print tool usage information</span>
+<span class="c1"># Parameters:   none</span>
+<span class="c1"># Return:   none</span>
+<span class="k">sub</span><span class="w"> </span><span class="nf">print_usage</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">print</span><span class="w"> </span><span class="s">&lt;&lt;</span><span class="dl">END_USAGE</span><span class="s">;</span>
+<span class="s">Usage: ./$tool_name [options] &lt;file name&gt; &lt;target id&gt; &lt;file name&gt; &lt;target id&gt; [file name] [target id]...</span>
+<span class="s">Use $tool_name to compare gcov files generated on different platforms or targets.</span>
+<span class="s">  -h, --help                      Print this help, then exit</span>
+<span class="s">  -v, --version                   Print version number, then exit</span>
+<span class="s">Input Options:</span>
+<span class="s">  -t, --tagfile                   Take file-tag assignments from a file, not from command-line</span>
+<span class="s">Ouput Options:</span>
+<span class="s">  -c, --combined          Print combined coverage</span>
+<span class="s">  -n, --no-summmary       Do not print summary</span>
+<span class="dl">END_USAGE</span>
+<span class="p">}</span>
+</code></pre></div>
+    </div>
+  </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 18:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

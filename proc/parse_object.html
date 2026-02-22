@@ -1,0 +1,1028 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>parse_object &ndash; JSON-Fortran</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Other Docs</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>parse_object
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.9% of total for procedures.">70 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_value_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_value_module.html'>json_value_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">parse_object</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/parse_object.html#src">parse_object</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private recursive subroutine parse_object(json, unit, str, parent, expecting_next_element)  
+</h2>
+    
+
+    <p>Core parsing routine.</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/json_core.html'>json_core</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~212"></span>
+              class(<a href='../type/json_core.html'>json_core</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-unit~6"></span>
+              integer(kind=IK),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>unit</strong></td>
+            <td>
+                <p>file unit number (if parsing from a file)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-str~40"></span>
+              character(kind=CK, len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>str</strong></td>
+            <td>
+                <p><abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> string (if parsing from a string)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-parent~6"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+<td></td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>parent</strong></td>
+            <td>
+                <p>the parsed object will be added as a child of this</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-expecting_next_element"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>expecting_next_element</strong></td>
+            <td>
+                <p>if true, this object is preceeded by a comma, so
+we expect a valid object to exist. used to check
+for trailing delimiters.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~parse_object~~CallsGraph Pages: 1 -->
+<svg id="procparse_objectCallsGraph" width="641pt" height="222pt"
+ viewBox="0.00 0.00 641.00 222.14" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~parse_object~~CallsGraph" class="graph" transform="scale(0.61 0.61) rotate(0) translate(4 363)">
+<title>proc~~parse_object~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-363 1055,-363 1055,4 -4,4"/>
+<!-- proc~parse_object -->
+<g id="proc~~parse_object~~CallsGraph_node1" class="node">
+<title>proc~parse_object</title>
+<polygon fill="none" stroke="black" points="141,-128 0,-128 0,-104 141,-104 141,-128"/>
+<text text-anchor="middle" x="70.5" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_core%parse_object</text>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~parse_object -->
+<g id="proc~~parse_object~~CallsGraph_edge5" class="edge">
+<title>proc~parse_object&#45;&gt;proc~parse_object</title>
+<path fill="none" stroke="#ff0000" d="M41.73,-128.01C31.68,-136.97 41.27,-146 70.5,-146 88.77,-146 99.36,-142.47 102.29,-137.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="105.6,-136.51 99.27,-128.01 98.92,-138.6 105.6,-136.51"/>
+</g>
+<!-- none~add~4 -->
+<g id="proc~~parse_object~~CallsGraph_node2" class="node">
+<title>none~add~4</title>
+<g id="a_proc~~parse_object~~CallsGraph_node2"><a xlink:href="../type/json_core.html#boundprocedure-add~4" xlink:title="json_core%add">
+<polygon fill="#a7506f" stroke="#a7506f" points="484,-275 391,-275 391,-251 484,-251 484,-275"/>
+<text text-anchor="middle" x="437.5" y="-260.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%add</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_object&#45;&gt;none~add~4 -->
+<g id="proc~~parse_object~~CallsGraph_edge1" class="edge">
+<title>proc~parse_object&#45;&gt;none~add~4</title>
+<path fill="none" stroke="#ff0000" d="M83.64,-128.26C102.14,-146.24 139.25,-179.62 177,-198 243.1,-230.18 326.68,-247.42 380.84,-255.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="380.52,-259.38 390.94,-257.42 381.57,-252.46 380.52,-259.38"/>
+</g>
+<!-- none~destroy~3 -->
+<g id="proc~~parse_object~~CallsGraph_node3" class="node">
+<title>none~destroy~3</title>
+<g id="a_proc~~parse_object~~CallsGraph_node3"><a xlink:href="../type/json_core.html#boundprocedure-destroy~3" xlink:title="json_core%destroy">
+<polygon fill="#a7506f" stroke="#a7506f" points="302,-189 190,-189 190,-165 302,-165 302,-189"/>
+<text text-anchor="middle" x="246" y="-174.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%destroy</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_object&#45;&gt;none~destroy~3 -->
+<g id="proc~~parse_object~~CallsGraph_edge2" class="edge">
+<title>proc~parse_object&#45;&gt;none~destroy~3</title>
+<path fill="none" stroke="#ff0000" d="M105.78,-128.05C133.11,-137.66 171.56,-151.18 201.13,-161.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="200.2,-164.96 210.79,-164.97 202.52,-158.35 200.2,-164.96"/>
+</g>
+<!-- none~throw_exception -->
+<g id="proc~~parse_object~~CallsGraph_node4" class="node">
+<title>none~throw_exception</title>
+<g id="a_proc~~parse_object~~CallsGraph_node4"><a xlink:href="../type/json_core.html#boundprocedure-throw_exception" xlink:title="json_core%throw_exception">
+<polygon fill="#a7506f" stroke="#a7506f" points="517,-108 358,-108 358,-84 517,-84 517,-108"/>
+<text text-anchor="middle" x="437.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%throw_exception</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_object&#45;&gt;none~throw_exception -->
+<g id="proc~~parse_object~~CallsGraph_edge3" class="edge">
+<title>proc~parse_object&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#ff0000" d="M141.02,-116.75C153.02,-116.86 165.37,-116.94 177,-117 238.33,-117.29 253.89,-122.24 315,-117 332.56,-115.49 351.4,-112.78 368.87,-109.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="369.74,-113.2 378.98,-108.02 368.52,-106.31 369.74,-113.2"/>
+</g>
+<!-- proc~json_value_create -->
+<g id="proc~~parse_object~~CallsGraph_node5" class="node">
+<title>proc~json_value_create</title>
+<g id="a_proc~~parse_object~~CallsGraph_node5"><a xlink:href="../proc/json_value_create.html" xlink:title="json_value_create">
+<polygon fill="#d9534f" stroke="#d9534f" points="300,-108 192,-108 192,-84 300,-84 300,-108"/>
+<text text-anchor="middle" x="246" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_create</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~json_value_create -->
+<g id="proc~~parse_object~~CallsGraph_edge4" class="edge">
+<title>proc~parse_object&#45;&gt;proc~json_value_create</title>
+<path fill="none" stroke="#ff0000" d="M141.07,-107.98C154.59,-106.42 168.69,-104.8 181.99,-103.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="182.45,-106.73 191.98,-102.11 181.64,-99.78 182.45,-106.73"/>
+</g>
+<!-- proc~parse_string -->
+<g id="proc~~parse_object~~CallsGraph_node6" class="node">
+<title>proc~parse_string</title>
+<g id="a_proc~~parse_object~~CallsGraph_node6"><a xlink:href="../proc/parse_string.html" xlink:title="json_core%parse_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="315,-66 177,-66 177,-42 315,-42 315,-66"/>
+<text text-anchor="middle" x="246" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%parse_string</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~parse_string -->
+<g id="proc~~parse_object~~CallsGraph_edge6" class="edge">
+<title>proc~parse_object&#45;&gt;proc~parse_string</title>
+<path fill="none" stroke="#ff0000" d="M100.85,-103.95C121.9,-95.46 151.02,-84.05 177,-75 182.61,-73.05 188.5,-71.09 194.38,-69.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="195.74,-72.44 204.21,-66.08 193.62,-65.76 195.74,-72.44"/>
+</g>
+<!-- proc~pop_char -->
+<g id="proc~~parse_object~~CallsGraph_node7" class="node">
+<title>proc~pop_char</title>
+<g id="a_proc~~parse_object~~CallsGraph_node7"><a xlink:href="../proc/pop_char.html" xlink:title="json_core%pop_char">
+<polygon fill="#d9534f" stroke="#d9534f" points="498.5,-24 376.5,-24 376.5,0 498.5,0 498.5,-24"/>
+<text text-anchor="middle" x="437.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%pop_char</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~pop_char -->
+<g id="proc~~parse_object~~CallsGraph_edge7" class="edge">
+<title>proc~parse_object&#45;&gt;proc~pop_char</title>
+<path fill="none" stroke="#ff0000" d="M82.37,-103.71C100.04,-84.68 137.08,-48.65 177,-33 237.78,-9.17 312.59,-5.54 366.24,-6.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="366.23,-10.41 376.34,-7.23 366.46,-3.42 366.23,-10.41"/>
+</g>
+<!-- proc~json_value_add_string_name_ascii -->
+<g id="proc~~parse_object~~CallsGraph_node10" class="node">
+<title>proc~json_value_add_string_name_ascii</title>
+<g id="a_proc~~parse_object~~CallsGraph_node10"><a xlink:href="../proc/json_value_add_string_name_ascii.html" xlink:title="json_core%json_value_add_string_name_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="827,-359 572,-359 572,-335 827,-335 827,-359"/>
+<text text-anchor="middle" x="699.5" y="-344.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_add_string_name_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~4&#45;&gt;proc~json_value_add_string_name_ascii -->
+<g id="proc~~parse_object~~CallsGraph_edge8" class="edge">
+<title>none~add~4&#45;&gt;proc~json_value_add_string_name_ascii</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.23,-275.15C493.09,-287.81 527.46,-306.42 560,-317 584.08,-324.83 611.49,-329.77 635.53,-333.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="635.19,-336.96 645.6,-334.99 636.24,-330.04 635.19,-336.96"/>
+</g>
+<!-- proc~json_value_add_string_val_ascii -->
+<g id="proc~~parse_object~~CallsGraph_node11" class="node">
+<title>proc~json_value_add_string_val_ascii</title>
+<g id="a_proc~~parse_object~~CallsGraph_node11"><a xlink:href="../proc/json_value_add_string_val_ascii.html" xlink:title="json_core%json_value_add_string_val_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="819.5,-317 579.5,-317 579.5,-293 819.5,-293 819.5,-317"/>
+<text text-anchor="middle" x="699.5" y="-302.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_add_string_val_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~4&#45;&gt;proc~json_value_add_string_val_ascii -->
+<g id="proc~~parse_object~~CallsGraph_edge9" class="edge">
+<title>none~add~4&#45;&gt;proc~json_value_add_string_val_ascii</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M484.04,-263.01C506.83,-266.1 534.85,-270.92 560,-275 591.93,-280.18 628.07,-285.65 655.42,-290.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="654.95,-294.44 665.45,-293 656.34,-287.58 654.95,-294.44"/>
+</g>
+<!-- proc~json_value_add_string_vec_name_ascii -->
+<g id="proc~~parse_object~~CallsGraph_node12" class="node">
+<title>proc~json_value_add_string_vec_name_ascii</title>
+<g id="a_proc~~parse_object~~CallsGraph_node12"><a xlink:href="../proc/json_value_add_string_vec_name_ascii.html" xlink:title="json_core%json_value_add_string_vec_name_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="839,-275 560,-275 560,-251 839,-251 839,-275"/>
+<text text-anchor="middle" x="699.5" y="-260.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_add_string_vec_name_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~4&#45;&gt;proc~json_value_add_string_vec_name_ascii -->
+<g id="proc~~parse_object~~CallsGraph_edge10" class="edge">
+<title>none~add~4&#45;&gt;proc~json_value_add_string_vec_name_ascii</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M484.09,-257.72C502.88,-256.94 525.83,-256.48 549.63,-256.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="549.9,-259.81 559.88,-256.26 549.86,-252.81 549.9,-259.81"/>
+</g>
+<!-- proc~json_value_add_string_vec_val_ascii -->
+<g id="proc~~parse_object~~CallsGraph_node13" class="node">
+<title>proc~json_value_add_string_vec_val_ascii</title>
+<g id="a_proc~~parse_object~~CallsGraph_node13"><a xlink:href="../proc/json_value_add_string_vec_val_ascii.html" xlink:title="json_core%json_value_add_string_vec_val_ascii">
+<polygon fill="#d9534f" stroke="#d9534f" points="831.5,-233 567.5,-233 567.5,-209 831.5,-209 831.5,-233"/>
+<text text-anchor="middle" x="699.5" y="-218.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_add_string_vec_val_ascii</text>
+</a>
+</g>
+</g>
+<!-- none~add~4&#45;&gt;proc~json_value_add_string_vec_val_ascii -->
+<g id="proc~~parse_object~~CallsGraph_edge11" class="edge">
+<title>none~add~4&#45;&gt;proc~json_value_add_string_vec_val_ascii</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M466.46,-250.88C488.96,-245.17 521.65,-239.31 557.18,-233.47"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="557.96,-236.89 567.27,-231.83 556.83,-229.98 557.96,-236.89"/>
+</g>
+<!-- proc~destroy_json_core -->
+<g id="proc~~parse_object~~CallsGraph_node8" class="node">
+<title>proc~destroy_json_core</title>
+<g id="a_proc~~parse_object~~CallsGraph_node8"><a xlink:href="../proc/destroy_json_core.html" xlink:title="json_core%destroy_json_core">
+<polygon fill="#d9534f" stroke="#d9534f" points="521,-231 354,-231 354,-207 521,-207 521,-231"/>
+<text text-anchor="middle" x="437.5" y="-216.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%destroy_json_core</text>
+</a>
+</g>
+</g>
+<!-- none~destroy~3&#45;&gt;proc~destroy_json_core -->
+<g id="proc~~parse_object~~CallsGraph_edge12" class="edge">
+<title>none~destroy~3&#45;&gt;proc~destroy_json_core</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M301.3,-189.04C323.41,-193.93 349.12,-199.63 372.16,-204.74"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="371.67,-208.22 382.19,-206.96 373.18,-201.38 371.67,-208.22"/>
+</g>
+<!-- proc~json_value_destroy -->
+<g id="proc~~parse_object~~CallsGraph_node14" class="node">
+<title>proc~json_value_destroy</title>
+<g id="a_proc~~parse_object~~CallsGraph_node14"><a xlink:href="../proc/json_value_destroy.html" xlink:title="json_core%json_value_destroy">
+<polygon fill="#d9534f" stroke="#d9534f" points="524,-189 351,-189 351,-165 524,-165 524,-189"/>
+<text text-anchor="middle" x="437.5" y="-174.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_destroy</text>
+</a>
+</g>
+</g>
+<!-- none~destroy~3&#45;&gt;proc~json_value_destroy -->
+<g id="proc~~parse_object~~CallsGraph_edge13" class="edge">
+<title>none~destroy~3&#45;&gt;proc~json_value_destroy</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M302.07,-170.81C314.26,-170.44 327.52,-170.26 340.8,-170.25"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="340.94,-173.75 350.95,-170.28 340.96,-166.75 340.94,-173.75"/>
+</g>
+<!-- proc~json_throw_exception -->
+<g id="proc~~parse_object~~CallsGraph_node9" class="node">
+<title>proc~json_throw_exception</title>
+<g id="a_proc~~parse_object~~CallsGraph_node9"><a xlink:href="../proc/json_throw_exception.html" xlink:title="json_core%json_throw_exception">
+<polygon fill="#d9534f" stroke="#d9534f" points="792.5,-149 606.5,-149 606.5,-125 792.5,-125 792.5,-149"/>
+<text text-anchor="middle" x="699.5" y="-134.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_throw_exception</text>
+</a>
+</g>
+</g>
+<!-- none~throw_exception&#45;&gt;proc~json_throw_exception -->
+<g id="proc~~parse_object~~CallsGraph_edge14" class="edge">
+<title>none~throw_exception&#45;&gt;proc~json_throw_exception</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M510.75,-108.05C526.95,-110.71 544.06,-113.48 560,-116 575.52,-118.45 592.02,-121.01 608.03,-123.45"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="607.5,-126.91 617.91,-124.96 608.55,-119.99 607.5,-126.91"/>
+</g>
+<!-- proc~wrap_json_throw_exception -->
+<g id="proc~~parse_object~~CallsGraph_node16" class="node">
+<title>proc~wrap_json_throw_exception</title>
+<g id="a_proc~~parse_object~~CallsGraph_node16"><a xlink:href="../proc/wrap_json_throw_exception.html" xlink:title="json_core%wrap_json_throw_exception">
+<polygon fill="#d9534f" stroke="#d9534f" points="808,-107 591,-107 591,-83 808,-83 808,-107"/>
+<text text-anchor="middle" x="699.5" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%wrap_json_throw_exception</text>
+</a>
+</g>
+</g>
+<!-- none~throw_exception&#45;&gt;proc~wrap_json_throw_exception -->
+<g id="proc~~parse_object~~CallsGraph_edge15" class="edge">
+<title>none~throw_exception&#45;&gt;proc~wrap_json_throw_exception</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M517.21,-89.44C537.21,-88.96 559.14,-88.72 580.62,-88.73"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="580.78,-92.23 590.79,-88.75 580.8,-85.23 580.78,-92.23"/>
+</g>
+<!-- proc~parse_string&#45;&gt;none~throw_exception -->
+<g id="proc~~parse_object~~CallsGraph_edge16" class="edge">
+<title>proc~parse_string&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#0000ff" d="M301.3,-66.04C323.41,-70.93 349.12,-76.63 372.16,-81.74"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="371.67,-85.22 382.19,-83.96 373.18,-78.38 371.67,-85.22"/>
+</g>
+<!-- proc~parse_string&#45;&gt;proc~pop_char -->
+<g id="proc~~parse_object~~CallsGraph_edge17" class="edge">
+<title>proc~parse_string&#45;&gt;proc~pop_char</title>
+<path fill="none" stroke="#0000ff" d="M301.3,-41.96C323.41,-37.07 349.12,-31.37 372.16,-26.26"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="373.18,-29.62 382.19,-24.04 371.67,-22.78 373.18,-29.62"/>
+</g>
+<!-- proc~unescape_string -->
+<g id="proc~~parse_object~~CallsGraph_node15" class="node">
+<title>proc~unescape_string</title>
+<g id="a_proc~~parse_object~~CallsGraph_node15"><a xlink:href="../proc/unescape_string.html" xlink:title="unescape_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="487.5,-66 387.5,-66 387.5,-42 487.5,-42 487.5,-66"/>
+<text text-anchor="middle" x="437.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">unescape_string</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_string&#45;&gt;proc~unescape_string -->
+<g id="proc~~parse_object~~CallsGraph_edge18" class="edge">
+<title>proc~parse_string&#45;&gt;proc~unescape_string</title>
+<path fill="none" stroke="#0000ff" d="M315.15,-54C335.48,-54 357.59,-54 377.29,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="377.36,-57.5 387.36,-54 377.36,-50.5 377.36,-57.5"/>
+</g>
+<!-- proc~json_value_add_string_name_ascii&#45;&gt;none~add~4 -->
+<g id="proc~~parse_object~~CallsGraph_edge20" class="edge">
+<title>proc~json_value_add_string_name_ascii&#45;&gt;none~add~4</title>
+<path fill="none" stroke="#aaff00" d="M571.67,-338.51C567.72,-337.41 563.82,-336.24 560,-335 521.33,-322.42 480.06,-298.51 456.95,-281.34"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="459.06,-278.55 449.03,-275.14 454.74,-284.06 459.06,-278.55"/>
+</g>
+<!-- interface~to_unicode -->
+<g id="proc~~parse_object~~CallsGraph_node17" class="node">
+<title>interface~to_unicode</title>
+<g id="a_proc~~parse_object~~CallsGraph_node17"><a xlink:href="../interface/to_unicode.html" xlink:title="to_unicode">
+<polygon fill="#a7506f" stroke="#a7506f" points="946,-275 875,-275 875,-251 946,-251 946,-275"/>
+<text text-anchor="middle" x="910.5" y="-260.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_unicode</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_add_string_name_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~parse_object~~CallsGraph_edge19" class="edge">
+<title>proc~json_value_add_string_name_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#aaff00" d="M815.44,-334.96C823.58,-332.48 831.52,-329.52 839,-326 860.35,-315.95 879.96,-297.32 893.05,-282.91"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="896.01,-284.84 899.96,-275.01 890.74,-280.23 896.01,-284.84"/>
+</g>
+<!-- proc~json_value_add_string_val_ascii&#45;&gt;none~add~4 -->
+<g id="proc~~parse_object~~CallsGraph_edge22" class="edge">
+<title>proc~json_value_add_string_val_ascii&#45;&gt;none~add~4</title>
+<path fill="none" stroke="#00ff00" d="M579.48,-296.11C572.89,-295.08 566.36,-294.03 560,-293 531.9,-288.44 500.2,-282.95 476.23,-277.47"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="477,-274.05 466.46,-275.12 475.37,-280.86 477,-274.05"/>
+</g>
+<!-- proc~json_value_add_string_val_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~parse_object~~CallsGraph_edge21" class="edge">
+<title>proc~json_value_add_string_val_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#00ff00" d="M792.1,-292.95C807.81,-290.36 823.93,-287.37 839,-284 847.6,-282.08 856.69,-279.66 865.38,-277.16"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="866.37,-280.52 874.97,-274.33 864.39,-273.81 866.37,-280.52"/>
+</g>
+<!-- proc~json_value_add_string_vec_name_ascii&#45;&gt;none~add~4 -->
+<g id="proc~~parse_object~~CallsGraph_edge24" class="edge">
+<title>proc~json_value_add_string_vec_name_ascii&#45;&gt;none~add~4</title>
+<path fill="none" stroke="#00ffa9" d="M559.88,-269.74C536.64,-269.67 513.78,-269.31 494.26,-268.66"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="494.21,-265.15 484.09,-268.28 493.95,-272.15 494.21,-265.15"/>
+</g>
+<!-- proc~json_value_add_string_vec_name_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~parse_object~~CallsGraph_edge23" class="edge">
+<title>proc~json_value_add_string_vec_name_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#00ffa9" d="M839.03,-263C848.08,-263 856.75,-263 864.72,-263"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="864.76,-266.5 874.76,-263 864.76,-259.5 864.76,-266.5"/>
+</g>
+<!-- proc~json_value_add_string_vec_val_ascii&#45;&gt;none~add~4 -->
+<g id="proc~~parse_object~~CallsGraph_edge26" class="edge">
+<title>proc~json_value_add_string_vec_val_ascii&#45;&gt;none~add~4</title>
+<path fill="none" stroke="#00a9ff" d="M665.45,-233C637.37,-238.95 596.01,-245.16 560,-251 538.39,-254.51 514.66,-258.56 493.95,-261.59"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="493.45,-258.13 484.04,-262.99 494.43,-265.06 493.45,-258.13"/>
+</g>
+<!-- proc~json_value_add_string_vec_val_ascii&#45;&gt;interface~to_unicode -->
+<g id="proc~~parse_object~~CallsGraph_edge25" class="edge">
+<title>proc~json_value_add_string_vec_val_ascii&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#00a9ff" d="M792.1,-233.05C807.81,-235.64 823.93,-238.63 839,-242 847.6,-243.92 856.69,-246.34 865.38,-248.84"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="864.39,-252.19 874.97,-251.67 866.37,-245.48 864.39,-252.19"/>
+</g>
+<!-- proc~json_value_destroy&#45;&gt;none~destroy~3 -->
+<g id="proc~~parse_object~~CallsGraph_edge27" class="edge">
+<title>proc~json_value_destroy&#45;&gt;none~destroy~3</title>
+<path fill="none" stroke="#0000ff" d="M350.95,-183.72C337.98,-183.8 324.78,-183.71 312.33,-183.45"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="312.15,-179.95 302.07,-183.19 311.97,-186.94 312.15,-179.95"/>
+</g>
+<!-- proc~destroy_json_data -->
+<g id="proc~~parse_object~~CallsGraph_node18" class="node">
+<title>proc~destroy_json_data</title>
+<g id="a_proc~~parse_object~~CallsGraph_node18"><a xlink:href="../proc/destroy_json_data.html" xlink:title="destroy_json_data">
+<polygon fill="#d9534f" stroke="#d9534f" points="753.5,-191 645.5,-191 645.5,-167 753.5,-167 753.5,-191"/>
+<text text-anchor="middle" x="699.5" y="-176.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">destroy_json_data</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_destroy&#45;&gt;proc~destroy_json_data -->
+<g id="proc~~parse_object~~CallsGraph_edge28" class="edge">
+<title>proc~json_value_destroy&#45;&gt;proc~destroy_json_data</title>
+<path fill="none" stroke="#0000ff" d="M524.35,-177.66C560.55,-177.94 601.92,-178.26 635.26,-178.51"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="635.3,-182.01 645.33,-178.59 635.36,-175.01 635.3,-182.01"/>
+</g>
+<!-- proc~valid_json_hex -->
+<g id="proc~~parse_object~~CallsGraph_node19" class="node">
+<title>proc~valid_json_hex</title>
+<g id="a_proc~~parse_object~~CallsGraph_node19"><a xlink:href="../proc/valid_json_hex.html" xlink:title="valid_json_hex">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="744,-65 655,-65 655,-41 744,-41 744,-65"/>
+<text text-anchor="middle" x="699.5" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">valid_json_hex</text>
+</a>
+</g>
+</g>
+<!-- proc~unescape_string&#45;&gt;proc~valid_json_hex -->
+<g id="proc~~parse_object~~CallsGraph_edge29" class="edge">
+<title>proc~unescape_string&#45;&gt;proc~valid_json_hex</title>
+<path fill="none" stroke="#aa00ff" d="M487.71,-53.81C532.47,-53.64 598.39,-53.39 644.56,-53.21"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="644.7,-56.71 654.68,-53.17 644.67,-49.71 644.7,-56.71"/>
+</g>
+<!-- proc~wrap_json_throw_exception&#45;&gt;none~throw_exception -->
+<g id="proc~~parse_object~~CallsGraph_edge31" class="edge">
+<title>proc~wrap_json_throw_exception&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#ff00aa" d="M590.79,-102.08C569.7,-102.33 547.8,-102.34 527.41,-102.1"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="527.26,-98.6 517.21,-101.96 527.16,-105.6 527.26,-98.6"/>
+</g>
+<!-- proc~wrap_json_throw_exception&#45;&gt;interface~to_unicode -->
+<g id="proc~~parse_object~~CallsGraph_edge30" class="edge">
+<title>proc~wrap_json_throw_exception&#45;&gt;interface~to_unicode</title>
+<path fill="none" stroke="#ff00aa" d="M808.34,-100.54C819.33,-104.19 829.81,-109.2 839,-116 880.29,-146.55 898.47,-207.67 905.55,-240.65"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="902.16,-241.55 907.55,-250.68 909.03,-240.19 902.16,-241.55"/>
+</g>
+<!-- proc~to_uni -->
+<g id="proc~~parse_object~~CallsGraph_node20" class="node">
+<title>proc~to_uni</title>
+<g id="a_proc~~parse_object~~CallsGraph_node20"><a xlink:href="../proc/to_uni.html" xlink:title="to_uni">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1043.5,-296 989.5,-296 989.5,-272 1043.5,-272 1043.5,-296"/>
+<text text-anchor="middle" x="1016.5" y="-281.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_uni</text>
+</a>
+</g>
+</g>
+<!-- interface~to_unicode&#45;&gt;proc~to_uni -->
+<g id="proc~~parse_object~~CallsGraph_edge32" class="edge">
+<title>interface~to_unicode&#45;&gt;proc~to_uni</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M946.13,-269.99C956.79,-272.14 968.54,-274.52 979.3,-276.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="978.75,-280.15 989.25,-278.7 980.14,-273.29 978.75,-280.15"/>
+</g>
+<!-- proc~to_uni_vec -->
+<g id="proc~~parse_object~~CallsGraph_node21" class="node">
+<title>proc~to_uni_vec</title>
+<g id="a_proc~~parse_object~~CallsGraph_node21"><a xlink:href="../proc/to_uni_vec.html" xlink:title="to_uni_vec">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1051,-254 982,-254 982,-230 1051,-230 1051,-254"/>
+<text text-anchor="middle" x="1016.5" y="-239.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_uni_vec</text>
+</a>
+</g>
+</g>
+<!-- interface~to_unicode&#45;&gt;proc~to_uni_vec -->
+<g id="proc~~parse_object~~CallsGraph_edge33" class="edge">
+<title>interface~to_unicode&#45;&gt;proc~to_uni_vec</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M946.13,-256.01C954.37,-254.34 963.27,-252.55 971.85,-250.81"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="972.62,-254.23 981.73,-248.82 971.23,-247.37 972.62,-254.23"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocparse_objectCallsGraph = svgPanZoom('#procparse_objectCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~parse_object~~CalledByGraph Pages: 1 -->
+<svg id="procparse_objectCalledByGraph" width="316pt" height="50pt"
+ viewBox="0.00 0.00 316.00 50.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~parse_object~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 46)">
+<title>proc~~parse_object~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-46 312,-46 312,4 -4,4"/>
+<!-- proc~parse_object -->
+<g id="proc~~parse_object~~CalledByGraph_node1" class="node">
+<title>proc~parse_object</title>
+<polygon fill="none" stroke="black" points="308,-24 167,-24 167,0 308,0 308,-24"/>
+<text text-anchor="middle" x="237.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_core%parse_object</text>
+</g>
+<!-- proc~parse_object&#45;&gt;proc~parse_object -->
+<g id="proc~~parse_object~~CalledByGraph_edge1" class="edge">
+<title>proc~parse_object&#45;&gt;proc~parse_object</title>
+<path fill="none" stroke="#ff0000" d="M209.06,-24.01C199.13,-32.97 208.61,-42 237.5,-42 255.56,-42 266.03,-38.47 268.92,-33.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="272.24,-32.53 265.94,-24.01 265.56,-34.6 272.24,-32.53"/>
+</g>
+<!-- proc~parse_value_recursive -->
+<g id="proc~~parse_object~~CalledByGraph_node2" class="node">
+<title>proc~parse_value_recursive</title>
+<g id="a_proc~~parse_object~~CalledByGraph_node2"><a xlink:href="../proc/parse_value_recursive.html" xlink:title="parse_value_recursive">
+<polygon fill="#d9534f" stroke="#d9534f" points="131,-24 0,-24 0,0 131,0 131,-24"/>
+<text text-anchor="middle" x="65.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parse_value_recursive</text>
+</a>
+</g>
+</g>
+<!-- proc~parse_value_recursive&#45;&gt;proc~parse_object -->
+<g id="proc~~parse_object~~CalledByGraph_edge2" class="edge">
+<title>proc~parse_value_recursive&#45;&gt;proc~parse_object</title>
+<path fill="none" stroke="#ff0000" d="M131.25,-12C139.62,-12 148.26,-12 156.83,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="156.83,-15.5 166.83,-12 156.83,-8.5 156.83,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">recursive subroutine </span><span class="n">parse_object</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">unit</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">,</span><span class="w"> </span><span class="n">expecting_next_element</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">implicit none</span>
+
+<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">      </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">unit</span><span class="w">    </span><span class="c">!! file unit number (if parsing from a file)</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">str</span><span class="w">     </span><span class="c">!! JSON string (if parsing from a string)</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w">            </span><span class="kd">::</span><span class="w"> </span><span class="n">parent</span><span class="w">  </span><span class="c">!! the parsed object will be added as a child of this</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">expecting_next_element</span><span class="w"> </span><span class="c">!! if true, this object is preceeded by a comma, so</span>
+<span class="w">                                                     </span><span class="c">!! we expect a valid object to exist. used to check</span>
+<span class="w">                                                     </span><span class="c">!! for trailing delimiters.</span>
+
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pair</span><span class="w">  </span><span class="c">!! temp variable</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">eof</span><span class="w">   </span><span class="c">!! end of file flag</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">c</span><span class="w">     </span><span class="c">!! character returned by [[pop_char]]</span>
+<span class="cp">#if defined __GFORTRAN__</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tmp</span><span class="w">  </span><span class="c">!! this is a work-around for a bug</span>
+<span class="w">                                                 </span><span class="c">!! in the gfortran 4.9 compiler.</span>
+<span class="cp">#endif</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+
+<span class="w">        </span><span class="c">!the routine is being called incorrectly.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">parent</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in parse_object: parent pointer not associated.&#39;</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        nullify</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span><span class="w">    </span><span class="c">!probably not necessary</span>
+
+<span class="w">        </span><span class="c">! pair name</span>
+<span class="w">        </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">pop_char</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="o">=</span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">eof</span><span class="o">=</span><span class="n">eof</span><span class="p">,</span><span class="w"> </span><span class="n">skip_ws</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                           </span><span class="n">skip_comments</span><span class="o">=</span><span class="n">json</span><span class="p">%</span><span class="n">allow_comments</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">eof</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in parse_object:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                      </span><span class="s1">&#39; Unexpected end of file while parsing start of object.&#39;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(</span><span class="n">end_object</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! end of an empty object</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">expecting_next_element</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">allow_trailing_comma</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                </span><span class="c">! this is a dangling comma.</span>
+<span class="w">                </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in parse_object: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                          </span><span class="s1">&#39;Dangling comma when parsing an object.&#39;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            return</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(</span><span class="n">quotation_mark</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">json_value_create</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+<span class="cp">#if defined __GFORTRAN__</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">parse_string</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span><span class="n">str</span><span class="p">,</span><span class="n">tmp</span><span class="p">)</span><span class="w">   </span><span class="c">! write to a tmp variable because of</span>
+<span class="w">            </span><span class="n">pair</span><span class="p">%</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tmp</span><span class="w">                        </span><span class="c">! a bug in 4.9 gfortran compiler.</span>
+<span class="w">            </span><span class="k">deallocate</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+<span class="cp">#else</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">parse_string</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span><span class="n">str</span><span class="p">,</span><span class="n">pair</span><span class="p">%</span><span class="n">name</span><span class="p">)</span>
+<span class="cp">#endif</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">json</span><span class="p">%</span><span class="n">destroy</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            end if</span>
+<span class="k">        else</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in parse_object: Expecting string: &quot;&#39;</span><span class="o">//</span><span class="n">c</span><span class="o">//</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! pair value</span>
+<span class="w">        </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">pop_char</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="o">=</span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">eof</span><span class="o">=</span><span class="n">eof</span><span class="p">,</span><span class="w"> </span><span class="n">skip_ws</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                           </span><span class="n">skip_comments</span><span class="o">=</span><span class="n">json</span><span class="p">%</span><span class="n">allow_comments</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">eof</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">destroy</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in parse_object:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                      </span><span class="s1">&#39; Unexpected end of file while parsing object member.&#39;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(</span><span class="n">colon_char</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! parse the value</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">parse_value</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">pair</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">json</span><span class="p">%</span><span class="n">destroy</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            else</span>
+<span class="k">                call </span><span class="n">json</span><span class="p">%</span><span class="n">add</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span><span class="w"> </span><span class="n">pair</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        else</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">destroy</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in parse_object:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                      </span><span class="s1">&#39; Expecting : and then a value: &#39;</span><span class="o">//</span><span class="n">c</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! another possible pair</span>
+<span class="w">        </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">pop_char</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="o">=</span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">eof</span><span class="o">=</span><span class="n">eof</span><span class="p">,</span><span class="w"> </span><span class="n">skip_ws</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                           </span><span class="n">skip_comments</span><span class="o">=</span><span class="n">json</span><span class="p">%</span><span class="n">allow_comments</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">eof</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in parse_object: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                      </span><span class="s1">&#39;End of file encountered when parsing an object&#39;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(</span><span class="n">delimiter</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! read the next member</span>
+<span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">parse_object</span><span class="p">(</span><span class="n">unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unit</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="o">=</span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parent</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                   </span><span class="n">expecting_next_element</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.)</span>
+<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">end_object</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! end of object</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        else</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in parse_object: Expecting end of object: &#39;</span><span class="o">//</span><span class="n">c</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">    end if</span>
+
+<span class="k">    end subroutine </span><span class="n">parse_object</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-02-22 18:03 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>
