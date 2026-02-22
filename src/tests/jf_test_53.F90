@@ -27,10 +27,10 @@ contains
     integer(IK) :: count, i
 
     character(kind=CK,len=*),parameter :: str = CK_'{'//&
-                                                   '  "a": 1,'//&
-                                                   '  "b": 2,'//&
-                                                   '  "c": 3'//&
-                                                   '}'
+                                                CK_'  "a": 1,'//&
+                                                CK_'  "b": 2,'//&
+                                                CK_'  "c": 3'//&
+                                                CK_'}'
 
     character(kind=CK,len=1),dimension(3),parameter :: expected_keys = [CK_'a', CK_'b', CK_'c']
 
