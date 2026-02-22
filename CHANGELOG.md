@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.2.1 (2026-02-22)](#921-2026-02-22)
     - [9.2.0 (2026-01-05)](#920-2026-01-05)
     - [9.1.0 (2026-01-02)](#910-2026-01-02)
     - [9.0.5 (2025-08-25)](#905-2025-08-25)
@@ -57,7 +58,18 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.2.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.2.1...HEAD)
+
+### [9.2.1](https://github.com/jacobwilliams/json-fortran/tree/9.2.1) (2026-02-22)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.2.0...9.2.1)
+or [Download v9.2.1](https://github.com/jacobwilliams/json-fortran/releases/tag/9.2.1)
+
+**Changes:**
+
+* Fixed compile for systems without `real128` [#619](https://github.com/jacobwilliams/json-fortran/issues/619) [#621](https://github.com/jacobwilliams/json-fortran/pull/621)  ([ivan-pi](https://github.com/ivan-pi))
+* Added a new test. [#622](https://github.com/jacobwilliams/json-fortran/issues/622) [#623](https://github.com/jacobwilliams/json-fortran/pull/623) ([jacobwilliams](https://github.com/jacobwilliams))
+* Some minor code and doc cleanups. [#575](https://github.com/jacobwilliams/json-fortran/issues/575) [#618](https://github.com/jacobwilliams/json-fortran/pull/618) ([jacobwilliams](https://github.com/jacobwilliams))
 
 ### [9.2.0](https://github.com/jacobwilliams/json-fortran/tree/9.2.0) (2026-01-05)
 
