@@ -2,7 +2,7 @@
 !>
 !  Entry point for the unified unit test application.
 !
-!  Runs all the tests in the `tests` folder
+!  Runs all the tests in the `test` folder
 !  Returns `1` if there are any errors.
 
     program jsonfortrantest
@@ -58,6 +58,8 @@
     use jf_test_49_mod , only: test_49
     use jf_test_50_mod , only: test_50
     use jf_test_51_mod , only: test_51
+    use jf_test_52_mod , only: test_52
+    use jf_test_53_mod , only: test_53
 
     implicit none
 
@@ -116,6 +118,8 @@
     call test_49(n_errors); if (n_errors /= 0) stop 1
     call test_50(n_errors); if (n_errors /= 0) stop 1
     call test_51(n_errors); if (n_errors /= 0) stop 1
+    call test_52(n_errors); if (n_errors /= 0) stop 1
+    call test_53(n_errors); if (n_errors /= 0) stop 1
 
     end program jsonfortrantest
 !*****************************************************************************************
