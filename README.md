@@ -42,13 +42,15 @@ Download
 --------------------
 
 [![GitHub release](https://img.shields.io/github/release/jacobwilliams/json-fortran.svg)](https://github.com/jacobwilliams/json-fortran/releases)
-[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg)](https://formulae.brew.sh/formula/json-fortran)
-[![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/json-fortran)](https://github.com/conda-forge/json-fortran-feedstock)
 
 Download the official versioned releases
 [here](https://github.com/jacobwilliams/json-fortran/releases/latest).
 Or, get the latest development code from the master branch
 [here](https://github.com/jacobwilliams/json-fortran.git).
+
+### Homebrew
+
+[![homebrew version](https://img.shields.io/homebrew/v/json-fortran.svg)](https://formulae.brew.sh/formula/json-fortran)
 
 __NEWS:__ As of June 7, 2015,
 [json-fortran](https://github.com/jacobwilliams/json-fortran) can be
@@ -68,6 +70,11 @@ _Please note_, if you wish to support usage of JSON-Fortran with
 multiple Fortran compilers, please follow the CMake installation
 instructions below, as the homebrew installation is only intended to
 support a single Fortran compiler. Cheers!
+
+### Conda
+
+[![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/json-fortran)](https://github.com/conda-forge/json-fortran-feedstock)
+[![Downloads](https://anaconda.org/conda-forge/json-fortran/badges/downloads.svg)](https://anaconda.org/conda-forge/json-fortran)
 
 __NEWS:__ As of January 20, 2022,
 [json-fortran](https://github.com/jacobwilliams/json-fortran) can be
@@ -142,7 +149,7 @@ cmake_minimum_required ( VERSION 3.18 FATAL_ERROR )
 enable_language ( Fortran )
 project ( jf_test NONE )
 
-find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 8.5.1 REQUIRED )
+find_package ( jsonfortran-${CMAKE_Fortran_COMPILER_ID} 9.2.1 REQUIRED )
 
 file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
 foreach ( UNIT_TEST ${JF_TEST_SRCS} )

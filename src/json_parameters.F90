@@ -99,9 +99,9 @@
     character(kind=CK,len=*),parameter :: false_str = CK_'false' !! JSON logical False string
 #endif
 
-    integer, private :: i_      !! just a counter for `control_chars` array
-    character(kind=CK,len=*),dimension(32),parameter :: control_chars = &
-        [(achar(i_,kind=CK),i_=1,31), achar(127,kind=CK)] !! Control characters, possibly in unicode
+    ! integer, private :: i_      !! just a counter for `control_chars` array
+    ! character(kind=CK,len=*),dimension(32),parameter :: control_chars = &
+    !     [(achar(i_,kind=CK),i_=1,31), achar(127,kind=CK)] !! Control characters, possibly in unicode
 
     !find out the precision of the floating point number system
     !and set safety factors
@@ -135,10 +135,12 @@
 
     integer(IK),parameter :: stream_chunk_size = 256_IK !! chunk size for reading stream files
 
-    integer(IK),parameter :: print_str_chunk_size = 1000_IK !! chunk size for writing JSON to a string
+    integer(IK),parameter :: print_str_initial_buffer_size = 10000_IK !! initial buffer size for writing JSON to a string
 
     integer(IK),parameter :: pushed_char_size = 10_IK !! size for `pushed_char`
                                                       !! array in [[json_core(type)]]
+
+    integer(IK),parameter :: iomsg_len = 256_IK !! length of `iomsg` strings used in IO statements
 
     end module json_parameters
 !*****************************************************************************************

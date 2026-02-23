@@ -64,6 +64,7 @@
     public :: real_to_string
     public :: string_to_integer
     public :: string_to_real
+    public :: string_to_real_c
     public :: valid_json_hex
     public :: to_unicode
     public :: escape_string
@@ -234,6 +235,7 @@
     integer(IK) :: ierr  !! read iostat error code
 
     read(str,fmt=*,iostat=ierr) rval
+
     status_ok = (ierr==0)
     if (.not. status_ok) then
         rval = 0.0_RK
@@ -251,6 +253,152 @@
     end if
 
     end subroutine string_to_real
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!  date: 11/05/2021
+!
+!  Convert a string into a `real(RK)`.
+!  This version uses `strtof`, `strtod`, or `strtold` from C.
+!  It will fall back to using `read(fmt=*)` if any errors.
+!
+!# History
+!  * Jacob Williams : 11/05/2021 : created by modification of [[string_to_real]].
+
+    subroutine string_to_real_c(str,use_quiet_nan,rval,status_ok)
+
+    use iso_c_binding, only: c_double, c_float, &
+                             c_char, c_ptr, c_null_ptr, c_long, &
+                             c_null_char, c_loc, c_associated
+#ifdef REAL128
+    use iso_c_binding, only: c_long_double
+#endif
+    implicit none
+
+    character(kind=CK,len=*),intent(in) :: str           !! the string to convert to a real
+    logical(LK),intent(in)              :: use_quiet_nan !! if true, return NaN's as `ieee_quiet_nan`.
+                                                         !! otherwise, use `ieee_signaling_nan`.
+    real(RK),intent(out)                :: rval          !! `str` converted to a real value
+    logical(LK),intent(out)             :: status_ok     !! true if there were no errors
+
+    integer(IK) :: ierr  !! read iostat error code
+    type(c_ptr) :: endptr !! pointer arg to `strtof`, etc.
+    character(kind=c_char,len=:),allocatable,target :: c_str !! for null-terminated C string
+    type(c_ptr) :: str_start !! pointer to start of string for comparison
+    logical :: done !! if the string has been processed
+
+    interface
+        function strtof( str, endptr ) result(d) bind(C, name="strtof" )
+            !! <stdlib.h> :: float strtof(const char *str, char **endptr)
+            import
+            implicit none
+            character(kind=c_char,len=1),dimension(*),intent(in) :: str
+            type(c_ptr), intent(inout) :: endptr
+            real(c_float) :: d
+        end function strtof
+        function strtod( str, endptr ) result(d) bind(C, name="strtod" )
+            !! <stdlib.h> :: double strtod(const char *str, char **endptr)
+            import
+            implicit none
+            character(kind=c_char,len=1),dimension(*),intent(in) :: str
+            type(c_ptr), intent(inout) :: endptr
+            real(c_double) :: d
+        end function strtod
+#ifdef REAL128
+        function strtold( str, endptr ) result(d) bind(C, name="strtold" )
+            !! <stdlib.h> :: long double strtold(const char *str, char **endptr)
+            import
+            implicit none
+            character(kind=c_char,len=1),dimension(*),intent(in) :: str
+            type(c_ptr), intent(inout) :: endptr
+            real(c_long_double) :: d
+        end function strtold
+#endif
+    end interface
+
+#ifdef USE_UCS4
+    ! if using unicode, don't try to call the C routines
+    ! [not sure they will work? need to test this... what if c_char /= CK?]
+    call string_to_real(str,use_quiet_nan,rval,status_ok)
+    return
+#endif
+
+    ! Create null-terminated C string
+    c_str = trim(str)//C_NULL_CHAR
+    str_start = c_loc(c_str)
+    endptr = c_null_ptr
+    done = .false.
+
+#ifdef REAL32
+
+    ! single precision
+
+    if (RK == c_float) then
+        rval = strtof( c_str, endptr )
+        ! Check if conversion was successful:
+        ! endptr should not point to the start (no conversion) and should not be null
+        if (c_associated(endptr) .and. .not. c_associated(endptr, str_start)) then
+            ierr = 0
+            status_ok = .true.
+            done = .true.
+        end if
+    end if
+
+#elif REAL128
+
+    ! quad precision
+
+    if (RK == c_long_double) then
+        rval = strtold( c_str, endptr )
+        ! Check if conversion was successful:
+        if (c_associated(endptr) .and. .not. c_associated(endptr, str_start)) then
+            ierr = 0
+            status_ok = .true.
+            done = .true.
+        end if
+    end if
+
+#else
+
+    ! double precision
+
+    if (RK == c_double) then
+        rval = strtod( c_str, endptr )
+        ! Check if conversion was successful:
+        if (c_associated(endptr) .and. .not. c_associated(endptr, str_start)) then
+            ierr = 0
+            status_ok = .true.
+            done = .true.
+        end if
+    end if
+
+#endif
+
+    if (allocated(c_str)) deallocate(c_str)
+
+    if (.not. done) then
+        ! the string was not processed, fallback to read:
+        read(str,fmt=*,iostat=ierr) rval
+        status_ok = (ierr==0)
+    end if
+
+    if (.not. status_ok) then
+        rval = 0.0_RK
+    else
+        if (ieee_support_nan(rval)) then
+            if (ieee_is_nan(rval)) then
+                ! make sure to return the correct NaN
+                if (use_quiet_nan) then
+                    rval = ieee_value(rval,ieee_quiet_nan)
+                else
+                    rval = ieee_value(rval,ieee_signaling_nan)
+                end if
+            end if
+        end if
+    end if
+
+    end subroutine string_to_real_c
 !*****************************************************************************************
 
 !*****************************************************************************************

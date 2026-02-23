@@ -112,3 +112,45 @@ logical(LK),intent(in),optional :: strict_integer_type_checking
   !!   value cannot be read.
   !!
   !! (default is true)
+logical(LK),intent(in),optional :: allow_trailing_comma
+  !! Allow a single trailing comma in arrays and objects.
+  !! (default is true)
+integer(IK),intent(in),optional :: parser_mode
+  !! Which version of the JSON parser to use:
+  !!
+  !! * 1 : the original recursive version [default]
+  !! * 2 : a non-recursive version that uses an
+  !!   explicit stack to avoid deep recursion issues.
+integer(IK),intent(in),optional :: parser_initial_stack_size
+  !! The initial stack size (in number of elements)
+  !! to use when `parser_mode=2` (non-recursive parser).
+  !! (default is 32)
+integer(IK),intent(in),optional :: parser_max_stack_size
+  !! The maximum stack size (in number of elements)
+  !! to use when `parser_mode=2` (non-recursive parser).
+  !! (default is 10000)
+integer(IK),intent(in),optional :: string_to_real_mode
+  !! Which implementation to use for converting
+  !! strings to real values:
+  !!
+  !! * 1 : use the Fortran implementation [default]
+  !! * 2 : use C library routines to convert
+  !!   strings to real values. This may be faster
+  !!   than the Fortran implementation. If the
+  !!   conversion fails, it will fall back to
+  !!   the Fortran version.
+integer(IK),intent(in),optional :: null_to_integer_mode
+  !! if `strict_type_checking=false`:
+  !!
+  !! * 1 : an exception will be raised if
+  !!   try to retrieve a `null` as an integer. [default]
+  !! * 2 : a `null` retrieved as an integer
+  !!   will return a 0.
+  !! * 3 : a `null` retrieved as an integer
+  !!   will return the value specified in
+  !!   `null_to_integer_value` (default is 0).
+integer(IK),intent(in),optional :: null_to_integer_value
+  !! The integer value to return when retrieving
+  !! a `null` as an integer and
+  !! `null_to_integer_mode=3`.
+  !! (default is 0).

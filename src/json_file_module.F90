@@ -208,6 +208,14 @@
 #endif
 
         !>
+        !  Add a null variable to a [[json_file(type)]], by specifying the path.
+        !
+        generic,public :: add_null => MAYBEWRAP(json_file_add_null), &
+                                      MAYBEWRAP(json_file_add_null_vec)
+        procedure :: MAYBEWRAP(json_file_add_null)
+        procedure :: MAYBEWRAP(json_file_add_null_vec)
+
+        !>
         !  Update a scalar variable in a [[json_file(type)]],
         !  by specifying the path.
         !
@@ -449,7 +457,7 @@
 #if defined __GFORTRAN__
     character(kind=CK,len=:),allocatable :: tmp  !! workaround for gfortran bugs
     call me%core%check_for_errors(status_ok,tmp)
-    if (present(error_msg)) error_msg = tmp
+    if (present(error_msg)) call move_alloc(tmp, error_msg)
 #else
     call me%core%check_for_errors(status_ok,error_msg)
 #endif
@@ -569,7 +577,8 @@
 
     function initialize_json_file(p,&
 #include "json_initialize_dummy_arguments.inc"
-                                 ) result(file_object)
+                                  , nullify_pointer &
+                                  ) result(file_object)
 
     implicit none
 
@@ -578,6 +587,13 @@
                                             !! as a `json_file` object. This
                                             !! will be nullified.
 #include "json_initialize_arguments.inc"
+    logical(LK),intent(in),optional :: nullify_pointer !! if True, then `p` will be nullified
+                                                       !! if present. (default is True). Normally,
+                                                       !! this should be done, because the [[json_file]] will destroy
+                                                       !! the pointer when the class goes out of scope (causing `p` to be
+                                                       !! a dangling pointer). However, if the intent is to use `p` in
+                                                       !! a [[json_file]] and then call [[json_file:nullify]] and continue
+                                                       !! to use `p`, then this should be set to False.
 
     call file_object%initialize(&
 #include "json_initialize_dummy_arguments.inc"
@@ -588,7 +604,11 @@
         ! we have to nullify it to avoid
         ! a dangling pointer when the file
         ! goes out of scope
-        nullify(p)
+        if (present(nullify_pointer)) then
+            if (nullify_pointer) nullify(p)
+        else
+            nullify(p)
+        end if
     end if
 
     end function initialize_json_file
@@ -839,7 +859,7 @@
 !     end program main
 !```
 
-    subroutine json_file_load(me, filename, unit)
+    subroutine json_file_load(me, filename, unit, destroy_pointer)
 
     implicit none
 
@@ -848,8 +868,14 @@
     integer(IK),intent(in),optional      :: unit      !! the unit number to use
                                                       !! (if not present, a newunit
                                                       !! is used)
+    logical(LK),intent(in),optional :: destroy_pointer  !! destroy the pointer before
+                                                        !! loading (default is True)
 
-    call me%destroy()
+    if (present(destroy_pointer)) then
+        if (destroy_pointer) call me%destroy()
+    else ! by default it is destroyed
+        call me%destroy()
+    end if
     call me%core%load(file=filename, p=me%p, unit=unit)
 
     end subroutine json_file_load
@@ -869,14 +895,20 @@
 !     call f%deserialize('{ "name": "Leonidas" }')
 !```
 
-    subroutine json_file_load_from_string(me, str)
+    subroutine json_file_load_from_string(me, str, destroy_pointer)
 
     implicit none
 
     class(json_file),intent(inout)      :: me
     character(kind=CK,len=*),intent(in) :: str  !! string to load JSON data from
+    logical(LK),intent(in),optional :: destroy_pointer  !! destroy the pointer before
+                                                        !! loading (default is True)
 
-    call me%destroy()
+    if (present(destroy_pointer)) then
+        if (destroy_pointer) call me%destroy()
+    else ! by default it is destroyed
+        call me%destroy()
+    end if
     call me%core%deserialize(me%p, str)
 
     end subroutine json_file_load_from_string
@@ -2464,6 +2496,89 @@
     end subroutine wrap_json_file_add_logical_vec
 !*****************************************************************************************
 
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a null value to a JSON file.
+
+    subroutine json_file_add_null(me,path,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_null_by_path(me%p,path,found,was_created)
+
+    end subroutine json_file_add_null
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_null]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_null(me,path,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_null(to_unicode(path),found,was_created)
+
+    end subroutine wrap_json_file_add_null
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Add a null vector to a JSON file.
+
+    subroutine json_file_add_null_vec(me,path,n_values,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CK,len=*),intent(in)  :: path         !! the path to the variable
+    integer(IK),intent(in)               :: n_values     !! number of nulls to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    if (.not. associated(me%p)) call me%core%create_object(me%p,ck_'') ! create root
+
+    call me%core%add_null_by_path(me%p,path,n_values,found,was_created)
+
+    end subroutine json_file_add_null_vec
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Alternate version of [[json_file_add_null_vec]], where "path" is kind=CDK.
+
+    subroutine wrap_json_file_add_null_vec(me,path,n_values,found,was_created)
+
+    implicit none
+
+    class(json_file),intent(inout)       :: me
+    character(kind=CDK,len=*),intent(in) :: path         !! the path to the variable
+    integer(IK),intent(in)               :: n_values     !! number of nulls to add
+    logical(LK),intent(out),optional     :: found        !! if the variable was found
+    logical(LK),intent(out),optional     :: was_created  !! if the variable had to be created
+
+    call me%json_file_add_null_vec(to_unicode(path),n_values,found,was_created)
+
+    end subroutine wrap_json_file_add_null_vec
+!*****************************************************************************************
+
 !*****************************************************************************************
 !> author: Jacob Williams
 !
@@ -3007,7 +3122,7 @@
 !
 !  Remove a variable from a JSON file.
 !
-!@note This is just a wrapper to [[remove_if_present]].
+!@note This is just a wrapper to [[json_core:remove_if_present]].
 
     subroutine json_file_remove(me,path)
 

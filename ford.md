@@ -5,15 +5,13 @@ author: Jacob Williams
 src_dir: ./src
 output_dir: ./doc
 media_dir: ./media
-exclude_dir: ./src/tests
-             ./src/tests/introspection
 favicon: ./media/json-fortran-32x32.png
 project_github: https://github.com/jacobwilliams/json-fortran
 project_download: https://github.com/jacobwilliams/json-fortran/releases/latest
 github: https://github.com/jacobwilliams
 website: http://degenerateconic.com
 twitter: https://twitter.com/degenerateconic
-preprocessor: {!.PREPROCESSOR!}
+preprocessor: gfortran -E
 predocmark_alt: >
 predocmark: <
 docmark_alt:

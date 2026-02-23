@@ -40,12 +40,12 @@ include ( "cmake/checkOutOfSource.cmake" )
 #---------------------
 project (
     jsonfortran
-    VERSION 8.5.2
+    VERSION 9.2.1
     LANGUAGES Fortran
 )
 
 # write the version file
-configure_file(${CMAKE_SOURCE_DIR}/.VERSION.in ${CMAKE_SOURCE_DIR}/.VERSION)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/.VERSION.in ${CMAKE_CURRENT_SOURCE_DIR}/.VERSION)
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
   option(JSON_FORTRAN_USE_OpenCoarrays
@@ -92,7 +92,7 @@ set ( JF_LIB_SRCS  src/json_kinds.F90
                    src/json_value_module.F90
                    src/json_file_module.F90
                    src/json_module.F90 )
-file ( GLOB JF_TEST_SRCS "src/tests/jf_test_*.F90" )
+file ( GLOB JF_TEST_SRCS "test/jf_test_*.F90" )
 set ( JF_TEST_UCS4_SUPPORT_SRC "${PROJECT_SOURCE_DIR}/src/tests/introspection/test_iso_10646_support.f90")
 
 #-----------------------------------------
@@ -252,7 +252,7 @@ if ( NOT SKIP_DOC_GEN )
     set ( DOC_DIR "${PROJECT_BINARY_DIR}/doc" )
     set ( PAGES_DIR "${PROJECT_SOURCE_DIR}/pages" )
     set ( PROJ_DIR "${PROJECT_SOURCE_DIR}/src" )
-    set ( FORD_PROJECT_FILE "${PROJECT_SOURCE_DIR}/json-fortran.md" )
+    set ( FORD_PROJECT_FILE "${PROJECT_SOURCE_DIR}/ford.md" )
     if ( ENABLE_UNICODE )
       set ( MACRO_FLAG "-m USE_UCS4" )
     else ()
@@ -288,7 +288,7 @@ if ( NOT SKIP_DOC_GEN )
 
     foreach ( DOC_SRC_FILE ${JF_LIB_SRCS} ${JF_TEST_SRCS} ${PROJECT_SOURCE_DIR}/README.md
 	${PROJECT_SOURCE_DIR}/CHANGELOG.md ${PROJECT_SOURCE_DIR}/.github/CONTRIBUTING.md
-	${PROJECT_SOURCE_DIR}/LICENSE ${PROJECT_SOURCE_DIR}/json-fortran.md ${PAGES_FILES} )
+	${PROJECT_SOURCE_DIR}/LICENSE ${PROJECT_SOURCE_DIR}/ford.md ${PAGES_FILES} )
       list ( APPEND FORD_DEPENDS "${DOC_SRC_FILE}" )
     endforeach ()
     add_custom_command ( OUTPUT ${FORD_OUTPUTS_CACHED}
