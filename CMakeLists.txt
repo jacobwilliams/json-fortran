@@ -235,6 +235,12 @@ set_target_properties ( ${LIB_NAME}
   LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
   Fortran_MODULE_DIRECTORY ${PROJECT_BINARY_DIR} )
 
+# Add trampoline heap implementation flag for gfortran on Linux
+if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU" AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  target_link_options(${LIB_NAME} PRIVATE -ftrampoline-impl=heap)
+  target_link_options(${LIB_NAME}-static PRIVATE -ftrampoline-impl=heap)
+endif()
+
 #-------------------------------------
 # Build the documentation with FORD
 #-------------------------------------
