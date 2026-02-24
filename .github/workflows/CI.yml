@@ -55,12 +55,17 @@ jobs:
         echo "PYTHONPATH=$MYDIR/FoBiS/src/main/python:$PYTHONPATH" >> $GITHUB_ENV
         echo "PATH=$MYDIR/FoBiS/src/main/python:$PATH" >> $GITHUB_ENV
 
+    - name: Setup Fortran Package Manager
+      uses: fortran-lang/setup-fpm@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Install Python dependencies
       if: contains( matrix.os, 'ubuntu')
       run: |
         python -m pip install --upgrade pip
         #pip install ford FoBiS.py pygooglechart fpm
-        pip install ford pygooglechart fpm>=0.13
+        pip install ford pygooglechart
         # just get the latest FoBiS from git:
         git clone https://github.com/szaghi/FoBiS.git
         # use a fork until there is a new release:
