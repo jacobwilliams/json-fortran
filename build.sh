@@ -284,7 +284,7 @@ fi
 
 if [[ $TRY_UNICODE == [yY]* ]]; then
     echo "Trying to compile library with Unicode/UCS4 support"
-    FoBiS.py build -ch -compiler "${FCOMPILER}" "${CUSTOM[@]}" "${COMPILERLFLAGS}" -cflags "${FCOMPILERFLAGS}" -dbld "${BINDIR}" -s "${INTROSPECDIR}" -dmod ./ -dobj ./ -t "${UCS4TESTCODE}" -o "${UCS4TESTCODE%.f90}" -colors
+    FoBiS.py build -ch -compiler "${FCOMPILER}" "${CUSTOM[@]}" $COMPILERLFLAGS -cflags "${FCOMPILERFLAGS}" -dbld "${BINDIR}" -s "${INTROSPECDIR}" -dmod ./ -dobj ./ -t "${UCS4TESTCODE}" -o "${UCS4TESTCODE%.f90}" -colors
     if "${BINDIR}/${UCS4TESTCODE%.f90}"; then
     DEFINES="-DUSE_UCS4 -Wunused-function"
     fi
@@ -307,7 +307,7 @@ if [[ $JF_SKIP_TESTS != [yY]* ]]; then
     for TEST in "${TESTDIR%/}"/jf_test_*.[fF]90; do
     THIS_TEST=${TEST##*/}
     echo "Build ${THIS_TEST%.[fF]90}"
-    FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" "${COMPILERLFLAGS}" -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld "${BINDIR}" -s "${TESTDIR}" -i "${LIBDIR}" -libs "${LIBDIR}/${LIBOUT}" -dmod ./ -dobj ./ -t "${THIS_TEST}" -o "${THIS_TEST%.[fF]90}" -colors
+    FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" $COMPILERLFLAGS -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld "${BINDIR}" -s "${TESTDIR}" -i "${LIBDIR}" -libs "${LIBDIR}/${LIBOUT}" -dmod ./ -dobj ./ -t "${THIS_TEST}" -o "${THIS_TEST%.[fF]90}" -colors
     done
 else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."
