@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        gcc_v: [12,10,11,9] # Version of GFortran we want to use.
+        gcc_v: [15,10,11,9] # Version of GFortran we want to use.
         python-version: [3.11]
     env:
       FC: gfortran-${{matrix.gcc_v}}
@@ -22,7 +22,7 @@ jobs:
       #  9 - build.sh with documentation, unit tests and coverage analysis. doc deployment
       #  10 - build.sh - no documentation, with and without unicode.
       #  11 - FPM
-      #  12 - CMake build with unit tests, no documentation, with coverage analysis. no unicode
+      #  15 - CMake build with unit tests, no documentation, with coverage analysis. no unicode
       #
       # NOTE: coverage disabled for now
 
@@ -34,7 +34,7 @@ jobs:
         submodules: recursive
 
     - name: Setup cmake
-      if: contains( matrix.gcc_v, 12 )
+      if: contains( matrix.gcc_v, 15 )
       uses: jwlawson/actions-setup-cmake@v2.0.2
       with:
         cmake-version: '3.28.x'
@@ -93,7 +93,7 @@ jobs:
       # CMake build with unit tests, no documentation, with coverage analysis
       # No unicode so that coverage combined with the build script will cover unicode
       # and non-unicode code paths
-      if: matrix.gcc_v == 12
+      if: matrix.gcc_v == 15
       run: |
         GFORTRAN=gfortran-${{matrix.gcc_v}}
         GCOV=gcov-${{matrix.gcc_v}}
