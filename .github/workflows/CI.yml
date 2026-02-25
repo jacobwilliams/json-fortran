@@ -47,14 +47,6 @@ jobs:
     - name: Setup Graphviz
       uses: ts-graphviz/setup-graphviz@v2.0.2
 
-    - name: Set current directory in env variable
-      run: echo "MYDIR=$(pwd)" >> $GITHUB_ENV
-
-    - name: Set PYTHONPATH and PATH for later steps
-      run: |
-        echo "PYTHONPATH=$MYDIR/FoBiS/src/main/python:$PYTHONPATH" >> $GITHUB_ENV
-        echo "PATH=$MYDIR/FoBiS/src/main/python:$PATH" >> $GITHUB_ENV
-
     - name: Setup Fortran Package Manager
       uses: fortran-lang/setup-fpm@v7
       with:
@@ -65,11 +57,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         #pip install ford FoBiS.py pygooglechart fpm
-        pip install ford pygooglechart
-        # just get the latest FoBiS from git:
-        git clone https://github.com/szaghi/FoBiS.git
-        # use a fork until there is a new release:
-        # git clone https://github.com/jacobwilliams/FoBiS.git
+        pip install ford FoBiS.py pygooglechart
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Install GFortran Linux
