@@ -12,6 +12,7 @@ $FORD_FILE    = ford.md
 $STATIC_LIB   = libjsonfortran.a
 $SHARED_LIB   = libjsonfortran.so
 $OPTIMIZE     = -O2
+$LFLAGS_GNU   = -ftrampoline-impl=heap
 $CSTATIC_GNU  = -c -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic
 $DEBUG_GNU    = -O0 -g3 -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wimplicit-interface -Wimplicit-procedure -Wunderflow -fcheck=all -fmodule-private -ffree-line-length-132 -fimplicit-none -fbacktrace -fdump-core -finit-real=nan -fall-intrinsics
 $CSTATIC_INT  = -c -std18
@@ -69,12 +70,14 @@ exclude_dirs    = $EXCLUDE_DIRS
 description     = Build library with GNU gfortran by optimized-static flags
 compiler        = gnu
 cflags          = $CSTATIC_GNU $OPTIMIZE
+lflags          = $LFLAGS_GNU
 template        = template-static
 
 [static-gnu-debug]
 description     = Build library with GNU gfortran by debug-static flags
 compiler        = gnu
 cflags          = $CSTATIC_GNU $DEBUG_GNU
+lflags          = $LFLAGS_GNU
 template        = template-static
 
 [static-intel]
@@ -93,12 +96,14 @@ template        = template-static
 description     = Build library with GNU gfortran by optimized-shared flags
 compiler        = gnu
 cflags          = $CSTATIC_GNU $OPTIMIZE
+lflags          = $LFLAGS_GNU
 template        = template-shared
 
 [shared-gnu-debug]
 description     = Build library with GNU gfortran by debug-shared flags
 compiler        = gnu
 cflags          = $CSTATIC_GNU $DEBUG_GNU
+lflags          = $LFLAGS_GNU
 template        = template-shared
 
 [shared-intel]
@@ -118,12 +123,14 @@ template        = template-shared
 description     = Build all tests with GNU gfortran by optimized-static flags
 compiler        = gnu
 cflags          = $CSTATIC_GNU $OPTIMIZE
+lflags          = $LFLAGS_GNU
 template        = template-tests
 
 [tests-gnu-debug]
 description     = Build all tests with GNU gfortran by debug-static flags
 compiler        = gnu
 cflags          = $CSTATIC_GNU $DEBUG_GNU
+lflags          = $LFLAGS_GNU
 template        = template-tests
 
 [tests-intel]
