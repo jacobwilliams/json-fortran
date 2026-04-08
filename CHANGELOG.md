@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.3.0 (2026-04-07)](#930-2026-04-07)
     - [9.2.1 (2026-02-22)](#921-2026-02-22)
     - [9.2.0 (2026-01-05)](#920-2026-01-05)
     - [9.1.0 (2026-01-02)](#910-2026-01-02)
@@ -58,7 +59,17 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.2.1...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.3.0...HEAD)
+
+### [9.3.0](https://github.com/jacobwilliams/json-fortran/tree/9.2.1) (2026-04-07)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.2.1...9.3.0)
+or [Download v9.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/9.3.0)
+
+**Changes:**
+
+* Test updates. Adding missing tests to unified Visual Studio solution file. Test reorganization (moved into `tests` folder). CI updates. Removed the old `-std=f2008ts` from the `fobis` file. [#624](https://github.com/jacobwilliams/json-fortran/issues/624) [#625](https://github.com/jacobwilliams/json-fortran/pull/625)  ([jacobwilliams](https://github.com/jacobwilliams))
+* Fixed an uninitialized variable. [#629](https://github.com/jacobwilliams/json-fortran/pull/629)  ([robertrueger](https://github.com/robertrueger))
 
 ### [9.2.1](https://github.com/jacobwilliams/json-fortran/tree/9.2.1) (2026-02-22)
 

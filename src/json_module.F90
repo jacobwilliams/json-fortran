@@ -73,7 +73,7 @@
 
     implicit none
 
-    character(kind=json_CK,len=*),parameter,private :: version = '9.2.1'
+    character(kind=json_CK,len=*),parameter,private :: version = '9.3.0'
         !! JSON-Fortran version.
         !!
         !!@note This string should match the one in the `.VERSION` file (which is used
