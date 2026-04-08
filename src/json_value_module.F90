@@ -10031,6 +10031,7 @@
     else
 
         ! open the file with a new unit number:
+        unit_was_open = .false.
         open (  newunit     = iunit, &
                 file        = file, &
                 status      = 'OLD', &
