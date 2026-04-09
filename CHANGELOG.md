@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
     - [Unreleased](#unreleased)
+    - [9.3.1 (2026-04-09)](#931-2026-04-09)
     - [9.3.0 (2026-04-07)](#930-2026-04-07)
     - [9.2.1 (2026-02-22)](#921-2026-02-22)
     - [9.2.0 (2026-01-05)](#920-2026-01-05)
@@ -59,9 +60,18 @@
 
 ### [Unreleased](https://github.com/jacobwilliams/json-fortran/tree/HEAD)
 
-[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.3.0...HEAD)
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.3.1...HEAD)
 
-### [9.3.0](https://github.com/jacobwilliams/json-fortran/tree/9.2.1) (2026-04-07)
+### [9.3.1](https://github.com/jacobwilliams/json-fortran/tree/9.3.1) (2026-04-07)
+
+[Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.3.0...9.3.1)
+or [Download v9.3.1](https://github.com/jacobwilliams/json-fortran/releases/tag/9.3.1)
+
+**Changes:**
+
+* Fix UCS4 introspection source path. [#630](https://github.com/jacobwilliams/json-fortran/pull/630) ([chenrui333](https://github.com/chenrui333))
+
+### [9.3.0](https://github.com/jacobwilliams/json-fortran/tree/9.3.0) (2026-04-07)
 
 [Complete Changeset](https://github.com/jacobwilliams/json-fortran/compare/9.2.1...9.3.0)
 or [Download v9.3.0](https://github.com/jacobwilliams/json-fortran/releases/tag/9.3.0)
