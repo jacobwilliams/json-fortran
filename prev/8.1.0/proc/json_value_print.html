@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="JSON-Fortran – A Fortran 2008 JSON API">
+    
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>json_value_print &ndash; JSON-Fortran</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>8.1.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+        
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>json_value_print
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 3.8% of total for procedures.">262 statements</a>
+     </li> 
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/json_value_module.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
+    
+     <li><a href='../module/json_value_module.html'>json_value_module</a></li>
+    
+  
+     <li class="active">json_value_print</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/json_value_print.html#src">json_value_print</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>
+private recursive subroutine json_value_print(json, p, iunit, str, indent, need_comma, colon, is_array_element, is_compressed_vector, iloc)
+    
+    
+   
+</h2>
+    
+  
+
+
+    
+    <p>Print the <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> structure to a string or a file.</p>
+<h3 id="notes">Notes</h3>
+<ul>
+<li>This is an internal routine called by the various wrapper routines.</li>
+<li>The reason the <code>str</code> argument is non-optional is because of a
+    bug in v4.9 of the gfortran compiler.</li>
+</ul>
+    
+
+    <h3>Arguments</h3>
+    
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-json%7E124"></span>class(<a href='../type/json_core.html'>json_core</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>json</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-p%7E70"></span>type(<a href='../type/json_value.html'>json_value</a>),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>p</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iunit%7E5"></span>integer(kind=IK),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iunit</strong></td><td><p>file unit to write to (the
+ file is assumed to be open)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-str%7E19"></span>character(kind=CK,len=:),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>allocatable</td><td>::</td>
+  <td><strong>str</strong></td><td><p>if <code>iunit==unit2str</code> (-1) then
+ the structure is printed to this
+ string rather than a file. This mode
+ is used by <a href="../proc/json_value_to_string.html">json_value_to_string</a>.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-indent"></span>integer(kind=IK),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>indent</strong></td><td><p>indention level</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-need_comma"></span>logical(kind=LK),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>need_comma</strong></td><td><p>if it needs a comma after it</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-colon"></span>logical(kind=LK),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>colon</strong></td><td><p>if the colon was just written</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_array_element"></span>logical(kind=LK),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>is_array_element</strong></td><td><p>if this is an array element</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_compressed_vector"></span>logical(kind=LK),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>is_compressed_vector</strong></td><td><p>if True, this is an element
+ from an array being printed
+ on one line [default is False]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iloc"></span>integer(kind=IK),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iloc</strong></td><td><p>current index in <code>str</code>. should be set to 0 initially.
+ [only used when <code>str</code> is used.]</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    
+    
+    
+    <br>
+    
+    
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~json_value_print~~CallsGraph Pages: 1 -->
+<svg id="procjson_value_printCallsGraph" width="350pt" height="116pt"
+ viewBox="0.00 0.00 350.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_value_print~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
+<title>proc~~json_value_print~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-112 346,-112 346,4 -4,4"/>
+<!-- proc~json_value_print -->
+<g id="proc~~json_value_print~~CallsGraph_node1" class="node"><title>proc~json_value_print</title>
+<polygon fill="none" stroke="black" points="91.5,-66 0.5,-66 0.5,-42 91.5,-42 91.5,-66"/>
+<text text-anchor="middle" x="46" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_value_print</text>
+</g>
+<!-- proc~real_to_string -->
+<g id="proc~~json_value_print~~CallsGraph_node2" class="node"><title>proc~real_to_string</title>
+<g id="a_proc~~json_value_print~~CallsGraph_node2"><a xlink:href=".././proc/real_to_string.html" xlink:title="real_to_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="214,-108 136,-108 136,-84 214,-84 214,-108"/>
+<text text-anchor="middle" x="175" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">real_to_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_print&#45;&gt;proc~real_to_string -->
+<g id="proc~~json_value_print~~CallsGraph_edge1" class="edge"><title>proc~json_value_print&#45;&gt;proc~real_to_string</title>
+<path fill="none" stroke="#ff0000" d="M83.3931,-66.0355C97.2097,-70.6048 113.134,-75.8711 127.741,-80.7019"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="127.008,-84.1458 137.602,-83.9627 129.206,-77.4998 127.008,-84.1458"/>
+</g>
+<!-- proc~escape_string -->
+<g id="proc~~json_value_print~~CallsGraph_node3" class="node"><title>proc~escape_string</title>
+<g id="a_proc~~json_value_print~~CallsGraph_node3"><a xlink:href=".././proc/escape_string.html" xlink:title="escape_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="214.5,-66 135.5,-66 135.5,-42 214.5,-42 214.5,-66"/>
+<text text-anchor="middle" x="175" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">escape_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_print&#45;&gt;proc~escape_string -->
+<g id="proc~~json_value_print~~CallsGraph_edge2" class="edge"><title>proc~json_value_print&#45;&gt;proc~escape_string</title>
+<path fill="none" stroke="#ff0000" d="M91.7754,-54C102.491,-54 113.988,-54 124.887,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="125.11,-57.5001 135.11,-54 125.11,-50.5001 125.11,-57.5001"/>
+</g>
+<!-- proc~integer_to_string -->
+<g id="proc~~json_value_print~~CallsGraph_node4" class="node"><title>proc~integer_to_string</title>
+<g id="a_proc~~json_value_print~~CallsGraph_node4"><a xlink:href=".././proc/integer_to_string.html" xlink:title="integer_to_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="221.5,-24 128.5,-24 128.5,-0 221.5,-0 221.5,-24"/>
+<text text-anchor="middle" x="175" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">integer_to_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_print&#45;&gt;proc~integer_to_string -->
+<g id="proc~~json_value_print~~CallsGraph_edge3" class="edge"><title>proc~json_value_print&#45;&gt;proc~integer_to_string</title>
+<path fill="none" stroke="#ff0000" d="M83.3931,-41.9645C97.2097,-37.3952 113.134,-32.1289 127.741,-27.2981"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="129.206,-30.5002 137.602,-24.0373 127.008,-23.8542 129.206,-30.5002"/>
+</g>
+<!-- proc~valid_json_hex -->
+<g id="proc~~json_value_print~~CallsGraph_node5" class="node"><title>proc~valid_json_hex</title>
+<g id="a_proc~~json_value_print~~CallsGraph_node5"><a xlink:href=".././proc/valid_json_hex.html" xlink:title="valid_json_hex">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="341.5,-66 258.5,-66 258.5,-42 341.5,-42 341.5,-66"/>
+<text text-anchor="middle" x="300" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">valid_json_hex</text>
+</a>
+</g>
+</g>
+<!-- proc~escape_string&#45;&gt;proc~valid_json_hex -->
+<g id="proc~~json_value_print~~CallsGraph_edge4" class="edge"><title>proc~escape_string&#45;&gt;proc~valid_json_hex</title>
+<path fill="none" stroke="#00ff00" d="M214.58,-54C225.261,-54 237.017,-54 248.276,-54"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="248.431,-57.5001 258.431,-54 248.431,-50.5001 248.431,-57.5001"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+     
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/json_value_print.html#src">json_value_print</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span>    <span class="k">recursive subroutine </span><span class="n">json_value_print</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">iunit</span><span class="p">,</span><span class="n">str</span><span class="p">,</span><span class="n">indent</span><span class="p">,&amp;</span>
+                                          <span class="n">need_comma</span><span class="p">,</span><span class="n">colon</span><span class="p">,</span><span class="n">is_array_element</span><span class="p">,&amp;</span>
+                                          <span class="n">is_compressed_vector</span><span class="p">,</span><span class="n">iloc</span><span class="p">)</span>
+
+    <span class="k">implicit none</span>
+
+<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">json</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">p</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">iunit</span>             <span class="c">!! file unit to write to (the</span>
+                                                              <span class="c">!! file is assumed to be open)</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>      <span class="kd">::</span> <span class="n">indent</span>            <span class="c">!! indention level</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>      <span class="kd">::</span> <span class="n">is_array_element</span>  <span class="c">!! if this is an array element</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>      <span class="kd">::</span> <span class="n">need_comma</span>        <span class="c">!! if it needs a comma after it</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span>      <span class="kd">::</span> <span class="n">colon</span>             <span class="c">!! if the colon was just written</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="k">allocatable</span> <span class="kd">::</span> <span class="n">str</span>
+                                                      <span class="c">!! if `iunit==unit2str` (-1) then</span>
+                                                      <span class="c">!! the structure is printed to this</span>
+                                                      <span class="c">!! string rather than a file. This mode</span>
+                                                      <span class="c">!! is used by [[json_value_to_string]].</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iloc</span>  <span class="c">!! current index in `str`. should be set to 0 initially.</span>
+                                       <span class="c">!! [only used when `str` is used.]</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">is_compressed_vector</span>  <span class="c">!! if True, this is an element</span>
+                                                             <span class="c">!! from an array being printed</span>
+                                                             <span class="c">!! on one line [default is False]</span>
+
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="n">max_numeric_str_len</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tmp</span> <span class="c">!! for value to string conversions</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span> <span class="kd">::</span> <span class="n">s_indent</span> <span class="c">!! the string of spaces for</span>
+                                                     <span class="c">!! indenting (see `tab` and `spaces`)</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span> <span class="kd">::</span> <span class="n">s</span> <span class="c">!! the string appended to `str`</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span> <span class="kd">::</span> <span class="n">element</span> <span class="c">!! for getting children</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tab</span>           <span class="c">!! number of `tabs` for indenting</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">spaces</span>        <span class="c">!! number of spaces for indenting</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span>             <span class="c">!! counter</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="nb">count</span>         <span class="c">!! number of children</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">print_comma</span>   <span class="c">!! if the comma will be printed after the value</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">write_file</span>    <span class="c">!! if we are writing to a file</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">write_string</span>  <span class="c">!! if we are writing to a string</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">is_array</span>      <span class="c">!! if this is an element in an array</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">var_type</span>      <span class="c">!! for getting the variable type of children</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">var_type_prev</span> <span class="c">!! for getting the variable type of children</span>
+    <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">is_vector</span>     <span class="c">!! if all elements of a vector</span>
+                                 <span class="c">!! are scalars of the same type</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span> <span class="kd">::</span> <span class="n">str_escaped</span> <span class="c">!! escaped version of</span>
+                                                        <span class="c">!! `name` or `str_value`</span>
+
+    <span class="k">if</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span> <span class="k">then</span>
+
+<span class="k">        if</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="nb">associated</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">then</span>
+            <span class="c">! note: a null() pointer will trigger this error.</span>
+            <span class="c">! However, if the pointer is undefined, then this will</span>
+            <span class="c">! crash (if this wasn&#39;t here it would crash below when</span>
+            <span class="c">! we try to access the contents)</span>
+            <span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_value_print: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
+                                      <span class="s1">&#39;the pointer is not associated&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">is_compressed_vector</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">is_vector</span> <span class="o">=</span> <span class="n">is_compressed_vector</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">is_vector</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
+        <span class="k">end if</span>
+
+        <span class="c">!whether to write a string or a file (one or the other):</span>
+        <span class="n">write_string</span> <span class="o">=</span> <span class="p">(</span><span class="n">iunit</span><span class="o">==</span><span class="n">unit2str</span><span class="p">)</span>
+        <span class="n">write_file</span> <span class="o">=</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">write_string</span>
+
+        <span class="c">!if the comma will be printed after the value</span>
+        <span class="c">! [comma not printed for the last elements]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">need_comma</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">print_comma</span> <span class="o">=</span> <span class="n">need_comma</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">print_comma</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
+        <span class="k">end if</span>
+
+        <span class="c">!number of &quot;tabs&quot; to indent:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">indent</span><span class="p">)</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">json</span><span class="p">%</span><span class="n">no_whitespace</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">tab</span> <span class="o">=</span> <span class="n">indent</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">tab</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">end if</span>
+        <span class="c">!convert to number of spaces:</span>
+        <span class="n">spaces</span> <span class="o">=</span> <span class="n">tab</span><span class="o">*</span><span class="n">json</span><span class="p">%</span><span class="n">spaces_per_tab</span>
+
+        <span class="c">!if this is an element in an array:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">is_array_element</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">is_array</span> <span class="o">=</span> <span class="n">is_array_element</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">is_array</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
+        <span class="k">end if</span>
+
+        <span class="c">!if the colon was the last thing written</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">colon</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">s_indent</span> <span class="o">=</span> <span class="n">CK_</span><span class="s1">&#39;&#39;</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">s_indent</span> <span class="o">=</span> <span class="nb">repeat</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">spaces</span><span class="p">)</span>
+        <span class="k">end if</span>
+
+<span class="k">        select case</span> <span class="p">(</span><span class="n">p</span><span class="p">%</span><span class="n">var_type</span><span class="p">)</span>
+
+        <span class="k">case</span> <span class="p">(</span><span class="n">json_object</span><span class="p">)</span>
+
+            <span class="nb">count</span> <span class="o">=</span> <span class="n">json</span><span class="p">%</span><span class="nb">count</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nb">count</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>    <span class="c">!special case for empty object</span>
+
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="n">start_object</span><span class="o">//</span><span class="n">end_object</span>
+                <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span> <span class="p">)</span>
+
+            <span class="k">else</span>
+
+<span class="k">                </span><span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="n">start_object</span>
+                <span class="k">call </span><span class="n">write_it</span><span class="p">()</span>
+
+                <span class="c">!if an object is in an array, there is an extra tab:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">is_array</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    if</span> <span class="p">(</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">json</span><span class="p">%</span><span class="n">no_whitespace</span><span class="p">)</span> <span class="n">tab</span> <span class="o">=</span> <span class="n">tab</span><span class="o">+</span><span class="mi">1</span>
+                    <span class="n">spaces</span> <span class="o">=</span> <span class="n">tab</span><span class="o">*</span><span class="n">json</span><span class="p">%</span><span class="n">spaces_per_tab</span>
+                <span class="k">end if</span>
+
+<span class="k">                nullify</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+                <span class="n">element</span> <span class="o">=&gt;</span> <span class="n">p</span><span class="p">%</span><span class="n">children</span>
+                <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">count</span>
+
+<span class="nb">                    </span><span class="k">if</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="nb">associated</span><span class="p">(</span><span class="n">element</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_value_print: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
+                                                  <span class="s1">&#39;Malformed JSON linked list&#39;</span><span class="p">)</span>
+                        <span class="k">return</span>
+<span class="k">                    end if</span>
+
+                    <span class="c">! print the name</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">element</span><span class="p">%</span><span class="n">name</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                        call </span><span class="n">escape_string</span><span class="p">(</span><span class="n">element</span><span class="p">%</span><span class="n">name</span><span class="p">,</span><span class="n">str_escaped</span><span class="p">,</span><span class="n">json</span><span class="p">%</span><span class="n">escape_solidus</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">no_whitespace</span><span class="p">)</span> <span class="k">then</span>
+                            <span class="c">!compact printing - no extra space</span>
+                            <span class="n">s</span> <span class="o">=</span> <span class="nb">repeat</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">spaces</span><span class="p">)</span><span class="o">//</span><span class="n">quotation_mark</span><span class="o">//</span><span class="p">&amp;</span>
+                                          <span class="n">str_escaped</span><span class="o">//</span><span class="n">quotation_mark</span><span class="o">//</span><span class="n">colon_char</span>
+                            <span class="k">call </span><span class="n">write_it</span><span class="p">(</span><span class="n">advance</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
+                        <span class="k">else</span>
+<span class="k">                            </span><span class="n">s</span> <span class="o">=</span> <span class="nb">repeat</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">spaces</span><span class="p">)</span><span class="o">//</span><span class="n">quotation_mark</span><span class="o">//</span><span class="p">&amp;</span>
+                                          <span class="n">str_escaped</span><span class="o">//</span><span class="n">quotation_mark</span><span class="o">//</span><span class="n">colon_char</span><span class="o">//</span><span class="n">space</span>
+                            <span class="k">call </span><span class="n">write_it</span><span class="p">(</span><span class="n">advance</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
+                        <span class="k">end if</span>
+<span class="k">                    else</span>
+<span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_value_print:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
+                                                  <span class="s1">&#39; element%name not allocated&#39;</span><span class="p">)</span>
+                        <span class="k">nullify</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+                        <span class="k">return</span>
+<span class="k">                    end if</span>
+
+                    <span class="c">! recursive print of the element</span>
+                    <span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">json_value_print</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">iunit</span><span class="o">=</span><span class="n">iunit</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">tab</span> <span class="o">+</span> <span class="mi">1_IK</span><span class="p">,</span> <span class="p">&amp;</span>
+                                    <span class="n">need_comma</span><span class="o">=</span><span class="n">i</span><span class="o">&lt;</span><span class="nb">count</span><span class="p">,</span> <span class="n">colon</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span> <span class="n">str</span><span class="o">=</span><span class="n">str</span><span class="p">,</span> <span class="n">iloc</span><span class="o">=</span><span class="n">iloc</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span> <span class="k">return</span>
+
+                    <span class="c">! get the next child the list:</span>
+                    <span class="n">element</span> <span class="o">=&gt;</span> <span class="n">element</span><span class="p">%</span><span class="n">next</span>
+
+                <span class="k">end do</span>
+
+                <span class="c">! [one fewer tab if it isn&#39;t an array element]</span>
+                <span class="k">if</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">is_array</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    </span><span class="n">s</span> <span class="o">=</span> <span class="nb">repeat</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0_IK</span><span class="p">,</span><span class="n">spaces</span><span class="o">-</span><span class="n">json</span><span class="p">%</span><span class="n">spaces_per_tab</span><span class="p">))</span><span class="o">//</span><span class="n">end_object</span>
+                <span class="k">else</span>
+<span class="k">                    </span><span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="n">end_object</span>
+                <span class="k">end if</span>
+<span class="k">                call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span> <span class="p">)</span>
+                <span class="k">nullify</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+            <span class="k">end if</span>
+
+<span class="k">        case</span> <span class="p">(</span><span class="n">json_array</span><span class="p">)</span>
+
+            <span class="nb">count</span> <span class="o">=</span> <span class="n">json</span><span class="p">%</span><span class="nb">count</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">compress_vectors</span><span class="p">)</span> <span class="k">then</span>
+                <span class="c">! check to see if every child is the same type,</span>
+                <span class="c">! and a scalar:</span>
+                <span class="n">is_vector</span> <span class="o">=</span> <span class="p">.</span><span class="n">true</span><span class="p">.</span>
+                <span class="n">var_type_prev</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>   <span class="c">! an invalid value</span>
+                <span class="k">nullify</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+                <span class="n">element</span> <span class="o">=&gt;</span> <span class="n">p</span><span class="p">%</span><span class="n">children</span>
+                <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">count</span>
+<span class="nb">                    </span><span class="k">if</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="nb">associated</span><span class="p">(</span><span class="n">element</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_value_print: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
+                                                  <span class="s1">&#39;Malformed JSON linked list&#39;</span><span class="p">)</span>
+                        <span class="k">return</span>
+<span class="k">                    end if</span>
+                    <span class="c">! check variable type of all the children.</span>
+                    <span class="c">! They must all be the same, and a scalar.</span>
+                    <span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">info</span><span class="p">(</span><span class="n">element</span><span class="p">,</span><span class="n">var_type</span><span class="o">=</span><span class="n">var_type</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">var_type</span><span class="o">==</span><span class="n">json_object</span> <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="p">&amp;</span>
+                        <span class="n">var_type</span><span class="o">==</span><span class="n">json_array</span> <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="p">&amp;</span>
+                        <span class="p">(</span><span class="n">i</span><span class="o">&gt;</span><span class="mi">1</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="n">var_type</span><span class="o">/=</span><span class="n">var_type_prev</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                        </span><span class="n">is_vector</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
+                        <span class="k">exit</span>
+<span class="k">                    end if</span>
+<span class="k">                    </span><span class="n">var_type_prev</span> <span class="o">=</span> <span class="n">var_type</span>
+                    <span class="c">! get the next child the list:</span>
+                    <span class="n">element</span> <span class="o">=&gt;</span> <span class="n">element</span><span class="p">%</span><span class="n">next</span>
+                <span class="k">end do</span>
+<span class="k">            else</span>
+<span class="k">                </span><span class="n">is_vector</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
+            <span class="k">end if</span>
+
+<span class="k">            if</span> <span class="p">(</span><span class="nb">count</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>    <span class="c">!special case for empty array</span>
+
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="n">start_array</span><span class="o">//</span><span class="n">end_array</span>
+                <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span> <span class="p">)</span>
+
+            <span class="k">else</span>
+
+<span class="k">                </span><span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="n">start_array</span>
+                <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">advance</span><span class="o">=</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">is_vector</span><span class="p">)</span> <span class="p">)</span>
+
+                <span class="c">!if an array is in an array, there is an extra tab:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">is_array</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    if</span> <span class="p">(</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">json</span><span class="p">%</span><span class="n">no_whitespace</span><span class="p">)</span> <span class="n">tab</span> <span class="o">=</span> <span class="n">tab</span><span class="o">+</span><span class="mi">1</span>
+                    <span class="n">spaces</span> <span class="o">=</span> <span class="n">tab</span><span class="o">*</span><span class="n">json</span><span class="p">%</span><span class="n">spaces_per_tab</span>
+                <span class="k">end if</span>
+
+<span class="k">                nullify</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+                <span class="n">element</span> <span class="o">=&gt;</span> <span class="n">p</span><span class="p">%</span><span class="n">children</span>
+                <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">count</span>
+
+<span class="nb">                    </span><span class="k">if</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="nb">associated</span><span class="p">(</span><span class="n">element</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_value_print: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
+                                                  <span class="s1">&#39;Malformed JSON linked list&#39;</span><span class="p">)</span>
+                        <span class="k">return</span>
+<span class="k">                    end if</span>
+
+                    <span class="c">! recursive print of the element</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">is_vector</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">json_value_print</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">iunit</span><span class="o">=</span><span class="n">iunit</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0_IK</span><span class="p">,&amp;</span>
+                                        <span class="n">need_comma</span><span class="o">=</span><span class="n">i</span><span class="o">&lt;</span><span class="nb">count</span><span class="p">,</span> <span class="n">is_array_element</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.,</span> <span class="p">&amp;</span>
+                                        <span class="n">str</span><span class="o">=</span><span class="n">str</span><span class="p">,</span> <span class="n">iloc</span><span class="o">=</span><span class="n">iloc</span><span class="p">,&amp;</span>
+                                        <span class="n">is_compressed_vector</span> <span class="o">=</span> <span class="p">.</span><span class="n">true</span><span class="p">.)</span>
+                    <span class="k">else</span>
+<span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">json_value_print</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">iunit</span><span class="o">=</span><span class="n">iunit</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">tab</span><span class="p">,&amp;</span>
+                                        <span class="n">need_comma</span><span class="o">=</span><span class="n">i</span><span class="o">&lt;</span><span class="nb">count</span><span class="p">,</span> <span class="n">is_array_element</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span> <span class="p">&amp;</span>
+                                        <span class="n">str</span><span class="o">=</span><span class="n">str</span><span class="p">,</span> <span class="n">iloc</span><span class="o">=</span><span class="n">iloc</span><span class="p">)</span>
+                    <span class="k">end if</span>
+<span class="k">                    if</span> <span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span> <span class="k">return</span>
+
+                    <span class="c">! get the next child the list:</span>
+                    <span class="n">element</span> <span class="o">=&gt;</span> <span class="n">element</span><span class="p">%</span><span class="n">next</span>
+
+                <span class="k">end do</span>
+
+                <span class="c">!indent the closing array character:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">is_vector</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    </span><span class="n">s</span> <span class="o">=</span> <span class="n">end_array</span>
+                    <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span> <span class="p">)</span>
+                <span class="k">else</span>
+<span class="k">                    </span><span class="n">s</span> <span class="o">=</span> <span class="nb">repeat</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0_IK</span><span class="p">,</span><span class="n">spaces</span><span class="o">-</span><span class="n">json</span><span class="p">%</span><span class="n">spaces_per_tab</span><span class="p">))</span><span class="o">//</span><span class="n">end_array</span>
+                    <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span> <span class="p">)</span>
+                <span class="k">end if</span>
+<span class="k">                nullify</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+            <span class="k">end if</span>
+
+<span class="k">        case</span> <span class="p">(</span><span class="n">json_null</span><span class="p">)</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="n">null_str</span>
+            <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span><span class="p">,</span> <span class="p">&amp;</span>
+                           <span class="n">advance</span><span class="o">=</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">is_vector</span><span class="p">),&amp;</span>
+                           <span class="n">space_after_comma</span><span class="o">=</span><span class="n">is_vector</span> <span class="p">)</span>
+
+        <span class="k">case</span> <span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">p</span><span class="p">%</span><span class="n">str_value</span><span class="p">))</span> <span class="k">then</span>
+                <span class="c">! have to escape the string for printing:</span>
+                <span class="k">call </span><span class="n">escape_string</span><span class="p">(</span><span class="n">p</span><span class="p">%</span><span class="n">str_value</span><span class="p">,</span><span class="n">str_escaped</span><span class="p">,</span><span class="n">json</span><span class="p">%</span><span class="n">escape_solidus</span><span class="p">)</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="n">quotation_mark</span><span class="o">//</span><span class="n">str_escaped</span><span class="o">//</span><span class="n">quotation_mark</span>
+                <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span><span class="p">,</span> <span class="p">&amp;</span>
+                               <span class="n">advance</span><span class="o">=</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">is_vector</span><span class="p">),&amp;</span>
+                               <span class="n">space_after_comma</span><span class="o">=</span><span class="n">is_vector</span> <span class="p">)</span>
+            <span class="k">else</span>
+<span class="k">                call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_value_print:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
+                                          <span class="s1">&#39; p%value_string not allocated&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+<span class="k">            end if</span>
+
+<span class="k">        case</span> <span class="p">(</span><span class="n">json_logical</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">%</span><span class="n">log_value</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="n">true_str</span>
+                <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span><span class="p">,</span> <span class="p">&amp;</span>
+                               <span class="n">advance</span><span class="o">=</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">is_vector</span><span class="p">),&amp;</span>
+                               <span class="n">space_after_comma</span><span class="o">=</span><span class="n">is_vector</span> <span class="p">)</span>
+            <span class="k">else</span>
+<span class="k">                </span><span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="n">false_str</span>
+                <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span><span class="p">,</span> <span class="p">&amp;</span>
+                               <span class="n">advance</span><span class="o">=</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">is_vector</span><span class="p">),&amp;</span>
+                               <span class="n">space_after_comma</span><span class="o">=</span><span class="n">is_vector</span> <span class="p">)</span>
+            <span class="k">end if</span>
+
+<span class="k">        case</span> <span class="p">(</span><span class="n">json_integer</span><span class="p">)</span>
+
+            <span class="k">call </span><span class="n">integer_to_string</span><span class="p">(</span><span class="n">p</span><span class="p">%</span><span class="n">int_value</span><span class="p">,</span><span class="n">int_fmt</span><span class="p">,</span><span class="n">tmp</span><span class="p">)</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span><span class="p">,</span> <span class="p">&amp;</span>
+                           <span class="n">advance</span><span class="o">=</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">is_vector</span><span class="p">),&amp;</span>
+                           <span class="n">space_after_comma</span><span class="o">=</span><span class="n">is_vector</span> <span class="p">)</span>
+
+        <span class="k">case</span> <span class="p">(</span><span class="n">json_real</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">real_fmt</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                call </span><span class="n">real_to_string</span><span class="p">(</span><span class="n">p</span><span class="p">%</span><span class="n">dbl_value</span><span class="p">,</span><span class="n">json</span><span class="p">%</span><span class="n">real_fmt</span><span class="p">,</span><span class="n">json</span><span class="p">%</span><span class="n">compact_real</span><span class="p">,</span><span class="n">json</span><span class="p">%</span><span class="n">non_normals_to_null</span><span class="p">,</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="k">else</span>
+                <span class="c">!use the default format (user has not called initialize() or specified one):</span>
+                <span class="k">call </span><span class="n">real_to_string</span><span class="p">(</span><span class="n">p</span><span class="p">%</span><span class="n">dbl_value</span><span class="p">,</span><span class="n">default_real_fmt</span><span class="p">,</span><span class="n">json</span><span class="p">%</span><span class="n">compact_real</span><span class="p">,</span><span class="n">json</span><span class="p">%</span><span class="n">non_normals_to_null</span><span class="p">,</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="k">end if</span>
+
+<span class="k">            </span><span class="n">s</span> <span class="o">=</span> <span class="n">s_indent</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">write_it</span><span class="p">(</span> <span class="n">comma</span><span class="o">=</span><span class="n">print_comma</span><span class="p">,</span> <span class="p">&amp;</span>
+                           <span class="n">advance</span><span class="o">=</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">is_vector</span><span class="p">),&amp;</span>
+                           <span class="n">space_after_comma</span><span class="o">=</span><span class="n">is_vector</span> <span class="p">)</span>
+
+        <span class="k">case </span><span class="n">default</span>
+
+            <span class="k">call </span><span class="n">integer_to_string</span><span class="p">(</span><span class="n">p</span><span class="p">%</span><span class="n">var_type</span><span class="p">,</span><span class="n">int_fmt</span><span class="p">,</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_value_print: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
+                                      <span class="s1">&#39;unknown data type: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+
+        <span class="k">end select</span>
+
+<span class="k">    end if</span>
+
+<span class="k">    contains</span>
+
+<span class="k">        subroutine </span><span class="n">write_it</span><span class="p">(</span><span class="n">advance</span><span class="p">,</span><span class="n">comma</span><span class="p">,</span><span class="n">space_after_comma</span><span class="p">)</span>
+
+        <span class="c">!! write the string `s` to the file (or the output string)</span>
+
+        <span class="k">implicit none</span>
+
+<span class="k">        </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">advance</span>           <span class="c">!! to add line break or not</span>
+        <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">comma</span>             <span class="c">!! print comma after the string</span>
+        <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="k">optional</span> <span class="kd">::</span> <span class="n">space_after_comma</span> <span class="c">!! print a space after the comma</span>
+
+        <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">add_comma</span>       <span class="c">!! if a delimiter is to be added after string</span>
+        <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">add_line_break</span>  <span class="c">!! if a line break is to be added after string</span>
+        <span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">add_space</span>       <span class="c">!! if a space is to be added after the comma</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span>               <span class="c">!! length of actual string `s` appended to `str`</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">room_left</span>       <span class="c">!! number of characters left in `str`</span>
+        <span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_chunks_to_add</span> <span class="c">!! number of chunks to add to `str` for appending `s`</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">comma</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">add_comma</span> <span class="o">=</span> <span class="n">comma</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">add_comma</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span> <span class="c">!default is not to add comma</span>
+        <span class="k">end if</span>
+<span class="k">        if</span> <span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">no_whitespace</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">add_space</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
+        <span class="k">else</span>
+<span class="k">            if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">space_after_comma</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">add_space</span> <span class="o">=</span> <span class="n">space_after_comma</span>
+            <span class="k">else</span>
+<span class="k">                </span><span class="n">add_space</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span> <span class="c">!default is not to add space</span>
+            <span class="k">end if</span>
+<span class="k">        end if</span>
+<span class="k">        if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">advance</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">            if</span> <span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">no_whitespace</span><span class="p">)</span> <span class="k">then</span>
+                <span class="c">! overrides input value:</span>
+                <span class="n">add_line_break</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
+            <span class="k">else</span>
+<span class="k">                </span><span class="n">add_line_break</span> <span class="o">=</span> <span class="n">advance</span>
+            <span class="k">end if</span>
+<span class="k">        else</span>
+<span class="k">            </span><span class="n">add_line_break</span> <span class="o">=</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">json</span><span class="p">%</span><span class="n">no_whitespace</span> <span class="c">! default is to advance if</span>
+                                                      <span class="c">! we are printing whitespace</span>
+        <span class="k">end if</span>
+
+        <span class="c">! string to print:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">add_comma</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            if</span> <span class="p">(</span><span class="n">add_space</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">//</span> <span class="n">delimiter</span> <span class="o">//</span> <span class="n">space</span>
+            <span class="k">else</span>
+<span class="k">                </span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">//</span> <span class="n">delimiter</span>
+            <span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="k">        if</span> <span class="p">(</span><span class="n">write_file</span><span class="p">)</span> <span class="k">then</span>
+
+<span class="k">            if</span> <span class="p">(</span><span class="n">add_line_break</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                write</span><span class="p">(</span><span class="n">iunit</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span> <span class="n">s</span>
+            <span class="k">else</span>
+<span class="k">                write</span><span class="p">(</span><span class="n">iunit</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;(A)&#39;</span><span class="p">,</span><span class="n">advance</span><span class="o">=</span><span class="s1">&#39;NO&#39;</span><span class="p">)</span> <span class="n">s</span>
+            <span class="k">end if</span>
+
+<span class="k">        else</span>    <span class="c">!write string</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">add_line_break</span><span class="p">)</span> <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">//</span> <span class="n">newline</span>
+
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">room_left</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">str</span><span class="p">)</span><span class="o">-</span><span class="n">iloc</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">room_left</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">)</span> <span class="k">then</span>
+                <span class="c">! need to add another chunk to fit this string:</span>
+                <span class="n">n_chunks_to_add</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1_IK</span><span class="p">,</span> <span class="nb">ceiling</span><span class="p">(</span> <span class="kt">real</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="n">room_left</span><span class="p">,</span><span class="n">RK</span><span class="p">)</span> <span class="o">/</span> <span class="kt">real</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">,</span><span class="n">RK</span><span class="p">),</span> <span class="n">IK</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">str</span> <span class="o">=</span> <span class="n">str</span> <span class="o">//</span> <span class="nb">repeat</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">print_str_chunk_size</span><span class="o">*</span><span class="n">n_chunks_to_add</span><span class="p">)</span>
+            <span class="k">end if</span>
+            <span class="c">! append s to str:</span>
+            <span class="n">str</span><span class="p">(</span><span class="n">iloc</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">iloc</span><span class="o">+</span><span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="n">s</span>
+            <span class="n">iloc</span> <span class="o">=</span> <span class="n">iloc</span> <span class="o">+</span> <span class="n">n</span>
+
+        <span class="k">end if</span>
+
+<span class="k">        end subroutine </span><span class="n">write_it</span>
+
+    <span class="k">end subroutine </span><span class="n">json_value_print</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on 2020-06-22 03:50  
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> JSON-Fortran was developed by Jacob Williams</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

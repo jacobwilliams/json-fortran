@@ -1,0 +1,897 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>json_traverse &ndash; JSON-Fortran</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran <small>9.0.5</small></a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>json_traverse
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+            <li class="list-inline-item" id="meta-author"><i class="fa fa-pencil"></i> Jacob Williams</li>
+            <li class="list-inline-item" id="meta-date"><i class="fa fa-calendar-o"></i> 4/28/2016</li>
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.5% of total for procedures.">35 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_value_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_value_module.f90.html'>json_value_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/json_value_module.html'>json_value_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_traverse</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/json_traverse.html#src">json_traverse</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine json_traverse(json, p, traverse_callback)  
+</h2>
+    
+
+    <p>Traverse a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> structure.
+This routine calls the user-specified <a href="../interface/json_traverse_callback_func.html">json_traverse_callback_func</a>
+for each element of the structure.</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/json_core.html'>json_core</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~173"></span>
+              class(<a href='../type/json_core.html'>json_core</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-p~120"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>p</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-traverse_callback~2"></span>
+              procedure(<a href='../interface/json_traverse_callback_func.html'>json_traverse_callback_func</a>)
+            </td>
+<td></td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>traverse_callback</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~json_traverse~~CallsGraph Pages: 1 -->
+<svg id="procjson_traverseCallsGraph" width="569pt" height="32pt"
+ viewBox="0.00 0.00 569.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_traverse~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~json_traverse~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 565,-28 565,4 -4,4"/>
+<!-- proc~json_traverse -->
+<g id="proc~~json_traverse~~CallsGraph_node1" class="node">
+<title>proc~json_traverse</title>
+<polygon fill="none" stroke="black" points="144,-24 0,-24 0,0 144,0 144,-24"/>
+<text text-anchor="middle" x="72" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_core%json_traverse</text>
+</g>
+<!-- none~throw_exception -->
+<g id="proc~~json_traverse~~CallsGraph_node2" class="node">
+<title>none~throw_exception</title>
+<g id="a_proc~~json_traverse~~CallsGraph_node2"><a xlink:href="../type/json_core.html#boundprocedure-throw_exception" xlink:title="json_core%throw_exception">
+<polygon fill="#a7506f" stroke="#a7506f" points="339,-24 180,-24 180,0 339,0 339,-24"/>
+<text text-anchor="middle" x="259.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%throw_exception</text>
+</a>
+</g>
+</g>
+<!-- proc~json_traverse&#45;&gt;none~throw_exception -->
+<g id="proc~~json_traverse~~CallsGraph_edge1" class="edge">
+<title>proc~json_traverse&#45;&gt;none~throw_exception</title>
+<path fill="none" stroke="#ff0000" d="M144.19,-12C152.56,-12 161.18,-12 169.75,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="169.78,-15.5 179.78,-12 169.78,-8.5 169.78,-15.5"/>
+</g>
+<!-- proc~json_throw_exception -->
+<g id="proc~~json_traverse~~CallsGraph_node3" class="node">
+<title>proc~json_throw_exception</title>
+<g id="a_proc~~json_traverse~~CallsGraph_node3"><a xlink:href="../proc/json_throw_exception.html" xlink:title="json_core%json_throw_exception">
+<polygon fill="#d9534f" stroke="#d9534f" points="561,-24 375,-24 375,0 561,0 561,-24"/>
+<text text-anchor="middle" x="468" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_throw_exception</text>
+</a>
+</g>
+</g>
+<!-- none~throw_exception&#45;&gt;proc~json_throw_exception -->
+<g id="proc~~json_traverse~~CallsGraph_edge2" class="edge">
+<title>none~throw_exception&#45;&gt;proc~json_throw_exception</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M339.16,-12C347.51,-12 356.1,-12 364.67,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="364.72,-15.5 374.72,-12 364.72,-8.5 364.72,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~json_traverse~~CalledByGraph Pages: 1 -->
+<svg id="procjson_traverseCalledByGraph" width="641pt" height="67pt"
+ viewBox="0.00 0.00 641.00 67.10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~json_traverse~~CalledByGraph" class="graph" transform="scale(0.37 0.37) rotate(0) translate(4 175)">
+<title>proc~~json_traverse~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-175 1706,-175 1706,4 -4,4"/>
+<!-- proc~json_traverse -->
+<g id="proc~~json_traverse~~CalledByGraph_node1" class="node">
+<title>proc~json_traverse</title>
+<polygon fill="none" stroke="black" points="1702,-66 1558,-66 1558,-42 1702,-42 1702,-66"/>
+<text text-anchor="middle" x="1630" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_core%json_traverse</text>
+</g>
+<!-- proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~json_traverse~~CalledByGraph_node2" class="node">
+<title>proc~json_check_all_for_duplicate_keys</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node2"><a xlink:href="../proc/json_check_all_for_duplicate_keys.html" xlink:title="json_core%json_check_all_for_duplicate_keys">
+<polygon fill="#d9534f" stroke="#d9534f" points="1522,-108 1269,-108 1269,-84 1522,-84 1522,-108"/>
+<text text-anchor="middle" x="1395.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_check_all_for_duplicate_keys</text>
+</a>
+</g>
+</g>
+<!-- proc~json_check_all_for_duplicate_keys&#45;&gt;proc~json_traverse -->
+<g id="proc~~json_traverse~~CalledByGraph_edge1" class="edge">
+<title>proc~json_check_all_for_duplicate_keys&#45;&gt;proc~json_traverse</title>
+<path fill="none" stroke="#ff0000" d="M1470.55,-83.96C1487.48,-81.11 1505.37,-78.02 1522,-75 1534.12,-72.8 1547,-70.36 1559.47,-67.94"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1560.2,-71.36 1569.35,-66.01 1558.86,-64.49 1560.2,-71.36"/>
+</g>
+<!-- proc~json_file_traverse -->
+<g id="proc~~json_traverse~~CalledByGraph_node3" class="node">
+<title>proc~json_file_traverse</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node3"><a xlink:href="../proc/json_file_traverse.html" xlink:title="json_file%json_file_traverse">
+<polygon fill="#d9534f" stroke="#d9534f" points="1475,-66 1316,-66 1316,-42 1475,-42 1475,-66"/>
+<text text-anchor="middle" x="1395.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_traverse</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_traverse&#45;&gt;proc~json_traverse -->
+<g id="proc~~json_traverse~~CalledByGraph_edge2" class="edge">
+<title>proc~json_file_traverse&#45;&gt;proc~json_traverse</title>
+<path fill="none" stroke="#ff0000" d="M1475.21,-54C1498.51,-54 1524.06,-54 1547.52,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1547.79,-57.5 1557.79,-54 1547.79,-50.5 1547.79,-57.5"/>
+</g>
+<!-- proc~json_value_is_child_of -->
+<g id="proc~~json_traverse~~CalledByGraph_node4" class="node">
+<title>proc~json_value_is_child_of</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node4"><a xlink:href="../proc/json_value_is_child_of.html" xlink:title="json_core%json_value_is_child_of">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1490,-24 1301,-24 1301,0 1490,0 1490,-24"/>
+<text text-anchor="middle" x="1395.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_is_child_of</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_is_child_of&#45;&gt;proc~json_traverse -->
+<g id="proc~~json_traverse~~CalledByGraph_edge3" class="edge">
+<title>proc~json_value_is_child_of&#45;&gt;proc~json_traverse</title>
+<path fill="none" stroke="#ff0000" d="M1470.55,-24.04C1487.48,-26.89 1505.37,-29.98 1522,-33 1534.12,-35.2 1547,-37.64 1559.47,-40.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1558.86,-43.51 1569.35,-41.99 1560.2,-36.64 1558.86,-43.51"/>
+</g>
+<!-- proc~json_parse_file -->
+<g id="proc~~json_traverse~~CalledByGraph_node5" class="node">
+<title>proc~json_parse_file</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node5"><a xlink:href="../proc/json_parse_file.html" xlink:title="json_core%json_parse_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="1220,-150 1069,-150 1069,-126 1220,-126 1220,-150"/>
+<text text-anchor="middle" x="1144.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_parse_file</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_file&#45;&gt;proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~json_traverse~~CalledByGraph_edge4" class="edge">
+<title>proc~json_parse_file&#45;&gt;proc~json_check_all_for_duplicate_keys</title>
+<path fill="none" stroke="#ff0000" d="M1216.85,-125.96C1246.94,-120.89 1282.12,-114.96 1313.2,-109.71"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1313.86,-113.15 1323.14,-108.04 1312.69,-106.25 1313.86,-113.15"/>
+</g>
+<!-- proc~json_parse_string -->
+<g id="proc~~json_traverse~~CalledByGraph_node6" class="node">
+<title>proc~json_parse_string</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node6"><a xlink:href="../proc/json_parse_string.html" xlink:title="json_core%json_parse_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="1227,-108 1062,-108 1062,-84 1227,-84 1227,-108"/>
+<text text-anchor="middle" x="1144.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_parse_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_parse_string&#45;&gt;proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~json_traverse~~CalledByGraph_edge5" class="edge">
+<title>proc~json_parse_string&#45;&gt;proc~json_check_all_for_duplicate_keys</title>
+<path fill="none" stroke="#ff0000" d="M1227.03,-96C1237.14,-96 1247.67,-96 1258.32,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1258.55,-99.5 1268.55,-96 1258.55,-92.5 1258.55,-99.5"/>
+</g>
+<!-- proc~json_value_swap -->
+<g id="proc~~json_traverse~~CalledByGraph_node7" class="node">
+<title>proc~json_value_swap</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node7"><a xlink:href="../proc/json_value_swap.html" xlink:title="json_core%json_value_swap">
+<polygon fill="#d9534f" stroke="#d9534f" points="1225,-24 1064,-24 1064,0 1225,0 1225,-24"/>
+<text text-anchor="middle" x="1144.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_swap</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_swap&#45;&gt;proc~json_value_is_child_of -->
+<g id="proc~~json_traverse~~CalledByGraph_edge7" class="edge">
+<title>proc~json_value_swap&#45;&gt;proc~json_value_is_child_of</title>
+<path fill="none" stroke="#0000ff" d="M1225.31,-12C1246.07,-12 1268.73,-12 1290.53,-12"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1290.81,-15.5 1300.81,-12 1290.81,-8.5 1290.81,-15.5"/>
+</g>
+<!-- proc~json_value_validate -->
+<g id="proc~~json_traverse~~CalledByGraph_node8" class="node">
+<title>proc~json_value_validate</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node8"><a xlink:href="../proc/json_value_validate.html" xlink:title="json_core%json_value_validate">
+<polygon fill="#d9534f" stroke="#d9534f" points="1233,-66 1056,-66 1056,-42 1233,-42 1233,-66"/>
+<text text-anchor="middle" x="1144.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%json_value_validate</text>
+</a>
+</g>
+</g>
+<!-- proc~json_value_validate&#45;&gt;proc~json_check_all_for_duplicate_keys -->
+<g id="proc~~json_traverse~~CalledByGraph_edge6" class="edge">
+<title>proc~json_value_validate&#45;&gt;proc~json_check_all_for_duplicate_keys</title>
+<path fill="none" stroke="#ff0000" d="M1216.03,-66.03C1233.35,-68.97 1251.84,-72.11 1269,-75 1283.07,-77.37 1298.03,-79.89 1312.54,-82.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1312.05,-85.78 1322.49,-83.98 1313.2,-78.88 1312.05,-85.78"/>
+</g>
+<!-- none~deserialize~2 -->
+<g id="proc~~json_traverse~~CalledByGraph_node9" class="node">
+<title>none~deserialize~2</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node9"><a xlink:href="../type/json_core.html#boundprocedure-deserialize~2" xlink:title="json_core%deserialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="1020,-108 890,-108 890,-84 1020,-84 1020,-108"/>
+<text text-anchor="middle" x="955" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%deserialize</text>
+</a>
+</g>
+</g>
+<!-- none~deserialize~2&#45;&gt;proc~json_parse_string -->
+<g id="proc~~json_traverse~~CalledByGraph_edge9" class="edge">
+<title>none~deserialize~2&#45;&gt;proc~json_parse_string</title>
+<path fill="none" stroke="#7fff00" d="M1020,-96C1030.21,-96 1040.95,-96 1051.65,-96"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1051.88,-99.5 1061.88,-96 1051.88,-92.5 1051.88,-99.5"/>
+</g>
+<!-- none~load~2 -->
+<g id="proc~~json_traverse~~CalledByGraph_node10" class="node">
+<title>none~load~2</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node10"><a xlink:href="../type/json_core.html#boundprocedure-load~2" xlink:title="json_core%load">
+<polygon fill="#a7506f" stroke="#a7506f" points="1003,-150 907,-150 907,-126 1003,-126 1003,-150"/>
+<text text-anchor="middle" x="955" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_core%load</text>
+</a>
+</g>
+</g>
+<!-- none~load~2&#45;&gt;proc~json_parse_file -->
+<g id="proc~~json_traverse~~CalledByGraph_edge8" class="edge">
+<title>none~load~2&#45;&gt;proc~json_parse_file</title>
+<path fill="none" stroke="#ff0000" d="M1003.31,-138C1020.14,-138 1039.64,-138 1058.65,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1058.83,-141.5 1068.83,-138 1058.83,-134.5 1058.83,-141.5"/>
+</g>
+<!-- proc~json_file_load -->
+<g id="proc~~json_traverse~~CalledByGraph_node11" class="node">
+<title>proc~json_file_load</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node11"><a xlink:href="../proc/json_file_load.html" xlink:title="json_file%json_file_load">
+<polygon fill="#d9534f" stroke="#d9534f" points="821.5,-150 683.5,-150 683.5,-126 821.5,-126 821.5,-150"/>
+<text text-anchor="middle" x="752.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_load</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_load&#45;&gt;none~load~2 -->
+<g id="proc~~json_traverse~~CalledByGraph_edge12" class="edge">
+<title>proc~json_file_load&#45;&gt;none~load~2</title>
+<path fill="none" stroke="#00ffff" d="M821.66,-138C846.09,-138 873.35,-138 896.76,-138"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="896.88,-141.5 906.88,-138 896.88,-134.5 896.88,-141.5"/>
+</g>
+<!-- proc~json_file_load_from_string -->
+<g id="proc~~json_traverse~~CalledByGraph_node12" class="node">
+<title>proc~json_file_load_from_string</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node12"><a xlink:href="../proc/json_file_load_from_string.html" xlink:title="json_file%json_file_load_from_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="854,-108 651,-108 651,-84 854,-84 854,-108"/>
+<text text-anchor="middle" x="752.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%json_file_load_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~json_file_load_from_string&#45;&gt;none~deserialize~2 -->
+<g id="proc~~json_traverse~~CalledByGraph_edge10" class="edge">
+<title>proc~json_file_load_from_string&#45;&gt;none~deserialize~2</title>
+<path fill="none" stroke="#ff0000" d="M854.04,-96C862.73,-96 871.41,-96 879.82,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="879.94,-99.5 889.94,-96 879.94,-92.5 879.94,-99.5"/>
+</g>
+<!-- proc~wrap_json_parse_string -->
+<g id="proc~~json_traverse~~CalledByGraph_node13" class="node">
+<title>proc~wrap_json_parse_string</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node13"><a xlink:href="../proc/wrap_json_parse_string.html" xlink:title="wrap_json_parse_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="820.5,-66 684.5,-66 684.5,-42 820.5,-42 820.5,-66"/>
+<text text-anchor="middle" x="752.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_json_parse_string</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_json_parse_string&#45;&gt;none~deserialize~2 -->
+<g id="proc~~json_traverse~~CalledByGraph_edge11" class="edge">
+<title>proc~wrap_json_parse_string&#45;&gt;none~deserialize~2</title>
+<path fill="none" stroke="#ff0000" d="M811.16,-66.04C825.18,-68.97 840.13,-72.09 854,-75 864.63,-77.23 875.91,-79.59 886.9,-81.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="886.38,-85.37 896.89,-84 887.82,-78.52 886.38,-85.37"/>
+</g>
+<!-- none~deserialize -->
+<g id="proc~~json_traverse~~CalledByGraph_node14" class="node">
+<title>none~deserialize</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node14"><a xlink:href="../type/json_file.html#boundprocedure-deserialize" xlink:title="json_file%deserialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="615,-108 491,-108 491,-84 615,-84 615,-108"/>
+<text text-anchor="middle" x="553" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%deserialize</text>
+</a>
+</g>
+</g>
+<!-- none~deserialize&#45;&gt;proc~json_file_load_from_string -->
+<g id="proc~~json_traverse~~CalledByGraph_edge13" class="edge">
+<title>none~deserialize&#45;&gt;proc~json_file_load_from_string</title>
+<path fill="none" stroke="#00ff00" d="M615.14,-96C623.28,-96 631.82,-96 640.5,-96"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="640.72,-99.5 650.72,-96 640.72,-92.5 640.72,-99.5"/>
+</g>
+<!-- proc~assign_string_to_json_file -->
+<g id="proc~~json_traverse~~CalledByGraph_node15" class="node">
+<title>proc~assign_string_to_json_file</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node15"><a xlink:href="../proc/assign_string_to_json_file.html" xlink:title="json_file%assign_string_to_json_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="455,-171 256,-171 256,-147 455,-147 455,-171"/>
+<text text-anchor="middle" x="355.5" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file%assign_string_to_json_file</text>
+</a>
+</g>
+</g>
+<!-- proc~assign_string_to_json_file&#45;&gt;none~deserialize -->
+<g id="proc~~json_traverse~~CalledByGraph_edge14" class="edge">
+<title>proc~assign_string_to_json_file&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M421.89,-146.97C433.03,-144.38 444.42,-141.38 455,-138 476.73,-131.05 500.23,-120.95 518.66,-112.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="520.25,-115.51 527.8,-108.08 517.26,-109.18 520.25,-115.51"/>
+</g>
+<!-- proc~initialize_json_file_from_string -->
+<g id="proc~~json_traverse~~CalledByGraph_node16" class="node">
+<title>proc~initialize_json_file_from_string</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node16"><a xlink:href="../proc/initialize_json_file_from_string.html" xlink:title="initialize_json_file_from_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="441,-129 270,-129 270,-105 441,-105 441,-129"/>
+<text text-anchor="middle" x="355.5" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_json_file_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_json_file_from_string&#45;&gt;none~deserialize -->
+<g id="proc~~json_traverse~~CalledByGraph_edge15" class="edge">
+<title>proc~initialize_json_file_from_string&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M441.11,-107.91C454.3,-106.49 467.82,-105.04 480.68,-103.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="481.26,-107.12 490.83,-102.57 480.51,-100.16 481.26,-107.12"/>
+</g>
+<!-- proc~initialize_json_file_from_string_v2 -->
+<g id="proc~~json_traverse~~CalledByGraph_node17" class="node">
+<title>proc~initialize_json_file_from_string_v2</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node17"><a xlink:href="../proc/initialize_json_file_from_string_v2.html" xlink:title="initialize_json_file_from_string_v2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="450,-87 261,-87 261,-63 450,-63 450,-87"/>
+<text text-anchor="middle" x="355.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_json_file_from_string_v2</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_json_file_from_string_v2&#45;&gt;none~deserialize -->
+<g id="proc~~json_traverse~~CalledByGraph_edge16" class="edge">
+<title>proc~initialize_json_file_from_string_v2&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M450.24,-85.07C460.5,-86.17 470.81,-87.28 480.73,-88.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="480.59,-91.85 490.91,-89.44 481.34,-84.89 480.59,-91.85"/>
+</g>
+<!-- proc~wrap_json_file_load_from_string -->
+<g id="proc~~json_traverse~~CalledByGraph_node18" class="node">
+<title>proc~wrap_json_file_load_from_string</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node18"><a xlink:href="../proc/wrap_json_file_load_from_string.html" xlink:title="wrap_json_file_load_from_string">
+<polygon fill="#d9534f" stroke="#d9534f" points="446,-45 265,-45 265,-21 446,-21 446,-45"/>
+<text text-anchor="middle" x="355.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_json_file_load_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_json_file_load_from_string&#45;&gt;none~deserialize -->
+<g id="proc~~json_traverse~~CalledByGraph_edge17" class="edge">
+<title>proc~wrap_json_file_load_from_string&#45;&gt;none~deserialize</title>
+<path fill="none" stroke="#ff0000" d="M421.89,-45.03C433.03,-47.62 444.42,-50.62 455,-54 476.73,-60.95 500.23,-71.05 518.66,-79.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="517.26,-82.82 527.8,-83.92 520.25,-76.49 517.26,-82.82"/>
+</g>
+<!-- interface~json_file -->
+<g id="proc~~json_traverse~~CalledByGraph_node19" class="node">
+<title>interface~json_file</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node19"><a xlink:href="../interface/json_file.html" xlink:title="json_file">
+<polygon fill="#a7506f" stroke="#a7506f" points="138,-87 82,-87 82,-63 138,-63 138,-87"/>
+<text text-anchor="middle" x="110" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file</text>
+</a>
+</g>
+</g>
+<!-- interface~json_file&#45;&gt;proc~initialize_json_file_from_string -->
+<g id="proc~~json_traverse~~CalledByGraph_edge20" class="edge">
+<title>interface~json_file&#45;&gt;proc~initialize_json_file_from_string</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M138.46,-79.74C171.38,-85.41 228,-95.18 275.01,-103.29"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="274.44,-106.74 284.89,-104.99 275.63,-99.84 274.44,-106.74"/>
+</g>
+<!-- interface~json_file&#45;&gt;proc~initialize_json_file_from_string_v2 -->
+<g id="proc~~json_traverse~~CalledByGraph_edge22" class="edge">
+<title>interface~json_file&#45;&gt;proc~initialize_json_file_from_string_v2</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M138.46,-75C165.86,-75 209.69,-75 250.73,-75"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="250.81,-78.5 260.81,-75 250.81,-71.5 250.81,-78.5"/>
+</g>
+<!-- proc~wrap_assign_string_to_json_file -->
+<g id="proc~~json_traverse~~CalledByGraph_node20" class="node">
+<title>proc~wrap_assign_string_to_json_file</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node20"><a xlink:href="../proc/wrap_assign_string_to_json_file.html" xlink:title="wrap_assign_string_to_json_file">
+<polygon fill="#d9534f" stroke="#d9534f" points="199,-171 21,-171 21,-147 199,-147 199,-171"/>
+<text text-anchor="middle" x="110" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_assign_string_to_json_file</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_assign_string_to_json_file&#45;&gt;proc~assign_string_to_json_file -->
+<g id="proc~~json_traverse~~CalledByGraph_edge18" class="edge">
+<title>proc~wrap_assign_string_to_json_file&#45;&gt;proc~assign_string_to_json_file</title>
+<path fill="none" stroke="#ff0000" d="M199.25,-159C214.33,-159 230.14,-159 245.67,-159"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="245.83,-162.5 255.83,-159 245.83,-155.5 245.83,-162.5"/>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string -->
+<g id="proc~~json_traverse~~CalledByGraph_node21" class="node">
+<title>proc~wrap_initialize_json_file_from_string</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node21"><a xlink:href="../proc/wrap_initialize_json_file_from_string.html" xlink:title="wrap_initialize_json_file_from_string">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="211,-129 9,-129 9,-105 211,-105 211,-129"/>
+<text text-anchor="middle" x="110" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_initialize_json_file_from_string</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string&#45;&gt;proc~initialize_json_file_from_string -->
+<g id="proc~~json_traverse~~CalledByGraph_edge19" class="edge">
+<title>proc~wrap_initialize_json_file_from_string&#45;&gt;proc~initialize_json_file_from_string</title>
+<path fill="none" stroke="#7fff00" d="M211.09,-117C227.13,-117 243.68,-117 259.59,-117"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="259.93,-120.5 269.93,-117 259.93,-113.5 259.93,-120.5"/>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string_v2 -->
+<g id="proc~~json_traverse~~CalledByGraph_node22" class="node">
+<title>proc~wrap_initialize_json_file_from_string_v2</title>
+<g id="a_proc~~json_traverse~~CalledByGraph_node22"><a xlink:href="../proc/wrap_initialize_json_file_from_string_v2.html" xlink:title="wrap_initialize_json_file_from_string_v2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="220,-45 0,-45 0,-21 220,-21 220,-45"/>
+<text text-anchor="middle" x="110" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_initialize_json_file_from_string_v2</text>
+</a>
+</g>
+</g>
+<!-- proc~wrap_initialize_json_file_from_string_v2&#45;&gt;proc~initialize_json_file_from_string_v2 -->
+<g id="proc~~json_traverse~~CalledByGraph_edge21" class="edge">
+<title>proc~wrap_initialize_json_file_from_string_v2&#45;&gt;proc~initialize_json_file_from_string_v2</title>
+<path fill="none" stroke="#00ffff" d="M180.78,-45.04C210.07,-50.09 244.3,-55.99 274.6,-61.22"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="274.26,-64.71 284.71,-62.96 275.45,-57.81 274.26,-64.71"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocjson_traverseCalledByGraph = svgPanZoom('#procjson_traverseCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">json_traverse</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">traverse_callback</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">implicit none</span>
+
+<span class="k">    class</span><span class="p">(</span><span class="n">json_core</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">         </span><span class="kd">::</span><span class="w"> </span><span class="n">json</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">    </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span>
+<span class="w">    </span><span class="k">procedure</span><span class="p">(</span><span class="n">json_traverse_callback_func</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">traverse_callback</span>
+
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">finished</span><span class="w"> </span><span class="c">!! can be used to stop the process</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">traverse</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">contains</span>
+
+<span class="k">        recursive subroutine </span><span class="n">traverse</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">!! recursive [[json_value]] traversal.</span>
+
+<span class="w">        </span><span class="k">implicit none</span>
+
+<span class="k">        type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span>
+
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">element</span><span class="w">  </span><span class="c">!! a child element</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="w">        </span><span class="c">!! counter</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">icount</span><span class="w">   </span><span class="c">!! number of children</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span><span class="w"> </span><span class="k">return</span>
+<span class="k">        call </span><span class="n">traverse_callback</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">finished</span><span class="p">)</span><span class="w"> </span><span class="c">! first call for this object</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">finished</span><span class="p">)</span><span class="w"> </span><span class="k">return</span>
+
+<span class="w">        </span><span class="c">!for arrays and objects, have to also call for all children:</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">p</span><span class="p">%</span><span class="n">var_type</span><span class="o">==</span><span class="n">json_array</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">p</span><span class="p">%</span><span class="n">var_type</span><span class="o">==</span><span class="n">json_object</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+
+<span class="k">            </span><span class="n">icount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="nb">count</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="c">! number of children</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">icount</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">element</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">p</span><span class="p">%</span><span class="n">children</span><span class="w">   </span><span class="c">! first one</span>
+<span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">icount</span><span class="w">        </span><span class="c">! call for each child</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">element</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_traverse: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                                  </span><span class="s1">&#39;Malformed JSON linked list&#39;</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">return</span>
+<span class="k">                    end if</span>
+<span class="k">                    call </span><span class="n">traverse</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">finished</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">json</span><span class="p">%</span><span class="n">exception_thrown</span><span class="p">)</span><span class="w"> </span><span class="k">exit</span>
+<span class="k">                    </span><span class="n">element</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">element</span><span class="p">%</span><span class="n">next</span>
+<span class="w">                </span><span class="k">end do</span>
+<span class="k">            end if</span>
+<span class="k">            nullify</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        end subroutine </span><span class="n">traverse</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">json_traverse</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2025-08-26 00:50 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

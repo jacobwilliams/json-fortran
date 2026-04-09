@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1" />
+<link rel="stylesheet" href="../robodoc.css" type="text/css" />
+<title>./src/tests/jf_test_6.f90</title>
+<!-- Source: ./src/tests/jf_test_6.f90 -->
+<!-- Generated with ROBODoc Version 4.99.41 (May  3 2011) -->
+</head>
+<body>
+<div id="logo">
+<a name="robo_top_of_doc">jsonfortran 4.1.0</a>
+</div> <!-- logo -->
+<div id="navigation">
+<a class="menuitem" href="../toc_index.html#top">Table of Contents</a>
+<a class="menuitem" href="../robo_sourcefiles.html#top">Sourcefiles</a>
+<a class="menuitem" href="../masterindex.html#top">Index</a>
+<a class="menuitem" href="../robo_interfaces.html#top">Interfaces</a>
+<a class="menuitem" href="../robo_macros.html#top">Macros</a>
+<a class="menuitem" href="../robo_classes.html#top">Classes</a>
+<a class="menuitem" href="../robo_definitions.html#top">Parameters</a>
+<a class="menuitem" href="../robo_functions.html#top">Functions</a>
+<a class="menuitem" href="../robo_modules.html#top">Modules</a>
+<a class="menuitem" href="../robo_unittests.html#top">Unittest</a>
+</div> <!-- navigation -->
+<div id="content">
+<hr />
+<a name="JSON2fjf5ftest5f6"></a>
+<a name="robo42"></a><h2>JSON/jf_test_6 [ Unittest ]</h2>
+
+<p>[ <a href="#robo_top_of_doc">Top</a> ] [ <a href="../robo_unittests.html#robo_top_of_doc">Unittest</a> ]</p>
+<p class="item_name">NAME</p>
+<p>    <strong>jf_test_6</strong>
+</p>
+<p class="item_name">DESCRIPTION</p>
+<p>    Sixth unit test
+</p>
+<p class="item_name">USES</p>
+<p>    <a href="../json_module_F90.html#robo0">json_module</a>
+    iso_fortran_env (intrinsic)
+</p>
+<p class="item_name">HISTORY</p>
+<p>    Izaak Beekman : 2/18/2015 : Created (refactoried original json_example.f90 file)
+</p>
+<p class="item_name">LICENSE</p>
+<p>    JSON-FORTRAN: A Fortran 2008 JSON API
+</p>
+
+<p>    https://github.com/jacobwilliams/json-fortran
+</p>
+
+<p>    Copyright (c) 2014, Jacob Williams
+</p>
+
+<p>    All rights reserved.
+</p>
+
+<p>    Redistribution and use in source and binary forms, with or without modification,
+    are permitted provided that the following conditions are met:
+</p>
+<ul><li>    Redistributions of source code must retain the above copyright notice, this
+      list of conditions and the following disclaimer.
+</li>
+<li>    Redistributions in binary form must reproduce the above copyright notice, this
+      list of conditions and the following disclaimer in the documentation and/or
+      other materials provided with the distribution.
+</li>
+<li>    The names of its contributors may not be used to endorse or promote products
+      derived from this software without specific prior written permission.
+</li>
+</ul>
+<p>    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+    ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</p>
+<p class="item_name">SOURCE</p>
+<pre class="source"><span class="line_number"> 49 </span><span class="keyword">module</span> jf_test_6_mod
+<span class="line_number"> 50 </span>
+<span class="line_number"> 51 </span>    <span class="keyword">use</span> <a href="../json_module_F90.html#robo0">json_module</a>
+<span class="line_number"> 52 </span>    <span class="keyword">use</span><span class="sign">,</span> <span class="keyword">intrinsic</span> <span class="sign">:</span><span class="sign">:</span> iso_fortran_env <span class="sign">,</span> <span class="keyword">only</span><span class="sign">:</span> error_unit<span class="sign">,</span> output_unit<span class="sign">,</span> wp <span class="sign">=</span><span class="sign">&gt;</span> real64
+<span class="line_number"> 53 </span>
+<span class="line_number"> 54 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number"> 55 </span>
+<span class="line_number"> 56 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">parameter</span> <span class="sign">:</span><span class="sign">:</span> dir <span class="sign">=</span> <span class="squote">'../files/inputs/'</span>        <span class="comment">!working directory</span>
+<span class="line_number"> 57 </span>
+<span class="line_number"> 58 </span><span class="keyword">contains</span>
+<span class="line_number"> 59 </span>
+<span class="line_number"> 60 </span>    <span class="keyword">subroutine</span> test_6<span class="sign">(</span>error_cnt<span class="sign">)</span>
+<span class="line_number"> 61 </span>
+<span class="line_number"> 62 </span><span class="comment">!    This example tries to read an invalid json file.</span>
+<span class="line_number"> 63 </span>
+<span class="line_number"> 64 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number"> 65 </span>
+<span class="line_number"> 66 </span>    <span class="keyword">integer</span><span class="sign">,</span><span class="keyword">intent</span><span class="sign">(</span>out<span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> error_cnt
+<span class="line_number"> 67 </span>
+<span class="line_number"> 68 </span>    <span class="keyword">type</span><span class="sign">(</span><a href="../json_module_F90.html#robo14">json_file</a><span class="sign">)</span> <span class="sign">:</span><span class="sign">:</span> json
+<span class="line_number"> 69 </span>    <span class="keyword">integer</span> <span class="sign">:</span><span class="sign">:</span> i
+<span class="line_number"> 70 </span>
+<span class="line_number"> 71 </span>    <span class="keyword">character</span><span class="sign">(</span><span class="keyword">len</span><span class="sign">=</span><span class="sign">*</span><span class="sign">)</span><span class="sign">,</span><span class="keyword">dimension</span><span class="sign">(</span>2<span class="sign">)</span><span class="sign">,</span><span class="keyword">parameter</span> <span class="sign">:</span><span class="sign">:</span> files <span class="sign">=</span> <span class="sign">[</span><span class="squote">'invalid.json '</span><span class="sign">,</span><span class="sign">&amp;</span>
+<span class="line_number"> 72 </span>                                                        <span class="squote">'invalid2.json'</span><span class="sign">]</span>
+<span class="line_number"> 73 </span>
+<span class="line_number"> 74 </span>    error_cnt <span class="sign">=</span> 0
+<span class="line_number"> 75 </span>    <span class="keyword">call</span> <a href="../json_module_F90.html#robo95">json_initialize</a><span class="sign">(</span><span class="sign">)</span>
+<span class="line_number"> 76 </span>    <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_F90.html#robo50">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number"> 77 </span>        <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number"> 78 </span>        error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number"> 79 </span>    <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number"> 80 </span>
+<span class="line_number"> 81 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number"> 82 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'================================='</span>
+<span class="line_number"> 83 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'   EXAMPLE 6 : invalid JSON files'</span>
+<span class="line_number"> 84 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'================================='</span>
+<span class="line_number"> 85 </span>    <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number"> 86 </span>
+<span class="line_number"> 87 </span>    <span class="keyword">do</span> i<span class="sign">=</span>1<span class="sign">,</span>2
+<span class="line_number"> 88 </span>
+<span class="line_number"> 89 </span>        <span class="comment">! parse the json file:</span>
+<span class="line_number"> 90 </span>        <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number"> 91 </span>        <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'load file: '</span><span class="sign">/</span><span class="sign">/</span><span class="keyword">trim</span><span class="sign">(</span>files<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span>
+<span class="line_number"> 92 </span>        <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">''</span>
+<span class="line_number"> 93 </span>        <span class="keyword">call</span> json<span class="sign">%</span>load_file<span class="sign">(</span>filename <span class="sign">=</span> dir<span class="sign">/</span><span class="sign">/</span><span class="keyword">trim</span><span class="sign">(</span>files<span class="sign">(</span>i<span class="sign">)</span><span class="sign">)</span><span class="sign">)</span>
+<span class="line_number"> 94 </span>        <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_F90.html#robo50">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number"> 95 </span>            <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number"> 96 </span>        <span class="keyword">else</span>
+<span class="line_number"> 97 </span>            <span class="keyword">write</span><span class="sign">(</span>error_unit<span class="sign">,</span><span class="squote">'(A)'</span><span class="sign">)</span> <span class="squote">'An error should have been raised!'</span>
+<span class="line_number"> 98 </span>            error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number"> 99 </span>        <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">100 </span>        <span class="comment">! clean up</span>
+<span class="line_number">101 </span>        <span class="keyword">call</span> json<span class="sign">%</span>destroy<span class="sign">(</span><span class="sign">)</span>
+<span class="line_number">102 </span>        <span class="keyword">if</span> <span class="sign">(</span><a href="../json_module_F90.html#robo50">json_failed</a><span class="sign">(</span><span class="sign">)</span><span class="sign">)</span> <span class="keyword">then</span>
+<span class="line_number">103 </span>            <span class="keyword">call</span> json_print_error_message<span class="sign">(</span>error_unit<span class="sign">)</span>
+<span class="line_number">104 </span>            error_cnt <span class="sign">=</span> error_cnt <span class="sign">+</span> 1
+<span class="line_number">105 </span>        <span class="keyword">end</span> <span class="keyword">if</span>
+<span class="line_number">106 </span>    <span class="keyword">end</span> <span class="keyword">do</span>
+<span class="line_number">107 </span>
+<span class="line_number">108 </span>    <span class="keyword">end</span> <span class="keyword">subroutine</span> test_6
+<span class="line_number">109 </span>
+<span class="line_number">110 </span><span class="keyword">end</span> <span class="keyword">module</span> jf_test_6_mod
+<span class="line_number">111 </span>
+<span class="line_number">112 </span><span class="keyword">program</span> <strong>jf_test_6</strong>
+<span class="line_number">113 </span>    <span class="keyword">use</span> jf_test_6_mod <span class="sign">,</span> <span class="keyword">only</span><span class="sign">:</span> test_6
+<span class="line_number">114 </span>    <span class="keyword">implicit</span> <span class="keyword">none</span>
+<span class="line_number">115 </span>    <span class="keyword">integer</span> <span class="sign">:</span><span class="sign">:</span> n_errors
+<span class="line_number">116 </span>    n_errors <span class="sign">=</span> 0
+<span class="line_number">117 </span>    <span class="keyword">call</span> test_6<span class="sign">(</span>n_errors<span class="sign">)</span>
+<span class="line_number">118 </span>    <span class="keyword">if</span> <span class="sign">(</span>n_errors <span class="sign">/</span><span class="sign">=</span> 0<span class="sign">)</span> <span class="keyword">stop</span> 1
+<span class="line_number">119 </span><span class="keyword">end</span> <span class="keyword">program</span> <strong>jf_test_6</strong>
+</pre>
+
+</div> <!-- content -->
+<div id="footer">
+<p>Generated from ./src/tests/jf_test_6.f90 with <a href="http://www.xs4all.nl/~rfsber/Robo/robodoc.html">ROBODoc</a> V4.99.41 on Thu May 07 2015 02:37:19
+</p>
+</div> <!-- footer -->
+</body>
+</html>
