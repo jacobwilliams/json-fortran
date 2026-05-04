@@ -70,6 +70,7 @@
                                json_string
     use json_value_module
     use json_file_module
+    use json_hash_module
 
     implicit none
 
