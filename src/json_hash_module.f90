@@ -63,6 +63,7 @@ module json_hash_module
         procedure :: resize => hash_table_resize
         procedure :: preprocess_key
         procedure :: keys_equal
+        final :: hash_table_finalize
     end type json_hash_table
 
 contains
@@ -365,6 +366,15 @@ contains
 
         deallocate(old_buckets)
     end subroutine hash_table_resize
+
+    !*******************************************************************************
+    !>
+    !  Finalizer - automatically clean up when hash table goes out of scope
+
+    subroutine hash_table_finalize(me)
+        type(json_hash_table), intent(inout) :: me
+        call me%destroy()
+    end subroutine hash_table_finalize
 
 !*****************************************************************************************
     end module json_hash_module
