@@ -7,7 +7,7 @@
 !  case-insensitive key comparison.
 
 module json_hash_module
-    use json_kinds,            only: RK, IK
+    use json_kinds,            only: RK, IK, CK, LK
     use json_value_module,     only: json_value, json_core
     use json_string_utilities, only: lowercase_string
     use json_parameters,       only: json_object
@@ -19,8 +19,8 @@ module json_hash_module
     type :: hash_node_t
         !! This is a linked list to avoid collisions in the hash table buckets.
         private
-        character(len=:), allocatable :: key !! string key. if `case_sensitive_keys=False` then
-                                             !! this will always be lowercase.
+        character(kind=CK,len=:), allocatable :: key !! string key. if `case_sensitive_keys=False` then
+                                                     !! this will always be lowercase.
         type(json_value), pointer :: value => null() !! associated value in the hash table
         type(hash_node_t), pointer :: next => null()
     end type hash_node_t
@@ -45,9 +45,9 @@ module json_hash_module
         real(RK) :: load_factor = 0.75_RK     !! Resize threshold that determines when the
                                               !! hash table should automatically resize to
                                               !! maintain optimal performance.
-        logical :: case_sensitive_keys = .true. !! Case-sensitive key comparison
-        logical :: trailing_spaces_significant = .false. !! Whether trailing spaces in keys
-                                                         !! are significant for comparison
+        logical(LK) :: case_sensitive_keys = .true. !! Case-sensitive key comparison
+        logical(LK) :: trailing_spaces_significant = .false. !! Whether trailing spaces in keys
+                                                             !! are significant for comparison
 
         contains
 
@@ -78,7 +78,7 @@ contains
         type(json_core), intent(in) :: json
         integer(IK), intent(in), optional :: initial_capacity
 
-        integer :: i !! counter
+        integer(IK) :: i !! counter
 
         if (present(initial_capacity)) then
             me%capacity = initial_capacity
@@ -86,7 +86,7 @@ contains
 
         ! get the key settings from the JSON object so that the hash
         ! table will be consistent with how keys are compared in the JSON library.
-        call json%get_name_settings(case_sensitive_keys = me%case_sensitive_keys,&
+        call json%get_name_settings(case_sensitive_keys = me%case_sensitive_keys, &
                                     trailing_spaces_significant = me%trailing_spaces_significant)
 
         allocate(me%buckets(0:me%capacity-1))
@@ -106,7 +106,7 @@ contains
     subroutine hash_table_destroy(me)
         class(json_hash_table), intent(inout) :: me
 
-        integer :: i !! counter
+        integer(IK) :: i !! counter
         type(hash_node_t), pointer :: current, temp
 
         if (.not. allocated(me%buckets)) return
@@ -136,11 +136,11 @@ contains
 
     function hash_table_hash(me, key) result(hash_value)
         class(json_hash_table), intent(in) :: me
-        character(len=*), intent(in) :: key
+        character(kind=CK,len=*), intent(in) :: key
         integer(kind=IK) :: hash_value
 
-        integer(kind=IK) :: hash
-        integer :: i !! counter
+        integer(IK) :: hash
+        integer(IK) :: i !! counter
 
         hash = 5381_IK
         do i = 1, len_trim(key)
@@ -158,8 +158,8 @@ contains
 
     function preprocess_key(me, key) result(proc_key)
         class(json_hash_table), intent(in) :: me
-        character(len=*), intent(in) :: key
-        character(len=:), allocatable :: proc_key
+        character(kind=CK, len=*), intent(in) :: key
+        character(kind=CK, len=:), allocatable :: proc_key
 
         ! if spaces are not significant, trim the key.
         if (me%trailing_spaces_significant) then
@@ -186,8 +186,8 @@ contains
     function keys_equal(me, key1, key2) result(equal)
 
         class(json_hash_table), intent(in) :: me
-        character(len=*), intent(in) :: key1, key2
-        logical :: equal
+        character(kind=CK,len=*), intent(in) :: key1, key2
+        logical(LK) :: equal
 
         if (me%trailing_spaces_significant) then
             ! if trailing spaces are significant, then the keys
@@ -211,12 +211,12 @@ contains
         type(json_core), intent(inout) :: json
         type(json_value), pointer :: p !! the JSON value whose children will be used to populate
                                        !! the hash table. This must be a JSON object.
-        logical, intent(out) :: status_ok !! true if no problems.
+        logical(LK), intent(out) :: status_ok !! true if no problems.
 
         integer(IK) :: i !! counter
         integer(IK) :: n_members !! number of members in the JSON object
         integer (IK) :: var_type !! type of the JSON value
-        character(len=:), allocatable :: key !! member names
+        character(kind=CK,len=:), allocatable :: key !! member names
         type(json_value), pointer :: current !! pointer to current member value
         type(json_value), pointer :: next !! pointer to next member value
 
@@ -253,13 +253,13 @@ contains
 
     subroutine hash_table_insert(me, key, value)
         class(json_hash_table), intent(inout) :: me
-        character(len=*), intent(in) :: key
+        character(kind=CK,len=*), intent(in) :: key
         type(json_value),pointer :: value
 
         integer(IK) :: bucket_idx
         type(hash_node_t), pointer :: current, new_node
         real(RK) :: current_load
-        character(len=:), allocatable :: key_to_insert
+        character(kind=CK,len=:), allocatable :: key_to_insert
 
         ! Check if we need to resize
         current_load = real(me%size, RK) / real(me%capacity, RK)
@@ -298,13 +298,13 @@ contains
 
     function hash_table_get(me, key, found) result(value)
         class(json_hash_table), intent(in) :: me
-        character(len=*), intent(in) :: key
-        logical, intent(out), optional :: found
+        character(kind=CK,len=*), intent(in) :: key
+        logical(LK), intent(out), optional :: found
         type(json_value), pointer :: value
 
         integer(IK) :: bucket_idx
         type(hash_node_t), pointer :: current
-        character(len=:), allocatable :: key_to_search
+        character(kind=CK,len=:), allocatable :: key_to_search
 
         value => null()
         if (present(found)) found = .false.
@@ -337,7 +337,7 @@ contains
 
         type(hash_node_t), dimension(:), allocatable :: old_buckets
         type(hash_node_t), pointer :: current, temp
-        integer :: i, old_capacity
+        integer(IK) :: i, old_capacity
 
         ! Save old buckets
         old_capacity = me%capacity

@@ -44,7 +44,7 @@ contains
                          case_sensitive_keys = .false.)
 
     ! generate a JSON structure with 1000 members
-    call json%create_object(p, 'root')
+    call json%create_object(p, CK_'root')
     do i = 1, 1000
         call integer_to_string(i,'(I5)',str)
         call json%add(p, str, i)  ! key is a string of the integer, value is the integer

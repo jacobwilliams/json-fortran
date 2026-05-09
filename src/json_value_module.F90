@@ -6281,7 +6281,7 @@
     type(json_value),pointer :: element !! for getting children
     integer(IK) :: tab           !! number of `tabs` for indenting
     integer(IK) :: spaces        !! number of spaces for indenting
-    integer(IK) :: i,j           !! counter
+    integer(IK) :: i             !! counter
     integer(IK) :: count         !! number of children
     logical(LK) :: print_comma   !! if the comma will be printed after the value
     logical(LK) :: write_file    !! if we are writing to a file
