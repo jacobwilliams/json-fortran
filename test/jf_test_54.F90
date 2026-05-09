@@ -124,6 +124,10 @@ contains
     write(output_unit,'(A, F6.3, A)') 'Time taken for 10,000 JSON object retrievals: ', t_end - t_start, ' seconds'
     write(output_unit, '(A)') ''
 
+    ! clean up:
+    call json%destroy(p)
+    call hash%destroy(p)
+
     end subroutine test_54
 
 end module jf_test_54_mod
