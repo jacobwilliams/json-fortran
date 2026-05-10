@@ -39,12 +39,17 @@ module json_hash_module
 
         private
 
+        type(json_core) :: json  !! The instance of the [[json_core(type)]]
+                                 !! factory used for this table.
+
         type(hash_node_t), dimension(:), allocatable :: buckets
         integer(IK) :: size = 0_IK            !! Number of elements in the table
         integer(IK) :: capacity = 16_IK       !! Number of buckets in the table
         real(RK) :: load_factor = 0.75_RK     !! Resize threshold that determines when the
                                               !! hash table should automatically resize to
                                               !! maintain optimal performance.
+
+        ! these are obtained from `json`:
         logical(LK) :: case_sensitive_keys = .true. !! Case-sensitive key comparison
         logical(LK) :: trailing_spaces_significant = .false. !! Whether trailing spaces in keys
                                                              !! are significant for comparison
@@ -57,7 +62,6 @@ module json_hash_module
         procedure,public :: destroy => hash_table_destroy
         procedure,public :: get     => hash_table_get
 
-        procedure :: init => hash_table_init
         procedure :: insert => hash_table_insert
         procedure :: hash => hash_table_hash
         procedure :: resize => hash_table_resize
@@ -68,37 +72,6 @@ module json_hash_module
 
 contains
 !*****************************************************************************************
-
-    !*******************************************************************************
-    !>
-    !  Initialize hash table with optional initial capacity
-
-    subroutine hash_table_init(me, json, initial_capacity)
-
-        class(json_hash_table), intent(inout) :: me
-        type(json_core), intent(in) :: json
-        integer(IK), intent(in), optional :: initial_capacity
-
-        integer(IK) :: i !! counter
-
-        if (present(initial_capacity)) then
-            me%capacity = initial_capacity
-        end if
-
-        ! get the key settings from the JSON object so that the hash
-        ! table will be consistent with how keys are compared in the JSON library.
-        call json%get_name_settings(case_sensitive_keys = me%case_sensitive_keys, &
-                                    trailing_spaces_significant = me%trailing_spaces_significant)
-
-        allocate(me%buckets(0:me%capacity-1))
-
-        ! Initialize each bucket head node
-        do i = 0, me%capacity - 1
-            me%buckets(i)%next => null()
-        end do
-
-        me%size = 0
-    end subroutine hash_table_init
 
     !*******************************************************************************
     !>
@@ -209,7 +182,8 @@ contains
     subroutine hash_table_create(me, json, p, status_ok)
 
         class(json_hash_table), intent(out) :: me
-        type(json_core), intent(inout) :: json
+        type(json_core), intent(in) :: json !! the JSON core factory to use for this hash table.
+                                            !! a copy of this will be made and stored in the table.
         type(json_value), pointer :: p !! the JSON value whose children will be used to populate
                                        !! the hash table. This must be a JSON object.
         logical(LK), intent(out) :: status_ok !! true if no problems.
@@ -227,17 +201,26 @@ contains
         end if
 
         status_ok = .true.
-        call json%info(p, n_children=n_members, var_type=var_type)
+
+        me%json = json  ! make a copy
+        call me%json%info(p, n_children=n_members, var_type=var_type)
         if (n_members > 0_IK .and. var_type == json_object) then
             ! size it initally to the number of members divided by the load factor to minimize
             ! the number of resizes needed as members are inserted.
-            call me%init(json, initial_capacity=ceiling(real(n_members, RK) / me%load_factor))
+            me%capacity = ceiling(real(n_members, RK) / me%load_factor)
+            ! get the key settings from the JSON object so that the hash
+            ! table will be consistent with how keys are compared in the JSON library.
+            ! store these in the hash table for easy access.
+            call me%json%get_name_settings(case_sensitive_keys = me%case_sensitive_keys, &
+                                           trailing_spaces_significant = me%trailing_spaces_significant)
+            ! allocate the buckets:
+            allocate(me%buckets(0:me%capacity-1))
             ! iterate over each child member and insert into the hash table
-            call json%get_child(p, 1, current) ! the first one
+            call me%json%get_child(p, 1, current) ! the first one
             do i = 1, n_members
-                call json%info(current, name=key)
+                call me%json%info(current, name=key)
                 call me%insert(key, current)
-                call json%get_next(current, next) ! get the next one in the list of children
+                call me%json%get_next(current, next) ! get the next one in the list of children
                 current => next
             end do
         else
@@ -297,11 +280,11 @@ contains
     !>
     !  Get value for a given key
 
-    function hash_table_get(me, key, found) result(value)
+    subroutine hash_table_get(me, key, value, found)
         class(json_hash_table), intent(in) :: me
         character(kind=CK,len=*), intent(in) :: key
-        logical(LK), intent(out), optional :: found
         type(json_value), pointer :: value
+        logical(LK), intent(out), optional :: found
 
         integer(IK) :: bucket_idx
         type(hash_node_t), pointer :: current
@@ -325,7 +308,7 @@ contains
             end if
             current => current%next
         end do
-    end function hash_table_get
+    end subroutine hash_table_get
 
     !*******************************************************************************
     !>

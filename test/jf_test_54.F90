@@ -66,7 +66,7 @@ contains
         j = mod(i * 12345_IK, 1000_IK) + 1_IK
 
         call integer_to_string(j,'(I5)',str)
-        p_val => hash%get(str, status_ok)
+        call hash%get(str, p_val, status_ok)
         if (.not. status_ok) then
             write(error_unit,'(A)') 'Error retrieving value from hash table for key: '// trim(str)
             error_cnt = error_cnt + 1
