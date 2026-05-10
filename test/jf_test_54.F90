@@ -126,7 +126,7 @@ contains
 
     ! clean up:
     call json%destroy(p)
-    call hash%destroy(p)
+    call hash%destroy()
 
     end subroutine test_54
 
