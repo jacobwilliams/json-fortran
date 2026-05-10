@@ -204,6 +204,10 @@ contains
 
         me%json = json  ! make a copy
         call me%json%info(p, n_children=n_members, var_type=var_type)
+        if (me%json%failed()) then
+            call set_error()
+            return
+        end if
         if (n_members > 0_IK .and. var_type == json_object) then
             ! size it initally to the number of members divided by the load factor to minimize
             ! the number of resizes needed as members are inserted.
@@ -216,17 +220,33 @@ contains
             ! allocate the buckets:
             allocate(me%buckets(0:me%capacity-1))
             ! iterate over each child member and insert into the hash table
-            call me%json%get_child(p, 1, current) ! the first one
+            call me%json%get_child(p, 1, current, found=status_ok) ! the first one
+            if (.not. status_ok) return ! should never happen since we know the size
             do i = 1, n_members
                 call me%json%info(current, name=key)
+                if (me%json%failed()) then
+                    call set_error()
+                    return
+                end if
                 call me%insert(key, current)
                 call me%json%get_next(current, next) ! get the next one in the list of children
+                if (me%json%failed()) then
+                    call set_error()
+                    return
+                end if
                 current => next
             end do
         else
             ! can't create a hash table.
             status_ok = .false.
         end if
+
+        contains
+            subroutine set_error()
+                !! clear any JSON exceptions and set error flag to false.
+                call me%json%clear_exceptions()
+                status_ok = .false.
+            end subroutine set_error
 
     end subroutine hash_table_create
     !*******************************************************************************
