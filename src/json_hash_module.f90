@@ -7,6 +7,7 @@
 !  case-insensitive key comparison.
 
 module json_hash_module
+
     use json_kinds,            only: RK, IK, CK, LK
     use json_value_module,     only: json_value, json_core
     use json_string_utilities, only: lowercase_string
@@ -22,7 +23,7 @@ module json_hash_module
         character(kind=CK,len=:), allocatable :: key !! string key. if `case_sensitive_keys=False` then
                                                      !! this will always be lowercase.
         type(json_value), pointer :: value => null() !! associated value in the hash table
-        type(hash_node_t), pointer :: next => null()
+        type(hash_node_t), pointer :: next => null() !! pointer to the next node in the linked list
     end type hash_node_t
 
     type, public :: json_hash_table
@@ -39,15 +40,17 @@ module json_hash_module
 
         private
 
-        type(json_core) :: json  !! The instance of the [[json_core(type)]]
-                                 !! factory used for this table.
+        type(json_core) :: json !! The instance of the [[json_core(type)]]
+                                !! factory used for this table.
 
-        type(hash_node_t), dimension(:), allocatable :: buckets
-        integer(IK) :: size = 0_IK            !! Number of elements in the table
-        integer(IK) :: capacity = 16_IK       !! Number of buckets in the table
-        real(RK) :: load_factor = 0.75_RK     !! Resize threshold that determines when the
-                                              !! hash table should automatically resize to
-                                              !! maintain optimal performance.
+        type(hash_node_t), dimension(:), allocatable :: buckets !! array of buckets for the hash table.
+                                                                !! Each bucket is a linked list of `hash_node_t`
+                                                                !! to handle collisions.
+        integer(IK) :: size = 0_IK        !! Number of elements in the table
+        integer(IK) :: capacity = 16_IK   !! Number of buckets in the table
+        real(RK) :: load_factor = 0.75_RK !! Resize threshold that determines when the
+                                          !! hash table should automatically resize to
+                                          !! maintain optimal performance.
 
         ! these are obtained from `json`:
         logical(LK) :: case_sensitive_keys = .true. !! Case-sensitive key comparison
@@ -67,7 +70,9 @@ module json_hash_module
         procedure :: resize => hash_table_resize
         procedure :: preprocess_key
         procedure :: keys_equal
+
         final :: hash_table_finalize
+
     end type json_hash_table
 
 contains
@@ -78,6 +83,7 @@ contains
     !  Destroy hash table and free all memory
 
     subroutine hash_table_destroy(me)
+
         class(json_hash_table), intent(inout) :: me
 
         integer(IK) :: i !! counter
@@ -98,6 +104,7 @@ contains
 
         deallocate(me%buckets)
         me%size = 0_IK
+
     end subroutine hash_table_destroy
 
     !*******************************************************************************
@@ -109,6 +116,7 @@ contains
     !   [Fortran Dev](https://fortrandev.wordpress.com/2013/07/06/fortran-hashing-algorithm/)
 
     function hash_table_hash(me, key) result(hash_value)
+
         class(json_hash_table), intent(in) :: me
         character(kind=CK,len=*), intent(in) :: key
         integer(kind=IK) :: hash_value
@@ -123,6 +131,7 @@ contains
 
         ! Map to bucket index
         hash_value = int(modulo(hash, int(me%capacity, IK)), IK)
+
     end function hash_table_hash
 
     !*******************************************************************************
@@ -131,9 +140,11 @@ contains
     !  insertion and lookup (handle trim and case-sensitivity).
 
     function preprocess_key(me, key) result(proc_key)
+
         class(json_hash_table), intent(in) :: me
-        character(kind=CK, len=*), intent(in) :: key
-        character(kind=CK, len=:), allocatable :: proc_key
+        character(kind=CK, len=*), intent(in) :: key !! the key to preprocess
+        character(kind=CK, len=:), allocatable :: proc_key !! the preprocessed key to use for
+                                                           !! storage and comparison in the hash table.
 
         ! if spaces are not significant, trim the key.
         if (me%trailing_spaces_significant) then
@@ -143,6 +154,7 @@ contains
         end if
         !if case-insensitive, lowercase the key.
         if (.not. me%case_sensitive_keys) proc_key = lowercase_string(proc_key)
+
     end function preprocess_key
 
     !*******************************************************************************
@@ -160,7 +172,8 @@ contains
     function keys_equal(me, key1, key2) result(equal)
 
         class(json_hash_table), intent(in) :: me
-        character(kind=CK,len=*), intent(in) :: key1, key2
+        character(kind=CK,len=*), intent(in) :: key1
+        character(kind=CK,len=*), intent(in) :: key2
         logical(LK) :: equal
 
         if (me%trailing_spaces_significant) then
@@ -242,6 +255,7 @@ contains
         end if
 
         contains
+
             subroutine set_error()
                 !! clear any JSON exceptions and set error flag to false.
                 call me%json%clear_exceptions()
@@ -256,14 +270,20 @@ contains
     !  Insert or update a key-value pair
 
     subroutine hash_table_insert(me, key, value)
-        class(json_hash_table), intent(inout) :: me
-        character(kind=CK,len=*), intent(in) :: key
-        type(json_value),pointer :: value
 
-        integer(IK) :: bucket_idx
-        type(hash_node_t), pointer :: current, new_node
-        real(RK) :: current_load
-        character(kind=CK,len=:), allocatable :: key_to_insert
+        class(json_hash_table), intent(inout) :: me
+        character(kind=CK,len=*), intent(in) :: key  !! key to insert. This will be preprocessed
+                                                     !! (trimmed and/or lowercased) according to the
+                                                     !! settings of the hash table.
+        type(json_value),pointer :: value  !! value to associate with the key.
+                                           !! This is a pointer to a JSON value.
+
+        integer(IK) :: bucket_idx !! index of the bucket for this key
+        real(RK) :: current_load !! current load factor of the hash table
+        character(kind=CK,len=:), allocatable :: key_to_insert !! the key after preprocessing
+                                                               !! (trimming and/or lowercasing)
+        type(hash_node_t), pointer :: current, new_node !! pointers for traversing the linked list in the
+                                                        !! bucket and for the new node to insert
 
         ! Check if we need to resize
         current_load = real(me%size, RK) / real(me%capacity, RK)
@@ -294,6 +314,7 @@ contains
         new_node%next => me%buckets(bucket_idx)%next
         me%buckets(bucket_idx)%next => new_node
         me%size = me%size + 1
+
     end subroutine hash_table_insert
 
     !*******************************************************************************
@@ -301,14 +322,17 @@ contains
     !  Get value for a given key
 
     subroutine hash_table_get(me, key, value, found)
-        class(json_hash_table), intent(in) :: me
-        character(kind=CK,len=*), intent(in) :: key
-        type(json_value), pointer :: value
-        logical(LK), intent(out), optional :: found
 
-        integer(IK) :: bucket_idx
-        type(hash_node_t), pointer :: current
-        character(kind=CK,len=:), allocatable :: key_to_search
+        class(json_hash_table), intent(in) :: me
+        character(kind=CK,len=*), intent(in) :: key !! key to look up.
+        type(json_value), pointer :: value !! pointer to the value associated with the key.
+                                           !! This will be set to null() if the key is not found.
+        logical(LK), intent(out), optional :: found !! flag indicating whether the key was found in
+                                                    !! the table (true) or not (false).
+
+        integer(IK) :: bucket_idx !! index of the bucket for this key
+        type(hash_node_t), pointer :: current !! pointer for traversing the linked list in the bucket
+        character(kind=CK,len=:), allocatable :: key_to_search !! the key after preprocessing (trimming and/or lowercasing)
 
         value => null()
         if (present(found)) found = .false.
@@ -328,6 +352,7 @@ contains
             end if
             current => current%next
         end do
+
     end subroutine hash_table_get
 
     !*******************************************************************************
@@ -339,9 +364,10 @@ contains
         class(json_hash_table), intent(inout) :: me
         integer, intent(in) :: new_capacity
 
-        type(hash_node_t), dimension(:), allocatable :: old_buckets
-        type(hash_node_t), pointer :: current, temp
-        integer(IK) :: i, old_capacity
+        type(hash_node_t), dimension(:), allocatable :: old_buckets !! temporary array to hold old buckets during resizing
+        type(hash_node_t), pointer :: current, temp !! pointers for traversing linked lists during rehashing
+        integer(IK) :: i !! counter
+        integer(IK) :: old_capacity !! previous capacity of the hash table
 
         ! Save old buckets
         old_capacity = me%capacity
@@ -368,15 +394,19 @@ contains
         end do
 
         deallocate(old_buckets)
+
     end subroutine hash_table_resize
 
     !*******************************************************************************
     !>
-    !  Finalizer - automatically clean up when hash table goes out of scope
+    !  Finalizer - automatically clean up when hash table goes out of scope.
 
     subroutine hash_table_finalize(me)
+
         type(json_hash_table), intent(inout) :: me
+
         call me%destroy()
+
     end subroutine hash_table_finalize
 
 !*****************************************************************************************
