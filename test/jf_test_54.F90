@@ -50,8 +50,11 @@ contains
         call json%add(p, str, i)  ! key is a string of the integer, value is the integer
     end do
 
-    ! create a hash table for the root object
-    call hash%create(json, p, status_ok)
+    ! create a hash table for the root object.
+    !  [for testing, create a small table so it will resize as we insert.
+    !   in practice, initial_capacity is not set, and it will automatically be determined
+    !   based on the number of members in the JSON object to minimize resizing.]
+    call hash%create(json, p, status_ok, initial_capacity = 100_IK)  
     if (.not. status_ok) then
         write(error_unit,'(A)') 'Error creating hash table'
         error_cnt = error_cnt + 1

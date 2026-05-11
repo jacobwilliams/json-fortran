@@ -192,7 +192,7 @@ contains
     !  The keys are the object member names and the values are
     !  pointers to the associated JSON values.
 
-    subroutine hash_table_create(me, json, p, status_ok)
+    subroutine hash_table_create(me, json, p, status_ok, initial_capacity)
 
         class(json_hash_table), intent(out) :: me
         type(json_core), intent(in) :: json !! the JSON core factory to use for this hash table.
@@ -200,6 +200,10 @@ contains
         type(json_value), pointer :: p !! the JSON value whose children will be used to populate
                                        !! the hash table. This must be a JSON object.
         logical(LK), intent(out) :: status_ok !! true if no problems.
+        integer(IK), intent(in), optional :: initial_capacity !! initial capacity of the hash table (number of buckets). 
+                                                              !! If not provided, it will be set based on the number of members 
+                                                              !! divided by the load factor to minimize
+                                                              !! the number of resizes needed as members are inserted
 
         integer(IK) :: i !! counter
         integer(IK) :: n_members !! number of members in the JSON object
@@ -222,9 +226,15 @@ contains
             return
         end if
         if (n_members > 0_IK .and. var_type == json_object) then
-            ! size it initally to the number of members divided by the load factor to minimize
-            ! the number of resizes needed as members are inserted.
-            me%capacity = ceiling(real(n_members, RK) / me%load_factor)
+            if (present(initial_capacity)) then
+                me%capacity = initial_capacity
+            else
+                ! size it initially to the number of members divided by the load factor to minimize
+                ! the number of resizes needed as members are inserted.
+                me%capacity = ceiling(real(n_members, RK) / me%load_factor)
+            end if
+            ! enforce a minimum capacity to avoid too many collisions when there are few members
+            me%capacity = max(me%capacity, 16_IK) 
             ! get the key settings from the JSON object so that the hash
             ! table will be consistent with how keys are compared in the JSON library.
             ! store these in the hash table for easy access.
