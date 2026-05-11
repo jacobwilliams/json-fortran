@@ -105,6 +105,9 @@ contains
         deallocate(me%buckets)
         me%size = 0_IK
 
+        ! also destroy the JSON core instance
+        call me%json%destroy()  
+
     end subroutine hash_table_destroy
 
     !*******************************************************************************
