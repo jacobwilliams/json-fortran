@@ -125,7 +125,7 @@ contains
         integer(IK) :: i !! counter
 
         hash = 5381_IK
-        do i = 1, len_trim(key)
+        do i = 1, len(key)
             hash = ishft(hash, 5_IK) + hash + iachar(key(i:i), kind=IK)  ! hash * 33 + c
         end do
 
@@ -162,7 +162,7 @@ contains
     !  Compare two keys for equality, taking into account the setting
     !  for trailing spaces.
     !
-    !  Is it assumed that [[preprocess_key]] has already been applied
+    !  It is assumed that [[preprocess_key]] has already been applied
     !  to both keys before calling this function. This allows us to
     !  avoid redundant lowercasing and trimming of the keys.
     !
@@ -362,7 +362,7 @@ contains
     subroutine hash_table_resize(me, new_capacity)
 
         class(json_hash_table), intent(inout) :: me
-        integer, intent(in) :: new_capacity
+        integer(IK), intent(in) :: new_capacity
 
         type(hash_node_t), dimension(:), allocatable :: old_buckets !! temporary array to hold old buckets during resizing
         type(hash_node_t), pointer :: current, temp !! pointers for traversing linked lists during rehashing
