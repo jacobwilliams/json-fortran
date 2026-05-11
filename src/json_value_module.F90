@@ -11362,17 +11362,14 @@
     type(json_value),pointer            :: value  !! JSON data that is extracted
 
     ! Parser states
-    integer(IK),parameter :: STATE_INITIAL         = 1
-    integer(IK),parameter :: STATE_PARSE_VALUE     = 2
-    integer(IK),parameter :: STATE_OBJECT_START    = 3
-    integer(IK),parameter :: STATE_OBJECT_KEY      = 4
-    integer(IK),parameter :: STATE_OBJECT_COLON    = 5
-    integer(IK),parameter :: STATE_OBJECT_VALUE    = 6
-    integer(IK),parameter :: STATE_OBJECT_NEXT     = 7
-    integer(IK),parameter :: STATE_ARRAY_START     = 8
-    integer(IK),parameter :: STATE_ARRAY_VALUE     = 9
-    integer(IK),parameter :: STATE_ARRAY_NEXT      = 10
-    integer(IK),parameter :: STATE_DONE            = 11
+    integer(IK),parameter :: STATE_INITIAL      = 1_IK
+    integer(IK),parameter :: STATE_OBJECT_START = 2_IK
+    integer(IK),parameter :: STATE_OBJECT_COLON = 3_IK
+    integer(IK),parameter :: STATE_OBJECT_VALUE = 4_IK
+    integer(IK),parameter :: STATE_OBJECT_NEXT  = 5_IK
+    integer(IK),parameter :: STATE_ARRAY_START  = 6_IK
+    integer(IK),parameter :: STATE_ARRAY_NEXT   = 7_IK
+    integer(IK),parameter :: STATE_DONE         = 8_IK
 
     type parse_stack_entry
         !! Stack entry type for tracking parse context
