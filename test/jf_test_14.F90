@@ -121,9 +121,9 @@ contains
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer,intent(in) :: p
-    logical(json_LK),intent(out)        :: finished
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p
+    logical(json_LK),intent(out)   :: finished
 
     integer(IK) :: var_type
     character(kind=json_CK,len=:),allocatable :: str

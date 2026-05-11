@@ -109,7 +109,11 @@
         !force the constituents to be stored contiguously
         ![note: on Intel, the order of the variables below
         ! is significant to avoid the misaligned field warnings]
+        ![to disable sequence for portability with strict compilers,
+        ! compile with -DJSONNOSEQUENCE]
+#ifndef JSONNOSEQUENCE
         sequence
+#endif
 
         private
 
@@ -984,9 +988,9 @@
             !! Callback function used by [[json_traverse]]
             import :: json_value,json_core,LK
             implicit none
-            class(json_core),intent(inout)      :: json
-            type(json_value),pointer,intent(in) :: p
-            logical(LK),intent(out)             :: finished  !! set true to stop traversing
+            class(json_core),intent(inout) :: json
+            type(json_value),pointer       :: p
+            logical(LK),intent(out)        :: finished  !! set true to stop traversing
         end subroutine json_traverse_callback_func
 
         subroutine parser_func(json, unit, str, value)
@@ -2960,9 +2964,9 @@
     !! Traverse until `p` is `p2`.
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer,intent(in) :: p
-    logical(LK),intent(out)             :: finished
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p
+    logical(LK),intent(out)        :: finished
 
     is_child_of = associated(p,p2)
     finished = is_child_of  ! stop searching if found
@@ -2997,7 +3001,7 @@
     implicit none
 
     class(json_core),intent(inout)      :: json
-    type(json_value),pointer,intent(in) :: p
+    type(json_value),pointer            :: p
     logical(LK),intent(out)             :: is_valid  !! True if the structure is valid.
     character(kind=CK,len=:),allocatable,intent(out) :: error_msg !! if not valid, this will contain
                                                                   !! a description of the problem
@@ -6049,9 +6053,9 @@
 
         implicit none
 
-        class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: p
-        logical(LK),intent(out)             :: finished
+        class(json_core),intent(inout)  :: json
+        type(json_value),pointer        :: p
+        logical(LK),intent(out)         :: finished
 
 #if defined __GFORTRAN__
 
