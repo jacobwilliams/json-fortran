@@ -446,8 +446,8 @@ contains
 
     implicit none
 
-    class(json_core),intent(inout)      :: json
-    type(json_value),pointer,intent(in) :: p
+    class(json_core),intent(inout) :: json
+    type(json_value),pointer       :: p
     logical(LK),intent(out)        :: finished  !! set true to stop traversing
 
     character(kind=json_CK,len=:),allocatable :: path !! path to the variable

@@ -113,9 +113,9 @@ contains
 
         implicit none
 
-        class(json_core),intent(inout)      :: json
-        type(json_value),pointer,intent(in) :: p
-        logical(LK),intent(out)             :: finished  !! set true to stop traversing
+        class(json_core),intent(inout) :: json
+        type(json_value),pointer       :: p
+        logical(LK),intent(out)        :: finished  !! set true to stop traversing
 
         integer(IK) :: var_type
         character(kind=CK,len=:),allocatable :: path
