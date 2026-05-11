@@ -12,6 +12,12 @@
     module json_string_utilities
 
     use,intrinsic :: ieee_arithmetic
+    use,intrinsic :: iso_c_binding, only: c_double, c_float, &
+                                          c_char, c_ptr, c_null_ptr, c_long, &
+                                          c_null_char, c_loc, c_associated
+#ifdef REAL128
+    use,intrinsic :: iso_c_binding, only: c_long_double
+#endif
     use json_kinds
     use json_parameters
 
@@ -268,12 +274,6 @@
 
     subroutine string_to_real_c(str,use_quiet_nan,rval,status_ok)
 
-    use iso_c_binding, only: c_double, c_float, &
-                             c_char, c_ptr, c_null_ptr, c_long, &
-                             c_null_char, c_loc, c_associated
-#ifdef REAL128
-    use iso_c_binding, only: c_long_double
-#endif
     implicit none
 
     character(kind=CK,len=*),intent(in) :: str           !! the string to convert to a real
