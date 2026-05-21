@@ -116,7 +116,6 @@ argument is passed. Additionally, A custom compiler may be passed to the 'compil
 flag, but appropriate 'cflags' should also be passed to the script.\n\n"
 }
 
-
 while [ "$#" -ge "1" ]; do # Get command line arguments while there are more left to process
 
     key="$1" # Command line args are key-value pairs or value-less keys
@@ -257,6 +256,12 @@ while [ "$#" -ge "1" ]; do # Get command line arguments while there are more lef
     shift # look at next argument
 done # with argument parsing loop
 
+# linker flags for gfortran:
+COMPILERLFLAGS=""
+if [ $FCOMPILER = gnu ]; then
+    COMPILERLFLAGS='-lflags "-ftrampoline-impl=heap"'
+fi
+
 # if no compiler selected, then we're defaulting to gnu, and need to check that the cflags are set
 if [ "$FCOMPILER" = 'gnu' ] && [ -z "$FCOMPILERFLAGS" ]; then
     FCOMPILERFLAGS="$GNUCOMPILERFLAGS"
@@ -279,7 +284,7 @@ fi
 
 if [[ $TRY_UNICODE == [yY]* ]]; then
     echo "Trying to compile library with Unicode/UCS4 support"
-    FoBiS.py build -ch -compiler "${FCOMPILER}" "${CUSTOM[@]}" -cflags "${FCOMPILERFLAGS}" -dbld "${BINDIR}" -s "${INTROSPECDIR}" -dmod ./ -dobj ./ -t "${UCS4TESTCODE}" -o "${UCS4TESTCODE%.f90}" -colors
+    FoBiS.py build -ch -compiler "${FCOMPILER}" "${CUSTOM[@]}" $COMPILERLFLAGS -cflags "${FCOMPILERFLAGS}" -dbld "${BINDIR}" -s "${INTROSPECDIR}" -dmod ./ -dobj ./ -t "${UCS4TESTCODE}" -o "${UCS4TESTCODE%.f90}" -colors
     if "${BINDIR}/${UCS4TESTCODE%.f90}"; then
     DEFINES="-DUSE_UCS4 -Wunused-function"
     fi
@@ -289,7 +294,7 @@ fi
 echo ""
 echo "Building library..."
 
-FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" -cflags "${FCOMPILERFLAGS} ${DEFINES} ${REAL_KIND} ${INT_KIND}" ${COVERAGE} ${PROFILING} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
+FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" $COMPILERLFLAGS -cflags "${FCOMPILERFLAGS} ${DEFINES} ${REAL_KIND} ${INT_KIND}" ${COVERAGE} ${PROFILING} -dbld ${LIBDIR} -s ${SRCDIR} -dmod ./ -dobj ./ -t ${MODCODE} -o ${LIBOUT} -mklib static -colors
 
 #build the unit tests (uses the above library):
 if [[ $JF_SKIP_TESTS != [yY]* ]]; then
@@ -302,7 +307,7 @@ if [[ $JF_SKIP_TESTS != [yY]* ]]; then
     for TEST in "${TESTDIR%/}"/jf_test_*.[fF]90; do
     THIS_TEST=${TEST##*/}
     echo "Build ${THIS_TEST%.[fF]90}"
-    FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld "${BINDIR}" -s "${TESTDIR}" -i "${LIBDIR}" -libs "${LIBDIR}/${LIBOUT}" -dmod ./ -dobj ./ -t "${THIS_TEST}" -o "${THIS_TEST%.[fF]90}" -colors
+    FoBiS.py build -ch -compiler ${FCOMPILER} "${CUSTOM[@]}" $COMPILERLFLAGS -cflags "${FCOMPILERFLAGS} ${DEFINES}" ${COVERAGE} ${PROFILING} -dbld "${BINDIR}" -s "${TESTDIR}" -i "${LIBDIR}" -libs "${LIBDIR}/${LIBOUT}" -dmod ./ -dobj ./ -t "${THIS_TEST}" -o "${THIS_TEST%.[fF]90}" -colors
     done
 else
     echo "Skip building the unit tests since \$JF_SKIP_TESTS has been set to 'true'."
