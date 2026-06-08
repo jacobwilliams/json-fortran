@@ -836,7 +836,7 @@
         if (from%failed()) then
             !Don't get the data if the FROM file has an
             !active exception, since it may not be valid.
-            call to%throw_exception('Error in json_file_move_pointer: '//&
+            call to%throw_exception(CK_'Error in json_file_move_pointer: '//&
                                     'error exception in FROM file.')
         else
             call to%initialize()  !initialize and clear any exceptions that may be present
@@ -845,7 +845,7 @@
         end if
 
     else
-        call to%throw_exception('Error in json_file_move_pointer: '//&
+        call to%throw_exception(CK_'Error in json_file_move_pointer: '//&
                                 'pointer is not associated.')
     end if
 
@@ -975,7 +975,7 @@
     if (iunit/=unit2str) then
         call me%core%print(me%p,iunit=iunit)
     else
-        call me%throw_exception('Error in json_file_print_to_unit: iunit must not be -1.')
+        call me%throw_exception(CK_'Error in json_file_print_to_unit: iunit must not be -1.')
     end if
 
     end subroutine json_file_print_to_unit
