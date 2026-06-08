@@ -10,7 +10,6 @@ module json_hash_module
 
     use json_kinds,            only: RK, IK, CK, LK
     use json_value_module,     only: json_value, json_core
-    use json_file_module,      only: json_file
     use json_string_utilities, only: lowercase_string
     use json_parameters,       only: json_object
 
@@ -62,13 +61,10 @@ module json_hash_module
 
         private
 
-        generic,public :: create => hash_table_create_from_file, &
-                                    hash_table_create_from_value
+        procedure,public :: create  => hash_table_create_from_value
         procedure,public :: destroy => hash_table_destroy
         procedure,public :: get     => hash_table_get
 
-        procedure :: hash_table_create_from_file, &
-                     hash_table_create_from_value
         procedure :: insert => hash_table_insert
         procedure :: hash => hash_table_hash
         procedure :: resize => hash_table_resize
@@ -195,36 +191,6 @@ contains
         equal = key1 == key2
 
     end function keys_equal
-!*****************************************************************************************
-
-!*****************************************************************************************
-!>
-!  Create a hash table from a JSON file.
-!
-!  This is a wrapper to [[hash_table_create_from_value]].
-
-    subroutine hash_table_create_from_file(me, json, status_ok, initial_capacity)
-
-    class(json_hash_table), intent(out) :: me
-    type(json_file), intent(inout) :: json !! the JSON file to use for this hash table.
-                                           !! It must contain a JSON object.
-    logical(LK), intent(out) :: status_ok !! true if no problems.
-    integer(IK), intent(in), optional :: initial_capacity !! initial capacity of the hash table (number of buckets).
-                                                          !! If not provided, it will be set based on the number of members
-                                                          !! divided by the load factor to minimize
-                                                          !! the number of resizes needed as members are inserted
-
-    type(json_core) :: core !! from `json`
-    type(json_value), pointer :: value !! from `json`
-
-    ! get the JSON core from the file and the pointer to the root value:
-    call json%get_core(core)
-    call json%get(value)
-
-    ! call the low-level routine:
-    call me%hash_table_create_from_value(core, value, status_ok, initial_capacity)
-
-    end subroutine hash_table_create_from_file
 !*****************************************************************************************
 
 !*****************************************************************************************
