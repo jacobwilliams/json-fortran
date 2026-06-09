@@ -254,6 +254,7 @@
         ! hash table functions:
         procedure,public :: initialize_hash
         procedure,public :: destroy_hash
+        procedure,public :: is_hash_enabled
 
         ! ***************************************************
         ! operators
@@ -3289,6 +3290,20 @@
     me%hash_enabled = status_ok
 
     end subroutine initialize_hash
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Check if the hash table is enabled.
+
+    pure function is_hash_enabled(me) result(enabled)
+
+    class(json_file),intent(in) :: me
+    logical(LK) :: enabled
+
+    enabled = me%hash_enabled
+
+    end function is_hash_enabled
 !*****************************************************************************************
 
 !*****************************************************************************************
