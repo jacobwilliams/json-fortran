@@ -5,6 +5,9 @@
 !  This module defines a hash table type with methods for initialization, insertion, lookup, and
 !  deletion. It uses the DJB hash algorithm for hashing string keys and supports optional
 !  case-insensitive key comparison.
+!
+!  It can be used independently, or in a [[json_file(type)]] object to speed up
+!  lookups of the root-level members of the JSON file.
 
 module json_hash_module
 

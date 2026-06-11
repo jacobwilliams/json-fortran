@@ -1499,7 +1499,6 @@
     logical(LK),intent(out),optional    :: found   !! if it was really found
     integer(IK),intent(in),optional     :: default
 
-    ! call me%core%get(me%p, path, val, found, default)
     integer(IK),parameter :: default_if_not_specified = 0_IK
     character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_integer'
 
