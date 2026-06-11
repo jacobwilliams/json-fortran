@@ -16,6 +16,7 @@
     use json_parameters, only: unit2str
     use json_string_utilities
     use json_value_module
+    use json_hash_module
 
     implicit none
 
@@ -69,6 +70,10 @@
                                                  !! factory used for this file.
         type(json_value),pointer :: p => null()  !! the JSON structure read from the file
 
+        ! this class also has the option to use a hash table
+        logical :: hash_enabled = .false.  !! whether to use a hash table for this file
+        type(json_hash_table) :: hash !! the hash table for this file (if enabled)
+
     contains
 
         generic,public :: initialize => initialize_json_core_in_file,&
@@ -111,6 +116,7 @@
         procedure,public :: print_error_message => json_file_print_error_message
         procedure,public :: check_for_errors => json_file_check_for_errors
         procedure,public :: clear_exceptions => json_file_clear_exceptions
+        procedure :: throw_exception
 
         generic,public :: print => json_file_print_to_console, &
                                    json_file_print_to_unit, &
@@ -244,6 +250,11 @@
 
         !traverse
         procedure,public :: traverse => json_file_traverse
+
+        ! hash table functions:
+        procedure,public :: initialize_hash
+        procedure,public :: destroy_hash
+        procedure,public :: is_hash_enabled
 
         ! ***************************************************
         ! operators
@@ -782,6 +793,7 @@
 !### History
 !  * 12/9/2013 : Created
 !  * 4/26/2016 : Added optional `destroy_core` argument
+!  * 6/7/2026 : Also destroy hash table.
 !
 !@note This routine will be called automatically when the variable
 !      goes out of scope.
@@ -795,6 +807,7 @@
                                                  !! default is to leave it as is.
 
     if (associated(me%p)) call me%core%destroy(me%p)
+    call me%destroy_hash() ! also have to destroy the hash table if used
 
     if (present(destroy_core)) then
         if (destroy_core) call me%core%destroy()
@@ -824,8 +837,8 @@
         if (from%failed()) then
             !Don't get the data if the FROM file has an
             !active exception, since it may not be valid.
-            call to%core%throw_exception('Error in json_file_move_pointer: '//&
-                                         'error exception in FROM file.')
+            call to%throw_exception(CK_'Error in json_file_move_pointer: '//&
+                                    'error exception in FROM file.')
         else
             call to%initialize()  !initialize and clear any exceptions that may be present
             to%p => from%p
@@ -833,8 +846,8 @@
         end if
 
     else
-        call to%core%throw_exception('Error in json_file_move_pointer: '//&
-                                     'pointer is not associated.')
+        call to%throw_exception(CK_'Error in json_file_move_pointer: '//&
+                                'pointer is not associated.')
     end if
 
     end subroutine json_file_move_pointer
@@ -963,7 +976,7 @@
     if (iunit/=unit2str) then
         call me%core%print(me%p,iunit=iunit)
     else
-        call me%core%throw_exception('Error in json_file_print_to_unit: iunit must not be -1.')
+        call me%throw_exception(CK_'Error in json_file_print_to_unit: iunit must not be -1.')
     end if
 
     end subroutine json_file_print_to_unit
@@ -1424,6 +1437,11 @@
 !  date: 2/3/2014
 !
 !  Get a [[json_value]] pointer to an object from a JSON file.
+!
+!  If the hash table has been enabled, then it will use that to get the pointer.
+!  Note that this only will work for the top-level variables,
+!  since the hash table only stores those.
+!  Otherwise, it will fall back to the normal method of getting the pointer.
 
     subroutine json_file_get_object(me, path, p, found)
 
@@ -1434,6 +1452,14 @@
     type(json_value),pointer,intent(out) :: p      !! pointer to the variable
     logical(LK),intent(out),optional     :: found  !! if it was really found
 
+    if (me%hash_enabled) then
+        call me%hash%get(path, p, found)
+        ! if p is associated, then we know it was found (see hash_table_get)
+        if (associated(p)) return
+    end if
+
+    ! if not using the hash table, or the key was not found,
+    ! fall back to the normal method:
     call me%core%get(me%p, path, p, found)
 
     end subroutine json_file_get_object
@@ -1473,7 +1499,10 @@
     logical(LK),intent(out),optional    :: found   !! if it was really found
     integer(IK),intent(in),optional     :: default
 
-    call me%core%get(me%p, path, val, found, default)
+    integer(IK),parameter :: default_if_not_specified = 0_IK
+    character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_integer'
+
+#include "json_file_get_scalar_by_path.inc"
 
     end subroutine json_file_get_integer
 !*****************************************************************************************
@@ -1513,7 +1542,9 @@
     logical(LK),intent(out),optional                 :: found  !! if it was really found
     integer(IK),dimension(:),intent(in),optional     :: default
 
-    call me%core%get(me%p, path, vec, found, default)
+    character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_integer_vec'
+
+#include "json_file_get_vec_by_path.inc"
 
     end subroutine json_file_get_integer_vec
 !*****************************************************************************************
@@ -1553,7 +1584,10 @@
     logical(LK),intent(out),optional    :: found !! if it was really found
     real(RK),intent(in),optional        :: default
 
-    call me%core%get(me%p, path, val, found, default)
+    real(RK),parameter :: default_if_not_specified = 0.0_RK
+    character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_real'
+
+#include "json_file_get_scalar_by_path.inc"
 
     end subroutine json_file_get_real
 !*****************************************************************************************
@@ -1593,7 +1627,9 @@
     logical(LK),intent(out),optional              :: found !! if it was really found
     real(RK),dimension(:),intent(in),optional     :: default
 
-    call me%core%get(me%p, path, vec, found, default)
+    character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_real_vec'
+
+#include "json_file_get_vec_by_path.inc"
 
     end subroutine json_file_get_real_vec
 !*****************************************************************************************
@@ -1634,7 +1670,16 @@
     logical(LK),intent(out),optional    :: found !! if it was really found
     real(real32),intent(in),optional    :: default
 
-    call me%core%get(me%p, path, val, found, default)
+    real(RK) :: tmp
+    real(RK) :: tmp_default
+
+    if (present(default)) then
+        tmp_default = real(default,RK)
+        call me%get(path, tmp, found, tmp_default)
+    else
+        call me%get(path, tmp, found)
+    end if
+    val = real(tmp,real32)
 
     end subroutine json_file_get_real32
 !*****************************************************************************************
@@ -1674,7 +1719,17 @@
     logical(LK),intent(out),optional                  :: found !! if it was really found
     real(real32),dimension(:),intent(in),optional     :: default
 
-    call me%core%get(me%p, path, vec, found, default)
+    real(RK),dimension(:),allocatable :: tmp
+    real(RK),dimension(:),allocatable :: tmp_default
+
+    if (present(default)) then
+        tmp_default = real(default,RK)
+        call me%get(path, tmp, found, tmp_default)
+    else
+        call me%get(path, tmp, found)
+    end if
+
+    if (allocated(tmp)) vec = real(tmp,real32)
 
     end subroutine json_file_get_real32_vec
 !*****************************************************************************************
@@ -1716,7 +1771,16 @@
     logical(LK),intent(out),optional    :: found !! if it was really found
     real(real64),intent(in),optional    :: default
 
-    call me%core%get(me%p, path, val, found, default)
+    real(RK) :: tmp
+    real(RK) :: tmp_default
+
+    if (present(default)) then
+        tmp_default = real(default, RK)
+        call me%get(path, tmp, found, tmp_default)
+    else
+        call me%get(path, tmp, found)
+    end if
+    val = real(tmp,real64)
 
     end subroutine json_file_get_real64
 !*****************************************************************************************
@@ -1756,7 +1820,16 @@
     logical(LK),intent(out),optional                  :: found !! if it was really found
     real(real64),dimension(:),intent(in),optional     :: default
 
-    call me%core%get(me%p, path, vec, found, default)
+    real(RK),dimension(:),allocatable :: tmp
+    real(RK),dimension(:),allocatable :: tmp_default
+
+    if (present(default)) then
+        tmp_default = real(default, RK)
+        call me%get(path, tmp, found, tmp_default)
+    else
+        call me%get(path, tmp, found)
+    end if
+    if (allocated(tmp)) vec = real(tmp,real64)
 
     end subroutine json_file_get_real64_vec
 !*****************************************************************************************
@@ -1797,7 +1870,10 @@
     logical(LK),intent(out),optional     :: found  !! if it was really found
     logical(LK),intent(in),optional      :: default
 
-    call me%core%get(me%p, path, val, found, default)
+    logical(LK),parameter :: default_if_not_specified = .false.
+    character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_logical'
+
+#include "json_file_get_scalar_by_path.inc"
 
     end subroutine json_file_get_logical
 !*****************************************************************************************
@@ -1837,7 +1913,9 @@
     logical(LK),intent(out),optional                 :: found !! if it was really found
     logical(LK),dimension(:),intent(in),optional     :: default
 
-    call me%core%get(me%p, path, vec, found, default)
+    character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_logical_vec'
+
+#include "json_file_get_vec_by_path.inc"
 
     end subroutine json_file_get_logical_vec
 !*****************************************************************************************
@@ -1878,7 +1956,10 @@
     logical(LK),intent(out),optional                 :: found !! if it was really found
     character(kind=CK,len=*),intent(in),optional     :: default
 
-    call me%core%get(me%p, path, val, found, default)
+    character(kind=CK,len=*),parameter :: default_if_not_specified = CK_''
+    character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_string'
+
+#include "json_file_get_scalar_by_path.inc"
 
     end subroutine json_file_get_string
 !*****************************************************************************************
@@ -1918,7 +1999,9 @@
     logical(LK),intent(out),optional                              :: found !! if it was really found
     character(kind=CK,len=*),dimension(:),intent(in),optional     :: default
 
-    call me%core%get(me%p, path, vec, found, default)
+    character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_string_vec'
+
+#include "json_file_get_vec_by_path.inc"
 
     end subroutine json_file_get_string_vec
 !*****************************************************************************************
@@ -1964,7 +2047,9 @@
     integer(IK),dimension(:),intent(in),optional :: default_ilen !! the actual
                                                                  !! length of `default`
 
-    call me%core%get(me%p, path, vec, ilen, found, default, default_ilen)
+    character(kind=CK,len=*),parameter :: routine = CK_'json_file_get_alloc_string_vec'
+
+#include "json_file_get_vec_by_path_alloc.inc"
 
     end subroutine json_file_get_alloc_string_vec
 !*****************************************************************************************
@@ -3150,6 +3235,101 @@
     call me%remove(to_unicode(path))
 
     end subroutine wrap_json_file_remove
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Throw an exception.
+
+    subroutine throw_exception(me,msg,found)
+
+    class(json_file),intent(inout)      :: me
+    character(kind=CK,len=*),intent(in) :: msg    !! the error message
+    logical(LK),intent(inout),optional  :: found  !! if the caller is handling the
+                                                  !! exception with an optimal return
+                                                  !! argument. If so, `json%stop_on_error`
+                                                  !! is ignored.
+    call me%core%throw_exception(msg,found)
+
+    end subroutine throw_exception
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Create a hash table from the contents of the JSON file.
+!
+!### Notes
+!  * This is an optional step that can be taken after reading a JSON file,
+!    and before doing any lookups. The hash table only applies to the top level
+!    keys of the JSON structure. If the JSON file contains nested objects,
+!    then the hash table will not be used for lookups of keys in those nested objects.
+!    If it also important to note that, if any manipulation of the data is done
+!    after the hash table is created, it is the caller's responsibility to call
+!    [[destroy_hash]] and then [[initialize_hash]] to update the hash table.
+
+    subroutine initialize_hash(me, status_ok, initial_capacity)
+
+    class(json_file), intent(inout) :: me
+    logical(LK), intent(out) :: status_ok !! true if no problems.
+    integer(IK), intent(in), optional :: initial_capacity !! initial capacity of the hash table (number of buckets).
+                                                          !! If not provided, it will be set based on the number of members
+                                                          !! divided by the load factor to minimize
+                                                          !! the number of resizes needed as members are inserted
+
+    type(json_core) :: core
+    type(json_value), pointer :: value
+
+    ! get the JSON core from the file and the pointer to the root value:
+    call me%get_core(core)
+    call me%get(value)
+
+    ! call the low-level routine:
+    call me%hash%create(core, value, status_ok, initial_capacity)
+
+    me%hash_enabled = status_ok
+
+    end subroutine initialize_hash
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Check if the hash table is enabled.
+
+    pure function is_hash_enabled(me) result(enabled)
+
+    class(json_file),intent(in) :: me
+    logical(LK) :: enabled
+
+    enabled = me%hash_enabled
+
+    end function is_hash_enabled
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Destroy the hash table if it exists.
+
+    subroutine destroy_hash(me)
+
+    class(json_file), intent(inout) :: me
+
+    call me%hash%destroy()
+    me%hash_enabled = .false.
+
+    end subroutine destroy_hash
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  If `found` is present, set it it false.
+
+    subroutine flag_not_found(found)
+
+    logical(LK),intent(out),optional :: found
+
+    if (present(found)) found = .false.
+
+    end subroutine flag_not_found
 !*****************************************************************************************
 
 !*****************************************************************************************

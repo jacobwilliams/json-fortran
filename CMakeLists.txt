@@ -91,7 +91,8 @@ set ( JF_LIB_SRCS  src/json_kinds.F90
                    src/json_string_utilities.F90
                    src/json_value_module.F90
                    src/json_file_module.F90
-                   src/json_module.F90 )
+                   src/json_module.F90
+                   src/json_hash_module.f90)
 file ( GLOB JF_TEST_SRCS "test/jf_test_*.F90" )
 set ( JF_TEST_UCS4_SUPPORT_SRC "${PROJECT_SOURCE_DIR}/test/introspection/test_iso_10646_support.f90")
 

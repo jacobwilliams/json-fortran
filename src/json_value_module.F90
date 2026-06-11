@@ -918,6 +918,8 @@
         procedure,public :: equals              => json_value_equals       !! Check if two json_value structures
                                                                             !! are equal
 
+        procedure,public :: get_name_settings => json_get_name_settings !! Get the settings for how JSON variable names are compared.
+
         !other private routines:
         procedure        :: name_equal
         procedure        :: name_strings_equal
@@ -1317,6 +1319,24 @@
     end if
 
     end subroutine json_initialize
+!*****************************************************************************************
+
+!*****************************************************************************************
+!>
+!  Get the settings for case sensitivity and trailing spaces for name strings.
+
+    subroutine json_get_name_settings(json,case_sensitive_keys,trailing_spaces_significant)
+
+    implicit none
+
+    class(json_core),intent(in) :: json
+    logical(LK),intent(out),optional :: case_sensitive_keys
+    logical(LK),intent(out),optional :: trailing_spaces_significant
+
+    if (present(case_sensitive_keys)) case_sensitive_keys = json%case_sensitive_keys
+    if (present(trailing_spaces_significant)) trailing_spaces_significant = json%trailing_spaces_significant
+
+    end subroutine json_get_name_settings
 !*****************************************************************************************
 
 !*****************************************************************************************
@@ -6261,7 +6281,7 @@
     type(json_value),pointer :: element !! for getting children
     integer(IK) :: tab           !! number of `tabs` for indenting
     integer(IK) :: spaces        !! number of spaces for indenting
-    integer(IK) :: i,j           !! counter
+    integer(IK) :: i             !! counter
     integer(IK) :: count         !! number of children
     logical(LK) :: print_comma   !! if the comma will be printed after the value
     logical(LK) :: write_file    !! if we are writing to a file
