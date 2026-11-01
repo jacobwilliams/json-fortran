@@ -179,7 +179,7 @@
 <p>The following example is an array with <code>var_type=json_integer</code>,
   <code>n_sets=3</code>, and <code>set_size=4</code></p>
 <div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;matrix&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="nt">"matrix"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span>
 <span class="w">            </span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">],</span>
 <span class="w">            </span><span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">]</span>
@@ -3024,7 +3024,7 @@ large graphs.</div>
 <span class="k">            </span><span class="n">p_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">%</span><span class="n">name</span>
 <span class="w">            </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p_name</span>
 <span class="w">        </span><span class="k">else</span>
-<span class="k">            </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CK_</span><span class="s1">&#39;&#39;</span>
+<span class="k">            </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CK_</span><span class="s1">''</span>
 <span class="w">        </span><span class="k">end if</span>
 <span class="k">    end if</span>
 <span class="cp">#else</span>
@@ -3041,8 +3041,8 @@ large graphs.</div>
 <span class="w">            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get_child</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">p_row</span><span class="p">)</span>
 <span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">p_row</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                </span><span class="n">is_matrix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
-<span class="w">                </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_matrix_info: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                          </span><span class="s1">&#39;Malformed JSON linked list&#39;</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">'Error in json_matrix_info: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                          </span><span class="s1">'Malformed JSON linked list'</span><span class="p">)</span>
 <span class="w">                </span><span class="k">exit </span><span class="n">main</span>
 <span class="w">            </span><span class="k">end if</span>
 <span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">info</span><span class="p">(</span><span class="n">p_row</span><span class="p">,</span><span class="n">var_type</span><span class="o">=</span><span class="n">row_vartype</span><span class="p">,</span><span class="n">n_children</span><span class="o">=</span><span class="n">icount</span><span class="p">)</span>
@@ -3056,8 +3056,8 @@ large graphs.</div>
 <span class="w">                        </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get_child</span><span class="p">(</span><span class="n">p_row</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">p_element</span><span class="p">)</span>
 <span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">p_element</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                            </span><span class="n">is_matrix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
-<span class="w">                            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_matrix_info: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                                      </span><span class="s1">&#39;Malformed JSON linked list&#39;</span><span class="p">)</span>
+<span class="w">                            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">'Error in json_matrix_info: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                                      </span><span class="s1">'Malformed JSON linked list'</span><span class="p">)</span>
 <span class="w">                            </span><span class="k">exit </span><span class="n">main</span>
 <span class="w">                        </span><span class="k">end if</span>
 <span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">info</span><span class="p">(</span><span class="n">p_element</span><span class="p">,</span><span class="n">var_type</span><span class="o">=</span><span class="n">element_vartype</span><span class="p">)</span>
@@ -3116,7 +3116,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-05-11 00:49 +0000             </p>
+ on 2026-11-01 15:22 +0000             </p>
           </div>
         </div>
         <br>

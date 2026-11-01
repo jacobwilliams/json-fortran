@@ -178,7 +178,7 @@
 <span class="w">    </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">found</span>
 <span class="w">    </span><span class="c">!...</span>
 <span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">path_mode</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span><span class="s2">&quot;$[&#39;store&#39;][&#39;book&#39;][1][&#39;title&#39;]&quot;</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
+<span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span><span class="s2">"$['store']['book'][1]['title']"</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="see-also">See also</h3>
@@ -6253,7 +6253,7 @@ large graphs.</div>
 <span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">me</span><span class="w">          </span><span class="c">!! a JSON linked list</span>
 <span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">path</span><span class="w">        </span><span class="c">!! path to the variable</span>
 <span class="w">                                                        </span><span class="c">!! (using JSONPath</span>
-<span class="w">                                                        </span><span class="c">!! &quot;bracket-notation&quot;)</span>
+<span class="w">                                                        </span><span class="c">!! "bracket-notation")</span>
 <span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">json_value</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span><span class="w">           </span><span class="c">!! pointer to the variable</span>
 <span class="w">                                                        </span><span class="c">!! specify by `path`</span>
 <span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="k">optional</span><span class="w">     </span><span class="kd">::</span><span class="w"> </span><span class="n">found</span><span class="w">       </span><span class="c">!! true if it was found</span>
@@ -6268,11 +6268,11 @@ large graphs.</div>
 <span class="w">                                                        </span><span class="c">!! it will be false.</span>
 
 <span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">CK</span><span class="p">,</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">token</span><span class="w">  </span><span class="c">!! a token in the path</span>
-<span class="w">                                                   </span><span class="c">!! (between the `[&#39;&#39;]` or</span>
+<span class="w">                                                   </span><span class="c">!! (between the `['']` or</span>
 <span class="w">                                                   </span><span class="c">!! `[]` characters)</span>
-<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">istart</span><span class="w">             </span><span class="c">!! location of current &#39;[&#39;</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">istart</span><span class="w">             </span><span class="c">!! location of current '['</span>
 <span class="w">                                                   </span><span class="c">!! character in the path</span>
-<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">iend</span><span class="w">               </span><span class="c">!! location of current &#39;]&#39;</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">iend</span><span class="w">               </span><span class="c">!! location of current ']'</span>
 <span class="w">                                                   </span><span class="c">!! character in the path</span>
 <span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">ival</span><span class="w">               </span><span class="c">!! integer array index value</span>
 <span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">status_ok</span><span class="w">          </span><span class="c">!! error flag</span>
@@ -6280,8 +6280,8 @@ large graphs.</div>
 <span class="w">                                                   </span><span class="c">!! traversing the structure</span>
 <span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="w">                  </span><span class="c">!! counter</span>
 <span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">IK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">ilen</span><span class="w">               </span><span class="c">!! length of `path` string</span>
-<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">real_quotes</span><span class="w">      </span><span class="c">!! if the keys are enclosed in `&quot;`,</span>
-<span class="w">                                                   </span><span class="c">!! rather than `&#39;` tokens.</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">real_quotes</span><span class="w">      </span><span class="c">!! if the keys are enclosed in `"`,</span>
+<span class="w">                                                   </span><span class="c">!! rather than `'` tokens.</span>
 <span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">create</span><span class="w">             </span><span class="c">!! if the object is to be created</span>
 <span class="w">    </span><span class="kt">logical</span><span class="p">(</span><span class="n">LK</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">created</span><span class="w">            </span><span class="c">!! if `create` is true, then this will be</span>
 <span class="w">                                                   </span><span class="c">!! true if the leaf object had to be created</span>
@@ -6308,9 +6308,9 @@ large graphs.</div>
 <span class="k">        </span><span class="n">p</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">me</span><span class="w"> </span><span class="c">! initialize</span>
 <span class="w">        </span><span class="n">created</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">path</span><span class="o">==</span><span class="n">CK_</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_get_by_path_jsonpath_bracket: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                      </span><span class="s1">&#39;invalid path specification: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">path</span><span class="o">==</span><span class="n">CK_</span><span class="s1">''</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">'Error in json_get_by_path_jsonpath_bracket: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                      </span><span class="s1">'invalid path specification: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">        </span><span class="k">else</span>
 
 <span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">path</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="n">root</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">path</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="n">start_array</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="c">! the first character must be</span>
@@ -6325,12 +6325,12 @@ large graphs.</div>
 <span class="k">                    if</span><span class="w"> </span><span class="p">(</span><span class="n">create</span><span class="p">)</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span><span class="w"> </span><span class="c">! should always exist</span>
 <span class="w">                </span><span class="k">end if</span>
 
-<span class="w">                </span><span class="c">!path length (don&#39;t need trailing spaces:)</span>
+<span class="w">                </span><span class="c">!path length (don't need trailing spaces:)</span>
 <span class="w">                </span><span class="n">ilen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">len_trim</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
 <span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ilen</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 
-<span class="k">                    </span><span class="n">istart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w">   </span><span class="c">! initialize first &#39;[&#39; location index</span>
+<span class="k">                    </span><span class="n">istart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w">   </span><span class="c">! initialize first '[' location index</span>
 
 <span class="w">                    </span><span class="k">do</span>
 
@@ -6339,16 +6339,16 @@ large graphs.</div>
 <span class="w">                        </span><span class="c">! must be the next start bracket:</span>
 <span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="p">:</span><span class="n">istart</span><span class="p">)</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">start_array</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                            call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(&amp;</span>
-<span class="w">                                    </span><span class="s1">&#39;Error in json_get_by_path_jsonpath_bracket: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                    </span><span class="s1">&#39;expecting &quot;[&quot;, found: &quot;&#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="p">:</span><span class="n">istart</span><span class="p">))</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                    </span><span class="s1">&#39;&quot; in path: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="w">                                    </span><span class="s1">'Error in json_get_by_path_jsonpath_bracket: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                    </span><span class="s1">'expecting "[", found: "'</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="p">:</span><span class="n">istart</span><span class="p">))</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                    </span><span class="s1">'" in path: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                            </span><span class="k">exit</span>
 <span class="k">                        end if</span>
 
 <span class="w">                        </span><span class="c">! get the next token by checking:</span>
 <span class="w">                        </span><span class="c">!</span>
-<span class="w">                        </span><span class="c">! * [&#39;&#39;] -- is the token after istart a quote?</span>
-<span class="w">                        </span><span class="c">!           if so, then search for the next `&#39;]`</span>
+<span class="w">                        </span><span class="c">! * [''] -- is the token after istart a quote?</span>
+<span class="w">                        </span><span class="c">!           if so, then search for the next `']`</span>
 <span class="w">                        </span><span class="c">!</span>
 <span class="w">                        </span><span class="c">! * [1] -- if not, then maybe it is a number,</span>
 <span class="w">                        </span><span class="c">!          so search for the next `]`</span>
@@ -6356,30 +6356,30 @@ large graphs.</div>
 <span class="w">                        </span><span class="c">! verify length of remaining string</span>
 <span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">istart</span><span class="o">+</span><span class="mi">2</span><span class="o">&lt;=</span><span class="n">ilen</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 
-<span class="k">                            </span><span class="n">real_quotes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">quotation_mark</span><span class="w">   </span><span class="c">! [&quot;</span>
+<span class="k">                            </span><span class="n">real_quotes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">quotation_mark</span><span class="w">   </span><span class="c">! ["</span>
 
-<span class="w">                            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">real_quotes</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="n">single_quote</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w">  </span><span class="c">! [&#39;</span>
+<span class="w">                            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">real_quotes</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="n">single_quote</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w">  </span><span class="c">! ['</span>
 
-<span class="w">                                </span><span class="c">! it might be a key value: [&#39;abc&#39;]</span>
+<span class="w">                                </span><span class="c">! it might be a key value: ['abc']</span>
 
-<span class="w">                                </span><span class="n">istart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">istart</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="c">! move counter to &#39; index</span>
+<span class="w">                                </span><span class="n">istart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">istart</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="c">! move counter to ' index</span>
 <span class="w">                                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">real_quotes</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                                    </span><span class="n">iend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">istart</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">index</span><span class="p">(</span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">ilen</span><span class="p">),&amp;</span>
-<span class="w">                                           </span><span class="n">quotation_mark</span><span class="o">//</span><span class="n">end_array</span><span class="p">)</span><span class="w">  </span><span class="c">! &quot;]</span>
+<span class="w">                                           </span><span class="n">quotation_mark</span><span class="o">//</span><span class="n">end_array</span><span class="p">)</span><span class="w">  </span><span class="c">! "]</span>
 <span class="w">                                </span><span class="k">else</span>
 <span class="k">                                    </span><span class="n">iend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">istart</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">index</span><span class="p">(</span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">ilen</span><span class="p">),&amp;</span>
-<span class="w">                                           </span><span class="n">single_quote</span><span class="o">//</span><span class="n">end_array</span><span class="p">)</span><span class="w">  </span><span class="c">! &#39;]</span>
+<span class="w">                                           </span><span class="n">single_quote</span><span class="o">//</span><span class="n">end_array</span><span class="p">)</span><span class="w">  </span><span class="c">! ']</span>
 <span class="w">                                </span><span class="k">end if</span>
 <span class="k">                                if</span><span class="w"> </span><span class="p">(</span><span class="n">iend</span><span class="o">&gt;</span><span class="n">istart</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 
 <span class="w">                                    </span><span class="c">!     istart  iend</span>
 <span class="w">                                    </span><span class="c">!       |       |</span>
-<span class="w">                                    </span><span class="c">! [&#39;p&#39;][&#39;abcdefg&#39;]</span>
+<span class="w">                                    </span><span class="c">! ['p']['abcdefg']</span>
 
 <span class="w">                                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">iend</span><span class="o">&gt;</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                                        </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">path</span><span class="p">(</span><span class="n">istart</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">iend</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="w">                                    </span><span class="k">else</span>
-<span class="k">                                        </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CK_</span><span class="s1">&#39;&#39;</span><span class="w">  </span><span class="c">! blank string</span>
+<span class="k">                                        </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CK_</span><span class="s1">''</span><span class="w">  </span><span class="c">! blank string</span>
 <span class="w">                                    </span><span class="k">end if</span>
 <span class="w">                                    </span><span class="c">! remove trailing spaces in</span>
 <span class="w">                                    </span><span class="c">! the token here if necessary:</span>
@@ -6394,11 +6394,11 @@ large graphs.</div>
 <span class="w">                                        </span><span class="c">! and destroy its data to prevent a memory leak</span>
 <span class="w">                                        </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">convert</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">json_object</span><span class="p">)</span>
 
-<span class="w">                                        </span><span class="c">! don&#39;t want to throw exceptions in this case</span>
+<span class="w">                                        </span><span class="c">! don't want to throw exceptions in this case</span>
 <span class="w">                                        </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get_child</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">token</span><span class="p">,</span><span class="n">tmp</span><span class="p">,</span><span class="n">status_ok</span><span class="p">)</span>
 <span class="w">                                        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">status_ok</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="w">                                            </span><span class="c">! have to create this child</span>
-<span class="w">                                            </span><span class="c">! [make it a null since we don&#39;t</span>
+<span class="w">                                            </span><span class="c">! [make it a null since we don't</span>
 <span class="w">                                            </span><span class="c">! know what it is yet]</span>
 <span class="w">                                            </span><span class="k">call </span><span class="n">json_value_create</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
 <span class="w">                                            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">to_null</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="n">token</span><span class="p">)</span>
@@ -6419,16 +6419,16 @@ large graphs.</div>
 <span class="w">                                        </span><span class="n">p</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">tmp</span>
 <span class="w">                                    </span><span class="k">else</span>
 <span class="k">                                        call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(&amp;</span>
-<span class="w">                                                </span><span class="s1">&#39;Error in json_get_by_path_jsonpath_bracket: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                                </span><span class="s1">&#39;invalid token found: &quot;&#39;</span><span class="o">//</span><span class="n">token</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                                </span><span class="s1">&#39;&quot; in path: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="w">                                                </span><span class="s1">'Error in json_get_by_path_jsonpath_bracket: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                                </span><span class="s1">'invalid token found: "'</span><span class="o">//</span><span class="n">token</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                                </span><span class="s1">'" in path: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                                        </span><span class="k">exit</span>
 <span class="k">                                    end if</span>
 <span class="k">                                    </span><span class="n">iend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iend</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="c">! move counter to ] index</span>
 <span class="w">                                </span><span class="k">else</span>
 <span class="k">                                    call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(&amp;</span>
-<span class="w">                                            </span><span class="s1">&#39;Error in json_get_by_path_jsonpath_bracket: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                            </span><span class="s1">&#39;invalid path: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="w">                                            </span><span class="s1">'Error in json_get_by_path_jsonpath_bracket: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                            </span><span class="s1">'invalid path: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                                    </span><span class="k">exit</span>
 <span class="k">                                end if</span>
 
@@ -6448,7 +6448,7 @@ large graphs.</div>
 <span class="w">                                    </span><span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 <span class="w">                                        </span><span class="c">! It must only contain (0..9) characters</span>
 <span class="w">                                        </span><span class="c">! (it must be unsigned)</span>
-<span class="w">                                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">scan</span><span class="p">(</span><span class="n">token</span><span class="p">(</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="p">),</span><span class="n">CK_</span><span class="s1">&#39;0123456789&#39;</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">scan</span><span class="p">(</span><span class="n">token</span><span class="p">(</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="p">),</span><span class="n">CK_</span><span class="s1">'0123456789'</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                                            </span><span class="n">status_ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 <span class="w">                                            </span><span class="k">exit</span>
 <span class="k">                                        end if</span>
@@ -6483,7 +6483,7 @@ large graphs.</div>
 <span class="w">                                                </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get_child</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">,</span><span class="w"> </span><span class="n">status_ok</span><span class="p">)</span>
 <span class="w">                                                </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">status_ok</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                                                    call </span><span class="n">json_value_create</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-<span class="w">                                                    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">to_null</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="w">  </span><span class="c">! array element doesn&#39;t need a name</span>
+<span class="w">                                                    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">to_null</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="w">  </span><span class="c">! array element doesn't need a name</span>
 <span class="w">                                                    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">tmp</span><span class="p">)</span>
 <span class="w">                                                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="o">==</span><span class="n">ival</span><span class="p">)</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
 <span class="w">                                                </span><span class="k">else</span>
@@ -6502,23 +6502,23 @@ large graphs.</div>
 <span class="w">                                        </span><span class="k">else</span>
 <span class="w">                                            </span><span class="c">! not found</span>
 <span class="w">                                            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(&amp;</span>
-<span class="w">                                                    </span><span class="s1">&#39;Error in json_get_by_path_jsonpath_bracket: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                                    </span><span class="s1">&#39;invalid array index found: &quot;&#39;</span><span class="o">//</span><span class="n">token</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                                    </span><span class="s1">&#39;&quot; in path: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="w">                                                    </span><span class="s1">'Error in json_get_by_path_jsonpath_bracket: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                                    </span><span class="s1">'invalid array index found: "'</span><span class="o">//</span><span class="n">token</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                                    </span><span class="s1">'" in path: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                                            </span><span class="k">exit</span>
 <span class="k">                                        end if</span>
 <span class="k">                                    else</span>
 <span class="k">                                        call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(&amp;</span>
-<span class="w">                                                </span><span class="s1">&#39;Error in json_get_by_path_jsonpath_bracket: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                                </span><span class="s1">&#39;invalid token: &quot;&#39;</span><span class="o">//</span><span class="n">token</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                                </span><span class="s1">&#39;&quot; in path: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="w">                                                </span><span class="s1">'Error in json_get_by_path_jsonpath_bracket: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                                </span><span class="s1">'invalid token: "'</span><span class="o">//</span><span class="n">token</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                                </span><span class="s1">'" in path: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                                        </span><span class="k">exit</span>
 <span class="k">                                    end if</span>
 
 <span class="k">                                else</span>
 <span class="k">                                    call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(&amp;</span>
-<span class="w">                                            </span><span class="s1">&#39;Error in json_get_by_path_jsonpath_bracket: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                            </span><span class="s1">&#39;invalid path: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="w">                                            </span><span class="s1">'Error in json_get_by_path_jsonpath_bracket: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                            </span><span class="s1">'invalid path: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                                    </span><span class="k">exit</span>
 <span class="k">                                end if</span>
 
@@ -6526,8 +6526,8 @@ large graphs.</div>
 
 <span class="k">                        else</span>
 <span class="k">                            call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(&amp;</span>
-<span class="w">                                    </span><span class="s1">&#39;Error in json_get_by_path_jsonpath_bracket: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                    </span><span class="s1">&#39;invalid path: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="w">                                    </span><span class="s1">'Error in json_get_by_path_jsonpath_bracket: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                    </span><span class="s1">'invalid path: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                            </span><span class="k">exit</span>
 <span class="k">                        end if</span>
 
@@ -6540,9 +6540,9 @@ large graphs.</div>
 
 <span class="k">            else</span>
 <span class="k">                call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(&amp;</span>
-<span class="w">                        </span><span class="s1">&#39;Error in json_get_by_path_jsonpath_bracket: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                        </span><span class="s1">&#39;expecting &quot;&#39;</span><span class="o">//</span><span class="n">root</span><span class="o">//</span><span class="s1">&#39;&quot;, found: &quot;&#39;</span><span class="o">//</span><span class="n">path</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                        </span><span class="s1">&#39;&quot; in path: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="w">                        </span><span class="s1">'Error in json_get_by_path_jsonpath_bracket: '</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="s1">'expecting "'</span><span class="o">//</span><span class="n">root</span><span class="o">//</span><span class="s1">'", found: "'</span><span class="o">//</span><span class="n">path</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="s1">'" in path: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">            </span><span class="k">end if</span>
 
 <span class="k">        end if</span>
@@ -6589,7 +6589,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-05-11 00:49 +0000             </p>
+ on 2026-11-01 15:22 +0000             </p>
           </div>
         </div>
         <br>

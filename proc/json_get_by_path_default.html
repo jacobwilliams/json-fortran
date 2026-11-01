@@ -170,7 +170,7 @@
 <span class="w">    </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">found</span>
 <span class="w">    </span><span class="c">!...</span>
 <span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">initialize</span><span class="p">(</span><span class="n">path_mode</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="c">! this is the default so not strictly necessary.</span>
-<span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span><span class="s1">&#39;data(2).version&#39;</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
+<span class="w">    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span><span class="s1">'data(2).version'</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="notes">Notes</h3>
@@ -6329,7 +6329,7 @@ large graphs.</div>
 <span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">create</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 
 <span class="w">                        </span><span class="c">! Example:</span>
-<span class="w">                        </span><span class="c">!    &#39;aaa.bbb(1)&#39;</span>
+<span class="w">                        </span><span class="c">!    'aaa.bbb(1)'</span>
 <span class="w">                        </span><span class="c">!     -&gt; and aaa is a null, need to make it an object</span>
 <span class="w">                        </span><span class="c">!</span>
 <span class="w">                        </span><span class="c">!  What about the case: aaa.bbb(1)(3) ?</span>
@@ -6341,7 +6341,7 @@ large graphs.</div>
 <span class="w">                            </span><span class="n">p</span><span class="p">%</span><span class="n">var_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json_object</span>
 <span class="w">                        </span><span class="k">end if</span>
 
-<span class="w">                        </span><span class="c">! don&#39;t want to throw exceptions in this case</span>
+<span class="w">                        </span><span class="c">! don't want to throw exceptions in this case</span>
 <span class="w">                        </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get_child</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="p">(</span><span class="n">child_i</span><span class="p">:</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">tmp</span><span class="p">,</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span>
 <span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="w">                            </span><span class="c">! have to create this child</span>
@@ -6359,12 +6359,12 @@ large graphs.</div>
 <span class="w">                    </span><span class="k">end if</span>
 <span class="k">                    </span><span class="n">p</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">tmp</span>
 <span class="w">                </span><span class="k">else</span>
-<span class="k">                    </span><span class="n">child_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w">     </span><span class="c">! say, &#39;@(&#39;</span>
+<span class="k">                    </span><span class="n">child_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w">     </span><span class="c">! say, '@('</span>
 <span class="w">                    </span><span class="k">cycle</span>
 <span class="k">                end if</span>
 <span class="k">                if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                    call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_get_by_path_default:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                              </span><span class="s1">&#39; Error getting array element&#39;</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
+<span class="k">                    call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">'Error in json_get_by_path_default:'</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                              </span><span class="s1">' Error getting array element'</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                    </span><span class="k">exit</span>
 <span class="k">                end if</span>
 <span class="k">                </span><span class="n">child_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
@@ -6372,22 +6372,22 @@ large graphs.</div>
 <span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">end_array</span><span class="p">,</span><span class="n">end_array_alt</span><span class="p">)</span>
 
 <span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="k">array</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                    call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_get_by_path_default:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                              </span><span class="s1">&#39; Unexpected &#39;</span><span class="o">//</span><span class="n">c</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
+<span class="k">                    call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">'Error in json_get_by_path_default:'</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                              </span><span class="s1">' Unexpected '</span><span class="o">//</span><span class="n">c</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                    </span><span class="k">exit</span>
 <span class="k">                end if</span>
 <span class="k">                array</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 <span class="w">                </span><span class="k">call </span><span class="n">string_to_integer</span><span class="p">(</span><span class="n">path</span><span class="p">(</span><span class="n">child_i</span><span class="p">:</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">child_i</span><span class="p">,</span><span class="n">status_ok</span><span class="p">)</span>
 <span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">status_ok</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                    call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_get_by_path_default:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                              </span><span class="s1">&#39; Could not convert array index to integer: &#39;</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="k">                    call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">'Error in json_get_by_path_default:'</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                              </span><span class="s1">' Could not convert array index to integer: '</span><span class="o">//</span><span class="p">&amp;</span>
 <span class="w">                                              </span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">(</span><span class="n">child_i</span><span class="p">:</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                    </span><span class="k">exit</span>
 <span class="k">                end if</span>
 
 <span class="k">                nullify</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
 <span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">create</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="w">                    </span><span class="c">! don&#39;t want to throw exceptions in this case</span>
+<span class="w">                    </span><span class="c">! don't want to throw exceptions in this case</span>
 <span class="w">                    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get_child</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">child_i</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">,</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span>
 <span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 
@@ -6405,7 +6405,7 @@ large graphs.</div>
 <span class="w">                            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get_child</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">,</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span>
 <span class="w">                            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                                call </span><span class="n">json_value_create</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-<span class="w">                                </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">to_null</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="w">  </span><span class="c">! array element doesn&#39;t need a name</span>
+<span class="w">                                </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">to_null</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="w">  </span><span class="c">! array element doesn't need a name</span>
 <span class="w">                                </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">tmp</span><span class="p">)</span>
 <span class="w">                                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="o">==</span><span class="n">child_i</span><span class="p">)</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
 <span class="w">                            </span><span class="k">else</span>
@@ -6440,7 +6440,7 @@ large graphs.</div>
 <span class="w">                                </span><span class="n">p</span><span class="p">%</span><span class="n">var_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json_object</span>
 <span class="w">                            </span><span class="k">end if</span>
 
-<span class="w">                            </span><span class="c">! don&#39;t want to throw exceptions in this case</span>
+<span class="w">                            </span><span class="c">! don't want to throw exceptions in this case</span>
 <span class="w">                            </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">get_child</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="p">(</span><span class="n">child_i</span><span class="p">:</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">tmp</span><span class="p">,</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span>
 <span class="w">                            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">child_found</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="w">                                </span><span class="c">! have to create this child</span>
@@ -6458,13 +6458,13 @@ large graphs.</div>
 <span class="w">                        </span><span class="k">end if</span>
 <span class="k">                        </span><span class="n">p</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">tmp</span>
 <span class="w">                    </span><span class="k">else</span>
-<span class="k">                        </span><span class="n">child_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w">     </span><span class="c">! say &#39;$.&#39;, &#39;@.&#39;, or &#39;).&#39;</span>
+<span class="k">                        </span><span class="n">child_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w">     </span><span class="c">! say '$.', '@.', or ').'</span>
 <span class="w">                        </span><span class="k">cycle</span>
 <span class="k">                    end if</span>
 
 <span class="k">                    if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_get_by_path_default:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                                  </span><span class="s1">&#39; Error getting child member.&#39;</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
+<span class="k">                        call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">'Error in json_get_by_path_default:'</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                                  </span><span class="s1">' Error getting child member.'</span><span class="p">,</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                        </span><span class="k">exit</span>
 <span class="k">                    end if</span>
 
@@ -6516,7 +6516,7 @@ large graphs.</div>
 <span class="w">                </span><span class="c">! we already have p</span>
 <span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">create</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">created</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="w">                    </span><span class="c">! make leaf p a null, but only</span>
-<span class="w">                    </span><span class="c">! if it wasn&#39;t there</span>
+<span class="w">                    </span><span class="c">! if it wasn't there</span>
 <span class="w">                    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">to_null</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 <span class="w">                </span><span class="k">end if</span>
 <span class="k">            end if</span>
@@ -6525,8 +6525,8 @@ large graphs.</div>
 <span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">found</span><span class="p">))</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="w">    </span><span class="c">!everything seems to be ok</span>
 <span class="w">            </span><span class="k">else</span>
-<span class="k">                call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">&#39;Error in json_get_by_path_default:&#39;</span><span class="o">//</span><span class="p">&amp;</span>
-<span class="w">                                          </span><span class="s1">&#39; variable not found: &#39;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
+<span class="k">                call </span><span class="n">json</span><span class="p">%</span><span class="n">throw_exception</span><span class="p">(</span><span class="s1">'Error in json_get_by_path_default:'</span><span class="o">//</span><span class="p">&amp;</span>
+<span class="w">                                          </span><span class="s1">' variable not found: '</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">path</span><span class="p">),</span><span class="n">found</span><span class="p">)</span>
 <span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">found</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                    </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
 <span class="w">                    </span><span class="k">call </span><span class="n">json</span><span class="p">%</span><span class="n">clear_exceptions</span><span class="p">()</span>
@@ -6567,7 +6567,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-05-11 00:49 +0000             </p>
+ on 2026-11-01 15:22 +0000             </p>
           </div>
         </div>
         <br>
