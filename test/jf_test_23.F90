@@ -212,7 +212,7 @@ contains
       if (.not. found) then
         write(error_unit,'(A)') key//' not in file.'
       else
-        write(error_unit,'(A)') key//' = ',ival
+        write(error_unit,'(A,I0)') key//' = ',ival
         error_cnt = error_cnt + 1
       end if
 

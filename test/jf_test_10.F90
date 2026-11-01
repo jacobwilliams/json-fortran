@@ -101,7 +101,7 @@ contains
         if (var_type==json_integer .and. n_children==0) then
             write(error_unit,'(A)') '...success'
         else
-            write(error_unit,'(A)') 'Error invalid values:',var_type,n_children
+            write(error_unit,'(A,1X,I0,1X,I0)') 'Error invalid values:', var_type, n_children
             error_cnt = error_cnt + 1
         end if
     end if
@@ -113,11 +113,14 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. lval) then
-            write(error_unit,'(A)') '...success'
-        else
-            write(error_unit,'(A)') 'Error: incorrect result: ', lval
+        if (.not. found) then ! first, where unable to find variable
+            write(error_unit,'(A)') 'Error: variable not found'
             error_cnt = error_cnt + 1
+        else if (.not. lval) then ! second, handle where logical value is false
+            write(error_unit,'(A)') 'Error: logical value incorrect'
+            error_cnt = error_cnt + 1
+        else
+            write(error_unit,'(A)') '...success'
         end if
     end if
 
@@ -128,11 +131,14 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. ival==1_IK) then
-            write(error_unit,'(A)') '...success'
-        else
-            write(error_unit,'(A,1X,I5)') 'Error: incorrect result: ', ival
+        if (.not. found) then ! first, where unable to find variable
+            write(error_unit,'(A)') 'Error: variable not found'
             error_cnt = error_cnt + 1
+        else if (ival /= 1_IK) then ! second, handle where ival is not 1
+            write(error_unit,'(A,1X,I0)') 'Error: incorrect result:', ival
+            error_cnt = error_cnt + 1
+        else
+            write(error_unit,'(A)') '...success'
         end if
     end if
 
@@ -145,12 +151,20 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. size(str_vec)==7 .and. &
-            str_vec(1)=='..\path\to\files\file1.txt') then
-            write(error_unit,'(A)') '...success'
-        else
+        if (.not. found) then ! unable to find variable
+            write(error_unit,'(A)') 'Error: variable not found'
+            error_cnt = error_cnt + 1
+        else if (.not. allocated(str_vec)) then ! string array not allocated
+            write(error_unit,'(A)') 'Error: str_vec array not allocated'
+            error_cnt = error_cnt + 1
+        else if (size(str_vec) /= 7) then ! string array wrong size
+            write(error_unit,'(A,1X,I0)') 'Error: incorrect string array size:', size(str_vec)
+            error_cnt = error_cnt + 1
+        else if (str_vec(1) /= '..\path\to\files\file1.txt') then ! wrong path
             write(error_unit,'(A)') 'Error: incorrect result: '//trim(str_vec(1))
             error_cnt = error_cnt + 1
+        else
+            write(error_unit,'(A)') '...success'
         end if
     end if
 
@@ -223,7 +237,7 @@ contains
     !--------------------------------
 
     write(error_unit,'(A)') ''
-    write(error_unit,'(A)') 'json_file_get_integer...'
+    write(error_unit,'(A)') 'json_file_get_root...'
     call f2%get('$',p,found)  !get root
     if (f2%failed()) then
         call f2%print_error_message(error_unit)
@@ -304,12 +318,20 @@ contains
         error_cnt = error_cnt + 1
     else
         !also make sure the values are correct:
-        if (found .and. size(str_vec)==7 .and. &
-            str_vec(1)=='..\path\to\files\file1.txt') then
-            write(error_unit,'(A)') '...success'
-        else
+        if (.not. found) then ! unable to find variable
+            write(error_unit,'(A)') 'Error: variable not found'
+            error_cnt = error_cnt + 1
+        else if (.not. allocated(str_vec)) then ! string array not allocated
+            write(error_unit,'(A)') 'Error: str_vec array not allocated'
+            error_cnt = error_cnt + 1
+        else if (size(str_vec) /= 7) then ! string array wrong size
+            write(error_unit,'(A,1X,I0)') 'Error: incorrect string array size:', size(str_vec)
+            error_cnt = error_cnt + 1
+        else if (str_vec(1) /= '..\path\to\files\file1.txt') then ! wrong path
             write(error_unit,'(A)') 'Error: incorrect result: '//trim(str_vec(1))
             error_cnt = error_cnt + 1
+        else
+            write(error_unit,'(A)') '...success'
         end if
     end if
 
