@@ -1,0 +1,1553 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="JSON-Fortran – A Modern Fortran JSON API">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>json_hash_module &ndash; JSON-Fortran</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">JSON-Fortran </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Other Docs</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>json_hash_module
+      <small>Module</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 2.6% of total for modules and submodules.">231 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/json_hash_module.f90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/json_hash_module.f90.html'>json_hash_module.f90</a></li>
+            <li class="breadcrumb-item active" aria-current="page">json_hash_module</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+        <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#types-0"
+         aria-expanded="false" aria-controls="types-0">
+         <h4 class="card-header bg-primary text-white">Derived Types</h4>
+      </a>
+      <div id="types-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/json_hash_module.html#type-hash_node_t">hash_node_t</a>
+            <a class="list-group-item" href="../module/json_hash_module.html#type-json_hash_table">json_hash_table</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#funcs-0"
+         aria-expanded="false" aria-controls="funcs-0">
+         <h4 class="card-header bg-primary text-white">Functions</h4>
+      </a>
+      <div id="funcs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/json_hash_module.html#proc-hash_table_hash">hash_table_hash</a>
+            <a class="list-group-item" href="../module/json_hash_module.html#proc-keys_equal">keys_equal</a>
+            <a class="list-group-item" href="../module/json_hash_module.html#proc-preprocess_key">preprocess_key</a>
+        </div>
+      </div>
+    </div>
+
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#subs-0"
+         aria-expanded="false" aria-controls="subs-0">
+         <h4 class="card-header bg-primary text-white">Subroutines</h4>
+      </a>
+      <div id="subs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../module/json_hash_module.html#proc-hash_table_create_from_value">hash_table_create_from_value</a>
+            <a class="list-group-item" href="../module/json_hash_module.html#proc-hash_table_destroy">hash_table_destroy</a>
+            <a class="list-group-item" href="../module/json_hash_module.html#proc-hash_table_finalize">hash_table_finalize</a>
+            <a class="list-group-item" href="../module/json_hash_module.html#proc-hash_table_get">hash_table_get</a>
+            <a class="list-group-item" href="../module/json_hash_module.html#proc-hash_table_insert">hash_table_insert</a>
+            <a class="list-group-item" href="../module/json_hash_module.html#proc-hash_table_resize">hash_table_resize</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <p>A simple hash table implementation for a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> structure.</p>
+<p>This module defines a hash table type with methods for initialization, insertion, lookup, and
+deletion. It uses the DJB hash algorithm for hashing string keys and supports optional
+case-insensitive key comparison.</p>
+<p>It can be used independently, or in a <a href="../type/json_file.html">json_file</a> object to speed up
+lookups of the root-level members of the <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> file.</p>
+<br>          <div class="card mb-4">
+      <h3 class="card-header card-title bg-light">Uses</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <ul class="list-inline">
+                  <li class="list-inline-item"><a href='json_value_module.html'>json_value_module</a></li>
+                  <li class="list-inline-item"><a href='json_string_utilities.html'>json_string_utilities</a></li>
+                  <li class="list-inline-item"><a href='json_kinds.html'>json_kinds</a></li>
+                  <li class="list-inline-item"><a href='json_parameters.html'>json_parameters</a></li>
+              </ul>
+            </li>
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~json_hash_module~~UsesGraph Pages: 1 -->
+<svg id="modulejson_hash_moduleUsesGraph" width="641pt" height="185pt"
+ viewBox="0.00 0.00 641.00 184.77" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~json_hash_module~~UsesGraph" class="graph" transform="scale(0.81 0.81) rotate(0) translate(4 223.72)">
+<title>module~~json_hash_module~~UsesGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-223.72 786,-223.72 786,4 -4,4"/>
+<!-- module~json_hash_module -->
+<g id="module~~json_hash_module~~UsesGraph_node1" class="node">
+<title>module~json_hash_module</title>
+<polygon fill="none" stroke="black" points="782,-204.12 671,-204.12 671,-180.12 782,-180.12 782,-204.12"/>
+<text text-anchor="middle" x="726.5" y="-189.72" font-family="Helvetica,sans-Serif" font-size="10.50">json_hash_module</text>
+</g>
+<!-- module~json_kinds -->
+<g id="module~~json_hash_module~~UsesGraph_node2" class="node">
+<title>module~json_kinds</title>
+<g id="a_module~~json_hash_module~~UsesGraph_node2"><a xlink:href="../module/json_kinds.html" xlink:title="json_kinds">
+<polygon fill="#337ab7" stroke="#337ab7" points="197,-62.12 130,-62.12 130,-38.12 197,-38.12 197,-62.12"/>
+<text text-anchor="middle" x="163.5" y="-47.72" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_kinds</text>
+</a>
+</g>
+</g>
+<!-- module~json_hash_module&#45;&gt;module~json_kinds -->
+<g id="module~~json_hash_module~~UsesGraph_edge1" class="edge">
+<title>module~json_hash_module&#45;&gt;module~json_kinds</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M426.5,-212.12C340.29,-206.14 303.78,-242.69 233,-193.12 192.08,-164.46 174.75,-104.56 168.13,-72.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="171.56,-71.44 166.28,-62.26 164.69,-72.74 171.56,-71.44"/>
+</g>
+<!-- module~json_parameters -->
+<g id="module~~json_hash_module~~UsesGraph_node3" class="node">
+<title>module~json_parameters</title>
+<g id="a_module~~json_hash_module~~UsesGraph_node3"><a xlink:href="../module/json_parameters.html" xlink:title="json_parameters">
+<polygon fill="#337ab7" stroke="#337ab7" points="335,-184.12 233,-184.12 233,-160.12 335,-160.12 335,-184.12"/>
+<text text-anchor="middle" x="284" y="-169.72" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_parameters</text>
+</a>
+</g>
+</g>
+<!-- module~json_hash_module&#45;&gt;module~json_parameters -->
+<g id="module~~json_hash_module~~UsesGraph_edge2" class="edge">
+<title>module~json_hash_module&#45;&gt;module~json_parameters</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M576.5,-212.12C510.86,-207.94 494.12,-216.67 428.5,-212.12"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M426.5,-212.12C390.73,-209.64 351.62,-197.84 323.6,-187.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="324.77,-184.39 314.18,-184.19 322.33,-190.96 324.77,-184.39"/>
+</g>
+<!-- module~json_string_utilities -->
+<g id="module~~json_hash_module~~UsesGraph_node4" class="node">
+<title>module~json_string_utilities</title>
+<g id="a_module~~json_hash_module~~UsesGraph_node4"><a xlink:href="../module/json_string_utilities.html" xlink:title="json_string_utilities">
+<polygon fill="#337ab7" stroke="#337ab7" points="484,-144.12 371,-144.12 371,-120.12 484,-120.12 484,-144.12"/>
+<text text-anchor="middle" x="427.5" y="-129.72" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_string_utilities</text>
+</a>
+</g>
+</g>
+<!-- module~json_hash_module&#45;&gt;module~json_string_utilities -->
+<g id="module~~json_hash_module~~UsesGraph_edge3" class="edge">
+<title>module~json_hash_module&#45;&gt;module~json_string_utilities</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M674.32,-204.14C646.14,-209.48 610.5,-214.15 578.5,-212.12"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M576.5,-212.12C526.04,-208.9 476.16,-173.46 449.14,-150.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="451.38,-148.15 441.51,-144.28 446.81,-153.46 451.38,-148.15"/>
+</g>
+<!-- module~json_value_module -->
+<g id="module~~json_hash_module~~UsesGraph_node5" class="node">
+<title>module~json_value_module</title>
+<g id="a_module~~json_hash_module~~UsesGraph_node5"><a xlink:href="../module/json_value_module.html" xlink:title="json_value_module">
+<polygon fill="#337ab7" stroke="#337ab7" points="635,-164.12 520,-164.12 520,-140.12 635,-140.12 635,-164.12"/>
+<text text-anchor="middle" x="577.5" y="-149.72" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_value_module</text>
+</a>
+</g>
+</g>
+<!-- module~json_hash_module&#45;&gt;module~json_value_module -->
+<g id="module~~json_hash_module~~UsesGraph_edge4" class="edge">
+<title>module~json_hash_module&#45;&gt;module~json_value_module</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M681.4,-180.11C666.06,-175.94 648.68,-171.21 632.62,-166.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="633.4,-163.43 622.83,-164.18 631.56,-170.18 633.4,-163.43"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~json_hash_module~~UsesGraph_node8" class="node">
+<title>iso_fortran_env</title>
+<g id="a_module~~json_hash_module~~UsesGraph_node8"><a xlink:href="http://fortranwiki.org/fortran/show/iso_fortran_env" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="94,-42.12 0,-42.12 0,-18.12 94,-18.12 94,-42.12"/>
+<text text-anchor="middle" x="47" y="-27.72" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- module~json_kinds&#45;&gt;iso_fortran_env -->
+<g id="module~~json_hash_module~~UsesGraph_edge5" class="edge">
+<title>module~json_kinds&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M130,-44.44C121.92,-43.03 113.04,-41.48 104.19,-39.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="104.72,-36.47 94.26,-38.2 103.51,-43.37 104.72,-36.47"/>
+</g>
+<!-- module~json_parameters&#45;&gt;module~json_kinds -->
+<g id="module~~json_hash_module~~UsesGraph_edge6" class="edge">
+<title>module~json_parameters&#45;&gt;module~json_kinds</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M254.28,-160.11C246.9,-156.27 239.28,-151.57 233,-146.12 208.07,-124.46 187.36,-91.98 175.45,-70.92"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="178.5,-69.2 170.62,-62.12 172.37,-72.57 178.5,-69.2"/>
+</g>
+<!-- module~json_string_utilities&#45;&gt;module~json_kinds -->
+<g id="module~~json_hash_module~~UsesGraph_edge9" class="edge">
+<title>module~json_string_utilities&#45;&gt;module~json_kinds</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M370.74,-135.83C330.73,-136.35 276.44,-132.56 233,-113.12 211.79,-103.63 192.8,-84.92 180.22,-70.35"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="182.67,-67.81 173.59,-62.35 177.28,-72.28 182.67,-67.81"/>
+</g>
+<!-- module~json_string_utilities&#45;&gt;module~json_parameters -->
+<g id="module~~json_hash_module~~UsesGraph_edge10" class="edge">
+<title>module~json_string_utilities&#45;&gt;module~json_parameters</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M384.05,-144.12C369.49,-148.23 353.02,-152.89 337.74,-157.21"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="336.58,-153.9 327.91,-159.99 338.49,-160.63 336.58,-153.9"/>
+</g>
+<!-- ieee_arithmetic -->
+<g id="module~~json_hash_module~~UsesGraph_node6" class="node">
+<title>ieee_arithmetic</title>
+<g id="a_module~~json_hash_module~~UsesGraph_node6"><a xlink:href="http://fortranwiki.org/fortran/show/ieee_arithmetic" xlink:title="ieee_arithmetic">
+<polygon fill="#337ab7" stroke="#337ab7" points="332,-62.12 236,-62.12 236,-38.12 332,-38.12 332,-62.12"/>
+<text text-anchor="middle" x="284" y="-47.72" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ieee_arithmetic</text>
+</a>
+</g>
+</g>
+<!-- module~json_string_utilities&#45;&gt;ieee_arithmetic -->
+<g id="module~~json_hash_module~~UsesGraph_edge7" class="edge">
+<title>module~json_string_utilities&#45;&gt;ieee_arithmetic</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M410.23,-119.88C392.38,-106.8 362.58,-85.93 335,-71.12 331.96,-69.49 328.77,-67.89 325.53,-66.36"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="326.92,-63.14 316.37,-62.21 324.04,-69.52 326.92,-63.14"/>
+</g>
+<!-- iso_c_binding -->
+<g id="module~~json_hash_module~~UsesGraph_node7" class="node">
+<title>iso_c_binding</title>
+<g id="a_module~~json_hash_module~~UsesGraph_node7"><a xlink:href="http://fortranwiki.org/fortran/show/iso_c_binding" xlink:title="iso_c_binding">
+<polygon fill="#337ab7" stroke="#337ab7" points="326,-104.12 242,-104.12 242,-80.12 326,-80.12 326,-104.12"/>
+<text text-anchor="middle" x="284" y="-89.72" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_c_binding</text>
+</a>
+</g>
+</g>
+<!-- module~json_string_utilities&#45;&gt;iso_c_binding -->
+<g id="module~~json_hash_module~~UsesGraph_edge8" class="edge">
+<title>module~json_string_utilities&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M384.05,-120.11C369.09,-115.89 352.11,-111.09 336.49,-106.67"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="337.03,-103.19 326.45,-103.83 335.12,-109.92 337.03,-103.19"/>
+</g>
+<!-- module~json_value_module&#45;&gt;module~json_kinds -->
+<g id="module~~json_hash_module~~UsesGraph_edge13" class="edge">
+<title>module~json_value_module&#45;&gt;module~json_kinds</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M283,-10.12C253.27,-12.57 221.33,-23.91 198.1,-33.89"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="196.44,-30.8 188.72,-38.05 199.28,-37.2 196.44,-30.8"/>
+</g>
+<!-- module~json_value_module&#45;&gt;module~json_parameters -->
+<g id="module~~json_hash_module~~UsesGraph_edge14" class="edge">
+<title>module~json_value_module&#45;&gt;module~json_parameters</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M519.95,-156C469.76,-159.44 396.65,-164.46 345.35,-167.98"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="344.81,-164.5 335.07,-168.68 345.29,-171.49 344.81,-164.5"/>
+</g>
+<!-- module~json_value_module&#45;&gt;module~json_string_utilities -->
+<g id="module~~json_hash_module~~UsesGraph_edge15" class="edge">
+<title>module~json_value_module&#45;&gt;module~json_string_utilities</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M519.7,-144.44C511.47,-143.33 502.94,-142.18 494.55,-141.04"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="494.79,-137.54 484.41,-139.67 493.85,-144.48 494.79,-137.54"/>
+</g>
+<!-- module~json_value_module&#45;&gt;ieee_arithmetic -->
+<g id="module~~json_hash_module~~UsesGraph_edge11" class="edge">
+<title>module~json_value_module&#45;&gt;ieee_arithmetic</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M426.5,-10.12C407.28,-3.96 357.81,-20.67 322.8,-34.35"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="321.35,-31.16 313.35,-38.11 323.93,-37.67 321.35,-31.16"/>
+</g>
+<!-- module~json_value_module&#45;&gt;iso_fortran_env -->
+<g id="module~~json_hash_module~~UsesGraph_edge12" class="edge">
+<title>module~json_value_module&#45;&gt;iso_fortran_env</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M569.5,-140.1C551.11,-110.04 498.02,-32.37 428.5,-10.12"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M426.5,-10.12C366.6,9.05 347.68,-4.95 285,-10.12"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M283,-10.12C221.98,-15.15 152.07,-21.12 104.47,-25.23"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="104.03,-21.75 94.37,-26.1 104.63,-28.72 104.03,-21.75"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panmodulejson_hash_moduleUsesGraph = svgPanZoom('#modulejson_hash_moduleUsesGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsesGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsesGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+          <div class="card">
+      <h3 class="card-header card-title bg-light">Used by</h3>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: module~~json_hash_module~~UsedByGraph Pages: 1 -->
+<svg id="modulejson_hash_moduleUsedByGraph" width="373pt" height="52pt"
+ viewBox="0.00 0.00 373.00 52.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~json_hash_module~~UsedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 48)">
+<title>module~~json_hash_module~~UsedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-48 369,-48 369,4 -4,4"/>
+<!-- module~json_hash_module -->
+<g id="module~~json_hash_module~~UsedByGraph_node1" class="node">
+<title>module~json_hash_module</title>
+<polygon fill="none" stroke="black" points="111,-44 0,-44 0,-20 111,-20 111,-44"/>
+<text text-anchor="middle" x="55.5" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50">json_hash_module</text>
+</g>
+<!-- module~json_file_module -->
+<g id="module~~json_hash_module~~UsedByGraph_node2" class="node">
+<title>module~json_file_module</title>
+<g id="a_module~~json_hash_module~~UsedByGraph_node2"><a xlink:href="../module/json_file_module.html" xlink:title="json_file_module">
+<polygon fill="#337ab7" stroke="#337ab7" points="249,-24 147,-24 147,0 249,0 249,-24"/>
+<text text-anchor="middle" x="198" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_file_module</text>
+</a>
+</g>
+</g>
+<!-- module~json_file_module&#45;&gt;module~json_hash_module -->
+<g id="module~~json_hash_module~~UsedByGraph_edge1" class="edge">
+<title>module~json_file_module&#45;&gt;module~json_hash_module</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M146.67,-19.16C138.41,-20.34 129.75,-21.57 121.19,-22.79"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="120.64,-19.33 111.23,-24.21 121.63,-26.26 120.64,-19.33"/>
+</g>
+<!-- module~json_module -->
+<g id="module~~json_hash_module~~UsedByGraph_node3" class="node">
+<title>module~json_module</title>
+<g id="a_module~~json_hash_module~~UsedByGraph_node3"><a xlink:href="../module/json_module.html" xlink:title="json_module">
+<polygon fill="#337ab7" stroke="#337ab7" points="365,-44 285,-44 285,-20 365,-20 365,-44"/>
+<text text-anchor="middle" x="325" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">json_module</text>
+</a>
+</g>
+</g>
+<!-- module~json_module&#45;&gt;module~json_hash_module -->
+<g id="module~~json_hash_module~~UsedByGraph_edge2" class="edge">
+<title>module~json_module&#45;&gt;module~json_hash_module</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M284.69,-32.62C273.19,-32.78 260.59,-32.92 249,-33 203.67,-33.3 192.33,-33.25 147,-33 138.64,-32.95 129.85,-32.88 121.17,-32.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="121.09,-29.3 111.06,-32.7 121.02,-36.3 121.09,-29.3"/>
+</g>
+<!-- module~json_module&#45;&gt;module~json_file_module -->
+<g id="module~~json_hash_module~~UsedByGraph_edge3" class="edge">
+<title>module~json_module&#45;&gt;module~json_file_module</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M284.79,-25.73C276.66,-24.43 267.92,-23.03 259.23,-21.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.53,-18.14 249.1,-20.02 258.42,-25.05 259.53,-18.14"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#UsedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="UsedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="518pt" height="32pt"
+ viewBox="0.00 0.00 517.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 513.5,-28 513.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node">
+<title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node">
+<title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="145.5,-24 72.5,-24 72.5,0 145.5,0 145.5,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 164,-24 164,0 234,0 234,-24"/>
+<text text-anchor="middle" x="199" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="310,-24 252,-24 252,0 310,0 310,-24"/>
+<text text-anchor="middle" x="281" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="386,-24 328,-24 328,0 386,0 386,-24"/>
+<text text-anchor="middle" x="357" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="509.5,-24 404.5,-24 404.5,0 509.5,0 509.5,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a submodule to the (sub)module which it is
+descended from. Dashed arrows point from a module or program unit to 
+modules which it uses.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+            </li>
+        </ul>
+      </div>
+    </div>
+
+      <br>
+
+
+
+
+
+
+        <section>
+          <h2>Derived Types</h2>
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-hash_node_t"></span>
+      <h3>
+        type, private&nbsp;::&nbsp;
+        <a href='../type/hash_node_t.html'>hash_node_t</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      <p>This is a linked list to avoid collisions in the hash table buckets.</p>
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key"></span>
+              character(kind=CK, len=:),
+            </td>
+              <td>private,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+<p>string key. if <code>case_sensitive_keys=False</code> then
+this will always be lowercase.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-next~5"></span>
+              type(<a href='../type/hash_node_t.html'>hash_node_t</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>next</strong></td>
+<td>=&gt; </td>
+                <td>null()</td>
+            <td>
+<p>pointer to the next node in the linked list</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~45"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+<td>=&gt; </td>
+                <td>null()</td>
+            <td>
+<p>associated value in the hash table</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum">
+      <span class="anchor" id="type-json_hash_table"></span>
+      <h3>
+        type, public&nbsp;::&nbsp;
+        <a href='../type/json_hash_table.html'>json_hash_table</a>
+        
+      </h3>
+    </div>
+    <div class="card-body">
+      <p>Hash table type.</p><a href="../type/json_hash_table.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+        <h4>Components</h4>
+          <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-buckets"></span>
+              type(<a href='../type/hash_node_t.html'>hash_node_t</a>),
+            </td>
+              <td>private,</td>
+            <td>
+              dimension(:), allocatable
+            </td>
+            <td>::</td>
+            <td><strong>buckets</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+<p>array of buckets for the hash table.
+Each bucket is a linked list of <code>hash_node_t</code>
+to handle collisions.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-capacity"></span>
+              integer(kind=IK),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>capacity</strong></td>
+<td> =</td>
+                <td>16_IK</td>
+            <td>
+<p>Number of buckets in the table</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-case_sensitive_keys~9"></span>
+              logical(kind=LK),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>case_sensitive_keys</strong></td>
+<td> =</td>
+                <td>.true.</td>
+            <td>
+<p>Case-sensitive key comparison</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~223"></span>
+              type(<a href='../type/json_core.html'>json_core</a>),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+<p>The instance of the <a href="../type/json_core.html">json_core</a>
+factory used for this table.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-load_factor"></span>
+              real(kind=RK),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>load_factor</strong></td>
+<td> =</td>
+                <td>0.75_RK</td>
+            <td>
+<p>Resize threshold that determines when the
+hash table should automatically resize to
+maintain optimal performance.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-size"></span>
+              integer(kind=IK),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>size</strong></td>
+<td> =</td>
+                <td>0_IK</td>
+            <td>
+<p>Number of elements in the table</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-trailing_spaces_significant~9"></span>
+              logical(kind=LK),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>trailing_spaces_significant</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+<p>Whether trailing spaces in keys
+are significant for comparison</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+        <h4>Finalizations Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>final :: <strong>hash_table_finalize</strong></td>
+                <td></td>
+              </tr>
+          </tbody>
+        </table>
+
+        <h4>Type-Bound Procedures</h4>
+        <table class="table table-striped varlist">
+          <tbody>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/json_hash_table.html#boundprocedure-create~9'>create</a></strong> => <a href='/home/runner/work/json-fortran/json-fortran/doc/proc/hash_table_create_from_value.html'>hash_table_create_from_value</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/json_hash_table.html#boundprocedure-destroy~6'>destroy</a></strong> => <a href='/home/runner/work/json-fortran/json-fortran/doc/proc/hash_table_destroy.html'>hash_table_destroy</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, public ::
+  <strong><a href='../type/json_hash_table.html#boundprocedure-get~3'>get</a></strong> => <a href='/home/runner/work/json-fortran/json-fortran/doc/proc/hash_table_get.html'>hash_table_get</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private ::
+  <strong><a href='../type/json_hash_table.html#boundprocedure-hash~2'>hash</a></strong> => <a href='/home/runner/work/json-fortran/json-fortran/doc/proc/hash_table_hash.html'>hash_table_hash</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private ::
+  <strong><a href='../type/json_hash_table.html#boundprocedure-insert'>insert</a></strong> => <a href='/home/runner/work/json-fortran/json-fortran/doc/proc/hash_table_insert.html'>hash_table_insert</a></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private ::
+  <strong><a href='../type/json_hash_table.html#boundprocedure-keys_equal'>keys_equal</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private ::
+  <strong><a href='../type/json_hash_table.html#boundprocedure-preprocess_key'>preprocess_key</a></strong></td>
+                  <td></td>
+              </tr>
+              <tr>
+                <td>  procedure, private ::
+  <strong><a href='../type/json_hash_table.html#boundprocedure-resize'>resize</a></strong> => <a href='/home/runner/work/json-fortran/json-fortran/doc/proc/hash_table_resize.html'>hash_table_resize</a></td>
+                  <td></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Functions</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-hash_table_hash"></span> <h3>private  function <a href='../proc/hash_table_hash.html'>hash_table_hash</a>(me, key) result(hash_value)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>DJB hash algorithm for a string.</p><a href="../proc/hash_table_hash.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~189"></span>
+              class(<a href='../type/json_hash_table.html'>json_hash_table</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~2"></span>
+              character(kind=CK, len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=IK)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-keys_equal"></span> <h3>private  function <a href='../proc/keys_equal.html'>keys_equal</a>(me, key1, key2) result(equal)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Compare two keys for equality, taking into account the setting
+  for trailing spaces.</p><a href="../proc/keys_equal.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~191"></span>
+              class(<a href='../type/json_hash_table.html'>json_hash_table</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key1"></span>
+              character(kind=CK, len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key1</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key2"></span>
+              character(kind=CK, len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key2</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical(kind=LK)</small>
+    </h4>
+    
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-preprocess_key"></span> <h3>private  function <a href='../proc/preprocess_key.html'>preprocess_key</a>(me, key) result(proc_key)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Preprocess key for saving in the hash table, as well as for
+insertion and lookup (handle trim and case-sensitivity).</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~190"></span>
+              class(<a href='../type/json_hash_table.html'>json_hash_table</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~3"></span>
+              character(kind=CK, len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+<p>the key to preprocess</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>character(kind=CK, len=:), allocatable</small>
+    </h4>
+    <p>the preprocessed key to use for
+storage and comparison in the hash table.</p>
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+        <section>
+          <h2>Subroutines</h2>
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-hash_table_create_from_value"></span> <h3>private  subroutine <a href='../proc/hash_table_create_from_value.html'>hash_table_create_from_value</a>(me, json, p, status_ok, initial_capacity)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Create a hash table from the children of an existing <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> object.
+The keys are the object member names and the values are
+pointers to the associated <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> values.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~192"></span>
+              class(<a href='../type/json_hash_table.html'>json_hash_table</a>),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-json~224"></span>
+              type(<a href='../type/json_core.html'>json_core</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>json</strong></td>
+            <td>
+<p>the <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> core factory to use for this hash table.
+a copy of this will be made and stored in the table.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-p~161"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+<td></td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>p</strong></td>
+            <td>
+<p>the <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> value whose children will be used to populate
+the hash table. This must be a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-status_ok~17"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>status_ok</strong></td>
+            <td>
+<p>true if no problems.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-initial_capacity~2"></span>
+              integer(kind=IK),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>initial_capacity</strong></td>
+            <td>
+<p>initial capacity of the hash table (number of buckets).
+If not provided, it will be set based on the number of members
+divided by the load factor to minimize
+the number of resizes needed as members are inserted</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-hash_table_destroy"></span> <h3>private  subroutine <a href='../proc/hash_table_destroy.html'>hash_table_destroy</a>(me)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Destroy hash table and free all memory</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~188"></span>
+              class(<a href='../type/json_hash_table.html'>json_hash_table</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-hash_table_finalize"></span> <h3>private  subroutine <a href='../proc/hash_table_finalize.html'>hash_table_finalize</a>(me)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Finalizer - automatically clean up when hash table goes out of scope.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~196"></span>
+              type(<a href='../type/json_hash_table.html'>json_hash_table</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-hash_table_get"></span> <h3>private  subroutine <a href='../proc/hash_table_get.html'>hash_table_get</a>(me, key, value, found)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Get value for a given key</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~194"></span>
+              class(<a href='../type/json_hash_table.html'>json_hash_table</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~6"></span>
+              character(kind=CK, len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+<p>key to look up.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~47"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+<td></td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+<p>pointer to the value associated with the key.
+This will be set to null() if the key is not found.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-found~175"></span>
+              logical(kind=LK),
+            </td>
+<td>intent(out),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>found</strong></td>
+            <td>
+<p>flag indicating whether the key was found in
+the table (true) or not (false).</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-hash_table_insert"></span> <h3>private  subroutine <a href='../proc/hash_table_insert.html'>hash_table_insert</a>(me, key, value)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Insert or update a key-value pair</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~193"></span>
+              class(<a href='../type/json_hash_table.html'>json_hash_table</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-key~5"></span>
+              character(kind=CK, len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>key</strong></td>
+            <td>
+<p>key to insert. This will be preprocessed
+(trimmed and/or lowercased) according to the
+settings of the hash table.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-value~46"></span>
+              type(<a href='../type/json_value.html'>json_value</a>),
+            </td>
+<td></td>
+              <td></td>            <td>
+              pointer
+            </td>
+            <td>::</td>
+            <td><strong>value</strong></td>
+            <td>
+<p>value to associate with the key.
+This is a pointer to a <abbr title="JavaScript Object Notation: A human friendly syntax for storing and exchanging data">JSON</abbr> value.</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+              <div class="card">
+    <div class="card-header codesum"><span class="anchor" id="proc-hash_table_resize"></span> <h3>private  subroutine <a href='../proc/hash_table_resize.html'>hash_table_resize</a>(me, new_capacity)  
+</h3></div>
+    <div class="card-body">
+          
+  <p>Resize the hash table (internal method)</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~195"></span>
+              class(<a href='../type/json_hash_table.html'>json_hash_table</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-new_capacity"></span>
+              integer(kind=IK),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>new_capacity</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    </div>
+  </div>
+
+        </section>
+        <br>
+
+
+
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              JSON-Fortran
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-11-03 00:19 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>
