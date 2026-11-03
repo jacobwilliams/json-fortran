@@ -253,7 +253,7 @@ contains
         ! allocate the buckets:
         allocate(me%buckets(0:me%capacity-1))
         ! iterate over each child member and insert into the hash table
-        call me%json%get_child(p, 1, current, found=status_ok) ! the first one
+        call me%json%get_child(p, 1_IK, current, found=status_ok) ! the first one
         if (.not. status_ok) then
             call set_error() ! should never happen since we know the size
             return

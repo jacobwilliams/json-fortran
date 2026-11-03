@@ -54,7 +54,7 @@ contains
             write(error_unit,'(A,I0)') 'Error: expected 3 children, got ', count
         else
             write(output_unit,'(A,I0)') 'Success: expected 3 children, got ', count
-            call json%get_child(p_root, 1, p_child) ! get the first one
+            call json%get_child(p_root, 1_IK, p_child) ! get the first one
             do i = 1, count
                 call json%info(p_child, name=key) ! get the key name
                 write(output_unit,'(A,I3,A,A)') 'Key ', i, ': ', trim(key)

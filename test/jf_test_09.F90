@@ -6,7 +6,7 @@
 
 module jf_test_9_mod
 
-    use json_module, CK => json_CK
+    use json_module, CK => json_CK, IK => json_IK
     use, intrinsic :: iso_fortran_env , only: error_unit, output_unit
 
     implicit none
@@ -61,7 +61,7 @@ contains
     write(error_unit,'(A)') '================================='
 
     ! Load file with recursive parser
-    call f1%initialize( parser_mode = 1 )
+    call f1%initialize( parser_mode = 1_IK )
     str = 'recursive parser'
 
     write(error_unit,'(A)') ''
@@ -83,7 +83,7 @@ contains
     write(error_unit,'(A)') ''
 
     ! Load file with non-recursive parser
-    call f2%initialize( parser_mode = 2 )
+    call f2%initialize( parser_mode = 2_IK )
     str = 'non-recursive parser'
 
     write(error_unit,'(A)') ''
