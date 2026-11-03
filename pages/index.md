@@ -25,6 +25,8 @@ A [README](README.html), the same one that's posted on
 [GitHub](https://github.com/jacobwilliams/json-fortran), can be found
 [here](README.html).
 
+The [C interface](c-interface.html) describes how to use JSON-Fortran from C.
+
 [^1]:
     Documentation pages for a specific release do not contain links
     back to this page and the master documentation. Please use your
